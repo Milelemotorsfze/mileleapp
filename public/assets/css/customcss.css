@@ -1,0 +1,63 @@
+img{
+    display: block;
+    width: 100%;
+  }
+  iframe{
+    width: 100%;
+    display: block;
+  }
+  .dragdrop{
+    display: block;
+    margin-top: 10px;
+    padding: 20px 15px;
+    text-align:center;
+    border: 1px solid #222;
+  }
+  .btncenter{
+    display: block;
+    width: 20%;
+    margin: auto;
+  }
+  .btnright{
+    display: block;
+    width: 20%;
+    margin: auto 0px auto auto;
+  }
+  .close {
+float: right;
+height:30px;
+width:30px;
+}
+.close:hover {
+color: #000;
+text-decoration: none; 
+}
+.jadafahon
+{
+  width: 80%;
+  display: block;
+  margin: auto;
+  height: 700px;
+}
+.modalhide{
+  display: none;
+}
+.modalshow{
+  display: block;
+}
+.infomodalwidth{
+  width: 80% !important;
+  display: block;
+  margin: auto;
+  padding: 10px 10px 40px;
+}
+.adjwi{
+  width: 7% !important;
+}
+.topnav{
+	margin-top: 0px !important;
+}
+.page-content
+{
+margin-top: 10px !important;	
+}
