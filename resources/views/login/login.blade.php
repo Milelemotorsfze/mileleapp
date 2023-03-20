@@ -6,16 +6,12 @@
         <title>Login | MILELE</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Milele" name="description" />
-        <meta content="Waqar" name="author" />
+        <meta content="Milele" name="author" />
         <!-- App favicon -->
         <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-            <?= $this->include('partials/head-css') ?>
-
+        @include('partials.head-css')
 </head>
-
-<?= $this->include('partials/body') ?>
-
+@include('partials.body')
     <!-- <body data-layout="horizontal"> -->
         <div class="auth-page">
             <div class="container-fluid p-0">
@@ -26,18 +22,14 @@
                                 <div class="d-flex flex-column h-100">
                                     <div class="mb-4 mb-md-5 text-center">
                                         <a href="/" class="d-block auth-logo">
-                                           <!-- <img src="assets/images/logo-sm.svg" alt="" height="28"> <span class="logo-txt">Minia</span> -->
                                         </a>
                                     </div>
                                     <div class="auth-content my-auto">
                                         <div class="text-center">
-										<?php if(session()->getFlashdata('msg')):?>
-                    <div class="alert alert-danger"><?= session()->getFlashdata('msg') ?></div>
-                <?php endif;?>
                                             <h5 class="mb-0">Welcome Back !</h5>
                                             <p class="text-muted mt-2">Sign in to continue to Milele.</p>
                                         </div>
-                                        <form class="custom-form mt-4 pt-2" action="<?php echo base_url(); ?>/login"method="post">
+                                        <form class="custom-form mt-4 pt-2" action="/login"method="post">
                                             <div class="mb-3">
                                                 <label class="form-label">Username</label>
                                                 <input type="text" class="form-control" id="username" placeholder="Enter username" name="username">
@@ -89,7 +81,7 @@
 					
                         <div class="auth-bg pt-md-5 p-4 d-flex">
                             <div class="bg-overlay bg-primary">
-							<img src="<?php echo base_url(); ?>/public/bgm.png"><span class="logo-txt"></span>
+							<img src="bgm.png"><span class="logo-txt"></span>
 							</div>
                             <ul class="bg-bubbles">
 							
@@ -135,9 +127,9 @@
 
 
         <!-- JAVASCRIPT -->
-       <?= $this->include('partials/vendor-scripts') ?>
+        @include('partials.vendor-scripts')
         <!-- password addon init -->
-        <script src="<?php echo base_url(); ?>/public/assets/js/pages/pass-addon.init.js"></script>
+        <script src="js/pages/pass-addon.init.js"></script>
 
     </body>
 
