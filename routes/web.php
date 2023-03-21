@@ -1,7 +1,9 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
-
+  
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,8 +13,16 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
-
-Route::get('/', function () {
-    return view('login/login');
+*/  
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+  
+Auth::routes();
+  
+Route::get('/', [HomeController::class, 'index'])->name('home');
+  
+Route::group(['middleware' => ['auth']], function() {
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
 });
