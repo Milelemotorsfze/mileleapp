@@ -1,69 +1,50 @@
+<button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+<i class="fa fa-fw fa-bars"></i>
+</button>
 <div class="topnav">
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
-        
+
             <div class="collapse navbar-collapse" id="topnav-menu-content">
-			<ul class="navbar-nav">
-			<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="/home" id="topnav-more" role="button">
-                            <i data-feather="layout"></i><span data-key="t-extra-pages">Stock Report </span>
-                        </a>
-            </li>
-			<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Records </span> <div class="arrow-down"></div>
+                <ul class="navbar-nav">
+						<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Demand & Planning</span> <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewrecord" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create New Records </span>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button >
+                                    <span data-key="t-authentication">Forecast</span>
                                 </a>
                             </div>
-						
                             <div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" href="/recordsinfo" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Records Summary </span>
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Demand</span>
+                              </a>
+                            </div>                            
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Deals</span>
                               </a>
                             </div>
-                        </div>
-            </li>
-			<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Summary </span> <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/summaryreport" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Overall Summary </span>
-                                </a>
                             </div>
-                        </div>
-            </li>
+						</li>
 						<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Master Data </span> <div class="arrow-down"></div>
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i><span data-key="t-extra-pages">Master Data</span> <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Suppliers </span><div class="arrow-down"></div>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Models </span><div class="arrow-down"></div>
                                 </a>
 									<div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Suplier </a>
-                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Supplier Info </a> 
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Models </a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Model Info </a> 
                                 </div>
                             </div>
                             <div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Customers </span><div class="arrow-down"></div>
-                              </a>
-							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewcustomers" class="dropdown-item" data-key="t-login">Add New Customers </a>
-                                    <a href="/customerinfo" class="dropdown-item" data-key="t-login">Customers Info </a> 
-                                </div>
-                            </div>
-							 <div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" id="topnav-utility" role="button">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                               <span data-key="t-utility">Variants </span><div class="arrow-down"></div><div class="arrow-down"></div>
                               </a>
 							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
@@ -71,39 +52,287 @@
                                     <a href="/variantinfo" class="dropdown-item" data-key="t-login">Variants Info </a> 
                                 </div>
                             </div>
-							<div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Users </span><div class="arrow-down"></div>
-                              </a>
-							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewusers" class="dropdown-item" data-key="t-login">Add New Users </a>
-                                    <a href="/usersinfo" class="dropdown-item" data-key="t-login">User Info </a> 
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Colours </span><div class="arrow-down"></div>
+                                </a>
+									<div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Colours </a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Colours Info </a> 
                                 </div>
                             </div>
-                        </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Garages </span><div class="arrow-down"></div>
+                                </a>
+									<div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Garages </a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Garages Info </a> 
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Warehouse </span><div class="arrow-down"></div>
+                              </a>
+							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewcustomers" class="dropdown-item" data-key="t-login">Add New Warehouse </a>
+                                    <a href="/customerinfo" class="dropdown-item" data-key="t-login">Warehouse Info </a> 
+                                </div>
+                            </div>
+                            </div>
 						</li>
 						<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Daily Movements </span> <div class="arrow-down"></div>
+												<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="user"></i><span data-key="t-extra-pages">Users</span> <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/dailymovemnet" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Add New Daily Movements </span>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Customers </span><div class="arrow-down"></div>
                                 </a>
-								<a class="dropdown-item dropdown-toggle arrow-none" href="/dailymovemnetinfo" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Movements Info </span>
+									<div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Customer info</a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Customer reports </a> 
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Suppliers</span><div class="arrow-down"></div><div class="arrow-down"></div>
+                              </a>
+							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewvariants" class="dropdown-item" data-key="t-login">Supplier Inventory </a>
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Vehicles Suppliers </a> 
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Parts Suppliers </a> 
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Supplier PDIs </a> 
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Supplier Deals </a> 
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Supplier mapping </a> 
+                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Supplier reports </a> 
+                                </div>
+                            </div>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Vendors </span><div class="arrow-down"></div>
+                                </a>
+									<div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Vendors </a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Vendors Info </a> 
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Employees </span><div class="arrow-down"></div>
+                                </a>
+									<div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Employees </a>
+                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Employees Info </a> 
+                                </div>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="shopping-bag"></i><span data-key="t-extra-pages">Purchase </span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">PO </span>
                                 </a>
                             </div>
-                        </div>
-            </li>
-			</ul>
-            </div>
-            <i class="bi bi-list mobile-nav-toggle d-none"></i>
-			<div class="d-flex alright">
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">PO Reports</span>
+                              </a>
+                            </div>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Inquiry Forms </span>
+                                </a>
+									
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Account Report </span>
+                                </a>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="box"></i><span data-key="t-extra-pages">Warehouse </span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Daily Movement </span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">BOD Car Maintains</span>
+                              </a>
+                            </div>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Incidents </span>
+                                </a>	
+                            </div>
+							 <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Spare Parts </span>
+                                </a>	
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="git-pull-request"></i><span data-key="t-extra-pages">Vehicles </span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Incoming Vehicles</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Inventory</span>
+                              </a>
+                            </div>                            
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Urgent Vehicles</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Other Warehouse Stocks</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Other Country Vehicles</span>
+                              </a>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="life-buoy"></i><span data-key="t-extra-pages">Logistics </span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Imports Shipment</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Export Document Record</span>
+                              </a>
+                            </div>                            
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Document Expire Record</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Export Shipment</span>
+                              </a>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="slack"></i><span data-key="t-extra-pages">Sales </span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">SO</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">SO Report</span>
+                              </a>
+                            </div>                            
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Sales Report</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Booking</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Daily Leads</span>
+                              </a>
+                            </div>
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Account Report</span>
+                              </a>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="slack"></i><span data-key="t-extra-pages">QC</span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">QC Reports</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">PDIs</span>
+                              </a>
+                            </div>                            
+							<div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Modifications</span>
+                              </a>
+                            </div>
+                            </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="hard-drive"></i><span data-key="t-extra-pages">HR</span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+						<div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Leaves</span>
+                                </a>
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Payroll</span>
+                              </a>                           
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Renewals & Documentations</span>
+                              </a>
+							  </div>
+							  </div>
+						</li>
+						<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-more" role="button">
+                            <i data-feather="folder"></i><span data-key="t-extra-pages">Work Orders</span>
+                        </a>
+						
+						</li>	
+            </ul>
+        </div>		
+<div class="d-flex">		
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown"
-                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> 
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img class="rounded-circle header-profile-user" src="images/users/avatar-1.jpg" alt="Header Avatar">			
                     <span class="d-none d-xl-inline-block ms-1 fw-medium">@if(auth()->user()->name) {{ auth()->user()->name }} @endif
 					</span>
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -120,12 +349,11 @@
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf
                                     </form>
-                                    </a>
-                                
+                                    </a>        
                 </div>
-            </div>
-            
-        </div>
+                </div>
+                </div>
+
         </nav>
     </div>
 </div>
