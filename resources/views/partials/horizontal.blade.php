@@ -343,7 +343,7 @@
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ route('roles.create') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
+                    <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="mdi mdi-logout font-size-16 align-middle me-1"></i> Logout 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
