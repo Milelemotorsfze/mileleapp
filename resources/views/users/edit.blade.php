@@ -37,7 +37,7 @@
                             {!! Form::model($user, ['method' => 'PATCH','route' => ['users.update', $user->id]]) !!}
                                <div class="row">
 										</div>  
-										<form action="" method="post" enctype="multipart/form-data">
+										<!-- <form action="" method="post" enctype="multipart/form-data"> -->
                                             <div class="row">
                                             
 											<div class="col-lg-6 col-md-6">

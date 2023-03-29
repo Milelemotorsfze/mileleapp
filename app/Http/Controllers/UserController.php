@@ -8,14 +8,27 @@ namespace App\Http\Controllers;
     use DB;
     use Hash;
     use Illuminate\Support\Arr;
-        
+   
     class UserController extends Controller
     {
-       
+        function __construct()
+        {
+             $this->middleware('permission:user-list-active|user-list-inactive|user-list-deleted|user-view|user-create|user-edit|user-delete|user-make-inactive|user-make-active|user-restore', ['only' => ['index','store']]);
+             $this->middleware('permission:user-view', ['only' => ['show']]);
+             $this->middleware('permission:user-create', ['only' => ['create','store']]);
+             $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
+             $this->middleware('permission:user-delete', ['only' => ['delete']]);
+             $this->middleware('permission:user-make-inactive', ['only' => ['updateStatus']]);
+             $this->middleware('permission:user-make-active', ['only' => ['makeActive']]);
+             $this->middleware('permission:user-restore', ['only' => ['restore']]);
+        }
+
         public function index(Request $request)
         {
-            $data = User::orderBy('id','DESC')->paginate(5);
-            return view('users.index',compact('data'));
+            $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
+            $inactive_users = User::where('status','inactive')->get();
+            $deleted_users = User::onlyTrashed()->get();
+            return view('users.index',compact('data','inactive_users','deleted_users'));
         }
         
     
@@ -86,10 +99,34 @@ namespace App\Http\Controllers;
                             ->with('success','User updated successfully');
         }
         
-        public function destroy($id)
+        public function delete($id)
         {
             User::find($id)->delete();
             return redirect()->route('users.index')
                             ->with('success','User deleted successfully');
+        }
+        public function updateStatus($id)
+        {
+            $user = User::find($id);
+            $user->status = 'inactive';
+            $user->update();
+            return redirect()->route('users.index')
+                            ->with('success','User updated successfully');
+        }
+        
+        public function makeActive($id)
+        {
+           $user = User::find($id);
+           $user->status = 'active';
+           $user->update();
+           return redirect()->route('users.index')
+                           ->with('success','User updated successfully');
+        }
+
+        public function restore($id)
+        {
+            User::withTrashed()->find($id)->restore();
+            return redirect()->route('users.index')
+                            ->with('success','User updated successfully');
         }
     }

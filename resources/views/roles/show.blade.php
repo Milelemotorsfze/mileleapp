@@ -20,8 +20,8 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Show User</h4>
-                                <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('users.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                                <h4 class="card-title">Show Roles</h4>
+                                <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('roles.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                             </div>
                             <div class="card-body">
                             <div class="row">
