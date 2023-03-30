@@ -40,6 +40,7 @@
                                                 </div>
                                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                                     <div class="form-group">
+                                                    <br/>
                                                     <h3><strong>Permission:</strong></h3>
                                                     <br/>
                                                     @foreach($modules as $module)
@@ -49,7 +50,7 @@
                                                                 <table class="table table-striped table-editable table-edits table">
                                                                     <thead>
                                                                         <tr>
-                                                                            <th>No</th>
+                                                                            <th>Check</th>
                                                                             <th>Name</th>
                                                                             <th>Description</th>
                                                                         </tr>
@@ -58,12 +59,9 @@
                                                                     <div hidden>{{$i=0;}}</div>
                                                                     @foreach($module->permissions as $permission)      
                                                                         <tr data-id="1">
-                                                                        <td>{{ ++$i }}</td>
-                                                                        <td> 
-                                                                            <label>
-                                                                                {{ Form::checkbox('permission[]', $permission->id, false, array('class' => 'name')) }}
-                                                                                        {{ $permission->slug_name  }}
-                                                                            </label>
+                                                                        <td> {{ Form::checkbox('permission[]', $permission->id, false, array('class' => 'name')) }}</td>
+                                                                        <td>
+                                                                           {{ $permission->slug_name  }}                                               
                                                                         </td>
                                                                         <td>
                                                                         {{ $permission->description  }}

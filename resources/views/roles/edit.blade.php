@@ -41,20 +41,38 @@
                                                 </div>
                                                 <div class="col-xs-12 col-sm-12 col-md-12">
                                                     <div class="form-group">
+                                                    <br/> 
                                                     <h3><strong>Permission:</strong></h3>
                                                     <br/>
                                                     @foreach($modules as $module)
                                                         <h4>{{$module->name}}</h4>
-                                                        <br/>
-                                                        <div class="row">
-                                                            @foreach($module->permissions as $permission)                                                    
-                                                                <div class="col-xs-12 col-sm-3 col-md-2">                                                                   
-                                                                    <label>{{ Form::checkbox('permission[]', $permission->id, in_array($permission->id, $rolePermissions) ? true : false, array('class' => 'name')) }}
-                                                                {{ $permission->slug_name }}
-                                                            </label>
-                                                                </div>
-                                                            @endforeach
-                                                        </div> 
+                                                        <br/>                                        
+                                                            <div class="table-responsive">
+                                                                <table class="table table-striped table-editable table-edits table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Check</th>
+                                                                            <th>Name</th>
+                                                                            <th>Description</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    <div hidden>{{$i=0;}}</div>
+                                                                    @foreach($module->permissions as $permission)      
+                                                                        <tr data-id="1">
+                                                                        <td> {{ Form::checkbox('permission[]', $permission->id, in_array($permission->id, $rolePermissions) ? true : false, array('class' => 'name')) }}</td>
+                                                                        <td>
+                                                                           {{ $permission->slug_name  }}                                               
+                                                                        </td>
+                                                                        <td>
+                                                                        {{ $permission->description  }}
+                                                                        </td>
+                                                
+                                                                        </tr>
+                                                                    @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
                                                         <br/>
                                                     @endforeach
                                                 </div>
