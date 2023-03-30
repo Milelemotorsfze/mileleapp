@@ -39,8 +39,8 @@
                                     <span data-key="t-authentication">Models </span><div class="arrow-down"></div>
                                 </a>
 									<div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Models </a>
-                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Model Info </a> 
+                                    <a href="{{ route('carmodels.create') }}" class="dropdown-item" data-key="t-login">Add New Models </a>
+                                    <a href="{{ route('carmodels.index') }}" class="dropdown-item" data-key="t-login">Model Info </a> 
                                 </div>
                             </div>
                             <div class="dropdown">
@@ -48,8 +48,8 @@
                               <span data-key="t-utility">Variants </span><div class="arrow-down"></div><div class="arrow-down"></div>
                               </a>
 							  <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewvariants" class="dropdown-item" data-key="t-login">Add New Variants </a>
-                                    <a href="/variantinfo" class="dropdown-item" data-key="t-login">Variants Info </a> 
+                                    <a href="" class="dropdown-item" data-key="t-login">Add New Variants </a>
+                                    <a href="" class="dropdown-item" data-key="t-login">Variants Info </a> 
                                 </div>
                             </div>
                         <div class="dropdown">
