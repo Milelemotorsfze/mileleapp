@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\Modules;
 use DB;
     
 class RoleController extends Controller
@@ -13,22 +14,23 @@ class RoleController extends Controller
 
     function __construct()
     {
-         $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:role-list|role-view|role-create|role-edit|role-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:role-view', ['only' => ['show']]);
          $this->middleware('permission:role-create', ['only' => ['create','store']]);
          $this->middleware('permission:role-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:role-delete', ['only' => ['destroy']]);
+         $this->middleware('permission:role-delete', ['only' => ['delete']]);
     }
     
     public function index(Request $request)
     {
-        $roles = Role::orderBy('id','DESC')->paginate(5);
+        $roles = Role::orderBy('id','ASC')->get();
         return view('roles.index',compact('roles'));
     }
     
     public function create()
     {
-        $permission = Permission::get();
-        return view('roles.create',compact('permission'));
+        $modules = Modules::with('permissions')->get();
+        return view('roles.create',compact('modules'));
     }
     
     public function store(Request $request)
@@ -58,12 +60,12 @@ class RoleController extends Controller
     public function edit($id)
     {
         $role = Role::find($id);
-        $permission = Permission::get();
+        $modules = Modules::with('permissions')->get();
         $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
     
-        return view('roles.edit',compact('role','permission','rolePermissions'));
+        return view('roles.edit',compact('role','modules','rolePermissions'));
     }
 
     public function update(Request $request, $id)
@@ -83,7 +85,7 @@ class RoleController extends Controller
                         ->with('success','Role updated successfully');
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
         DB::table("roles")->where('id',$id)->delete();
         return redirect()->route('roles.index')

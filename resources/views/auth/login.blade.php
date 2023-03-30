@@ -13,6 +13,11 @@
         <!-- App favicon -->
         <link rel="shortcut icon" href="assets/images/favicon.ico">
         @include('partials.head-css')
+        <style>
+.paragraph-class {
+  color: red;
+}
+</style>
 </head>
 @include('partials.body')
     <!-- <body data-layout="horizontal"> -->
@@ -40,11 +45,14 @@
                                                 <!-- <input type="text" class="form-control" id="username" placeholder="Enter username" name="username"> -->
                                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
-@error('email')
+<!-- @error('email')
     <span class="invalid-feedback" role="alert">
         <strong>{{ $message }}</strong>
     </span>
-@enderror
+@enderror -->
+@if(Session::has('error'))
+        <p class="alert paragraph-class">{{ Session::get('error') }}</p>
+@endif
                                             </div>
                                             <div class="mb-3">
                                                 <div class="d-flex align-items-start">

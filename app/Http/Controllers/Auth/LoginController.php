@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Session;
 
 class LoginController extends Controller
 {
@@ -18,7 +21,39 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
+public function login(Request $request){
+    if ($request->isMethod('post')) {
+        $data= $request->all();
+        $roles=[
+            'email' => 'required|email|max:255',
+            'password' => 'required',
+        ];
+        $customessage=[
+                'email.required' =>'Email is required',
+                'email.email' => 'Email is not vaild',
+            'password.required' => 'Password is required',
+        ];
+        $this->validate($request,$roles,$customessage);
+        
+        if(Auth::guard('web')->attempt(['email'=>$data['email'],'password'=>$data['password']])) {
+            
+            if(Auth::user()->status == 'active') 
+            {
+                return redirect()->route('home');
+            }
+else{
+    Session::flash('error','You are not Active by Admin');
+    return view('auth.login');
+}
+            
+        } else {
 
+            Session::flash('error','These credentials do not match our records.');
+            return view('auth.login');
+        }
+    }
+    return view('auth.login');
+}
     use AuthenticatesUsers;
 
     /**
@@ -26,6 +61,7 @@ class LoginController extends Controller
      *
      * @var string
      */
+    
     protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
