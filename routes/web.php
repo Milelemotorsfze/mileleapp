@@ -20,13 +20,6 @@ use App\Http\Controllers\CarmodelController;
 // });
   
 Auth::routes();
-<<<<<<< HEAD
-Route::get('/', [HomeController::class, 'index'])->name('home'); 
-Route::group(['middleware' => ['auth']], function() {
-    Route::resource('roles', RoleController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('carmodels', CarmodelController::class);
-=======
 Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -39,5 +32,5 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Role
     Route::resource('roles', RoleController::class);
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
->>>>>>> 6fa71c501ae386792cc4b9a29babd967fb9ed878
+    Route::resource('carmodels', CarmodelController::class);
 });

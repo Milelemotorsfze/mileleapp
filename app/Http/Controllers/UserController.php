@@ -8,26 +8,8 @@ namespace App\Http\Controllers;
     use DB;
     use Hash;
     use Illuminate\Support\Arr;
-<<<<<<< HEAD
     class UserController extends Controller
     {
-=======
-   
-    class UserController extends Controller
-    {
-        function __construct()
-        {
-             $this->middleware('permission:user-list-active|user-list-inactive|user-list-deleted|user-view|user-create|user-edit|user-delete|user-make-inactive|user-make-active|user-restore', ['only' => ['index','store']]);
-             $this->middleware('permission:user-view', ['only' => ['show']]);
-             $this->middleware('permission:user-create', ['only' => ['create','store']]);
-             $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
-             $this->middleware('permission:user-delete', ['only' => ['delete']]);
-             $this->middleware('permission:user-make-inactive', ['only' => ['updateStatus']]);
-             $this->middleware('permission:user-make-active', ['only' => ['makeActive']]);
-             $this->middleware('permission:user-restore', ['only' => ['restore']]);
-        }
-
->>>>>>> 6fa71c501ae386792cc4b9a29babd967fb9ed878
         public function index(Request $request)
         {
             $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
@@ -94,12 +76,7 @@ namespace App\Http\Controllers;
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
-<<<<<<< HEAD
         public function destroy($id)
-=======
-        
-        public function delete($id)
->>>>>>> 6fa71c501ae386792cc4b9a29babd967fb9ed878
         {
             User::find($id)->delete();
             return redirect()->route('users.index')

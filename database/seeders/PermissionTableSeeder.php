@@ -12,7 +12,9 @@ class PermissionTableSeeder extends Seeder
     {
         $modules = [
             ['1','User'],
-            ['2','Role']
+            ['2','Role'],
+            ['3','Sales - Daily Leads'],
+            ['4','Procurement']
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -39,6 +41,18 @@ class PermissionTableSeeder extends Seeder
             ['2','Create Role','role-create'],
             ['2','Edit Role','role-edit'],
             ['2','Delete Role','role-delete'],
+
+            ['3','List Daily Leads','daily-leads-list'],
+            ['3','View  Daily Leads Details', 'daily-leads-view'],
+            ['3','Create Daily Leads','daily-leads-create'],
+            ['3','Edit Daily Leads','daily-leads-edit'],
+            ['3','Delete Daily Leads','daily-leads-delete'],
+
+            ['4','List Procurement','Procurement-list'],
+            ['4','View  Procurement Details', 'Procurement-view'],
+            ['4','Create Procurement','Procurement-create'],
+            ['4','Edit Procurement','Procurement-edit'],
+            ['4','Delete Procurement','Procurement-delete'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

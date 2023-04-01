@@ -37,7 +37,7 @@
     </style>
   </head>
   <body data-layout="horizontal" id="closed">
-    <div id="layout-wrapper">
+  <div id="layout-wrapper">
       @include('partials/horizontal') 
       <div class="main-content">
         <div class="page-content">
@@ -48,30 +48,30 @@
                   <div class="card-header">
                     <h4 class="card-title">
                       Users Info
-                    </h4>
-                    @can('user-create')
-                      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('users.create') }}" text-align: right>
-                        <i class="fa fa-plus" aria-hidden="true"></i> New User
-                      </a>
-                    @endcan
-                    <ul class="nav nav-pills nav-fill">
-                      <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Users</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inactive Users</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Deleted Users</a>
-                      </li>
-                    </ul>      
+                        </h4>
+                        @can('user-create')
+                        <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('users.create') }}" text-align: right>
+                            <i class="fa fa-plus" aria-hidden="true"></i> New User
+                        </a>
+                        @endcan
+                        <ul class="nav nav-pills nav-fill">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inactive Users</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="pill" href="#tab3">Deleted Users</a>
+                        </li>
+                        </ul>      
                   </div>
-                  @can('user-list-active')
-                    <div class="tab-content">
-                      <div class="tab-pane fade show active" id="tab1"> 
-                        <div class="card-body">
-                          <div class="table-responsive">
-                            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+                  <div class="tab-content">
+                    @can('user-list-active')
+                    <div class="tab-pane fade show active" id="tab1"> 
+                      <div class="card-body">
+                        <div class="table-responsive">
+                          <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                               <thead>
                                 <tr>
                                   <th>No</th>
@@ -146,17 +146,17 @@
                                       </td>                
                                     </tr>
                                   @endforeach
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>          
-                        </div>
-                      </div>
-                      @can('user-list-inactive')
-                        <div class="tab-pane fade show" id="tab2">
-                            <div class="card-body">
-                              <div class="table-responsive">
-                                <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
+                            </tbody>
+                          </table>
+                        </div>  
+                      </div>  
+                    </div>  
+                    @endcan
+                    @can('user-list-inactive')
+                    <div class="tab-pane fade show" id="tab2">
+                      <div class="card-body">
+                        <div class="table-responsive">
+                          <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
                                   <thead>
                                     <tr>
                                       <th>No</th>
@@ -213,16 +213,15 @@
                                       @endforeach
                                     </tbody>
                                   </table>
-                                </div>
-                              </div>
-                            </div>  
                         </div> 
-                      @endcan
-                      @can('user-list-deleted')                   
-                        <div class="tab-pane fade show" id="tab3">
-                              <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+                      </div>  
+                    </div> 
+                    @endcan
+                    @can('user-list-deleted')
+                    <div class="tab-pane fade show" id="tab3">
+                      <div class="card-body">
+                        <div class="table-responsive">
+                          <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                                       <thead>
                                         <tr>
                                           <th>No</th>
@@ -280,23 +279,19 @@
                                         @endforeach
                                       </tbody>
                                     </table>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>   
                         </div>
-                      @endcan
+                      </div>
                     </div>
-                  @endcan
+                    @endcan
+                  </div><!-- end tab-content-->
                 </div>
-              </div>  
-              @include('partials/footer') 
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     @include('partials/right-sidebar') 
     @include('partials/vendor-scripts') 
     <script src="{{ asset('libs/table-edits/build/table-edits.min.js')}}"></script>
