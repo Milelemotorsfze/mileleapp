@@ -35,6 +35,7 @@ namespace App\Http\Controllers;
         public function create()
         {
             $roles = Role::pluck('name','name')->all();
+            // dd($roles);
             return view('users.create',compact('roles'));
         }
         

@@ -1,10 +1,6 @@
-
-
-
 <!doctype html>
 <html lang="en">
     <head>
-
         <meta charset="utf-8" />
         <title>Login | MILELE</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +10,14 @@
         <link rel="shortcut icon" href="assets/images/favicon.ico">
         @include('partials.head-css')
         <style>
-.paragraph-class {
-  color: red;
-}
-</style>
-</head>
-@include('partials.body')
-    <!-- <body data-layout="horizontal"> -->
+            .paragraph-class 
+            {
+                color: red;
+            }
+        </style>
+    </head>
+        @include('partials.body')
+    <body>
         <div class="auth-page">
             <div class="container-fluid p-0">
                 <div class="row g-0">
@@ -37,22 +34,14 @@
                                             <h5 class="mb-0">Welcome Back !</h5>
                                             <p class="text-muted mt-2">Sign in to continue to Milele.</p>
                                         </div>
-                                        <!-- <form class="custom-form mt-4 pt-2" action="/login"method="post"> -->
                                         <form method="POST" action="{{ route('login') }}">
-                        @csrf
+                                            @csrf
                                             <div class="mb-3">
                                                 <label class="form-label">Username</label>
-                                                <!-- <input type="text" class="form-control" id="username" placeholder="Enter username" name="username"> -->
                                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-<!-- @error('email')
-    <span class="invalid-feedback" role="alert">
-        <strong>{{ $message }}</strong>
-    </span>
-@enderror -->
-@if(Session::has('error'))
-        <p class="alert paragraph-class">{{ Session::get('error') }}</p>
-@endif
+                                                @if(Session::has('error'))
+                                                        <p class="alert paragraph-class">{{ Session::get('error') }}</p>
+                                                @endif
                                             </div>
                                             <div class="mb-3">
                                                 <div class="d-flex align-items-start">
@@ -61,7 +50,6 @@
                                                     </div>
                                                     <div class="flex-shrink-0">
                                                         <div class="">
-                                                            <!-- <a href="auth-recoverpw" class="text-muted">Forgot password?</a> -->
                                                             @if (Route::has('password.request'))
                                                                 <a class="btn btn-link" href="{{ route('password.request') }}">
                                                                     {{ __('Forgot Your Password?') }}
@@ -69,10 +57,8 @@
                                                             @endif
                                                         </div>
                                                     </div>
-                                                </div>
-                                                
+                                                </div>                                                
                                                 <div class="input-group auth-pass-inputgroup">
-                                                    <!-- <input type="password" class="form-control" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon" name="password"> -->
                                                     <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
                                                         @error('password')
@@ -86,7 +72,6 @@
                                             <div class="row mb-4">
                                                 <div class="col">
                                                     <div class="form-check">
-                                                        <!-- <input class="form-check-input" type="checkbox" id="remember-check"> -->
                                                         <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="remember-check">
                                                             Remember me
@@ -96,14 +81,10 @@
                                                 
                                             </div>
                                             <div class="mb-3">
-                                                <!-- <button class="btn btn-primary w-100 waves-effect waves-light" type="post">Log In</button> -->
                                                 <button type="submit" class="btn btn-primary w-100 waves-effect waves-light">
-                                    {{ __('Login') }}
-                                </button>
-
-                                
+                                                    {{ __('Login') }}
+                                                </button>
                                             </div>
-                                            
                                         </form>
                                     </div>
                                     <div class="mt-4 mt-md-5 text-center">
@@ -114,16 +95,13 @@
                         </div>
                         <!-- end auth full page content -->
                     </div>
-					
                     <!-- end col -->
                     <div class="col-xxl-9 col-lg-8 col-md-7">
-					
                         <div class="auth-bg pt-md-5 p-4 d-flex">
                             <div class="bg-overlay bg-primary">
 							<img src="bgm.png"><span class="logo-txt"></span>
 							</div>
                             <ul class="bg-bubbles">
-							
                                 <li></li>
                                 <li></li>
                                 <li></li>
@@ -163,13 +141,9 @@
             </div>
             <!-- end container fluid -->
         </div>
-
-
         <!-- JAVASCRIPT -->
         @include('partials.vendor-scripts')
         <!-- password addon init -->
         <script src="js/pages/pass-addon.init.js"></script>
-
     </body>
-
 </html>

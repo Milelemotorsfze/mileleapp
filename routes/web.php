@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AddonController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,7 +18,9 @@ use App\Http\Controllers\UserController;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-  
+  Route::get('/dd', function () {
+    return view('dd');
+});
 Auth::routes();
 Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
@@ -31,4 +34,6 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Role
     Route::resource('roles', RoleController::class);
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
+    // Addon
+    Route::resource('addon', AddonController::class);
 });
