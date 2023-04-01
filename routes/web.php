@@ -18,7 +18,9 @@ use App\Http\Controllers\CarmodelController;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-  
+  Route::get('/dd', function () {
+    return view('dd');
+});
 Auth::routes();
 Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
@@ -32,5 +34,6 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Role
     Route::resource('roles', RoleController::class);
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
-    Route::resource('carmodels', CarmodelController::class);
+    // Addon
+    Route::resource('addon', AddonController::class);
 });

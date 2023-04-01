@@ -332,7 +332,7 @@
             <div class="dropdown d-inline-block">
                 <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown"
                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img class="rounded-circle header-profile-user" src="images/users/avatar-1.jpg" alt="Header Avatar">			
+                    <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar">			
                     <span class="d-none d-xl-inline-block ms-1 fw-medium">@if(auth()->user()->name) {{ auth()->user()->name }} @endif
 					</span>
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -344,6 +344,8 @@
                     <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="mdi mdi-logout font-size-16 align-middle me-1"></i> Logout 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
