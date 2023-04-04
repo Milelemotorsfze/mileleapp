@@ -7,7 +7,37 @@
 
             <div class="collapse navbar-collapse" id="topnav-menu-content">
                 <ul class="navbar-nav">
+					@can('sales-view')
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="/" id="topnav-more" role="button">
+                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Dashboard</span>
+                        </a>
+						</li>
 						<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Sales</span> <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button >
+                                    <span data-key="t-authentication">Daily Calls</span>
+                                </a>
+                            </div>
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button >
+                                    <span data-key="t-authentication">Leads</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                              <span data-key="t-utility">Sales</span>
+                              </a>
+                            </div>                            
+                            </div>
+						</li>
+					    @endcan
+                        @can('user-create')
+                        <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="file-text"></i><span data-key="t-extra-pages">Demand & Planning</span> <div class="arrow-down"></div>
                         </a>
@@ -39,8 +69,8 @@
                                     <span data-key="t-authentication">Models </span><div class="arrow-down"></div>
                                 </a>
 									<div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="{{ route('carmodels.create') }}" class="dropdown-item" data-key="t-login">Add New Models </a>
-                                    <a href="{{ route('carmodels.index') }}" class="dropdown-item" data-key="t-login">Model Info </a> 
+                                    <a href="" class="dropdown-item" data-key="t-login">Add New Models </a>
+                                    <a href="" class="dropdown-item" data-key="t-login">Model Info </a> 
                                 </div>
                             </div>
                             <div class="dropdown">
@@ -325,7 +355,8 @@
                             <i data-feather="folder"></i><span data-key="t-extra-pages">Work Orders</span>
                         </a>
 						
-						</li>	
+						</li>
+                        @endcan
             </ul>
         </div>		
 <div class="d-flex">		
@@ -341,12 +372,18 @@
                     <!-- item-->
                     <a class="dropdown-item" href="profile"><i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile </a>
                     <div class="dropdown-divider"></div>
+                    @can('user-view')
                     <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
                     <div class="dropdown-divider"></div>
+                    @endcan
+                    @can('role-list')
                     <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
                     <div class="dropdown-divider"></div>
+                    @endcan
+                    @can('addon-view')
                     <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
                     <div class="dropdown-divider"></div>
+                    @endcan
                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="mdi mdi-logout font-size-16 align-middle me-1"></i> Logout 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf

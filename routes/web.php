@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CarmodelController;
+use App\Http\Controllers\DailyleadsController;
+use App\Http\Controllers\CallsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -36,4 +37,9 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
     // Addon
     Route::resource('addon', AddonController::class);
+    // Sales 
+    // Daily Leads
+    Route::resource('dailyleads', DailyleadsController::class);
+    //Daily Calls
+    Route::resource('calls', CallsController::class);
 });

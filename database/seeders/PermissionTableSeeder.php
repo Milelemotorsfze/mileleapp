@@ -13,7 +13,7 @@ class PermissionTableSeeder extends Seeder
         $modules = [
             ['1','User'],
             ['2','Role'],
-            ['3','Sales - Daily Leads'],
+            ['3','Sales'],
             ['4','Procurement']
             ];
         foreach ($modules as $key => $value):
@@ -42,17 +42,19 @@ class PermissionTableSeeder extends Seeder
             ['2','Edit Role','role-edit','To edit a role with permissions.'],
             ['2','Delete Role','role-delete','To delete a role.'],
             
-            ['3','List Daily Leads','daily-leads-list'],
-            ['3','View  Daily Leads Details', 'daily-leads-view'],
-            ['3','Create Daily Leads','daily-leads-create'],
-            ['3','Edit Daily Leads','daily-leads-edit'],
-            ['3','Delete Daily Leads','daily-leads-delete'],
+            ['3','View Sales','sales-view', 'To View the sales department'],
+            ['3','List Daily Leads','daily-leads-list', 'To View the List of the Daily Leads'],
+            ['3','View  Daily Leads Details', 'daily-leads-view', 'To view the details of the list of the Daily Leads'],
+            ['3','Create Daily Leads','daily-leads-create', 'To create New the Daily Leads'],
+            ['3','Edit Daily Leads','daily-leads-edit', 'To Edit the Daily Leads'],
 
-            ['4','List Procurement','Procurement-list'],
-            ['4','View  Procurement Details', 'Procurement-view'],
-            ['4','Create Procurement','Procurement-create'],
-            ['4','Edit Procurement','Procurement-edit'],
-            ['4','Delete Procurement','Procurement-delete'],
+            ['4','View Procurement','Procurement-view', 'To View the the Procurement Department'],
+            ['4','List Procurement','Procurement-list', 'To View the List of the Procurement'],
+            ['4','View  Procurement Details', 'Procurement-view-detail', 'To view the details of the Procurement'],
+            ['4','Create Procurement (Only GCC)','Procurement-create-gcc', 'To Create the New Procurement GCC Only'],
+            ['4','Create Procurement (Expect GCC)','Procurement-create-other', 'To Create the New Procurement For all Countries expect GCC'],
+            ['4','Edit Procurement','Procurement-edit', 'To Edit his Own Procurement'],
+            ['4','Delete Procurement','Procurement-delete', 'To Delete his Own Procurement'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [
