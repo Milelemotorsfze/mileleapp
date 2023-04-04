@@ -20,8 +20,10 @@ return new class extends Migration
             // $table->unsignedBigInteger('model_id')->nullable();
             // $table->foreign('model_id')->references('id')->on('master_models');
             $table->integer('addon_details_id')->nullable();
-            $table->integer('brand_id')->nullable();
-            $table->integer('model_id')->nullable();
+            // $table->integer('brand_id')->nullable();
+            // $table->integer('model_id')->nullable();
+            $table->string('brand_id')->nullable();
+            $table->string('model_id')->nullable();
             // $table->unsignedBigInteger('created_by')->nullable();
             // $table->foreign('created_by')->references('id')->on('users');
             // $table->unsignedBigInteger('updated_by')->nullable();
