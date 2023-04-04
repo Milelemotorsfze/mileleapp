@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call(PermissionTableSeeder::class);
         $this->call(CreateAdminUserSeeder::class);
+        $this->call(AddonTableSeeder::class);
+        $this->call(BrandsTableSeeder::class);
+        $this->call(MasterModelTableSeeder::class);
     }
 }
