@@ -40,6 +40,7 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
     // Addon
     Route::resource('addon', AddonController::class);
+    Route::resource('calls', CallsController::class);
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
