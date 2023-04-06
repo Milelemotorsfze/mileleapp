@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Demand;
 
 class DemandController extends Controller
 {
@@ -28,7 +29,7 @@ class DemandController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    { 
         $this->validate($request, [
             'supplier' => 'required',
             'whole_saler' => 'required',
@@ -41,7 +42,9 @@ class DemandController extends Controller
         $demand->steering = $request->input('steering');
         $demand->created_by = Auth::id();
         $demand->save();
-        
+
+        return route('demands.edit',$demand->id)->with('success','Demand created successfully');
+
     
     }
 
