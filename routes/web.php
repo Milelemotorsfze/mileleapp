@@ -6,6 +6,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DailyleadsController;
 use App\Http\Controllers\CallsController;
+use App\Http\Controllers\LetterOfIndentController;
+use App\Http\Controllers\DemandController;
+/*
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,4 +45,6 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     Route::resource('dailyleads', DailyleadsController::class);
     //Daily Calls
     Route::resource('calls', CallsController::class);
+    Route::resource('letter-of-indents', LetterOfIndentController::class);
+    Route::resource('demands', DemandController::class);
 });

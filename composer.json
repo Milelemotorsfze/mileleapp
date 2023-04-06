@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
         "laravelcollective/html": "^6.4",
+        "spatie/laravel-enum": "^3.0",
         "spatie/laravel-permission": "^5.9",
         "twbs/bootstrap": "5.0.2"
     },
