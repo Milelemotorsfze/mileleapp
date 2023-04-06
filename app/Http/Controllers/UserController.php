@@ -8,21 +8,8 @@ namespace App\Http\Controllers;
     use DB;
     use Hash;
     use Illuminate\Support\Arr;
-   
     class UserController extends Controller
     {
-        function __construct()
-        {
-             $this->middleware('permission:user-list-active|user-list-inactive|user-list-deleted|user-view|user-create|user-edit|user-delete|user-make-inactive|user-make-active|user-restore', ['only' => ['index','store']]);
-             $this->middleware('permission:user-view', ['only' => ['show']]);
-             $this->middleware('permission:user-create', ['only' => ['create','store']]);
-             $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
-             $this->middleware('permission:user-delete', ['only' => ['delete']]);
-             $this->middleware('permission:user-make-inactive', ['only' => ['updateStatus']]);
-             $this->middleware('permission:user-make-active', ['only' => ['makeActive']]);
-             $this->middleware('permission:user-restore', ['only' => ['restore']]);
-        }
-
         public function index(Request $request)
         {
             $data = User::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
@@ -30,16 +17,11 @@ namespace App\Http\Controllers;
             $deleted_users = User::onlyTrashed()->get();
             return view('users.index',compact('data','inactive_users','deleted_users'));
         }
-        
-    
         public function create()
         {
             $roles = Role::pluck('name','name')->all();
-            // dd($roles);
             return view('users.create',compact('roles'));
         }
-        
-    
         public function store(Request $request)
         {
             $this->validate($request, [
@@ -56,7 +38,7 @@ namespace App\Http\Controllers;
             $user->assignRole($request->input('roles'));
         
             return redirect()->route('users.index')
-                            ->with('success','User created successfully');
+            ->with('success','User created successfully');
         }
         
         public function show($id)
@@ -64,7 +46,6 @@ namespace App\Http\Controllers;
             $user = User::find($id);
             return view('users.show',compact('user'));
         }
-        
         public function edit($id)
         {
             $user = User::find($id);
@@ -73,7 +54,6 @@ namespace App\Http\Controllers;
         
             return view('users.edit',compact('user','roles','userRole'));
         }
-    
         public function update(Request $request, $id)
         {
             $this->validate($request, [
@@ -89,18 +69,14 @@ namespace App\Http\Controllers;
             }else{
                 $input = Arr::except($input,array('password'));    
             }
-        
             $user = User::find($id);
             $user->update($input);
             DB::table('model_has_roles')->where('model_id',$id)->delete();
-        
             $user->assignRole($request->input('roles'));
-        
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
-        
-        public function delete($id)
+        public function destroy($id)
         {
             User::find($id)->delete();
             return redirect()->route('users.index')

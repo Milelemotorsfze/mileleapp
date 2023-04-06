@@ -4,7 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AddonController;
+use App\Http\Controllers\DailyleadsController;
+use App\Http\Controllers\CallsController;
+use App\Http\Controllers\LetterOfIndentController;
+use App\Http\Controllers\DemandController;
+/*
 /*
 |--------------------------------------------------------------------------
 | Web Routes
