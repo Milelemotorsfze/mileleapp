@@ -14,49 +14,71 @@
                         </a>
 						</li>
 						<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Sales</span> <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                        <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button >
-                                    <span data-key="t-authentication">Daily Calls</span>
-                                </a>
-                            </div>
-                        <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button >
-                                    <span data-key="t-authentication">Leads</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Sales</span>
-                              </a>
-                            </div>                            
+    						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i><span data-key="t-extra-pages">Sales</span> <div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">Daily Calls</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">Leads</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Sales</span>
+                                    </a>
+                                </div>                            
                             </div>
 						</li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i><span data-key="t-extra-pages">BL Form</span><div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">Create New BL</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">View VINs</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Change Country</span>
+                                    </a>
+                                </div>                            
+                            </div>
+                        </li>
 					    @endcan
                         @can('user-create')
                         <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i><span data-key="t-extra-pages">Demand & Planning</span> <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                        <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button >
-                                    <span data-key="t-authentication">Forecast</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Demand</span>
-                              </a>
-                            </div>                            
-							<div class="dropdown">
-                             <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                              <span data-key="t-utility">Deals</span>
-                              </a>
-                            </div>
+    						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i><span data-key="t-extra-pages">Demand & Planning</span> <div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">Forecast</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Demand</span>
+                                    </a>
+                                </div>                            
+    							<div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Deals</span>
+                                    </a>
+                                </div>
                             </div>
 						</li>
 						<li class="nav-item dropdown">
