@@ -22,4 +22,8 @@ class AddonDetails extends Model
         'deleted_by',
         'image'
     ];
+    public function AddonTypes()
+    {
+        return $this->hasMany('App\Models\AddonTypes');
+    }
 }

@@ -27,8 +27,8 @@
             @foreach ($addons as $key => $addon)
               <tr data-id="1">
                 <td>{{ ++$i }}</td>
-                <td><img src="{{ asset('addon_image/' . $addon->image) }}" style="width:100%;" /></td>
-                <td>{{ $addon->addon_id }}</td>
+                <td><img src="{{ asset('addon_image/' . $addon->image) }}" style="width:100%; height:100px;" /></td>
+                <td>{{ $addon->name }}</td>
                 <td>{{ $addon->addon_code }}</td>
                 <td>{{ $addon->brand_id }}</td>
                 <td>{{ $addon->model_id }}</td>
@@ -38,7 +38,7 @@
                 <td>{{ $addon->selling_price }}</td>
                 <td>
                   <!-- @can('role-edit') -->
-                    <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('addon.edit',$addon->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                    <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                   <!-- @endcan -->
                 </td>
               </tr>
