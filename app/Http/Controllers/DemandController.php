@@ -43,7 +43,7 @@ class DemandController extends Controller
         $demand->created_by = Auth::id();
         $demand->save();
 
-        return route('demands.edit',$demand->id)->with('success','Demand created successfully');
+        return redirect()->route('demands.edit',$demand->id)->with('success','Demand created successfully');
 
     
     }
@@ -61,7 +61,8 @@ class DemandController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $demands = Demand::where('id', $id)->get();
+        return view('demands.edit', compact('demands'));
     }
 
     /**

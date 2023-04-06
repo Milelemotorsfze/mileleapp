@@ -11,7 +11,6 @@
 						<a class="nav-link dropdown-toggle arrow-none" href="/" id="topnav-more" role="button">
                             <i data-feather="file-text"></i><span data-key="t-extra-pages">Dashboard</span>
                         </a>
-<<<<<<< HEAD
 					</li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
@@ -20,12 +19,12 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button >
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button" >
                                     <span data-key="t-authentication">Daily Calls</span>
                                 </a>
                             </div>
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button >
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button" >
                                     <span data-key="t-authentication">Leads</span>
                                 </a>
                             </div>
@@ -144,7 +143,6 @@
                                     <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
                                         <span data-key="t-utility">Deals</span>
                                     </a>
->>>>>>> 1ed2aeb44ece3829b5729d39db730717e60af421
                                 </div>
                             </div>
                         </div>
