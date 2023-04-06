@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('addon_details', function (Blueprint $table) {
             $table->id();
-            // $table->integer('addon_id')->nullable();
-            $table->string('addon_id')->nullable();
+            $table->integer('addon_id')->nullable();
+            // $table->string('addon_id')->nullable();
             // $table->unsignedBigInteger('addon_id')->nullable();
             // $table->foreign('addon_id')->references('id')->on('addons');
             $table->string('addon_code')->nullable();

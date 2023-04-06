@@ -3,6 +3,52 @@
     <head>
         @include('partials/head-css') 
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <style>
+            .related-addon-header
+            {
+                background-color:#5156be;
+            }
+            .related-addon-h4
+            {
+                padding-top:8px;
+                padding-bottom:8px;
+                text-align:center;
+                color:white;
+            }
+            .related-addon .each-addon
+            {
+                border-style: solid;
+                border-width: 1px;
+                border-color: #5156be;
+                border-radius: 5px;
+                /* margin-top: 10px; */
+                padding-top:10px;
+                padding-bottom:10px;
+            }
+            .related-addon input
+            {
+                padding-top:0px;
+                padding-bottom:0px;
+                padding-right:0px;
+                padding-left:0px;
+                /* height:50%; */
+            }
+            .related-label
+            {
+                padding-top:0px;
+                padding-bottom:0px;
+            }
+            
+            /* .related-addon .related-input-div
+            {
+                margin-top:0px;
+                margin-bottom:0px;
+                margin-right:0px;
+                margin-left:0px;
+            } */
+          
+        </style>
     </head>
     <body data-layout="horizontal">
         <!-- Begin page -->
@@ -43,15 +89,14 @@
                     reader.onload = function (e) 
                     {
                         $('#blah').css('visibility', 'visible');
-                        $('#blah').attr('src', e.target.result).width('100%').height('#blah'.width());
+                        $('#blah').attr('src', e.target.result).width('100%').height('#blah'.width);
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
             }
-        </script>
-        <script type="text/javascript">
+            // jquery
             $(document).ready(function()
-            {    
+            {   
                 // hide addon image tag when page reload 
                 $('#blah').css('visibility', 'hidden');
                 // add row
@@ -69,20 +114,14 @@
                     html += '<div class="row">';
                     html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                     html += '<div class="row">';
-                    html += '<div class="col-xxl-3 col-lg-6 col-md-12">';
-                    html += '<label for="name" class="col-form-label text-md-end">{{ __('Brand') }}</label>';
-                    html += '</div>';
-                    html += '<div class="col-xxl-9 col-lg-6 col-md-12">';
+                    html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
                     html += '<input list="cityname1" id="addon_name" type="text" class="form-control @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value="" required autocomplete="addon_name" autofocus>';
                     html += '</div>';
                     html += '</div>';
                     html += '</div>';
                     html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                     html += '<div class="row">';
-                    html += '<div class="col-xxl-3 col-lg-6 col-md-12">';
-                    html += '<label for="name" class="col-form-label text-md-end">{{ __('Model Line') }}</label>';
-                    html += '</div>';
-                    html += '<div class="col-xxl-9 col-lg-6 col-md-12">';
+                    html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
                     html += '<input list="cityname2" id="addon_name1" type="text" class="form-control @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="" required autocomplete="addon_name" autofocus>';
                     html += '</div>';
                     html += '</div>';
@@ -100,7 +139,44 @@
                     var button_id = $(this).attr("id");   
                     $('#row'+button_id+'').remove();  
                 });
-            });  
+                //get addon_id
+                $('#submit').click(function()
+                {
+                    var value = $('#addon_id').val();
+                    var a = $('#cityname [value="' + value + '"]').data('value');
+                    $('#addon_id').val(a);
+                    var value1 = $('#title').val();
+                });
+                $('#addon_id').change(function()
+                {
+                    // fetch addon existing images
+                    var value =$('#addon_id').val();
+                    var id = $('#cityname [value="' + value + '"]').data('value');
+                    $.ajax
+                    ({
+                        url: '/addons/existingImage/'+id,
+                        type: "GET",
+                        dataType: "json",
+                        success:function(data) { 
+                            var html = '';
+                            html += '<h1>cccccccccc</h1>';
+                            $('#dynamic_field1').append(html);
+                            // console.log(data);                     
+                            // $('select[name="city"]').empty();
+                            // $.each(data, function(key, value) {
+                            // $('select[name="city"]').append('<option value="'+ key +'">'+ value +'</option>');
+                            // });
+                        }
+                });
+                })
+            }); 
+        </script>
+        <script type="text/javascript">
+         
+            $(document).ready(function() {
+
+
+});
         </script>
     </body>
 </html>
