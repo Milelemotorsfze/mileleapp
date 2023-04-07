@@ -20,14 +20,8 @@ use App\Http\Controllers\BLformController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */  
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-  Route::get('/dd', function () {
-    return view('dd');
-});
-Auth::routes();
-Route::group(['middleware' => ['auth','checkstatus']], function() {
+    Auth::routes();
+    Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
     // User
@@ -41,14 +35,15 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     Route::get('roles/destroy/{id}', [RoleController::class,'delete'])->name('roles.delete');
     // Addon
     Route::resource('addon', AddonController::class);
-    Route::resource('calls', CallsController::class);
-
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
-
+    //Demand & Planning 
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('demands', DemandController::class);
+    //BL Module
     Route::resource('blfrom', BLformController::class);
-
+    //Sales
+    Route::resource('calls', CallsController::class);
+    Route::resource('dailyleads', DailyleadsController::class);
 });
