@@ -8,6 +8,7 @@ use App\Http\Controllers\DailyleadsController;
 use App\Http\Controllers\CallsController;
 use App\Http\Controllers\LetterOfIndentController;
 use App\Http\Controllers\DemandController;
+use App\Http\Controllers\BLformController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,13 @@ Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Addon
     Route::resource('addon', AddonController::class);
     Route::resource('calls', CallsController::class);
+
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
+
+    Route::resource('letter-of-indents', LetterOfIndentController::class);
+    Route::resource('demands', DemandController::class);
+    Route::resource('blfrom', BLformController::class);
+
 });

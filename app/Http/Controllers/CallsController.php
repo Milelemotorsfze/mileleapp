@@ -23,7 +23,6 @@ class CallsController extends Controller
     {
         return view('calls.create');
     }
-
     /**
      * Store a newly created resource in storage.
      */
