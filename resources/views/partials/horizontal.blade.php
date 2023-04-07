@@ -81,6 +81,24 @@
                                 </div>
                             </div>
 						</li>
+                        <li class="nav-item dropdown">
+    						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i><span data-key="t-extra-pages">Addons</span> <div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">Create Addon</span>
+                                    </a>
+                                </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.index') }}" id="topnav-auth" role="button">
+                                        <span data-key="t-authentication">List Addon</span>
+                                    </a>
+                                </div>
+                                                        
+                            </div>
+						</li>
 						<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i><span data-key="t-extra-pages">Master Data</span> <div class="arrow-down"></div>
