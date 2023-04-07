@@ -21,10 +21,11 @@ class AddonController extends Controller
         $addons = DB::table('addon_details')
                     ->join('addons','addons.id','addon_details.addon_id')
                     ->join('addon_types','addon_types.addon_details_id','addon_details.id')
-                    ->select('addons.name','addon_details.id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.currency',
+                    ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.currency',
                     'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_types.brand_id','addon_types.model_id')
                     ->orderBy('addon_details.id','ASC')
                     ->get();
+                    // dd($addons);
         return view('addon.index',compact('addons'));
     }
 
@@ -70,6 +71,7 @@ class AddonController extends Controller
             'brand' => 'required',
             'model' => 'required',
             'image' => 'required|max:2048',
+            // |mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         
         if ($validator->fails()) 
@@ -84,10 +86,50 @@ class AddonController extends Controller
             $size = $request->image->getSize();
     
             $request->image->move(public_path('addon_image'), $fileName);
+
+
+
+
+
+
+
+            // $image = $request->image;
+
+            // $input['imagename'] = time().'.'.$image->getClientOriginalExtension();
+            // dd($image);
+            // $destinationPath = public_path('/thumbnail');
+            // $img = Image::make($image->getRealPath());
+            
+            // $img->resize(100, 100, function ($constraint) {
+            //     $constraint->aspectRatio();
+            // })->save($destinationPath.'/'.$input['imagename']);
+       
+            // $destinationPath = public_path('/images');
+            // $image->move($destinationPath, $input['imagename']);
+       
+            // $this->postImage->add($input);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             $input = $request->all();
             $input['currency'] = 'AED';
             $input['created_by'] = $authId;
             $input['image'] = $fileName;
+            
             $addon_details = AddonDetails::create($input);
             $inputaddontype['addon_details_id'] = $addon_details->id;
             $inputaddontype['created_by'] = $authId;
@@ -142,7 +184,9 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
-        $addonDetails = AddonDetails::find($id)->with('AddonTypes')->first();
+        
+        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName')->first();
+        // dd($addonDetails);
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $models = MasterModel::select('model')->get();

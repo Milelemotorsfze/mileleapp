@@ -38,7 +38,7 @@
                 <td>{{ $addon->selling_price }}</td>
                 <td>
                   <!-- @can('role-edit') -->
-                    <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                    <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->addon_details_table_id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                   <!-- @endcan -->
                 </td>
               </tr>

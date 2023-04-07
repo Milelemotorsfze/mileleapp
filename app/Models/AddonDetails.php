@@ -24,6 +24,12 @@ class AddonDetails extends Model
     ];
     public function AddonTypes()
     {
-        return $this->hasMany('App\Models\AddonTypes');
+        return $this->hasMany(AddonTypes::class,'addon_details_id','id');
+        // ,'id','addon_details_id'
+    }
+    public function AddonName()
+    {
+        return $this->hasOne(Addon::class,'id','addon_id');
+        // ,'id','addon_details_id'
     }
 }

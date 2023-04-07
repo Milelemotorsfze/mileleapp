@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lists', function(Blueprint $table)
+        Schema::table('demands', function(Blueprint $table)
         {
             $table->dropForeign('demands_created_by_foreign');
             $table->foreign('created_by')->references('id')->on('users');

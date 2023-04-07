@@ -13,26 +13,22 @@ return new class extends Migration
     {
         Schema::create('addon_details', function (Blueprint $table) {
             $table->id();
-            $table->integer('addon_id')->nullable();
-            // $table->string('addon_id')->nullable();
-            // $table->unsignedBigInteger('addon_id')->nullable();
-            // $table->foreign('addon_id')->references('id')->on('addons');
+            $table->bigInteger('addon_id')->unsigned()->index()->nullable();
+            $table->foreign('addon_id')->references('id')->on('addons')->onDelete('cascade');
             $table->string('addon_code')->nullable();
             $table->decimal('purchase_price', 10,2)->nullable();
             $table->decimal('selling_price', 10,2)->nullable();
             $table->string('currency')->nullable();
             $table->integer('lead_time')->nullable();
             $table->string('additional_remarks')->nullable();
-            // $table->unsignedBigInteger('created_by')->nullable();
-            // $table->foreign('created_by')->references('id')->on('users');
-            // $table->unsignedBigInteger('updated_by')->nullable();
-            // $table->foreign('updated_by')->references('id')->on('users');
-            // $table->unsignedBigInteger('deleted_by')->nullable();
-            // $table->foreign('deleted_by')->references('id')->on('users');
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->integer('deleted_by')->nullable();
+            $table->bigInteger('created_by')->unsigned()->index()->nullable();
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('updated_by')->unsigned()->index()->nullable();
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
+            $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
             $table->string('image')->nullable();
+            $table->string('image2')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
