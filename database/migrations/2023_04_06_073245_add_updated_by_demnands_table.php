@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::table('demands', function(Blueprint $table)
         {
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users');
         });
 
     }
@@ -27,8 +27,7 @@ return new class extends Migration
     {
         Schema::table('demands', function(Blueprint $table)
         {
-            $table->dropForeign('demands_created_by_foreign');
-            $table->foreign('created_by')->references('id')->on('users');
+            Schema::dropIfExists('demands');
         });
     }
 };

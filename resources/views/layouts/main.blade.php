@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        @include('partials/head-css') 
+        @include('partials/head-css')
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <style>
@@ -39,7 +39,7 @@
                 padding-top:0px;
                 padding-bottom:0px;
             }
-            
+
             /* .related-addon .related-input-div
             {
                 margin-top:0px;
@@ -47,13 +47,13 @@
                 margin-right:0px;
                 margin-left:0px;
             } */
-          
+
         </style>
     </head>
     <body data-layout="horizontal">
         <!-- Begin page -->
         <div id="layout-wrapper">
-            @include('partials/horizontal') 
+            @include('partials/horizontal')
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
@@ -65,28 +65,29 @@
                             <div class="col-12">
                                 <div class="card">
                                     @yield('content')
-                                </div> 
+                                </div>
                             </div> <!-- end col -->
                         </div> <!-- end row -->
                     </div> <!-- container-fluid -->
                 </div> <!-- End Page-content -->
-                @include('partials/footer') 
+                @include('partials/footer')
             </div> <!-- end main content-->
         </div> <!-- END layout-wrapper -->
-        @include('partials/right-sidebar') 
+        @include('partials/right-sidebar')
         <!-- JAVASCRIPT -->
-        @include('partials/vendor-scripts') 
+        @include('partials/vendor-scripts')
+        @stack('scripts')
         <!-- dropzone js -->
         <script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
         <script src="{{ asset('js/app.js') }}"></script>
         <script type="text/javascript">
             // display selected addon image
-            function readURL(input) 
-            {        
-                if (input.files && input.files[0]) 
+            function readURL(input)
+            {
+                if (input.files && input.files[0])
                 {
                     var reader = new FileReader();
-                    reader.onload = function (e) 
+                    reader.onload = function (e)
                     {
                         $('#blah').css('visibility', 'visible');
                         $('#blah').attr('src', e.target.result).width('100%').height('#blah'.width);
@@ -96,18 +97,18 @@
             }
             // jquery
             $(document).ready(function()
-            {   
-                // hide addon image tag when page reload 
+            {
+                // hide addon image tag when page reload
                 $('#blah').css('visibility', 'hidden');
                 // add row
-                var i=1;  
+                var i=1;
                 var j=1;
                 $('#add').click(function()
-                {  
+                {
                     var title = $("#title").val();
-                    i++;  
+                    i++;
                     var title = $("#title1").val();
-                    i++;  
+                    i++;
                     var html = '';
                     html += '</br>';
                     html += '<div id="row'+i+'" class="dynamic-added">';
@@ -128,16 +129,16 @@
                     html += '</div>';
                     html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
                     html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
-                    html += '</div>';            
+                    html += '</div>';
                     html += '</div>';
                     html += '</div>';
                     $('#dynamic_field').append(html);
-                });  
+                });
                 // remove row
                 $(document).on('click', '.btn_remove', function()
-                {  
-                    var button_id = $(this).attr("id");   
-                    $('#row'+button_id+'').remove();  
+                {
+                    var button_id = $(this).attr("id");
+                    $('#row'+button_id+'').remove();
                 });
                 //get addon_id
                 $('#submit').click(function()
@@ -157,11 +158,11 @@
                         url: '/addons/existingImage/'+id,
                         type: "GET",
                         dataType: "json",
-                        success:function(data) { 
+                        success:function(data) {
                             var html = '';
                             html += '<h1>cccccccccc</h1>';
                             $('#dynamic_field1').append(html);
-                            // console.log(data);                     
+                            // console.log(data);
                             // $('select[name="city"]').empty();
                             // $.each(data, function(key, value) {
                             // $('select[name="city"]').append('<option value="'+ key +'">'+ value +'</option>');
@@ -169,10 +170,10 @@
                         }
                 });
                 })
-            }); 
+            });
         </script>
         <script type="text/javascript">
-         
+
             $(document).ready(function() {
 
 
@@ -183,14 +184,14 @@
 
 
 
-                        
-                    
-                    
-                     
-                    
-                
-            
-            
+
+
+
+
+
+
+
+
 
 
 

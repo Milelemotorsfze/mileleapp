@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
+use App\Models\blfrom;
 use Illuminate\Http\Request;
 
 class BLformController extends Controller
@@ -12,11 +12,11 @@ class BLformController extends Controller
      */
     public function index()
     {
-    	echo "BL Form";
+        return view('blform.index');
     }
     public function create()
     {
-    	return view('blfrom.create');
+        return view('blform.create');
     }
     public function store()
     {
