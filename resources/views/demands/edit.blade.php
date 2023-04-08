@@ -33,7 +33,7 @@
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Steering</label>
                         <input type="text" value="{{$demand->steering}}" class="form-control" readonly/>
                     </div>
-                </div>  
+                </div>
                 <div class ="d-flex">
                     <div class = "col-lg-4">
                         <div class = "row">
@@ -42,8 +42,8 @@
                         <select class="form-control" data-trigger name="supplier" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             <option value="TTC">TTC</option>
-                            <option value="AMS">AMS</option>  
-                            <option value="CPS">CPS</option>  
+                            <option value="AMS">AMS</option>
+                            <option value="CPS">CPS</option>
                         </select>
                     </div>
                     <div class="col-lg-3 col-md-3">
@@ -52,12 +52,12 @@
                         </div>
                     </div>
                 </div>
-                            
-                </br>						
+
+                </br>
                 @endforeach
                 <div class="col-lg-12 col-md-12">
                     <button type="submit" class="btn btn-dark btncenter">Submit</button>
-                </div>  
+                </div>
             </div>
 
 
