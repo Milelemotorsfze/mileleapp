@@ -30,6 +30,7 @@ class DemandController extends Controller
         for ($i=$currentMonth; $i<=$endMonth; $i++) {
             $months[] = date('M y', mktime(0,0,0,$i, 1, date('Y')));
         }
+
         $models = MasterModel::all();
         return view('demands.create',compact('models','months'));
     }
@@ -97,7 +98,6 @@ class DemandController extends Controller
     {
         $data = Varaint::where('sfx', $request->sfx)
             ->pluck('name');
-        info($data);
         return $data;
     }
 }

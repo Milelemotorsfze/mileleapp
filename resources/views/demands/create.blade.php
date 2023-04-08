@@ -52,7 +52,7 @@
                 </div>
             </div>
             <br/>
-            <div id="monthly-demand-list-div">
+            <div class="d-none" id="monthly-demand-list-div">
                 <div class="row">
                     <div class="col-lg-4 col-md-6">
                         <div class="mb-3">
@@ -73,6 +73,7 @@
                         </div>
                     </div>
                 </div>
+                <div class=""></div>
                 <form action="{{ route('demand-lists.store') }}" method="POST" enctype="multipart/form-data" >
                     @csrf
                     <div class="d-flex">
@@ -130,7 +131,8 @@
     </div>
 @endsection
 @push('scripts')
-<script type="text/javascript">
+    <script type="text/javascript">
+
     $('#model').select2();
 
     $('#add-demand').click(function() {
@@ -187,7 +189,6 @@
                 sfx: sfx
             },
             success:function (data) {
-                console.log(data);
                 jQuery.each(data, function(key,value){
                     $('select[name="variant_name"]').append('<option value="'+ value +'">'+ value +'</option>');
                 });
@@ -211,37 +212,16 @@
         var total = +value0 + +value1 + +value2 + +value3 + +value4;
         $('#total').val(total);
     }
-    {{--$('.add-demand-list-details').submit(function() {--}}
-    {{--    $('#form_id').submit();--}}
-    {{--    alert("ok");--}}
-
-
-    {{--    let demand_id = $('#demand-id').val();--}}
-    {{--    let model = $('#model').val();--}}
-    {{--    let sfx = $('#sfx').val();--}}
-    {{--    let variant = $('#variant-name').val();--}}
-    {{--    let month = $('#month-year').val();--}}
-    {{--    let quantity = $('#quantity').val();--}}
-    {{--    let total = $('#total').val();--}}
-    {{--    alert(month);--}}
-    {{--    let url = '{{route('demand-lists.store')}}';--}}
-    {{--    $.ajax({--}}
-    {{--        type: "POST",--}}
-    {{--        url: url,--}}
-    {{--        dataType: "json",--}}
-    {{--        data: {--}}
-    {{--            demand_id: demand_id,--}}
-    {{--            model: model,--}}
-    {{--            sfx: sfx,--}}
-    {{--            variant_name: variant,--}}
-    {{--            month:month,--}}
-    {{--            _token: '{{ csrf_token() }}'--}}
-    {{--        },--}}
-    {{--        success: function (data) {--}}
-    {{--           alert("ok");--}}
-    {{--        }--}}
-    {{--    });--}}
-    {{--});--}}
+    $('.add-demand-list-details').click(function() {
+        let url = '{{ route('demand-lists.store') }}';
+        $.ajax({
+            url: url,
+            data:$('form.form-demand').serializeArray(),
+            success: function (data) {
+                location.reload();
+            }
+        });
+    });
 
 </script>
 @endpush
