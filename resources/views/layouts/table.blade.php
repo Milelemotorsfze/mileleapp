@@ -35,6 +35,84 @@
             top: 0;
         }
         </style>
+        <style>
+            .related-addon-header
+            {
+                background-color:#5156be;
+            }
+            .related-addon-h4
+            {
+                padding-top:8px;
+                padding-bottom:8px;
+                text-align:center;
+                color:white;
+            }
+            .related-addon .each-addon
+            {
+                background-color:#f2f2f2;
+                border-style: solid;
+                border-width: 1px;
+                border-color: white;
+                border-radius: 5px;
+                margin-left:0px;
+                margin-right:0px;
+                margin-top:5px;
+                margin-bottom:5px;
+                /* padding-left:1px;
+                padding-right:1px; */
+                /* margin-top: 10px; */
+                padding-top:10px;
+                padding-bottom:10px;
+            }
+            .related-addon input
+            {
+                padding-top:0px;
+                padding-bottom:0px;
+                padding-right:0px;
+                padding-left:0px;
+                /* height:50%; */
+            }
+            .related-label
+            {
+                padding-top:0px;
+                padding-bottom:0px;
+            }
+           
+            /* .related-addon .related-input-div
+            {
+                margin-top:0px;
+                margin-bottom:0px;
+                margin-right:0px;
+                margin-left:0px;
+            } */
+          .list2
+          {
+            margin-right:10px;
+                margin-left:10px;
+          }
+          .labellist
+          {
+            border-style: solid;
+                border-width: 1px;
+                border-color: #5156be;
+                border-radius: 5px;
+              
+          }
+          .labeldesign
+          {
+            background-color:#6266c4;
+            color:white;
+            border-color: white;
+          }
+          .databack1{
+            background-color:#e6e6ff;
+            border-color: white;
+          }
+          .databack2{
+            background-color:#f2f2f2;
+            border-color: white;
+          }
+        </style>
     </head>
     <body data-layout="horizontal">
         <div id="layout-wrapper">
@@ -81,6 +159,8 @@
                     // $('.modal').hide();
                     console.log('Modal Hidden from close button');
                     });
+                    // div colour
+                    // alert($('.divcolorclass').val());
         });
         function closemodal()
             {    

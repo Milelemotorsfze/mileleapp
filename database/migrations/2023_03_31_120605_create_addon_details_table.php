@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('selling_price', 10,2)->nullable();
             $table->string('currency')->nullable();
             $table->integer('lead_time')->nullable();
-            $table->string('additional_remarks')->nullable();
+            $table->text('additional_remarks')->nullable();
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('updated_by')->unsigned()->index()->nullable();

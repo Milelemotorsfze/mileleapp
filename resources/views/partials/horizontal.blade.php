@@ -167,18 +167,18 @@
                     <!-- item-->
                     <a class="dropdown-item" href="profile"><i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile </a>
                     <div class="dropdown-divider"></div>
-                    @can('user-view')
+                    <!-- @can('user-view') -->
                     <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
                     <div class="dropdown-divider"></div>
-                    @endcan
-                    @can('role-list')
+                    <!-- @endcan
+                    @can('role-list') -->
                     <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
                     <div class="dropdown-divider"></div>
-                    @endcan
+                    <!-- @endcan
                     @can('addon-view')
                     <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
                     <div class="dropdown-divider"></div>
-                    @endcan
+                    @endcan -->
                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="mdi mdi-logout font-size-16 align-middle me-1"></i> Logout 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                                         @csrf
