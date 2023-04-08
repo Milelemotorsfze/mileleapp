@@ -18,6 +18,7 @@ class AddonController extends Controller
      */
     public function index()
     {
+        $addon1 = AddonDetails::with('AddonName','AddonTypes')->get();
         $addons = DB::table('addon_details')
                     ->join('addons','addons.id','addon_details.addon_id')
                     ->join('addon_types','addon_types.addon_details_id','addon_details.id')
@@ -26,7 +27,7 @@ class AddonController extends Controller
                     ->orderBy('addon_details.id','ASC')
                     ->get();
                     // dd($addons);
-        return view('addon.index',compact('addons'));
+        return view('addon.index',compact('addons','addon1'));
     }
 
     /**
