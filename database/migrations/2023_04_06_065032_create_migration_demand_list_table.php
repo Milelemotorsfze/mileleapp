@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('demand_id')->unsigned()->index()->nullable();
             $table->foreign('demand_id')->references('id')->on('demands')->onDelete('cascade');
+            
+            $table->bigInteger('student_id')->unsigned()->index()->nullable();
+            $table->foreign('student_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->bigInteger('varaint_id')->unsigned()->index()->nullable();
             $table->foreign('varaint_id')->references('id')->on('varaints')->onDelete('cascade');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();

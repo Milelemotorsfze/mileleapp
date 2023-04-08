@@ -14,14 +14,12 @@ return new class extends Migration
         Schema::create('brands', function (Blueprint $table) {
             $table->id();
             $table->string('brand_name');
-            // $table->foreign('created_by')->references('id')->on('users');
-            // $table->unsignedBigInteger('updated_by')->nullable();
-            // $table->foreign('updated_by')->references('id')->on('users');
-            // $table->unsignedBigInteger('deleted_by')->nullable();
-            // $table->foreign('deleted_by')->references('id')->on('users');
-            $table->integer('created_by')->nullable();
-            $table->integer('updated_by')->nullable();
-            $table->integer('deleted_by')->nullable();
+            $table->bigInteger('created_by')->unsigned()->index()->nullable();
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('updated_by')->unsigned()->index()->nullable();
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
+            $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
+            $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -24,7 +24,7 @@
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Name') }}</label>
                         </div>
                         <div class="col-xxl-8 col-lg-5 col-md-11">
-                            <input list="cityname" id="addon_id" type="text" class="form-control @error('addon_id') is-invalid @enderror" name="addon_id" placeholder="Choose Addon Name" value="{{ $addonDetails->addon_id }}" required autocomplete="addon_id" autofocus>
+                            <input list="cityname" id="addon_id" type="text" class="form-control @error('addon_id') is-invalid @enderror" name="addon_id" placeholder="Choose Addon Name" value="{{ $addonDetails->AddonName->name }}" required autocomplete="addon_id" autofocus>
                             <datalist id="cityname">
                                 @foreach($addons as $addon)
                                     <option data-amount="{{$addon->id}}">{{$addon->name}}</option>

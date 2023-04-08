@@ -2,7 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Addon Master</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('roles.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('addon.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -196,7 +196,8 @@
               </div>
             </div>
             </br>
-            <div class="related-addon-header">
+            <div>
+            <!-- <div class="related-addon-header">
                 <h4 class="card-title related-addon-h4">Related Addons</h4>
             </div>
             </br>
@@ -361,6 +362,7 @@
                     <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                     </div>
                 </div>
+            </div> -->
             </div>
         </form>
     </div>  

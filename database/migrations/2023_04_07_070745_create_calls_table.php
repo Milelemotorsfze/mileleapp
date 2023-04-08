@@ -11,17 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('addons', function (Blueprint $table) {
+        Schema::create('calls', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('phone');
+            $table->string('email');
+            $table->string('source');
+            $table->string('status');
+            $table->bigInteger('sales_person')->unsigned()->nullable();
+            $table->foreign('sales_person')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->bigInteger('updated_by')->unsigned()->index()->nullable();
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
-            $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
-            $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('addons');
+        Schema::dropIfExists('calls');
     }
 };

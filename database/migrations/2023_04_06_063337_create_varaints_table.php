@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('dimensions')->nullable();
             $table->string('transmission')->nullable();
             $table->string('gearbox')->nullable();
-            $table->string('front_differential'->nullable());
+            $table->string('front_differential')->nullable();
             $table->string('rear_differential')->nullable();
             $table->string('fuel_tank_capacity')->nullable();
             $table->string('additional_fuel_tank_capacity')->nullable();

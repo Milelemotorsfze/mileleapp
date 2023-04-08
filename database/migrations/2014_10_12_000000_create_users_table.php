@@ -19,14 +19,17 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->enum('status',['active','inactive'])->default('active');
-            $table->Integer('created_by')->nullable();
-            $table->Integer('updated_by')->nullable();
-            $table->Integer('deleted_by')->nullable();
+            // $table->bigInteger('created_by')->unsigned()->index()->nullable();
+            // $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            // $table->bigInteger('updated_by')->unsigned()->index()->nullable();
+            // $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
+            // $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
+            // $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
     }
-
+  
     /**
      * Reverse the migrations.
      */
@@ -34,4 +37,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('users');
     }
+    
 };
