@@ -5,9 +5,15 @@
       Users Info
     </h4>
     @can('user-create')
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('users.create') }}" text-align: right>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('users.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New User
       </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('sales_person_languages.create') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Languages
+      </a>
+      <div class="clearfix"></div>
+<br>
     @endcan
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">

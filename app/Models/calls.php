@@ -17,6 +17,7 @@ class calls extends Model
         'phone',
         'source',
         'status',
+        'language',
         'demand',
         'created_by',
         'created_at',
