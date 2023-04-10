@@ -112,9 +112,9 @@
             background-color:#f2f2f2;
             border-color: white;
           }
-          #addonListTable{
+          /* #addonListTable{
             display: none;
-          }
+          } */
         </style>
     </head>
     <body data-layout="horizontal">
@@ -166,15 +166,43 @@
                     // alert($('.divcolorclass').val());
 
                     // show addon list table
-                    $('#addonListTableButton').on('click', function()
-                    {
-                        $('#addonListTable').style.display = "block";
-                    });
+                  
+                    // $('#addonListTableButton').on('click', function()
+                    // {
+                       
+                    //     // $('#addonListTable').attr("hidden", true); 
+                    //     // $('#addonListTable').attr("hidden", false); 
+                    //     // $('#addonListTable').removeAttribute("hidden"); 
+                    //     // alert('hiis');
+                    //     // $('#addonListTable').style.display = "block";
+                    // });
         });
         function closemodal()
             {    
                 $('.modal').removeClass('modalshow');
                 $('.modal').addClass('modalhide');
+            }
+            function showAddonTable()
+            {
+                let addonTable = document.getElementById('addonListTable');
+                addonTable.hidden = false
+                let addonListTableButton = document.getElementById('addonListTableButton');
+                addonListTableButton.hidden = true
+                let addonbox = document.getElementById('addonbox');
+                addonbox.hidden = true 
+                let addonBoxButton = document.getElementById('addonBoxButton');
+                addonBoxButton.hidden = false 
+            }
+            function showAddonBox()
+            {
+                let addonTable = document.getElementById('addonListTable');
+                addonTable.hidden = true
+                let addonListTableButton = document.getElementById('addonListTableButton');
+                addonListTableButton.hidden = false
+                let addonbox = document.getElementById('addonbox');
+                addonbox.hidden = false 
+                let addonBoxButton = document.getElementById('addonBoxButton');
+                addonBoxButton.hidden = true 
             }
         </script>
     </body>
