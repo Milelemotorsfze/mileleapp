@@ -4,6 +4,7 @@
         @include('partials/head-css') 
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdn.ckeditor.com/ckeditor5/37.0.1/classic/ckeditor.js"></script>
         <style>
             .related-addon-header
             {
@@ -172,10 +173,12 @@
             }); 
         </script>
         <script type="text/javascript">
-         
             $(document).ready(function() {
-
-
+        ClassicEditor
+          .create(document.querySelector('#editor'))
+          .catch(error => {
+            console.error(error);
+          });
 });
         </script>
     </body>

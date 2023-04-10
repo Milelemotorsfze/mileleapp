@@ -1,7 +1,8 @@
 @extends('layouts.main')
 @section('content')
-    <div class="card-header">
-        <h4 class="card-title">Create New Calls</h4>
+@can('Calls-modified')
+<div class="card-header">
+        <h4 class="card-title">New Calls & Messages</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -20,43 +21,39 @@
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
                 <div class="row"> 
-					<div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">date : </label>
-                        {!! Form::date('date', null, array('class' => 'form-control')) !!}
-                    </div>
-					<div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Name : </label>
+					<div class="col-lg-6 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
                         {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Phone : </label>
+                    <div class="col-lg-6 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Customer Phone : </label>
                         {!! Form::number('phone', null, array('placeholder' => 'Phone','class' => 'form-control')) !!}
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Email : </label>
+                    <div class="col-lg-6 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Customer Email : </label>
                         {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
                         <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Sales Person : </label>
-                        {{ Form::select('sales_person', [
-                        'Aymen B Bouderbala' => 'Aymen B Bouderbala',
-                        'Faisal Raiz' => 'Faisal Raiz',
-						'Fahad Raiz' => 'Fahad Raiz',
-                        'Mohammed Azarudin Abdul' => 'Mohammed Azarudin Abdul',
-                        'Paul Membwange' => 'Paul Membwange',
-                        'Lincoln Mukwada' => 'Lincoln Mukwada',
-                        'Abdu Khakim Mamutov' => 'Abdu Khakim Mamutov',
-                        'Hanif Mohideen Afiq A K' => 'Hanif Mohideen Afiq A K',
-                        'Ayman Abdel Rafe' => 'Ayman Abdel Rafe',
-                        'Raymond Tichaona Chikoki' => 'Raymond Tichaona Chikoki',
-                        'Muath A A Kullab' => 'Muath A A Kullab',
-                        'Belal Reyad Batal' => 'Belal Reyad Batal',
+                    <div class="col-lg-6 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Client Demand : </label>
+                        {!! Form::text('demand', null, array('placeholder' => 'Demand','class' => 'form-control')) !!}
+                        <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Source : </label>
+                        {{ Form::select('source', [
+                        'Website' => 'Website',
+                        'Facebook' => 'Facebook',
+						'Dubizzle' => 'Dubizzle',
+                        'Direct Call' => 'Direct Call',
+                        'Email' => 'Email',
+                        'Linkdin' => 'Linkdin',
+                        'Classified ADs' => 'Classified ADs',
                         ], null, ['class' => 'form-control']) }}
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        {{ Form::textarea('remarks', null, ['class' => 'form-control', 'rows' => '3']) }}
+                        <textarea name="remarks" id="editor"></textarea>
                     </div>
 			        </div>  
                     </br>
@@ -67,4 +64,5 @@
 		{!! Form::close() !!}
 		</br>
     </div>
+    @endcan
 @endsection

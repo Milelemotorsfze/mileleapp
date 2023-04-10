@@ -7,12 +7,26 @@
 
             <div class="collapse navbar-collapse" id="topnav-menu-content">
                 <ul class="navbar-nav">
-					@can('sales-view')
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="/" id="topnav-more" role="button">
                             <i data-feather="file-text"></i><span data-key="t-extra-pages">Dashboard</span>
                         </a>
 						</li>
+                        @can('Calls-view')
+                        <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
+                            <i data-feather="phone-call"></i><span data-key="t-extra-pages">Messages & Calls</span>
+                        </a>
+						</li>
+                        @endcan
+                        @can('variants-view')
+                        <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i><span data-key="t-extra-pages">Variants</span>
+                        </a>
+						</li>
+					    @endcan
+					@can('sales-view')
 						<li class="nav-item dropdown">
     						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                 <i data-feather="file-text"></i><span data-key="t-extra-pages">Sales</span> <div class="arrow-down"></div>
@@ -146,7 +160,6 @@
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <!-- item-->
                     <a class="dropdown-item" href="profile"><i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile </a>
                     <div class="dropdown-divider"></div>
                     @can('user-view')
@@ -169,7 +182,6 @@
                 </div>
                 </div>
                 </div>
-
         </nav>
     </div>
 </div>

@@ -14,7 +14,8 @@ class PermissionTableSeeder extends Seeder
             ['1','User'],
             ['2','Role'],
             ['3','Sales'],
-            ['4','Procurement']
+            ['4','Procurement'],
+            ['5','Marketing'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -55,6 +56,15 @@ class PermissionTableSeeder extends Seeder
             ['4','Create Procurement (Expect GCC)','Procurement-create-other', 'To Create the New Procurement For all Countries expect GCC'],
             ['4','Edit Procurement','Procurement-edit', 'To Edit his Own Procurement'],
             ['4','Delete Procurement','Procurement-delete', 'To Delete his Own Procurement'],
+
+            ['5','View Calls','Calls-view', 'To View the Calls'],
+            ['5','Add,Edit, Delete Calls','Calls-modified', 'Add, Edit, Delete Calls'],
+            ['5','View Variants','variants-view', 'To View the Vairants'],
+            ['5','List Variants','variants-list', 'To View the List of the Variants'],
+            ['5','List With Missing Variants','variants-list-missing', 'To View the List of the Missing pictures and other data of Variants'],
+            ['5','View Variants Details', 'variants-details-view', 'To view the details of the list of the Variants'],
+            ['5','Update Variants Pictures','variants-update-pictures', 'To Update the Pictures of the Variants'],
+            ['5','Update Variants Reals','variants-update-reals', 'To Update the reals of the Variants'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

@@ -2,24 +2,24 @@
 @section('content')
   <div class="card-header">
     <h4 class="card-title">
-      Daily Calls Info
+     Calls & Messages Info
     </h4>
-    @can('daily-leads-create')
+    @can('Calls-modified')
       <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Daily Calls 
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Daily Calls & Messages 
       </a>
     @endcan
+    @can('Calls-view')
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Calls to Leads</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Calls & Messages to Leads</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Calls to Leads Converted</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Calls & Messages to Leads Converted</a>
       </li>
     </ul>      
   </div>
   <div class="tab-content">
-    @can('daily-leads-list')
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
           <div class="table-responsive">
@@ -28,10 +28,13 @@
                 <tr>
                   <th>S.No</th>
                   <th>Date</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
                   <th>Sales Person</th>
+                  <th>Demand</th>
+                  <th>Source</th>
+                  <th>Language</th>
                   <th>Remarks</th>
                 </tr>
               </thead>

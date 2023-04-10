@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Dailyleads extends Model
 {
     use HasFactory;
-    protected $table = 'daily_lead';
+    protected $table = 'dailyleads';
 }

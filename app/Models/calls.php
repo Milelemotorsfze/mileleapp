@@ -10,14 +10,16 @@ class calls extends Model
     use HasFactory;
     protected $table = 'calls';
     protected $fillable = [
-        'date',
         'name',
         'email',
         'sales_person',
         'remarks',
         'phone',
-        'sales_person',
-        'user_id',
+        'source',
+        'status',
+        'demand',
+        'created_by',
+        'created_at',
     ];
     public $timestamps = false;
 }

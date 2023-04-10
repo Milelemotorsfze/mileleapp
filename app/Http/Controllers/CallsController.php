@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\calls;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CallsController extends Controller
 {
@@ -30,20 +32,23 @@ class CallsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'date' => 'required',
             'name' => 'required',
             'phone' => 'required',
-            'sales_person' => 'required',
+            'source' => 'required',
+            'demand' => 'required',
             'email' => 'required|email|unique:users,email',
         ]);
+        
         $data = [
-            'date' => $request->input('date'),
             'name' => $request->input('name'),
+            'demand' => $request->input('demand'),
             'email' => $request->input('email'),
             'sales_person' => $request->input('sales_person'),
             'remarks' => $request->input('remarks'),
             'phone' => $request->input('phone'),
-            'user_id' => $request->input('user_id'),
+            'created_at' => now()->timestamp,
+            'created_by' => Auth::id(),
+            'status' => "New",
         ];
         $model = new Calls($data);
         $model->save();
