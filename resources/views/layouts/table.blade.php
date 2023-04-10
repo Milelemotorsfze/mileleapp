@@ -112,6 +112,9 @@
             background-color:#f2f2f2;
             border-color: white;
           }
+          #addonListTable{
+            display: none;
+          }
         </style>
     </head>
     <body data-layout="horizontal">
@@ -161,6 +164,12 @@
                     });
                     // div colour
                     // alert($('.divcolorclass').val());
+
+                    // show addon list table
+                    $('#addonListTableButton').on('click', function()
+                    {
+                        $('#addonListTable').style.display = "block";
+                    });
         });
         function closemodal()
             {    

@@ -2,8 +2,9 @@
 @section('content')
   <div class="card-header">
     <h4 class="card-title">Addon List</h4>
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Addon</a>
-  </div>
+      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}"><i class="fa fa-plus" aria-hidden="true"></i> New Addon</a>
+      <a id="addonListTableButton" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" href=""><i class="fa fa-table" aria-hidden="true"></i></a>  
+    </div>
   <div class="card-body">
     <div class="list2">
             <div class="row related-addon">
@@ -111,7 +112,7 @@
 
 
 
-      <div class="table-responsive">
+      <div class="table-responsive" id="addonListTable">
       
         <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
           <thead>
