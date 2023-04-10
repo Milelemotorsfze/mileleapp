@@ -50,7 +50,9 @@ Route::get('/dd', function () {
     Route::resource('demand-lists', DemandListController::class);
     //BL Module
     Route::resource('blfrom', BLformController::class);
-    //Sales
+    //Marketing
     Route::resource('calls', CallsController::class);
+    Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
+    //Sales
     Route::resource('dailyleads', DailyleadsController::class);
 });

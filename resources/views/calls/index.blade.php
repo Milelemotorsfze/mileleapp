@@ -5,9 +5,11 @@
      Calls & Messages Info
     </h4>
     @can('Calls-modified')
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Daily Calls & Messages 
+    <a class="btn btn-sm btn-success float-end" href="{{ route('calls.create') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Daily Calls & Messages
       </a>
+      <div class="clearfix"></div>
+<br>
     @endcan
     @can('Calls-view')
     <ul class="nav nav-pills nav-fill">
@@ -43,12 +45,23 @@
                 @foreach ($data as $key => $calls)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ $calls->date }}</td>
+                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>  
-                    <td>{{ $calls->sales_person }}</td>  
-                    <td>{{ $calls->remarks }}</td>             
+                    <td>{{ $calls->email }}</td>
+                     @php
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $sales_persons_name }}</td>  
+                    <td>{{ $calls->demand }}</td> 
+                    <td>{{ $calls->source }}</td>
+                    <td>{{ $calls->language }}</td>
+                    @php
+    $text = $calls->remarks;
+    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+    @endphp
+    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>         
                   </tr>
                 @endforeach
               </tbody>
@@ -62,28 +75,42 @@
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-              <thead>
+            <thead>
                 <tr>
                   <th>S.No</th>
                   <th>Date</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
                   <th>Sales Person</th>
+                  <th>Demand</th>
+                  <th>Source</th>
+                  <th>Language</th>
                   <th>Remarks</th>
                 </tr>
               </thead>
               <tbody>
               <div hidden>{{$i=0;}}</div>
-                @foreach ($convertedleads as $key => $callsl)
+                @foreach ($convertedleads as $key => $calls)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                  <td>{{ $callsl->date }}</td>
-                    <td>{{ $callsl->name }}</td>     
-                    <td>{{ $callsl->phone }}</td> 
-                    <td>{{ $callsl->email }}</td>  
-                    <td>{{ $callsl->sales_person }}</td>  
-                    <td>{{ $callsl->remarks }}</td>            
+                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ $calls->name }}</td>     
+                    <td>{{ $calls->phone }}</td> 
+                    <td>{{ $calls->email }}</td>
+                     @php
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $sales_persons_name }}</td>  
+                    <td>{{ $calls->demand }}</td> 
+                    <td>{{ $calls->source }}</td>
+                    <td>{{ $calls->language }}</td>
+                    @php
+    $text = $calls->remarks;
+    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+    @endphp
+    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>         
                   </tr>
                 @endforeach
               </tbody>
