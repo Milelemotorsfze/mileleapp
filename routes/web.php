@@ -42,7 +42,6 @@ Route::get('/dd', function () {
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
-
     //Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
