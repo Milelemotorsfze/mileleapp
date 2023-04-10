@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('varaints', function (Blueprint $table) {
             $table->id();
             $table->string('model');
-            $table->string('sfx'); 
+            $table->string('sfx');
             $table->string('name');
             $table->string('engine')->nullable();
             $table->string('number_of_cylinders')->nullable();

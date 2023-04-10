@@ -1,6 +1,5 @@
 <?php
 use Illuminate\Support\Facades\Route;
-  
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -8,7 +7,9 @@ use App\Http\Controllers\DailyleadsController;
 use App\Http\Controllers\CallsController;
 use App\Http\Controllers\LetterOfIndentController;
 use App\Http\Controllers\DemandController;
+use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
+use App\Http\Controllers\DemandListController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,10 @@ use App\Http\Controllers\BLformController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/  
+*/
+Route::get('/dd', function () {
+    return view('dd');
+});
     Auth::routes();
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
@@ -38,9 +42,13 @@ use App\Http\Controllers\BLformController;
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
-    //Demand & Planning 
+
+    //Demand & Planning
+    Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
+    Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('demands', DemandController::class);
+    Route::resource('demand-lists', DemandListController::class);
     //BL Module
     Route::resource('blfrom', BLformController::class);
     //Sales

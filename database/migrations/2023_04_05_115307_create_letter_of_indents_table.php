@@ -16,16 +16,16 @@ return new class extends Migration
             $table->string('LOI_reference');
             $table->string('category');
             $table->string('submission_status')->comments('PFI_CREATED','UNDER_REVIEW','NEW','PARTIAL_APPROVAL');
-            $table->string('status'); 
-            $table->string('value');  
+            $table->string('status');
+            $table->string('value');
             $table->string('date');
             $table->longText('review');
             $table->bigInteger('entity_id')->unsigned()->index()->nullable();
-            $table->foreign('entity_id')->references('id')->on('entities')->onDelete('cascade');
+            $table->foreign('entity_id')->references('id')->on('entities');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users');
             $table->timestamps();
-    
+
         });
     }
 

@@ -17,15 +17,15 @@ return new class extends Migration
             $table->string('document_number');
             $table->string('category');
             $table->string('source');
-            $table->string('type'); 
-            $table->string('country');  
+            $table->string('type');
+            $table->string('country');
             $table->string('license_file');
             $table->string('tax_certificate_file');
             $table->string('passport_file');
             $table->string('national_id_file');
             $table->string('status')->comments('PENDING','APPROVAL');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users');
             $table->timestamps();
         });
     }
