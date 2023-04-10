@@ -32,8 +32,6 @@ class DemandListController extends Controller
      */
     public function store(Request $request)
     {
-//        return $request->all();
-
         info("test");
         info($request->all());
 
@@ -41,7 +39,6 @@ class DemandListController extends Controller
             'model' => 'required',
             'sfx' => 'required',
             'variant_name' => 'required',
-//            'demand_id' => 'required'
         ]);
 
         DB::beginTransaction();

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DemandList;
 use App\Models\MasterModel;
+use App\Models\MonthlyDemand;
 use App\Models\Varaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Demand;
+use Illuminate\Support\Facades\DB;
 
 class DemandController extends Controller
 {
@@ -24,15 +27,7 @@ class DemandController extends Controller
      */
     public function create()
     {
-        $months = [];
-        $currentMonth = Carbon::now()->format('m');
-        $endMonth = $currentMonth + 4;
-        for ($i=$currentMonth; $i<=$endMonth; $i++) {
-            $months[] = date('M y', mktime(0,0,0,$i, 1, date('Y')));
-        }
-
-        $models = MasterModel::all();
-        return view('demands.create',compact('models','months'));
+        return view('demands.create');
     }
 
     /**
@@ -53,7 +48,7 @@ class DemandController extends Controller
         $demand->created_by = Auth::id();
         $demand->save();
 
-        return response($demand, 200);
+        return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully');
     }
 
     /**
@@ -69,8 +64,21 @@ class DemandController extends Controller
      */
     public function edit(string $id)
     {
-        $demands = Demand::where('id', $id)->get();
-        return view('demands.edit', compact('demands'));
+        $demand = Demand::findOrFail($id);
+        $demandLists = DemandList::where('demand_id',$id)->get();
+        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
+                            ->get();
+
+        $months = [];
+        $currentMonth = date('n') - 2;
+        $endMonth = $currentMonth + 4;
+        for ($i=$currentMonth; $i<=$endMonth; $i++) {
+            $months[] = date('M y', mktime(0,0,0,$i, 1, date('Y')));
+        }
+
+        $models = MasterModel::all();
+        return view('demands.edit',
+            compact('demand','demandLists','models','months','monthlyDemands'));
     }
 
     /**
