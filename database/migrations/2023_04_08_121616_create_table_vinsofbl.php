@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bl_vinsdata', function (Blueprint $table) {
             $table->id();
             $table->string('bl_number')->unique();
-            $table->string('no_of_containers');
+            $table->string('vin_numbers');
             $table->timestamps();
         });
     }

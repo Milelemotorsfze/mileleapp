@@ -9,6 +9,7 @@ use App\Http\Controllers\LetterOfIndentController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
+use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
 /*
 /*
@@ -50,9 +51,9 @@ Route::get('/dd', function () {
     Route::resource('demand-lists', DemandListController::class);
     //BL Module
     Route::resource('blfrom', BLformController::class);
-    //Marketing
+    Route::resource('blfrom', BLVINSController::class);
+    //Sales
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
-    //Sales
     Route::resource('dailyleads', DailyleadsController::class);
 });
