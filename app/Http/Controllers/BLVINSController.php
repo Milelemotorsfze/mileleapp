@@ -24,11 +24,11 @@ class BLVINSController extends Controller
         $BLFormNumber = $request->input('bl_number');
         $vinsNumbers = $request->input('vins_numbers');
 
-        $data = new BlVinsdata();
-        $data->bl_number = $BLFormNumber;
-        $data->vins_numbers = $vinsNumbers;
-        $data->save();
-
-        return response()->json(['success' => true]);
+        DB::table('bl_vinsdata')->insert([
+            'bl_number' => $BLFormNumber,
+            'vins_numbers' => $vinsNumbers,
+        ]);
+        return response()->json(['bl_number' => $BLFormNumber, 'vins_numbers' => $vinsNumbers]);
     }
+
 }
