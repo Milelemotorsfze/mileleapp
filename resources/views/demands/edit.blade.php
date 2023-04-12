@@ -94,7 +94,6 @@
                                 <label for="basicpill-firstname-input" class="form-label">SFX</label>
                                 <select class="form-control" name="sfx" id="sfx"></select>
                             </div>
-
                             <div class="col-lg-4 col-md-4">
                                 <label for="basicpill-firstname-input" class="form-label">Varients</label>
                                 <select class="form-control" name="variant_name" id="variant-name"></select>
@@ -138,7 +137,6 @@
                         </div>
                     </div>
                 </div>
-
                 <br/>
                 <input type="hidden" value="{{ $demand->id }}" name="demand_id" id="demand-id">
                 <div class="col-lg-12 col-md-12">
@@ -150,7 +148,6 @@
             </div>
         </div>
     </div>
-    </div>
 @endsection
 @push('scripts')
 {{--    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>--}}
@@ -160,7 +157,7 @@
         $('.demand-list-quantity-4').attr('readonly', false);
 
         $('#model').select2();
-        $('#model').on('change',function(e){
+        $('#model').on('change',function(){
             $('#sfx').empty();
             let model = $(this).val();
             let url = '{{ route('demand.get-sfx') }}';
@@ -178,7 +175,7 @@
                 }
             });
         });
-        $('#sfx').on('change',function(e){
+        $('#sfx').on('change',function(){
             let sfx = $(this).val();
             let url = '{{ route('demand.get-variant') }}';
             $.ajax({

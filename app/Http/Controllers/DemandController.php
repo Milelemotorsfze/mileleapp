@@ -7,32 +7,11 @@ use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
 use App\Models\Varaint;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Demand;
-use Illuminate\Support\Facades\DB;
 
 class DemandController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('demands.create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -50,18 +29,6 @@ class DemandController extends Controller
 
         return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully');
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $cu = date('n') - 2;
@@ -93,22 +60,6 @@ class DemandController extends Controller
         $models = MasterModel::all();
         return view('demands.edit',
             compact('demand','demandLists','models','months','monthlyDemands','totalYearlyQuantities'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
     public function getSFX(Request $request)
     {
