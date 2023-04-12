@@ -11,6 +11,8 @@ use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
 use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
+use App\Http\Controllers\MonthlyDemandsController;
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -43,12 +45,14 @@ Route::get('/dd', function () {
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
+    Route::resource('letter-of-indents', LetterOfIndentController::class);
+
     //Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
-    Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
+    Route::resource('monthly-demands', MonthlyDemandsController::class);
     //BL Module
     Route::resource('blfrom', BLformController::class);
     Route::resource('blfrom', BLVINSController::class);

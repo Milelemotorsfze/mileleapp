@@ -64,6 +64,20 @@ class DemandController extends Controller
      */
     public function edit(string $id)
     {
+        $cu = date('n') - 2;
+        $ru   = $cu + 4;
+        $totalYearlyQuantities = [];
+        for($k=$cu;$k<=$ru;$k++) {
+            $month = date('M', mktime(0, 0, 0, $k, 10));
+            $year = date('y', mktime(0, 0, 0, $k, 10));
+            $data = MonthlyDemand::where('demand_id',$id)
+                ->where('month',$month)
+                ->where('year',$year)
+                ->sum('quantity');
+
+            $totalYearlyQuantities[] = $data;
+        }
+
         $demand = Demand::findOrFail($id);
         $demandLists = DemandList::where('demand_id',$id)->get();
         $monthlyDemands = MonthlyDemand::where('demand_id',$id)
@@ -78,7 +92,7 @@ class DemandController extends Controller
 
         $models = MasterModel::all();
         return view('demands.edit',
-            compact('demand','demandLists','models','months','monthlyDemands'));
+            compact('demand','demandLists','models','months','monthlyDemands','totalYearlyQuantities'));
     }
 
     /**

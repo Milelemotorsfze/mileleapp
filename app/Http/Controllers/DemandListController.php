@@ -32,9 +32,6 @@ class DemandListController extends Controller
      */
     public function store(Request $request)
     {
-        info("test");
-        info($request->all());
-
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',

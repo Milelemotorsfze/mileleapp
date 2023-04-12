@@ -36,8 +36,7 @@
                 </div>
             </div>
             @if($demandLists->count() > 0)
-                <span>welcome</span>
-                @foreach($demandLists as $demandList)
+                @foreach($demandLists as $value => $demandList)
                     <div class="d-flex">
                         <div class="col-lg-8">
                             <div class="row">
@@ -63,7 +62,7 @@
                                         <label for="basicpill-firstname-input" class="form-label">
                                             {{ $monthlyDemand->month }} {{ $monthlyDemand->year }}
                                         </label>
-                                        <input type="number" value="{{ $monthlyDemand->quantity }}" id="" name="demand_quanties[]"
+                                        <input type="text" min="0" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" name="demand_quanties[]"
                                                class="form-control demand-list-quantity-{{ $key }}" readonly />
                                     </div>
                                 @endforeach
@@ -132,6 +131,7 @@
                             @foreach($months as $key => $month)
                                 <div class="col-lg-2 col-md-3">
                                   <span id="monthly-total-{{$key}}">
+                                      {{ $totalYearlyQuantities[$key] }}
                                   </span>
                                 </div>
                             @endforeach
@@ -146,24 +146,18 @@
                 </div>
             </form>
             <div class="col-lg-12 col-md-12">
-                <button type="submit" class="btn btn-dark btnright">Finish</button>
+                <button type="button" class="btn btn-dark btnright" id="update-monthly-demands">Finish</button>
             </div>
         </div>
     </div>
     </div>
 @endsection
 @push('scripts')
+{{--    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>--}}
     <script type="text/javascript">
         $('.demand-list-quantity-2').attr('readonly', false);
         $('.demand-list-quantity-3').attr('readonly', false);
         $('.demand-list-quantity-4').attr('readonly', false);
-
-        $i=0;
-        for($i=0;$i<=5;$i++) {
-            $('#monthly-total-'+$i).val();
-            $('#monthly-total-'+$i).append(10);
-            // $("#destination").val(sum);
-        }
 
         $('#model').select2();
         $('#model').on('change',function(e){
@@ -201,11 +195,11 @@
                 }
             });
         });
-        for($i=0;$i<=5;$i++) {
-            $('#count-'+$i).on('keyup',function() {
+        for($j=0;$j<=5;$j++) {
+            $('#count-'+$j).on('keyup',function() {
                 Total();
             });
-            $('#count-'+$i).on('click',function() {
+            $('#count-'+$j).on('click',function() {
                 Total();
             });
         }
@@ -223,6 +217,36 @@
             $.ajax({
                 url: url,
                 data:$('form.form-demand').serializeArray(),
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        });
+        $('#update-monthly-demands').click(function() {
+            var count = '{{ $demandLists->count() }}';
+            var demand_id = $('#demand-id').val();
+            var quantities = [];
+            for($i=0;$i<count;$i++) {
+                var quantity0 = $('#demand-quantity-'+$i+'-0').val();
+                var quantity1 = $('#demand-quantity-'+$i+'-1').val();
+                var quantity2 = $('#demand-quantity-'+$i+'-2').val();
+                var quantity3 = $('#demand-quantity-'+$i+'-3').val();
+                var quantity4 = $('#demand-quantity-'+$i+'-4').val();
+                quantities.push(quantity0);
+                quantities.push(quantity1);
+                quantities.push(quantity2);
+                quantities.push(quantity3);
+                quantities.push(quantity4);
+            }
+            let url = '{{ route('monthly-demands.store') }}';
+            $.ajax({
+                url: url,
+                type: "POST",
+                data:{
+                    demand_id: demand_id,
+                    quantities:quantities,
+                    _token: '{{ csrf_token() }}'
+                },
                 success: function (data) {
                     location.reload();
 
