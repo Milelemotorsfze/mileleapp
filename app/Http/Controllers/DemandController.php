@@ -12,6 +12,14 @@ use App\Models\Demand;
 
 class DemandController extends Controller
 {
+    public function index()
+    {
+
+    }
+    public function create()
+    {
+        return view('demands.create');
+    }
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -20,12 +28,19 @@ class DemandController extends Controller
             'steering' => 'required'
         ]);
 
-        $demand = new Demand();
-        $demand->supplier = $request->input('supplier');
-        $demand->whole_saler = $request->input('whole_saler');
-        $demand->steering = $request->input('steering');
-        $demand->created_by = Auth::id();
-        $demand->save();
+        $demand = Demand::where('supplier',$request->supplier)
+            ->where('whole_saler', $request->whole_saler)
+            ->where('steering', $request->steering)
+            ->first();
+
+        if (!$demand) {
+            $demand = new Demand();
+            $demand->supplier = $request->input('supplier');
+            $demand->whole_saler = $request->input('whole_saler');
+            $demand->steering = $request->input('steering');
+            $demand->created_by = Auth::id();
+            $demand->save();
+        }
 
         return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully');
     }
@@ -47,15 +62,23 @@ class DemandController extends Controller
 
         $demand = Demand::findOrFail($id);
         $demandLists = DemandList::where('demand_id',$id)->get();
-        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
-                            ->get();
 
         $months = [];
+        $years = [];
+        $currentMonths = [];
         $currentMonth = date('n') - 2;
         $endMonth = $currentMonth + 4;
         for ($i=$currentMonth; $i<=$endMonth; $i++) {
             $months[] = date('M y', mktime(0,0,0,$i, 1, date('Y')));
+            $years[] = date('y', mktime(0,0,0,$i, 1, date('Y')));
+            $currentMonths[] = date('M', mktime(0,0,0,$i, 1, date('Y')));
         }
+
+        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
+            ->whereIn('month', $currentMonths)
+            ->whereIn('year', $years)
+            ->get();
+//        return $monthlyDemands;
 
         $models = MasterModel::all();
         return view('demands.edit',

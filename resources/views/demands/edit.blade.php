@@ -36,20 +36,41 @@
                 </div>
             </div>
             @if($demandLists->count() > 0)
+                <div class="d-flex">
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">Model</label>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">SFX</label>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">Varients</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-md-3">
+                        <div class ="row">
+                            @foreach($months as $key => $month)
+                                <div class="col-lg-1">
+                                    <label>{{ $month }} </label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
                 @foreach($demandLists as $value => $demandList)
                     <div class="d-flex">
                         <div class="col-lg-8">
                             <div class="row">
                                 <div class="col-lg-4 col-md-4">
-                                    <label for="basicpill-firstname-input" class="form-label">Model</label>
                                     <input type="text" value="{{ $demandList->model }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-4 col-md-4">
-                                    <label for="basicpill-firstname-input" class="form-label">SFX</label>
                                     <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-4 col-md-4">
-                                    <label for="basicpill-firstname-input" class="form-label">Varients</label>
                                     <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
                                 </div>
                             </div>
@@ -57,17 +78,14 @@
                         <p>&nbsp;&nbsp;&nbsp;</p>
                         <div class="col-lg-8 col-md-3">
                             <div class ="row">
+
                                 @foreach($demandList->monthlyDemands as $key => $monthlyDemand)
                                     <div class="col-lg-1">
-                                        <label for="basicpill-firstname-input" class="form-label">
-                                            {{ $monthlyDemand->month }} {{ $monthlyDemand->year }}
-                                        </label>
                                         <input type="text" min="0" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" name="demand_quanties[]"
                                                class="form-control demand-list-quantity-{{ $key }}" readonly />
                                     </div>
                                 @endforeach
                                     <div class="col-lg-1">
-                                        <label for="basicpill-firstname-input" class="form-label">Total</label>
                                         <input type="text" class="form-control" readonly value="{{ $demandList->monthlyDemands()->sum('quantity') }}" >
                                     </div>
                             </div>
@@ -76,27 +94,28 @@
                     <br/>
                 @endforeach
             @endif
-            <form id="form-demand" action="{{ route('demand-lists.store') }}" method="POST" enctype="multipart/form-data" class="form-demand">
+            <form id="form-demand" action="{{ route('demand-lists.store') }}" method="POST" enctype="multipart/form-data" >
                 @csrf
                 <div class="d-flex">
                     <div class="col-lg-8">
                         <div class="row">
                             <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">Model</label>
                                 <select class="form-select" name="model" id="model">
-                                    <option value="" disabled>Select The Model</option>
+                                    <option value="" >Select Model</option>
                                     @foreach($models as $model)
                                         <option value="{{ $model->model }}">{{ $model->model }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                                <select class="form-control" name="sfx" id="sfx"></select>
+                                <select class="form-select" name="sfx" id="sfx">
+                                    <option value="" >Select SFX</option>
+                                </select>
                             </div>
                             <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">Varients</label>
-                                <select class="form-control" name="variant_name" id="variant-name"></select>
+                                <select class="form-select" name="variant_name" id="variant-name" >
+                                    <option value="" >Select Variant</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -105,14 +124,11 @@
                         <div class ="row">
                             @foreach($months as $key => $month)
                                 <div class="col-lg-1">
-                                    <label for="basicpill-firstname-input" class="form-label">{{ $month }}
-                                    </label>
                                     <input type="hidden" value="{{$month}}" name="month[]" id="month-year"/>
                                     <input type="number" value="0" id="count-{{$key}}" name="quantity[]" class="form-control quantity"/>
                                 </div>
                             @endforeach
                             <div class="col-lg-1">
-                                <label for="basicpill-firstname-input" class="form-label">Total</label>
                                 <input type="text"  class="form-control" readonly  value="" id="total" name="total">
                             </div>
                         </div>
@@ -158,7 +174,6 @@
 
         $('#model').select2();
         $('#model').on('change',function(){
-            $('#sfx').empty();
             let model = $(this).val();
             let url = '{{ route('demand.get-sfx') }}';
             $.ajax({
@@ -169,6 +184,10 @@
                     model: model
                 },
                 success:function (data) {
+                    $('select[name="sfx"]').empty();
+                    $('select[name="variant_name"]').empty();
+                    $('#sfx').html('<option value=""> Select SFX </option>');
+                    $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
@@ -186,6 +205,8 @@
                     sfx: sfx
                 },
                 success:function (data) {
+                    $('select[name="variant_name"]').empty();
+                    $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="variant_name"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
