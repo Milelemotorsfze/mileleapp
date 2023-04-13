@@ -69,6 +69,7 @@ use App\Http\Controllers\BLFormNewVinsController;
     Route::resource('blformvins', BLFormNewVinsController::class);
     // Route::resource('blformvins', BLVINSController::class);
     Route::post('/store-data', [BLVINSController::class, 'blformvins'])->name('store-data');
+    // Route::post('/store-data', [BLVINSController::class, 'blformvins'])->name('store-data');
 
 
     //Sales
