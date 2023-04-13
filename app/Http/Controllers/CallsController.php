@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ModelHasRoles;
 use App\Models\SalesPersonLaugauges;
+use Monarobase\CountryList\CountryListFacade;
 use Carbon\Carbon;
 
 class CallsController extends Controller
@@ -26,9 +27,9 @@ class CallsController extends Controller
      */
     public function create()
     {
-        return view('calls.create');
+        $countries = CountryListFacade::getList('en');
+        return view('calls.create', compact('countries'));
     }
-    
     /**
      * Store a newly created resource in storage.
      */
@@ -39,6 +40,7 @@ class CallsController extends Controller
             'phone' => 'required',
             'source' => 'required',
             'demand' => 'required',
+            'location' => 'required',
             'email' => 'required|email|unique:users,email',
         ]);
         $email = $request->input('email');
@@ -112,6 +114,7 @@ class CallsController extends Controller
             'email' => $request->input('email'),
             'sales_person' => $sales_person_id,
             'remarks' => $request->input('remarks'),
+            'location' => $request->input('location'),
             'phone' => $request->input('phone'),
             'language' => $request->input('language'),
             'created_at' => $formattedDate,

@@ -21,7 +21,7 @@
                         @endcan
                         @can('variants-view')
                         <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
+						<a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i><span data-key="t-extra-pages">Variants</span>
                         </a>
 						</li>

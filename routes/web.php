@@ -10,6 +10,8 @@ use App\Http\Controllers\DemandController;
 use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
 use App\Http\Controllers\DemandListController;
+use App\Http\Controllers\SalesPersonLanguagesController; 
+use App\Http\Controllers\VariatnsPicturesController; 
 /*
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +55,7 @@ Route::get('/dd', function () {
     //Marketing
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
+    Route::resource('variant_pictures', VariatnsPicturesController::class);
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\SalesPersonLaugauges;
 use Illuminate\Http\Request;
+use App\Models\ModelHasRoles;
 
 class SalesPersonLanguagesController extends Controller
 {
@@ -14,7 +15,9 @@ class SalesPersonLanguagesController extends Controller
 
     public function create()
     {
-        return view('languages.create');
+        $data = ModelHasRoles::where('role_id', 4)->get();
+        $name = User::find($data);
+        return view('sales_person_languages.create',compact('name'));
     }
 
     public function store(Request $request)

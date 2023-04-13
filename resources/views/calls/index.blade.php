@@ -37,6 +37,7 @@
                   <th>Demand</th>
                   <th>Source</th>
                   <th>Language</th>
+                  <th>Location</th>
                   <th>Remarks</th>
                 </tr>
               </thead>
@@ -57,6 +58,7 @@
                     <td>{{ $calls->demand }}</td> 
                     <td>{{ $calls->source }}</td>
                     <td>{{ $calls->language }}</td>
+                    <td>{{ $calls->location }}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
@@ -86,6 +88,7 @@
                   <th>Demand</th>
                   <th>Source</th>
                   <th>Language</th>
+                  <th>Location</th>
                   <th>Remarks</th>
                 </tr>
               </thead>
@@ -106,6 +109,7 @@
                     <td>{{ $calls->demand }}</td> 
                     <td>{{ $calls->source }}</td>
                     <td>{{ $calls->language }}</td>
+                    <td>{{ $calls->location }}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);

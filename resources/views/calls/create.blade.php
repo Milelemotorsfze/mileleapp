@@ -68,6 +68,17 @@
                         'shona' => 'Shona',
                         ], null, ['class' => 'form-control']) }}
                     </div>
+                    <div class="col-xs-6 col-sm-12 col-md-6">
+                        <div class="form-group">
+                            <strong>Location:</strong>
+                            <select name="location" id="country" class="form-control mb-1">
+                                <option value="">Select Location</option>
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country }}">{{ $country }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
                         <textarea name="remarks" id="editor"></textarea>

@@ -18,6 +18,7 @@ class calls extends Model
         'source',
         'status',
         'language',
+        'location',
         'demand',
         'created_by',
         'created_at',
