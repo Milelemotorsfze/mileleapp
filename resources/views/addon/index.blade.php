@@ -10,10 +10,10 @@
     </a>
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
-    </a>  
+    </a>
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
-    </a> 
+    </a>
   </div>
   <div class="card-header">
     <form>
@@ -105,25 +105,25 @@
                       {{$AddonTypes->model_id}}
                     </div>
                   @endforeach
-                </div>                     
-              </div>          
-            </div> 
+                </div>
+              </div>
+            </div>
             </br>
             <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
                   <i class="fa fa-edit" aria-hidden="true"></i> Edit
                 </a>
-              </div>     
+              </div>
             </div>
           </div>
           </br>
-          
+
         @endforeach
         </br>
       </div>
     </div>
-    <div class="table-responsive" id="addonListTable" hidden>     
+    <div class="table-responsive" id="addonListTable" hidden>
       <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
         <thead>
           <tr>
@@ -166,7 +166,7 @@
   </div>
 @endsection
 
-                                   
+
 
 
 
@@ -175,7 +175,7 @@
                                                       <div class="table-responsive">
                                                       <div class="each-addon col-xxl-4 col-lg-6 col-md-12">
                                                       <table id="" class="table table-striped table-editable table-edits table">
-                                                  
+
                                                   <tbody>
                                                     <div hidden>{{$i=0;}}</div>
                                                         <tr data-id="1">
