@@ -12,12 +12,12 @@ class BLformController extends Controller
      */
     public function index()
     {
-        return view('blform.index');
+        return view('blformvins.index');
         $bldata = BLForm::all();
     }
     public function create()
     {
-        return view('blform.create');
+        return view('blformvins.createvin');
     }
     public function store()
     {

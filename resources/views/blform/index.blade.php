@@ -2,7 +2,6 @@
 @section('content')
   <div class="card-header">
     <h4 class="card-title">Bill of Lading Form</h4>
-    <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blfrom.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i>Add New BL Form</a>
     <div class="clearfix"></div>
     <br>
     <ul class="nav nav-pills nav-fill">
@@ -15,7 +14,7 @@
     </ul>      
   </div>
   <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
@@ -25,7 +24,10 @@
                 </tr>
               </thead>
               <tbody>
-                <h2>Table 1</h2>
+                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> Add New BL Form</a>
+                <br>
+                <br>
+                <div class="clearfix"></div>
               </tbody>
             </table>
           </div>  
@@ -41,7 +43,10 @@
                 </tr>
               </thead>
               <tbody>
-                <h2>Table 2</h2>
+                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> Add New VIN</a>
+                <br>
+                <br>
+                <div class="clearfix"></div>
               </tbody>
             </table>
           </div> 

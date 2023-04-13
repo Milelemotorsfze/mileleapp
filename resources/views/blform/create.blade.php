@@ -2,7 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Create New Bill of Lading Form</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('blfrom.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('blform.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -149,27 +149,37 @@
     //         $("#newVINRowinModal").append('<br><input placeholder="Enter VIN Number" type="text" name="" class="form-control">');
     //     });
     // });
+
+
     $(document).ready(function() {
-      $('#addNewVINField').click(function() {
-        var $prevInput = $("#newVINRowinModal input[type='text']:last");
-        $prevInput.prop('readonly', true);
-        $("#newVINRowinModal").append('<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control">');
-        var vins_numbers = $prevInput.val();
-        var bl_number = $("#BLFormNumber").val();
-        $.ajax({
-          url: '/store-vin',
-          method: 'POST',
-          data: {bl_number: bl_number, vins_numbers: vins_numbers},
-          success: function(response) {
-            var newInput = '<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" value="' + response.vins_numbers + '">';
-            $("#newVINRowinModal").append(newInput);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            alert('Error storing VIN: ' + errorThrown);
-          }
+        $('#addNewVINField').click(function() {
+            var $prevInput = $("#newVINRowinModal input[type='text']:last");
+            if ($prevInput.length > 0) {
+                $prevInput.prop('readonly', true);
+            }
+            $("#newVINRowinModal").append('<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" required>');
+            var vins_numbers = $prevInput.val();
+            var bl_number = $("#BLFormNumber").val();
+            var url = "{{ route('store-data') }}";
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    bl_number: bl_number,
+                    vins_numbers: vins_numbers,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    var newInput = '<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" value="' + vins_numbers + '" required>';
+                    $("#newVINRowinModal").append(newInput);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Error storing VIN: ' + errorThrown);
+                }
+            });
         });
-      });
     });
+
 
     $(document).ready(function() {
       $("#saveChanges").click(function() {

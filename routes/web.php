@@ -16,6 +16,7 @@ use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
+use App\Http\Controllers\BLFormNewVinsController;
 
 
 /*
@@ -64,8 +65,12 @@ use App\Http\Controllers\SupplierInventoryController;
     Route::resource('supplier-inventories', SupplierInventoryController::class);
 
     //BL Module
-    Route::resource('blfrom', BLformController::class);
-    Route::resource('blfrom', BLVINSController::class);
+    Route::resource('blform', BLformController::class);
+    Route::resource('blformvins', BLFormNewVinsController::class);
+    // Route::resource('blformvins', BLVINSController::class);
+    Route::post('/store-data', [BLVINSController::class, 'blformvins'])->name('store-data');
+
+
     //Sales
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
