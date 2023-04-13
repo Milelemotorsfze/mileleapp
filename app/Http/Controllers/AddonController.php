@@ -5,11 +5,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Addon;
 use App\Models\Brand;
-use App\Models\MasterModel;
+use App\Models\MasterModelLines;
 use App\Models\AddonDetails;
 use App\Models\AddonTypes;
 use DB;
 use Validator;
+
 
 class AddonController extends Controller
 {
@@ -18,16 +19,19 @@ class AddonController extends Controller
      */
     public function index()
     {
-        $addon1 = AddonDetails::with('AddonName','AddonTypes')->get();
+        $addonMasters = Addon::select('id','name')->get();
+        $brandMatsers = Brand::select('id','brand_name')->get();
+        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->get();
+        $addon1 = AddonDetails::with('AddonName','AddonTypes')->orderBy('id', 'DESC')->get();
         $addons = DB::table('addon_details')
                     ->join('addons','addons.id','addon_details.addon_id')
                     ->join('addon_types','addon_types.addon_details_id','addon_details.id')
                     ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.currency',
                     'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_types.brand_id','addon_types.model_id')
-                    ->orderBy('addon_details.id','ASC')
+                    ->orderBy('addon_details.id','DESC')
                     ->get();
-                    // dd($addons);
-        return view('addon.index',compact('addons','addon1'));
+                   
+        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters'));
     }
 
     /**
@@ -35,10 +39,13 @@ class AddonController extends Controller
      */
     public function create()
     {
+        // $lastAddonCode = AddonDetails::orderBy('id', 'desc')->first()->addon_code;
+      
+       
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
-        $models = MasterModel::select('model')->get();
-        return view('addon.create',compact('addons','brands','models'));
+        $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
+        return view('addon.create',compact('addons','brands','modelLines'));
     }
 
     /**
@@ -64,7 +71,7 @@ class AddonController extends Controller
 
         $validator = Validator::make($request->all(), [
             'addon_id' => 'required',
-            'addon_code' => 'required',
+            // 'addon_code' => 'required',
             'purchase_price' => 'required',
             'selling_price' => 'required',
             'lead_time' => 'required',
@@ -125,12 +132,19 @@ class AddonController extends Controller
 
 
 
+           
 
+            //output: P00001
             $input = $request->all();
+            
             $input['currency'] = 'AED';
             $input['created_by'] = $authId;
             $input['image'] = $fileName;
-            
+            $lastAddonCode = AddonDetails::orderBy('id', 'desc')->first()->addon_code;
+            $lastAddonCodeNumber = substr($lastAddonCode, 1, 5);
+            $newAddonCodeNumber =  $lastAddonCodeNumber+1;
+            $newAddonCode = "P".$newAddonCodeNumber;
+            $input['addon_code'] = $newAddonCode;
             $addon_details = AddonDetails::create($input);
             $inputaddontype['addon_details_id'] = $addon_details->id;
             $inputaddontype['created_by'] = $authId;
@@ -190,8 +204,8 @@ class AddonController extends Controller
         // dd($addonDetails);
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
-        $models = MasterModel::select('model')->get();
-        return view('addon.edit',compact('addons','brands','models','addonDetails'));
+        $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
+        return view('addon.edit',compact('addons','brands','modelLines','addonDetails'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
@@ -258,5 +272,28 @@ class AddonController extends Controller
                     ->orderBy('addon_details.id','ASC')
                     ->get();
         return $existingImages;
+    }
+    public function addonFilters(Request $request) 
+    {
+        $oldValue = $request->oldValue;
+        $addonIds = AddonDetails::with('AddonTypes')->whereHas('AddonTypes', function($q) use($request) {
+            if($request->BrandIds)
+            {
+            $q->whereNotIn('brand_id',$request->BrandIds)->get();
+            }
+            if($request->BrandIds)
+            {
+            $q->whereNotIn('brand_id',$request->BrandIds)->get();
+            }
+        });
+        if($request->AddonIds)
+        {
+            $addonIds = $addonIds->whereNotIn('addon_id',$request->AddonIds);
+        }
+        $addonIds = $addonIds->pluck('id');
+        $data['addonIds'] = $addonIds;
+        // dd($oldValue);
+        $data['oldValue'] =  $oldValue;
+        return response()->json($data);
     }
 }

@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bl_vinsdata', function (Blueprint $table) {
+        Schema::create('supplier_inventories', function (Blueprint $table) {
             $table->id();
-            $table->string('bl_number')->unique();
-            $table->string('vin_numbers');
             $table->timestamps();
         });
     }
@@ -24,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bl_vinsdata');
+        Schema::dropIfExists('supplier_inventories');
     }
 };

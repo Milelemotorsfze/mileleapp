@@ -1,4 +1,7 @@
 <?php
+
+use App\Http\Controllers\SalesPersonLanguagesController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
@@ -9,9 +12,12 @@ use App\Http\Controllers\LetterOfIndentController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
+use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
-use App\Http\Controllers\SalesPersonLanguagesController; 
-use App\Http\Controllers\VariatnsPicturesController; 
+use App\Http\Controllers\MonthlyDemandsController;
+use App\Http\Controllers\SupplierInventoryController;
+
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +29,9 @@ use App\Http\Controllers\VariatnsPicturesController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/dd', function () {
-    return view('dd');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
     Auth::routes();
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
@@ -44,15 +50,23 @@ Route::get('/dd', function () {
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
-    //Demand & Planning
+    Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
+
+    // Letter of Indent
+    Route::resource('letter-of-indents', LetterOfIndentController::class);
+
+    // Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
-    Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
+    Route::resource('monthly-demands', MonthlyDemandsController::class);
+    Route::resource('supplier-inventories', SupplierInventoryController::class);
+
     //BL Module
     Route::resource('blfrom', BLformController::class);
-    //Marketing
+    Route::resource('blfrom', BLVINSController::class);
+    //Sales
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);

@@ -21,7 +21,7 @@
                 <div class="row"> 
 					<div class="col-lg-3 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">BL Number</label>
-                        <input type="text" name="bl_number" class="form-control" placeholder="Enter Bill of Lading Number">
+                        <input type="text" name="bl_number" class="form-control" placeholder="Enter Bill of Lading Number" id="BLFormNumber">
                     </div>
 					<div class="col-lg-3 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">SO Number</label>
@@ -73,16 +73,20 @@
                         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Add Multiple VINs</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control">
-                                </div>
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Add Multiple VINs</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post" action="" id="addNewVINForm">
+                                            <div id="newVINRowinModal"></div>
+                                        </form>
+                                        <br>
+                                        <a class="btn btn-success" id="addNewVINField">Add New VIN</a>
+                                    </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary">Save changes</button>
+                                        <button type="button" class="btn btn-primary" id="saveChanges">Save changes</button>
                                     </div>
                                 </div>
                             </div>
@@ -133,12 +137,45 @@
                 </br> 
 		        <div class="col-lg-12 col-md-12">
                     <input type="submit" name="submit" value="submit" class="btn btn-success btn-sm btncenter" />
-		        </div>  
+		        </div> 
+            </form> 
 		</br>
     </div>
 @endsection
 @push('scripts')
 <script type="text/javascript">
+    // $(document).ready(function() {
+    //     $('#addNewVINField').click(function(){
+    //         $("#newVINRowinModal").append('<br><input placeholder="Enter VIN Number" type="text" name="" class="form-control">');
+    //     });
+    // });
+    $(document).ready(function() {
+      $('#addNewVINField').click(function() {
+        var $prevInput = $("#newVINRowinModal input[type='text']:last");
+        $prevInput.prop('readonly', true);
+        $("#newVINRowinModal").append('<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control">');
+        var vins_numbers = $prevInput.val();
+        var bl_number = $("#BLFormNumber").val();
+        $.ajax({
+          url: '/store-vin',
+          method: 'POST',
+          data: {bl_number: bl_number, vins_numbers: vins_numbers},
+          success: function(response) {
+            var newInput = '<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" value="' + response.vins_numbers + '">';
+            $("#newVINRowinModal").append(newInput);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            alert('Error storing VIN: ' + errorThrown);
+          }
+        });
+      });
+    });
+
+    $(document).ready(function() {
+      $("#saveChanges").click(function() {
+        $("#BLFormNumber").prop("readonly", true);
+      });
+    });
     $(document).ready(function() {
         var countries = [
             { id: 1, text: 'Afghanistan' },
@@ -404,6 +441,7 @@
             data: countries
         });
     });
+
 </script>
 @endpush
 

@@ -1,9 +1,10 @@
 @extends('layouts.table')
 @section('content')
   <div class="card-header">
-    <h4 class="card-title">
-      Bill of Lading Form
-    </h4>
+    <h4 class="card-title">Bill of Lading Form</h4>
+    <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blfrom.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i>Add New BL Form</a>
+    <div class="clearfix"></div>
+    <br>
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Bill of Lading Form</a>
@@ -24,7 +25,6 @@
                 </tr>
               </thead>
               <tbody>
-                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blfrom.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i>Add New BL Form</a>
                 <h2>Table 1</h2>
               </tbody>
             </table>

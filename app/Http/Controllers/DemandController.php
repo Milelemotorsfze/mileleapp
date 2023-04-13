@@ -7,32 +7,19 @@ use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
 use App\Models\Varaint;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Demand;
-use Illuminate\Support\Facades\DB;
 
 class DemandController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    }
     public function create()
     {
         return view('demands.create');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -41,60 +28,61 @@ class DemandController extends Controller
             'steering' => 'required'
         ]);
 
-        $demand = new Demand();
-        $demand->supplier = $request->input('supplier');
-        $demand->whole_saler = $request->input('whole_saler');
-        $demand->steering = $request->input('steering');
-        $demand->created_by = Auth::id();
-        $demand->save();
+        $demand = Demand::where('supplier',$request->supplier)
+            ->where('whole_saler', $request->whole_saler)
+            ->where('steering', $request->steering)
+            ->first();
+
+        if (!$demand) {
+            $demand = new Demand();
+            $demand->supplier = $request->input('supplier');
+            $demand->whole_saler = $request->input('whole_saler');
+            $demand->steering = $request->input('steering');
+            $demand->created_by = Auth::id();
+            $demand->save();
+        }
 
         return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully');
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
+        $cu = date('n') - 2;
+        $ru   = $cu + 4;
+        $totalYearlyQuantities = [];
+        for($k=$cu;$k<=$ru;$k++) {
+            $month = date('M', mktime(0, 0, 0, $k, 10));
+            $year = date('y', mktime(0, 0, 0, $k, 10));
+            $data = MonthlyDemand::where('demand_id',$id)
+                ->where('month',$month)
+                ->where('year',$year)
+                ->sum('quantity');
+
+            $totalYearlyQuantities[] = $data;
+        }
+
         $demand = Demand::findOrFail($id);
         $demandLists = DemandList::where('demand_id',$id)->get();
-        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
-                            ->get();
 
         $months = [];
+        $years = [];
+        $currentMonths = [];
         $currentMonth = date('n') - 2;
         $endMonth = $currentMonth + 4;
         for ($i=$currentMonth; $i<=$endMonth; $i++) {
             $months[] = date('M y', mktime(0,0,0,$i, 1, date('Y')));
+            $years[] = date('y', mktime(0,0,0,$i, 1, date('Y')));
+            $currentMonths[] = date('M', mktime(0,0,0,$i, 1, date('Y')));
         }
+
+        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
+            ->whereIn('month', $currentMonths)
+            ->whereIn('year', $years)
+            ->get();
+//        return $monthlyDemands;
 
         $models = MasterModel::all();
         return view('demands.edit',
-            compact('demand','demandLists','models','months','monthlyDemands'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            compact('demand','demandLists','models','months','monthlyDemands','totalYearlyQuantities'));
     }
     public function getSFX(Request $request)
     {

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MasterModel;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class MasterModelController extends Controller
+class SupplierInventoryController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class MasterModelController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MasterModel $masterModel)
+    public function show(string $id)
     {
         //
     }
@@ -42,7 +42,7 @@ class MasterModelController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(MasterModel $masterModel)
+    public function edit(string $id)
     {
         //
     }
@@ -50,7 +50,7 @@ class MasterModelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MasterModel $masterModel)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -58,7 +58,7 @@ class MasterModelController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(MasterModel $masterModel)
+    public function destroy(string $id)
     {
         //
     }

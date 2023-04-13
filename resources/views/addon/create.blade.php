@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
@@ -55,7 +55,7 @@
                             @enderror
                         </div>
                     </div>
-                    </br>
+                    </br> -->
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Purchase Price ( AED )') }}</label>
@@ -164,8 +164,9 @@
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                     <input list="cityname2" id="title1" type="text" class="form-control @error('model') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="" required autocomplete="model" autofocus>
                                     <datalist id="cityname2">
-                                        <option value="Boston">
-                                        <option value="Cambridge">
+                                    @foreach($modelLines as $modelLine)
+                                            <option data-value="{{$modelLine->id}}" value="{{$modelLine->model_line}}"></option>
+                                        @endforeach
                                     </datalist>
                                     @error('model')
                                         <span class="invalid-feedback" role="alert">
