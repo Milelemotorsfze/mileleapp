@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('master_models', function (Blueprint $table) {
+        Schema::create('master_model_lines', function (Blueprint $table) {
             $table->id();
-            $table->string('steering')->nullable();
-            $table->string('model')->nullable();
-            $table->string('sfx')->nullable();
-            $table->string('amount_uae')->nullable();
-            $table->string('amount_belgium')->nullable();
+            $table->bigInteger('brand_id')->unsigned()->index()->nullable();
+            $table->foreign('brand_id')->references('id')->on('brands')->onDelete('cascade');
+            $table->string('model_line')->nullable();
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('updated_by')->unsigned()->index()->nullable();
@@ -25,7 +23,6 @@ return new class extends Migration
             $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
             $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('master_models');
+        Schema::dropIfExists('master_model_lines');
     }
 };

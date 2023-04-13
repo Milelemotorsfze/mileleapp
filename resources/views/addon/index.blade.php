@@ -1,5 +1,6 @@
 @extends('layouts.table')
 @section('content')
+
   <div class="card-header">
     <h4 class="card-title">
       Addon List
@@ -12,13 +13,40 @@
     </a>  
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
-    </a>  
+    </a> 
+  </div>
+  <div class="card-header">
+    <form>
+      <div class="row">
+        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+          <select id="fltr-addon-code" multiple="true" style="width: 100%;">
+            @foreach($addonMasters as $addonMaster)
+              <option value="{{$addonMaster->id}}">{{$addonMaster->name}}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+          <select id="fltr-brand" multiple="true" style="width: 100%;">
+            @foreach($brandMatsers as $brandMatser)
+              <option value="{{$brandMatser->brand_name}}">{{$brandMatser->brand_name}}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+          <select id="fltr-model-line" multiple="true" style="width: 100%;">
+          @foreach($modelLineMasters as $modelLineMaster)
+          <option value="{{$modelLineMaster->id}}">{{$modelLineMaster->model_line}}</option>
+          @endforeach
+          </select>
+        </div>
+      </div>
+    </form>
   </div>
   <div class="card-body">
     <div class="list2" id="addonbox">
       <div class="row related-addon">
         @foreach($addon1 as $addonsdata)
-          <div class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+          <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
             <div class="row">
               <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                 <img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:115px;" alt="Addon Image" />

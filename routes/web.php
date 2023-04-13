@@ -29,9 +29,9 @@ use App\Http\Controllers\SupplierInventoryController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/dd', function () {
-    return view('dd');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
     Auth::routes();
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
@@ -50,16 +50,18 @@ Route::get('/dd', function () {
     Route::get('addons/details/edit/{id}', [AddonController::class,'editAddonDetails'])->name('addon.editDetails');
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
+    Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
+
+    // Letter of Indent
     Route::resource('letter-of-indents', LetterOfIndentController::class);
 
-    //Demand & Planning
+    // Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
     Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);
     Route::resource('supplier-inventories', SupplierInventoryController::class);
-
 
     //BL Module
     Route::resource('blfrom', BLformController::class);

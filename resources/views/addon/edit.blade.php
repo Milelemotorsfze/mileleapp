@@ -47,7 +47,7 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Enter Addon Code" value="{{ $addonDetails->addon_code }}" required autocomplete="addon_code" autofocus>
+                            <input id="addon_code" type="text" class="form-control @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Enter Addon Code" value="{{ $addonDetails->addon_code }}" required autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -158,8 +158,9 @@
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                     <input list="cityname2" id="title1" type="text" class="form-control @error('model') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="{{$AddonTypes->model_id}}" required autocomplete="model" autofocus>
                                     <datalist id="cityname2">
-                                        <option value="Boston">
-                                        <option value="Cambridge">
+                                    @foreach($modelLines as $modelLine)
+                                            <option data-value="{{$modelLine->id}}" value="{{$modelLine->model_line}}"></option>
+                                        @endforeach
                                     </datalist>
                                     @error('model')
                                         <span class="invalid-feedback" role="alert">

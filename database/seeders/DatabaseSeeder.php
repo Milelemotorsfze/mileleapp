@@ -22,6 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CreateAdminUserSeeder::class);
         $this->call(AddonTableSeeder::class);
         $this->call(BrandsTableSeeder::class);
-        $this->call(MasterModelTableSeeder::class);
+        $this->call(AddonDetailsTableSeeder::class);
     }
 }

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->bigInteger('addon_id')->unsigned()->index()->nullable();
             $table->foreign('addon_id')->references('id')->on('addons')->onDelete('cascade');
             $table->string('addon_code')->nullable();
-            $table->decimal('purchase_price', 10,2)->nullable();
-            $table->decimal('selling_price', 10,2)->nullable();
-            $table->string('currency')->nullable();
-            $table->integer('lead_time')->nullable();
+            $table->decimal('purchase_price', 10,2)->default('0.00');
+            $table->decimal('selling_price', 10,2)->default('0.00');
+            $table->string('currency')->default('AED')->nullable();
+            $table->string('lead_time')->nullable();
             $table->text('additional_remarks')->nullable();
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
