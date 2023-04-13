@@ -97,6 +97,11 @@
                                         <span data-key="t-utility">Deals</span>
                                     </a>
                                 </div>
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('supplier-inventories.index') }}" id="topnav-utility" role="button">
+                                        <span data-key="t-utility">Supplier Inventory</span>
+                                    </a>
+                                </div>
                             </div>
                         </li>
 						<li class="nav-item dropdown">

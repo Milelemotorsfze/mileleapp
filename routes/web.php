@@ -15,6 +15,8 @@ use App\Http\Controllers\BLformController;
 use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
+use App\Http\Controllers\SupplierInventoryController;
+
 
 /*
 /*
@@ -56,6 +58,9 @@ Route::get('/dd', function () {
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);
+    Route::resource('supplier-inventories', SupplierInventoryController::class);
+
+
     //BL Module
     Route::resource('blfrom', BLformController::class);
     Route::resource('blfrom', BLVINSController::class);
