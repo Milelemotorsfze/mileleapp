@@ -166,13 +166,13 @@
     </div>
 @endsection
 @push('scripts')
-{{--    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>--}}
     <script type="text/javascript">
         $('.demand-list-quantity-2').attr('readonly', false);
         $('.demand-list-quantity-3').attr('readonly', false);
         $('.demand-list-quantity-4').attr('readonly', false);
 
         $('#model').select2();
+
         $('#model').on('change',function(){
             let model = $(this).val();
             let url = '{{ route('demand.get-sfx') }}';
@@ -257,6 +257,7 @@
                 quantities.push(quantity4);
             }
             let url = '{{ route('monthly-demands.store') }}';
+            let redirect_url = '{{ route('demands.create') }}';
             $.ajax({
                 url: url,
                 type: "POST",
@@ -266,8 +267,7 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function (data) {
-                    location.reload();
-
+                    window.location.href = redirect_url;
                 }
             });
         });
