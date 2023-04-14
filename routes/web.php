@@ -15,11 +15,7 @@ use App\Http\Controllers\BLformController;
 use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
-<<<<<<< Updated upstream
 use App\Http\Controllers\VariatnsPicturesController;
-use App\Http\Controllers\BLFormNewVinsController;
-=======
->>>>>>> Stashed changes
 
 
 /*
@@ -68,10 +64,9 @@ use App\Http\Controllers\BLFormNewVinsController;
     Route::resource('supplier-inventories', SupplierInventoryController::class);
 
     //BL Module
-    Route::resource('blfrom', BLformController::class);
-    Route::resource('blfrom', BLVINSController::class);
+    Route::get('/blform', [BlFormController::class, 'index'])->name('blform.index');
+
     //Marketing
-    Route::resource('blform', BLformController::class);
 
 
     //Sales

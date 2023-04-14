@@ -21,11 +21,12 @@
             <div class="form-group">
                 <label for="images">Images:</label>
                 <div class="file-upload">
-                  <input type="file" id="images" name="images[]" multiple>
+                  <input type="file" id="images" name="images[]" multiple class="input-upload">
                   <label for="images" class="file-label">Drag and drop files here or click to browse</label>
                   <div id="preview" class="file-preview"></div>
                 </div>
             </div>
+            <br>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
@@ -71,25 +72,54 @@
         height: 200px;
         border: 2px dashed #ccc;
         cursor: pointer;
+        position: relative;
+        z-index: 10;
+    }
+    .file-upload  .input-upload{
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin: 0;
+        padding: 0;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0;
+        filter: alpha(opacity=0);
+        border: 1px solid #222;
+        width: 100%;
+        height: 100%;
+        z-index: 12;
     }
     .file-label {
         font-size: 16px;
         color: #666;
-        padding: 20px;
+        position: relative;
+        z-index: 11;
+
     }
     .file-preview {
         display: flex;
         flex-wrap: wrap;
-        margin-top: 20px;
     }
     .file-item {
         display: flex;
         flex-direction: column;
-        margin: 10px;
+        margin: 20px 10px 0px;
+        position: relative;
+        z-index: 13;
     }
     .file-remove {
         margin-top: 5px;
         cursor: pointer;
+        position: absolute;
+        top: -30px;
+        font-size: 17px;
+        width: 22%;
+        text-align: center;
+        right: 8px;
+        color: #fff;
+        background-color: #222;
+        border-radius: 100px;
     }
     .file-remove:hover {
         color: red;
