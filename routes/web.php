@@ -12,12 +12,14 @@ use App\Http\Controllers\LetterOfIndentController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\AddonController;
 use App\Http\Controllers\BLformController;
-use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
+<<<<<<< Updated upstream
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\BLFormNewVinsController;
+=======
+>>>>>>> Stashed changes
 
 
 /*
@@ -70,10 +72,6 @@ use App\Http\Controllers\BLFormNewVinsController;
     Route::resource('blfrom', BLVINSController::class);
     //Marketing
     Route::resource('blform', BLformController::class);
-    Route::resource('blformvins', BLFormNewVinsController::class);
-    // Route::resource('blformvins', BLVINSController::class);
-    Route::post('/store-data', [BLVINSController::class, 'blformvins'])->name('store-data');
-    // Route::post('/store-data', [BLVINSController::class, 'blformvins'])->name('store-data');
 
 
     //Sales
