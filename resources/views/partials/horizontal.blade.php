@@ -55,7 +55,7 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
                                 <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('blfrom.index') }}" id="topnav-auth" role="button">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('blform.index') }}" id="topnav-auth" role="button">
                                         <span data-key="t-authentication">Create New BL</span>
                                     </a>
                                 </div>

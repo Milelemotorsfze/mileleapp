@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
 
 class SupplierInventoryController extends Controller
@@ -12,7 +13,9 @@ class SupplierInventoryController extends Controller
      */
     public function index()
     {
-        //
+        $supplierInventories = SupplierInventory::all();
+        return view('supplier-inventories.index', compact('supplierInventories'));
+
     }
 
     /**

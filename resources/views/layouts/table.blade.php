@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-    @include('partials/head-css') 
+    @include('partials/head-css')
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<!--These jQuery libraries for chosen need to be included-->
 		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
@@ -52,9 +52,9 @@
             margin-right: 20px;
         }
         .icon-right {
-            z-index: 10;  
-            position: absolute;  
-            right: 0;  
+            z-index: 10;
+            position: absolute;
+            right: 0;
             top: 0;
         }
         </style>
@@ -100,7 +100,7 @@
                 padding-top:0px;
                 padding-bottom:0px;
             }
-           
+
             /* .related-addon .related-input-div
             {
                 margin-top:0px;
@@ -119,7 +119,7 @@
                 border-width: 1px;
                 border-color: #5156be;
                 border-radius: 5px;
-              
+
           }
           .labeldesign
           {
@@ -155,11 +155,11 @@
                         </div>
                     </div>
                 </div>
-                @include('partials/footer') 
+                @include('partials/footer')
             </div>
-        </div>    
-        @include('partials/right-sidebar') 
-        @include('partials/vendor-scripts') 
+        </div>
+        @include('partials/right-sidebar')
+        @include('partials/vendor-scripts')
         <script src="{{ asset('libs/table-edits/build/table-edits.min.js')}}"></script>
         <script src="{{ asset('js/pages/table-editable.int.js')}}"></script>
         <script src="{{ asset('js/app.js')}}"></script>
@@ -175,18 +175,18 @@ url:"{{url('get-states-by-country')}}",
 type: "POST",
 data: {
 country_id: country_id,
-_token: '{{csrf_token()}}' 
+_token: '{{csrf_token()}}'
 },
 dataType : 'json',
 success: function(result){
-$('#state-dropdown').html('<option value="">Select State</option>'); 
+$('#state-dropdown').html('<option value="">Select State</option>');
 $.each(result.states,function(key,value){
 $("#state-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
 });
-$('#city-dropdown').html('<option value="">Select State First</option>'); 
+$('#city-dropdown').html('<option value="">Select State First</option>');
 }
 });
-});    
+});
 $('#state-dropdown').on('change', function() {
 var state_id = this.value;
 $("#city-dropdown").html('');
@@ -195,11 +195,11 @@ url:"{{url('get-cities-by-state')}}",
 type: "POST",
 data: {
 state_id: state_id,
-_token: '{{csrf_token()}}' 
+_token: '{{csrf_token()}}'
 },
 dataType : 'json',
 success: function(result){
-$('#city-dropdown').html('<option value="">Select City</option>'); 
+$('#city-dropdown').html('<option value="">Select City</option>');
 $.each(result.cities,function(key,value){
 $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
 });
@@ -209,9 +209,9 @@ $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>
 });
 </script> -->
         <script>
-        $(document).ready(function () 
+        $(document).ready(function ()
         {
-           
+
             var oldValue = new Array(1,2,5);
             // filters on addon list
             $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
@@ -220,15 +220,15 @@ $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>
             $("#fltr-brand").select2();
             $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
             $("#fltr-model-line").select2();
-            $('#fltr-addon-code').change(function() 
+            $('#fltr-addon-code').change(function()
             {
                 addonFilter();
             });
-            $('#fltr-brand').change(function() 
+            $('#fltr-brand').change(function()
             {
                 addonFilter();
             });
-            $('#fltr-model-line').change(function() 
+            $('#fltr-model-line').change(function()
             {
                 addonFilter();
             });
@@ -247,27 +247,27 @@ console.log(oldValue);
                 var AddonIds = $('#fltr-addon-code').val();
                 var BrandIds = $('#fltr-brand').val();
                 var ModelLineIds = $('#fltr-model-line').val();
-                
+
                 $.ajax
                 ({
                     url:"{{url('addonFilters')}}",
                     type: "POST",
-                    data: 
+                    data:
                     {
                         AddonIds: AddonIds,
                         BrandIds: BrandIds,
                         ModelLineIds: ModelLineIds,
                         oldValue: globalThis.oldValue,
-                        _token: '{{csrf_token()}}' 
+                        _token: '{{csrf_token()}}'
                     },
                     dataType : 'json',
                     success: function(result)
                     {
-                      
+
                         // if(globalThis.oldValue)
                         // {
                         //     console.log('hi');
-                        
+
                         //     $.each(globalThis.oldValue,function(oldValue)
                         // {
                         //     console.log(oldValue);
@@ -276,15 +276,15 @@ console.log(oldValue);
                         // }
                         // $.each(result.oldValue,function(oldValue)
                         // {
-                            
+
                         //     $("#"+oldValue).show();
-                            
+
                         //     // console.log(value);
                         // });
                         // globalThis.oldValue = [];
                         $.each(result.addonIds,function(key,value)
                         {
-                            
+
                             $("#"+value).hide();
                             // globalThis.oldValue = categories.push($(this).text());
                             console.log(oldValue);
@@ -296,8 +296,9 @@ console.log(oldValue);
                     }
                 });
             }
-			// datatables	
+			// datatables
             $('#dtBasicExample').DataTable();
+            $('#dtBasicSupplierInventory').DataTable()
             $('#dtBasicExample1').DataTable();
             $('#dtBasicExample2').DataTable();
             $('#dtBasicExample3').DataTable();
@@ -318,19 +319,19 @@ console.log(oldValue);
                     // alert($('.divcolorclass').val());
 
                     // show addon list table
-                  
+
                     // $('#addonListTableButton').on('click', function()
                     // {
-                       
-                    //     // $('#addonListTable').attr("hidden", true); 
-                    //     // $('#addonListTable').attr("hidden", false); 
-                    //     // $('#addonListTable').removeAttribute("hidden"); 
+
+                    //     // $('#addonListTable').attr("hidden", true);
+                    //     // $('#addonListTable').attr("hidden", false);
+                    //     // $('#addonListTable').removeAttribute("hidden");
                     //     // alert('hiis');
                     //     // $('#addonListTable').style.display = "block";
                     // });
         });
         function closemodal()
-            {    
+            {
                 $('.modal').removeClass('modalshow');
                 $('.modal').addClass('modalhide');
             }
@@ -341,9 +342,9 @@ console.log(oldValue);
                 let addonListTableButton = document.getElementById('addonListTableButton');
                 addonListTableButton.hidden = true
                 let addonbox = document.getElementById('addonbox');
-                addonbox.hidden = true 
+                addonbox.hidden = true
                 let addonBoxButton = document.getElementById('addonBoxButton');
-                addonBoxButton.hidden = false 
+                addonBoxButton.hidden = false
             }
             function showAddonBox()
             {
@@ -352,9 +353,9 @@ console.log(oldValue);
                 let addonListTableButton = document.getElementById('addonListTableButton');
                 addonListTableButton.hidden = false
                 let addonbox = document.getElementById('addonbox');
-                addonbox.hidden = false 
+                addonbox.hidden = false
                 let addonBoxButton = document.getElementById('addonBoxButton');
-                addonBoxButton.hidden = true 
+                addonBoxButton.hidden = true
             }
         </script>
     </body>

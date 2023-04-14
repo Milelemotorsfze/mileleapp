@@ -2,33 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\blfrom;
+use App\Models\blformvins;
 use Illuminate\Http\Request;
 
 class BLVINSController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+{   
+    public function blformvins(Request $request)
     {
-        return view('blform.index');
-        $bldata = BLForm::all();
-    }
-    public function create()
-    {
-        return view('blform.create');
-    }
-    public function insertData(Request $request)
-    {
-        $BLFormNumber = $request->input('bl_number');
-        $vinsNumbers = $request->input('vins_numbers');
-
-        DB::table('bl_vinsdata')->insert([
-            'bl_number' => $BLFormNumber,
-            'vins_numbers' => $vinsNumbers,
+        $data = new Data;
+        $data->bl_number = $request->bl_number;
+        $data->vin_number = $request->vin_number;
+        $data->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'VIN Added Successfully'
         ]);
-        return response()->json(['bl_number' => $BLFormNumber, 'vins_numbers' => $vinsNumbers]);
     }
 
 }
