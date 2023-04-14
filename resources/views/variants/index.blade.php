@@ -52,7 +52,7 @@
                      @endphp 
                     <td>{{ $variantsp->int_colour }}</td> 
                     <td>{{ $variantsp->ext_colour }}</td>
-                   <td><a data-placement="top" class="btn btn-sm btn-success" href=""><i class="fa fa-camera" aria-hidden="true"></i></a>
+                   <td><a data-placement="top" class="btn btn-sm btn-success" href="{{ route('variant_pictures.edit',$variantsp->id) }}"><i class="fa fa-camera" aria-hidden="true"></i></a>
                    <a data-placement="top" class="btn btn-sm btn-info" href=""><i class="fa fa-film" aria-hidden="true"></i></a></td>        
                   </tr>
                 @endforeach
@@ -98,7 +98,7 @@
                      @endphp 
                     <td>{{ $variantsp->int_colour }}</td> 
                     <td>{{ $variantsp->ext_colour }}</td>
-                    <td><a data-placement="top" class="btn btn-sm btn-success" href=""><i class="fa fa-eye" aria-hidden="true"></i></a></td>       
+                    <td><a data-placement="top" class="btn btn-sm btn-success" href="{{ route('variant_pictures.edit',$variantsp->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a></td>       
                   </tr>
                 @endforeach
               </tbody>

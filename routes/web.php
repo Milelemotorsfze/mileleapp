@@ -16,7 +16,7 @@ use App\Http\Controllers\BLVINSController;
 use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
-
+use App\Http\Controllers\VariatnsPicturesController;
 
 /*
 /*
@@ -66,10 +66,11 @@ use App\Http\Controllers\SupplierInventoryController;
     //BL Module
     Route::resource('blfrom', BLformController::class);
     Route::resource('blfrom', BLVINSController::class);
-    //Sales
+    //Marketing
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
+    
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
 });
