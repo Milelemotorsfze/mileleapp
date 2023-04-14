@@ -27,10 +27,10 @@
                 @foreach ($supplierInventories as $key => $supplierInventory)
                     <tr data-id="1">
                         <td>{{ ++$i }}</td>
-                        <td>{{ $supplierInventory->model }}</td>
-                        <td>{{ $supplierInventory->sfx }}</td>
-                        <td>{{ $supplierInventory->sf }}</td>
-                        <td>{{ $supplierInventory->supplier }}</td>
+                        <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
+                        <td>{{ $supplierInventory->masterModel->sfx ?? '' }}</td>
+                        <td>{{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
+                        <td>{{ $supplierInventory->total_quantity }}</td>
                         <td>{{ $supplierInventory->color_code }}</td>
                     </tr>
                 @endforeach

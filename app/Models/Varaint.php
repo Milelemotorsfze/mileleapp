@@ -13,4 +13,8 @@ class Varaint extends Model
     {
         return $this->hasMany(AvailableColour::class, 'varaint_id');
     }
+    public function masterModel()
+    {
+        return $this->belongsTo(MasterModel::class,'master_models_id');
+    }
 }

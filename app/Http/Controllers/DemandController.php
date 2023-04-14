@@ -92,7 +92,10 @@ class DemandController extends Controller
     }
     public function getVariant(Request $request)
     {
-        $data = Varaint::where('sfx', $request->sfx)
+        $data = Varaint::with('masterModel')
+            ->whereHas('masterModel', function ($query) use($request) {
+                $query->where('sfx', $request->sfx);
+            })
             ->pluck('name');
         return $data;
     }

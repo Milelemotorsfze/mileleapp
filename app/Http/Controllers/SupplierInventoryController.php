@@ -13,7 +13,11 @@ class SupplierInventoryController extends Controller
      */
     public function index()
     {
-        $supplierInventories = SupplierInventory::all();
+        $supplierInventories = SupplierInventory::with('masterModel')
+            ->where('veh_status', SupplierInventory::status)
+            ->groupBy('master_model_id')
+            ->get();
+
         return view('supplier-inventories.index', compact('supplierInventories'));
 
     }
