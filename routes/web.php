@@ -64,7 +64,8 @@ use App\Http\Controllers\QuotationController;
     Route::resource('supplier-inventories', SupplierInventoryController::class);
 
     //BL Module
-    Route::get('/blform', [BlFormController::class, 'index'])->name('blform.index');
+    Route::resource('blform', BlFormController::class);
+    Route::post('store-data', [BlFormController::class, 'storeData'])->name('store.data');
 
     //Marketing
     Route::resource('calls', CallsController::class);

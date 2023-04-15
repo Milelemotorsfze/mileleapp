@@ -16,9 +16,9 @@
             </div>
         @endif
             <div class="row">
-			</div>  
+			</div>
 			<form action="" method="post" enctype="multipart/form-data">
-                <div class="row"> 
+                <div class="row">
 					<div class="col-lg-3 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">BL Number</label>
                         <input type="text" name="bl_number" class="form-control" placeholder="Enter Bill of Lading Number" id="BLFormNumber">
@@ -79,7 +79,9 @@
                                     </div>
                                     <div class="modal-body">
                                         <form method="post" action="" id="addNewVINForm">
-                                            <div id="newVINRowinModal"></div>
+                                            <div id="newVINRowinModal">
+                                                <input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" required>
+                                            </div>
                                         </form>
                                         <br>
                                         <a class="btn btn-success" id="addNewVINField">Add New VIN</a>
@@ -132,35 +134,61 @@
                         <label for="basicpill-firstname-input" class="form-label">BL Attachment</label>
                         <input type="file" name="bl_number" class="form-control" placeholder="Enter Bill of Lading Number">
                     </div>
-			     </div>  
+			     </div>
                 </br>
-                </br> 
+                </br>
 		        <div class="col-lg-12 col-md-12">
                     <input type="submit" name="submit" value="submit" class="btn btn-success btn-sm btncenter" />
-		        </div> 
-            </form> 
+		        </div>
+            </form>
 		</br>
     </div>
 @endsection
 @push('scripts')
 <script type="text/javascript">
-    // $(document).ready(function() {
-    //     $('#addNewVINField').click(function(){
-    //         $("#newVINRowinModal").append('<br><input placeholder="Enter VIN Number" type="text" name="" class="form-control">');
-    //     });
-    // });
-
-
     $(document).ready(function() {
-        $('#addNewVINField').click(function() {
+        $('#addNewVINField').click(function(e) {
+            e.preventDefault();
             var $prevInput = $("#newVINRowinModal input[type='text']:last");
             if ($prevInput.length > 0) {
                 $prevInput.prop('readonly', true);
             }
             $("#newVINRowinModal").append('<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" required>');
+            var vins_numbers = $prevInput.val();
+            var bl_number = $("#BLFormNumber").val();
+            console.log(vins_numbers);
+            console.log(bl_number);
+            $.ajax({
+                url: '{{ route('store.data') }}',
+                type: 'POST',
+                data: {
+                    'bl_number': bl_number,
+                    'vin_number': vins_numbers,
+                    _token: '{{ csrf_token() }}'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    alert('Data saved successfully.');
+                },
+                error: function (xhr, status, error) {
+                    alert('Error saving data: ' + error);
+                }
+            });
+
+            // $.ajax({
+            //     url: '',
+            //     method: 'POST',
+            //     data: {bl_number: bl_number, vins_numbers: vins_numbers},
+            //     success: function(response) {
+            //         var newInput = '<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" value="' + response.vins_numbers + '">';
+            //         $("#newVINRowinModal").append(newInput);
+            //     },
+            //     error: function(jqXHR, textStatus, errorThrown) {
+            //         alert('Error storing VIN: ' + errorThrown);
+            //     }
+            // });
         });
     });
-
 
     $(document).ready(function() {
       $("#saveChanges").click(function() {

@@ -11,7 +11,7 @@
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">All VINs of BL</a>
       </li>
-    </ul>      
+    </ul>
   </div>
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1">
@@ -24,15 +24,26 @@
                 </tr>
               </thead>
               <tbody>
-                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> Add New BL Form</a>
+                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}"><i class="fa fa-plus" aria-hidden="true"></i> Add New BL Form</a>
                 <br>
                 <br>
                 <div class="clearfix"></div>
+                <tr>
+                  @php
+                    $vinsresult = DB::table('bl_vinsdata')->get();
+                  @endphp
+                  @foreach ($vinsresult as $row)
+                    $vindata = $row->vin_number;
+                    $blnumber = $row->bl_number;
+                    <td>{{ $vindata }}</td>
+                    <td>{{ $blnumbero }}</td>
+                  @endforeach
+                </tr>
               </tbody>
             </table>
-          </div>  
-        </div>  
-      </div>  
+          </div>
+        </div>
+      </div>
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
           <div class="table-responsive">
@@ -43,14 +54,16 @@
                 </tr>
               </thead>
               <tbody>
-                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> Add New VIN</a>
+                <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('blform.create') }}"><i class="fa fa-plus" aria-hidden="true"></i> Add New VIN</a>
                 <br>
                 <br>
                 <div class="clearfix"></div>
+                <tr>
+                </tr>
               </tbody>
             </table>
-          </div> 
-        </div>  
+          </div>
+        </div>
       </div>
       </div>
     </div>

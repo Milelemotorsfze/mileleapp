@@ -115,7 +115,7 @@ body[data-layout-mode="dark"] .layout-mode-light {
   padding: calc(70px + 20px) calc(20px / 2) 60px calc(20px / 2); }
 
 .header-item {
-  height: 70px;
+  height: 55px;
   -webkit-box-shadow: none !important;
           box-shadow: none !important;
   color: #555b6d;
@@ -128,7 +128,8 @@ body[data-layout-mode="dark"] .layout-mode-light {
   height: 36px;
   width: 36px;
   background-color: #74788d;
-  padding: 3px; }
+  padding: 3px;
+  float: left; }
 
 .noti-icon i {
   font-size: 22px;
