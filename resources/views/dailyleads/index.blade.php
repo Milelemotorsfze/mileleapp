@@ -5,22 +5,33 @@
       Daily Leads Info
     </h4>
     @can('daily-leads-create')
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('users.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead 
+    <a class="btn btn-sm btn-success float-end" href="{{ route('users.create') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Demand / Lead
       </a>
+      <div class="clearfix"></div>
+<br>
     @endcan
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Calls</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Managment Remarks On Leads</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inquiry To Quotations</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Approved Leads By Management</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Quotations To Sales</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Already In Stock / Rejected</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Pending Demands</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Approved Demands</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Rejected Demands</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected Inquiry</a>
       </li>
     </ul>      
   </div>
@@ -30,47 +41,61 @@
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-              <thead>
+            <thead>
                 <tr>
                   <th>S.No</th>
                   <th>Date</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Demand</th>
+                  <th>Source</th>
+                  <th>Language</th>
+                  <th>Location</th>
                   <th>Remarks</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                @foreach ($pendingdata as $key => $leads)
+              <div hidden>{{$i=0;}}</div>
+                @foreach ($pendingdata as $key => $calls)
                   <tr data-id="1">
-                  <td>{{ $leads->date }}</td>
-                    <td>{{ $leads->name }}</td>     
-                    <td>{{ $leads->phone }}</td> 
-                    <td>{{ $leads->email }}</td>  
-                    <td>{{ $leads->sales_person }}</td>  
-                    <td>{{ $leads->remarks }}</td>    
-                    <td>
-                    <div class="btn-group">
-  <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-  <i class="fa fa-edit" aria-hidden="true"></i>
-  </button>
-    <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="{{ route('users.create') }}">Convert to Leads</a></li>
-    <li><a class="dropdown-item" href="{{ route('users.create') }}">Already In Stock</a></li>
-    <li><a class="dropdown-item" href="{{ route('users.create') }}">Rejected</a></li>
-  </ul>
-</div>
-                    </td>        
+                  <td>{{ ++$i }}</td>
+                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ $calls->name }}</td>     
+                    <td>{{ $calls->phone }}</td> 
+                    <td>{{ $calls->email }}</td>
+                     @php
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $calls->demand }}</td> 
+                    <td>{{ $calls->source }}</td>
+                    <td>{{ $calls->language }}</td>
+                    <td>{{ $calls->location }}</td>
+                    @php
+                    $text = $calls->remarks;
+                    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
+                    @endphp
+                    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>  
+                    <td><a data-placement="top" class="btn btn-sm btn-success" href="{{ route('quotation.show',$calls->id) }}"><i class="fas fa-file-invoice" aria-hidden="true" title="Add Into Qoutation"></i></a>
+                    <button type="button" href="" class="btn btn-sm btn-info" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" href="" class="btn btn-sm btn-danger" data-bs-toggle="dropdown" aria-expanded="false" title="Rejected">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                    </td>
+                    </td>       
                   </tr>
                 @endforeach
               </tbody>
             </table>
             </br>
-</br>
-</br>
-</br>
-</br>
+            </br>
+            </br>
+            </br>
+            </br>
           </div>  
         </div>  
       </div>  

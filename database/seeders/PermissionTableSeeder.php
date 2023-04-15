@@ -16,6 +16,7 @@ class PermissionTableSeeder extends Seeder
             ['3','Sales'],
             ['4','Procurement'],
             ['5','Marketing'],
+            ['6','HR'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -45,9 +46,9 @@ class PermissionTableSeeder extends Seeder
             
             ['3','View Sales','sales-view', 'To View the sales department'],
             ['3','List Daily Leads','daily-leads-list', 'To View the List of the Daily Leads'],
-            ['3','View  Daily Leads Details', 'daily-leads-view', 'To view the details of the list of the Daily Leads'],
-            ['3','Create Daily Leads','daily-leads-create', 'To create New the Daily Leads'],
-            ['3','Edit Daily Leads','daily-leads-edit', 'To Edit the Daily Leads'],
+            ['3','View  Quotation Details', 'daily-leads-view', 'To view the Quotation Details and Listing'],
+            ['3','Create Quotation','daily-leads-create', 'To create New Quotation'],
+            ['3','Edit Quotation','daily-leads-edit', 'To Edit the Quotation'],
 
             ['4','View Procurement','Procurement-view', 'To View the the Procurement Department'],
             ['4','List Procurement','Procurement-list', 'To View the List of the Procurement'],
@@ -65,6 +66,11 @@ class PermissionTableSeeder extends Seeder
             ['5','View Variants Details', 'variants-details-view', 'To view the details of the list of the Variants'],
             ['5','Update Variants Pictures','variants-update-pictures', 'To Update the Pictures of the Variants'],
             ['5','Update Variants Reals','variants-update-reals', 'To Update the reals of the Variants'],
+
+            ['6','View HR','HR-view', 'To View the HR Module'],
+            ['6','Job Requirement','Job-Requirement', 'To Submit a Job Request From Department Head'],
+            ['6','Job Requests Portal','Job-request-portal', 'To Handle The Job Requests Portal'],
+            ['6','Employee Document Handling','document-handling', 'To Handle The Employee Documents'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

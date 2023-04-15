@@ -33,11 +33,6 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
                                 <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button">
-                                        <span data-key="t-authentication">Daily Calls</span>
-                                    </a>
-                                </div>
-                                <div class="dropdown">
                                     <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button">
                                         <span data-key="t-authentication">Leads</span>
                                     </a>

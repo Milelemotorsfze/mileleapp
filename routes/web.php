@@ -16,7 +16,7 @@ use App\Http\Controllers\DemandListController;
 use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
-
+use App\Http\Controllers\QuotationController;
 
 /*
 /*
@@ -67,13 +67,11 @@ use App\Http\Controllers\VariatnsPicturesController;
     Route::get('/blform', [BlFormController::class, 'index'])->name('blform.index');
 
     //Marketing
-
-
-    //Sales
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
 
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
+    Route::resource('quotation', QuotationController::class);
 });
