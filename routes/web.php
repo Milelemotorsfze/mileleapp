@@ -61,6 +61,8 @@ use App\Http\Controllers\QuotationController;
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);
+
+    // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class);
 
     //BL Module

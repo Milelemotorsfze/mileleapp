@@ -1,14 +1,15 @@
 @extends('layouts.table')
 @section('content')
-
     <div class="card-header">
         <h4 class="card-title">
             Inventory List
         </h4>
     </div>
-    <div class="card-header">
-    </div>
     <div class="card-body">
+        <div class="ml-auto">
+            <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
+        </div>
+        <br>
         <div class="table-responsive" >
             <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table">
                 <thead>
@@ -29,9 +30,14 @@
                         <td>{{ ++$i }}</td>
                         <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
                         <td>{{ $supplierInventory->masterModel->sfx ?? '' }}</td>
-                        <td>{{ $supplierInventory->masterModel->variant->name ?? '' }}</td>
+                        <td>{{ $supplierInventory->masterModel->variant->name ?? 'Variant Listed But Blanked' }}</td>
                         <td>{{ $supplierInventory->total_quantity }}</td>
-                        <td>{{ $supplierInventory->color_code }}</td>
+                        <td>
+                            @foreach($supplierInventory->color_codes as $color_code)
+                               {{  "(Colour Not Listed)  ". $color_code->color_code }} : {{$color_code->color_code_count  }}
+                                <br>
+                            @endforeach
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>
