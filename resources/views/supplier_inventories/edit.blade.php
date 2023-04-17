@@ -46,7 +46,7 @@
                 </div>
             </div>
             <input type="hidden" class="form-control" id="datepicker-datetime" name="date" value=""/>
-            <div class="col-lg-8 col-md-6">
+            <div class="col-lg-6 col-md-6">
                 <div class="col-4">
                     <input type="file" name="file" class="form-control" >
                 </div>

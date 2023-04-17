@@ -10,17 +10,26 @@ use Illuminate\Support\Facades\DB;
 class SupplierInventory extends Model
 {
     use HasFactory;
-
-    protected $appends = [
-        'color_codes',
-        'total_quantity',
-        ];
-
+    public $timestamps = false;
     public const status = "supplier inventory";
     public const DEALER_TRANS_CARS = "Trans Cars";
     public const DEALER_MILELE_MOTORS = "Milele Motors";
 
-
+    protected $appends = [
+        'color_codes',
+        'total_quantity',
+    ];
+    protected $fillable = [
+        'master_model_id',
+        'engine_number',
+        'chasis',
+        'color_code',
+        'color_name',
+        'pord_month',
+        'po_arm',
+        'status',
+        'eta_import'
+    ];
     public function masterModel()
     {
         return $this->belongsTo(MasterModel::class);
