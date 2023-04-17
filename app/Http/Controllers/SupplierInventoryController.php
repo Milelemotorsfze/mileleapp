@@ -168,8 +168,7 @@ class SupplierInventoryController extends Controller
                                                                 ->orwhere('color_code', $uploadFileContent['color_code'])
                                                                 ->orwhere('pord_month', $uploadFileContent['pord_month'])
                                                                 ->orwhere('po_arm', $uploadFileContent['po_arm'])
-                                                                ->orwhere('eta_import', $uploadFileContent['eta_import'])
-                                                                ->get();
+                                                                ->orwhere('eta_import', $uploadFileContent['eta_import']);
                             info("".$supplierInventory->get());
 
 //                        if ($supplierInventory->count() > 1)
