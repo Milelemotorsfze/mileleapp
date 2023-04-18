@@ -54,4 +54,58 @@
       </div>
     </div>
   @endcan
+  <script type="text/javascript">
+    $(document).ready(function ()
+    {
+      $('.modal-button').on('click', function()
+      {
+        var modalId = $(this).data('modal-id');
+        $('#' + modalId).addClass('modalshow');
+        $('#' + modalId).removeClass('modalhide');
+      });
+      $('.close').on('click', function()
+      {
+        $('.modal').addClass('modalhide');
+        $('.modal').removeClass('modalshow');
+      });
+    });
+    function closemodal()
+    {
+      $('.modal').removeClass('modalshow');
+      $('.modal').addClass('modalhide');
+    }
+  </script>
 @endsection
+<style>
+    .modal-content {
+            position:fixed;
+            top: 50%;
+            left: 50%;
+            width:30em;
+            height:18em;
+            margin-top: -9em; /*set to a negative number 1/2 of your height*/
+            margin-left: -15em; /*set to a negative number 1/2 of your width*/
+            border: 2px solid #e3e4f1;
+            background-color: white;
+        }
+        .modal-title {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        .modal-paragraph {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .modal-button-class {
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        .icon-right {
+            z-index: 10;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+</style>

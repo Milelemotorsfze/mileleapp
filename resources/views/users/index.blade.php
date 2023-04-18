@@ -13,7 +13,7 @@
         <i class="fa fa-plus" aria-hidden="true"></i> Languages
       </a>
       <div class="clearfix"></div>
-<br>
+      <br>
     @endcan
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
@@ -32,7 +32,7 @@
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
+            <table id="activeUsersList" class="table table-striped table-editable table-edits table">
               <thead>
                 <tr>
                   <th>No</th>
@@ -118,7 +118,7 @@
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
+            <table id="inactiveUsersList" class="table table-striped table-editable table-edits table">
               <thead>
                 <tr>
                   <th>No</th>
@@ -184,7 +184,7 @@
         <div class="tab-pane fade show" id="tab3">
           <div class="card-body">
             <div class="table-responsive">
-              <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+              <table id="deletedUsersList" class="table table-striped table-editable table-edits table">
                 <thead>
                   <tr>
                     <th>No</th>
@@ -250,6 +250,62 @@
       </div><!-- end tab-content-->
     </div>
   </div>
+  <script type="text/javascript">
+    $(document).ready(function ()
+    {
+      $('#activeUsersList').DataTable();
+      $('#inactiveUsersList').DataTable();
+      $('#deletedUsersList').DataTable();
+      $('.modal-button').on('click', function()
+      {
+        var modalId = $(this).data('modal-id');
+        $('#' + modalId).addClass('modalshow');
+        $('#' + modalId).removeClass('modalhide');
+      });
+      $('.close').on('click', function()
+      {
+        $('.modal').addClass('modalhide');
+        $('.modal').removeClass('modalshow');
+      });
+    });
+    function closemodal()
+    {
+      $('.modal').removeClass('modalshow');
+      $('.modal').addClass('modalhide');
+    }
+  </script>
 @endsection
-
+<style>
+    .modal-content {
+            position:fixed;
+            top: 50%;
+            left: 50%;
+            width:30em;
+            height:18em;
+            margin-top: -9em; /*set to a negative number 1/2 of your height*/
+            margin-left: -15em; /*set to a negative number 1/2 of your width*/
+            border: 2px solid #e3e4f1;
+            background-color: white;
+        }
+        .modal-title {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        .modal-paragraph {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .modal-button-class {
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        .icon-right {
+            z-index: 10;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+</style>
    

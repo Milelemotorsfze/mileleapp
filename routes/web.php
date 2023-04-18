@@ -51,6 +51,7 @@ use App\Http\Controllers\QuotationController;
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
+    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon');
 
     // Letter of Indent
     Route::resource('letter-of-indents', LetterOfIndentController::class);
