@@ -294,11 +294,12 @@
             {
                 border-style: solid;
                 border-width: 1px;
-                border-color: #5156be;
+                border-color: white;
                 border-radius: 5px;
                 /* margin-top: 10px; */
                 padding-top:10px;
                 padding-bottom:10px;
+                background-color:#f2f2f2;
             }
             .related-addon input
             {
