@@ -115,6 +115,7 @@ class SupplierInventoryController extends Controller
             }
 
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
+            info(count($newModels));
             if(count($newModels) > 0) {
                 $filename = 'New_Models_'.date('Y_m_d').'.csv';
                 $headers = array(
@@ -144,46 +145,61 @@ class SupplierInventoryController extends Controller
                         ->where('sfx', $uploadFileContent['sfx'])
                         ->first();
                     $modelId = $model->id;
-                    info("modelid".$modelId);
+
                     $inventories = SupplierInventory::where('master_model_id', $modelId);
                     if ($inventories->count() > 0)
                     {
-                        info("existing".$model->id);
-
                         DB::beginTransaction();
-                        $data = [
-                            'master_model_id' => $modelId,
-                            'engine_number'  =>  $uploadFileContent['engine_number'],
-                            'chasis'		 =>  $uploadFileContent['chasis'],
-                            'color_code'	 =>  $uploadFileContent['color_code'],
-                            'color_name'     =>  $uploadFileContent['color_name'],
-                            'pord_month'	 =>  $uploadFileContent['pord_month'],
-                            'po_arm'		 =>  $uploadFileContent['po_arm'],
-                            'status'		 =>  $uploadFileContent['status'],
-                            'eta_import'	 =>  $uploadFileContent['eta_import']
-                        ];
 
-                        $supplierInventory = $inventories->where('chasis', $uploadFileContent['chasis'])
-                                                                ->orwhere('engine_number', $uploadFileContent['engine_number'])
-                                                                ->orwhere('color_code', $uploadFileContent['color_code'])
-                                                                ->orwhere('pord_month', $uploadFileContent['pord_month'])
-                                                                ->orwhere('po_arm', $uploadFileContent['po_arm'])
-                                                                ->orwhere('eta_import', $uploadFileContent['eta_import']);
-                            info("".$supplierInventory->get());
+                        $etaImport = Carbon::createFromFormat('d/m/Y', $uploadFileContent['eta_import'])->format('Y-m-d');
+                        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
+                                                ->where('chasis', $uploadFileContent['chasis']);
 
-//                        if ($supplierInventory->count() > 1)
-//                        {
-//                            $supplierInventory = $supplierInventory->orderBy('id','DESC')->first();
-//                            info("lastest update".$supplierInventory->id);
-//                            $supplierInventory->update($data);
-//
-//                        }else{
-//                            $supplierInventory = $supplierInventory->first();
-//                            info("update".$supplierInventory->id);
-//                            $supplierInventory->update($data);
-//                        }
-                        $supplierInventory = $supplierInventory->first();
-                        $supplierInventory->update($data);
+                        if ($supplierInventories->count() > 1) {
+                            info("dupliacte found engine_number");
+                            $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number']);
+
+                        }
+                        if($supplierInventories->count() > 1) {
+                            info("dupliacte found color_code");
+                            $supplierInventories = $supplierInventories->where('color_code', $uploadFileContent['color_code']);
+
+                        }
+                        if($supplierInventories->count() > 1) {
+                            info("dupliacte found pord_month");
+                            $supplierInventories = $supplierInventories->where('pord_month', $uploadFileContent['pord_month']);
+
+                        }
+                        if($supplierInventories->count() > 1) {
+                            info("dupliacte found po_arm");
+                            $supplierInventories = $supplierInventories->where('po_arm', $uploadFileContent['po_arm']);
+
+                        }
+                        if($supplierInventories->count() > 1) {
+                            info("dupicate found eta_import");
+                            $supplierInventories = $supplierInventories->where('eta_import', $etaImport);
+
+                        }
+                        if($supplierInventories->count() > 1 ) {
+                            info("duplicate". $supplierInventories->get());
+                            $supplierInventory = $supplierInventories->orderBy('id','DESC')->first();
+                            info("existing => update latest record".$supplierInventory->id);
+
+                        }
+
+                        if($supplierInventories->count() == 1) {
+                            $supplierInventory  = $supplierInventories->first();
+                        }
+
+                        $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                        $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
+                        $supplierInventory->color_code      = $uploadFileContent['color_code'];
+                        $supplierInventory->color_name      = $uploadFileContent['color_name'];
+                        $supplierInventory->status	        = $uploadFileContent['status'];
+                        $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
+                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                        $supplierInventory->eta_import      = $etaImport;
+                        $supplierInventory->save();
 
                         DB::commit();
 
