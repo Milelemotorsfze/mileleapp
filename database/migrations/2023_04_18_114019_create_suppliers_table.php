@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('supplier')->nullable();
             $table->string('contact_person')->nullable();
+            $table->string('country_code')->nullable();
             $table->string('contact_number')->nullable();
+            $table->string('country_code2')->nullable();
             $table->string('alternative_contact_number')->nullable();
             $table->string('email')->nullable();
             $table->string('person_contact_by')->nullable();
