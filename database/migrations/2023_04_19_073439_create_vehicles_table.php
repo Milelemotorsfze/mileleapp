@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreign('varaints_id')->references('id')->on('varaints');
             $table->string('int_colour');
             $table->string('ex_colour');
-            $table->string('max-price');
+            $table->string('max_price');
             $table->string('vin');
             $table->string('engine');
             $table->text('remarks');
