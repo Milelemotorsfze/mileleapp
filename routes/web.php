@@ -17,6 +17,7 @@ use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\SupplierController;
 
 /*
 /*
@@ -51,6 +52,9 @@ use App\Http\Controllers\QuotationController;
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
+    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon'); 
+    // Suppliers
+    Route::resource('suppliers', SupplierController::class);
 
     // Letter of Indent
     Route::resource('letter-of-indents', LetterOfIndentController::class);
@@ -76,5 +80,8 @@ use App\Http\Controllers\QuotationController;
 
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
+    Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
+    Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
+    Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation', QuotationController::class);
 });

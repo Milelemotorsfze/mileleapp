@@ -20,16 +20,15 @@ class AddonDetails extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-        'image'
+        'image',
+        'is_all_brands'
     ];
     public function AddonTypes()
     {
         return $this->hasMany(AddonTypes::class,'addon_details_id','id');
-        // ,'id','addon_details_id'
     }
     public function AddonName()
     {
         return $this->hasOne(Addon::class,'id','addon_id');
-        // ,'id','addon_details_id'
     }
 }

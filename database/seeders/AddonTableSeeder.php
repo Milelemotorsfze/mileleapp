@@ -317,7 +317,10 @@ class AddonTableSeeder extends Seeder
 	['299','Wooden Trim'],
 	['300','Wooden Trim On Steering, And Gear Knob'],
 	['301','Wooden Trim On Steering, Doors Side, Console'],
-	['302','Xtreme LC300 (Xtreme Body Sticker)']
+	['302','Xtreme LC300 (Xtreme Body Sticker)'],
+	['303','Roof paint'],
+	['304','2 doors (front and back) + 2 down mouldings paint'],
+	['305','"Service kit 2 (15000 KM) Drain plug (for Oil pan drain), Gasket(for Oil pan drain plug), Oil filter, Air filter,AC Filter, FR Brake Pad Kit, RR Brake Pad Kit, V belt(for fan & Alternator), Glow plug Kit"']
             ];
         foreach ($addons as $key => $value):
         $addon[] = [

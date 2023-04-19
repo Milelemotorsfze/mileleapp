@@ -12,5 +12,4 @@ class MasterModel extends Model
     {
         return $this->hasOne(Varaint::class,'master_models_id');
     }
-
 }

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('deleted_by')->unsigned()->index()->nullable();
             $table->foreign('deleted_by')->references('id')->on('users')->onDelete('cascade');
+            $table->enum('is_all_brands', ['yes', 'no'])->default('no');
             $table->string('image')->nullable();
             $table->string('image2')->nullable();
             $table->timestamps();
