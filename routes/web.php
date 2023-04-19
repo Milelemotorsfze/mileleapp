@@ -74,5 +74,8 @@ use App\Http\Controllers\QuotationController;
 
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
+    Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
+    Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
+    Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation', QuotationController::class);
 });

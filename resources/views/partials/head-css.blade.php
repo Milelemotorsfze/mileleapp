@@ -1,8 +1,8 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <!-- Bootstrap Css -->
-        <link href="{{ asset('css/preloader.min.css') }}" rel="stylesheet" />
-        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet"  />
+<!-- Bootstrap Css -->
+<link href="{{ asset('css/preloader.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet"  />
 <!-- Icons Css -->
 <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 <!-- App Css-->
@@ -17,5 +17,4 @@
 <link href="{{ asset('css/customcss.css') }}" rel="stylesheet" type="text/css" />
 <!-- select 2 -->
 <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
-
 

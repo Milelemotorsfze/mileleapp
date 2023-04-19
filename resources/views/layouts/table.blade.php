@@ -237,7 +237,7 @@ $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>
 // console.log('jiiiii');
 //             });
 // var oldValue = [1,1];
-console.log(oldValue);
+
             function addonFilter()
             {
                 var oldValue = new Array(1,2);
