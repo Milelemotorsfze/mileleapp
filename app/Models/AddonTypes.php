@@ -13,8 +13,17 @@ class AddonTypes extends Model
         'addon_details_id',
         'brand_id',
         'model_id',
+        'is_all_model_lines',
         'created_by',
         'updated_by',
         'deleted_by'
     ];
+    public function brands()
+    {
+        return $this->belongsTo(Brand::class,'brand_id','id');
+    }
+    public function modelLines()
+    {
+        return $this->belongsTo(MasterModelLines::class,'model_id','id');
+    }
 }

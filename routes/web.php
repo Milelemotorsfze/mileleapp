@@ -17,6 +17,7 @@ use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
+use App\Http\Controllers\SupplierController;
 
 /*
 /*
@@ -51,6 +52,9 @@ use App\Http\Controllers\QuotationController;
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
+    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon'); 
+    // Suppliers
+    Route::resource('suppliers', SupplierController::class);
 
     // Letter of Indent
     Route::resource('letter-of-indents', LetterOfIndentController::class);
@@ -61,6 +65,8 @@ use App\Http\Controllers\QuotationController;
     Route::resource('demands', DemandController::class);
     Route::resource('demand-lists', DemandListController::class);
     Route::resource('monthly-demands', MonthlyDemandsController::class);
+
+    // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class);
 
     //BL Module
