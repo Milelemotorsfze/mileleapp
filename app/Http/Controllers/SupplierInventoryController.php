@@ -12,30 +12,19 @@ use Illuminate\Support\Facades\Response;
 
 class SupplierInventoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->groupBy('master_model_id')
             ->get();
+
         return view('supplier_inventories.index', compact('supplierInventories'));
-
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('supplier_inventories.edit');
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -116,55 +105,34 @@ class SupplierInventoryController extends Controller
 
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
 
-            if(count($newModels) > 0) {
-
+            if(count($newModels) > 0)
+            {
                 $filename = 'New_Models_'.date('Y_m_d').'.csv';
-                header("Content-Description: File Transfer");
-                header("Content-Disposition: attachment; filename=$filename");
-                header("Content-Type: application/csv;");
+                $columns = array('Model','SFX');
+                $callback = function() use ($newModels, $columns)
+                {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, $columns);
+                    foreach($newModels as $newmodel) {
+                        fputcsv($file, array(
+                            $newmodel['model'],
+                            $newmodel['sfx'],
+                        ));
+                    }
+                    fclose($file);
+                };
 
-                $file = fopen('php://output', 'w');
-                $columns = array("models","SFX");
-                fputcsv($file, $columns);
-                foreach($newModels as $newmodel) {
-                    fputcsv($file, array(
-                        $newmodel['model'],
-                        $newmodel['sfx'],
-                    ));
-                }
-                fclose($file);
-                exit;
-
-
-//               $filename = 'New_Models_'.date('Y_m_d').'.csv';
-
-//                $columns = array('Model','SFX');
-//                $callback = function() use ($newModels, $columns)
-//                {
-//                    $file = fopen('php://output', 'w');
-//                    fputcsv($file, $columns);
-//                    foreach($newModels as $newmodel) {
-//                        fputcsv($file, array(
-//                            $newmodel['model'],
-//                            $newmodel['sfx'],
-//                        ));
-//                    }
-//                    fclose($file);
-//                };
-//
                 return redirect()->route('supplier-inventories.create')->with('message','Please add new models to master table.');
-            }else
+            } else
             {
                 $csvModels = [];
-
-                foreach($uploadFileContents as $uploadFileContent){
+                foreach ($uploadFileContents as $uploadFileContent)
+                {
                     $model = MasterModel::where('model', $uploadFileContent['model'])
                         ->where('sfx', $uploadFileContent['sfx'])
                         ->first();
-
                     $modelId = $model->id;
                     $csvModels[] = $modelId;
-
                     $inventories = SupplierInventory::where('master_model_id', $modelId);
 
                     if ($inventories->count() > 0)
@@ -174,36 +142,29 @@ class SupplierInventoryController extends Controller
                         $etaImport = Carbon::createFromFormat('d/m/Y', $uploadFileContent['eta_import'])->format('Y-m-d');
                         $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
                                                 ->where('chasis', $uploadFileContent['chasis']);
-
                         if ($supplierInventories->count() > 1) {
-                            info("dupliacte found engine_number");
                             $supplierInventories = $supplierInventories->where('engine_number', $uploadFileContent['engine_number']);
 
                         }
                         if($supplierInventories->count() > 1) {
-                            info("dupliacte found color_code");
                             $supplierInventories = $supplierInventories->where('color_code', $uploadFileContent['color_code']);
 
                         }
                         if($supplierInventories->count() > 1) {
-                            info("dupliacte found pord_month");
                             $supplierInventories = $supplierInventories->where('pord_month', $uploadFileContent['pord_month']);
 
                         }
                         if($supplierInventories->count() > 1) {
-                            info("dupliacte found po_arm");
                             $supplierInventories = $supplierInventories->where('po_arm', $uploadFileContent['po_arm']);
 
                         }
                         if($supplierInventories->count() > 1) {
-                            info("dupicate found eta_import");
                             $supplierInventories = $supplierInventories->where('eta_import', $etaImport);
 
                         }
                         if($supplierInventories->count() > 1 ) {
-                            info("duplicate". $supplierInventories->get());
                             $supplierInventory = $supplierInventories->orderBy('id','DESC')->first();
-                            info("existing => update latest record".$supplierInventory->id);
+
                             $supplierInventory->chasis          = $uploadFileContent['chasis'];
                             $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
@@ -213,9 +174,7 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                             $supplierInventory->eta_import      = $etaImport;
                             $supplierInventory->save();
-
                         }
-
                         if($supplierInventories->count() == 1) {
                             $supplierInventory  = $supplierInventories->first();
                             $supplierInventory->chasis          = $uploadFileContent['chasis'];
@@ -228,11 +187,9 @@ class SupplierInventoryController extends Controller
                             $supplierInventory->eta_import      = $etaImport;
                             $supplierInventory->save();
                         }
-
                         DB::commit();
 
                     }else {
-                        INFO("NEW MODEL".$model->id);
 
                         $supplierInventory = new SupplierInventory();
                         $supplierInventory->master_model_id = $model->id;
@@ -290,37 +247,5 @@ class SupplierInventoryController extends Controller
                 return redirect()->route('supplier-inventories.create')->with('message','supplier updated successfully');
             }
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }
