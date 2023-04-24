@@ -84,4 +84,9 @@ use App\Http\Controllers\SupplierController;
     Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
     Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation', QuotationController::class);
+    Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
+    Route::get('/get-vehicle-count/{userId}', function($userId) {
+        $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
+        return $count;
+      });
 });

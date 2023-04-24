@@ -28,23 +28,25 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach ($vehicles as $vehicles)
+                                        @foreach ($vehicles as $vehicle)
                                         <tr data-id="1">
-                                                <td>{{$vehicles->steering}}</td>
-                                                <td>{{$vehicles->fuel_type}}</td>
-                                                <td>{{$vehicles->my}}</td>
-                                                <td>{{$vehicles->upholestry}}</td>
-                                                <td>{{$vehicles->brand_name}}</td>
-                                                <td>{{$vehicles->model_line}}</td>
-                                                <td>{{$vehicles->sub_model}}</td>
-                                                <td>{{$vehicles->name}}</td>
-												<td>{{$vehicles->seats}}</td>
-                                                <td>{{$vehicles->gear}}</td>
-                                                <td>{{$vehicles->int_color}}</td>
-                                                <td>{{$vehicles->ex_color}}</td>
-                                                <td>{{$vehicles->max_price}}</td>
-                                                <td></td>
-                                                </tr>
+                                                <td>{{$vehicle->steering}}</td>
+                                                <td>{{$vehicle->fuel_type}}</td>
+                                                <td>{{$vehicle->my}}</td>
+                                                <td>{{$vehicle->upholestry}}</td>
+                                                <td>{{$vehicle->brand_name}}</td>
+                                                <td>{{$vehicle->model_line}}</td>
+                                                <td>{{$vehicle->sub_model}}</td>
+                                                <td>{{$vehicle->name}}</td>
+												<td>{{$vehicle->seats}}</td>
+                                                <td>{{$vehicle->gear}}</td>
+                                                <td>{{$vehicle->int_color}}</td>
+                                                <td>{{$vehicle->ex_color}}</td>
+                                                <td>{{$vehicle->max_price}}</td>
+                                                <td><input type="button" name="btn" value="Add Vehicle" class="addvehicles" id="addvehicles_{{ $vehicle->veh_id }}" />
+                                                <input type="hidden" class="quotation_id "value="{{ $quotation->id }}" />
+                                            </td>
+                                            </tr>
                                         @endforeach
                                         </tbody>
                                     </table>
@@ -64,6 +66,9 @@ $(document).ready(function () {
                 .every(function (d) {
                     var column = this;
                     var theadname = $("#example th").eq([d]).text();
+                    if (d === 13) {
+                        return;
+                    }
                     var select = $('<select class="form-control my-1"><option value="">All</option></select>')
                         .appendTo( $(column.header()) )
                         .on('change', function () {
@@ -82,88 +87,35 @@ $(document).ready(function () {
                 });
         },
     });
+    $('.addvehicles').click(function(){
+                var id = this.id;
+                var split_id = id.split("_");
+                var actiond = split_id[0];
+                var vehicles_id = split_id[1];
+                var quotation_id = $('.quotation_id').val();
+                let url = "{{ route('quotation.vehicles-insert') }}";
+                //console.log(actiond);
+               if(vehicles_id != '')
+             {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                 }
+                 });
+                 $.ajax({
+                     url: url,
+                     method:"POST",
+                     data:{vehicles_id:vehicles_id, actiond:actiond, quotation_id:quotation_id},
+                     dataType:"JSON",
+                     success:function(data)
+                     {
+                     //console.log(data);
+                    // console.log("123");
+                     $('#addvehicles_' + vehicles_id).closest('tr').remove();
+                     }
+                }); 
+            }
+        });
 });
 </script>
-<!-- <script type="text/javascript">
-
-/* Each drop-down selection affects the values in the other drop-downs */
-
-var primaryColIdx;
-var secondaryColIdx;
-
-$(document).ready(function() {
-    $('#example').DataTable( {
-        initComplete: function () {
-          populateDropdowns(this);
-        }
-    } );
-
-} );
-
-function populateDropdowns(table) {
-    table.api().columns([1,2]).every( function () {
-        var column = this;
-        //console.log("processing col idx " + column.index());
-        var select = $('<select><option value=""></option></select>')
-            .appendTo( $(column.footer()).empty() )
-            .on( 'change', function () {
-                var dropdown = this;
-                doFilter(table, dropdown, column);
-                rebuildSecondaryDropdown(table, column.index());
-            } );
-
-        column.data().unique().sort().each( function ( val, idx ) {
-            select.append( '<option value="' + val + '">' + val + '</option>' )
-        } );
-    } );
-}
-
-function doFilter(table, dropdown, column) {
-    // first time a drop-down is used, it becomes the primary. This
-    // remains the case until the page is refreshed:
-    if (primaryColIdx == null) {
-        primaryColIdx = column.index();
-        secondaryColIdx = (primaryColIdx == 1) ? 2 : 1;
-    }
-
-    if (column.index() === primaryColIdx) {
-        // reset all the filters because the primary is changing:
-        table.api().search( '' ).columns().search( '' );
-    }
-
-    var filterVal = $.fn.dataTable.util.escapeRegex($(dropdown).val());
-    //console.log("firing dropdown for col idx " + column.index() + " with value " + filterVal);
-    column
-        .search( filterVal ? '^' + filterVal + '$' : '', true, false )
-        .draw();
-}
-
-function rebuildSecondaryDropdown(table, primaryColIdx) {
-    var secondaryCol;
-
-    table.api().columns(secondaryColIdx).every( function () {
-        secondaryCol = this;
-    } );
-
-    // get only the unfiltered (unhidden) values for the "other" column:
-    var raw = table.api().columns( { search: 'applied' } ).data()[secondaryColIdx];
-    // the following uses "spread syntax" (...) for sorting and de-duping:
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-    var uniques = [...new Set(raw)].sort();
-
-    var filteredSelect = $('<select><option value=""></option></select>')
-        .appendTo( $(secondaryCol.footer()).empty() )
-        .on( 'change', function () {
-            var dropdown = this;
-            doFilter(table, dropdown, secondaryCol);
-            //rebuildSecondaryDropdown(table, column.index());
-        } );
-
-    uniques.forEach(function (item, index) {
-        filteredSelect.append( '<option value="' + item + '">' + item + '</option>' )
-    } );
-
-}
-
-</script> -->
 @endpush

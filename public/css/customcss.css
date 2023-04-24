@@ -1,3 +1,25 @@
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+  top: 10px;
+  right: 10px;
+}
+
+.cart-icon-number {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: red;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
 img{
     display: block;
     width: 100%;

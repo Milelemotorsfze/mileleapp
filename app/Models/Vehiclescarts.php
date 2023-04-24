@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class quotation extends Model
+class Vehiclescarts extends Model
 {
     use HasFactory;
-protected $fillable = ['calls_id', 'created_by', /* other fillable attributes */];
+protected $fillable = ['vehicle_id', 'created_by', 'quotation_id', /* other fillable attributes */];
 }

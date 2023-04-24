@@ -108,43 +108,6 @@
                     </div>
                     </div>
                     <hr>
-                    <div class="row">
-                    <h4 class="card-title">Select The Vehicles :</h4>
-			        </div> 
-                    <div class="row">
-                    <div class="col-lg-2 col-md-1">
-                    <select name="brand" id="brand" class="form-control mb-1">
-                                <option value="">Select Brand</option>
-                                @foreach ($brand as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                @endforeach
-                            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-1">
-                    <select name="my" id="my" class="form-control mb-1">
-                                <option value="">Select Manufacture Year</option>
-                            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-1">
-                    <select name="model_line" id="model_line" class="form-control mb-1">
-                                <option value="">Select Model Line</option>
-                            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-1">
-                    <select name="sub_model" id="sub_model" class="form-control mb-1">
-                                <option value="">Select Sub Model</option>
-                            </select>
-                    </div>
-                    <div class="col-lg-2 col-md-1">
-                    <select name="variants" id="variants" class="form-control mb-1">
-                                <option value="">Select Code</option>
-                                @foreach ($variants as $variants)
-                                    <option value="{{ $variants }}">{{ $variants->name }}</option>
-                                @endforeach
-                            </select>
-                    </div>
-                    </div>
-                    <hr>
     <div class="row">
         <div class="col-12">
             <div class="table-responsive">
@@ -164,7 +127,7 @@
                             <tr>
                             <td></td>
                             <td></td>
-                            <td><input type ="text" class="form-control" name="payment_terms" placeholder = "" value = ""></td>
+                            <td></td>
                             <td><input type ="text" class="form-control" name="payment_terms" placeholder = "" value = ""></td>
                             <td><input type ="text" class="form-control" name="payment_terms" placeholder = "" value = ""></td>
                             <td></td>
