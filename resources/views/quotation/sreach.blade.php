@@ -8,58 +8,44 @@
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="dtBasicExample" class="table">
+                                    <table id="example" class="table">
                                         <thead>
                                             <tr>
-                                                <th>
-                                                <select name="brand[]" id="brand" class="form-control" multiple>
-                                                    @foreach ($brand as $brand)
-                                                   <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
-                                                    @endforeach
-                                                  </select></th>
-                                                <th>
-                                                <select name="model[]" id="model" class="form-control" multiple>
-                                                    @foreach ($variants as $variants)
-                                                   <option value="{{ $variants->master_model_lines_id }}">{{ $variants->name }}</option>
-                                                    @endforeach
-                                                  </select>
-                                                </th>
-                                                <th></th>
-                                                <th><select name="sub_model[]" id="sub_model" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="variant[]" id="variant" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="my[]" id="my" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="steering[]" id="steering" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="seats[]" id="seats" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="fuel[]" id="fuel" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="ex_colour[]" id="ex_colour" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="int_colour[]" id="int_colour" class="form-control" multiple>
-                                                  </select></th>
-                                                  <th><select name="upholestry[]" id="upholestry" class="form-control" multiple>
-                                                  </select></th>
+                                                <th>Steering</th>
+                                                <th>Fuel</th>
+                                                <th>Model Year</th>
+                                                <th>Upholestry</th>
+                                                <th>Brand</th>
+                                                <th>Model</th>
+                                                <th>Sub Model</th>
+                                                <th>Variant</th>
+                                                <th>Seats</th>
+                                                <th>Gear</th>
+                                                <th>Int Color</th>
+                                                <th>Ex Color</th>
+                                                <th>Max Price</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr data-id="1">
+                                        @foreach ($vehicles as $vehicles)
+                                        <tr data-id="1">
+                                                <td>{{$vehicles->steering}}</td>
+                                                <td>{{$vehicles->fuel_type}}</td>
+                                                <td>{{$vehicles->my}}</td>
+                                                <td>{{$vehicles->upholestry}}</td>
+                                                <td>{{$vehicles->brand_name}}</td>
+                                                <td>{{$vehicles->model_line}}</td>
+                                                <td>{{$vehicles->sub_model}}</td>
+                                                <td>{{$vehicles->name}}</td>
+												<td>{{$vehicles->seats}}</td>
+                                                <td>{{$vehicles->gear}}</td>
+                                                <td>{{$vehicles->int_color}}</td>
+                                                <td>{{$vehicles->ex_color}}</td>
+                                                <td>{{$vehicles->max_price}}</td>
                                                 <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-												<td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                               </tr>
+                                                </tr>
+                                        @endforeach
                                         </tbody>
                                     </table>
                                 </div>
@@ -70,49 +56,114 @@
 @endsection
 @push('scripts')
 <script type="text/javascript">
-$('#brand').select2({
-    multiple: true,
-    placeholder: "Select Brand"
-});
-$('#model').select2({
-    multiple: true,
-    placeholder: "Select Model"
-});
-$('#sub_model').select2({
-    multiple: true,
-    placeholder: "Select Sub Model"
-});
-$('#variant').select2({
-    multiple: true,
-    placeholder: "Select Variant"
-});
-$('#my').select2({
-    multiple: true,
-    placeholder: "Select MY"
-});
-$('#steering').select2({
-    multiple: true,
-    placeholder: "Select Steering"
-});
-$('#seats').select2({
-    multiple: true,
-    placeholder: "Select Seats"
-});
-$('#fuel').select2({
-    multiple: true,
-    placeholder: "Select Fuel"
-});
-$('#ex_colour').select2({
-    multiple: true,
-    placeholder: "Select Ex Colour"
-});
-$('#int_colour').select2({
-    multiple: true,
-    placeholder: "Select Int Colour"
-});
-$('#upholestry').select2({
-    multiple: true,
-    placeholder: "Select Upholestry"
+$(document).ready(function () {
+    $('#example').DataTable({
+        initComplete: function () {
+            this.api()
+                .columns()
+                .every(function (d) {
+                    var column = this;
+                    var theadname = $("#example th").eq([d]).text();
+                    var select = $('<select class="form-control my-1"><option value="">All</option></select>')
+                        .appendTo( $(column.header()) )
+                        .on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+ 
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+ 
+                    column
+                        .data()
+                        .unique()
+                        .sort()
+                        .each(function (d, j) {
+                            select.append('<option value="' + d + '">' + d + '</option>');
+                        });
+                });
+        },
+    });
 });
 </script>
+<!-- <script type="text/javascript">
+
+/* Each drop-down selection affects the values in the other drop-downs */
+
+var primaryColIdx;
+var secondaryColIdx;
+
+$(document).ready(function() {
+    $('#example').DataTable( {
+        initComplete: function () {
+          populateDropdowns(this);
+        }
+    } );
+
+} );
+
+function populateDropdowns(table) {
+    table.api().columns([1,2]).every( function () {
+        var column = this;
+        //console.log("processing col idx " + column.index());
+        var select = $('<select><option value=""></option></select>')
+            .appendTo( $(column.footer()).empty() )
+            .on( 'change', function () {
+                var dropdown = this;
+                doFilter(table, dropdown, column);
+                rebuildSecondaryDropdown(table, column.index());
+            } );
+
+        column.data().unique().sort().each( function ( val, idx ) {
+            select.append( '<option value="' + val + '">' + val + '</option>' )
+        } );
+    } );
+}
+
+function doFilter(table, dropdown, column) {
+    // first time a drop-down is used, it becomes the primary. This
+    // remains the case until the page is refreshed:
+    if (primaryColIdx == null) {
+        primaryColIdx = column.index();
+        secondaryColIdx = (primaryColIdx == 1) ? 2 : 1;
+    }
+
+    if (column.index() === primaryColIdx) {
+        // reset all the filters because the primary is changing:
+        table.api().search( '' ).columns().search( '' );
+    }
+
+    var filterVal = $.fn.dataTable.util.escapeRegex($(dropdown).val());
+    //console.log("firing dropdown for col idx " + column.index() + " with value " + filterVal);
+    column
+        .search( filterVal ? '^' + filterVal + '$' : '', true, false )
+        .draw();
+}
+
+function rebuildSecondaryDropdown(table, primaryColIdx) {
+    var secondaryCol;
+
+    table.api().columns(secondaryColIdx).every( function () {
+        secondaryCol = this;
+    } );
+
+    // get only the unfiltered (unhidden) values for the "other" column:
+    var raw = table.api().columns( { search: 'applied' } ).data()[secondaryColIdx];
+    // the following uses "spread syntax" (...) for sorting and de-duping:
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+    var uniques = [...new Set(raw)].sort();
+
+    var filteredSelect = $('<select><option value=""></option></select>')
+        .appendTo( $(secondaryCol.footer()).empty() )
+        .on( 'change', function () {
+            var dropdown = this;
+            doFilter(table, dropdown, secondaryCol);
+            //rebuildSecondaryDropdown(table, column.index());
+        } );
+
+    uniques.forEach(function (item, index) {
+        filteredSelect.append( '<option value="' + item + '">' + item + '</option>' )
+    } );
+
+}
+
+</script> -->
 @endpush

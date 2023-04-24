@@ -6,6 +6,7 @@ use App\Models\quotation;
 use App\Models\Calls;
 use App\Models\Brand;
 use App\Models\Varaint;
+use App\Models\Vehicles;
 use App\Models\MasterModelLines;
 use Illuminate\Http\Request;
 use Monarobase\CountryList\CountryListFacade;
@@ -41,12 +42,18 @@ class QuotationController extends Controller
      */
     public function show($id)
     {
+        $vehicles = Vehicles::query()
+                    ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+                    ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+                    ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+                    ->where('vehicles.status', '=', 'New')
+                    ->get();
         $data = Calls::where('id',$id)->first();
         $variants = Varaint::get();
         $brand = Brand::get();
         $countries = CountryListFacade::getList('en');
        // return view('quotation.add_new',compact('data', 'countries', 'variants', 'brand'));
-       return view('quotation.sreach',compact('data', 'countries', 'variants', 'brand'));
+       return view('quotation.sreach',compact('data', 'countries', 'variants', 'brand', 'vehicles'));
     }
     /**
      * Show the form for editing the specified resource.
