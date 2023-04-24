@@ -200,6 +200,16 @@
                                     <a href="/customerinfo" class="dropdown-item" data-key="t-login">Warehouse Info </a>
                                 </div>
                             </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Supplier </span>
+                                    <div class="arrow-down"></div>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="{{route('suppliers.create')}}" class="dropdown-item" data-key="t-login">Add New Supplier </a>
+                                    <a href="{{route('suppliers.index')}}" class="dropdown-item" data-key="t-login">Supplier Info </a>
+                                </div>
+                            </div>
                         </div>
                     </li>
                     @endcan
