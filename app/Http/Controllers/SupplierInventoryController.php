@@ -18,7 +18,7 @@ class SupplierInventoryController extends Controller
     public function index()
     {
         $supplierInventories = SupplierInventory::with('masterModel')
-            ->where('veh_status', SupplierInventory::status)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->groupBy('master_model_id')
             ->get();
         return view('supplier_inventories.index', compact('supplierInventories'));
@@ -115,38 +115,58 @@ class SupplierInventoryController extends Controller
             }
 
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
-            info(count($newModels));
-            if(count($newModels) > 0) {
-                $filename = 'New_Models_'.date('Y_m_d').'.csv';
-                $headers = array(
-                    "Content-type" => "text/csv",
-                    "Content-Disposition" => "attachment; filename=$filename",
-                    "Content-Description: File Transfer"
-                );
 
-                $columns = array('Model');
-                $callback = function() use ($newModels, $columns)
-                {
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, $columns);
-                    foreach($newModels as $newmodel) {
-                        fputcsv($file, array(
-                            $newmodel['model'],
-                            $newmodel['sfx'],
-                        ));
-                    }
-                    fclose($file);
-                };
-                return Response::stream($callback, 200, $headers);
+            if(count($newModels) > 0) {
+
+                $filename = 'New_Models_'.date('Y_m_d').'.csv';
+                header("Content-Description: File Transfer");
+                header("Content-Disposition: attachment; filename=$filename");
+                header("Content-Type: application/csv;");
+
+                $file = fopen('php://output', 'w');
+                $columns = array("models","SFX");
+                fputcsv($file, $columns);
+                foreach($newModels as $newmodel) {
+                    fputcsv($file, array(
+                        $newmodel['model'],
+                        $newmodel['sfx'],
+                    ));
+                }
+                fclose($file);
+                exit;
+
+
+//               $filename = 'New_Models_'.date('Y_m_d').'.csv';
+
+//                $columns = array('Model','SFX');
+//                $callback = function() use ($newModels, $columns)
+//                {
+//                    $file = fopen('php://output', 'w');
+//                    fputcsv($file, $columns);
+//                    foreach($newModels as $newmodel) {
+//                        fputcsv($file, array(
+//                            $newmodel['model'],
+//                            $newmodel['sfx'],
+//                        ));
+//                    }
+//                    fclose($file);
+//                };
+//
+                return redirect()->route('supplier-inventories.create')->with('message','Please add new models to master table.');
             }else
             {
+                $csvModels = [];
+
                 foreach($uploadFileContents as $uploadFileContent){
                     $model = MasterModel::where('model', $uploadFileContent['model'])
                         ->where('sfx', $uploadFileContent['sfx'])
                         ->first();
+
                     $modelId = $model->id;
+                    $csvModels[] = $modelId;
 
                     $inventories = SupplierInventory::where('master_model_id', $modelId);
+
                     if ($inventories->count() > 0)
                     {
                         DB::beginTransaction();
@@ -184,22 +204,30 @@ class SupplierInventoryController extends Controller
                             info("duplicate". $supplierInventories->get());
                             $supplierInventory = $supplierInventories->orderBy('id','DESC')->first();
                             info("existing => update latest record".$supplierInventory->id);
+                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                            $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
+                            $supplierInventory->color_code      = $uploadFileContent['color_code'];
+                            $supplierInventory->color_name      = $uploadFileContent['color_name'];
+                            $supplierInventory->status	        = $uploadFileContent['status'];
+                            $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
+                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                            $supplierInventory->eta_import      = $etaImport;
+                            $supplierInventory->save();
 
                         }
 
                         if($supplierInventories->count() == 1) {
                             $supplierInventory  = $supplierInventories->first();
+                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                            $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
+                            $supplierInventory->color_code      = $uploadFileContent['color_code'];
+                            $supplierInventory->color_name      = $uploadFileContent['color_name'];
+                            $supplierInventory->status	        = $uploadFileContent['status'];
+                            $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
+                            $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
+                            $supplierInventory->eta_import      = $etaImport;
+                            $supplierInventory->save();
                         }
-
-                        $supplierInventory->chasis          = $uploadFileContent['chasis'];
-                        $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
-                        $supplierInventory->color_code      = $uploadFileContent['color_code'];
-                        $supplierInventory->color_name      = $uploadFileContent['color_name'];
-                        $supplierInventory->status	        = $uploadFileContent['status'];
-                        $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
-                        $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
-                        $supplierInventory->eta_import      = $etaImport;
-                        $supplierInventory->save();
 
                         DB::commit();
 
@@ -219,11 +247,45 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->country     	= $uploadFileContent['country'];
                         $supplierInventory->date            = $uploadFileContent['date'];
                         $supplierInventory->uniques         = $uploadFileContent['uniques'];
-                        $supplierInventory->veh_status      = SupplierInventory::status;
+                        $supplierInventory->veh_status      = SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY;
                         $supplierInventory->save();
                      }
 
                 }
+
+                $deletedModels = MasterModel::with('supplierInventories')
+                    ->whereHas('supplierInventories',function ($query) use ($csvModels) {
+                        $query->whereNotIn('master_model_id', $csvModels)
+                            ->groupBY('master_model_id');
+                    })
+                    ->pluck( 'Model','sfx');
+
+                // status changed to deleted
+
+                $deletedSupplierInventories = SupplierInventory::whereIn('master_model_id', $deletedModels)->pluck('id');
+
+                foreach ($deletedSupplierInventories as $deletedSupplierInventory) {
+                    $supplierInventory = SupplierInventory::find($deletedSupplierInventory);
+                    info($supplierInventory);
+                    $supplierInventory->veh_status = SupplierInventory::VEH_STATUS_DELETED;
+                }
+
+                $filename = 'DeletedModels_Models_'.date('Y_m_d').'.csv';
+                header("Content-Description: File Transfer");
+                header("Content-Disposition: attachment; filename=$filename");
+                header("Content-Type: application/csv;");
+
+                $file = fopen('php://output', 'w');
+                $columns = array("models","SFX");
+                fputcsv($file, $columns);
+                foreach($deletedModels as $key =>  $deletedModel) {
+                    fputcsv($file, array(
+                        $key,
+                        $deletedModel,
+                    ));
+                }
+                fclose($file);
+                exit;
 
                 return redirect()->route('supplier-inventories.create')->with('message','supplier updated successfully');
             }

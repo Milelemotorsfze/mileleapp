@@ -11,7 +11,8 @@ class SupplierInventory extends Model
 {
     use HasFactory;
     public $timestamps = false;
-    public const status = "supplier inventory";
+    public const VEH_STATUS_SUPPLIER_INVENTORY = "supplier inventory";
+    public const VEH_STATUS_DELETED = "Deleted";
     public const DEALER_TRANS_CARS = "Trans Cars";
     public const DEALER_MILELE_MOTORS = "Milele Motors";
 
@@ -43,7 +44,7 @@ class SupplierInventory extends Model
             ->whereHas('masterModel', function ($query) use($modelId){
                 $query->where('id', $modelId);
             })
-            ->where('veh_status', SupplierInventory::status)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->get();
 
         if (!$supplierInventories) {
@@ -59,36 +60,11 @@ class SupplierInventory extends Model
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
             ->where('master_models.id', '=', $modelId)
-            ->where('veh_status', SupplierInventory::status)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->groupBy('color_code')
             ->get();
-        return $colorCodes;
 
-//        foreach ($colorCodes as $query) {
-//
-//            $colorCode = $query->color_code;
-//            $colorCodeCount = $query->color_code_count;
-//            $code_nameex = "(Colour Not Listed)  ".$colorCode;
-//            $code = $colorCode;
-//            $colorCodeLength = strlen($colorCode);
-//            if($colorCodeLength == 5)
-//            {
-//                info($query->master_model_id);
-//                $exterior = substr($code, 0, 3);
-//            }
-//            if ($colorCodeLength == 4)
-//            {
-//                info($query->master_model_id);
-//                $altercolourcode = "0".$code;
-//                $exterior = substr($altercolourcode, 0, 3);
-//            }
-//            return $exterior;
-//            $parentColors = DB::table('color_codes')
-//                ->select('parent')
-//                ->where('code','=', $extcolour)
-//                ->groupBy('parent')
-//                ->get();
-//        }
+        return $colorCodes;
 
     }
 

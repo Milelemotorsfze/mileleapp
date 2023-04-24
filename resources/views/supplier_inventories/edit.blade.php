@@ -4,9 +4,9 @@
         <h4 class="card-title">Add/ Update Supplier Inventory Record</h4>
     </div>
     <div class="card-body">
-        @if(Session::has('info'))
+        @if(Session::has('message'))
             <div class="alert alert-danger">
-                {{Session::get('info')}}
+                {{Session::get('message')}}
             </div>
         @endif
 {{--        @if (count($errors) > 0)--}}
