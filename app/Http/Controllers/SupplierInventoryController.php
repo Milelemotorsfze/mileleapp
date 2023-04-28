@@ -76,10 +76,6 @@ class SupplierInventoryController extends Controller
                     $colourname = $code_nameex;
                     $uploadFileContents[$i]['model'] = $filedata[0];
                     $uploadFileContents[$i]['sfx'] = $filedata[1];
-                    if (empty($filedata[2]))
-                    {
-                        $filedata[2] = 'NULL';
-                    }
                     $uploadFileContents[$i]['chasis'] = $filedata[2];
                     $uploadFileContents[$i]['engine_number'] = $filedata[3];
                     $uploadFileContents[$i]['color_code'] = $filedata[4];
@@ -156,12 +152,12 @@ class SupplierInventoryController extends Controller
                     if ($supplierInventories->count() <= 0)
                     {
                         info("new entry");
-
                         // model and sfx not existing in Suplr Invtry => new entry
                         $supplierInventory = new SupplierInventory();
 
+
                         $supplierInventory->master_model_id = $model->id;
-                        $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                        $supplierInventory->chasis          = !empty($uploadFileContent['chasis']) ? $uploadFileContent['chasis'] : NULL;
                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                         $supplierInventory->color_code      = $uploadFileContent['color_code'];
                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
@@ -185,22 +181,18 @@ class SupplierInventoryController extends Controller
                         $supplierInventory = $supplierInventories->where('chasis', $uploadFileContent['chasis'])->first();
                         $isNullChaisis = SupplierInventory::where('master_model_id', $modelId)
                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                            ->where('chasis',"NULL")
+                            ->whereNull('chasis')
                             ->first();
                         if (!$supplierInventory)
                         {
                             info("chaisis not exist");
                             // chasis not existing
-                            info($modelId);
-
-                            info($isNullChaisis);
-                            if (!empty($isNullChaisis) && $uploadFileContent['chasis'] !== 'NULL')
+                            if (!empty($isNullChaisis) && !empty($uploadFileContent['chasis']))
                             {
                                 // null chaisis existing => updating with current data
-                                info($uploadFileContent['chasis']);
                                 info( "chaisis existing => updating with current data");
                                 $supplierInventory = $isNullChaisis;
-                                $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                                $supplierInventory->chasis          = !empty($uploadFileContent['chasis']) ? $uploadFileContent['chasis'] : NULL;
                                 $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                                 $supplierInventory->color_code      = $uploadFileContent['color_code'];
                                 $supplierInventory->color_name      = $uploadFileContent['color_name'];
@@ -209,18 +201,17 @@ class SupplierInventoryController extends Controller
                                 $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                                 $supplierInventory->eta_import      = $etaImport;
                                 $supplierInventory->save();
-                                info("null chaisis found");
                                 info("update null chaisis");
 
-
-                            }else {
+                            }else
+                            {
                                 info("NULL CHAISIS NEW ENTRY");
                                 // new chaisis with existing model and sfx and  chasis not null ,
 
                                 $supplierInventory = new SupplierInventory();
 
                                 $supplierInventory->master_model_id = $model->id;
-                                $supplierInventory->chasis = $uploadFileContent['chasis'];
+                                $supplierInventory->chasis = !empty($uploadFileContent['chasis']) ? $uploadFileContent['chasis'] : NULL;
                                 $supplierInventory->engine_number = $uploadFileContent['engine_number'];
                                 $supplierInventory->color_code = $uploadFileContent['color_code'];
                                 $supplierInventory->pord_month = $uploadFileContent['pord_month'];
@@ -238,7 +229,7 @@ class SupplierInventoryController extends Controller
                         }else
                         {
                             info("data". $uploadFileContent['chasis']);
-                            if ($uploadFileContent['chasis'] == "NULL" && $isNullChaisis)
+                            if (empty($uploadFileContent['chasis']) )
                             {
                                 info("yes null NEW ENTRY");
                                 $supplierInventory = new SupplierInventory();
@@ -256,7 +247,7 @@ class SupplierInventoryController extends Controller
                             }
                             info("EXIST CHAISIS");
                             // chasis existing
-                            $supplierInventory->chasis          = $uploadFileContent['chasis'];
+                            $supplierInventory->chasis          = !empty($uploadFileContent['chasis']) ? $uploadFileContent['chasis'] : NULL;
                             $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                             $supplierInventory->color_code      = $uploadFileContent['color_code'];
                             $supplierInventory->color_name      = $uploadFileContent['color_name'];
