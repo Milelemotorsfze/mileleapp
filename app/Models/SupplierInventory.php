@@ -15,6 +15,9 @@ class SupplierInventory extends Model
     public const VEH_STATUS_DELETED = "Deleted";
     public const DEALER_TRANS_CARS = "Trans Cars";
     public const DEALER_MILELE_MOTORS = "Milele Motors";
+    public const UPLOAD_STATUS_ACTIVE = "Active";
+    public const UPLOAD_STATUS_INACTIVE = "Inactive";
+
 
     protected $appends = [
         'color_codes',
@@ -29,7 +32,8 @@ class SupplierInventory extends Model
         'pord_month',
         'po_arm',
         'status',
-        'eta_import'
+        'eta_import',
+        'upload_status'
     ];
     public function masterModel()
     {
@@ -39,12 +43,12 @@ class SupplierInventory extends Model
     public function getTotalQuantityAttribute()
     {
         $modelId = $this->master_model_id;
-
         $supplierInventories = SupplierInventory::with('masterModel')
             ->whereHas('masterModel', function ($query) use($modelId){
                 $query->where('id', $modelId);
             })
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->get();
 
         if (!$supplierInventories) {
@@ -55,17 +59,16 @@ class SupplierInventory extends Model
     public function getColorCodesAttribute()
     {
         $modelId = $this->master_model_id;
-
         $colorCodes =  DB::table('supplier_inventories')
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
             ->where('master_models.id', '=', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->groupBy('color_code')
             ->get();
 
         return $colorCodes;
-
     }
 
 }
