@@ -1,4 +1,7 @@
 @extends('layouts.main')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Create Suppliers</h4>
@@ -60,7 +63,7 @@
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="text" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number" placeholder="Enter Contact Number" value="{{ old('contact_number') }}" required autocomplete="contact_number" autofocus>
+                            <input id="contact_number" type="tel" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{ old('contact_number') }}" required autocomplete="contact_number" autofocus>
                             @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -76,7 +79,7 @@
                             <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="text" class="form-control @error('alternative_contact_number') is-invalid @enderror" name="alternative_contact_number" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number') }}" autocomplete="alternative_contact_number" autofocus>
+                            <input id="alternative_contact_number" type="text" class="form-control @error('alternative_contact_number') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number') }}" autocomplete="alternative_contact_number" autofocus>
                             @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -142,7 +145,13 @@
                             <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="is_primary_payment_method" type="text" class="form-control @error('is_primary_payment_method') is-invalid @enderror" name="is_primary_payment_method" placeholder="Enter Supplier Type" value="{{ old('is_primary_payment_method') }}" required autocomplete="is_primary_payment_method" autofocus>
+                        <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control">
+                            <option value="">Choose Payment Method</option>
+                            @foreach($paymentMethods as $paymentMethod)
+                            <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
+                            @endforeach
+                        </select>
+                            <!-- <input id="is_primary_payment_method" type="text" class="form-control @error('is_primary_payment_method') is-invalid @enderror" name="is_primary_payment_method" placeholder="Enter Supplier Type" value="{{ old('is_primary_payment_method') }}" required autocomplete="is_primary_payment_method" autofocus> -->
                             @error('is_primary_payment_method')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -207,11 +216,33 @@
             $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             $("#adoon").select2();
         });
+        var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
+        separateDialCode: true,
+        preferredCountries:["ae"],
+        hiddenInput: "full",
+        utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+        var alternative_contact_number = window.intlTelInput(document.querySelector("#alternative_contact_number"), {
+        separateDialCode: true,
+        preferredCountries:["ae"],
+        hiddenInput: "full",
+        utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        });
+        $("form").submit(function() {
+        var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+        $("input[name='contact_number[full]'").val(full_number);
+        var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+        $("input[name='alternative_contact_number[full]'").val(full_number);
+        });
     </script>
 @endsection
 <style>
     .error 
     {
         color: #FF0000;
+    }
+    .iti 
+    { 
+        width: 100%; 
     }
 </style>

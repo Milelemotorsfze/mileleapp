@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Addon extends Model
+class SupplierAvailablePayments extends Model
 {
     use HasFactory;
-    protected $table = "addons";
+    protected $table = "supplier_available_payment_methods";
     protected $fillable = [
-        'addon_type',
-        'name',
+        'supplier_id',
+        'payment_methods_id',
+        'is_primary_payment_method',
         'created_by',
         'updated_by',
         'deleted_by'

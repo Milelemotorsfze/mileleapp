@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('addons', function (Blueprint $table) {
             $table->id();
+            $table->enum('addon_type', ['P', 'S', 'D', 'DP', 'E']); // P - accessories , S - shipping_cost , D - documentation , DP - documentation_on_purchase , E - Not Mentioned Any Specification
             $table->string('name');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');

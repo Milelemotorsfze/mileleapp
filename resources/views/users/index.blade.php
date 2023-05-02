@@ -275,7 +275,7 @@
     }
   </script>
 @endsection
-<style>
+<!-- <style>
     .modal-content {
             position:fixed;
             top: 50%;
@@ -307,5 +307,5 @@
             right: 0;
             top: 0;
         }
-</style>
+</style> -->
    
