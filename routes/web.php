@@ -53,6 +53,9 @@ use App\Http\Controllers\SupplierController;
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
     Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon'); 
+    Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown'); 
+    Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view'); 
+    Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
 
