@@ -12,7 +12,7 @@
         <br>
         <div class="table-responsive" >
             <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table">
-                <thead>
+                <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
                     <th>Model</th>

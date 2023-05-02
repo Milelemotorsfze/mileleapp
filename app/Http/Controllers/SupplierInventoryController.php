@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Session;
 
 class SupplierInventoryController extends Controller
 {
@@ -25,8 +26,12 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
-
+//        $deletedRows = [];
+//        $newlyAddedRows = [];
+//        $updatedRows = [];
         return view('supplier_inventories.edit');
+//            ,compact('deletedRows','newlyAddedRows','updatedRows')
+
     }
     public function store(Request $request)
     {
@@ -56,7 +61,9 @@ class SupplierInventoryController extends Controller
                     $country = $request->input('country');
 
                     $colourcode = $filedata[4];
-                    $colourcodecount = strlen($colourcode);
+                    if($colourcode) {
+                        $colourcodecount = strlen($colourcode);
+
                         if ($colourcodecount == 5) {
                             $extcolour = substr($colourcode, 0, 3);
                         }
@@ -64,17 +71,22 @@ class SupplierInventoryController extends Controller
                             $altercolourcode = "0" . $colourcode;
                             $extcolour = substr($altercolourcode, 0, 3);
                         }
-                    $parentColors = DB::table('color_codes')
-                    ->select('parent','id')
-                    ->where('code','=', $extcolour)
-                    ->where('status','=',ColorCode::EXTERIOR)
-                    ->get();
+                        if($extcolour) {
+                            $parentColors = DB::table('color_codes')
+                                ->select('parent','id')
+                                ->where('code','=', $extcolour)
+                                ->where('status','=',ColorCode::EXTERIOR)
+                                ->get();
 
-                    foreach ($parentColors as $row)
-                    {
-                        $code_nameex = $row->parent;
-                        $exteriorColorCodeId = $row->id;
+                            foreach ($parentColors as $row)
+                            {
+                                $code_nameex = $row->parent;
+                                $exteriorColorCodeId = $row->id;
+                            }
+                        }
                     }
+
+
                     $colourname = $code_nameex;
                     $uploadFileContents[$i]['model'] = $filedata[0];
                     $uploadFileContents[$i]['sfx'] = $filedata[1];
@@ -126,6 +138,7 @@ class SupplierInventoryController extends Controller
                 $columns = array('Model','SFX');
                 $callback = function() use ($newModels, $columns)
                 {
+                    Session::flash('message', 'Download successful');
                     $file = fopen('php://output', 'w');
                     fputcsv($file, $columns);
                     foreach($newModels as $newmodel) {
@@ -136,7 +149,8 @@ class SupplierInventoryController extends Controller
                     }
                     fclose($file);
                 };
-                return Response::stream($callback, 200, $headers);
+
+                return  response()->stream($callback, 200, $headers);
                 // show error msg
 //                return redirect()->route('supplier-inventories.create')->with('message','Please add new models to master table.');
             } else
@@ -161,7 +175,21 @@ class SupplierInventoryController extends Controller
                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 
-                    info($supplierInventories->count());
+//                      $uniqueCsvModels = array_map("unserialize", array_unique(array_map("serialize", $csvModels)));
+////                    foreach ($uniqueCsvModels as $csvModel) {
+//                        info("inside forloop");
+//                        $groupedModelValues =  array_count_values($csvModels);
+//                        // get each pair count in excel
+//                        $modelOccuranceCount = $groupedModelValues[$modelId];
+//                        // get each pair in database
+//                        $modelDbCount = $supplierInventories->count();
+//
+//                        if ($modelOccuranceCount < $modelDbCount) {
+//                            // add to deleted model
+//
+//                        }
+////                    }
+
 
                     if ($supplierInventories->count() <= 0) {
                         info("new entry");
@@ -223,7 +251,7 @@ class SupplierInventoryController extends Controller
                                }else
                                {
                                  $supplierInventory = $supplierInventories->where('color_code', $uploadFileContent['color_code'])
-                                       ->first();
+                                                        ->first();
                                  if (!$supplierInventory)
                                  {
                                      info("no clr code matching update row");
@@ -248,7 +276,7 @@ class SupplierInventoryController extends Controller
                                      }else{
 
                                          $supplierInventory = $supplierInventories->where('po_arm', $uploadFileContent['po_arm'])
-                                             ->first();
+                                                                ->first();
                                          if (!$supplierInventory) {
                                              info("no po arm matching update row");
                                              $updatedRows[$i]['model'] = $uploadFileContent['model'];
@@ -258,7 +286,7 @@ class SupplierInventoryController extends Controller
                                              $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                                          }else{
                                              $supplierInventory = $supplierInventories->whereDate('eta_import', $uploadFileContent['eta_import'])
-                                                 ->first();
+                                                                    ->first();
                                              if (!$supplierInventory) {
                                                  info("no eta import matching update row");
                                                  $updatedRows[$i]['model'] = $uploadFileContent['model'];
@@ -268,7 +296,7 @@ class SupplierInventoryController extends Controller
                                                  $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                                              }else{
                                                  $supplierInventory = $supplierInventories->where('status', $uploadFileContent['status'])
-                                                     ->first();
+                                                                        ->first();
                                                  if (!$supplierInventory) {
                                                      info("no status matching update row");
                                                      $updatedRows[$i]['model'] = $uploadFileContent['model'];
@@ -296,7 +324,6 @@ class SupplierInventoryController extends Controller
                             $groupedCountValue =  array_count_values($countblankchasis);
                             if($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
                             {
-                                //
                                 $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                                 $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                 $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -390,27 +417,34 @@ class SupplierInventoryController extends Controller
                         ->get();
 
                     if ($inventories->count() > 0) {
-                        info("deleted row");
-                        info("CSV MODELS");
                         info($csvModels);
                         $deletedModels = SupplierInventory::whereNotIn('master_model_id', $csvModels)
                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->groupBY('master_model_id')
                             ->pluck('master_model_id');
+
+//                        return $deletedModels;
+
                         info($deletedModels);
-//
-//                        $deletedRows = SupplierInventory::whereIn('master_model_id', $deletedModels)
-//                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)->get();
-                        info($deletedRows);
+                        info("deleted models");
+
+                        $deletedRows = SupplierInventory::whereIn('master_model_id', $deletedModels)
+                            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                            ->get();
+
+//                        foreach ($deletedDatas as $deletedRow)
+//                        {
+//                            $deletedRows['model'] = $deletedRow->masterModel->model ?? '';
+//                            $deletedRows['sfx'] = $deletedRow->masterModel->sfx ?? '';
+//                            $deletedRows['chasis'] = $deletedRow->chasis;
+//                            $deletedRows['engine_number'] = $deletedRow->engine_number;
+//                            $deletedRows['color_code'] = $deletedRow->color_code;
+//                        }
+//                        info($deletedRows);
                     }
-                    $preivousDatas = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)->get();
-                    foreach ($preivousDatas as $preivousData)
-                    {
-                        $preivousData->upload_status = SupplierInventory::UPLOAD_STATUS_INACTIVE;
-                        $preivousData->save();
-                    }
+
 
 //                    $deletedSupplierInventoriesIds = $deletedSupplierInventories->pluck('id');
 
@@ -420,10 +454,18 @@ class SupplierInventoryController extends Controller
 //                        $deletedSupplierInventory->veh_status = SupplierInventory::VEH_STATUS_DELETED;
 //                        $deletedSupplierInventory->save();
 //                    }
+
+                $preivousDatas = SupplierInventory::where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)->get();
+                foreach ($preivousDatas as $preivousData)
+                {
+                    $preivousData->upload_status = SupplierInventory::UPLOAD_STATUS_INACTIVE;
+                    $preivousData->save();
+                }
                 foreach ($uploadFileContents as $uploadFileContent) {
                     $model = MasterModel::where('model', $uploadFileContent['model'])
                         ->where('sfx', $uploadFileContent['sfx'])
                         ->first();
+
                     $supplierInventory = new SupplierInventory();
                     $supplierInventory->master_model_id = $model->id;
                     $supplierInventory->chasis          = $uploadFileContent['chasis'];

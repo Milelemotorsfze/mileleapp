@@ -9,7 +9,7 @@
         }
 
         td, th {
-            border: 1px solid #dddddd;
+            border: 1px solid #1c1b1b;
             text-align: left;
             padding: 8px;
         }
@@ -21,16 +21,23 @@
             text-align: center;
             font-weight: bold;
         }
-
+       .new-row {
+           background-color: #bdd5f3;
+       }
+        .updated-row {
+            background-color: #d8d4ea;
+        }
+        .deleted-row {
+            background-color: #e5beb2;
+        }
     </style>
 </head>
 <body>
 
-<h2>Supplier Inventoy Reports</h2>
-    <table>
-        <span class="count-span">{{ count($newlyAddedRows) }}</span>
+<h2 style="text-align: center">Supplier Inventory Reports</h2>
+    <table class="new-row">
         <tr>
-            <td colspan="4" class="heading">Newly Added Rows</td>
+            <td colspan="5" class="heading">Newly Added Rows - {{ count($newlyAddedRows) }}</td>
         </tr>
         <tr>
             <th>Model</th>
@@ -48,13 +55,16 @@
             <td>{{ $newlyAddedRow['color_code'] }}</td>
         </tr>
     @endforeach
-
+    @if(!$newlyAddedRows)
+        <tr>
+            <td colspan="5" style="text-align: center" >No data Added</td>
+        </tr>
+    @endif
 </table>
-<br>
-<table>
-    <span class="count-span">{{ count($updatedRows) }}</span>
+<br><br>
+<table class="updated-row">
     <tr>
-        <td colspan="4" class="heading">Updated Added Rows</td>
+        <td colspan="5" class="heading">Updated Added Rows - {{ count($updatedRows) }}</td>
     </tr>
     <tr>
         <th>Model</th>
@@ -70,33 +80,41 @@
             <td>{{ $updatedRow['chasis'] }}</td>
             <td>{{ $updatedRow['engine_number'] }}</td>
             <td>{{ $updatedRow['color_code'] }}</td>
-
         </tr>
     @endforeach
+    @if(!$updatedRows)
+        <tr>
+            <td colspan="5" style="text-align: center" >No data Updated</td>
+        </tr>
+    @endif
 </table>
-<table>
-    <span class="count-span">{{ count($updatedRows) }}</span>
+<br><br>
+<table class="deleted-row">
     <tr>
-        <td colspan="4" class="heading">Deleted Rows</td>
+        <td colspan="5" class="heading">Deleted Rows - {{ count($deletedRows) }}</td>
     </tr>
     <tr>
         <th>Model</th>
         <th>SFX</th>
         <th>Chasis</th>
-        <th>Engine Number</th>
-<th>Color Code</th>
+        <th>Engine Number </th>
+        <th>Color Code</th>
     </tr>
+
     @foreach($deletedRows as $deletedRow)
         <tr>
-            <td>{{ $deletedRow['model']  }}</td>
-            <td>{{ $deletedRow['sfx']  }}</td>
-            <td>{{ $deletedRow['chasis']  }}</td>
-            <td>{{ $deletedRow['engine_number']  }}</td>
-            <td>{{ $deletedRow['color_code']}}</td>
-
-
+            <td>{{ $deletedRow->masterModel->model ?? '' }}</td>
+            <td>{{ $deletedRow->masterModel->sfx ?? '' }}</td>
+            <td>{{ $deletedRow->chasis  }}</td>
+            <td>{{ $deletedRow->engine_number }}</td>
+            <td>{{ $deletedRow->color_code }}</td>
         </tr>
     @endforeach
+    @if(!$deletedRows)
+        <tr>
+            <td colspan="5" style="text-align: center" >No data Deleted</td>
+        </tr>
+    @endif
 </table>
 </body>
 </html>
