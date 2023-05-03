@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
             $table->dropColumn('date');
-            $table->dropColumn('modification_id');
+//            $table->dropColumn('modification_id');
         });
     }
 
@@ -24,8 +24,7 @@ return new class extends Migration
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
             $table->dropColumn('date');
-            $table->dropColumn('modification_id');
-            $table->dropColumn('modification_id');
+//            $table->dropColumn('modification_id');
 
         });
     }
