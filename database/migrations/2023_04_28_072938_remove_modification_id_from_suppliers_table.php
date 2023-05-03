@@ -23,7 +23,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
-           $table->date('date');
+            $table->dropColumn('date');
+            $table->dropColumn('modification_id');
+            $table->dropColumn('modification_id');
+
         });
     }
 };
