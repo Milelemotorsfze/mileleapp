@@ -404,8 +404,8 @@
            
             $('#add').click(function()
             {
-                alert(i);
-                alert(globalThis.selectedBrands);
+                // alert(i);
+                // alert(globalThis.selectedBrands);
                 let opt = document.querySelector('option[data-value=allbrands]')
                 opt.setAttribute('disabled','disabled');
                 // globalThis.selectedBrands = [];
@@ -519,11 +519,11 @@
             for (let a = 1; a <= i; a++)
                 {
                     var value =$('#'+id).val();
-            alert(value); // BENTLEY
+            // alert(value); // BENTLEY
             // id="selectBrand'+i+'"
             // '#'+id 
                 var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-                alert(brandId); //1
+                // alert(brandId); //1
                 globalThis.selectedBrands .push(brandId);
                 // alert('i is coming');
                 // alert(globalThis.i);
@@ -532,7 +532,7 @@
                     showRelatedModal(brandId);
                 
                 }
-                alert('#selectBrand'+i);
+                // alert('#selectBrand'+i);
                 }
             // globalThis.selectedBrands[i] = 2;
             // alert(selectedBrands);
