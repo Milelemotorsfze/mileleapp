@@ -520,8 +520,8 @@ class AddonDetailsTableSeeder extends Seeder
             ['316',"D25",NULL,"900",'AED',NULL,NULL,'yes',"Expedited Courrier of Keys and Manual, based on weight and dimension",NULL],
             ['316',"D26",NULL,"500",'AED',NULL,NULL,'yes',"BL amendment",NULL],
             ['316',"D27",NULL,"500",'AED',NULL,NULL,'yes',"Manifest Amendment",NULL],
-            ['316',"D28",NULL,"600",'USD',NULL,NULL,'yes',"Shipping line Schedule amendment / cancellation charges after booking ","USD 600/container",NULL],
-            ['316',"D29",NULL,"1000",'USD',NULL,NULL,'yes',"Shipping line NO SHOW fee","USD 1000/container",NULL],
+            ['316',"D28",NULL,"600",'USD',NULL,NULL,'yes',"Shipping line Schedule amendment / cancellation charges after booking ","USD 600/container"],
+            ['316',"D29",NULL,"1000",'USD',NULL,NULL,'yes',"Shipping line NO SHOW fee","USD 1000/container"],
             ['316',"D30",NULL,NULL,'AED',NULL,NULL,'yes',"Reserved vehicle storage - after twenty days of free days",NULL],
             ['320',"D31",NULL,"200",'AED',NULL,NULL,'yes',"RTA PASSING FOR LOCAL REGISTRATION",NULL],
             ['321',"D32",NULL,"800",'AED',NULL,NULL,'yes',"RTA LOCAL REGISTRATION CHARGES",NULL],
@@ -542,7 +542,7 @@ class AddonDetailsTableSeeder extends Seeder
             ['314',"DP6",NULL,NULL,'AED',NULL,NULL,'yes',"Standing Gaurentee Charge","1% Deposit"],
             ['319',"DP7",NULL,"89.25",'AED',NULL,NULL,'yes',"Gate Pass - Export",NULL],
             ['314',"DP8",NULL,"25",'AED',NULL,NULL,'yes',"Declaration Cancellation Charges",NULL],
-            ['330',"DP9",NULL,"25",'AED',NULL,NULL,'yes',"Ownership Transfer","",NULL],
+            ['330',"DP9",NULL,"25",'AED',NULL,NULL,'yes',"Ownership Transfer",NULL]
 
         ];
         foreach ($addonDetails as $key => $value):
@@ -556,6 +556,7 @@ class AddonDetailsTableSeeder extends Seeder
             'image' => $value[6],
             'is_all_brands' => $value[7],
             'additional_remarks' => $value[8],
+            'payment_condition' =>$value[9]
         ];
         endforeach ;
         DB::table('addon_details')->insert($addonDetail);
