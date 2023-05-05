@@ -26,6 +26,9 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
+//        $newModels = [];
+//        $newModelsWithSteerings = [];
+//        return view('supplier_inventories.new_models',compact('newModelsWithSteerings','newModels'));
         return view('supplier_inventories.edit');
 
     }
@@ -38,9 +41,7 @@ class SupplierInventoryController extends Controller
 
         ]);
 
-
         if ($request->file('file')) {
-            info("file is getting");
             $file = $request->file('file');
             $fileName = time().'.'.$file->getClientOriginalExtension();
             $destinationPath = "inventory";
@@ -51,6 +52,7 @@ class SupplierInventoryController extends Controller
             $uploadFileContents = [];
             $code_nameex = NULL;
             $exteriorColorCodeId = NULL;
+            $extcolour = NULL;
             $date = Carbon::now()->format('Y-m-d');
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
@@ -94,8 +96,8 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['exterior_color_code_id'] = $exteriorColorCodeId;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
-                    if (!empty($filedata[7])) {
-                        $filedata[7] = Carbon::createFromFormat('d/m/Y', $filedata[7])->format('Y-m-d');
+                    if (!empty($filedata[8])) {
+                        $filedata[8] = Carbon::createFromFormat('d/m/Y', $filedata[8])->format('Y-m-d');
                     }
                     $uploadFileContents[$i]['eta_import'] = $filedata[8];
                     $uploadFileContents[$i]['supplier'] = $supplier_id;
@@ -109,7 +111,7 @@ class SupplierInventoryController extends Controller
             fclose($file);
 
             $newModels = [];
-            $newModelsWithSteering = [];
+            $newModelsWithSteerings = [];
             $j=0;
             foreach($uploadFileContents as $uploadFileContent){
                 $isModelExist = MasterModel::where('model',$uploadFileContent['model'])
@@ -121,9 +123,9 @@ class SupplierInventoryController extends Controller
                     ->first();
                 if(!$isModelWithSteeringExist)
                 {
-                    $newModelsWithSteering[$j]['steering'] = $uploadFileContent['steering'];
-                    $newModelsWithSteering[$j]['model'] = $uploadFileContent['model'];
-                    $newModelsWithSteering[$j]['sfx'] = $uploadFileContent['sfx'];
+                    $newModelsWithSteerings[$j]['steering'] = $uploadFileContent['steering'];
+                    $newModelsWithSteerings[$j]['model'] = $uploadFileContent['model'];
+                    $newModelsWithSteerings[$j]['sfx'] = $uploadFileContent['sfx'];
                 }
                 if (!$isModelExist)
                 {
@@ -132,31 +134,13 @@ class SupplierInventoryController extends Controller
                 }
                 $j++;
             }
+            $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
-            if(count($newModels) > 0)
+            if(count($newModels) > 0 || count($newModelsWithSteerings) > 0)
             {
-                $filename = 'New_Models_'.date('Y_m_d').'.csv';
-                $headers = array(
-                    "Content-type" => "text/csv",
-                    "Content-Disposition" => "attachment; filename=$filename",
-                    "Content-Description: File Transfer"
-                );
-
-                $columns = array('Model','SFX');
-                $callback = function() use ($newModels, $columns)
-                {
-                    Session::flash('message', 'Download successful');
-                    $file = fopen('php://output', 'w');
-                    fputcsv($file, $columns);
-                    foreach($newModels as $newmodel) {
-                        fputcsv($file, array(
-                            $newmodel['model'],
-                            $newmodel['sfx'],
-                        ));
-                    }
-                    fclose($file);
-                };
-                return  response()->stream($callback, 200, $headers);
+                $pdf = PDF::loadView('supplier_inventories.new_models', compact('newModels', 'newModelsWithSteerings'));
+                return $pdf->download('New_Models_'.date('Y_m_d').'.pdf');
+//                return  response()->stream($callback, 200, $headers);
                 // show error msg
 //                return redirect()->route('supplier-inventories.create')->with('message','Please add new models to master table.');
             } else
@@ -170,9 +154,17 @@ class SupplierInventoryController extends Controller
                     $newlyAddedRows = [];
                     $updatedRows = [];
                     $updatedRowsIds = [];
-                    foreach ($uploadFileContents as $uploadFileContent) {
+                    $excelValuePair = [];
+                        foreach ($uploadFileContents as $uploadFileContent) {
+                            $csvValuePair = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'] . "_" . $uploadFileContent['chasis'] . "_" .
+                                $uploadFileContent['engine_number'] . "_" . $uploadFileContent['color_code'] . "_" . $uploadFileContent['pord_month'] . "_" .
+                                $uploadFileContent['po_arm'];
+                            $excelValuePair[] = $csvValuePair;
+                        }
+                        foreach ($uploadFileContents as $uploadFileContent) {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
+                            ->where('steering', $uploadFileContent['steering'])
                             ->first();
                         $modelId = $model->id;
                         $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
@@ -180,6 +172,7 @@ class SupplierInventoryController extends Controller
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier', $request->supplier)
                             ->where('whole_sales', $request->whole_sales);
+
                         if ($supplierInventories->count() <= 0) {
                             info("new entry");
                             // model and sfx not existing in Suplr Invtry => new row
@@ -209,6 +202,7 @@ class SupplierInventoryController extends Controller
                                         $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                                         $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                                     } else {
+                                        info("new chasis with existing model and sfx".$uploadFileContent['sfx']);
                                         // new chaisis with existing model and sfx => add row ,
                                         $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                                         $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -377,21 +371,23 @@ class SupplierInventoryController extends Controller
                             }
                         }$i++;
                     }
+                    info("UPDATED rOWS");
+                    info($updatedRowsIds);
                     $supplierInventories = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                         ->where('supplier', $request->supplier)
                         ->where('whole_sales', $request->whole_sales)
                         ->get();
 
-                    $totalExcelEntries = count($uploadFileContents);
-                    if ($supplierInventories->count() > $totalExcelEntries )
-                    {
-                        $excelValuePair = [];
+                        // group the value pair to get count of duplicate data
+                        $groupedExcelCountValue =  array_count_values($excelValuePair);
+//                        info("array count values".$groupedExcelCountValue);
                         $excelRows = [];
                         foreach ($uploadFileContents as $uploadFileContent)
                         {
                             $model = MasterModel::where('model', $uploadFileContent['model'])
                                 ->where('sfx', $uploadFileContent['sfx'])
+                                ->where('steering',$uploadFileContent['steering'])
                                 ->first();
                             $isExistSupplier = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                 ->where('supplier', $request->supplier)
@@ -414,11 +410,11 @@ class SupplierInventoryController extends Controller
                                     $csvValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx']."_".$uploadFileContent['chasis']."_".
                                         $uploadFileContent['engine_number']."_".$uploadFileContent['color_code']."_".$uploadFileContent['pord_month']."_".
                                         $uploadFileContent['po_arm'];
-                                    $excelValuePair[] = $csvValuePair;
-                                    $groupedExcelCountValue =  array_count_values($excelValuePair);
-                                    if ($groupedExcelCountValue[$csvValuePair] < $dbRowCount)
+                                    info("the excel value is");
+                                    info($groupedExcelCountValue[$csvValuePair]);
+                                    if ($groupedExcelCountValue[$csvValuePair] <= $dbRowCount)
                                     {
-                                        info("founded rows deleted");
+                                        info("excel have only row count". $groupedExcelCountValue[$csvValuePair]);
                                         $ExcelExistingRowId = $isExistSupplier->take($groupedExcelCountValue[$csvValuePair])->pluck('id');
                                         info("row id of existing in excel".$ExcelExistingRowId);
                                         foreach ($ExcelExistingRowId as $ExcelExistingRowId) {
@@ -427,25 +423,28 @@ class SupplierInventoryController extends Controller
                                     }
                                 }else{
                                     info("data exist with 1 row");
-                                    info($isExistSupplier->first());
+
                                     $supplierInventory = $isExistSupplier->first();
                                     $excelRows[] = $supplierInventory->id;
+                                    info($supplierInventory->id);
                                 }
                                 foreach ($updatedRowsIds as $updatedRowsId) {
                                     $excelRows[] = $updatedRowsId;
                                 }
-                                info($excelRows);
-                                info("row found in excel");
+
+
                             }
                         }
                         $excelRows =  array_map("unserialize", array_unique(array_map("serialize", $excelRows)));
+                        info("row found in excel");
+                        info($excelRows);
                         $deletedRows = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier', $request->supplier)
                             ->where('whole_sales', $request->whole_sales)
                             ->whereNotIn('id', $excelRows)
                             ->get();
-                    }
+
                     $preivousDatas = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                         ->where('supplier', $request->supplier)
@@ -461,7 +460,9 @@ class SupplierInventoryController extends Controller
                     foreach ($uploadFileContents as $uploadFileContent) {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
+                            ->where('steering', $uploadFileContent['steering'])
                             ->first();
+
                         $supplierInventory = new SupplierInventory();
                         $supplierInventory->master_model_id = $model->id;
                         $supplierInventory->chasis          = $uploadFileContent['chasis'];
@@ -490,6 +491,7 @@ class SupplierInventoryController extends Controller
                     foreach ($uploadFileContents as $uploadFileContent) {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
+                            ->where('steering', $uploadFileContent['steering'])
                             ->first();
                         $supplierInventory = new SupplierInventory();
                         $supplierInventory->master_model_id = $model->id;
