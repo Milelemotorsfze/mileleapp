@@ -32,7 +32,7 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => storage_path('app/public'),
             'throw' => false,
         ],
 
@@ -41,9 +41,8 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
-            'throw' => false,
-        ],
-
+        ],        
+        
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -58,16 +57,8 @@ return [
 
     ],
 
-        'default' => 'azure',
-        'cloud' => 'azure',
-        'disks' => [
-        'azure' => [
-            'driver' => 'azure',
-            'connection_string' => env('AZURE_STORAGE_CONNECTION_STRING'),
-            'container' => env('AZURE_STORAGE_CONTAINER'),
-            'url' => env('AZURE_STORAGE_URL'),
-            ],
-         ],    
+        'default' => 'local',
+        'cloud' => 'local',   
     /*
     |--------------------------------------------------------------------------
     | Symbolic Links

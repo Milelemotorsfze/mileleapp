@@ -1,14 +1,13 @@
-<style>
-
-    </style>
 <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
     <i class="fa fa-fw fa-bars"></i>
 </button>
 <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
+@can('sales-view')
 <div class="cart-icon-container">
   <a href="{{route('quotation.create')}}"><i class="fa fa-car fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
 </div>
+@endcan
     <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
         <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
         <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">

@@ -80,7 +80,15 @@ use App\Http\Controllers\SupplierController;
     Route::resource('calls', CallsController::class);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
-
+    Route::get('/editreels/{id}', [VariatnsPicturesController::class, 'editreels'])->name('variant_pictures.editreels');
+    Route::post('/uploadingreal', [VariatnsPicturesController::class, 'uploadingreal'])->name('variant_pictures.uploadingreal');
+    Route::get('/editreels/videos/{filename}', function ($filename) {
+        $path = storage_path('app/public/videos/' . $filename);
+        if (file_exists($path)) {
+            return response()->file($path);
+        }
+        abort(404);
+    });
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -89,7 +97,12 @@ use App\Http\Controllers\SupplierController;
     Route::resource('quotation', QuotationController::class);
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
     Route::get('/get-vehicle-count/{userId}', function($userId) {
-        $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
-        return $count;
-      });
+    $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
+    return $count;
+    });
+    Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
+    // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');
+    Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
+    // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
+    Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
 });

@@ -71,7 +71,6 @@
         <!-- dropzone js -->
         <script src="{{ asset('libs/dropzone/min/dropzone.min.js') }}"></script>
         <script src="{{ asset('js/app.js') }}"></script>
-       
         <script type="text/javascript">
             $(document).ready(function() {
         ClassicEditor
@@ -84,18 +83,3 @@
        
     </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
