@@ -1,8 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Calls;
+
 
 class HomeController extends Controller
 {
@@ -11,18 +12,30 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
-        return view('home');
-    }
+        $calls = DB::table('calls')->select('source', 'location')->get();
+        $chartData = [
+            'datasets' => []
+        ];
+        foreach ($calls as $call) {
+            $source = $call->source;
+            $location = $call->location;
+            $sourceIndex = array_search($source, array_column($chartData['datasets'], 'label'));
+            if ($sourceIndex === false) {
+                $chartData['datasets'][] = [
+                    'label' => $source,
+                    'fillColor' => "blue",
+                    'data' => [$location => 1]
+                ];
+            } else {
+                if (!isset($chartData['datasets'][$sourceIndex]['data'][$location])) {
+                    $chartData['datasets'][$sourceIndex]['data'][$location] = 1;
+                } else {
+                    $chartData['datasets'][$sourceIndex]['data'][$location]++;
+                }
+            }
+        }
+        return view('home', compact('chartData'));
+    }      
 }

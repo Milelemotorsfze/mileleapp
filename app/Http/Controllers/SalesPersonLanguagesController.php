@@ -12,7 +12,6 @@ class SalesPersonLanguagesController extends Controller
     {
       
     }
-
     public function create()
     {
         $data = ModelHasRoles::where('role_id', 4)->get();

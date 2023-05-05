@@ -9,6 +9,7 @@ use App\Models\Varaint;
 use App\Models\Vehicles;
 use App\Models\Vehiclescarts;
 use App\Models\MasterModelLines;
+use App\Models\CartAddon;
 use Illuminate\Http\Request;
 use Monarobase\CountryList\CountryListFacade;
 
@@ -34,10 +35,11 @@ class QuotationController extends Controller
     $data = Calls::select('name', 'email')
             ->where('id', $callsId)
             ->first();         
-            $countries = CountryListFacade::getList('en');    
-    return view('quotation.add_new', compact('data', 'countries'));
+            $countries = CountryListFacade::getList('en');   
+            $vehicles_id = Vehiclescarts::where('created_by', auth()->user()->id)->pluck('vehicle_id');
+            $items = Vehicles::whereIn('id', $vehicles_id)->get();
+    return view('quotation.add_new', compact('data', 'countries', 'items', 'vehicles_id'));
 }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -148,5 +150,28 @@ class QuotationController extends Controller
             ]);
         return $data;    
         }
+    }
+    public function removeVehicle($id)
+{
+    $data = Vehiclescarts::where('vehicle_id', $id)->delete();
+    return redirect()->back();
+}
+public function addqaddone(Request $request)
+    {
+        if($request->anu == "addadones"){
+         $data = CartAddon::updateOrCreate([
+                 'cart_id' => $request->cart_id, 
+                 'addon_id' => $request->addon_id,
+                 'created_by' => auth()->user()->id
+             ]);
+             $addon_id = $request->addon_id;
+             $results = DB::table('addon_details')
+             ->select('addon_details.addon_code', 'addons.name', 'addon_details.lead_time', 'addon_details.selling_price')
+             ->join('addon_types', 'addon_details.id', '=', 'addon_types.addon_details_id')
+             ->join('addons', 'addon_details.addon_id', '=', 'addons.id')
+             ->where('addon_details.id', '=', $addonid)
+             ->get();
+         return $results;    
+         }
     }
 }

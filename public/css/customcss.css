@@ -1,10 +1,66 @@
+.btn-addmore {
+  display: inline-block;
+  font-size: 12px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-addmore:hover {
+  background-color: blue;
+  color: #fff;
+}
+
+.btn-addmore i {
+  margin-right: 5px;
+}
+.btn-successe {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-successe:hover {
+  background-color: blue;
+  font-size: 16px;
+  color: white;
+}
 .cart-icon-container {
   position: relative;
   display: inline-block;
   top: 10px;
   right: 10px;
 }
-
+  .plus-circle-link {
+    font-size: 20px;
+    color: white;
+    background-color: green;
+  }
+  .plus-circle-link:hover {
+    font-size: 22px;
+    color: red;
+  }
+  .minus-circle-link {
+    font-size: 20px;
+    color: red;
+  }
+  .minus-circle-link:hover {
+    font-size: 22px;
+    color: black;
+  }
 .cart-icon-number {
   position: absolute;
   top: -10px;

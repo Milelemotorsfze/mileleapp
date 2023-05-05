@@ -67,7 +67,7 @@ class CallsController extends Controller
                     $new_calls_count = Calls::where('status', 'New')
                                              ->where('sales_person', $sales_person->model_id)
                                              ->count();
-                    if ($new_calls_count < 5) {
+                    if ($new_calls_count < 25) {
                         $sales_person_id = $sales_person->model_id;
                         break;
                     }
