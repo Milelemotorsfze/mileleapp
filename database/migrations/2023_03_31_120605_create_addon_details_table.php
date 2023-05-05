@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('addon_code')->nullable();
             $table->decimal('purchase_price', 10,2)->default('0.00');
             $table->decimal('selling_price', 10,2)->default('0.00');
+            $table->string('payment_condition')->nullable();
             $table->string('currency')->default('AED')->nullable();
             $table->string('lead_time')->nullable();
             $table->text('additional_remarks')->nullable();

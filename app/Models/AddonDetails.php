@@ -14,6 +14,7 @@ class AddonDetails extends Model
         'addon_code',
         'purchase_price',
         'selling_price',
+        'payment_condition',
         'currency',
         'lead_time',
         'additional_remarks',
@@ -30,5 +31,9 @@ class AddonDetails extends Model
     public function AddonName()
     {
         return $this->hasOne(Addon::class,'id','addon_id');
+    }
+    public function AddonSuppliers()
+    {
+        return $this->hasMany(SupplierAddons::class,'addon_details_id','id');
     }
 }

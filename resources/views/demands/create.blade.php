@@ -20,7 +20,7 @@
                 <div class="row demand-div">
                     <div class="col-lg-4 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Supplier</label>
+                            <label for="choices-single-default" class="form-label font-size-13 ">Select The Supplier</label>
                             <select class="form-control" data-trigger name="supplier" id="supplier">
                                 <option value="" disabled>Select The Supplier</option>
                                 <option value="TTC">TTC</option>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 text-muted">Dealers</label>
+                            <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                             <select class="form-control" data-trigger name="whole_saler" id="whole-saler">
                                 <option value="Trans Cars">Trans Cars</option>
                                 <option value="Milele Motors">Milele Motors</option>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 text-muted">Steering</label>
+                            <label for="choices-single-default" class="form-label font-size-13">Steering</label>
                             <select class="form-control" data-trigger name="steering" id="steering">
                                 <option value="LHD">LHD</option>
                                 <option value='RHD'>RHD</option>

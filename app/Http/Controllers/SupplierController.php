@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\AddonDetails;
 use DB;
 use Validator;
+
+use App\Models\AddonDetails;
+use App\Models\SupplierAddons;
+use App\Models\SupplierAvailablePayments;
 
 
 class SupplierController extends Controller
@@ -17,7 +20,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+      
     }
 
     /**
@@ -35,44 +38,59 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->contact_number['full']);
         $authId = Auth::id();
-        $validator = Validator::make($request->all(), [
-            'supplier' => 'required',
-            'contact_person' => 'required',
-            'contact_number' => 'required',
-            'email' => 'required',
-            'person_contact_by' => 'required',
-            'supplier_type' => 'required',
-            'is_primary_payment_method' => 'required',
-            'model' => 'required',
-            'addon_id' => 'required',
-            'payment_methods_id' => 'required',
-        ]);
-        
-        if ($validator->fails()) 
-        {
-            // dd($validator);
-            return redirect(route('addon.create'))->withInput()->withErrors($validator);
-        }
-        else 
-        {
-// dd('hiii');
-        //     $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();  
-        //     $type = $request->image->getClientMimeType();
-        //     $size = $request->image->getSize();
-        //     $request->image->move(public_path('addon_image'), $fileName);
-        //     $input = $request->all();
-        //     $input['addon_id'] = $request->addon_name;
-        //     $input['currency'] = 'AED';
-        //     $input['created_by'] = $authId;
-        //     $input['image'] = $fileName;
-        //     $lastAddonCode = AddonDetails::orderBy('id', 'desc')->first()->addon_code;
-        //     $lastAddonCodeNumber = substr($lastAddonCode, 1, 5);
-        //     $newAddonCodeNumber =  $lastAddonCodeNumber+1;
-        //     $newAddonCode = "P".$newAddonCodeNumber;
-        //     $input['addon_code'] = $newAddonCode;
-        //     $addon_details = AddonDetails::create($input);
-        //     $inputaddontype['addon_details_id'] = $addon_details->id;
+        // $validator = Validator::make($request->all(), [
+        //     'supplier' => 'required',
+        //     'contact_person' => 'required',
+        //     'contact_number' => 'required',
+        //      'alternative_contact_number' => 'required',
+        //     'email' => 'required',
+        //     'person_contact_by' => 'required',
+        //     'supplier_type' => 'required',
+        //     'is_primary_payment_method' => 'required',
+        //     'model' => 'required',
+        //     'addon_id' => 'required',
+        //     'payment_methods_id' => 'required',
+        // ]);
+       
+        // if ($validator->fails()) 
+        // {
+        //     // dd('hi');
+        //     return redirect(route('addon.create'))->withInput()->withErrors($validator);
+        // }
+        // else 
+        // { 
+
+            $input = $request->all();
+            
+            $input['contact_number'] = $request->contact_number['full'];
+            $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+            // dd($input);
+            $input['created_by'] = $authId;
+            $suppliers = Supplier::create($input);
+            $payment_methods['supplier_id'] = $suppliers->id;
+            $payment_methods['created_by'] = $authId;
+            foreach($request->payment_methods_id as $payment_methods_id)
+            {
+                $payment_methods['payment_methods_id'] = $payment_methods_id;
+                if($payment_methods['payment_methods_id'] == $request->is_primary_payment_method)
+                {
+                    $payment_methods['is_primary_payment_method'] = 'yes'; 
+                }
+                else{
+                    $payment_methods['is_primary_payment_method'] = 'no'; 
+                }
+                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+                
+            }
+            $supplier_addon['supplier_id'] = $suppliers->id;
+            $isupplier_addonnput['created_by'] = $authId;
+            foreach($request->addon_id as $addon_id)
+            {
+                $supplier_addon['addon_details_id'] = $addon_id;
+                $supplierAddon = SupplierAddons::create($supplier_addon);
+            }
         //     $inputaddontype['created_by'] = $authId;
         //     for($i=0; $i<count($request->brand); $i++)
         //     {
@@ -80,9 +98,9 @@ class SupplierController extends Controller
         //         $inputaddontype['model_id'] = $request->model[$i];
         //         $addon_types = AddonTypes::create($inputaddontype);
         //     }
-        //     return redirect()->route('addon.index')
-        //                     ->with('success','Addon created successfully');
-        }
+            return redirect()->route('suppliers.index')
+                            ->with('success','Addon created successfully');
+        // }
     }
 
     /**

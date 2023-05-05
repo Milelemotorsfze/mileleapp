@@ -12,7 +12,7 @@
         <br>
         <div class="table-responsive" >
             <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table">
-                <thead>
+                <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
                     <th>Model</th>
@@ -40,6 +40,7 @@
                                     $code_nameex = "(Colour Not Listed)  ".$color_code;
                                     $colourcode = $color_code;
                                     $colourcodecount = strlen($colourcode);
+                                    $extcolour = NULL;
                                     if($colourcodecount == 5)
                                     {
                                     $extcolour = substr($colourcode, 0, 3);
@@ -49,6 +50,7 @@
                                     $altercolourcode = "0".$colourcode;
                                     $extcolour = substr($altercolourcode, 0, 3);
                                     }
+
                                     $query =  \Illuminate\Support\Facades\DB::table('color_codes')
                                     ->select('parent')
                                     ->where('code','=', $extcolour)
@@ -60,7 +62,6 @@
                                         $code_nameex = $row->parent;
                                     }
                                 @endphp
-
                                {{  $code_nameex }} : {{$color_codeqty }}
                                 <br>
                             @endforeach

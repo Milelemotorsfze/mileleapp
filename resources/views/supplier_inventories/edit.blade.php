@@ -9,6 +9,7 @@
                 {{Session::get('message')}}
             </div>
         @endif
+
 {{--        @if (count($errors) > 0)--}}
 {{--            <div class="alert alert-danger">--}}
 {{--                <strong>Whoops!</strong> There were some problems with your input.<br><br>--}}
@@ -54,6 +55,14 @@
             <div class="col-lg-6 col-md-6">
                 <div class="col-4">
                     <input type="file" name="file" class="form-control" >
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="form-check mt-3">
+                    <input class="form-check-input" type="checkbox" name="is_add_new" id="is_add_new" {{ old('is_add_new') ? 'checked' : '' }} />
+                    <label class="form-check-label" for="remember-check">
+                        Is Adding New Supplier List ?
+                    </label>
                 </div>
             </div>
             </br>

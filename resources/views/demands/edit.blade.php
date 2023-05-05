@@ -86,7 +86,7 @@
                                     </div>
                                 @endforeach
                                     <div class="col-lg-1">
-                                        <input type="text" class="form-control" readonly value="{{ $demandList->monthlyDemands()->sum('quantity') }}" >
+                                        <input type="number" class="form-control" readonly value="{{ $demandList->monthlyDemands()->sum('quantity') }}" >
                                     </div>
                             </div>
                         </div>

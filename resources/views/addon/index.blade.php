@@ -7,10 +7,10 @@
     <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Addon
     </a>
-    <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
+    <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
     </a>  
-    <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
+    <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn  btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a> 
   </div>
@@ -127,6 +127,9 @@
             </br>
             <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
+                <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
+                  <i class="fa fa-eye" aria-hidden="true"></i> View
+                </a>
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
                   <i class="fa fa-edit" aria-hidden="true"></i> Edit
                 </a>
@@ -172,6 +175,7 @@
               <td>{{ $addon->purchase_price }}</td>
               <td>{{ $addon->selling_price }}</td>
               <td>
+                <a class="btn btn-sm btn-info" href="{{ route('addon.view',$addon->addon_details_table_id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->addon_details_table_id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
               </td>
             </tr>
