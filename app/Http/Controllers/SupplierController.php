@@ -11,6 +11,9 @@ use Validator;
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
 use App\Models\SupplierAvailablePayments;
+use App\Models\Addon;
+use App\Models\Brand;
+use App\Models\MasterModelLines;
 
 
 class SupplierController extends Controller
@@ -20,7 +23,8 @@ class SupplierController extends Controller
      */
     public function index()
     {
-      
+        $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods')->get();
+        return view('suppliers.index',compact('suppliers'));
     }
 
     /**
@@ -38,6 +42,7 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         // dd($request->contact_number['full']);
         $authId = Auth::id();
         // $validator = Validator::make($request->all(), [
@@ -108,7 +113,27 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        //
+        $addon1 = $addons = '';
+        $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->with('PaymentMethods')->first();
+        $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->with('PaymentMethods')->get();
+        $supplierAddonId = SupplierAddons::where('supplier_id',$supplier->id)->pluck('addon_details_id');
+        if(count($supplierAddonId) > 0)
+        {
+            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines')->orderBy('id', 'ASC')->get();
+            $addons = DB::table('addon_details')
+                        ->join('addons','addons.id','addon_details.addon_id')
+                        ->join('addon_types','addon_types.addon_details_id','addon_details.id')
+                        ->join('brands','brands.id','addon_types.brand_id')
+                        ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
+                        ->whereIn('addon_details.id',$supplierAddonId)
+                        ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+                        'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
+                        'master_model_lines.model_line')
+                        ->orderBy('addon_details.id','ASC')
+                        ->get();
+        }
+         
+        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons'));
     }
 
     /**

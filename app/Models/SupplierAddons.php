@@ -20,4 +20,9 @@ class SupplierAddons extends Model
     {
         return $this->hasOne(Supplier::class,'id','supplier_id');
     }
+    public function supplierAddonDetails()
+    {
+        return $this->hasOne(AddonDetails::class,'id','addon_details_id');
+    }
+   
 }

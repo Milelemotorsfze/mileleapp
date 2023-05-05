@@ -232,7 +232,7 @@
         var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
         $("input[name='contact_number[full]'").val(full_number);
         var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-        $("input[name='alternative_contact_number[full]'").val(full_number);
+        $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
         });
     </script>
 @endsection

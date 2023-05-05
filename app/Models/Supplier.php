@@ -23,5 +23,12 @@ class Supplier extends Model
         'updated_by',
         'deleted_by'
     ];
-    
+    public function supplierAddons()
+    {
+        return $this->hasMany(SupplierAddons::class,'supplier_id','id');
+    }
+    public function paymentMethods()
+    {
+        return $this->hasMany(SupplierAvailablePayments::class,'supplier_id','id');
+    }
 }

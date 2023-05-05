@@ -17,4 +17,8 @@ class SupplierAvailablePayments extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function PaymentMethods()
+    {
+        return $this->hasOne(PaymentMethods::class,'id','payment_methods_id');
+    }
 }

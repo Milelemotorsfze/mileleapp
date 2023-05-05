@@ -215,6 +215,20 @@
                     </br>
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
+                            <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
+                        </div>
+                        <div class="col-xxl-9 col-lg-6 col-md-12">
+                            <input id="payment_condition" type="text" class="form-control @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}" required autocomplete="payment_condition" autofocus>
+                            @error('payment_condition')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+                    </div>
+                    </br>
+                    <div class="row">
+                        <div class="col-xxl-3 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
