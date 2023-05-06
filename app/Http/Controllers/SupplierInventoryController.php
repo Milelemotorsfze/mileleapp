@@ -155,13 +155,15 @@ class SupplierInventoryController extends Controller
                     $updatedRows = [];
                     $updatedRowsIds = [];
                     $excelValuePair = [];
-                        foreach ($uploadFileContents as $uploadFileContent) {
-                            $csvValuePair = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'] . "_" . $uploadFileContent['chasis'] . "_" .
-                                $uploadFileContent['engine_number'] . "_" . $uploadFileContent['color_code'] . "_" . $uploadFileContent['pord_month'] . "_" .
-                                $uploadFileContent['po_arm'];
-                            $excelValuePair[] = $csvValuePair;
-                        }
-                        foreach ($uploadFileContents as $uploadFileContent) {
+                    $chasisUpdatedRowIds = [];
+                    foreach ($uploadFileContents as $uploadFileContent) {
+                        $csvValuePair = $uploadFileContent['model'] . "_" . $uploadFileContent['sfx'] . "_" . $uploadFileContent['chasis'] . "_" .
+                            $uploadFileContent['engine_number'] . "_" . $uploadFileContent['color_code'] . "_" . $uploadFileContent['pord_month'] . "_" .
+                            $uploadFileContent['po_arm'];
+                        $excelValuePair[] = $csvValuePair;
+                    }
+                    foreach ($uploadFileContents as $uploadFileContent)
+                    {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
@@ -189,12 +191,14 @@ class SupplierInventoryController extends Controller
                                 $isNullChaisis = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                                    ->whereNull('chasis')
-                                    ->first();
+                                    ->whereNull('chasis');
                                 if (!$supplierInventory) {
                                     //adding new row simply
-                                    if (!empty($isNullChaisis)) {
+                                    if (!empty($isNullChaisis->first())) {
                                         // null chaisis existing => updating row
+                                        $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
+                                        $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
+                                        $isNullChaisis = $isNullChaisis->first();
                                         $updatedRowsIds[] = $isNullChaisis->id;
                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                         $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -277,18 +281,25 @@ class SupplierInventoryController extends Controller
                                 }
                             } else
                             {
+                                info("CHASIS updated rows");
+                                info($chasisUpdatedRowIds);
                                 $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                     ->where('supplier', $request->supplier)
                                     ->where('whole_sales', $request->whole_sales)
+                                    ->whereNotIn('id', $chasisUpdatedRowIds)
                                     ->whereNull('chasis')
                                     ->count();
                                 $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
                                 $countblankchasis[] = $modelSfxValuePair;
+                                info("model value pair".$modelSfxValuePair);
                                 $groupedCountValue =  array_count_values($countblankchasis);
-                                if($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
+                                info("excel count".$groupedCountValue[$modelSfxValuePair]);
+                                info("db count".$nullChaisisCount);
+                                if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
                                 {
+                                    info("newly add is there");
                                     $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                                     $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                     $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -303,6 +314,7 @@ class SupplierInventoryController extends Controller
                                         ->first();
                                     if (!$supplierInventory1)
                                     {
+                                        info("anychanges");
                                         $updatedRowsIds[] = $supplierInventory->id;
                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                         $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -371,6 +383,7 @@ class SupplierInventoryController extends Controller
                             }
                         }$i++;
                     }
+
                     info("UPDATED rOWS");
                     info($updatedRowsIds);
                     $supplierInventories = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
@@ -410,12 +423,19 @@ class SupplierInventoryController extends Controller
                                     $csvValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx']."_".$uploadFileContent['chasis']."_".
                                         $uploadFileContent['engine_number']."_".$uploadFileContent['color_code']."_".$uploadFileContent['pord_month']."_".
                                         $uploadFileContent['po_arm'];
+                                    info("model value pair is".$csvValuePair);
                                     info("the excel value is");
                                     info($groupedExcelCountValue[$csvValuePair]);
                                     if ($groupedExcelCountValue[$csvValuePair] <= $dbRowCount)
                                     {
                                         info("excel have only row count". $groupedExcelCountValue[$csvValuePair]);
-                                        $ExcelExistingRowId = $isExistSupplier->take($groupedExcelCountValue[$csvValuePair])->pluck('id');
+                                        $ExcelExistingRowId = $isExistSupplier->orderBy('id','desc')->take($groupedExcelCountValue[$csvValuePair])->pluck('id');
+                                        info("row id of existing in excel".$ExcelExistingRowId);
+                                        foreach ($ExcelExistingRowId as $ExcelExistingRowId) {
+                                            $excelRows[] = $ExcelExistingRowId;
+                                        }
+                                    }else{
+                                        $ExcelExistingRowId = $isExistSupplier->take($dbRowCount)->pluck('id');
                                         info("row id of existing in excel".$ExcelExistingRowId);
                                         foreach ($ExcelExistingRowId as $ExcelExistingRowId) {
                                             $excelRows[] = $ExcelExistingRowId;
@@ -444,6 +464,8 @@ class SupplierInventoryController extends Controller
                             ->where('whole_sales', $request->whole_sales)
                             ->whereNotIn('id', $excelRows)
                             ->get();
+                        info($deletedRows);
+                        info("deletedrows");
 
                     $preivousDatas = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
