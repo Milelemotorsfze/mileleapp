@@ -42,7 +42,7 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
+                            <!-- <span class="error">* </span> -->
                             <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -59,7 +59,7 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
+                            <!-- <span class="error">* </span> -->
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -92,7 +92,7 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
+                            <!-- <span class="error">* </span> -->
                             <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -109,7 +109,7 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
+                            <!-- <span class="error">* </span> -->
                             <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -132,6 +132,9 @@
                         <div class="col-xxl-9 col-lg-6 col-md-12">
                         <select name="supplier_type" id="supplier_type" class="form-control">
                             <option value="">Choose Supplier Type</option>
+                            <option value="accessories">Accessories</option>      
+                            <option value="freelancer">Freelancer</option>
+                            <option value="garage">Garage</option>
                             <option value="spare_parts">Spare Parts</option>
                         </select>
                         </div>
@@ -164,7 +167,7 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
+                            <!-- <span class="error">* </span> -->
                             <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Addons') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -185,8 +188,8 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
-                            <span class="error">* </span>
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Payment Methods') }}</label>
+                            <!-- <span class="error">* </span> -->
+                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
                             <div class="col-xxl-2 col-lg-2 col-md-6">

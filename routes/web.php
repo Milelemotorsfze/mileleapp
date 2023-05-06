@@ -18,6 +18,7 @@ use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\HiringController;
 
 /*
 /*
@@ -105,4 +106,9 @@ use App\Http\Controllers\SupplierController;
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
+
+    // HR
+    Route::resource('hiring', HiringController::class);
+    // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
+    // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
 });

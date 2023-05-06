@@ -102,8 +102,10 @@
                             <option value="P">Accessories</option>                          
                             <option value="D">Documentation</option>
                             <option value="DP">Documentation On Purchase</option>
-                            <option value="E">Not Mentioned Any Specification</option>
+                            <option value="E">Others</option>
                             <option value="S">Shipping Cost</option>
+                            <option value="SP">Spare Parts</option>
+                            <option value="W">Warranty</option>
                         </select>
                             @error('addon_type')
                                 <span class="invalid-feedback" role="alert">

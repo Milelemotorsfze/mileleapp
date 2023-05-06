@@ -100,18 +100,22 @@
                         </div>
                     </div>
                     </br>
-                </div>     
+                </div> 
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-2 col-md-4">
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Other Payment Methods') }}</label>
+                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         <div class="col-xxl-8 col-lg-6 col-md-12">
+                            @if(count($otherPaymentMethods) > 0)
                             <p class="form-control" readonly>
                             @foreach($otherPaymentMethods as $otherPaymentMethod)
                                 {{ $otherPaymentMethod->PaymentMethods->payment_methods }} , 
                             @endforeach
                             </p>
+                            @else
+                            <input class="form-control" value="" readonly>
+                            @endif
                         </div>
                     </div>
                     </br>

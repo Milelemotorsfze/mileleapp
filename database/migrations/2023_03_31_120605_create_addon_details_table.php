@@ -31,6 +31,7 @@ return new class extends Migration
             $table->enum('is_all_brands', ['yes', 'no'])->default('no');
             $table->string('image')->nullable();
             $table->string('image2')->nullable();
+            $table->enum('status', ['inactive', 'active'])->default('active');
             $table->timestamps();
             $table->softDeletes();
         });

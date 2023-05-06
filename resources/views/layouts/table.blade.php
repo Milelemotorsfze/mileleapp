@@ -44,8 +44,66 @@
             $('#dtBasicExample1').DataTable();
             $('#dtBasicExample2').DataTable();
             $('#dtBasicExample3').DataTable();
-            //    
         }); 
+            $('#dtBasicExample4').DataTable();
+            $('#dtBasicExample5').DataTable();
+            $('#dtBasicExample6').DataTable();
+            $('#dtBasicExample7').DataTable();
+            $('.modal-button').on('click', function()
+            {
+                var modalId = $(this).data('modal-id');
+                $('#' + modalId).addClass('modalshow');
+                $('#' + modalId).removeClass('modalhide');
+                console.log('Modal Show');
+                });
+                $('.close').on('click', function(){
+                    $('.modal').addClass('modalhide');
+                    $('.modal').removeClass('modalshow');
+                    // $('.modal').hide();
+                    console.log('Modal Hidden from close button');
+                    });
+                    // div colour
+                    // alert($('.divcolorclass').val());
+
+                    // show addon list table
+
+                    // $('#addonListTableButton').on('click', function()
+                    // {
+
+                    //     // $('#addonListTable').attr("hidden", true);
+                    //     // $('#addonListTable').attr("hidden", false);
+                    //     // $('#addonListTable').removeAttribute("hidden");
+                    //     // alert('hiis');
+                    //     // $('#addonListTable').style.display = "block";
+                    // });
+        });
+        function closemodal()
+            {
+                $('.modal').removeClass('modalshow');
+                $('.modal').addClass('modalhide');
+            }
+            function showAddonTable()
+            {
+                let addonTable = document.getElementById('addonListTable');
+                addonTable.hidden = false
+                let addonListTableButton = document.getElementById('addonListTableButton');
+                addonListTableButton.hidden = true
+                let addonbox = document.getElementById('addonbox');
+                addonbox.hidden = true
+                let addonBoxButton = document.getElementById('addonBoxButton');
+                addonBoxButton.hidden = false
+            }
+            function showAddonBox()
+            {
+                let addonTable = document.getElementById('addonListTable');
+                addonTable.hidden = true
+                let addonListTableButton = document.getElementById('addonListTableButton');
+                addonListTableButton.hidden = false
+                let addonbox = document.getElementById('addonbox');
+                addonbox.hidden = false
+                let addonBoxButton = document.getElementById('addonBoxButton');
+                addonBoxButton.hidden = true
+            }
         </script>
        
     </body>
