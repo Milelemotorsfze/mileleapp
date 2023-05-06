@@ -174,19 +174,6 @@
                     alert('Error saving data: ' + error);
                 }
             });
-
-            // $.ajax({
-            //     url: '',
-            //     method: 'POST',
-            //     data: {bl_number: bl_number, vins_numbers: vins_numbers},
-            //     success: function(response) {
-            //         var newInput = '<br><input type="text" name="vin_number" placeholder="Enter VIN Number" class="form-control" value="' + response.vins_numbers + '">';
-            //         $("#newVINRowinModal").append(newInput);
-            //     },
-            //     error: function(jqXHR, textStatus, errorThrown) {
-            //         alert('Error storing VIN: ' + errorThrown);
-            //     }
-            // });
         });
     });
 

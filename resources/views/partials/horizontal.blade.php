@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
     <i class="fa fa-fw fa-bars"></i>
 </button>
@@ -11,36 +12,55 @@
     <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
         <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
         <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
+=======
+
+    <div class="dropdown d-inline-block" style="position: absolute; line-height: 55px; right: 100px;">
+        <button class="btn btn-sm btn-primary"><i class="fa fa-fw fa-shopping-cart"></i></button>
+        <button class="btn btn-sm btn-primary"><i class="fa fa-fw fa-bell"></i></button>
+    </div>
+    <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
+        <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
+            <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
+            <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
+>>>>>>> Stashed changes
             @if(auth()->user()->name) {{ auth()->user()->name }} @endif
         </span>
-        <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
-    </button>
-    <div class="dropdown-menu dropdown-menu-end">
-        <a class="dropdown-item" href="profile">
-            <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
-        </a>
-        <div class="dropdown-divider"></div>
-        @can('user-view')
-        <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
-        <div class="dropdown-divider"></div>
-        @endcan
-        @can('role-list')
-        <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
-        <div class="dropdown-divider"></div>
-        @endcan
-        @can('addon-view')
-        <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
-        <div class="dropdown-divider"></div>
-        @endcan
-        <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
-        </a>
+            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end">
+            <a class="dropdown-item" href="profile">
+                <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            @can('user-view')
+                <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            @can('role-list')
+                <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            @can('addon-view')
+                <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </a>
+        </div>
     </div>
+<<<<<<< Updated upstream
                </div>
+=======
+>>>>>>> Stashed changes
 <div class="topnav">
+    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+        <i class="fa fa-fw fa-bars"></i>
+    </button>
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">
@@ -217,6 +237,14 @@
                                 </div>
                             </div>
                         </div>
+                    </li>
+                    @endcan
+                    @can('HR-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('hiring.index') }}" id="topnav-more" role="button">
+                            <i data-feather="file-text"></i>
+                            <span data-key="t-extra-pages">Hiring</span>
+                        </a>
                     </li>
                     @endcan
                     <li class="nav-item dropdown">

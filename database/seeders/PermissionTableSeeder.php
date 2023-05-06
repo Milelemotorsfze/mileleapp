@@ -68,6 +68,7 @@ class PermissionTableSeeder extends Seeder
             ['5','Update Variants Reals','variants-update-reals', 'To Update the reals of the Variants'],
 
             ['6','View HR','HR-view', 'To View the HR Module'],
+            ['6','Edit HR','HR-edit', 'To Edit the HR Module'],
             ['6','Job Requirement','Job-Requirement', 'To Submit a Job Request From Department Head'],
             ['6','Job Requests Portal','Job-request-portal', 'To Handle The Job Requests Portal'],
             ['6','Employee Document Handling','document-handling', 'To Handle The Employee Documents'],
