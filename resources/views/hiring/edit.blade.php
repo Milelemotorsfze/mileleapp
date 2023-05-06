@@ -17,7 +17,6 @@
         @endif
 			<form action="{{ route('hiring.update', $hiring->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PATCH')
                 <div class="row">
                     <div class="col-lg-4 col-md-6 col-sm-12 btncenter">
                         <div class="col-lg-12 col-md-12">
