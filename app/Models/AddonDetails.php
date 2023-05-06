@@ -22,7 +22,8 @@ class AddonDetails extends Model
         'updated_by',
         'deleted_by',
         'image',
-        'is_all_brands'
+        'is_all_brands',
+        'status'
     ];
     public function AddonTypes()
     {

@@ -86,7 +86,7 @@
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                       <!-- @endcan -->
                       <!-- @can('user-delete') -->
-                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <!-- <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="deleteSupplier{{$supplier->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -101,10 +101,10 @@
                               </div>
                             </div>                                          
                           </div>
-                        </div>
+                        </div> -->
                       <!-- @endcan -->
                       <!-- @can('user-make-inactive') -->
-                        <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                        <!-- <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="makeInactiveSupplier{{$supplier->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -119,7 +119,7 @@
                               </div>
                             </div>                                          
                           </div>
-                        </div>
+                        </div> -->
                       <!-- @endcan                               -->
                     </td>                
                   </tr>

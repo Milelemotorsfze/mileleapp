@@ -1,18 +1,32 @@
 @extends('layouts.table')
 @section('content')
+<style>
+  .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link
+  {
+    width :20%;
+  }
+  </style>
   <div class="card-header">
     <h4 class="card-title">
-      Addon List
+      Addon Info
     </h4>
     <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Addon
     </a>
-    <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-info">
+    <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
     </a>  
-    <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn  btn-info" hidden>
+    <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a> 
+    <ul class="nav nav-pills nav-fill">
+      <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Addons</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inactive Addons</a>
+      </li>
+    </ul> 
   </div>
   <div class="card-header">
     <form>

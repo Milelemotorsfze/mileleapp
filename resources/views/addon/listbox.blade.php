@@ -164,6 +164,7 @@
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
                   <i class="fa fa-edit" aria-hidden="true"></i> Edit
                 </a>
+                
               </div>     
             </div>
           </div>

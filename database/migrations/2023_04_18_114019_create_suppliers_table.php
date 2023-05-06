@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('alternative_contact_number')->nullable();
             $table->string('email')->nullable();
             $table->string('person_contact_by')->nullable();
-            $table->enum('supplier_type', ['spare_parts'])->nullable();
+            $table->enum('supplier_type', ['spare_parts','freelancer','garage','spare_parts'])->nullable();
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('updated_by')->unsigned()->index()->nullable();
