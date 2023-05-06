@@ -17,11 +17,8 @@ use App\Http\Controllers\MonthlyDemandsController;
 use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
-<<<<<<< Updated upstream
 use App\Http\Controllers\SupplierController;
-=======
 use App\Http\Controllers\HiringController;
->>>>>>> Stashed changes
 
 /*
 /*
@@ -99,7 +96,6 @@ use App\Http\Controllers\HiringController;
     Route::get('quotation-data/get-model-line', [QuotationController::class,'getmodelline'])->name('quotation.get-model-line');
     Route::get('quotation-data/get-sub-model', [QuotationController::class,'getsubmodel'])->name('quotation.get-sub-model');
     Route::resource('quotation', QuotationController::class);
-<<<<<<< Updated upstream
     Route::post('quotation-data/vehicles-insert', [QuotationController::class,'addvehicles'])->name('quotation.vehicles-insert');
     Route::get('/get-vehicle-count/{userId}', function($userId) {
     $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
@@ -110,12 +106,9 @@ use App\Http\Controllers\HiringController;
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
-=======
 
     // HR
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
-
->>>>>>> Stashed changes
 });

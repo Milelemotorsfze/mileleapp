@@ -44,10 +44,7 @@
             $('#dtBasicExample1').DataTable();
             $('#dtBasicExample2').DataTable();
             $('#dtBasicExample3').DataTable();
-<<<<<<< Updated upstream
-            //    
         }); 
-=======
             $('#dtBasicExample4').DataTable();
             $('#dtBasicExample5').DataTable();
             $('#dtBasicExample6').DataTable();
@@ -107,7 +104,6 @@
                 let addonBoxButton = document.getElementById('addonBoxButton');
                 addonBoxButton.hidden = true
             }
->>>>>>> Stashed changes
         </script>
        
     </body>

@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
     <i class="fa fa-fw fa-bars"></i>
 </button>
@@ -12,7 +11,6 @@
     <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
         <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
         <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
-=======
 
     <div class="dropdown d-inline-block" style="position: absolute; line-height: 55px; right: 100px;">
         <button class="btn btn-sm btn-primary"><i class="fa fa-fw fa-shopping-cart"></i></button>
@@ -22,7 +20,6 @@
         <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
             <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
             <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
->>>>>>> Stashed changes
             @if(auth()->user()->name) {{ auth()->user()->name }} @endif
         </span>
             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -53,10 +50,7 @@
             </a>
         </div>
     </div>
-<<<<<<< Updated upstream
                </div>
-=======
->>>>>>> Stashed changes
 <div class="topnav">
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
