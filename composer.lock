@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a1bf2e4b95195f165d0f84cc84983e8a",
+    "content-hash": "773f8611d53d24c1ec8a9586a74ee199",
     "packages": [
         {
             "name": "balping/json-raw-encoder",
@@ -2430,6 +2430,56 @@
                 "source": "https://github.com/Azure/azure-storage-common-php/tree/v1.5.2"
             },
             "time": "2021-10-09T03:03:47+00:00"
+        },
+        {
+            "name": "microsoft/microsoft-graph",
+            "version": "1.36.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/microsoftgraph/msgraph-sdk-php.git",
+                "reference": "570613d2694595dc1dfdc25561a5180e5f0ab8f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/microsoftgraph/msgraph-sdk-php/zipball/570613d2694595dc1dfdc25561a5180e5f0ab8f9",
+                "reference": "570613d2694595dc1dfdc25561a5180e5f0ab8f9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "guzzlehttp/guzzle": "^6.0 || ^7.0",
+                "php": "^8.0 || ^7.3"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.2",
+                "phpstan/phpstan": "^0.12.90",
+                "phpunit/phpunit": "^8.0 || ^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Microsoft\\Graph\\": "src/",
+                    "Beta\\Microsoft\\Graph\\": "src/Beta/Microsoft/Graph/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Microsoft Graph Client Tooling",
+                    "email": "graphtooling@service.microsoft.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The Microsoft Graph SDK for PHP",
+            "homepage": "https://developer.microsoft.com/en-us/graph",
+            "support": {
+                "issues": "https://github.com/microsoftgraph/msgraph-sdk-php/issues",
+                "source": "https://github.com/microsoftgraph/msgraph-sdk-php/tree/1.36.0"
+            },
+            "time": "2021-08-11T14:10:01+00:00"
         },
         {
             "name": "monarobase/country-list",

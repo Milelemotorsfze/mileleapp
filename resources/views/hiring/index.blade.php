@@ -43,7 +43,7 @@
               <th>Experiance</th>
               <th>Skills</th>
               <th>Other</th>
-              <th>Actions</th>
+              <!-- <th>Actions</th> -->
             </tr>
           </thead>
           <tbody><div hidden>{{$i=0;}}</div>
@@ -60,9 +60,9 @@
               <!-- View Not Defined Yet. Change HR-View to HR-Edit -->
               @can('HR-view')
               <td>
-                <a href="{{ route('hiring.edit', $hiringDetails->id) }}" class="btn btn-sm btn-success">
+                <!-- <a href="{{ route('hiring.edit', $hiringDetails->id) }}" class="btn btn-sm btn-success">
                   <i data-feather="edit-3"></i>
-                </a>
+                </a> -->
                 &nbsp;
               </td>
               @endcan

@@ -1,6 +1,8 @@
-<button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-    <i class="fa fa-fw fa-bars"></i>
-</button>
+
+<div class="topnav" style="overflow: unset;">
+    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+        <i class="fa fa-fw fa-bars"></i>
+    </button>
 <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
 @can('sales-view')
 <div class="cart-icon-container">
@@ -8,15 +10,6 @@
   <span class="cart-icon-number"></span>
 </div>
 @endcan
-    <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
-        <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
-        <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
-
-    <div class="dropdown d-inline-block" style="position: absolute; line-height: 55px; right: 100px;">
-        <button class="btn btn-sm btn-primary"><i class="fa fa-fw fa-shopping-cart"></i></button>
-        <button class="btn btn-sm btn-primary"><i class="fa fa-fw fa-bell"></i></button>
-    </div>
-    <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
         <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
             <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
             <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
@@ -49,12 +42,7 @@
                 </form>
             </a>
         </div>
-    </div>
-               </div>
-<div class="topnav">
-    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-        <i class="fa fa-fw fa-bars"></i>
-    </button>
+</div>
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">

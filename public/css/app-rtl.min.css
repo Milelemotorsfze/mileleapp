@@ -1041,11 +1041,9 @@ body[data-layout-mode="dark"][data-sidebar=light] .sidebar-alert {
     .topnav .navbar-nav .nav-link {
       padding: 0.75rem 1.1rem; }
     .topnav .dropdown .dropdown-menu {
-      background-color: transparent;
-      border: none;
+      background-color: #fff;
       -webkit-box-shadow: none;
-              box-shadow: none;
-      padding-right: 24px; }
+              box-shadow: none;}
       .topnav .dropdown .dropdown-menu.dropdown-mega-menu-xl {
         width: auto; }
         .topnav .dropdown .dropdown-menu.dropdown-mega-menu-xl .row {
