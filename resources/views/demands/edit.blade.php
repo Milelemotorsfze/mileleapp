@@ -35,19 +35,19 @@
                     </div>
                 </div>
             </div>
-            @if($demandLists->count() > 0)
+
                 <div class="d-flex">
                     <div class="col-lg-8">
                         <div class="row">
-                            <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">Model</label>
-                            </div>
-                            <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                            </div>
-                            <div class="col-lg-4 col-md-4">
-                                <label for="basicpill-firstname-input" class="form-label">Varients</label>
-                            </div>
+{{--                            <div class="col-lg-4 col-md-4">--}}
+{{--                                <label for="basicpill-firstname-input" class="form-label">Model</label>--}}
+{{--                            </div>--}}
+{{--                            <div class="col-lg-4 col-md-4">--}}
+{{--                                <label for="basicpill-firstname-input" class="form-label">SFX</label>--}}
+{{--                            </div>--}}
+{{--                            <div class="col-lg-4 col-md-4">--}}
+{{--                                <label for="basicpill-firstname-input" class="form-label">Varients</label>--}}
+{{--                            </div>--}}
                         </div>
                     </div>
                     <div class="col-lg-8 col-md-3">
@@ -59,7 +59,9 @@
                             @endforeach
                         </div>
                     </div>
+
                 </div>
+            @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)
                     <div class="d-flex">
                         <div class="col-lg-8">
@@ -78,7 +80,6 @@
                         <p>&nbsp;&nbsp;&nbsp;</p>
                         <div class="col-lg-8 col-md-3">
                             <div class ="row">
-
                                 @foreach($demandList->monthlyDemands as $key => $monthlyDemand)
                                     <div class="col-lg-1">
                                         <input type="text" min="0" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" name="demand_quanties[]"
