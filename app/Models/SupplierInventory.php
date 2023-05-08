@@ -18,10 +18,10 @@ class SupplierInventory extends Model
     public const UPLOAD_STATUS_ACTIVE = "Active";
     public const UPLOAD_STATUS_INACTIVE = "Inactive";
 
-
     protected $appends = [
         'color_codes',
         'total_quantity',
+        'actual_quantity'
     ];
     protected $fillable = [
         'master_model_id',
@@ -56,6 +56,25 @@ class SupplierInventory extends Model
         }
          return $supplierInventories->count();
     }
+
+    public function getActualQuantityAttribute()
+    {
+        $modelId = $this->master_model_id;
+        $supplierInventories = SupplierInventory::with('masterModel')
+            ->whereHas('masterModel', function ($query) use($modelId){
+                $query->where('id', $modelId);
+            })
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('eta_import')
+            ->get();
+
+        if (!$supplierInventories) {
+            return 0;
+        }
+        return $supplierInventories->count();
+    }
+
     public function getColorCodesAttribute()
     {
         $modelId = $this->master_model_id;
@@ -65,6 +84,7 @@ class SupplierInventory extends Model
             ->where('master_models.id', '=', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('eta_import')
             ->groupBy('color_code')
             ->get();
 

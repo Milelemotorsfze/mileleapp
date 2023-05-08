@@ -19,6 +19,7 @@
                     <th>SFX</th>
                     <th>Variant</th>
                     <th>Total QTY</th>
+                    <th>Actual QTY</th>
                     <th>Group By Colors</th>
                 </tr>
                 </thead>
@@ -32,6 +33,7 @@
                         <td>{{ $supplierInventory->masterModel->sfx ?? '' }}</td>
                         <td>{{ $supplierInventory->masterModel->variant->name ?? 'Variant Listed But Blanked' }}</td>
                         <td>{{ $supplierInventory->total_quantity }}</td>
+                        <td>{{ $supplierInventory->actual_quantity }}</td>
                         <td>
                             @foreach($supplierInventory->color_codes as $row)
                                 @php
