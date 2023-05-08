@@ -40,11 +40,10 @@
         {
 			// datatables
             $('#dtBasicExample').DataTable();
-            $('#dtBasicSupplierInventory').DataTable()
+            $('#dtBasicSupplierInventory').DataTable();
             $('#dtBasicExample1').DataTable();
             $('#dtBasicExample2').DataTable();
             $('#dtBasicExample3').DataTable();
-        }); 
             $('#dtBasicExample4').DataTable();
             $('#dtBasicExample5').DataTable();
             $('#dtBasicExample6').DataTable();
@@ -105,6 +104,6 @@
                 addonBoxButton.hidden = true
             }
         </script>
-       
+
     </body>
 </html>
