@@ -74,6 +74,8 @@ use App\Http\Controllers\HiringController;
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
     Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
     Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
+    Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])->name('supplier-inventories.file-comparision-report');
+
     Route::get('supplier-inventories/get-child-rows', [SupplierInventoryController::class,'getChildRows'])->name('supplier-inventories.get-child-rows');
 
     //BL Module
