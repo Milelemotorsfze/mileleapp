@@ -10,6 +10,11 @@
   <span class="cart-icon-number"></span>
 </div>
 @endcan
+
+<div class="cart-icon-container">
+  <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
+  <span class="cart-icon-number"></span>
+</div>
         <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
             <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
             <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
