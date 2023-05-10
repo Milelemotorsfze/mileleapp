@@ -21,6 +21,7 @@ class SupplierInventoryController extends Controller
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->whereNull('eta_import')
             ->groupBy('master_model_id')
+            ->orderBy('id','desc')
             ->get();
 
         return view('supplier_inventories.index', compact('supplierInventories'));
@@ -567,5 +568,41 @@ class SupplierInventoryController extends Controller
             }
 
         }
+    }
+
+    public function lists(Request $request) {
+        $startDate = '';
+        $endDate = ' ';
+        $supplierInventories = SupplierInventory::with('masterModel')
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('eta_import')
+            ->groupBy('master_model_id');
+
+        if (!empty($request->start_date) && !empty($request->end_date)) {
+            $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+            $endDate =  Carbon::parse($request->end_date)->format('Y-m-d');
+
+            $supplierInventories =  $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+        }
+        $supplierInventories = $supplierInventories->get();
+
+        return view('supplier_inventories.list', compact('supplierInventories','startDate','endDate'));
+    }
+    public function FileComparision() {
+
+        $supplierInventoryDates = SupplierInventory::groupBy('date_of_entry')
+            ->pluck('date_of_entry');
+
+        return view('supplier_inventories.file_comparision',compact('supplierInventoryDates'));
+    }
+    public function getChildRows(Request $request) {
+        $masterModelId = $request->master_model_id;
+        $data = SupplierInventory::where('master_model_id', $masterModelId)
+           ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->get();
+
+        return $data;
     }
 }

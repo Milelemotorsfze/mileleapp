@@ -53,9 +53,9 @@ use App\Http\Controllers\HiringController;
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
-    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon'); 
-    Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown'); 
-    Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view'); 
+    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon');
+    Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
+    Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
@@ -71,7 +71,10 @@ use App\Http\Controllers\HiringController;
     Route::resource('monthly-demands', MonthlyDemandsController::class);
 
     // Supplier Inventories
-    Route::resource('supplier-inventories', SupplierInventoryController::class);
+    Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
+    Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
+    Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
+    Route::get('supplier-inventories/get-child-rows', [SupplierInventoryController::class,'getChildRows'])->name('supplier-inventories.get-child-rows');
 
     //BL Module
     Route::resource('blform', BlFormController::class);

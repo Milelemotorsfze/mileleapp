@@ -6,12 +6,31 @@
         </h4>
     </div>
     <div class="card-body">
-        <div class="ml-auto">
-            <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
-        </div>
-        <br>
+        <form action="{{route('supplier-inventories.lists')}}" >
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Start Date</label>
+                        <input type="date" id="datepicker" name="start_date" value="{{ old('start_date',$startDate) }}"
+                               class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">End Date</label>
+                        <input type="date" id="datepicker" value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit"  class="btn btn-primary mt-4 search">Serach</button>
+                    <a href="{{route('supplier-inventories.lists')}}">
+                        <button type="button"  class="btn btn-primary mt-4 ">Refresh</button>
+                    </a>
+                </div>
+            </div>
+        </form>
         <div class="table-responsive" >
-            <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-condensed" style="">
+            <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
@@ -27,9 +46,7 @@
                 <div hidden>{{$i=0;}}
                 </div>
                 @foreach ($supplierInventories as $key => $supplierInventory)
-                    <tr class="inventory-collapse" data-bs-toggle="collapse" data-bs-target="#get-child-rows-{{$key}}"
-                        data-id="{{$supplierInventory->master_model_id}}" data-model="{{$supplierInventory->masterModel->model ?? ''}}"
-                        data-sfx="{{ $supplierInventory->masterModel->sfx ?? ''}}" >
+                    <tr data-id="1">
                         <td>{{ ++$i }}</td>
                         <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
                         <td>{{ $supplierInventory->masterModel->sfx ?? '' }}</td>
@@ -66,67 +83,16 @@
                                         $code_nameex = $row->parent;
                                     }
                                 @endphp
-                               {{  $code_nameex }} : {{$color_codeqty }}
+                                {{  $code_nameex }} : {{$color_codeqty }}
                                 <br>
                             @endforeach
                         </td>
-{{--                    </tr>--}}
-                    <div class="collapse accordion-collapse row-add" id="get-child-rows-{{$key}}" data-key="{{$key}}" data-bs-parent=".table">
-{{--                        @foreach($supplierInventory)--}}
-
-{{--                        @endforeach--}}
-                    </div>
-
+                    </tr>
                 @endforeach
                 </tbody>
             </table>
         </div>
     </div>
-    <script type="text/javascript">
-        {{--$(document).ready(function () {--}}
-        {{--    $('.inventory-collapse').click(function() {--}}
-        {{--       let masterModelId = $(this).attr('data-id');--}}
-        {{--        let model = $(this).attr('data-model');--}}
-        {{--        let sfx = $(this).attr('data-sfx');--}}
-        {{--        let key = $(this).attr('data-key');--}}
-        {{--       let url = '{{ route('supplier-inventories.get-child-rows') }}';--}}
-        {{--        $.ajax({--}}
-        {{--            type: "GET",--}}
-        {{--            url: url,--}}
-        {{--            dataType: "json",--}}
-        {{--            data: {--}}
-        {{--                master_model_id: masterModelId--}}
-        {{--            },--}}
-        {{--            success:function (data) {--}}
-        {{--                $('.row-add').empty();--}}
-        {{--                $i =0;--}}
-        {{--                jQuery.each(data, function(i,item){--}}
-        {{--                    console.log(item.chasis);--}}
-        {{--                    $('.row-add').append('<tr>','<td>'+ ++$i +'</td>','<td>'+model+'</td>','<td>'+sfx+'</td>','<td>'+item.chasis+'</td>','</tr>','</br>');--}}
 
-        {{--                     //.appendTo('#records_table');--}}
-        {{--                });--}}
-        {{--            }--}}
-        {{--        });--}}
-        {{--    })--}}
-
-        {{--});--}}
-    </script>
 @endsection
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
