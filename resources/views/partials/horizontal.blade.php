@@ -239,6 +239,7 @@
                             <span data-key="t-extra-pages">Hiring</span>
                         </a>
                     </li>
+                    @endcan
                     @can('Calls-view')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">

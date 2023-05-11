@@ -77,6 +77,7 @@ use App\Http\Controllers\LeadSourceController;
     Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
     Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
     Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])->name('supplier-inventories.file-comparision-report');
+    Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
 
     Route::get('supplier-inventories/get-child-rows', [SupplierInventoryController::class,'getChildRows'])->name('supplier-inventories.get-child-rows');
 

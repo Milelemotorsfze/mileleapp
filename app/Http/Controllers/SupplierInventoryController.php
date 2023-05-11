@@ -997,4 +997,13 @@ class SupplierInventoryController extends Controller
 
         return $data;
     }
+    public function getDate(Request $request)
+    {
+        $supplierInventoryDates = SupplierInventory::where('supplier', $request->supplier)
+            ->where('whole_sales', $request->wholesaler)
+            ->groupBy('date_of_entry')
+            ->pluck('date_of_entry');
+
+        return $supplierInventoryDates;
+    }
 }
