@@ -61,13 +61,16 @@
                         </select>
                     </div>
                 </div>
+{{--                {{ $order->quantity == 1 ? 'selected' : '' }}--}}
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">First File</label>
                         <select class="form-control" data-trigger name="first_file" id="supplier">
                             <option value="" disabled>Select First File</option>
                             @foreach($supplierInventoryDates as $key => $supplierInventoryDate)
-                                <option value="{{ $supplierInventoryDate }}">File {{ $key + 1 }} ({{$supplierInventoryDate}} )</option>
+                                <option value="{{ $supplierInventoryDate }}"  {{ ( $supplierInventoryDate == request()->first_file) ? 'selected' : '' }} >
+                                    File {{ $key + 1 }} ({{$supplierInventoryDate}} )
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -78,7 +81,9 @@
                         <select class="form-control" name="second_file" data-trigger name="supplier" id="supplier">
                             <option value="" disabled>Select Second File</option>
                             @foreach($supplierInventoryDates as $key => $supplierInventoryDate)
-                                <option value="{{ $supplierInventoryDate }}">File {{ $key + 1 }} ({{$supplierInventoryDate}}) </option>
+                                <option value="{{ $supplierInventoryDate }}" {{ ( $supplierInventoryDate == request()->second_file) ? 'selected' : '' }} >
+                                    File {{ $key + 1 }} ({{$supplierInventoryDate}})
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -91,10 +96,9 @@
                 </a>
             </div>
             </br>
-
         </form>
 
-{{--        @if(count($updatedRows) > 0 ||  count($newlyAddedRows) > 0 || count($deletedRows) > 0)--}}
+{{--        @if(!empty($updatedRows) ||  !empty($newlyAddedRows) || !empty($deletedRows))--}}
             <div class="container report-div">
                <h2 style="text-align: center">Supplier Inventory Reports</h2>
                <table class="new-row">
@@ -179,15 +183,11 @@
                    @endif
                </table>
             </div>
+{{--            @else--}}
+
 {{--        @endif--}}
     </div>
 @endsection
-@push('scripts')
-    <script>
-        $('#compare-button').click(function () {
-            $('.report-div').attr('hidden',false);
-        })
-    </script>
-@endpush
+
 
 

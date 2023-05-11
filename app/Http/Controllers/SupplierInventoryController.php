@@ -55,7 +55,7 @@ class SupplierInventoryController extends Controller
             $code_nameex = NULL;
             $exteriorColorCodeId = NULL;
             $extcolour = NULL;
-            $date = '2023-05-09';
+            $date = '2023-05-04';
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
                 if ($i > 0 && $num == $numberOfFields)
@@ -378,7 +378,7 @@ class SupplierInventoryController extends Controller
                                                 {
                                                     info("po arm not match update");
 
-                                                    $updatedRowsIds[] = $supplierInventory4->id;
+                                                    $updatedRowsIds[] = $supplierInventory3->id;
                                                     $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                     $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                                     $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -562,8 +562,10 @@ class SupplierInventoryController extends Controller
         $deletedRows = [];
         $updatedRows = [];
 
-        return view('supplier_inventories.file_comparision',compact('supplierInventoryDates','newlyAddedRows',
-            'deletedRows','updatedRows'));
+        return view('supplier_inventories.file_comparision',compact('supplierInventoryDates',
+            'newlyAddedRows',
+            'deletedRows','updatedRows'
+        ));
     }
     public function FileComparisionReport(Request $request)
     {
@@ -574,19 +576,21 @@ class SupplierInventoryController extends Controller
         $updatedRows = [];
         $firstFileValuePairs = [];
         $chasisUpdatedRowIds = [];
-
+        $updatedRowsIds = [];
         $i = 0;
-
 
         $firstFileRowDetails = SupplierInventory::whereDate('date_of_entry', $request->first_file)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
+            ->where('supplier', $request->supplier)
+            ->where('whole_sales', $request->whole_sales)
+//            ->whereNull('eta_import')
             ->get();
         $secondFileRowDetails = SupplierInventory::whereDate('date_of_entry', $request->second_file)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //            ->whereNull('eta_import')
+            ->where('supplier', $request->supplier)
+            ->where('whole_sales', $request->whole_sales)
             ->get();
-//        return $secondFileRowDetails;
 
         foreach ($secondFileRowDetails as $secondFileRowDetail)
         {
@@ -608,7 +612,7 @@ class SupplierInventoryController extends Controller
                 info("new entry");
                 // model and sfx not existing in Suplr Invtry => new row
                 $newlyAddedRows[$i]['model'] = $masterModel->model;
-                $newlyAddedRows[$i]['sfx'] = $secondFileRowDetail['sfx'];
+                $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
                 $newlyAddedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
                 $newlyAddedRows[$i]['engine_number'] = $secondFileRowDetail['engine_number'];
                 $newlyAddedRows[$i]['color_code'] = $secondFileRowDetail['color_code'];
@@ -622,10 +626,12 @@ class SupplierInventoryController extends Controller
                     // Store the Count into Update the Row with data
                     $supplierInventory = $supplierInventories->where('chasis', $secondFileRowDetail['chasis'])
                         ->first();
-                    $isNullChaisis = SupplierInventory::whereDate('date_of_entry', $request->second_file)
+                    $isNullChaisis = SupplierInventory::whereDate('date_of_entry', $request->first_file)
                         ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
 //                                    ->whereNull('eta_import')
+                        ->where('supplier', $request->supplier)
+                        ->where('whole_sales', $request->whole_sales)
                         ->whereNull('chasis');
                     if (!$supplierInventory) {
                         //adding new row simply
@@ -835,7 +841,7 @@ class SupplierInventoryController extends Controller
                                     {
                                         info("po arm not match update");
 
-                                        $updatedRowsIds[] = $supplierInventory4->id;
+                                        $updatedRowsIds[] = $supplierInventory3->id;
                                         $updatedRows[$i]['model'] = $masterModel->model;
                                         $updatedRows[$i]['sfx'] = $masterModel->sfx;
                                         $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
@@ -873,8 +879,7 @@ class SupplierInventoryController extends Controller
                 }
             }$i++;
         }
-        info("UPDATEDrOE");
-        info($updatedRows);
+
         foreach ($firstFileRowDetails as $firstFileRowDetail)
         {
             $masterModel = MasterModel::find($firstFileRowDetail['master_model_id']);
@@ -887,10 +892,21 @@ class SupplierInventoryController extends Controller
         $groupedFirstFileCount =  array_count_values($firstFileValuePairs);
         $j=0;
         $updatedDetails = [];
-        foreach ($updatedRows as $updatedRow) {
-            $updatedDetails[] =  $updatedRow['model']."_".$updatedRow['sfx']."_".$updatedRow['chasis']."_".
-            $updatedRow['engine_number']."_".$updatedRow['color_code']."_".$updatedRow['pord_month']."_".
-            $updatedRow['po_arm'];
+        foreach ($updatedRowsIds as $updatedRowsId) {
+            $supplierInventory = SupplierInventory::find($updatedRowsId);
+            $updatedDetails[] =  $supplierInventory->masterModel->model."_".$supplierInventory->masterModel->sfx."_".$supplierInventory->chasis."_".
+                $supplierInventory->engine_number."_".$supplierInventory->color_code."_".$supplierInventory->pord_month."_".
+                $supplierInventory->po_arm;
+        }
+        $chasisUpdatedRows = [];
+        if(!empty($chasisUpdatedRowIds)) {
+            foreach ($chasisUpdatedRowIds as $chasisUpdatedRowId) {
+                $supplierInventory = SupplierInventory::find($chasisUpdatedRowId);
+                $chasisUpdatedRows[] =  $supplierInventory->masterModel->model."_".$supplierInventory->masterModel->sfx."_".$supplierInventory->chasis."_".
+                    $supplierInventory->engine_number."_".$supplierInventory->color_code."_".$supplierInventory->pord_month."_".
+                    $supplierInventory->po_arm;
+            }
+            $updatedChasisGroupedCount =  array_count_values($chasisUpdatedRows);
         }
 
         foreach ($firstFileRowDetails as $firstFileRowDetail)
@@ -914,19 +930,21 @@ class SupplierInventoryController extends Controller
 //                                ->whereNull('eta_import')
             if ($isExistSupplier->count() > 0)
             {
-                info("row exist".$isExistSupplier->count());
-
-                if ($isExistSupplier->count() > 1) {
+                if ($isExistSupplier->count() != $groupedFirstFileCount[$firstFileRow])
+                {
                     $secondFileRowCount = $isExistSupplier->count();
-                    info("model value pair is".$firstFileRow);
-                    info("second file have rows number". $isExistSupplier->count());
-                    info("first file have rows number".$groupedFirstFileCount[$firstFileRow]);
+                    if (!empty($chasisUpdatedRows))
+                    {
+                        if (in_array($firstFileRow,$chasisUpdatedRows))
+                        {
+                            $groupedFirstFileCount[$firstFileRow] = $groupedFirstFileCount[$firstFileRow] - $updatedChasisGroupedCount[$firstFileRow];
+                        }
+                    }
                     if ($secondFileRowCount < $groupedFirstFileCount[$firstFileRow])
                     {
-                     info("excel have only row count, that means deleted some row". $groupedFirstFileCount[$firstFileRow]);
-                     $deletedRowCount = $groupedFirstFileCount[$firstFileRow] - $secondFileRowCount;
+                         $deletedRowCount = $groupedFirstFileCount[$firstFileRow] - $secondFileRowCount;
                          $row = $isExistSupplier->first();
-                         for($i=0;$i<=$deletedRowCount;$i++) {
+                         for($i=0;$i<$deletedRowCount;$i++) {
                              $deletedRows[$i]['model'] = $masterModel->model;
                              $deletedRows[$i]['sfx'] = $masterModel->sfx;
                              $deletedRows[$i]['chasis'] = $row->chasis;
@@ -936,16 +954,8 @@ class SupplierInventoryController extends Controller
                     }
                 }
             }else{
-
-                info("row not exist");
-                info($masterModel->id);
-                info($masterModel->sfx);
-                $firstFileRow = $masterModel->model."_".$masterModel->sfx."_".$firstFileRowDetail['chasis']."_".
-                    $firstFileRowDetail['engine_number']."_".$firstFileRowDetail['color_code']."_".
-                    $firstFileRowDetail['pord_month']."_". $firstFileRowDetail['po_arm'];
-                info($firstFileRow);
-                if(!in_array($firstFileRow, $updatedDetails )) {
-                    info("row not found as updated => deleted");
+                if (!in_array($firstFileRow, $updatedDetails ))
+                {
                     $deletedRows[$j]['model'] = $masterModel->model;
                     $deletedRows[$j]['sfx'] = $masterModel->sfx;
                     $deletedRows[$j]['chasis'] = $firstFileRowDetail['chasis'];
@@ -955,8 +965,6 @@ class SupplierInventoryController extends Controller
             }
             $j++;
         }
-//      return $deletedRows;
-
         return view('supplier_inventories.file_comparision',compact('supplierInventoryDates','newlyAddedRows',
             'deletedRows','updatedRows'));
     }
