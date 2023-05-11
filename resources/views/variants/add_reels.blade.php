@@ -1,109 +1,127 @@
 @extends('layouts.main')
-
-@section('content')
-<div class="card">
-    <div class="card-header">
-        <h4 class="card-title">Variant Reels</h4>
-    </div>
-    <div class="card-body">
-    <div id="uploadedVideoContainer" style="display: none;">
-                <h5>Uploaded Reel</h5>
-                <video id="uploadedVideo" controls></video>
-            </div>
-        <div class="upload-form">
-            <form action="{{ route('variant_pictures.uploadingreal') }}" class="dropzone" id="video-dropzone">
-                @csrf
-                <div class="dz-message needsclick">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>Drag and drop video files here or click to upload</span>
-                </div>
-                </form>
-                <div class="text-center mt-3">
-                <a href="{{ route('variant_pictures.index') }}"><button type="submit" class="btn btn-primary">Finish</button></a>
-                </div>
-                </div>
-                </div>
-                </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js"></script>
-    <script>
-        Dropzone.autoDiscover = false;
-        Dropzone.options.videoDropzone = {
-            paramName: 'video',
-            maxFilesize: 200, 
-            acceptedFiles: 'video/mp4, video/quicktime',
-            init: function() {
-                var self = this;
-                this.on('success', function(file, response) {
-                    console.log(response);
-                    var uploadedVideo = document.getElementById('uploadedVideo');
-                    uploadedVideo.src = response.path;
-                    uploadedVideo.load();
-                    document.getElementById('uploadedVideoContainer').style.display = 'block';
-                    self.removeAllFiles();
-                });
-                this.on('error', function(file, response) {
-                    console.log(response);
-                    alert('Error uploading the video.');
-                });
-            }
-        };
-        var videoDropzone = new Dropzone('#video-dropzone');
-        videoDropzone.options.url = '{{ route('variant_pictures.uploadingreal') }}';
-    </script>
-@endsection
 <style>
-    .card {
-    margin: 0 auto;
-    width: 60%;
+.video-container {
+    position: relative;
+    padding-bottom: 15%; /* 16:9 aspect ratio */
+    overflow: hidden;
+    border: 1px solid black;
 }
-    .card-header {
-        background-color: #007bff;
-        padding: 10px 20px;
-        border-radius: 5px 5px 0 0;
-        color: #fff;
-    }
-    .card-title {
-        margin: 0;
-        font-size: 20px;
-    }
-    .card-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 5%;
+    width: 90%;
+    height:315px;
+    display: block;
 }
-    .upload-form {
-        margin-top: 20px;
-    }
 
-    .dz-message {
-        text-align: center;
-        margin-bottom: 10px;
-    }
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-gap: 20px;
+}
+.delete-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: red;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-    .fas {
-        font-size: 40px;
-        margin-bottom: 10px;
-        color: #007bff;
-    }
-    .btn-primary {
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-    #uploadedVideoContainer {
-        display: none;
-        margin-top: 20px;
-    }
-
-    #uploadedVideo {
-        width: 100%;
-    }
+.btn-danger {
+    color: #fff;
+    background-color: #fd625e;
+    border-color: #fd625e;
+    position: absolute;
+}
 </style>
+@section('content')
+<div class="card-header">
+        <h4 class="card-title">Add New Videos</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('variant_pictures.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </div>
+    <div class="card-body row">
+    @if(!empty($videos))
+    <h2>16 x 9 Videos</h2>
+    @foreach ($videos as $index => $embedCode)
+        @if ($embedCode !== null)
+            <div class="video-container col-md-3">
+                {!! $embedCode !!}
+                <form method="POST" action="{{ route('delete_video', $variantsreelss[$index]->id) }}" class="delete-form">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger delete-button">Delete</button>
+                </form>
+            </div>
+        @endif
+    @endforeach
+@else
+    <p>No video available.</p>
+@endif
+    <hr>
+    <div class="card-body row">
+    @if(!empty($reel))
+        <h2>9 x 16 Reels</h2>
+        @foreach ($reel as $index => $embedCodereel)
+        @if ($embedCodereel !== null)
+            <div class="video-container col-md-3">
+                {!! $embedCodereel !!}
+                <form method="POST" action="{{ route('delete_reel', $variantsreelss[$index]->id) }}" class="delete-form">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger delete-button">Delete</button>
+                </form>
+            </div>
+            @endif
+        @endforeach
+    @endif
+</div>
+<hr>
+			<form id="variant-pictures-form" method="POST" action="{{ route('variant_pictures.uploadingreal') }}" enctype="multipart/form-data">
+    @csrf
+    <!-- Existing input fields -->
+    <div class="maindd">
+    <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <label for="reel-path" class="form-label">Reel Link:</label>
+                <input type="text" name="reel_path[]" class="form-control reel-path-input" value="">
+                <input type="hidden" name="available_colour_id" value="{{ $id }}">
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <label for="video-path" class="form-label">Full Video Link:</label>
+                <input type="text" name="video_path[]" class="form-control video-path-input" value="">
+            </div>
+</div>
+</div>
+    <!-- Submit button -->
+<div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-end">
+        <div class="btn btn-primary add-row-btn">
+            <i class="fas fa-plus"></i> Add New Row
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 mt-3">
+        <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+    </div>
+</form>
+    <script>
+    $(document).ready(function() {
+        // Add row on plus button click
+        $(document).on("click", ".add-row-btn", function() {
+            var newRow = '<div class="row">'+
+            '<div class="col-lg-6 col-md-6">'+
+                        '<label for="reel-path" class="form-label">Reel Link:</label>' +
+                            '<input type="text" name="reel_path[]" class="form-control reel-path-input" value="">' +
+                            '</div>' +
+                            '<div class="col-lg-6 col-md-6">' +
+                                '<label for="video-path" class="form-label">Full Video Link:</label>' +
+                                '<input type="text" name="video_path[]" class="form-control video-path-input" value="">'+
+                                '</div>';
+            $('.maindd').append(newRow);
+        });
+    });
+</script>
+@endsection

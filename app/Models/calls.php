@@ -19,8 +19,12 @@ class calls extends Model
         'status',
         'language',
         'location',
-        'demand',
+        'brand_id',
+        'model_line_id',
         'created_by',
+        'type',
+        'region',
+        'custom_brand_model',
         'created_at',
     ];
     public $timestamps = false;

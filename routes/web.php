@@ -19,6 +19,8 @@ use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
+use App\Http\Controllers\LeadSourceController;
+
 
 /*
 /*
@@ -95,6 +97,11 @@ use App\Http\Controllers\HiringController;
         }
         abort(404);
     });
+    Route::get('calls-get/getmodelline', [CallsController::class,'getmodelline'])->name('calls.get-modellines');
+    Route::delete('/delete-video/{id}', [VariatnsPicturesController::class, 'deleteVideo'])->name('delete_video');
+    Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
+    Route::resource('lead_source', LeadSourceController::class);
+
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');

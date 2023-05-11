@@ -17,4 +17,12 @@ class AvailableColour extends Model
     {
     return $this->hasMany(VariantPicture::class);
     }
+    public function variantPicture()
+    {
+        return $this->hasMany(VariantPicture::class);
+    }
+    public function VariantsReel()
+    {
+        return $this->hasMany(VariantsReel::class);
+    }
 }

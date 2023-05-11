@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ModelHasRoles;
 use App\Models\SalesPersonLaugauges;
 use Monarobase\CountryList\CountryListFacade;
+use App\Models\Brand;
+use App\Models\LeadSource;
+use App\Models\MasterModelLines;
+use App\Models\Logs;
 use Carbon\Carbon;
 
 class CallsController extends Controller
@@ -20,7 +24,8 @@ class CallsController extends Controller
     {
         $data = Calls::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
         $convertedleads = Calls::where('status','Converted To Leads')->get();
-        return view('calls.index',compact('data','convertedleads'));
+        $convertedso = Calls::where('status','Converted To SO')->get();
+        return view('calls.index',compact('data','convertedleads', 'convertedso'));
     }
     /**
      * Show the form for creating a new resource.
@@ -28,7 +33,11 @@ class CallsController extends Controller
     public function create()
     {
         $countries = CountryListFacade::getList('en');
-        return view('calls.create', compact('countries'));
+        $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+        return view('calls.create', compact('countries', 'brandMatsers', 'modelLineMasters', 'LeadSource', 'sales_persons'));
     }
     /**
      * Store a newly created resource in storage.
@@ -36,38 +45,38 @@ class CallsController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'phone' => 'required',
-            'source' => 'required',
-            'demand' => 'required',
+            'phone' => 'nullable|required_without:email',
+            'email' => 'nullable|required_without:phone|email',            
             'location' => 'required',
-            'email' => 'required|email|unique:users,email',
         ]);
+        if($request->input('sales-option') == "auto-assign") {
         $email = $request->input('email');
         $phone = $request->input('phone');
         $language = $request->input('language');
-        $sales_persons = ModelHasRoles::where('role_id', 4)->get();
+        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
         $sales_person_id = null;
         $existing_email_count = null;
         $existing_phone_count = null;
         $existing_language_count = null;
-        
         foreach ($sales_persons as $sales_person) {
             if($language == "English") {
                 $existing_email_count = Calls::where('email', $email)
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->whereNotNull('email')
                                              ->count();
                 $existing_phone_count = Calls::where('phone', $phone)
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->whereNotNull('phone')
                                              ->count();
                 if($existing_email_count != 0 || $existing_phone_count != 0) {
                     $sales_person_id = $sales_person->model_id;
                     break;
-                } else {
+                } 
+                else {
                     $new_calls_count = Calls::where('status', 'New')
                                              ->where('sales_person', $sales_person->model_id)
                                              ->count();
-                    if ($new_calls_count < 25) {
+                    if ($new_calls_count < 5) {
                         $sales_person_id = $sales_person->model_id;
                         break;
                     }
@@ -90,7 +99,6 @@ class CallsController extends Controller
                 }
             }
         }
-        
         if ($sales_person_id == null) {
             $sales_person_id = Calls::select('sales_person', DB::raw('COUNT(*) as count'))
                                      ->where('status', 'New')
@@ -98,24 +106,25 @@ class CallsController extends Controller
                                      ->orderBy('count', 'ASC')
                                      ->first()
                                      ->sales_person;
-        }
-        
-        // Assign the call to the selected sales persons        
-        // create a new Carbon instance with the current time
+        }  
+    }
+    else{
+        $sales_person_id = $request->input('sales_person'); 
+    }
         $date = Carbon::now();
-        // set the timezone to UAE
         $date->setTimezone('Asia/Dubai');
-        // format the date and time as desired
         $formattedDate = $date->format('Y-m-d H:i:s');
         $data = [
             'name' => $request->input('name'),
-            'demand' => $request->input('demand'),
+            'model_line_id' => $request->input('model_line_id'),
+            'brand_id' => $request->input('brand_id'),
             'source' => $request->input('source'),
             'email' => $request->input('email'),
             'sales_person' => $sales_person_id,
             'remarks' => $request->input('remarks'),
             'location' => $request->input('location'),
             'phone' => $request->input('phone'),
+            'custom_brand_model' => $request->input('custom_brand_model'),
             'language' => $request->input('language'),
             'created_at' => $formattedDate,
             'created_by' => Auth::id(),
@@ -123,10 +132,21 @@ class CallsController extends Controller
         ];
         $model = new Calls($data);
         $model->save();
+        $lastRecord = Calls::where('created_by', $data['created_by'])
+                   ->orderBy('id', 'desc')
+                   ->first();
+        $table_id = $lastRecord->id;
+        $logdata = [
+            'table_name' => "calls",
+            'table_id' => $table_id,
+            'user_id' => Auth::id(),
+            'action' => "Create",
+        ];
+        $log = new Logs($logdata);
+        $model->save();
         return redirect()->route('calls.index')
-        ->with('success','User created successfully');
+        ->with('success','Call Record created successfully');
     }
-
     /**
      * Display the specified resource.
      */
@@ -158,4 +178,12 @@ class CallsController extends Controller
     {
         //
     }
+    public function getmodelline(Request $request)
+    {
+        $brandId = $request->input('brand'); 
+        $data = MasterModelLines::where('brand_id', $brandId)
+            ->pluck('model_line', 'id');
+        return response()->json($data);
+    }
+    
 }

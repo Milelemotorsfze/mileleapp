@@ -4,7 +4,7 @@
         <i class="fa fa-fw fa-bars"></i>
     </button>
 <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-@can('sales-view')
+@can('user-view')
 <div class="cart-icon-container">
   <a href="{{route('quotation.create')}}"><i class="fa fa-car fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -239,6 +239,13 @@
                             <span data-key="t-extra-pages">Hiring</span>
                         </a>
                     </li>
+                    @can('Calls-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
+                            <i data-feather="server"></i>
+                            <span data-key="t-extra-pages">Master Lead Source</span>
+                        </a>
+					</li>
                     @endcan
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">

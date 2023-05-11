@@ -9,7 +9,7 @@
         "barryvdh/laravel-dompdf": "^2.0",
         "ckeditor/ckeditor": "^4.21",
         "consoletvs/charts": "^6.0",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^7.5",
         "intervention/image": "^2.7",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
