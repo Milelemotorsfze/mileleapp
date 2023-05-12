@@ -14,6 +14,7 @@ class AddonTypes extends Model
         'brand_id',
         'model_id',
         'is_all_model_lines',
+        'model_number',
         'created_by',
         'updated_by',
         'deleted_by'

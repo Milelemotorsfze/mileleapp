@@ -2,7 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Edit User</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('addon.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)

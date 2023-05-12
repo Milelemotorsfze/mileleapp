@@ -12,6 +12,8 @@ class SupplierAddons extends Model
     protected $fillable = [
         'supplier_id',
         'addon_details_id',
+        'purchase_price_aed',
+        'purchase_price_usd',
         'created_by',
         'updated_by',
         'deleted_by'

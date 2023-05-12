@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('cascade');
             $table->bigInteger('addon_details_id')->unsigned()->index()->nullable();
             $table->foreign('addon_details_id')->references('id')->on('addon_details')->onDelete('cascade');
+            $table->decimal('purchase_price_aed', 10,2)->default('0.00');
+            $table->decimal('purchase_price_usd', 10,2)->default('0.00');
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('updated_by')->unsigned()->index()->nullable();

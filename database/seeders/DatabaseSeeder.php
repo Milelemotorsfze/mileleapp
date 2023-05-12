@@ -24,5 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BrandsTableSeeder::class);
         $this->call(AddonDetailsTableSeeder::class);
         $this->call(PaymentMethodsMasterTableSeeder::class);
+        $this->call(ModelDescriptionMasterTableSeeder::class);
     }
 }

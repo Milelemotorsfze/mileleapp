@@ -20,12 +20,18 @@ class AddonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($data)
     {
+        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines');
+        if($data != 'all')
+        {
+            $addon1 = $addon1->where('addon_type_name',$data);
+        }
+        $addon1 = $addon1->orderBy('id', 'ASC')->get();
         $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines')->orderBy('id', 'ASC')->get();
+        // $addons = AddonDetails::with('AddonTypes.brands','AddonTypes.modelLines','AddonTypes.brands')
         $addons = DB::table('addon_details')
                     ->join('addons','addons.id','addon_details.addon_id')
                     ->join('addon_types','addon_types.addon_details_id','addon_details.id')
@@ -141,6 +147,7 @@ class AddonController extends Controller
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
+        
         return view('addon.edit',compact('addons','brands','modelLines','addonDetails'));
     }
     public function updateAddonDetails(Request $request, $id)

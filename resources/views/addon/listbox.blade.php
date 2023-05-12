@@ -85,7 +85,9 @@
                 {{$addonsdata->AddonName->name}}
               </div>
               <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
+              @if($addonsdata->image)
                 <img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:115px;" alt="Addon Image" />
+                @endif
                 @if($addonsdata->additional_remarks)
                 <div class="labellist labeldesign col-xxl-12 col-lg-12 col-md-12">
                   <center>Additional Remarks</center>

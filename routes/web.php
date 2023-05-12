@@ -56,6 +56,7 @@ use App\Http\Controllers\SupplierController;
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown'); 
     Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view'); 
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
+    Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
 

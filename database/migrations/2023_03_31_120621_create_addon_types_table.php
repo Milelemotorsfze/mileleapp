@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('model_id')->unsigned()->index()->nullable();
             $table->foreign('model_id')->references('id')->on('master_model_lines')->onDelete('cascade');
             $table->enum('is_all_model_lines', ['yes', 'no'])->default('no');
+            $table->string('model_number')->nullable();
             $table->bigInteger('created_by')->unsigned()->index()->nullable();
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             $table->bigInteger('updated_by')->unsigned()->index()->nullable();

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('addon_details', function (Blueprint $table) {
             $table->id();
+            $table->enum('addon_type_name', ['P', 'D', 'DP', 'E', 'S','SP','W','K']);
             $table->bigInteger('addon_id')->unsigned()->index()->nullable();
             $table->foreign('addon_id')->references('id')->on('addons')->onDelete('cascade');
             $table->string('addon_code')->nullable();
+            $table->string('part_number')->nullable();
             $table->decimal('purchase_price', 10,2)->default('0.00');
             $table->decimal('selling_price', 10,2)->default('0.00');
             $table->string('payment_condition')->nullable();
