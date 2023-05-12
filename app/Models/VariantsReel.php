@@ -9,5 +9,9 @@ class VariantsReel extends Model
 {
     use HasFactory;
     protected $table = 'variants_reels';
-protected $fillable = ['available_colour_id', 'reel_path', 'status', /* other fillable attributes */];
+protected $fillable = ['available_colour_id', 'reel_path', 'created_by', 'video_path',/* other fillable attributes */];
+}
+function variantsReels()
+{
+    return $this->hasMany(VariantsReel::class);
 }

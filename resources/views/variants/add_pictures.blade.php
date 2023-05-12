@@ -1,126 +1,7 @@
 @extends('layouts.main')
-@section('content')
-    <div class="card-header">
-        <h4 class="card-title">Add Variants Pictures</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('variant_pictures.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-    </div>
-    <div class="card-body">
-    @if (session('variantPictures'))
-    <div class="gallery">
-        @foreach (session('variantPictures') as $variantPicture)
-            <div class="gallery-item">
-                <img src="{{ asset($variantPicture->image_path) }}" alt="Thumbnail" class="gallery-image">
-            </div>
-        @endforeach
-    </div>
-@endif
-@if (session('uploadedImagePaths'))
-    <div class="gallery">
-        @foreach (session('uploadedImagePaths') as $imagePath)
-            <div class="gallery-item">
-                <img src="{{ asset($imagePath) }}" alt="Thumbnail" class="gallery-image">
-            </div>
-        @endforeach
-    </div>
-@endif
-@if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
-        <form action="{{ route('variant_pictures.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-<div class="form-group">
-  <label for="images">Images:</label>
-  <div class="file-upload">
-    <input type="file" id="images" name="images[]" multiple class="input-upload">
-    <label for="images" class="file-label">Drag and drop files here or click to browse</label>
-    
-  </div>
-  <div id="preview" class="file-preview"></div>
-</div>
-<br>
-<input type="hidden" name="available_colour_id" value="{{ $id }}">
-<button type="submit" class="btn btn-primary">Submit</button>
-</form>
-<!-- Modal -->
-<div id="imageModal" class="modal">
-  <span class="close">&times;</span>
-  <img class="modal-content" id="modalImage">
-  <div class="modal-navigation">
-    <button id="prevBtn">&lt; Prev</button>
-    <button id="nextBtn">Next &gt;</button>
-  </div>
-</div>
- <script>
-const imagesInput = document.getElementById('images');
-const preview = document.getElementById('preview');
-const modal = document.getElementById('imageModal');
-const modalImg = document.getElementById('modalImage');
-const closeBtn = document.getElementsByClassName('close')[0];
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-let currentIndex = 0;
-let imageList = [];
-imagesInput.addEventListener('change', function () {
-  const files = Array.from(imagesInput.files);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = function () {
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file-item';
-      const filePreview = document.createElement('img');
-      filePreview.src = reader.result;
-      filePreview.alt = file.name;
-      filePreview.className = 'file-preview';
-      filePreview.addEventListener('click', function () {
-        currentIndex = imageList.findIndex(image => image.src === reader.result);
-        openModal();
-      });
-      const fileRemove = document.createElement('span');
-fileRemove.innerText = '×';
-fileRemove.className = 'file-remove';
-fileRemove.addEventListener('click', function () {
-  const index = imageList.findIndex(image => image.src === reader.result);
-  fileItem.remove();
-  const updatedFiles = Array.from(imagesInput.files).filter(f => f !== file);
-  const newFileList = new DataTransfer();
-  updatedFiles.forEach(file => newFileList.items.add(file));
-  imagesInput.files = newFileList.files;
-  imageList.splice(index, 1);
-  currentIndex = 0;
-});
-      fileItem.appendChild(filePreview);
-      fileItem.appendChild(fileRemove);
-      preview.appendChild(fileItem);
-      imageList.push(filePreview);
-    };
-    reader.readAsDataURL(file);
-  });
-});
-closeBtn.addEventListener('click', closeModal);
-prevBtn.addEventListener('click', showPrevImage);
-nextBtn.addEventListener('click', showNextImage);
-function openModal() {
-  modal.style.display = 'block';
-  modalImg.src = imageList[currentIndex].src;
-}
-function closeModal() {
-  modal.style.display = 'none';
-}
-function showPrevImage() {
-  currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
-  modalImg.src = imageList[currentIndex].src;
-}
-function showNextImage() {
-  currentIndex = (currentIndex + 1) % imageList.length;
-  modalImg.src = imageList[currentIndex].src;
-}
-    </script>
-@endsection
 <style>
-      /* Modal Styles */
-  .modal {
+     /* Modal Styles */
+     .modal {
     display: none; /* Hide the modal by default */
     position: fixed;
     z-index: 9999;
@@ -327,4 +208,218 @@ function showNextImage() {
 .gallery-image:hover {
     transform: scale(1.1);
 }
-</style>
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    min-height: 200px;
+    max-height: 500px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.gallery-item {
+    flex-basis: calc(33.33% - 10px);
+    margin-bottom: 20px;
+}
+
+.gallery-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid gray;
+}
+.image-upload-container {
+  position: relative;
+  overflow: hidden;
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.image-upload-container input[type=file] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+.drag-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  color: #999;
+}
+
+.image-upload-container.drag-over .drag-text {
+  display: none;
+}
+  </style>
+@section('content')
+    <div class="card-header">
+        <h4 class="card-title">Add Variants Pictures</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('variant_pictures.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </div>
+    <div class="card-body">
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+@if(isset($variantsPictures) && $variantsPictures->isNotEmpty())
+    <div class="gallery">
+        @foreach($variantsPictures as $picture)
+            <div class="gallery-item">
+            <form action="{{ route('variant_pictures.destroy', ['variant_picture' => $picture->id]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-dark">&times;</button>
+                </form>
+                <a href="{{ asset($picture->image_path) }}" target="_blank">
+                    <img src="{{ asset($picture->image_path) }}" alt="Picture">
+</a>
+            </div>
+        @endforeach
+    </div>
+@endif
+<form action="{{ route('variant_pictures.store') }}" method="POST" enctype="multipart/form-data">
+  @csrf
+  <div class="row">
+    <div class="col-lg-9">
+      <div class="form-group">
+        <label for="images">Other Images:</label>
+        <div class="file-upload">
+          <input type="file" id="images" name="images[]" multiple class="input-upload">
+          <label for="images" class="file-label">Drag and drop Images here or click to browse</label>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="form-group">
+        <label for="image-upload">Feature Image</label>
+        <div class="image-upload-container">
+          <div class="drag-text">Drag and Drop Here</div>
+          <input type="file" id="image-upload" name="feature_image" class="form-control-file" accept="image/*" onchange="previewImage(event)">
+          <div class="image-preview">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="preview" class="file-preview"></div>
+  </div>
+  <br>
+  <input type="hidden" name="available_colour_id" value="{{ $id }}">
+  <div class="col-lg-12 col-md-12 mt-3">
+    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+  </div>
+</form>
+<!-- Modal -->
+<div id="imageModal" class="modal">
+  <span class="close">&times;</span>
+  <img class="modal-content" id="modalImage">
+  <div class="modal-navigation">
+    <button id="prevBtn">&lt; Prev</button>
+    <button id="nextBtn">Next &gt;</button>
+  </div>
+</div>
+ <script>
+const imagesInput = document.getElementById('images');
+const preview = document.getElementById('preview');
+const modal = document.getElementById('imageModal');
+const modalImg = document.getElementById('modalImage');
+const closeBtn = document.getElementsByClassName('close')[0];
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+let currentIndex = 0;
+let imageList = [];
+imagesInput.addEventListener('change', function () {
+  const files = Array.from(imagesInput.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      const filePreview = document.createElement('img');
+      filePreview.src = reader.result;
+      filePreview.alt = file.name;
+      filePreview.className = 'file-preview';
+      filePreview.addEventListener('click', function () {
+        currentIndex = imageList.findIndex(image => image.src === reader.result);
+        openModal();
+      });
+      const fileRemove = document.createElement('span');
+fileRemove.innerText = '×';
+fileRemove.className = 'file-remove';
+fileRemove.addEventListener('click', function () {
+  const index = imageList.findIndex(image => image.src === reader.result);
+  fileItem.remove();
+  const updatedFiles = Array.from(imagesInput.files).filter(f => f !== file);
+  const newFileList = new DataTransfer();
+  updatedFiles.forEach(file => newFileList.items.add(file));
+  imagesInput.files = newFileList.files;
+  imageList.splice(index, 1);
+  currentIndex = 0;
+});
+      fileItem.appendChild(filePreview);
+      fileItem.appendChild(fileRemove);
+      preview.appendChild(fileItem);
+      imageList.push(filePreview);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+closeBtn.addEventListener('click', closeModal);
+prevBtn.addEventListener('click', showPrevImage);
+nextBtn.addEventListener('click', showNextImage);
+function openModal() {
+  modal.style.display = 'block';
+  modalImg.src = imageList[currentIndex].src;
+}
+function closeModal() {
+  modal.style.display = 'none';
+}
+function showPrevImage() {
+  currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
+  modalImg.src = imageList[currentIndex].src;
+}
+function showNextImage() {
+  currentIndex = (currentIndex + 1) % imageList.length;
+  modalImg.src = imageList[currentIndex].src;
+}
+function previewImage(event) {
+  var reader = new FileReader();
+  reader.onload = function() {
+    var output = document.querySelector('.image-preview');
+    output.style.backgroundImage = "url('" + reader.result + "')";
+  }
+  reader.readAsDataURL(event.target.files[0]);
+  document.querySelector('.image-upload-container').classList.add('drag-over');
+}
+    </script>
+@endsection

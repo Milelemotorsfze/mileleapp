@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('available_colour_id')->unsigned()->index()->nullable();
             $table->foreign('available_colour_id')->references('id')->on('available_colour')->onDelete('cascade');
             $table->string('reel_path')->nullable();
-            $table->string('status');
+            $table->string('video_path')->nullable();
             $table->timestamps();
         });
     }

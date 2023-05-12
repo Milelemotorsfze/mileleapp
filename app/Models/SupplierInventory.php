@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\JoinClause;
@@ -18,10 +19,11 @@ class SupplierInventory extends Model
     public const UPLOAD_STATUS_ACTIVE = "Active";
     public const UPLOAD_STATUS_INACTIVE = "Inactive";
 
-
     protected $appends = [
         'color_codes',
         'total_quantity',
+        'actual_quantity',
+        'child_rows'
     ];
     protected $fillable = [
         'master_model_id',
@@ -47,28 +49,69 @@ class SupplierInventory extends Model
             ->whereHas('masterModel', function ($query) use($modelId){
                 $query->where('id', $modelId);
             })
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->get();
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY);
+        if (!empty(request()->start_date) && !empty(request()->end_date)) {
+            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
+            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
+            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+        }else{
+            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+        }
 
         if (!$supplierInventories) {
              return 0;
         }
          return $supplierInventories->count();
     }
+
+    public function getActualQuantityAttribute()
+    {
+        $modelId = $this->master_model_id;
+        $supplierInventories = SupplierInventory::with('masterModel')
+            ->whereHas('masterModel', function ($query) use($modelId){
+                $query->where('id', $modelId);
+            })
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->whereNull('eta_import');
+
+        if (!empty(request()->start_date) && !empty(request()->end_date)) {
+            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
+            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
+            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+        }else{
+            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+        }
+
+        if (!$supplierInventories) {
+            return 0;
+        }
+        return $supplierInventories->count();
+    }
+
     public function getColorCodesAttribute()
     {
         $modelId = $this->master_model_id;
-        $colorCodes =  DB::table('supplier_inventories')
+        $supplierInventories =  DB::table('supplier_inventories')
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
             ->where('master_models.id', '=', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->groupBy('color_code')
-            ->get();
+            ->whereNull('eta_import')
+            ->groupBy('color_code');
 
-        return $colorCodes;
+        if (!empty(request()->start_date) && !empty(request()->end_date)) {
+            $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
+            $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
+            $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
+        }else{
+            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+        }
+
+        return $supplierInventories->get();
+    }
+    public function getChildRowsAttribute() {
+        info($this->master_model_id);
+        info("clicked");
     }
 
 }

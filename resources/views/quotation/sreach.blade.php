@@ -94,7 +94,6 @@ $(document).ready(function () {
                 var vehicles_id = split_id[1];
                 var quotation_id = $('.quotation_id').val();
                 let url = "{{ route('quotation.vehicles-insert') }}";
-                //console.log(actiond);
                if(vehicles_id != '')
              {
         $.ajaxSetup({
@@ -109,9 +108,19 @@ $(document).ready(function () {
                      dataType:"JSON",
                      success:function(data)
                      {
-                     //console.log(data);
-                    // console.log("123");
                      $('#addvehicles_' + vehicles_id).closest('tr').remove();
+                     var userId = {{ auth()->user()->id }};
+                    function updateVehicleCount() {
+                    $.ajax({
+                        url: '/get-vehicle-count/' + userId,
+                        type: 'GET',
+                        success: function(data) {
+                        $('.cart-icon-number').text(data);
+                        }
+                    });
+                    }
+                    updateVehicleCount();
+                    // setInterval(updateVehicleCount, 500);
                      }
                 }); 
             }

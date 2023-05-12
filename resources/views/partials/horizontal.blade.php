@@ -1,18 +1,26 @@
-<button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-    <i class="fa fa-fw fa-bars"></i>
-</button>
+
+<div class="topnav" style="overflow: unset;">
+    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+        <i class="fa fa-fw fa-bars"></i>
+    </button>
 <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-@can('sales-view')
+@can('user-view')
 <div class="cart-icon-container">
   <a href="{{route('quotation.create')}}"><i class="fa fa-car fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
 </div>
 @endcan
-    <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
-        <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
-        <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
+
+<div class="cart-icon-container">
+  <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
+  <span class="cart-icon-number"></span>
+</div>
+        <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
+            <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
+            <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
             @if(auth()->user()->name) {{ auth()->user()->name }} @endif
         </span>
+<<<<<<< HEAD
         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-end">
@@ -37,6 +45,36 @@
     </div>
                </div>
 <div class="topnav">
+=======
+            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end">
+            <a class="dropdown-item" href="profile">
+                <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
+            </a>
+            <div class="dropdown-divider"></div>
+            @can('user-view')
+                <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            @can('role-list')
+                <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            @can('addon-view')
+                <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
+                <div class="dropdown-divider"></div>
+            @endcan
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            </a>
+        </div>
+</div>
+>>>>>>> 0ef2ffc57a079bd2b12e6400c61363e1374e2e00
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">
@@ -139,9 +177,15 @@
                                 </a>
                             </div>
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('supplier-inventories.index') }}" id="topnav-utility" role="button">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Supplier Inventory</span>
+                                    <div class="arrow-down"></div>
                                 </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                    <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
+                                    <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                </div>
                             </div>
                         </div>
                     </li>
@@ -214,6 +258,22 @@
                             </div>
                         </div>
                     </li>
+                    @endcan
+                    @can('HR-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('hiring.index') }}" id="topnav-more" role="button">
+                            <i data-feather="file-text"></i>
+                            <span data-key="t-extra-pages">Hiring</span>
+                        </a>
+                    </li>
+                    @endcan
+                    @can('Calls-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
+                            <i data-feather="server"></i>
+                            <span data-key="t-extra-pages">Master Lead Source</span>
+                        </a>
+					</li>
                     @endcan
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">

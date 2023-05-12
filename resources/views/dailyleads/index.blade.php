@@ -60,7 +60,7 @@
               <div hidden>{{$i=0;}}</div>
                 @foreach ($pendingdata as $key => $calls)
                   <tr data-id="1">
-                  <td>{{ ++$i }}</td>
+                    <td>{{ ++$i }}</td>
                     <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 

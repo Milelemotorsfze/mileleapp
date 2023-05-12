@@ -18,6 +18,9 @@ use App\Http\Controllers\SupplierInventoryController;
 use App\Http\Controllers\VariatnsPicturesController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\HiringController;
+use App\Http\Controllers\LeadSourceController;
+
 
 /*
 /*
@@ -52,9 +55,9 @@ use App\Http\Controllers\SupplierController;
     Route::post('addons/details/update/{id}', [AddonController::class, 'updateAddonDetails'])->name('addon.updatedetails');
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
-    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon'); 
-    Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown'); 
-    Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view'); 
+    Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon');
+    Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
+    Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     // Suppliers
@@ -71,7 +74,13 @@ use App\Http\Controllers\SupplierController;
     Route::resource('monthly-demands', MonthlyDemandsController::class);
 
     // Supplier Inventories
-    Route::resource('supplier-inventories', SupplierInventoryController::class);
+    Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
+    Route::get('supplier-inventories/lists', [SupplierInventoryController::class,'lists'])->name('supplier-inventories.lists');
+    Route::get('supplier-inventories/file-comparision', [SupplierInventoryController::class,'FileComparision'])->name('supplier-inventories.file-comparision');
+    Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])->name('supplier-inventories.file-comparision-report');
+    Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
+
+    Route::get('supplier-inventories/get-child-rows', [SupplierInventoryController::class,'getChildRows'])->name('supplier-inventories.get-child-rows');
 
     //BL Module
     Route::resource('blform', BlFormController::class);
@@ -90,6 +99,11 @@ use App\Http\Controllers\SupplierController;
         }
         abort(404);
     });
+    Route::get('calls-get/getmodelline', [CallsController::class,'getmodelline'])->name('calls.get-modellines');
+    Route::delete('/delete-video/{id}', [VariatnsPicturesController::class, 'deleteVideo'])->name('delete_video');
+    Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
+    Route::resource('lead_source', LeadSourceController::class);
+
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -106,4 +120,9 @@ use App\Http\Controllers\SupplierController;
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
+
+    // HR
+    Route::resource('hiring', HiringController::class);
+    // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
+    // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
 });

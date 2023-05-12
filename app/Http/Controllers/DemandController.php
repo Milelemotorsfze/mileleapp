@@ -73,12 +73,10 @@ class DemandController extends Controller
             $years[] = date('y', mktime(0,0,0,$i, 1, date('Y')));
             $currentMonths[] = date('M', mktime(0,0,0,$i, 1, date('Y')));
         }
-
         $monthlyDemands = MonthlyDemand::where('demand_id',$id)
             ->whereIn('month', $currentMonths)
             ->whereIn('year', $years)
             ->get();
-//        return $monthlyDemands;
 
         $models = MasterModel::all();
         return view('demands.edit',
