@@ -520,17 +520,28 @@ class SupplierInventoryController extends Controller
         }
     }
     public function FileComparision(Request $request) {
-
-        $supplierInventoryDates = SupplierInventory::groupBy('date_of_entry')->pluck('date_of_entry');
+        $supplier = 'TTC';
+        $wholesaler = SupplierInventory::DEALER_TRANS_CARS;
+//        $supplierInventoryDates = SupplierInventory::where('supplier', $supplier)
+//            ->where('whole_sales', $wholesaler)
+//            ->groupBy('date_of_entry')
+//            ->pluck('date_of_entry');
+//
+//        return $supplierInventoryDates;
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
 
-        return view('supplier_inventories.file_comparision',compact('supplierInventoryDates',
+        return view('supplier_inventories.file_comparision',compact(
             'newlyAddedRows', 'deletedRows','updatedRows'));
     }
     public function FileComparisionReport(Request $request)
     {
+        if ($request->first_file > $request->second_file)
+        {
+            return redirect()->route('supplier-inventories.file-comparision-report')
+                ->with('message','The Second file date should be greater than First File Date');
+        }
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];

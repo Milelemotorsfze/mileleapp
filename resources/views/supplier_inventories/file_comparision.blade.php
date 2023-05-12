@@ -86,7 +86,7 @@
             </div>
             <div class="col-4">
                 <button type="submit" class="btn btn-dark mt-4 compare-button"> Compare </button>
-                <a href="{{ route('supplier-inventories.file-comparision-report') }}">
+                <a href="{{ route('supplier-inventories.file-comparision') }}">
                     <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
                 </a>
             </div>
@@ -181,9 +181,10 @@
 @push('scripts')
     <script>
         getDates();
+        getSelectedDates();
         $('#supplier').select2();
         $('#wholesaler').select2();
-        getDates();
+        // getDates();
 
         $('#supplier').change(function () {
             $('select[name="first_file"]').empty();
@@ -195,6 +196,13 @@
             $('select[name="second_file"]').empty();
              getDates();
         })
+
+        function getSelectedDates() {
+            let first = '{{ request()->first_file }}';
+            let second = '{{ request()->second_file }}';
+            $("#first-file option[value='" + first + "']").prop("selected",true);
+            $("#second-file option[value='" + second + "']").prop("selected",true);
+        }
 
         function getDates() {
             let supplier = $('#supplier').val();
@@ -211,11 +219,8 @@
                 },
                 success:function (data) {
                     jQuery.each(data, function(key,value){
-                        let first = '{{ request()->first_file }}';
-                        let second = '{{ request()->second_file }}';
+                        getSelectedDates();
                         var key = key + 1;
-                        $("#first-file option[value='" + first + "']").prop("selected",true);
-                        $("#second-file option[value='" + second + "']").prop("selected",true);
                         $('select[name="first_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
                         $('select[name="second_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
                     });
