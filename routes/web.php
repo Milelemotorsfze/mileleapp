@@ -79,8 +79,6 @@ use App\Http\Controllers\LeadSourceController;
     Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])->name('supplier-inventories.file-comparision-report');
     Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
 
-    Route::get('supplier-inventories/get-child-rows', [SupplierInventoryController::class,'getChildRows'])->name('supplier-inventories.get-child-rows');
-
     //BL Module
     Route::resource('blform', BlFormController::class);
     Route::post('store-data', [BlFormController::class, 'storeData'])->name('store.data');

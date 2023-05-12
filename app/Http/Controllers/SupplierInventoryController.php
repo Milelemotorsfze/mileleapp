@@ -55,7 +55,7 @@ class SupplierInventoryController extends Controller
             $code_nameex = NULL;
             $exteriorColorCodeId = NULL;
             $extcolour = NULL;
-            $date = '2023-05-04';
+            $date = Carbon::now()->format('Y-m-d');
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
                 if ($i > 0 && $num == $numberOfFields)
@@ -144,15 +144,11 @@ class SupplierInventoryController extends Controller
             {
                 $pdf = PDF::loadView('supplier_inventories.new_models', compact('newModels', 'newModelsWithSteerings'));
                 return $pdf->download('New_Models_'.date('Y_m_d').'.pdf');
-//                return  response()->stream($callback, 200, $headers);
                 // show error msg
-//                return redirect()->route('supplier-inventories.create')->with('message','Please add new models to master table.');
             } else
             {
                 if(!$request->has('is_add_new'))
                 {
-                    info("not checked");
-//                    $deletedRows = [];
                     $i = 0;
                     $countblankchasis = [];
                     $newlyAddedRows = [];
@@ -180,8 +176,8 @@ class SupplierInventoryController extends Controller
                             ->where('whole_sales', $request->whole_sales);
 //                            ->whereNull('eta_import');
 
-                        if ($supplierInventories->count() <= 0) {
-                            info("new entry");
+                        if ($supplierInventories->count() <= 0)
+                        {
                             // model and sfx not existing in Suplr Invtry => new row
                             $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                             $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -189,8 +185,8 @@ class SupplierInventoryController extends Controller
                             $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                             $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                         } else {
-                            if (!empty($uploadFileContent['chasis'])) {
-                                info("chais not empty");
+                            if (!empty($uploadFileContent['chasis']))
+                            {
                                 // Store the Count into Update the Row with data
                                 $supplierInventory = $supplierInventories->where('chasis', $uploadFileContent['chasis'])
                                     ->first();
@@ -204,9 +200,9 @@ class SupplierInventoryController extends Controller
                                     if (!empty($isNullChaisis->first())) {
                                         // null chaisis existing => updating row
                                         $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
-                                        info("empty chais with same model and sfx existing => update that row".$chasisUpdatedRow->id);
                                         $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
                                         $isNullChaisis = $isNullChaisis->first();
+
                                         $updatedRowsIds[] = $isNullChaisis->id;
                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                         $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -214,7 +210,6 @@ class SupplierInventoryController extends Controller
                                         $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                                         $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                                     } else {
-                                        info("new chasis with existing model and sfx => new entry".$uploadFileContent['sfx']);
                                         // new chaisis with existing model and sfx => add row ,
                                         $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                                         $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -224,11 +219,9 @@ class SupplierInventoryController extends Controller
                                     }
                                 } else
                                 {
-                                    info(" chais existing then checking any field have updattion");
                                     $supplierInventoryOne = $supplierInventories->where('engine_number', $uploadFileContent['engine_number'])->first();
                                     if (!$supplierInventoryOne)
                                     {
-                                        info("engine number not matching => update done".$supplierInventory->id);
                                         // chasis existing our system so get corresponding inventory when engine number is not matching
                                         $updatedRowsIds[] = $supplierInventory->id;
                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
@@ -236,14 +229,11 @@ class SupplierInventoryController extends Controller
                                         $updatedRows[$i]['chasis'] = $uploadFileContent['chasis'];
                                         $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                                         $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
-
                                     }else
                                     {
                                         $supplierInventoryTwo = $supplierInventories->where('color_code', $uploadFileContent['color_code'])->first();
                                         if (!$supplierInventoryTwo)
                                         {
-                                            info("engine number not matching => update done".$supplierInventory->id);
-
                                             $updatedRowsIds[] = $supplierInventoryOne->id;
                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -255,8 +245,6 @@ class SupplierInventoryController extends Controller
                                             $supplierInventoryThree = $supplierInventories->where('pord_month', $uploadFileContent['pord_month'])->first();
                                             if (!$supplierInventoryThree)
                                             {
-                                                info($supplierInventoryTwo);
-                                                info("no clr code not matching update row");
                                                 $updatedRowsIds[] = $supplierInventoryTwo->id;
                                                 $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                 $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -267,7 +255,6 @@ class SupplierInventoryController extends Controller
 
                                                 $supplierInventoryFour = $supplierInventories->where('po_arm', $uploadFileContent['po_arm'])->first();
                                                 if (!$supplierInventoryFour) {
-                                             info("no po arm matching update row");
                                                     $updatedRowsIds[] = $supplierInventoryThree->id;
                                                     $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                     $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -275,11 +262,9 @@ class SupplierInventoryController extends Controller
                                                     $updatedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                                                     $updatedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                                                 }else{
-                                                    info("eta import value".$uploadFileContent['eta_import']);
                                                     if(!empty($uploadFileContent['eta_import'])) {
                                                         $supplierInventoryFive = $supplierInventories->whereDate('eta_import', $uploadFileContent['eta_import'])->first();
                                                         if (!$supplierInventoryFive) {
-                                                            info("no eta import matching update row");
                                                             $updatedRowsIds[] = $supplierInventoryFour->id;
                                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -297,8 +282,6 @@ class SupplierInventoryController extends Controller
                                 }
                             } else
                             {
-                                info("CHASIS updated rows");
-                                info($chasisUpdatedRowIds);
                                 $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -310,13 +293,9 @@ class SupplierInventoryController extends Controller
                                     ->count();
                                 $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
                                 $countblankchasis[] = $modelSfxValuePair;
-                                info("model value pair".$modelSfxValuePair);
                                 $groupedCountValue =  array_count_values($countblankchasis);
-                                info("excel count".$groupedCountValue[$modelSfxValuePair]);
-                                info("db count".$nullChaisisCount);
                                 if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
                                 {
-                                    info("newly add is there");
                                     $newlyAddedRows[$i]['model'] = $uploadFileContent['model'];
                                     $newlyAddedRows[$i]['sfx'] = $uploadFileContent['sfx'];
                                     $newlyAddedRows[$i]['chasis'] = $uploadFileContent['chasis'];
@@ -346,8 +325,6 @@ class SupplierInventoryController extends Controller
                                             ->first();
                                         if (!$supplierInventory2)
                                         {
-                                            info("clr code not match update");
-
                                             $updatedRowsIds[] = $supplierInventory1->id;
                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -361,8 +338,6 @@ class SupplierInventoryController extends Controller
                                                 ->first();
                                             if (!$supplierInventory3)
                                             {
-                                                info("chasis not match update");
-
                                                 $updatedRowsIds[] = $supplierInventory2->id;
                                                 $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                 $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -376,8 +351,6 @@ class SupplierInventoryController extends Controller
                                                     ->first();
                                                 if (!$supplierInventory4)
                                                 {
-                                                    info("po arm not match update");
-
                                                     $updatedRowsIds[] = $supplierInventory3->id;
                                                     $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                     $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -392,8 +365,6 @@ class SupplierInventoryController extends Controller
                                                             ->first();
                                                         if (!$supplierInventory5)
                                                         {
-                                                            info("eta import not match update");
-
                                                             $updatedRowsIds[] = $supplierInventory4->id;
                                                             $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                                             $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -434,28 +405,20 @@ class SupplierInventoryController extends Controller
                                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
                             if ($isExistSupplier->count() > 0)
                             {
-                                info("row exist");
-                                if ($isExistSupplier->count() > 1) {
-                                    info("multiple row found");
-                                    info("dbcount => ".$isExistSupplier->count());
+                                if ($isExistSupplier->count() > 1)
+                                {
                                     $dbRowCount = $isExistSupplier->count();
                                     $csvValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx']."_".$uploadFileContent['chasis']."_".
                                         $uploadFileContent['engine_number']."_".$uploadFileContent['color_code']."_".$uploadFileContent['pord_month']."_".
                                         $uploadFileContent['po_arm'];
-                                    info("model value pair is".$csvValuePair);
-                                    info("the excel value is");
-                                    info($groupedExcelCountValue[$csvValuePair]);
                                     if ($groupedExcelCountValue[$csvValuePair] <= $dbRowCount)
                                     {
-//                                        info("excel have only row count". $groupedExcelCountValue[$csvValuePair]);
                                         $ExcelExistingRowId = $isExistSupplier->orderBy('id','desc')->take($groupedExcelCountValue[$csvValuePair])->pluck('id');
-//                                        info("row id of existing in excel".$ExcelExistingRowId);
                                         foreach ($ExcelExistingRowId as $ExcelExistingRowId) {
                                             $excelRows[] = $ExcelExistingRowId;
                                         }
                                     }else{
                                         $ExcelExistingRowId = $isExistSupplier->take($dbRowCount)->pluck('id');
-//                                        info("row id of existing in excel".$ExcelExistingRowId);
                                         foreach ($ExcelExistingRowId as $ExcelExistingRowId) {
                                             $excelRows[] = $ExcelExistingRowId;
                                         }
@@ -494,7 +457,8 @@ class SupplierInventoryController extends Controller
                             $preivousData->save();
                         }
                     }
-                    foreach ($uploadFileContents as $uploadFileContent) {
+                    foreach ($uploadFileContents as $uploadFileContent)
+                    {
                         $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
@@ -563,14 +527,10 @@ class SupplierInventoryController extends Controller
         $updatedRows = [];
 
         return view('supplier_inventories.file_comparision',compact('supplierInventoryDates',
-            'newlyAddedRows',
-            'deletedRows','updatedRows'
-        ));
+            'newlyAddedRows', 'deletedRows','updatedRows'));
     }
     public function FileComparisionReport(Request $request)
     {
-        $supplierInventoryDates = SupplierInventory::groupBy('date_of_entry')->pluck('date_of_entry');
-
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
@@ -595,19 +555,12 @@ class SupplierInventoryController extends Controller
         foreach ($secondFileRowDetails as $secondFileRowDetail)
         {
             $masterModel = MasterModel::find($secondFileRowDetail['master_model_id']);
-
-            info($secondFileRowDetail['master_model_id']);
-            info("master model id");
             $supplierInventories = SupplierInventory::whereDate('date_of_entry', $request->first_file)
                 ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('supplier', $request->supplier)
                 ->where('whole_sales', $request->whole_sales);
 //                            ->whereNull('eta_import');
-
-            info($supplierInventories->count());
-            info("suppliers count");
-
             if ($supplierInventories->count() <= 0) {
                 info("new entry");
                 // model and sfx not existing in Suplr Invtry => new row
@@ -638,11 +591,10 @@ class SupplierInventoryController extends Controller
                         if (!empty($isNullChaisis->first())) {
                             // null chaisis existing => updating row
                             $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
-                            info("empty chais with same model and sfx existing => update that row".$chasisUpdatedRow->id);
                             $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
                             $isNullChaisis = $isNullChaisis->first();
-                            $updatedRowsIds[] = $isNullChaisis->id;
 
+                            $updatedRowsIds[] = $isNullChaisis->id;
                             $updatedRows[$i]['model'] = $masterModel->model;
                             $updatedRows[$i]['sfx'] = $masterModel->sfx;
                             $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
@@ -652,7 +604,6 @@ class SupplierInventoryController extends Controller
                             $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
                             $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
                         } else {
-                            info("new chasis with existing model and sfx => new entry".$secondFileRowDetail['sfx']);
                             // new chaisis with existing model and sfx => add row ,
                             $newlyAddedRows[$i]['model'] = $masterModel->model;
                             $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
@@ -662,14 +613,11 @@ class SupplierInventoryController extends Controller
                         }
                     } else
                     {
-                        info(" chais existing then checking any field have updattion");
                         $supplierInventoryOne = $supplierInventories->where('engine_number', $secondFileRowDetail['engine_number'])->first();
                         if (!$supplierInventoryOne)
                         {
-                            info("engine number not matching => update done".$supplierInventory->id);
                             // chasis existing our system so get corresponding inventory when engine number is not matching
                             $updatedRowsIds[] = $supplierInventory->id;
-
                             $updatedRows[$i]['model'] = $masterModel->model;
                             $updatedRows[$i]['sfx'] = $masterModel->sfx;
                             $updatedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
@@ -684,8 +632,6 @@ class SupplierInventoryController extends Controller
                             $supplierInventoryTwo = $supplierInventories->where('color_code', $secondFileRowDetail['color_code'])->first();
                             if (!$supplierInventoryTwo)
                             {
-                                info("engine number not matching => update done".$supplierInventory->id);
-
                                 $updatedRowsIds[] = $supplierInventoryOne->id;
                                 $updatedRows[$i]['model'] = $masterModel->model;
                                 $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -700,8 +646,6 @@ class SupplierInventoryController extends Controller
                                 $supplierInventoryThree = $supplierInventories->where('pord_month', $secondFileRowDetail['pord_month'])->first();
                                 if (!$supplierInventoryThree)
                                 {
-                                    info($supplierInventoryTwo);
-                                    info("no clr code not matching update row");
                                     $updatedRowsIds[] = $supplierInventoryTwo->id;
                                     $updatedRows[$i]['model'] = $masterModel->model;
                                     $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -714,8 +658,8 @@ class SupplierInventoryController extends Controller
                                 }else{
 
                                     $supplierInventoryFour = $supplierInventories->where('po_arm', $secondFileRowDetail['po_arm'])->first();
-                                    if (!$supplierInventoryFour) {
-                                        info("no po arm matching update row");
+                                    if (!$supplierInventoryFour)
+                                    {
                                         $updatedRowsIds[] = $supplierInventoryThree->id;
                                         $updatedRows[$i]['model'] = $masterModel->model;
                                         $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -726,11 +670,9 @@ class SupplierInventoryController extends Controller
                                         $updatedRows[$i]['po_arm'] = $secondFileRowDetail['po_arm'];
                                         $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
                                     }else{
-                                        info("eta import value".$secondFileRowDetail['eta_import']);
                                         if(!empty($secondFileRowDetail['eta_import'])) {
                                             $supplierInventoryFive = $supplierInventories->whereDate('eta_import', $secondFileRowDetail['eta_import'])->first();
                                             if (!$supplierInventoryFive) {
-                                                info("no eta import matching update row");
                                                 $updatedRowsIds[] = $supplierInventoryFour->id;
                                                 $updatedRows[$i]['model'] = $masterModel->model;
                                                 $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -742,17 +684,13 @@ class SupplierInventoryController extends Controller
                                                 $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
                                             }
                                         }
-
                                     }
                                 }
                             }
-
                         }
                     }
                 } else
                 {
-                    info("CHASIS updated rows");
-                    info($chasisUpdatedRowIds);
                     $nullChaisisCount = SupplierInventory::whereDate('date_of_entry', $request->first_file)
                         ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
@@ -764,13 +702,9 @@ class SupplierInventoryController extends Controller
                         ->count();
                     $modelSfxValuePair = $masterModel->model."_".$masterModel->sfx;
                     $countblankchasis[] = $modelSfxValuePair;
-                    info("model value pair".$modelSfxValuePair);
                     $groupedCountValue =  array_count_values($countblankchasis);
-                    info("excel count".$groupedCountValue[$modelSfxValuePair]);
-                    info("db count".$nullChaisisCount);
                     if ($groupedCountValue[$modelSfxValuePair] > $nullChaisisCount)
                     {
-                        info("newly add is there");
                         $newlyAddedRows[$i]['model'] = $masterModel->model;
                         $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
                         $newlyAddedRows[$i]['chasis'] = $secondFileRowDetail['chasis'];
@@ -785,7 +719,6 @@ class SupplierInventoryController extends Controller
                             ->first();
                         if (!$supplierInventory1)
                         {
-//                                        info("engine number not match update");
                             $updatedRowsIds[] = $supplierInventory->id;
                             $updatedRows[$i]['model'] = $masterModel->model;
                             $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -803,8 +736,6 @@ class SupplierInventoryController extends Controller
                                 ->first();
                             if (!$supplierInventory2)
                             {
-                                info("clr code not match update");
-
                                 $updatedRowsIds[] = $supplierInventory1->id;
                                 $updatedRows[$i]['model'] = $masterModel->model;
                                 $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -821,8 +752,6 @@ class SupplierInventoryController extends Controller
                                     ->first();
                                 if (!$supplierInventory3)
                                 {
-                                    info("chasis not match update");
-
                                     $updatedRowsIds[] = $supplierInventory2->id;
                                     $updatedRows[$i]['model'] = $masterModel->model;
                                     $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -839,8 +768,6 @@ class SupplierInventoryController extends Controller
                                         ->first();
                                     if (!$supplierInventory4)
                                     {
-                                        info("po arm not match update");
-
                                         $updatedRowsIds[] = $supplierInventory3->id;
                                         $updatedRows[$i]['model'] = $masterModel->model;
                                         $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -858,7 +785,6 @@ class SupplierInventoryController extends Controller
                                                 ->first();
                                             if (!$supplierInventory5)
                                             {
-                                                info("eta import not match update");
                                                 $updatedRowsIds[] = $supplierInventory4->id;
                                                 $updatedRows[$i]['model'] = $masterModel->model;
                                                 $updatedRows[$i]['sfx'] = $masterModel->sfx;
@@ -870,7 +796,6 @@ class SupplierInventoryController extends Controller
                                                 $updatedRows[$i]['eta_import'] = $secondFileRowDetail['eta_import'];
                                             }
                                         }
-
                                     }
                                 }
                             }
@@ -965,7 +890,7 @@ class SupplierInventoryController extends Controller
             }
             $j++;
         }
-        return view('supplier_inventories.file_comparision',compact('supplierInventoryDates','newlyAddedRows',
+        return view('supplier_inventories.file_comparision',compact('newlyAddedRows',
             'deletedRows','updatedRows'));
     }
     public function lists(Request $request) {
@@ -988,15 +913,7 @@ class SupplierInventoryController extends Controller
         return view('supplier_inventories.list', compact('supplierInventories','startDate','endDate'));
     }
 
-    public function getChildRows(Request $request) {
-        $masterModelId = $request->master_model_id;
-        $data = SupplierInventory::where('master_model_id', $masterModelId)
-           ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->get();
 
-        return $data;
-    }
     public function getDate(Request $request)
     {
         $supplierInventoryDates = SupplierInventory::where('supplier', $request->supplier)
