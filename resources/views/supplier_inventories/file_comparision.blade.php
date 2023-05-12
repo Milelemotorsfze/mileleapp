@@ -72,12 +72,6 @@
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">First File</label>
                         <select class="form-control" data-trigger name="first_file" id="first-file">
                             <option value="" >Select First File</option>
-
-{{--                            @foreach($supplierInventoryDates as $key => $supplierInventoryDate)--}}
-{{--                                <option value="{{ $supplierInventoryDate }}"  {{ ( $supplierInventoryDate == request()->first_file) ? 'selected' : '' }} >--}}
-{{--                                    File {{ $key + 1 }} ({{$supplierInventoryDate}} )--}}
-{{--                                </option>--}}
-{{--                            @endforeach--}}
                         </select>
                     </div>
                 </div>
@@ -86,26 +80,19 @@
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Second File</label>
                         <select class="form-control" name="second_file" id="second-file" >
                             <option value="" >Select Second File</option>
-{{--                            @foreach($supplierInventoryDates as $key => $supplierInventoryDate)--}}
-{{--                                <option value="{{ $supplierInventoryDate }}" {{ ( $supplierInventoryDate == request()->second_file) ? 'selected' : '' }} >--}}
-{{--                                    File {{ $key + 1 }} ({{$supplierInventoryDate}})--}}
-{{--                                </option>--}}
-{{--                            @endforeach--}}
                         </select>
                     </div>
                 </div>
             </div>
             <div class="col-4">
                 <button type="submit" class="btn btn-dark mt-4 compare-button"> Compare </button>
-                <a href="{{ route('supplier-inventories.file-comparision-report') }}">
+                <a href="{{ route('supplier-inventories.file-comparision') }}">
                     <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
                 </a>
             </div>
             </br>
         </form>
-
-{{--        @if(!empty($updatedRows) ||  !empty($newlyAddedRows) || !empty($deletedRows))--}}
-            <div class="container report-div" >
+        <div class="container report-div" >
                <h2 style="text-align: center">Supplier Inventory Reports</h2>
                <table class="new-row">
                    <tr>
@@ -189,17 +176,15 @@
                    @endif
                </table>
             </div>
-{{--            @else--}}
-
-{{--        @endif--}}
     </div>
 @endsection
 @push('scripts')
     <script>
         getDates();
+        getSelectedDates();
         $('#supplier').select2();
         $('#wholesaler').select2();
-        getDates();
+        // getDates();
 
         $('#supplier').change(function () {
             $('select[name="first_file"]').empty();
@@ -211,31 +196,14 @@
             $('select[name="second_file"]').empty();
              getDates();
         })
-        {{--$('.compare-button').click(function () {--}}
-        {{--    let supplier = $('#supplier').val();--}}
-        {{--    let whole_sales = $('#wholesaler').val();--}}
-        {{--    let first_file = $('#first-file').val();--}}
-        {{--    let second_file = $('#second-file').val();--}}
-        {{--    alert("ok");--}}
-        {{--    let url = '{{ route('supplier-inventories.file-comparision-report') }}';--}}
-        {{--    $.ajax({--}}
-        {{--        type: "GET",--}}
-        {{--        url: url,--}}
-        {{--        dataType: "json",--}}
-        {{--        data: {--}}
-        {{--            supplier: supplier,--}}
-        {{--            whole_sales: whole_sales,--}}
-        {{--            first_file: first_file,--}}
-        {{--            second_file: second_file--}}
-        {{--        },--}}
-        {{--        success:function () {--}}
-        {{--            alert("test ok");--}}
 
-        {{--           $('.report-div').attr('hidden',false)--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--})--}}
-        let file1 = '{{ request()->first_file }}'
+        function getSelectedDates() {
+            let first = '{{ request()->first_file }}';
+            let second = '{{ request()->second_file }}';
+            $("#first-file option[value='" + first + "']").prop("selected",true);
+            $("#second-file option[value='" + second + "']").prop("selected",true);
+        }
+
         function getDates() {
             let supplier = $('#supplier').val();
             let wholesaler = $('#wholesaler').val();
@@ -250,15 +218,10 @@
                     wholesaler: wholesaler
                 },
                 success:function (data) {
-                    console.log(data);
-                    $('select[name="first_file"]').html('<option value=""> Select First File </option>');
-                    $('select[name="second_file"]').html('<option value=""> Select Second File </option>');
-
                     jQuery.each(data, function(key,value){
-                        var key = key +1;
-
-                        $('#first-file option[value=file1]').prop('selected', true);
-                        $('select[name="first_file"]').append('<option value="'+ value +'"  > File '+ key +'(' + value + ')'+'</option>');
+                        getSelectedDates();
+                        var key = key + 1;
+                        $('select[name="first_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
                         $('select[name="second_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
                     });
                 }

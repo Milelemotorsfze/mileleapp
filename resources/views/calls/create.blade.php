@@ -59,39 +59,21 @@
 			</div>  
 			<form action="" method="post" enctype="multipart/form-data">
                 <div class="row"> 
-					<div class="col-lg-6 col-md-6">
+					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
                         {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Phone : </label>
                         <input type="number" name="phone" class="form-control" value="">
                         
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Email : </label>
                         {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
                         <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
                     </div>
-                    <div class="col-lg-6 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">Brand : </label>
-                            <select name="brand_id" id="brand" class="form-control mb-1">
-                                <option value="">Select Brand</option>
-                                @foreach ($brandMatsers as $brandMatsers)
-                                    <option value="{{ $brandMatsers->id }}">{{ $brandMatsers->brand_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    <div class="col-lg-6 col-md-6">
-                    <label for="basicpill-firstname-input" class="form-label">Model Line : </label>
-                            <select name="model_line_id" id="model" class="form-control mb-1">
-                                <option value="">Select Model Line</option>
-                                @foreach ($modelLineMasters as $modelLineMasters)
-                                    <option value="{{ $modelLineMasters->id }}">{{ $modelLineMasters->model_line }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Source : </label>
                         <select name="source" id="source" class="form-control mb-1">
                                 @foreach ($LeadSource as $LeadSource)
@@ -99,7 +81,7 @@
                                 @endforeach
                                 </select>
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Preferred Language : </label>
                         {{ Form::select('language', [
                         'English' => 'English',
@@ -116,7 +98,7 @@
                         'shona' => 'Shona',
                         ], null, ['class' => 'form-control', 'id' => 'language']) }}
                     </div>
-                    <div class="col-xs-6 col-sm-12 col-md-6">
+                    <div class="col-xs-4 col-sm-12 col-md-4">
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>
                             <select name="location" id="country" class="form-control mb-1">
                                 <option value="">Select Destination</option>
@@ -125,7 +107,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-lg-6 col-md-6">
+                        <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Type : </label>
                         {{ Form::select('type', [
                         'Export' => 'Export',
@@ -133,11 +115,10 @@
 						'Other' => 'Other',
                         ], null, ['class' => 'form-control', 'id' => 'type']) }}
                     </div>
-                    <div class="col-lg-6 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
                     </div>
-                    <div class="col-lg-6 col-md-6">
+                    </br>
+                    <div class="row">
+                    <div class="col-lg-4 col-md-6">
     <label for="sales-options" class="form-label">Sales Persons Options:</label>
     <div>
         <label>
@@ -148,9 +129,9 @@
         </label>
     </div>
 </div>
-<div class="col-lg-6 col-md-6" id="manual-sales-person-list" style="display: none;">
+<div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
     <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <select name="sales_person" class="form-control mb-1">
+    <select name="sales_person" id="sales_persons" class="form-control mb-1">
                                 @foreach ($sales_persons as $sales_persons)
                                 @php
                      $sales_personsss = DB::table('users')->where('id', $sales_persons->model_id)->first();
@@ -159,6 +140,31 @@
                                     <option value="{{ $sales_persons->model_id }}">{{ $sales_persons_name }}</option>
                                 @endforeach
                             </select>
+</div>
+                    </div>
+                    <div class="maindd">
+    <div id="row-container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <label for="basicpill-firstname-input" class="form-label">Brand & Models: </label>
+                <select name="brand_id" class="form-control mb-1">
+                    <option value="">Select Brand</option>
+                    @foreach ($modelLineMasters as $modelLineMasters)
+                    @php
+                    $brand = DB::table('brands')->where('id', $modelLineMasters->brand_id)->first();
+                    $brand_name = $brand->brand_name;
+                    @endphp 
+                    <option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+        <div class="btn btn-primary add-row-btn">
+            <i class="fas fa-plus"></i> Add More
+        </div>
+    </div>
 </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
@@ -183,6 +189,7 @@ $('#country').select2();
 $('#language').select2();
 $('#source').select2();
 $('#type').select2();
+$('#sales_persons').select2();
 $('#brand').on('change',function(){
             let brand = $(this).val();
             let url = '{{ route('calls.get-modellines') }}';
@@ -219,6 +226,22 @@ $('#brand').on('change',function(){
         manualSalesPersonList.style.display = 'block';
         salesOptionValueField.value = manualAssignOption.value;
     });
-</script>
+    $(document).ready(function() {
+    // Define the function to add a new row
+    function addNewRow() {
+        // Create a new row element and append it to the end of the form
+        var newRow = $('<div class="row"></div>').appendTo('.maindd #row-container');
+        // Create a new brand dropdown and append it to the new row
+        var newBrandDropdown = $('<div class="col-lg-4 col-md-6"><label for="basicpill-firstname-input" class="form-label">Brand & Models: </label><select name="brand_id" class="form-control mb-1"><option value="">Select Brand</option>@foreach ($modelLineMasters as $modelLineMasters)@php $brand = DB::table("brands")->where("id", $modelLineMasters->brand_id)->first(); $brand_name = $brand->brand_name; @endphp<option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>@endforeach</select></div>').appendTo(newRow);
+        // Return the new row
+        return newRow;
+    }
 
+    // Add a click event listener to the "Add More" button
+    $('.add-row-btn').click(function() {
+        // Add a new row to the form
+        addNewRow();
+    });
+});
+</script>
 @endpush
