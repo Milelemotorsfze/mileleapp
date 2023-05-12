@@ -10,16 +10,6 @@
             </div>
         @endif
 
-{{--        @if (count($errors) > 0)--}}
-{{--            <div class="alert alert-danger">--}}
-{{--                <strong>Whoops!</strong> There were some problems with your input.<br><br>--}}
-{{--                <ul>--}}
-{{--                    @foreach ($errors->all() as $error)--}}
-{{--                        <li>{{ $error }}</li>--}}
-{{--                    @endforeach--}}
-{{--                </ul>--}}
-{{--            </div>--}}
-{{--        @endif--}}
         <form action="{{ route('supplier-inventories.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="col-lg-2 col-md-6">

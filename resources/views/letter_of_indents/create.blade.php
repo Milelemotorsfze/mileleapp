@@ -1,8 +1,7 @@
 @extends('layouts.main')
 @section('content')
     <div class="card-header">
-        <h4 class="card-title">Create New Calls</h4>
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <h4 class="card-title">Add New LOI</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -15,56 +14,101 @@
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'calls.store','method'=>'POST')) !!}
+        <form action="{{ route('letter-of-indents.store') }}" method="POST" >
+            @csrf
             <div class="row">
-			</div>  
-			<form action="" method="post" enctype="multipart/form-data">
-                <div class="row"> 
-					<div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">date : </label>
-                        {!! Form::date('date', null, array('class' => 'form-control')) !!}
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Select Country</label>
+                        <select class="form-control" data-trigger name="country" id="country">
+                            <option disabled>Select Country</option>
+                            @foreach($countries as $country)
+                                <option value="{{$country}}"> {{ $country }} </option>
+                            @endforeach
+                        </select>
                     </div>
-					<div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
+                        <select class="form-control"name="customer_type" id="customer-type">
+                            <option value="" disabled>Select The Type</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
+                            <option value={{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}>{{ \App\Models\Customer::CUSTOMER_TYPE_NGO }}</option>
+                        </select>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Phone : </label>
-                        {!! Form::number('phone', null, array('placeholder' => 'Phone','class' => 'form-control')) !!}
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
+                        <select class="form-control" data-trigger name="customer_id" id="customer" >
+                        </select>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Email : </label>
-                        {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
-                        <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                        <select class="form-control" name="category" id="choices-single-default">
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
+                            </option>
+                            <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}">
+                                {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
+                            </option>
+                        </select>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Sales Person : </label>
-                        {{ Form::select('sales_person', [
-                        'Aymen B Bouderbala' => 'Aymen B Bouderbala',
-                        'Faisal Raiz' => 'Faisal Raiz',
-						'Fahad Raiz' => 'Fahad Raiz',
-                        'Mohammed Azarudin Abdul' => 'Mohammed Azarudin Abdul',
-                        'Paul Membwange' => 'Paul Membwange',
-                        'Lincoln Mukwada' => 'Lincoln Mukwada',
-                        'Abdu Khakim Mamutov' => 'Abdu Khakim Mamutov',
-                        'Hanif Mohideen Afiq A K' => 'Hanif Mohideen Afiq A K',
-                        'Ayman Abdel Rafe' => 'Ayman Abdel Rafe',
-                        'Raymond Tichaona Chikoki' => 'Raymond Tichaona Chikoki',
-                        'Muath A A Kullab' => 'Muath A A Kullab',
-                        'Belal Reyad Batal' => 'Belal Reyad Batal',
-                        ], null, ['class' => 'form-control']) }}
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                        <input type="date" class="form-control" id="basicpill-firstname-input" name="date">
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        {{ Form::textarea('remarks', null, ['class' => 'form-control', 'rows' => '3']) }}
-                    </div>
-			        </div>  
-                    </br>
-                    </br> 
-			        <div class="col-lg-12 col-md-12">
-				    <input type="submit" name="submit" value="submit" class="btn btn-success btn-sm btncenter" />
-			        </div>  
-		{!! Form::close() !!}
-		</br>
+                </div>
+                <br>
+                <div class="col-lg-12 col-md-12">
+                    <button type="submit" class="btn btn-dark btncenter" >Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        getCustomers();
+        $('#country').change(function (){
+           getCustomers();
+        });
+        $('#customer-type').change(function (){
+            getCustomers();
+        });
+        function getCustomers() {
+            var country = $('#country').val();
+            var customer_type = $('#customer-type').val();
+
+            let url = '{{ route('letter-of-indents.get-customers') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    country: country,
+                    customer_type: customer_type
+                },
+                success:function (data) {
+                    $('#customer').empty();
+                    $('#customer').html('<option value="">Select Customer</option>');
+                    jQuery.each(data, function(key,value){
+                        $('#customer').append('<option value="'+ value.id +'">'+ value.name +'</option>');
+                    });
+                }
+            });
+
+        }
+    </script>
+@endpush
+

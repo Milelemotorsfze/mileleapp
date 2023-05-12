@@ -5,7 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Entity extends Model
+class LetterOfIndentItems extends Model
 {
     use HasFactory;
+
+    public function LOI()
+    {
+        return $this->belongsTo(LetterOfIndent::class);
+    }
 }

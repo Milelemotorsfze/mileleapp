@@ -310,7 +310,6 @@ class SupplierInventoryController extends Controller
                                         ->first();
                                     if (!$supplierInventory1)
                                     {
-//                                        info("engine number not match update");
                                         $updatedRowsIds[] = $supplierInventory->id;
                                         $updatedRows[$i]['model'] = $uploadFileContent['model'];
                                         $updatedRows[$i]['sfx'] = $uploadFileContent['sfx'];
@@ -520,14 +519,6 @@ class SupplierInventoryController extends Controller
         }
     }
     public function FileComparision(Request $request) {
-        $supplier = 'TTC';
-        $wholesaler = SupplierInventory::DEALER_TRANS_CARS;
-//        $supplierInventoryDates = SupplierInventory::where('supplier', $supplier)
-//            ->where('whole_sales', $wholesaler)
-//            ->groupBy('date_of_entry')
-//            ->pluck('date_of_entry');
-//
-//        return $supplierInventoryDates;
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
@@ -573,7 +564,6 @@ class SupplierInventoryController extends Controller
                 ->where('whole_sales', $request->whole_sales);
 //                            ->whereNull('eta_import');
             if ($supplierInventories->count() <= 0) {
-                info("new entry");
                 // model and sfx not existing in Suplr Invtry => new row
                 $newlyAddedRows[$i]['model'] = $masterModel->model;
                 $newlyAddedRows[$i]['sfx'] = $masterModel->sfx;
@@ -586,7 +576,6 @@ class SupplierInventoryController extends Controller
 
             } else {
                 if (!empty($secondFileRowDetail['chasis'])) {
-                    info("chais not empty");
                     // Store the Count into Update the Row with data
                     $supplierInventory = $supplierInventories->where('chasis', $secondFileRowDetail['chasis'])
                         ->first();

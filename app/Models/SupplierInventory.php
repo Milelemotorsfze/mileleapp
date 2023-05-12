@@ -106,12 +106,7 @@ class SupplierInventory extends Model
         }else{
             $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
         }
-
         return $supplierInventories->get();
-    }
-    public function getChildRowsAttribute() {
-        info($this->master_model_id);
-        info("clicked");
     }
 
 }

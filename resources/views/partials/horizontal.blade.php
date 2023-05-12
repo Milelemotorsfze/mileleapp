@@ -20,7 +20,6 @@
             <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
             @if(auth()->user()->name) {{ auth()->user()->name }} @endif
         </span>
-<<<<<<< HEAD
         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-end">
@@ -45,7 +44,6 @@
     </div>
                </div>
 <div class="topnav">
-=======
             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
         </button>
 
@@ -74,7 +72,6 @@
             </a>
         </div>
 </div>
->>>>>>> 0ef2ffc57a079bd2b12e6400c61363e1374e2e00
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">
@@ -172,8 +169,8 @@
                                 </div>
                             </div>
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Deals</span>
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('letter-of-indents.create')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">LOI</span>
                                 </a>
                             </div>
                             <div class="dropdown">
@@ -265,6 +262,7 @@
                             <i data-feather="file-text"></i>
                             <span data-key="t-extra-pages">Hiring</span>
                         </a>
+                    </li>
                     </li>
                     @endcan
                     @can('Calls-view')

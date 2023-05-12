@@ -20,6 +20,7 @@ use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
+use App\Http\Controllers\LOIItemsController;
 
 
 /*
@@ -64,7 +65,9 @@ use App\Http\Controllers\LeadSourceController;
     Route::resource('suppliers', SupplierController::class);
 
     // Letter of Indent
+    Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::resource('letter-of-indents', LetterOfIndentController::class);
+    Route::resource('letter-of-indent-items', LOIItemsController::class);
 
     // Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');

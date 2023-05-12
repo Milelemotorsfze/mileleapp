@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\LetterOfIndent;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Monarobase\CountryList\CountryListFacade;
 
 class LetterOfIndentController extends Controller
 {
@@ -20,7 +24,10 @@ class LetterOfIndentController extends Controller
      */
     public function create()
     {
-        return view('letter_of_indents.create');
+        $countries = CountryListFacade::getList('en');
+        $customers = Customer::all();
+
+        return view('letter_of_indents.create',compact('countries','customers'));
     }
 
     /**
@@ -28,7 +35,31 @@ class LetterOfIndentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'customer_id' => 'required',
+            'category' => 'required',
+            'date' => 'required'
+        ]);
+
+        $LOI = new LetterOfIndent();
+
+        $LOI->customer_id = $request->customer_id;
+        $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
+        $LOI->category = $request->category;
+        $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS;
+        $LOI->status = LetterOfIndent::LOI_STATUS;
+        $LOI->save();
+
+        return redirect()->route('letter-of-indent-items.create',['id' => $LOI->id]);
+
+    }
+    public function getCustomers(Request $request)
+    {
+        $customers = Customer::where('country', $request->country)
+            ->where('type', $request->customer_type)
+            ->get();
+
+        return $customers;
     }
 
     /**
