@@ -143,30 +143,29 @@
 </div>
                     </div>
                     <div class="maindd">
-                    <div class="row">
-                    <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Brand & Models: </label>
-                            <select name="brand_id" id="brand" class="form-control mb-1">
-                                <option value="">Select Brand</option>
-                                @foreach ($modelLineMasters as $modelLineMasters)
-                                @php
-                                $brand = DB::table('brands')->where('id', $modelLineMasters->brand_id)->first();
-                                $brand_name = $brand->brand_name;
-                                @endphp 
-                                    <option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    <div class="col-lg-8 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
-                    </div>
-                    </div>
-                    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+    <div id="row-container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <label for="basicpill-firstname-input" class="form-label">Brand & Models: </label>
+                <select name="brand_id" class="form-control mb-1">
+                    <option value="">Select Brand</option>
+                    @foreach ($modelLineMasters as $modelLineMasters)
+                    @php
+                    $brand = DB::table('brands')->where('id', $modelLineMasters->brand_id)->first();
+                    $brand_name = $brand->brand_name;
+                    @endphp 
+                    <option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
         <div class="btn btn-primary add-row-btn">
             <i class="fas fa-plus"></i> Add More
         </div>
     </div>
+</div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
                         <textarea name="remarks" id="editor"></textarea>
@@ -227,5 +226,22 @@ $('#brand').on('change',function(){
         manualSalesPersonList.style.display = 'block';
         salesOptionValueField.value = manualAssignOption.value;
     });
+    $(document).ready(function() {
+    // Define the function to add a new row
+    function addNewRow() {
+        // Create a new row element and append it to the end of the form
+        var newRow = $('<div class="row"></div>').appendTo('.maindd #row-container');
+        // Create a new brand dropdown and append it to the new row
+        var newBrandDropdown = $('<div class="col-lg-4 col-md-6"><label for="basicpill-firstname-input" class="form-label">Brand & Models: </label><select name="brand_id" class="form-control mb-1"><option value="">Select Brand</option>@foreach ($modelLineMasters as $modelLineMasters)@php $brand = DB::table("brands")->where("id", $modelLineMasters->brand_id)->first(); $brand_name = $brand->brand_name; @endphp<option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>@endforeach</select></div>').appendTo(newRow);
+        // Return the new row
+        return newRow;
+    }
+
+    // Add a click event listener to the "Add More" button
+    $('.add-row-btn').click(function() {
+        // Add a new row to the form
+        addNewRow();
+    });
+});
 </script>
 @endpush
