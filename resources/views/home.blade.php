@@ -171,7 +171,8 @@
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-                                                            <td>{{ $rowsmonth->count }}</td>
+                                                        <td><a href="{{ route('calls.show', ['call' => $rowsmonth->id, 'brand_id' => $rowsmonth->brand_id, 'model_line_id' => $rowsmonth->model_line_id, 'location' => $rowsmonth->location, 'days' => '30', 'custom_brand_model' => $rowsmonth->custom_brand_model]) }}">{{ $rowsmonth->count }}</a>
+                                                        </td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -229,7 +230,7 @@
                                                     $regionsf = $regionsg ? $regionsg->region_name : '';
                                                     @endphp
                                                     <td>{{ $regionsf }}</td>
-                                                            <td>{{ $rowsweek->count }}</td>
+                                                            <td><a href="{{ route('calls.show', ['call' => $rowsweek->id, 'brand_id' => $rowsweek->brand_id, 'model_line_id' => $rowsweek->model_line_id, 'location' => $rowsweek->location, 'days' => '30', 'custom_brand_model' => $rowsweek->custom_brand_model]) }}">{{ $rowsweek->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>

@@ -44,7 +44,7 @@ class HomeController extends Controller
     $startOfWeek = Carbon::now()->startOfWeek();
     $endOfWeek = Carbon::now()->endOfWeek();
     $rowsweek = DB::table('calls')
-    ->select('brand_id', 'model_line_id', 'location','custom_brand_model', DB::raw('COUNT(*) as count'))
+    ->select('brand_id', 'model_line_id', 'location','custom_brand_model', 'id',  DB::raw('COUNT(*) as count'))
     ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
     ->groupBy('brand_id', 'model_line_id', 'location')
     ->orderByDesc('count')
@@ -52,14 +52,14 @@ class HomeController extends Controller
     ->get();
     $yesterday = Carbon::yesterday();
     $rowsyesterday = DB::table('calls')
-    ->select('brand_id', 'model_line_id', 'location', 'custom_brand_model', DB::raw('COUNT(*) as count'))
+    ->select('brand_id', 'model_line_id', 'location', 'custom_brand_model', 'id',  DB::raw('COUNT(*) as count'))
     ->whereDate('created_at', $yesterday)
     ->groupBy('brand_id', 'model_line_id', 'location')
     ->orderByDesc('count')
     ->limit(8)
     ->get();
      $rowsmonth = DB::table('calls')
-    ->select('brand_id', 'model_line_id', 'location','custom_brand_model', DB::raw('COUNT(*) as count'))
+    ->select('brand_id', 'model_line_id', 'location','custom_brand_model', 'id', DB::raw('COUNT(*) as count'))
     ->whereMonth('created_at', '=', date('m'))
     ->groupBy('brand_id', 'model_line_id', 'location')
     ->orderByDesc('count')

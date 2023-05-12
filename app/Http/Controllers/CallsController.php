@@ -25,7 +25,8 @@ class CallsController extends Controller
         $data = Calls::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
         $convertedleads = Calls::where('status','Converted To Leads')->get();
         $convertedso = Calls::where('status','Converted To SO')->get();
-        return view('calls.index',compact('data','convertedleads', 'convertedso'));
+        $convertedrejection = Calls::where('status','Rejection')->get();
+        return view('calls.index',compact('data','convertedleads', 'convertedso','convertedrejection'));
     }
     /**
      * Show the form for creating a new resource.
@@ -33,11 +34,10 @@ class CallsController extends Controller
     public function create()
     {
         $countries = CountryListFacade::getList('en');
-        $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 3)->get();
-        return view('calls.create', compact('countries', 'brandMatsers', 'modelLineMasters', 'LeadSource', 'sales_persons'));
+        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
     }
     /**
      * Store a newly created resource in storage.
@@ -150,11 +150,12 @@ class CallsController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(calls $calls)
-    {
-        //
-    }
-
+    public function show(calls $call, Request $request) 
+{
+    $brand_id = $request->route('brand_id');
+    // $brand_id = $request->route('brand_id');
+    // do something with $brand_id
+}
     /**
      * Show the form for editing the specified resource.
      */
