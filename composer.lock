@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "386a0b67a7d3da4ad01fc03a9d90623c",
-=======
-    "content-hash": "773f8611d53d24c1ec8a9586a74ee199",
->>>>>>> 0ef2ffc57a079bd2b12e6400c61363e1374e2e00
+    "content-hash": "3dd2aeee943856d85ca3d189e30b5d13",
     "packages": [
         {
             "name": "balping/json-raw-encoder",
@@ -1495,16 +1491,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v10.10.0",
+            "version": "v10.10.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "0da22a8d179f79b49d4e71f4822f759651f35012"
+                "reference": "be0478dea96a6619bb77676f36f67c1500846b17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/0da22a8d179f79b49d4e71f4822f759651f35012",
-                "reference": "0da22a8d179f79b49d4e71f4822f759651f35012",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/be0478dea96a6619bb77676f36f67c1500846b17",
+                "reference": "be0478dea96a6619bb77676f36f67c1500846b17",
                 "shasum": ""
             },
             "require": {
@@ -1691,7 +1687,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-05-09T13:08:05+00:00"
+            "time": "2023-05-11T13:20:25+00:00"
         },
         {
             "name": "laravel/sanctum",
@@ -2844,26 +2840,27 @@
         },
         {
             "name": "microsoft/microsoft-graph",
-            "version": "1.36.0",
+            "version": "1.97.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/microsoftgraph/msgraph-sdk-php.git",
-                "reference": "570613d2694595dc1dfdc25561a5180e5f0ab8f9"
+                "reference": "54e5694d12a3cecbc2492c71c4da4370172183d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/microsoftgraph/msgraph-sdk-php/zipball/570613d2694595dc1dfdc25561a5180e5f0ab8f9",
-                "reference": "570613d2694595dc1dfdc25561a5180e5f0ab8f9",
+                "url": "https://api.github.com/repos/microsoftgraph/msgraph-sdk-php/zipball/54e5694d12a3cecbc2492c71c4da4370172183d7",
+                "reference": "54e5694d12a3cecbc2492c71c4da4370172183d7",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.0 || ^7.0",
-                "php": "^8.0 || ^7.3"
+                "php": "^8.0 || ^7.3",
+                "psr/http-message": "^1.0"
             },
             "require-dev": {
                 "mikey179/vfsstream": "^1.2",
-                "phpstan/phpstan": "^0.12.90",
+                "phpstan/phpstan": "^0.12.90 || ^1.0.0",
                 "phpunit/phpunit": "^8.0 || ^9.0"
             },
             "type": "library",
@@ -2888,9 +2885,9 @@
             "homepage": "https://developer.microsoft.com/en-us/graph",
             "support": {
                 "issues": "https://github.com/microsoftgraph/msgraph-sdk-php/issues",
-                "source": "https://github.com/microsoftgraph/msgraph-sdk-php/tree/1.36.0"
+                "source": "https://github.com/microsoftgraph/msgraph-sdk-php/tree/1.97.0"
             },
-            "time": "2021-08-11T14:10:01+00:00"
+            "time": "2023-05-10T12:48:14+00:00"
         },
         {
             "name": "monarobase/country-list",
@@ -8375,16 +8372,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.1.2",
+            "version": "10.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "6f0cd95be71add539f8fd2be25b2a4a29789000b"
+                "reference": "2379ebafc1737e71cdc84f402acb6b7f04198b9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/6f0cd95be71add539f8fd2be25b2a4a29789000b",
-                "reference": "6f0cd95be71add539f8fd2be25b2a4a29789000b",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2379ebafc1737e71cdc84f402acb6b7f04198b9d",
+                "reference": "2379ebafc1737e71cdc84f402acb6b7f04198b9d",
                 "shasum": ""
             },
             "require": {
@@ -8456,7 +8453,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.1.2"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.1.3"
             },
             "funding": [
                 {
@@ -8472,7 +8469,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-04-22T07:38:19+00:00"
+            "time": "2023-05-11T05:16:22+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -9600,7 +9597,6 @@
         },
         {
             "name": "spatie/laravel-ignition",
-<<<<<<< HEAD
             "version": "2.1.2",
             "source": {
                 "type": "git",
@@ -9611,18 +9607,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/2f99fa6b732a6049e78ed34e4608ce589605ae54",
                 "reference": "2f99fa6b732a6049e78ed34e4608ce589605ae54",
-=======
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/spatie/laravel-ignition.git",
-                "reference": "802c7e27754456e45134f1a9d29ab7df4b6cb9e4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-ignition/zipball/802c7e27754456e45134f1a9d29ab7df4b6cb9e4",
-                "reference": "802c7e27754456e45134f1a9d29ab7df4b6cb9e4",
->>>>>>> 0ef2ffc57a079bd2b12e6400c61363e1374e2e00
                 "shasum": ""
             },
             "require": {
@@ -9701,11 +9685,7 @@
                     "type": "github"
                 }
             ],
-<<<<<<< HEAD
             "time": "2023-05-09T07:19:31+00:00"
-=======
-            "time": "2023-05-04T13:54:49+00:00"
->>>>>>> 0ef2ffc57a079bd2b12e6400c61363e1374e2e00
         },
         {
             "name": "symfony/yaml",

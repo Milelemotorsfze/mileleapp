@@ -61,6 +61,7 @@ use App\Http\Controllers\LOIItemsController;
     Route::get('viewAddon/{id}', [AddonController::class, 'addonView'])->name('addon.view');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
+    Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
 

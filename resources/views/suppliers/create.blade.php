@@ -591,7 +591,7 @@
             // if(inputSupplier == '')
             // {
             //     document.getElementById("supplierError").classList.add("paragraph-class"); 
-            //     document.getElementsById("supplierError").textContent="S";
+            //     document.getElementById("supplierError").textContent="S";
             // }
             if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
             {
