@@ -83,7 +83,6 @@
 			        </div>  
                     </form>
 		</br>
-    </div>
     @endcan
 @endsection
 @push('scripts')

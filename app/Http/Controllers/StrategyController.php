@@ -45,7 +45,8 @@ class StrategyController extends Controller
      */
     public function edit($id)
     {
-    return view('calls.createstrategy')->with('id', $id);
+        $strategies = Strategy::where('lead_source_id', $id)->get();
+        return view('calls.createstrategy')->with('id', $id);
     }
 
     /**
