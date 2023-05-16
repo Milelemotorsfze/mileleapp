@@ -16,7 +16,11 @@ class LetterOfIndentController extends Controller
      */
     public function index()
     {
-        //
+
+        $letterOfIndents = LetterOfIndent::all();
+
+
+        return view('letter_of_indents.index', compact('letterOfIndents'));
     }
 
     /**
@@ -51,7 +55,6 @@ class LetterOfIndentController extends Controller
         $LOI->save();
 
         return redirect()->route('letter-of-indent-items.create',['id' => $LOI->id]);
-
     }
     public function getCustomers(Request $request)
     {

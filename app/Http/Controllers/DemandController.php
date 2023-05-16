@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DemandList;
 use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
+use App\Models\SupplierInventory;
 use App\Models\Varaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -84,8 +85,21 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
-        $data = MasterModel::where('model', $request->model)
-            ->pluck('sfx');
+        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->whereNull('eta_import')
+            ->groupBy('master_model_id')
+            ->pluck('master_model_id');
+
+        $data = MasterModel::where('model', $request->model);
+            if ($request->module == 'LOI')
+            {
+                $data = $data->whereIn('id', $supplierInventoriesModels);
+            }
+
+            $data = $data->pluck('sfx');
+
         return $data;
     }
     public function getVariant(Request $request)
@@ -93,6 +107,7 @@ class DemandController extends Controller
         $data = Varaint::with('masterModel')
             ->whereHas('masterModel', function ($query) use($request) {
                 $query->where('sfx', $request->sfx);
+                $query->where('model', $request->model);
             })
             ->pluck('name');
         return $data;

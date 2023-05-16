@@ -22,8 +22,7 @@ class SupplierInventory extends Model
     protected $appends = [
         'color_codes',
         'total_quantity',
-        'actual_quantity',
-        'child_rows'
+        'actual_quantity'
     ];
     protected $fillable = [
         'master_model_id',

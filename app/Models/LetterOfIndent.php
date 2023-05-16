@@ -16,5 +16,12 @@ class LetterOfIndent extends Model
     {
         return $this->belongsTo(Customer::class);
     }
-
+    public function LOIDocuments()
+    {
+        return $this->hasMany(LetterOfIndentDocument::class);
+    }
+    public function letterOfIndentItems()
+    {
+        return $this->hasMany(LetterOfIndentItem::class,'letter_of_indent_id');
+    }
 }

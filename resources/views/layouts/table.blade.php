@@ -48,6 +48,7 @@
             $('#dtBasicExample5').DataTable();
             $('#dtBasicExample6').DataTable();
             $('#dtBasicExample7').DataTable();
+            $('#new-LOI-table').DataTable();
             $('.modal-button').on('click', function()
             {
                 var modalId = $(this).data('modal-id');

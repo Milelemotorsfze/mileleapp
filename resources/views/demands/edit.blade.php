@@ -197,13 +197,15 @@
         });
         $('#sfx').on('change',function(){
             let sfx = $(this).val();
+            let model = $('#model').val();
             let url = '{{ route('demand.get-variant') }}';
             $.ajax({
                 type: "GET",
                 url: url,
                 dataType: "json",
                 data: {
-                    sfx: sfx
+                    sfx: sfx,
+                    model:model
                 },
                 success:function (data) {
                     $('select[name="variant_name"]').empty();

@@ -22,6 +22,7 @@ use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
 use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
+use App\Http\Controllers\LOIDocumentsController;
 
 
 /*
@@ -68,6 +69,7 @@ use App\Http\Controllers\StrategyController;
 
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
+    Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('letter-of-indent-items', LOIItemsController::class);
 
@@ -133,7 +135,7 @@ use App\Http\Controllers\StrategyController;
         'call' => '[0-9]+',
         'brand_id' => '[0-9]+',
         'model_line_id' => '[0-9]+',
-    ]);    
+    ]);
     // HR
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
