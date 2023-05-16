@@ -86,37 +86,37 @@ class VariatnsPicturesController extends Controller
             }
     }
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        'feature_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-    ]);
-
-    if ($request->hasFile('feature_image')) {
-        $feature_image_path = time() . '_' . uniqid() . '.' . $request->file('feature_image')->getClientOriginalExtension();
-        $request->file('feature_image')->move(public_path('variantimages/feature_images/'), $feature_image_path);
-    } else {
-        return redirect()->back()->with('error', 'No feature image was uploaded.');
-    }
-
-    if ($request->hasFile('images')) {
-        $uploadedImagePaths = [];
-        foreach ($validatedData['images'] as $image) {
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('variantimages'), $filename);
-            VariantPicture::create([
-                'image_path' => 'variantimages/' . $filename,
-                'status' => 'variantimages/feature_images/' . $feature_image_path,
-                'available_colour_id'  => $request->available_colour_id
-            ]);
-            $uploadedImagePaths[] = 'variantimages/' . $filename;
+    {
+        $validatedData = $request->validate([
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:500',
+            'feature_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:500'
+        ]);
+    
+        if ($request->hasFile('feature_image')) {
+            $feature_image_path = time() . '_' . uniqid() . '.' . $request->file('feature_image')->getClientOriginalExtension();
+            $request->file('feature_image')->move(public_path('variantimages/feature_images/'), $feature_image_path);
+        } else {
+            return redirect()->back()->withErrors(['error' => 'No feature image was uploaded.']);
         }
-        return redirect()->back()->with('success', 'Variant pictures uploaded successfully.')
-            ->with('uploadedImagePaths', $uploadedImagePaths);
-    } else {
-        return redirect()->back()->with('error', 'No variant pictures were uploaded.');
-    }
-}
+    
+        if ($request->hasFile('images')) {
+            $uploadedImagePaths = [];
+            foreach ($validatedData['images'] as $image) {
+                $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('variantimages'), $filename);
+                VariantPicture::create([
+                    'image_path' => 'variantimages/' . $filename,
+                    'status' => 'variantimages/feature_images/' . $feature_image_path,
+                    'available_colour_id'  => $request->available_colour_id
+                ]);
+                $uploadedImagePaths[] = 'variantimages/' . $filename;
+            }
+            return redirect()->back()->with('success', 'Variant pictures uploaded successfully.')
+                ->with('uploadedImagePaths', $uploadedImagePaths);
+        } else {
+            return redirect()->back()->withErrors(['error' => 'No variant pictures were uploaded.']);
+        }
+    }    
     public function uploadingreal(Request $request)
     {
         $data = [];

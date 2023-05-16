@@ -33,10 +33,16 @@
   display: inline-block;
   margin-right: 10px;
 }
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none; 
+    margin: 0; 
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
 @can('Calls-modified')
 <div class="card-header">
@@ -65,7 +71,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Phone : </label>
-                        <input type="number" name="phone" class="form-control" value="">
+                        <input type="number" name="phone" class="form-control" value="" placeholder = "Phone Number">
                         
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -147,14 +153,14 @@
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <label for="basicpill-firstname-input" class="form-label">Brand & Models: </label>
-                <select name="brand_id" class="form-control mb-1">
-                    <option value="">Select Brand</option>
-                    @foreach ($modelLineMasters as $modelLineMasters)
+                <select name="model_line_id[]" id="brand" class="form-control mb-1">
+                    <option value="">Select Brand & Model</option>
+                    @foreach ($modelLineMasters as $modelLineMaster)
                     @php
-                    $brand = DB::table('brands')->where('id', $modelLineMasters->brand_id)->first();
+                    $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
                     $brand_name = $brand->brand_name;
                     @endphp 
-                    <option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>
+                    <option value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
                     @endforeach
                 </select>
             </div>
@@ -166,6 +172,10 @@
         </div>
     </div>
 </div>
+<div class="col-lg-4 col-md-6">
+                        <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
+                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+                    </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
                         <textarea name="remarks" id="editor"></textarea>
@@ -183,34 +193,12 @@
 @endsection
 @push('scripts')
     <script type="text/javascript">
-$('#model').select2();
 $('#brand').select2();
 $('#country').select2();
 $('#language').select2();
 $('#source').select2();
 $('#type').select2();
 $('#sales_persons').select2();
-$('#brand').on('change',function(){
-            let brand = $(this).val();
-            let url = '{{ route('calls.get-modellines') }}';
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                data: {
-                    brand: brand
-                },
-                success:function (data) {
-                    $('select[name="model_line_id"]').empty();
-                    $('#model').html('<option value=""> Select Model Line </option>');
-                    jQuery.each(data, function(key,value){
-                        $('select[name="model_line_id"]').append('<option value="'+ key +'">'+ value +'</option>');
-                    });
-                }
-            });
-        });
-</script>
-<script>
     // Add event listeners to the radio buttons to show/hide the manual sales person list and set the selected option value
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
@@ -227,21 +215,29 @@ $('#brand').on('change',function(){
         salesOptionValueField.value = manualAssignOption.value;
     });
     $(document).ready(function() {
-    // Define the function to add a new row
-    function addNewRow() {
-        // Create a new row element and append it to the end of the form
-        var newRow = $('<div class="row"></div>').appendTo('.maindd #row-container');
-        // Create a new brand dropdown and append it to the new row
-        var newBrandDropdown = $('<div class="col-lg-4 col-md-6"><label for="basicpill-firstname-input" class="form-label">Brand & Models: </label><select name="brand_id" class="form-control mb-1"><option value="">Select Brand</option>@foreach ($modelLineMasters as $modelLineMasters)@php $brand = DB::table("brands")->where("id", $modelLineMasters->brand_id)->first(); $brand_name = $brand->brand_name; @endphp<option value="{{ $modelLineMasters->id }}">{{ $brand_name }} / {{ $modelLineMasters->model_line }}</option>@endforeach</select></div>').appendTo(newRow);
-        // Return the new row
-        return newRow;
-    }
+    // Initialize select2 on the initial dropdown
+    $('#brand').select2();
 
-    // Add a click event listener to the "Add More" button
-    $('.add-row-btn').click(function() {
-        // Add a new row to the form
-        addNewRow();
+    var max_fields = 10; //maximum input fields allowed
+    var wrapper = $("#row-container"); //input fields wrapper
+    var add_button = $(".add-row-btn"); //add button class
+
+    var x = 1; //initlal text box count
+    $(add_button).click(function(e) { //on add input button click
+        e.preventDefault();
+        if (x < max_fields) { //max input box allowed
+            x++; //text box increment
+            // Add new row
+            $(wrapper).append('<br><div class="row"><div class="col-lg-4 col-md-6"><select name="model_line_id[]" class="form-control mb-1 new-select"><option value="">Select Brand & Model</option>@foreach($modelLineMasters as $modelLineMaster)@php $brand = DB::table("brands")->where("id", $modelLineMaster->brand_id)->first(); $brand_name =$brand->brand_name; @endphp <option value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>@endforeach</select></div><div class="col-lg-4 col-md-6"><a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a></div></div>');
+            // Initialize select2 on the new dropdown
+            $('.new-select').last().select2();
+        }
     });
+    $(wrapper).on("click", ".remove-row-btn", function(e) { //user click on remove text
+        e.preventDefault();
+        $(this).parent('div').parent('div').remove();
+        x--;
+    })
 });
 </script>
 @endpush

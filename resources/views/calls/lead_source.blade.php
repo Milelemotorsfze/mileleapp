@@ -36,7 +36,8 @@
                         <td>{{ $lead_source->id}}</td>
                         <td>{{ $lead_source->source_name }}</td>
                         <td>{{ $lead_source->status }}</td>
-                        <td><a title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('lead_source.edit',$lead_source->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                        <td><a title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('lead_source.edit',$lead_source->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        <a title="Create Strategy" data-placement="top" class="btn btn-sm btn-success" href="{{ route('strategy.edit',$lead_source->id) }}"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></a></td>
                     </tr>
                 @endforeach
                 </tbody>

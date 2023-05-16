@@ -5,6 +5,10 @@
      Calls & Messages Info
     </h4>
     @can('Calls-modified')
+    <a class="btn btn-sm btn-success float-end" href="{{ route('calls.createbulk') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Uploading Bulk CSV File
+      </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <a class="btn btn-sm btn-success float-end" href="{{ route('calls.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Daily Calls & Messages
       </a>
@@ -43,13 +47,12 @@
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Sales Person</th>
-                  <th>Brand</th>
-                  <th>Model</th>
+                  <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
-                  <th>Remarks</th>
+                  <th>Remarks & Messages</th>
                   <th>Sales Status</th>
                 </tr>
               </thead>
@@ -64,33 +67,34 @@
                     <td>{{ $calls->phone }}</td> 
                     <td>{{ $calls->email }}</td>
                      @php
+                     $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
                     <td>{{ $sales_persons_name }}</td>
                     @php
-    $brand_name = '';
-    if (!is_null($calls->brand_id)) {
-        $brands = DB::table('brands')->where('id', $calls->brand_id)->first();
-        if (!is_null($brands)) {
-            $brand_name = $brands->brand_name;
-        }
-    }
-@endphp  
-<td>{{ $brand_name }}</td>
+    $leads_models_brands = DB::table('calls_requirement')
+        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+        ->where('calls_requirement.lead_id', $calls->id)
+        ->get();
+@endphp
 
-@php
-    $model_line = '';
-    if (!is_null($calls->model_line_id)) {
-        $model_lines = DB::table('master_model_lines')->where('id', $calls->model_line_id)->first();
-        if (!is_null($model_lines)) {
-          $model_line = $model_lines->model_line;
+<td>
+    @php
+        $models_brands_string = '';
+        foreach ($leads_models_brands as $lead_model_brand) {
+            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
-    }
-@endphp  
-<td>{{ $model_line }}</td>
-<td>{{ $calls->custom_brand_model }}</td>
+        // Remove the trailing comma and space from the string
+        $models_brands_string = rtrim($models_brands_string, ', ');
+        echo $models_brands_string;
+    @endphp
+</td>
+                    <td>{{ $calls->custom_brand_model }}</td>
                     @php
+                    $leadsources = "";
                      $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
                      $leadsources = $leadsource->source_name;
                      @endphp
@@ -126,13 +130,12 @@
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Sales Person</th>
-                  <th>Brand</th>
-                  <th>Model</th>
+                  <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
-                  <th>Remarks</th>
+                  <th>Remarks & Messages</th>
                   <th>Sales Person Remarks</th>
                 </tr>
               </thead>
@@ -147,33 +150,42 @@
                     <td>{{ $calls->phone }}</td> 
                     <td>{{ $calls->email }}</td>
                      @php
+                     $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
                     <td>{{ $sales_persons_name }}</td>
                     @php
-    $brand_name = '';
-    if (!is_null($calls->brand_id)) {
-        $brands = DB::table('brands')->where('id', $calls->brand_id)->first();
-        if (!is_null($brands)) {
-            $brand_name = $brands->brand_name;
-        }
-    }
-@endphp  
-<td>{{ $brand_name }}</td>
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $sales_persons_name }}</td>
+                    @php
+    $leads_models_brands = DB::table('calls_requirement')
+        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+        ->where('calls_requirement.lead_id', $calls->id)
+        ->get();
+@endphp
 
-@php
-    $model_line = '';
-    if (!is_null($calls->model_line_id)) {
-        $model_lines = DB::table('master_model_lines')->where('id', $calls->model_line_id)->first();
-        if (!is_null($model_lines)) {
-          $model_line = $model_lines->model_line;
+<td>
+    @php
+        $models_brands_string = '';
+        foreach ($leads_models_brands as $lead_model_brand) {
+            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
-    }
-@endphp  
-<td>{{ $model_line }}</td> 
+        // Remove the trailing comma and space from the string
+        $models_brands_string = rtrim($models_brands_string, ', ');
+        echo $models_brands_string;
+    @endphp
+</td>
                     <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->source }}</td>
+                    @php
+                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
+                     $leadsources = $leadsource->source_name;
+                     @endphp
+                    <td>{{ $leadsources }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
                     @php
@@ -205,13 +217,12 @@
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Sales Person</th>
-                  <th>Brand</th>
-                  <th>Model</th>
+                  <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
-                  <th>Remarks</th>
+                  <th>Remarks & Messages</th>
                   <th>Sales Person Remarks</th>
                   <th>Customer Remarks</th>
                 </tr>
@@ -227,33 +238,42 @@
                     <td>{{ $calls->phone }}</td> 
                     <td>{{ $calls->email }}</td>
                      @php
+                     $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
                     <td>{{ $sales_persons_name }}</td>
                     @php
-    $brand_name = '';
-    if (!is_null($calls->brand_id)) {
-        $brands = DB::table('brands')->where('id', $calls->brand_id)->first();
-        if (!is_null($brands)) {
-            $brand_name = $brands->brand_name;
-        }
-    }
-@endphp  
-<td>{{ $brand_name }}</td>
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $sales_persons_name }}</td>
+                    @php
+    $leads_models_brands = DB::table('calls_requirement')
+        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+        ->where('calls_requirement.lead_id', $calls->id)
+        ->get();
+@endphp
 
-@php
-    $model_line = '';
-    if (!is_null($calls->model_line_id)) {
-        $model_lines = DB::table('master_model_lines')->where('id', $calls->model_line_id)->first();
-        if (!is_null($model_lines)) {
-          $model_line = $model_lines->model_line;
+<td>
+    @php
+        $models_brands_string = '';
+        foreach ($leads_models_brands as $lead_model_brand) {
+            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
-    }
-@endphp  
-<td>{{ $model_line }}</td>
+        // Remove the trailing comma and space from the string
+        $models_brands_string = rtrim($models_brands_string, ', ');
+        echo $models_brands_string;
+    @endphp
+</td>
                     <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->source }}</td>
+                    @php
+                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
+                     $leadsources = $leadsource->source_name;
+                     @endphp
+                    <td>{{ $leadsources }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
                     @php
@@ -286,13 +306,12 @@
                   <th>Customer Phone</th>
                   <th>Customer Email</th>
                   <th>Sales Person</th>
-                  <th>Brand</th>
-                  <th>Model</th>
+                  <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
-                  <th>Remarks</th>
+                  <th>Remarks & Messages</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,33 +325,42 @@
                     <td>{{ $calls->phone }}</td> 
                     <td>{{ $calls->email }}</td>
                      @php
+                     $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
                     <td>{{ $sales_persons_name }}</td>
                     @php
-    $brand_name = '';
-    if (!is_null($calls->brand_id)) {
-        $brands = DB::table('brands')->where('id', $calls->brand_id)->first();
-        if (!is_null($brands)) {
-            $brand_name = $brands->brand_name;
-        }
-    }
-@endphp  
-<td>{{ $brand_name }}</td>
+                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_name = $sales_persons->name;
+                     @endphp  
+                    <td>{{ $sales_persons_name }}</td>
+                    @php
+    $leads_models_brands = DB::table('calls_requirement')
+        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
+        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+        ->where('calls_requirement.lead_id', $calls->id)
+        ->get();
+@endphp
 
-@php
-    $model_line = '';
-    if (!is_null($calls->model_line_id)) {
-        $model_lines = DB::table('master_model_lines')->where('id', $calls->model_line_id)->first();
-        if (!is_null($model_lines)) {
-          $model_line = $model_lines->model_line;
+<td>
+    @php
+        $models_brands_string = '';
+        foreach ($leads_models_brands as $lead_model_brand) {
+            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
-    }
-@endphp  
-<td>{{ $model_line }}</td>
+        // Remove the trailing comma and space from the string
+        $models_brands_string = rtrim($models_brands_string, ', ');
+        echo $models_brands_string;
+    @endphp
+</td>
                     <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->source }}</td>
+                    @php
+                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
+                     $leadsources = $leadsource->source_name;
+                     @endphp
+                    <td>{{ $leadsources }}</td>
                     <td>{{ $calls->language }}</td>
                     <td>{{ $calls->location }}</td>
                     @php
@@ -361,7 +389,7 @@ $(document).ready(function () {
         .every(function(d) {
           var column = this;
           var theadname = $("#dtBasicExample1 th").eq([d]).text();
-          if (d === 14) {
+          if (d === 12) {
             return;
           }
           if (d === 13) {
@@ -380,9 +408,6 @@ $(document).ready(function () {
             return;
           }
           if (d === 5) {
-            return;
-          }
-          if (d === 9) {
             return;
           }
           var select = $('<select class="form-control my-1"><option value="">All</option></select>')
@@ -413,7 +438,7 @@ $('#my-table_filter').hide();
         .every(function(d) {
           var column = this;
           var theadname = $("#dtBasicExample2 th").eq([d]).text();
-          if (d === 14) {
+          if (d === 12) {
             return;
           }
           if (d === 13) {
@@ -432,9 +457,6 @@ $('#my-table_filter').hide();
             return;
           }
           if (d === 5) {
-            return;
-          }
-          if (d === 9) {
             return;
           }
           var select = $('<select class="form-control my-1"><option value="">All</option></select>')
@@ -464,13 +486,13 @@ $('#my-table_filter').hide();
         .every(function(d) {
           var column = this;
           var theadname = $("#dtBasicExample3 th").eq([d]).text();
-          if (d === 14) {
-            return;
-          }
-          if (d === 15) {
+          if (d === 12) {
             return;
           }
           if (d === 13) {
+            return;
+          }
+          if (d === 14) {
             return;
           }
           if (d === 0) {
@@ -486,9 +508,6 @@ $('#my-table_filter').hide();
             return;
           }
           if (d === 5) {
-            return;
-          }
-          if (d === 9) {
             return;
           }
           var select = $('<select class="form-control my-1"><option value="">All</option></select>')
@@ -518,7 +537,7 @@ $('#my-table_filter').hide();
         .every(function(d) {
           var column = this;
           var theadname = $("#dtBasicExample4 th").eq([d]).text();
-          if (d === 14) {
+          if (d === 12) {
             return;
           }
           if (d === 13) {
@@ -537,9 +556,6 @@ $('#my-table_filter').hide();
             return;
           }
           if (d === 5) {
-            return;
-          }
-          if (d === 9) {
             return;
           }
           var select = $('<select class="form-control my-1"><option value="">All</option></select>')

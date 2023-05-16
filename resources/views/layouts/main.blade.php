@@ -42,12 +42,8 @@
 </style>
     </head>
     <body data-layout="horizontal">
-        <!-- Begin page -->
         <div id="layout-wrapper">
             @include('partials/horizontal')
-            <!-- ============================================================== -->
-            <!-- Start right Content here -->
-            <!-- ============================================================== -->
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">
