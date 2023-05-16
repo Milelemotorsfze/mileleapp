@@ -1,4 +1,3 @@
-
 <div class="topnav" style="overflow: unset;">
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
@@ -44,9 +43,6 @@
     </div>
                </div>
 <div class="topnav">
-            <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
-        </button>
-
         <div class="dropdown-menu dropdown-menu-end">
             <a class="dropdown-item" href="profile">
                 <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile

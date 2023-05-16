@@ -19,8 +19,6 @@ class calls extends Model
         'status',
         'language',
         'location',
-        'brand_id',
-        'model_line_id',
         'created_by',
         'type',
         'region',

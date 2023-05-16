@@ -21,6 +21,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\HiringController;
 use App\Http\Controllers\LeadSourceController;
 use App\Http\Controllers\LOIItemsController;
+use App\Http\Controllers\StrategyController;
 
 
 /*
@@ -90,7 +91,8 @@ use App\Http\Controllers\LOIItemsController;
     Route::post('store-data', [BlFormController::class, 'storeData'])->name('store.data');
 
     //Marketing
-    Route::resource('calls', CallsController::class);
+    Route::resource('calls', CallsController::class)
+    ->parameters(['calls' => 'call']);
     Route::resource('sales_person_languages', SalesPersonLanguagesController::class);
     Route::resource('variant_pictures', VariatnsPicturesController::class);
     Route::get('/editreels/{id}', [VariatnsPicturesController::class, 'editreels'])->name('variant_pictures.editreels');
@@ -106,7 +108,9 @@ use App\Http\Controllers\LOIItemsController;
     Route::delete('/delete-video/{id}', [VariatnsPicturesController::class, 'deleteVideo'])->name('delete_video');
     Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
     Route::resource('lead_source', LeadSourceController::class);
-
+    Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
+    Route::post('/uploadingbulk', [VariatnsPicturesController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::resource('strategy', StrategyController::class);
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -123,7 +127,13 @@ use App\Http\Controllers\LOIItemsController;
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');
     // Route::get('/modal-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData']);
     Route::get('/modal-data/{id}', [AddonController::class, 'fetchAddonData'])->name('modal.show');
-
+    Route::name('calls.show')
+    ->get('calls/{call}/{brand_id}/{model_line_id}/{location}/{days}/{custom_brand_model?}', [CallsController::class, 'show'])
+    ->where([
+        'call' => '[0-9]+',
+        'brand_id' => '[0-9]+',
+        'model_line_id' => '[0-9]+',
+    ]);    
     // HR
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');

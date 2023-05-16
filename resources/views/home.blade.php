@@ -1,4 +1,16 @@
 @extends('layouts.table')
+<style>
+    .my-text {
+      font-weight: bold;
+      font-size: 24px;
+      background: linear-gradient(to right, #4a90e2, #2170eb);
+      padding: 10px 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      color: #fff;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+    }
+  </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
 @can('Calls-view')
@@ -10,19 +22,17 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-6">
-                                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Leads</span>
+                                            <span class="my-text">Leads</span><br><br>
                                             <h4 class="mb-3">
-                                                <span class="counter-value" data-target="{{ $totalleadscount }}">0</span>
+                                            This Month :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span><br><br>
+                                            This Week  :  <span class="counter-value" data-target="{{ $totalleadscount7days }}">0</span><br><br>
+                                            Today      :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span>
                                             </h4>
                                         </div>
 
                                         <div class="col-6">
                                         <canvas id="totalleads"></canvas>
                                         </div>
-                                    </div>
-                                    <div class="text-nowrap">
-                                        <span class="badge bg-soft-info text-info">+{{ $totalleadscount7days }}</span>
-                                        <span class="ms-1 text-muted font-size-13">Since last week</span>
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -35,18 +45,16 @@
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-6">
-                                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Variants</span>
+                                        <span class="my-text">Variants</span><br><br>
                                             <h4 class="mb-3">
-                                                <span class="counter-value" data-target="{{ $totalvariantcount }}">0</span>
+                                            This Month :  <span class="counter-value" data-target="{{ $totalvariantcount }}">0</span><br><br>
+                                            This Week  :  <span class="counter-value" data-target="{{ $totalvariantcount7days }}">0</span><br><br>
+                                            Today      :  <span class="counter-value" data-target="{{ $totalvariantcount }}">0 </span>
                                             </h4>
                                         </div>
                                         <div class="col-6">
                                         <canvas id="totalvariantss"></canvas>
                                         </div>
-                                    </div>
-                                    <div class="text-nowrap">
-                                        <span class="badge bg-soft-danger text-danger"> +{{ $totalvariantcount7days }}</span>
-                                        <span class="ms-1 text-muted font-size-13">Since last week</span>
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -171,8 +179,7 @@
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-                                                        <td><a href="{{ route('calls.show', ['call' => $rowsmonth->id, 'brand_id' => $rowsmonth->brand_id, 'model_line_id' => $rowsmonth->model_line_id, 'location' => $rowsmonth->location, 'days' => '30', 'custom_brand_model' => $rowsmonth->custom_brand_model]) }}">{{ $rowsmonth->count }}</a>
-                                                        </td>
+<td><a href="{{ route('calls.show', ['call' => $rowsmonth->id, 'brand_id' => $rowsmonth->brand_id, 'model_line_id' => $rowsmonth->model_line_id, 'location' => $rowsmonth->location, 'days' => '30', 'custom_brand_model' => $rowsmonth->custom_brand_model]) }}">{{ $rowsmonth->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -230,7 +237,7 @@
                                                     $regionsf = $regionsg ? $regionsg->region_name : '';
                                                     @endphp
                                                     <td>{{ $regionsf }}</td>
-                                                            <td><a href="{{ route('calls.show', ['call' => $rowsweek->id, 'brand_id' => $rowsweek->brand_id, 'model_line_id' => $rowsweek->model_line_id, 'location' => $rowsweek->location, 'days' => '30', 'custom_brand_model' => $rowsweek->custom_brand_model]) }}">{{ $rowsweek->count }}</a></td>
+                                                    <td><a href="{{ route('calls.show', ['call' => $rowsweek->id, 'brand_id' => $rowsweek->brand_id, 'model_line_id' => $rowsweek->model_line_id, 'location' => $rowsweek->location, 'days' => '7', 'custom_brand_model' => $rowsweek->custom_brand_model]) }}">{{ $rowsweek->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -259,7 +266,7 @@
                                                     <tbody>
                                                     @foreach ($rowsyesterday as $key => $rowsyesterday)
                                                         <tr>
-                                                        @php
+    @php
     $brand_name = '';
     if (!is_null($rowsyesterday->brand_id)) {
         $brands = DB::table('brands')->where('id', $rowsyesterday->brand_id)->first();
@@ -269,7 +276,6 @@
     }
 @endphp  
 <td>{{ $brand_name }}</td>
-
 @php
     $model_line = '';
     if (!is_null($rowsyesterday->model_line_id)) {
@@ -286,7 +292,7 @@
     $regionsf = $regionsg ? $regionsg->region_name : '';
 @endphp
 <td>{{ $regionsf }}</td>
-                                                            <td>{{ $rowsyesterday->count }}</td>
+<td><a href="{{ route('calls.show', ['call' => $rowsyesterday->id, 'brand_id' => $rowsyesterday->brand_id, 'model_line_id' => $rowsyesterday->model_line_id, 'location' => $rowsyesterday->location, 'days' => '2', 'custom_brand_model' => $rowsyesterday->custom_brand_model]) }}">{{ $rowsyesterday->count }}</a></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
