@@ -53,40 +53,50 @@ class SupplierInventoryController extends Controller
             $numberOfFields = 9;
             $uploadFileContents = [];
             $code_nameex = NULL;
-            $exteriorColorCodeId = NULL;
             $extcolour = NULL;
             $date = Carbon::now()->format('Y-m-d');
             while (($filedata = fgetcsv($file, 5000, ",")) !== FALSE) {
                 $num = count($filedata);
                 if ($i > 0 && $num == $numberOfFields)
                 {
+                    info("inside while loop");
                     $supplier_id = $request->input('supplier');
                     $country = $request->input('country');
-                    $colourcode = $filedata[4];
+                    info($filedata[6]);
+                    $colourcode = $filedata[5];
                     if($colourcode) {
+                        info("test ok");
+                        info($colourcode);
                         $colourcodecount = strlen($colourcode);
+                        info($colourcodecount);
 
                         if ($colourcodecount == 5) {
+                            info("colr code count is 5");
                             $extcolour = substr($colourcode, 0, 3);
+                            info($extcolour);
                         }
                         if ($colourcodecount == 4) {
+                            info("colr code count is 4");
+
                             $altercolourcode = "0" . $colourcode;
                             $extcolour = substr($altercolourcode, 0, 3);
+                            info($extcolour);
                         }
                         if($extcolour) {
-                            $parentColors = DB::table('color_codes')
-                                ->select('parent','id')
-                                ->where('code','=', $extcolour)
-                                ->where('status','=',ColorCode::EXTERIOR)
-                                ->get();
-
-                            foreach ($parentColors as $row)
+                            info("exterior clr");
+                            info($extcolour);
+                            $parentColors = ColorCode::where('code', $extcolour)
+                                ->where('belong_to', ColorCode::EXTERIOR)
+                                ->first();
+                            info("parent clrs".$parentColors);
+                            if ($parentColors)
                             {
-                                $code_nameex = $row->parent;
-                                $exteriorColorCodeId = $row->id;
+                                $code_nameex = $parentColors->parent;
                             }
                         }
                     }
+                    info($code_nameex);
+                    info("clr name");
                     $colourname = $code_nameex;
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];
@@ -95,7 +105,6 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['engine_number'] = $filedata[4];
                     $uploadFileContents[$i]['color_code'] = $filedata[5];
                     $uploadFileContents[$i]['color_name'] = $colourname;
-                    $uploadFileContents[$i]['exterior_color_code_id'] = $exteriorColorCodeId;
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
@@ -468,7 +477,6 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->chasis          = $uploadFileContent['chasis'];
                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                         $supplierInventory->color_code      = $uploadFileContent['color_code'];
-                        $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
                         $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];
@@ -499,7 +507,6 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->chasis          = $uploadFileContent['chasis'];
                         $supplierInventory->engine_number   = $uploadFileContent['engine_number'];
                         $supplierInventory->color_code      = $uploadFileContent['color_code'];
-                        $supplierInventory->exterior_color_code_id = $uploadFileContent['exterior_color_code_id'];
                         $supplierInventory->pord_month      = $uploadFileContent['pord_month'];
                         $supplierInventory->po_arm          = $uploadFileContent['po_arm'];
                         $supplierInventory->eta_import      = $uploadFileContent['eta_import'];

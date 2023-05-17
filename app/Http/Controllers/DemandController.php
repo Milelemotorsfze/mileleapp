@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemandList;
+use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
 use App\Models\SupplierInventory;
@@ -95,7 +96,17 @@ class DemandController extends Controller
         $data = MasterModel::where('model', $request->model);
             if ($request->module == 'LOI')
             {
-                $data = $data->whereIn('id', $supplierInventoriesModels);
+                $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
+                    ->get();
+                $addedModelIds = [];
+                foreach ($loiItems as $loiItem) {
+                    $model = MasterModel::where('model', $loiItem->model)
+                        ->where('sfx', $loiItem->sfx)
+                        ->first();
+                    $addedModelIds[] = $model->id;
+                }
+                $data = $data->whereNotIn('id', $addedModelIds)
+                ->whereIn('id', $supplierInventoriesModels);
             }
 
             $data = $data->pluck('sfx');

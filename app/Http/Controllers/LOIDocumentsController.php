@@ -43,22 +43,25 @@ class LOIDocumentsController extends Controller
 //        $request->validate([
 //            'files' => 'required'
 //        ]);
-        $LoiDocument = new LetterOfIndentDocument();
-        $LoiDocument->letter_of_indent_id = $request->letter_of_indent_id;
 
-        if (($request->has('files'))) {
-            $files = $request->file('files');
-
-            $destinationPath = 'LOI-Documents';
-            foreach ($files as $file) {
+        if (($request->has('files')))
+        {
+            foreach ($request->file('files') as $file)
+            {
                 $extension = $file->getClientOriginalExtension();
-                $fileName = time().'_'.$extension;
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'LOI-Documents';
                 $file->move($destinationPath, $fileName);
+
+                $LoiDocument = new LetterOfIndentDocument();
+
                 $LoiDocument->loi_document_file = $fileName;
+                $LoiDocument->letter_of_indent_id = $request->letter_of_indent_id;
+                $LoiDocument->save();
             }
         }
 
-        $LoiDocument->save();
+//        $LoiDocument->save();
 
         return redirect()->route('letter-of-indent-documents.create',['letter_of_indent_id' => $request->letter_of_indent_id]);
     }

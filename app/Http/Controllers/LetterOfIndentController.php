@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\LetterOfIndent;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Monarobase\CountryList\CountryListFacade;
@@ -17,8 +16,7 @@ class LetterOfIndentController extends Controller
     public function index()
     {
 
-        $letterOfIndents = LetterOfIndent::all();
-
+        $letterOfIndents = LetterOfIndent::orderBy('id','DESC')->get();
 
         return view('letter_of_indents.index', compact('letterOfIndents'));
     }
@@ -45,14 +43,22 @@ class LetterOfIndentController extends Controller
             'date' => 'required'
         ]);
 
-        $LOI = new LetterOfIndent();
-
-        $LOI->customer_id = $request->customer_id;
-        $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
-        $LOI->category = $request->category;
-        $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS;
-        $LOI->status = LetterOfIndent::LOI_STATUS;
-        $LOI->save();
+        $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
+            ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
+            ->where('category', $request->category)
+            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS)
+            ->where('status', LetterOfIndent::LOI_STATUS)
+            ->first();
+        if(!$LOI)
+        {
+            $LOI = new LetterOfIndent();
+            $LOI->customer_id = $request->customer_id;
+            $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
+            $LOI->category = $request->category;
+            $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS;
+            $LOI->status = LetterOfIndent::LOI_STATUS;
+            $LOI->save();
+        }
 
         return redirect()->route('letter-of-indent-items.create',['id' => $LOI->id]);
     }

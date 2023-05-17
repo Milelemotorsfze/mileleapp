@@ -47,52 +47,49 @@
                 </div>
             </div>
             <div class="row ">
+                <div class="d-flex">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3">
+                                <label class="form-label">Model</label>
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+                                <label  class="form-label">SFX</label>
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+                                <label class="form-label">Varients</label>
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+                                <label class="form-label">Qty</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 @if($letterOfIndentItems->count() > 0)
                     @foreach($letterOfIndentItems as $value => $letterOfIndentItem)
                         <div class="d-flex">
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-lg-3 col-md-3">
-                                        <label class="form-label">Model</label>
+                                        <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-3 col-md-3">
-                                        <label  class="form-label">SFX</label>
+                                        <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-2 col-md-2">
-                                        <label class="form-label">Varients</label>
+                                    <div class="col-lg-3 col-md-3">
+                                        <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-2 col-md-2">
-                                        <label class="form-label">Exterior Colour</label>
+                                    <div class="col-lg-3 col-md-3">
+                                        <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control"> </br>
                                     </div>
-                                    <div class="col-lg-2 col-md-2">
-                                        <label class="form-label">Qty</label>
-                                    </div>
+
                                 </div>
                             </div>
                         </div>
+
                     @endforeach
-                    <div class="d-flex">
-                        <div class="col-lg-12">
-                            <div class="row">
-                                <div class="col-lg-3 col-md-3">
-                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-3 col-md-3">
-                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-2 col-md-2">
-                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-2 col-md-2">
-                                    <input type="text" value="{{ $letterOfIndentItem->color }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-2 col-md-2">
-                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+               @endif
             </div>
             <form id="form-letter-of-indent-items" action="{{ route('letter-of-indent-items.store') }}" method="POST" >
                 @csrf
@@ -120,23 +117,15 @@
                                     <option value="" >Select SFX</option>
                                 </select>
                             </div>
-                            <div class="col-lg-2 col-md-2">
+                            <div class="col-lg-3 col-md-3">
                                 <select class="form-select" name="variant" id="variant">
                                     <option value="" >Select Variant</option>
                                 </select>
                             </div>
-                            <div class="col-lg-2 col-md-2">
-                                <select class="form-select" name="color" id="color">
-                                    <option value="" >Select Color</option>
-                                    @foreach($colorCodes as $colorCode)
-                                        <option value="{{ $colorCode->id }}">{{ $colorCode->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-2">
+                            <div class="col-lg-3 col-md-3">
                                 <input type="number" name="quantity" class="form-control">
                             </div>
-                            <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id">
+                            <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>
                     </div>
                 </div>
@@ -164,8 +153,10 @@
 @endsection
 @push('scripts')
     <script>
+
         $('#model').on('change',function(){
             let model = $(this).val();
+            let id = $('#letter_of_indent_id').val();
             let url = '{{ route('demand.get-sfx') }}';
             $.ajax({
                 type: "GET",
@@ -173,7 +164,8 @@
                 dataType: "json",
                 data: {
                     model: model,
-                    module: 'LOI'
+                    module: 'LOI',
+                    letter_of_indent_id: id
                 },
                 success:function (data) {
                     $('select[name="sfx"]').empty();

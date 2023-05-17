@@ -39,15 +39,15 @@
                 <div class="d-flex">
                     <div class="col-lg-8">
                         <div class="row">
-{{--                            <div class="col-lg-4 col-md-4">--}}
-{{--                                <label for="basicpill-firstname-input" class="form-label">Model</label>--}}
-{{--                            </div>--}}
-{{--                            <div class="col-lg-4 col-md-4">--}}
-{{--                                <label for="basicpill-firstname-input" class="form-label">SFX</label>--}}
-{{--                            </div>--}}
-{{--                            <div class="col-lg-4 col-md-4">--}}
-{{--                                <label for="basicpill-firstname-input" class="form-label">Varients</label>--}}
-{{--                            </div>--}}
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">Model</label>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">SFX</label>
+                            </div>
+                            <div class="col-lg-4 col-md-4">
+                                <label for="basicpill-firstname-input" class="form-label">Varients</label>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-8 col-md-3">

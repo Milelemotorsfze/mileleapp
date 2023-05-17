@@ -25,19 +25,29 @@ class LOIItemsController extends Controller
     public function create(Request $request)
     {
         $letterOfIndent = LetterOfIndent::find($request->id);
+        $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
+                    ->get();
+        $addedModelIds = [];
+        foreach ($loiItems as $loiItem) {
+            $model = MasterModel::where('model', $loiItem->model)
+                ->where('sfx', $loiItem->sfx)
+                ->first();
+            $addedModelIds[] = $model->id;
+        }
+
         $supplierInventoriesModels = SupplierInventory::with('masterModel')
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->whereNull('eta_import')
+            ->whereNotIn('master_model_id', $addedModelIds)
             ->groupBy('master_model_id')
             ->pluck('master_model_id');
 
-        $colorCodes = ColorCode::cursor();
         $models = MasterModel::whereIn('id',$supplierInventoriesModels)->get();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
         return view('letter-of-indent-items.create',compact('letterOfIndent','letterOfIndentItems',
-            'models','colorCodes'));
+            'models'));
     }
 
     /**
@@ -50,7 +60,6 @@ class LOIItemsController extends Controller
             'sfx' => 'required',
             'variant' => 'required',
             'quantity' => 'required',
-            'color' => 'required'
         ]);
 
         $LoiItem = new LetterOfIndentItem();
@@ -60,7 +69,6 @@ class LOIItemsController extends Controller
         $LoiItem->sfx = $request->sfx;
         $LoiItem->variant_name = $request->variant;
         $LoiItem->quantity = $request->quantity;
-        $LoiItem->color = $request->quantity;
         $LoiItem->save();
 
         return redirect()->route('letter-of-indent-items.create',['id' => $request->letter_of_indent_id]);

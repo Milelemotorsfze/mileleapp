@@ -165,9 +165,14 @@
                                 </div>
                             </div>
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('letter-of-indents.create')}}" id="topnav-utility" role="button">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="" id="topnav-utility" role="button">
                                     <span data-key="t-utility">LOI</span>
+                                    <div class="arrow-down"></div>
                                 </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
+                                    <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
+                                </div>
                             </div>
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">

@@ -5,10 +5,13 @@
            min-height: 300px;
             max-height: 500px;
         }
-        /*embed {*/
-        /*    min-height: 300px;*/
-        /*    min-width: 300px;*/
-        /*}*/
+        .modal {
+            position: absolute;
+            float: left;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI Items</h4>
@@ -58,7 +61,6 @@
         </div>
         <div class="row ">
             @if($letterOfIndentItems->count() > 0)
-                @foreach($letterOfIndentItems as $value => $letterOfIndentItem)
                     <div class="d-flex">
                         <div class="col-lg-12">
                             <div class="row">
@@ -68,40 +70,35 @@
                                 <div class="col-lg-3 col-md-3">
                                     <label  class="form-label">SFX</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-3 col-md-3">
                                     <label class="form-label">Varients</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2">
-                                    <label class="form-label">Exterior Colour</label>
-                                </div>
-                                <div class="col-lg-2 col-md-2">
+                                <div class="col-lg-3 col-md-3">
                                     <label class="form-label">Qty</label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
-                <div class="d-flex">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3">
-                                <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
-                            </div>
-                            <div class="col-lg-3 col-md-3">
-                                <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
-                            </div>
-                            <div class="col-lg-2 col-md-2">
-                                <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
-                            </div>
-                            <div class="col-lg-2 col-md-2">
-                                <input type="text" value="{{ $letterOfIndentItem->color }}" readonly class="form-control">
-                            </div>
-                            <div class="col-lg-2 col-md-2">
-                                <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
+                @foreach($letterOfIndentItems as $value => $letterOfIndentItem)
+                    <div class="d-flex">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3">
+                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control"><br>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endforeach
             @endif
         </div>
             <br>
@@ -140,10 +137,31 @@
             <div class="row">
                 <div class="col-1">
                     File {{ $key + 1 }}
-                    <a href="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"> View
-                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Launch demo modal
+                    </button>
+
+                    {{--                    <button type="button" class="modal-button" data-bs-toggle="modal" data-modal-id="view-LOI-doc-{{$letterOfIndentDocument->id}}" > View </button>--}}
                 </div>
             </div>
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endforeach
             <div class="row">
                 <div class="col-6">
@@ -163,7 +181,8 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
+    <script type="text/javascript">
+
         const fileInputLicense = document.querySelector("#file-upload");
         const previewFile = document.querySelector("#file-preview");
         const previewImage = document.querySelector("#image-preview");
@@ -194,6 +213,21 @@
                 }
             }
         });
+
+        // $(document).ready(function() {
+        //     $('.modal-button').on('click', function () {
+        //         var modalId = $(this).data('modal-id');
+        //
+        //         $('#' + modalId).addClass('modalshow');
+        //         $('#' + modalId).removeClass('modalhide');
+        //
+        //     });
+        //
+        //     $('.close').on('click', function () {
+        //         $('.modal').addClass('modalhide');
+        //         $('.modal').removeClass('modalshow');
+        //     });
+        // })
     </script>
 @endpush
 
