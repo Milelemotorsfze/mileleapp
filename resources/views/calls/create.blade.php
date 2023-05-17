@@ -81,7 +81,7 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Source : </label>
-                        <select name="source" id="source" class="form-control mb-1">
+                        <select name="source" id="source" class="form-control mb-1" multiple="true">
                                 @foreach ($LeadSource as $LeadSource)
                                     <option value="{{ $LeadSource->id }}">{{ $LeadSource->source_name }}</option>
                                 @endforeach
@@ -102,16 +102,16 @@ input[type=number]::-webkit-outer-spin-button {
                         'spanish' => 'Spanish',
                         'portuguese' => 'Portuguese',
                         'shona' => 'Shona',
-                        ], null, ['class' => 'form-control', 'id' => 'language']) }}
+                        ], null, ['class' => 'form-control', 'id' => 'language', 'multiple' => 'true']) }}
                     </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                            <select name="location" id="country" class="form-control mb-1">
-                                <option value="">Select Destination</option>
+                        <select class="form-control" name="location" id="country" multiple="true">
+                        <option value="">Select Destination</option>
                                 @foreach ($countries as $country)
                                     <option value="{{ $country }}">{{ $country }}</option>
                                 @endforeach
-                            </select>
+                                            </select>     
                         </div>
                         <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Type : </label>
@@ -119,7 +119,7 @@ input[type=number]::-webkit-outer-spin-button {
                         'Export' => 'Export',
                         'Local' => 'Local',
 						'Other' => 'Other',
-                        ], null, ['class' => 'form-control', 'id' => 'type']) }}
+                        ], null, ['class' => 'form-control', 'id' => 'type', 'multiple' => 'true']) }}
                     </div>
                     </div>
                     </br>
@@ -137,7 +137,7 @@ input[type=number]::-webkit-outer-spin-button {
 </div>
 <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
     <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <select name="sales_person" id="sales_persons" class="form-control mb-1">
+    <select name="sales_person" id="sales_persons" class="form-control mb-1" multiple="true">
                                 @foreach ($sales_persons as $sales_persons)
                                 @php
                      $sales_personsss = DB::table('users')->where('id', $sales_persons->model_id)->first();
@@ -153,7 +153,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <label for="basicpill-firstname-input" class="form-label">Brand & Models: </label>
-                <select name="model_line_id[]" id="brand" class="form-control mb-1">
+                <select name="model_line_id[]" id="brand" class="form-control mb-1" multiple="true">
                     <option value="">Select Brand & Model</option>
                     @foreach ($modelLineMasters as $modelLineMaster)
                     @php
@@ -193,12 +193,69 @@ input[type=number]::-webkit-outer-spin-button {
 @endsection
 @push('scripts')
     <script type="text/javascript">
-$('#brand').select2();
-$('#country').select2();
-$('#language').select2();
-$('#source').select2();
-$('#type').select2();
-$('#sales_persons').select2();
+         $(document).ready(function ()
+        {
+$("#brand").select2({
+            allowClear: true,
+            placeholder: 'Select Brand & Model',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#brand").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+$("#country").select2({
+            allowClear: true,
+            placeholder: 'Select Destination',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#country").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+$("#language").select2({
+            allowClear: true,
+            placeholder: 'Select language',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#language").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+$("#source").select2({
+            allowClear: true,
+            placeholder: 'Select source',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#source").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+$("#type").select2({
+            allowClear: true,
+            placeholder: 'Select Type',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#type").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+$("#sales_persons").select2({
+            allowClear: true,
+            placeholder: 'Select Sales Persons',
+            closeOnSelect: true,
+            dropdownAutoWidth: true,
+            dropdownParent: $("#sales_persons").parent(),
+            selectOnClose: true,
+            tags: false, // Disable custom tags
+            maximumSelectionLength: 1,
+        });
+        });
     // Add event listeners to the radio buttons to show/hide the manual sales person list and set the selected option value
     const autoAssignOption = document.getElementById('auto-assign-option');
     const manualAssignOption = document.getElementById('manual-assign-option');
@@ -228,7 +285,7 @@ $('#sales_persons').select2();
         if (x < max_fields) { //max input box allowed
             x++; //text box increment
             // Add new row
-            $(wrapper).append('<br><div class="row"><div class="col-lg-4 col-md-6"><select name="model_line_id[]" class="form-control mb-1 new-select"><option value="">Select Brand & Model</option>@foreach($modelLineMasters as $modelLineMaster)@php $brand = DB::table("brands")->where("id", $modelLineMaster->brand_id)->first(); $brand_name =$brand->brand_name; @endphp <option value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>@endforeach</select></div><div class="col-lg-4 col-md-6"><a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a></div></div>');
+            $(wrapper).append('<br><div class="row"><div class="col-lg-4 col-md-6"><select name="model_line_id[]" class="form-control mb-1 new-select" multiple="true"><option value="">Select Brand & Model</option>@foreach($modelLineMasters as $modelLineMaster)@php $brand = DB::table("brands")->where("id", $modelLineMaster->brand_id)->first(); $brand_name =$brand->brand_name; @endphp <option value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>@endforeach</select></div><div class="col-lg-4 col-md-6"><a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a></div></div>');
             // Initialize select2 on the new dropdown
             $('.new-select').last().select2();
         }

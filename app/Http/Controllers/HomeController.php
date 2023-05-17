@@ -16,7 +16,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $calls = DB::table('calls')
+    $calls = DB::table('calls')
     ->select('calls.source', 'calls.location', 'lead_source.source_name')
     ->join('lead_source', 'calls.source', '=', 'lead_source.id')
     ->get();

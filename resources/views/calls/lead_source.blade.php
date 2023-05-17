@@ -5,7 +5,11 @@
             Master Lead Source
         </h4>
         @can('Calls-modified')
-    <a class="btn btn-sm btn-success float-end" href="{{ route('lead_source.create') }}" text-align: right>
+        <a class="btn btn-sm btn-info float-end" href="{{ route('strategy.index') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Strategies Report
+      </a>
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('lead_source.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Master Lead Source
       </a>
       <div class="clearfix"></div>
