@@ -56,7 +56,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown()>
+                            <select id="addon_type" name="addon_type" class="form-control form-control-sm" onchange=getAddonCodeAndDropdown()>
                                 <option value="">Choose Addon Type</option>
                                 <option value="P">Accessories</option>                          
                                 <!-- <option value="D">Documentation</option>
@@ -74,7 +74,7 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ old('addon_code') }}" required autocomplete="addon_code" autofocus readonly>
+                            <input id="addon_code" type="text" class="form-control form-control-sm @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ old('addon_code') }}" required autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -111,7 +111,7 @@
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price ( AED )') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="purchase_price" type="text" class="form-control @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}" required autocomplete="purchase_price" readonly>
+                            <input id="purchase_price" type="text" class="form-control form-control-sm @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}" required autocomplete="purchase_price" readonly>
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -122,7 +122,7 @@
                             <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price ( AED )') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="selling_price" type="text" class="form-control @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" required autocomplete="selling_price">
+                            <input id="selling_price" type="text" class="form-control form-control-sm @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
                             @error('selling_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -137,7 +137,7 @@
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="lead_time" type="text" class="form-control @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}" required autocomplete="lead_time" autofocus>
+                            <input id="lead_time" type="text" class="form-control form-control-sm @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}" required autocomplete="lead_time" autofocus>
                             @error('lead_time')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -148,7 +148,7 @@
                             <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}" required autocomplete="payment_condition" autofocus>
+                            <input id="payment_condition" type="text" class="form-control form-control-sm @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}" required autocomplete="payment_condition" autofocus>
                             @error('payment_condition')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -181,7 +181,7 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <input id="part_number" type="text" class="form-control @error('part_number') is-invalid @enderror" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" required autocomplete="part_number" autofocus>
+                        <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -195,7 +195,7 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}" required autocomplete="additional_remarks" autofocus></textarea>
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control form-control-sm @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}" required autocomplete="additional_remarks" autofocus></textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -209,75 +209,12 @@
                   
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <input id="image" type="file" class="form-control" name="image" required autocomplete="image" onchange="readURL(this);" />
+                    <input id="image" type="file" class="form-control form-control-sm" name="image" required autocomplete="image" onchange="readURL(this);" />
                     </br>
                     </br>
                     <img id="blah" src="#" alt="your image" />
                 </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
-                    </div>
-                    <div id="London" class="tabcontent">
-                        <div class="row">
-                            <div class="card-body">
-                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-12 p-0">
-                                            <div class="col-md-12 form_field_outer p-0">
-                                                <div class="row form_field_outer_row">
-                                                    <div class="col-xxl-6 col-lg-6 col-md-12">
-                                                        <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
-                                                        <select name="supplierAndPrice[1][supplier_id][]" id="supplierArray1" multiple="true" style="width: 100%;">
-                                                            @foreach($suppliers as $supplier)
-                                                                <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>
-                                                            @endforeach
-                                                        </select>                           
-                                                        @error('supplier_id')
-                                                            <span class="invalid-feedback" role="alert">
-                                                                <strong>{{ $message }}</strong>
-                                                            </span>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-xxl-1 col-lg-1 col-md-1">
-                                                        <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                                                        <select name="supplierAndPrice[1][currency]" id="currency_1" class="form-control" onchange="changeCurrency(1)">
-                                                            <option value="AED">AED</option>      
-                                                            <option value="USD">USD</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
-                                                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                                                        <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
-                                                    </div>
-                                                    <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
-                                                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                        <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                                                    </div>
-                                                    <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
-                                                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                        <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
-                                                    </div>
-                                                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                        <button class="btn_round remove_node_btn_frm_field" disabled>
-                                                            <i class="fas fa-trash-alt"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn"><i class="fa fa-plus" aria-hidden="true"></i> Add</a> 
-                                        </div>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                        </div>  
-                    </div>
-                </div>
+               
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Addon Brand and Model Lines</h4>
@@ -312,7 +249,7 @@
                                             <div class="col-xxl-4 col-lg-6 col-md-12">
                                                 <div class="row">                                   
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value="" required autocomplete="brand" autofocus>
+                                                    <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control form-control-sm @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value="" required autocomplete="brand" autofocus>
                                                     <datalist id="cityname1">
                                                     <option data-value="allbrands" value="ALL BRANDS" id="allbrands"></option>
                                                         @foreach($brands as $brand)
@@ -370,7 +307,20 @@
                                     </div>
                                     </br>      
                                 </div>
-                                
+                                <div class="card"  id="kitSupplier" >
+                    <div class="card-header">
+                        <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
+                    </div>
+                    
+                    <div id="London" class="tabcontent">
+                        <div class="row">
+                            <div class="card-body">
+                @include('addon.kit')
+                @include('addon.supplierprice')
+                </div>
+                        </div>  
+                    </div>
+                </div>
                                 <div class="col-md-12">
                                 <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                             </div>
@@ -392,7 +342,7 @@
                                             <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                         </div>
                                         <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            <textarea rows="5" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}" required autofocus></textarea>
+                                            <textarea rows="5" id="new_addon_name" type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}" required autofocus></textarea>
                                             @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -410,6 +360,7 @@
                         </div> 
                 </div>  
                 </br>
+                
 <script type="text/javascript">
         var selectedSuppliers = [];
         var oldselectedSuppliers = [];
@@ -559,14 +510,14 @@
                html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                html += '<div class="row">';
                html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="cityname1" onchange=selectBrand(this.id)  id="selectBrand'+i+'" type="text" class="cityname1 form-control @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value="" required autocomplete="addon_name" autofocus>';
+               html += '<input list="cityname1" onchange=selectBrand(this.id)  id="selectBrand'+i+'" type="text" class="cityname1 form-control form-control-sm @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value="" required autocomplete="addon_name" autofocus>';
                html += '</div>';
                html += '</div>';
                html += '</div>';
                html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                html += '<div class="row">';
                html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="" id="addon_name1" type="text" class="form-control @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="" required autocomplete="addon_name" autofocus>';
+               html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="" required autocomplete="addon_name" autofocus>';
                html += '</div>';
                html += '</div>';
                html += '</div>';
@@ -604,61 +555,9 @@
                 $('.modal').removeClass('modalshow');
             });
         });
-        $("body").on("click",".add_new_frm_field_btn", function ()
-        { 
-            var index = $(".form_field_outer").find(".form_field_outer_row").length + 1; $(".form_field_outer").append(`
-                <div class="row form_field_outer_row">
-                    <div class="col-xxl-6 col-lg-6 col-md-12">
-                        <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
-                        <select class="addonClass"  id="supplierArray${index}" name="supplierAndPrice[${index}][supplier_id][]" multiple="true" style="width: 100%;" onchange="showAndHideSupplierDropdownOptions(${index})">
-                            @foreach($suppliers as $supplier)
-                                <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>
-                            @endforeach
-                        </select>
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-1">
-                        <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                        <select name="supplierAndPrice[${index}][currency]" id="currency_${index}" class="form-control" onchange="changeCurrency(${index})">
-                            <option value="AED">AED</option>      
-                            <option value="USD">USD</option>
-                        </select>
-                    </div>
-                    <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
-                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                        <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}" type="text" class="form-control @error('addon_purchase_price_in_usd') is-invalid @enderror"  placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
-                    </div>
-                    <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_${index}" hidden>
-                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                        <input name="supplierAndPrice[${index}][addon_purchase_price]" id="addon_purchase_price_${index}" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror"  placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                    </div>
-                    <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_${index}">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                        <input name="supplierAndPrice[${index}][addon_purchase_price]" id="addon_purchase_price_${index}" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
-                    </div>
-                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                        <button class="btn_round remove_node_btn_frm_field" disabled>
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                `); 
-                $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
-                $("#supplierArray"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-                $("#supplierArray"+index).select2({
-                // maximumSelectionLength: 1,
-            });
-        }); 
+      
                         // $("#supplierArray"+index).select2();
-        //===== delete the form fieed row
-        $("body").on("click", ".remove_node_btn_frm_field", function () 
-        {
-            $(this).closest(".form_field_outer_row").remove();
-        });
+    
         $('.modal-button').on('click', function()
         {
             currentAddonType =  $('#addon_type').val();
@@ -802,11 +701,13 @@ function closemodal()
                     hideModelNumberDropdown();
                 }
                 if(value == 'SP' )
-                {
+                {    
                     let showPartNumber = document.getElementById('partNumberDiv');
                     showPartNumber.hidden = false  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = false
+                    shownotKitSupplier();
+                    hidekitSupplier();
                 }
                 else
                 {
@@ -814,6 +715,8 @@ function closemodal()
                     showPartNumber.hidden = true  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true 
+                    showkitSupplier();
+                    hidenotKitSupplier();
                 }
                 $.ajax
                 ({
@@ -960,6 +863,7 @@ function closemodal()
         {
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
             var aed = usd * 3.6725;
+            var aed = aed.toFixed(4);
             if(aed == 0)
             {
                 document.getElementById('addon_purchase_price_'+i).value = "";
@@ -1048,6 +952,26 @@ function closemodal()
                     });
                 }
             });
+        }
+        function showkitSupplier()
+        {
+            let showDiv = document.getElementById('kitSupplier');
+            showDiv.hidden = false
+        }
+        function hidenotKitSupplier()
+        {
+            let showDiv = document.getElementById('notKitSupplier');
+            showDiv.hidden = true
+        }
+        function shownotKitSupplier()
+        {
+            let showDiv = document.getElementById('notKitSupplier');
+            showDiv.hidden = false
+        }
+        function hidekitSupplier()
+        {
+            let showDiv = document.getElementById('kitSupplier');
+            showDiv.hidden = true
         }
 </script>
 @endsection

@@ -50,11 +50,13 @@ class AddonController extends Controller
      */
     public function create()
     {
+        $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
+        $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->select('id','addon_code')->get();
         $addons = Addon::whereIn('addon_type',['P','SP','K','W'])->select('id','name')->orderBy('name', 'ASC')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
-        return view('addon.create',compact('addons','brands','modelLines','suppliers'));
+        return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown'));
     }
 
     /**
