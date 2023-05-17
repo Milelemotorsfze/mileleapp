@@ -74,7 +74,7 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control form-control-sm @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ old('addon_code') }}" required autocomplete="addon_code" autofocus readonly>
+                            <input id="addon_code" type="text" class="form-control form-control-sm @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ old('addon_code') }}"  autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -111,7 +111,7 @@
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price ( AED )') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="purchase_price" type="text" class="form-control form-control-sm @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}" required autocomplete="purchase_price" readonly>
+                            <input id="purchase_price" type="text" class="form-control form-control-sm @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" readonly>
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -137,7 +137,7 @@
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="lead_time" type="text" class="form-control form-control-sm @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}" required autocomplete="lead_time" autofocus>
+                            <input id="lead_time" type="text" class="form-control form-control-sm @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}"  autocomplete="lead_time">
                             @error('lead_time')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -148,7 +148,7 @@
                             <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control form-control-sm @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}" required autocomplete="payment_condition" autofocus>
+                            <input id="payment_condition" type="text" class="form-control form-control-sm @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}"  autocomplete="payment_condition" autofocus>
                             @error('payment_condition')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -195,7 +195,7 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control form-control-sm @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}" required autocomplete="additional_remarks" autofocus></textarea>
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control form-control-sm @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" autofocus></textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -209,7 +209,7 @@
                   
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <input id="image" type="file" class="form-control form-control-sm" name="image" required autocomplete="image" onchange="readURL(this);" />
+                    <input id="image" type="file" class="form-control form-control-sm" name="image"  autocomplete="image" onchange="readURL(this);" />
                     </br>
                     </br>
                     <img id="blah" src="#" alt="your image" />
@@ -249,7 +249,7 @@
                                             <div class="col-xxl-4 col-lg-6 col-md-12">
                                                 <div class="row">                                   
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control form-control-sm @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value="" required autocomplete="brand" autofocus>
+                                                    <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control form-control-sm @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value=""  autocomplete="brand" autofocus>
                                                     <datalist id="cityname1">
                                                     <option data-value="allbrands" value="ALL BRANDS" id="allbrands"></option>
                                                         @foreach($brands as $brand)
@@ -342,7 +342,7 @@
                                             <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                         </div>
                                         <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            <textarea rows="5" id="new_addon_name" type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}" required autofocus></textarea>
+                                            <textarea rows="5" id="new_addon_name" type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
                                             @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -510,14 +510,14 @@
                html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                html += '<div class="row">';
                html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="cityname1" onchange=selectBrand(this.id)  id="selectBrand'+i+'" type="text" class="cityname1 form-control form-control-sm @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value="" required autocomplete="addon_name" autofocus>';
+               html += '<input list="cityname1" onchange=selectBrand(this.id)  id="selectBrand'+i+'" type="text" class="cityname1 form-control form-control-sm @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value=""  autocomplete="addon_name" autofocus>';
                html += '</div>';
                html += '</div>';
                html += '</div>';
                html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
                html += '<div class="row">';
                html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value="" required autocomplete="addon_name" autofocus>';
+               html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
                html += '</div>';
                html += '</div>';
                html += '</div>';
@@ -694,11 +694,11 @@ function closemodal()
                 document.getElementById("AddonTypeError").textContent="";
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    showModelNumberDropdown();
+                    // showModelNumberDropdown();
                 }
                 else
                 {
-                    hideModelNumberDropdown();
+                    // hideModelNumberDropdown();
                 }
                 if(value == 'SP' )
                 {    
@@ -706,8 +706,8 @@ function closemodal()
                     showPartNumber.hidden = false  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = false
-                    shownotKitSupplier();
-                    hidekitSupplier();
+                    // shownotKitSupplier();
+                    // hidekitSupplier();
                 }
                 else
                 {
@@ -715,9 +715,26 @@ function closemodal()
                     showPartNumber.hidden = true  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true 
-                    showkitSupplier();
-                    hidenotKitSupplier();
+                    // showkitSupplier();
+                    // hidenotKitSupplier();
                 }
+                // if(value == 'K')
+                // {
+                //     let showPartNumber = document.getElementById('kitSupplier');
+                //     showPartNumber.hidden = false 
+                //     alert('hi');
+                //     showkitSupplier();
+                //     hidenotKitSupplier();
+                // }
+                // else
+                // {
+                //     let hideKitSupplier = document.getElementById('kitSupplier');
+                //     hideKitSupplier.hidden = false 
+                    
+                // alert('hlo');
+                // shownotKitSupplier();
+                //                     hidekitSupplier();
+                // }
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
@@ -730,7 +747,6 @@ function closemodal()
                     dataType : 'json',
                     success: function(data)
                     {
-                        console.log(currentAddonType);
                         $('#addon_type').val(currentAddonType);
                         $('#addon_code').val(data.newAddonCode);
                         $("#addon_id").html("");
@@ -955,23 +971,31 @@ function closemodal()
         }
         function showkitSupplier()
         {
-            let showDiv = document.getElementById('kitSupplier');
-            showDiv.hidden = false
+            // let showDivkit = document.getElementById('kitSupplier');
+            // showDivkit.hidden = false
+            // let showDivBtn = document.getElementById('kitSupplierButton');
+            // showDivBtn.hidden = false
+            // let showDivBr = document.getElementById('kitSupplierBr');
+            // showDivBr.hidden = false
         }
         function hidenotKitSupplier()
-        {
-            let showDiv = document.getElementById('notKitSupplier');
-            showDiv.hidden = true
+        {  
+            // let showDiv = document.getElementById('notKitSupplier');
+            // showDiv.hidden = true
         }
         function shownotKitSupplier()
-        {
-            let showDiv = document.getElementById('notKitSupplier');
-            showDiv.hidden = false
+        { 
+            // let showDiv = document.getElementById('notKitSupplier');
+            // showDiv.hidden = false
         }
         function hidekitSupplier()
-        {
-            let showDiv = document.getElementById('kitSupplier');
-            showDiv.hidden = true
+        { 
+            // let showDivkit = document.getElementById('kitSupplier');
+            // showDivkit.hidden = true
+            // let showDivBtn = document.getElementById('kitSupplierButton');
+            // showDivBtn.hidden = true
+            // let showDivBr = document.getElementById('kitSupplierBr');
+            // showDivBr.hidden = true
         }
 </script>
 @endsection
