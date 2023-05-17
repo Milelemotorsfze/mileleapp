@@ -1,5 +1,5 @@
-<div class="row">
-    <div class="card">
+<div class="row addSupplierForKitRow">
+    <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
         <div id="London" class="tabcontent">
             <div class="row">
                 <div class="card-body">
@@ -10,7 +10,7 @@
                                     <div class="row">
                                         <div class="col-xxl-5 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
-                                            <select name="supplierAndPrice[1][supplier_id][]" id="itemArray1" multiple="true" style="width: 100%;">
+                                            <select name="supplierAndPrice[1][supplier_id][]" id="kitSupplierDropdown1" multiple="true" style="width: 100%;">
                                                 @foreach($suppliers as $supplier)
                                                     <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>
                                                 @endforeach
@@ -30,7 +30,7 @@
                                             <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
                                         </div>
                                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                            <button class="btn_round removeKitItemForSupplier1" disabled>
+                                            <button class="btn_round removeKitSupplier" disabled hidden>
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -42,20 +42,20 @@
                 </div> 
             </div> 
         </div>
-        <div class="card-header">
+        <!-- <div class="card-header"> -->
             <h4 class="card-title">Kit Items And Purchase Price</h4>
-        </div>
+        <!-- </div> -->
         <div id="London" class="tabcontent">
             <div class="row">
                 <div class="card-body">
                     <div class="col-xxl-12 col-lg-12 col-md-12">
                         <div class="row">
                             <div class="col-md-12 p-0">
-                                <div class="col-md-12 apendNewItemHere p-0">
-                                    <div class="row kitItemRowForSupplier1">
+                                <div class="col-md-12 apendNewItemHere1 p-0">
+                                    <div class="row kitItemRowForSupplier1 kititemdelete">
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                            <select class="form-control form-control-sm" name="supplierAndPrice[1][supplier_id][]" id="itemArrays1" multiple="true" style="width: 100%;">
+                                            <select class="form-control form-control-sm" name="supplierAndPrice[1][supplier_id][]" id="kitSupplier1Item1" multiple="true" style="width: 100%;">
                                                 @foreach($kitItemDropdown as $kitItemDropdownData)
                                                     <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}}</option>
                                                 @endforeach
@@ -87,7 +87,7 @@
                                             <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                         </div>
                                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                            <button  class="btn_round removeKitItemForSupplier1" disabled>
+                                            <button  class="btn_round removeKitItemForSupplier1 remove-item-for-supplier" hidden disabled>
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -97,7 +97,7 @@
                         </div>
                         <div class="row">
                             <div class="col-xxl-12 col-lg-12 col-md-12">
-                                <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info addItemForSupplier1"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a> 
+                                <a id="addSupplier" style="float: right;" class="btn btn-sm btn-primary addItemForSupplier1" onclick="addItemForSupplier(1)"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a> 
                             </div>
                         </div>
                     </div>
@@ -110,20 +110,28 @@
 <script type="text/javascript">
     $(document).ready(function ()
     {
-        $("#itemArrays1").attr("data-placeholder","Choose Items....     Or     Type Here To Search....");
-        $("#itemArrays1").select2
+        $("#kitSupplier1Item1").attr("data-placeholder","Choose Items....     Or     Type Here To Search....");
+        $("#kitSupplier1Item1").select2
         ({
             maximumSelectionLength: 1,
         });
     });
-    $("body").on("click",".addItemForSupplier1", function ()
-    { 
-        var index = $(".apendNewItemHere").find(".kitItemRowForSupplier1").length + 1; 
-        $(".apendNewItemHere").append(`
-            <div class="row kitItemRowForSupplier1">
+    // $("body").on("click",".addItemForSupplier1", function ()
+    // { 
+       
+    // }); 
+    $("body").on("click", ".remove-item-for-supplier", function () 
+    {
+        $(this).closest(".kititemdelete").remove();
+    });
+    function addItemForSupplier(supplier)
+    {
+        var index = $(".apendNewItemHere"+supplier).find(".kitItemRowForSupplier"+supplier).length + 1; 
+        $(".apendNewItemHere"+supplier).append(`
+            <div class="row kitItemRowForSupplier${supplier} kititemdelete">
                 <div class="col-xxl-2 col-lg-6 col-md-12">
                     <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                    <select name="supplierAndPrice[1][supplier_id][]" id="itemArrays${index}" multiple="true" style="width: 100%;">
+                    <select name="supplierAndPrice[1][supplier_id][]" id="kitSupplier${supplier}Item${index}" multiple="true" style="width: 100%;">
                         @foreach($kitItemDropdown as $kitItemDropdownData)
                             <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}}</option>
                         @endforeach
@@ -155,21 +163,18 @@
                     <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                 </div>
                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                    <button class="btn_round removeKitItemForSupplier1" disabled>
+                    <button class="btn_round removeKitItemForSupplier${supplier} remove-item-for-supplier" disabled>
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
             `); 
-        $(".apendNewItemHere").find(".removeKitItemForSupplier1:not(:first)").prop("disabled", false); $(".apendNewItemHere").find(".removeKitItemForSupplier1").first().prop("disabled", true); 
-        $("#itemArrays"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-        $("#itemArrays"+index).select2
+        $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+supplier+":not(:first)").prop("disabled", false); $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+index).first().prop("disabled", true); 
+        $("#kitSupplier"+supplier+"Item"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
+        $("#kitSupplier"+supplier+"Item"+index).select2
         ({
             maximumSelectionLength: 1,
         });
-    }); 
-    $("body").on("click", ".removeKitItemForSupplier1", function () 
-    {
-        $(this).closest(".kitItemRowForSupplier1").remove();
-    });
+       
+    }
 </script>

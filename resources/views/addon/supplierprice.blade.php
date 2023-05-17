@@ -1,4 +1,4 @@
-<div class="col-xxl-12 col-lg-12 col-md-12">
+<div class="col-xxl-12 col-lg-12 col-md-12" id="notKitSupplier">
     <div class="row">
         <div class="col-md-12 p-0">
             <div class="col-md-12 supplierWithoutKit p-0">
@@ -25,7 +25,7 @@
                         <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
                     </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                        <button class="btn_round remove_node_btn_frm_field" disabled>
+                        <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
@@ -35,7 +35,7 @@
     </div>
     <div class="row">
         <div class="col-xxl-12 col-lg-12 col-md-12">
-            <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn"><i class="fa fa-plus" aria-hidden="true"></i> Add Supplier</a> 
+            <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit"><i class="fa fa-plus" aria-hidden="true"></i> Add Supplier</a> 
         </div>
     </div>
 </div>
@@ -49,7 +49,7 @@
             maximumSelectionLength: 1,
         });
     });
-    $("body").on("click",".add_new_frm_field_btn", function ()
+    $("body").on("click",".addSupplierAndPriceWithoutKit", function ()
     { 
         var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1; 
         $(".supplierWithoutKit").append(`
@@ -76,22 +76,21 @@
                     <input name="supplierAndPrice[${index}][addon_purchase_price]" id="addon_purchase_price_${index}" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror"  placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})">
                 </div>
                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                    <button class="btn_round remove_node_btn_frm_field" disabled>
+                    <button class="btn_round removeButtonSupplierWithoutKit" disabled>
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
             `); 
-            $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
+            $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit:not(:first)").prop("disabled", false); $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit").first().prop("disabled", true); 
             $("#supplierArray"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
             $("#supplierArray"+index).select2
             ({
                 // maximumSelectionLength: 1,
             });
         //===== delete the form fieed row
-        $("body").on("click", ".remove_node_btn_frm_field", function () 
+        $("body").on("click", ".removeButtonSupplierWithoutKit", function () 
         {
-            alert('ko');
             $(this).closest(".supplierWithoutKitApendHere").remove();
         });
     }); 
