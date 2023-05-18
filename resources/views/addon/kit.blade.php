@@ -1,10 +1,10 @@
-<div class="col-xxl-12 col-lg-12 col-md-12 supplierAddForKit"   id="kitSupplier">
+<div class="col-xxl-12 col-lg-12 col-md-12 supplierAddForKit" id="kitSupplierIdToHideandshow">
     @include('addon.items')
 </div>
-</br id="kitSupplierBr">
-<div class="row" id="kitSupplierButton">
+</br id="kitSupplierBrToHideandshow">
+<div class="row" id="kitSupplierButtonToHideandshow">
     <div class="col-xxl-12 col-lg-12 col-md-12">
-        <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info buttonForAddNewKitSupplier"><i class="fa fa-plus" aria-hidden="true"></i> Add Supplier1</a> 
+        <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info buttonForAddNewKitSupplier"><i class="fa fa-plus" aria-hidden="true"></i> Add Supplier</a> 
     </div>
 </div>
 <script type="text/javascript">
@@ -15,6 +15,9 @@
         ({
             maximumSelectionLength: 1,
         });
+        $('#kitSupplierIdToHideandshow').hide();
+        $('#kitSupplierBrToHideandshow').hide();
+        $('#kitSupplierButtonToHideandshow').hide();
     });
     $("body").on("click",".buttonForAddNewKitSupplier", function ()
     { 
@@ -45,11 +48,11 @@
                                                 </div>
                                                 <div class="col-xxl-3 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}TotalPriceUSD" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                                 </div>
                                                 <div class="col-xxl-3 col-lg-3 col-md-3" id="div_price_in_aed_1" >
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}TotalPriceAED" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
                                                 </div>
                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                     <button class="btn_round removeKitSupplier" disabled>
@@ -88,23 +91,23 @@
                                                 </div>
                                                 <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}Kit1Quantity" type="number" value="1" min="1" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)">
                                                 </div>
-                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" >
+                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}Kit1UnitPriceAED" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyUniTPriceAED(${index},1)">
                                                 </div>
-                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" >
+                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="addon_purchase_price_1" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}Kit1TotalPriceAED" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${index},1)">
                                                 </div>
-                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}Kit1UnitPriceUSD" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${index},1)">
                                                 </div>
-                                                <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" >
+                                                <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}Kit1TotalPriceUSD" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyTotalPriceUSD(${index},1)">
                                                 </div>
                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                     <button  class="btn_round removeKitItemForSupplier${index} remove-item-for-supplier" disabled hidden>
@@ -168,5 +171,141 @@
     //     alert('kok');
     //     // $(this).closest(".kitItemRowForSupplier"+supplier).remove();
     // }
-    
+    function calculateOtherValuesbyUniTPriceAED(supplier,kit)
+    {
+        var quantity = $("#Supplier"+supplier+"Kit"+kit+"Quantity").val();
+        var unitPriceAED = $("#Supplier"+supplier+"Kit"+kit+"UnitPriceAED").val();
+        calculateRelatedofUnitPriceAED(quantity,unitPriceAED,supplier,kit);  
+    }
+    function calculateOtherValuesbyTotalPriceAED(supplier,kit)
+    {
+        var quantity = $("#Supplier"+supplier+"Kit"+kit+"Quantity").val();
+        var totalPriceAED = $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val();
+        calculateRelatedofTotalPriceAED(quantity,totalPriceAED,supplier,kit);  
+    }
+    function calculateOtherValuesbyUnitPriceUSD(supplier,kit)
+    {
+        var quantity = $("#Supplier"+supplier+"Kit"+kit+"Quantity").val();
+        var unitPriceUSD = $("#Supplier"+supplier+"Kit"+kit+"UnitPriceUSD").val();
+        calculateRelatedofUnitPriceUSD(quantity,unitPriceUSD,supplier,kit);  
+    }
+    function calculateOtherValuesbyTotalPriceUSD(supplier,kit)
+    {
+        var quantity = $("#Supplier"+supplier+"Kit"+kit+"Quantity").val();
+        var totalPriceUSD = $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val(); 
+        calculateRelatedofTotalPriceUSD(quantity,totalPriceUSD,supplier,kit);
+    }
+    function calculateOtherValuesbyQuantity(supplier,kit)
+    {
+        var quantity = $("#Supplier"+supplier+"Kit"+kit+"Quantity").val();
+        var unitPriceAED = $("#Supplier"+supplier+"Kit"+kit+"UnitPriceAED").val();
+        var totalPriceAED = $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val();
+        var unitPriceUSD = $("#Supplier"+supplier+"Kit"+kit+"UnitPriceUSD").val();   
+        var totalPriceUSD = $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val(); 
+        if(unitPriceAED != '')
+        {
+            calculateRelatedofUnitPriceAED(quantity,unitPriceAED,supplier,kit);
+        }
+        else if(totalPriceAED != '')
+        { 
+            calculateRelatedofTotalPriceAED(quantity,totalPriceAED,supplier,kit); 
+        }
+        else if(unitPriceUSD != '')
+        { 
+            calculateRelatedofUnitPriceUSD(quantity,unitPriceUSD,supplier,kit); 
+        }
+        else if(totalPriceUSD != '')
+        { 
+            calculateRelatedofTotalPriceUSD(quantity,totalPriceUSD,supplier,kit); 
+        } 
+    }
+    function showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit)
+    {
+        
+        if(unitPriceAED == 0)
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"UnitPriceAED").val("");
+        }
+        else
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"UnitPriceAED").val(unitPriceAED);
+        }
+        if(totalPriceAED == 0)
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val("");
+        }
+        else
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val(totalPriceAED);
+        }
+        if(unitPriceUSD == 0)
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"UnitPriceUSD").val("");
+        }
+        else
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"UnitPriceUSD").val(unitPriceUSD);
+        }
+        if(totalPriceUSD == 0)
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val("");
+        }
+        else
+        {
+            $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val(totalPriceUSD);
+        }
+    }
+    function calculateRelatedofUnitPriceAED(quantity,unitPriceAED,supplier,kit)
+    { 
+        var totalPriceAED = quantity * unitPriceAED;
+        totalPriceAED = totalPriceAED.toFixed(4);
+        totalPriceAED = parseFloat(totalPriceAED);
+        var unitPriceUSD = unitPriceAED / 3.6725;
+        unitPriceUSD = unitPriceUSD.toFixed(4);
+        unitPriceUSD = parseFloat(unitPriceUSD);
+        var totalPriceUSD = totalPriceAED / 3.6725;
+        totalPriceUSD = totalPriceUSD.toFixed(4);
+        totalPriceUSD = parseFloat(totalPriceUSD);
+        showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
+    }
+    function calculateRelatedofTotalPriceAED(quantity,totalPriceAED,supplier,kit)
+    { 
+        var unitPriceAED = totalPriceAED / quantity;
+        unitPriceAED = unitPriceAED.toFixed(4);
+        unitPriceAED = parseFloat(unitPriceAED);
+        var unitPriceUSD = totalPriceAED / 3.6725;
+        unitPriceUSD = unitPriceUSD.toFixed(4);
+        unitPriceUSD = parseFloat(unitPriceUSD);
+        var totalPriceUSD = unitPriceAED / 3.6725;
+        totalPriceUSD = totalPriceUSD.toFixed(4);
+        totalPriceUSD = parseFloat(totalPriceUSD);
+        showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
+    }
+    function calculateRelatedofUnitPriceUSD(quantity,unitPriceUSD,supplier,kit)
+    { 
+        var totalPriceUSD = unitPriceUSD * quantity;
+        totalPriceUSD = totalPriceUSD.toFixed(4);
+        totalPriceUSD = parseFloat(totalPriceUSD);
+        var unitPriceAED = unitPriceUSD * 3.6725;
+        unitPriceAED = unitPriceAED.toFixed(4);
+        unitPriceAED = parseFloat(unitPriceAED);
+        var totalPriceAED = totalPriceUSD * 3.6725;
+        totalPriceAED = totalPriceAED.toFixed(4);
+        totalPriceAED = parseFloat(totalPriceAED);
+        showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
+    }
+    function calculateRelatedofTotalPriceUSD(quantity,totalPriceUSD,supplier,kit)
+    { 
+        var unitPriceUSD = totalPriceUSD / quantity;
+        unitPriceUSD = unitPriceUSD.toFixed(4);
+        unitPriceUSD = parseFloat(unitPriceUSD); 
+        var unitPriceAED = unitPriceUSD * 3.6725;
+        unitPriceAED = unitPriceAED.toFixed(4);
+        unitPriceAED = parseFloat(unitPriceAED); 
+        var totalPriceAED = totalPriceUSD * 3.6725;
+        totalPriceAED = totalPriceAED.toFixed(4);
+        totalPriceAED = parseFloat(totalPriceAED); 
+        showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
+    }
+                  
 </script>

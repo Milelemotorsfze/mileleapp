@@ -599,6 +599,7 @@ body {font-family: Arial;}
         }
         function changeCurrency(i)
         {
+            alert('hiihf');
             var e = document.getElementById("currency_"+i);
             var value = e.value;
             if(value == 'USD')
@@ -621,7 +622,7 @@ body {font-family: Arial;}
             }
         }
         function calculateAED(i)
-        {
+        { alert('hffffffffiihf');
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
             var aed = usd * 3.6725;
             if(aed == 0)
