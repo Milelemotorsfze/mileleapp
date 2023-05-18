@@ -718,23 +718,25 @@ function closemodal()
                     // showkitSupplier();
                     // hidenotKitSupplier();
                 }
-                // if(value == 'K')
-                // {
-                //     let showPartNumber = document.getElementById('kitSupplier');
-                //     showPartNumber.hidden = false 
-                //     alert('hi');
-                //     showkitSupplier();
-                //     hidenotKitSupplier();
-                // }
-                // else
-                // {
+                if(value == 'K')
+                {
+                    // let showPartNumber = document.getElementById('kitSupplier');
+                    // showPartNumber.hidden = false 
+                    // alert('hi');
+                    hidenotKitSupplier();
+                    showkitSupplier();
+                  
+                }
+                else
+                {
                 //     let hideKitSupplier = document.getElementById('kitSupplier');
                 //     hideKitSupplier.hidden = false 
                     
                 // alert('hlo');
-                // shownotKitSupplier();
-                //                     hidekitSupplier();
-                // }
+                hidekitSupplier();
+                shownotKitSupplier();
+                                   
+                }
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
@@ -858,6 +860,7 @@ function closemodal()
             var value = e.value;
             if(value == 'USD')
             {
+              
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
                 chooseCurrency.hidden = true  
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
@@ -880,6 +883,7 @@ function closemodal()
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
             var aed = usd * 3.6725;
             var aed = aed.toFixed(4);
+            aed = parseFloat(aed);
             if(aed == 0)
             {
                 document.getElementById('addon_purchase_price_'+i).value = "";
@@ -977,16 +981,21 @@ function closemodal()
             // showDivBtn.hidden = false
             // let showDivBr = document.getElementById('kitSupplierBr');
             // showDivBr.hidden = false
+            $('#kitSupplierIdToHideandshow').show();
+            $('#kitSupplierBrToHideandshow').show();
+            $('#kitSupplierButtonToHideandshow').show();
         }
         function hidenotKitSupplier()
         {  
             // let showDiv = document.getElementById('notKitSupplier');
             // showDiv.hidden = true
+            $('#notKitSupplier').hide();
         }
         function shownotKitSupplier()
         { 
             // let showDiv = document.getElementById('notKitSupplier');
             // showDiv.hidden = false
+            $('#notKitSupplier').show();
         }
         function hidekitSupplier()
         { 
@@ -996,6 +1005,9 @@ function closemodal()
             // showDivBtn.hidden = true
             // let showDivBr = document.getElementById('kitSupplierBr');
             // showDivBr.hidden = true
+            $('#kitSupplierIdToHideandshow').hide();
+            $('#kitSupplierBrToHideandshow').hide();
+            $('#kitSupplierButtonToHideandshow').hide();
         }
 </script>
 @endsection
