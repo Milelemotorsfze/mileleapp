@@ -54,6 +54,7 @@
                             <th>Approval Status</th>
                             <th>Deal Items</th>
                             <th>Deal Documents</th>
+                            <th>LOI</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -73,6 +74,7 @@
                                 <td><button type="button" class="btn btn-primary modal-button" data-bs-toggle="modal"
                                             data-modal-id="view-LOI-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
                                 </td>
+                                <td><a href="{{ route('letter-of-indents.generate-loi') }}"> LOI</a> </td>
                                 <div class="modal modalhide" id="viewdealinfo-{{$letterOfIndent->id}}" >
                                     <div class="modal-header bg-primary">
                                         <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>

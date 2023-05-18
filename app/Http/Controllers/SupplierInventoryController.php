@@ -8,9 +8,7 @@ use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Session;
+
 
 class SupplierInventoryController extends Controller
 {

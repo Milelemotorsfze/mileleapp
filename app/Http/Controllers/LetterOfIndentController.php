@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\LetterOfIndent;
+use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Monarobase\CountryList\CountryListFacade;
@@ -69,6 +70,16 @@ class LetterOfIndentController extends Controller
             ->get();
 
         return $customers;
+    }
+    public function generateLOI(Request $request)
+    {
+        $letterOfIndent = LetterOfIndent::find($request->id);
+
+        return view('letter_of_indents.loi_document');
+//
+//        $pdf = PDF::loadView('letter_of_indents.loi_document');
+//        return $pdf->download('LOI_'.date('Y_m_d').'.pdf');
+
     }
 
     /**

@@ -182,7 +182,6 @@
                     $('select[name="variant"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
                     $('#variant').html('<option value=""> Select Variant </option>');
-                    $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
@@ -199,7 +198,8 @@
                 dataType: "json",
                 data: {
                     sfx: sfx,
-                    model:model
+                    model:model,
+                    module: 'LOI',
                 },
                 success:function (data) {
                     $('select[name="variant"]').empty();

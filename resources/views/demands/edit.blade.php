@@ -208,6 +208,7 @@
                     model:model
                 },
                 success:function (data) {
+                    var data = data.variants
                     $('select[name="variant_name"]').empty();
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
