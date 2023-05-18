@@ -49,6 +49,10 @@
             $('#dtBasicExample6').DataTable();
             $('#dtBasicExample7').DataTable();
             $('#new-LOI-table').DataTable();
+            $('#supplier-approved-LOI-table').DataTable();
+            $('#milele-approved-LOI-table').DataTable();
+            $('#supplier-rejected-LOI-table').DataTable();
+            $('#milele-partial-approved-LOI-table').DataTable();
             $('.modal-button').on('click', function()
             {
                 var modalId = $(this).data('modal-id');

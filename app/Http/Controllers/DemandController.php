@@ -115,12 +115,21 @@ class DemandController extends Controller
     }
     public function getVariant(Request $request)
     {
-        $data = Varaint::with('masterModel')
+        $inventory = SupplierInventory::with('masterModel')
+            ->whereHas('masterModel', function ($query) use($request) {
+                $query->where('sfx', $request->sfx);
+                $query->where('model', $request->model);
+            })
+            ->first();
+
+        $data['variants'] = Varaint::with('masterModel')
             ->whereHas('masterModel', function ($query) use($request) {
                 $query->where('sfx', $request->sfx);
                 $query->where('model', $request->model);
             })
             ->pluck('name');
+
+        $data['quantity'] = $inventory->total_quantity;
         return $data;
     }
 }

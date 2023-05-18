@@ -53,14 +53,17 @@
                             <div class="col-lg-3 col-md-3">
                                 <label class="form-label">Model</label>
                             </div>
-                            <div class="col-lg-3 col-md-3">
+                            <div class="col-lg-2 col-md-2">
                                 <label  class="form-label">SFX</label>
                             </div>
                             <div class="col-lg-3 col-md-3">
                                 <label class="form-label">Varients</label>
                             </div>
-                            <div class="col-lg-3 col-md-3">
+                            <div class="col-lg-2 col-md-2">
                                 <label class="form-label">Qty</label>
+                            </div>
+                            <div class="col-lg-2 col-md-2">
+                                <label class="form-label">Inventory Qty</label>
                             </div>
                         </div>
                     </div>
@@ -74,16 +77,18 @@
                                     <div class="col-lg-3 col-md-3">
                                         <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-3 col-md-3">
+                                    <div class="col-lg-2 col-md-2">
                                         <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-3 col-md-3">
                                         <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-3 col-md-3">
+                                    <div class="col-lg-2 col-md-2">
                                         <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control"> </br>
                                     </div>
-
+                                    <div class="col-lg-2 col-md-2">
+                                        {{--                                        <input type="text"  readonly class="form-control">--}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +117,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-3">
+                            <div class="col-lg-2 col-md-2">
                                 <select class="form-select" name="sfx" id="sfx">
                                     <option value="" >Select SFX</option>
                                 </select>
@@ -122,9 +127,13 @@
                                     <option value="" >Select Variant</option>
                                 </select>
                             </div>
-                            <div class="col-lg-3 col-md-3">
+                            <div class="col-lg-2 col-md-2">
                                 <input type="number" name="quantity" class="form-control">
                             </div>
+                            <div class="col-lg-2 col-md-2">
+                                <input type="number"  readonly id="inventory-quantity" value="" class="form-control">
+                            </div>
+
                             <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>
                     </div>
@@ -138,7 +147,7 @@
             <br>
             <div class="col-lg-12 col-md-12">
                <a href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
-                   <button type="button" class="btn btn-dark btnright btn-deal-item-submit">Submit</button>
+                   <button type="button" class="btn btn-dark btnright btn-deal-item-submit">Next</button>
                </a>
             </div>
         <div class="row" id="deal-doc-upload-div" hidden>
@@ -168,9 +177,11 @@
                     letter_of_indent_id: id
                 },
                 success:function (data) {
+                    $('#inventory-quantity').val(0);
                     $('select[name="sfx"]').empty();
-                    $('select[name="variant_name"]').empty();
+                    $('select[name="variant"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
+                    $('#variant').html('<option value=""> Select Variant </option>');
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
@@ -192,7 +203,10 @@
                 },
                 success:function (data) {
                     $('select[name="variant"]').empty();
-                    $('#variant-name').html('<option value=""> Select Variant </option>');
+                    $('#variant').html('<option value=""> Select Variant </option>');
+                    let quantity = data.quantity;
+                    var data = data.variants;
+                    $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
                         $('select[name="variant"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });

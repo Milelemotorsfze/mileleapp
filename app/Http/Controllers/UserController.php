@@ -1,6 +1,6 @@
 <?php
 namespace App\Http\Controllers;
-    
+
     use Illuminate\Http\Request;
     use App\Http\Controllers\Controller;
     use App\Models\User;
@@ -30,17 +30,17 @@ namespace App\Http\Controllers;
                 'password' => 'required|same:confirm-password',
                 'roles' => 'required'
             ]);
-        
+
             $input = $request->all();
             $input['password'] = Hash::make($input['password']);
-        
+
             $user = User::create($input);
             $user->assignRole($request->input('roles'));
-        
+
             return redirect()->route('users.index')
             ->with('success','User created successfully');
         }
-        
+
         public function show($id)
         {
             $user = User::find($id);
@@ -51,7 +51,7 @@ namespace App\Http\Controllers;
             $user = User::find($id);
             $roles = Role::pluck('name','name')->all();
             $userRole = $user->roles->pluck('name','name')->all();
-        
+
             return view('users.edit',compact('user','roles','userRole'));
         }
         public function update(Request $request, $id)
@@ -62,12 +62,12 @@ namespace App\Http\Controllers;
                 'password' => 'same:confirm-password',
                 'roles' => 'required'
             ]);
-        
+
             $input = $request->all();
-            if(!empty($input['password'])){ 
+            if(!empty($input['password'])){
                 $input['password'] = Hash::make($input['password']);
             }else{
-                $input = Arr::except($input,array('password'));    
+                $input = Arr::except($input,array('password'));
             }
             $user = User::find($id);
             $user->update($input);
@@ -90,7 +90,7 @@ namespace App\Http\Controllers;
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
-        
+
         public function makeActive($id)
         {
            $user = User::find($id);
