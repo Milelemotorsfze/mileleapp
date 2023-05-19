@@ -23,6 +23,7 @@ use App\Http\Controllers\LeadSourceController;
 use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\LOIDocumentsController;
+use App\Http\Controllers\Repeatedcustomers;
 
 
 /*
@@ -114,6 +115,10 @@ use App\Http\Controllers\LOIDocumentsController;
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
     Route::post('/uploadingbulk', [VariatnsPicturesController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
     Route::resource('strategy', StrategyController::class);
+    Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
+    Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
+   
+
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');
@@ -137,6 +142,9 @@ use App\Http\Controllers\LOIDocumentsController;
         'brand_id' => '[0-9]+',
         'model_line_id' => '[0-9]+',
     ]);
+    Route::post('dailyleads/processStep', [DailyleadsController::class, 'processStep'])->name('processStep');
+    Route::get('dailyleads/prospecting/{id}', [DailyleadsController::class, 'prospecting'])->name('dailyleads.prospecting');
+
     // HR
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');

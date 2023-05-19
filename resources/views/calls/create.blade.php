@@ -50,6 +50,9 @@ input[type=number]::-webkit-outer-spin-button {
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
+    <div class="col-lg-12">
+    <div id="flashMessage"></div>
+</div>
         @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -71,12 +74,11 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Phone : </label>
-                        <input type="number" name="phone" class="form-control" value="" placeholder = "Phone Number">
-                        
+                        <input type="number" id = "phone" name="phone" class="form-control" placeholder = "Phone Number">
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Email : </label>
-                        {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
+                        {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
                         <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -296,5 +298,41 @@ $("#sales_persons").select2({
         x--;
     })
 });
+    $(document).ready(function() {
+        $('#phone, #email').on('input', function() {
+            var phone = $('#phone').val();
+            var email = $('#email').val();
+            
+            $.ajax({
+                url: "{{ route('checkExistence') }}",
+                method: 'POST',
+                data: {
+                    phone: phone,
+                    email: email,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#phoneCount').text('Phone count: ' + response.phoneCount);
+                    $('#emailCount').text('Email count: ' + response.emailCount);
+                    
+                    // Display flash message
+                    if (response.phoneCount > 0 || response.emailCount > 0) {
+                        var customerNames = response.customerNames.join(', '); // Join names with commas
+                        var message = 'Customer Names: ' + customerNames + '<br>';
+                        message += 'Phone Count: ' + response.phoneCount + '<br>';
+                        message += 'Email Count: ' + response.emailCount;
+                        
+                        // Add button to send details to another page
+                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + phone + '&email=' + email + '" class="btn btn-primary">See Details</a>';
+                        message += '<br>' + buttonHtml;
+                        
+                        $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');
+                    } else {
+                        $('#flashMessage').html('');
+                    }
+                }
+            });
+        });
+    });
 </script>
 @endpush

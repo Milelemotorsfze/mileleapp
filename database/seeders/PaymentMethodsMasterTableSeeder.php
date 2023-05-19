@@ -20,8 +20,8 @@ class PaymentMethodsMasterTableSeeder extends Seeder
             ['4','Credit Note']
             ];
         foreach ($payment_methods as $key => $value):
-        $payment_method[] = [
-            'id'       => $value[0],
+        $payment_method[]     = [
+            'id'              => $value[0],
             'payment_methods' => $value[1]
         ];
         endforeach ;

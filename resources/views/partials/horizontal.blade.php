@@ -3,7 +3,7 @@
         <i class="fa fa-fw fa-bars"></i>
     </button>
 <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-@can('user-view')
+@can('sales-view')
 <div class="cart-icon-container">
   <a href="{{route('quotation.create')}}"><i class="fa fa-car fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -22,7 +22,7 @@
         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-end">
-        <a class="dropdown-item" href="profile">
+        <a class="dropdown-item" href="">
             <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
         </a>
         <div class="dropdown-divider"></div>
@@ -96,28 +96,13 @@
                     @endcan
                     @can('sales-view')
                     <li class="nav-item dropdown">
-    					<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i>
-                            <span data-key="t-extra-pages">Sales</span> <div class="arrow-down"></div>
+                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i>
+                            <span data-key="t-extra-pages">Leads</span>
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Daily Calls</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Leads</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Sales</span>
-                                </a>
-                            </div>
-                        </div>
                     </li>
+                    @endcan
+                    @can('user-create')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="file-text"></i>
@@ -141,8 +126,6 @@
                             </div>
                         </div>
                     </li>
-                    @endcan
-                    @can('user-create')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="file-text"></i>
@@ -274,6 +257,7 @@
                         </a>
 					</li>
                     @endcan
+                    @can('user-view')
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -305,6 +289,7 @@
                             </div>
                         </div>
                     </li>
+                    @endcan
                 </ul>
             </div>
         </nav>

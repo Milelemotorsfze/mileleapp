@@ -2,7 +2,7 @@
 <style>
     .my-text {
       font-weight: bold;
-      font-size: 24px;
+      font-size: 20px;
       background: linear-gradient(to right, #4a90e2, #2170eb);
       padding: 10px 15px;
       border-radius: 10px;
@@ -23,10 +23,10 @@
                                     <div class="row align-items-center">
                                         <div class="col-6">
                                             <span class="my-text">Leads</span><br><br>
-                                            <h4 class="mb-3">
-                                            This Month :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span><br><br>
-                                            This Week  :  <span class="counter-value" data-target="{{ $totalleadscount7days }}">0</span><br><br>
-                                            Today      :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span>
+                                            <h5 class="mb-3">
+                                            Last 30 Days :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span><br><br>
+                                            Last 7 Days  :  <span class="counter-value" data-target="{{ $totalleadscount7days }}">0</span><br><br>
+                                            Today      :  <span class="counter-value" data-target="{{ $totalleadscounttoday }}">0</span>
                                             </h4>
                                         </div>
 
@@ -46,10 +46,10 @@
                                     <div class="row align-items-center">
                                         <div class="col-6">
                                         <span class="my-text">Variants</span><br><br>
-                                            <h4 class="mb-3">
-                                            This Month :  <span class="counter-value" data-target="{{ $totalvariantcount }}">0</span><br><br>
-                                            This Week  :  <span class="counter-value" data-target="{{ $totalvariantcount7days }}">0</span><br><br>
-                                            Today      :  <span class="counter-value" data-target="{{ $totalvariantcount }}">0 </span>
+                                            <h5 class="mb-3">
+                                            Last 30 Days :  <span class="counter-value" data-target="{{ $totalvariantcount }}">0</span><br><br>
+                                            Last 7 Days  :  <span class="counter-value" data-target="{{ $totalvariantcount7days }}">0</span><br><br>
+                                            Today      :  <span class="counter-value" data-target="{{ $totalvariantcounttoday }}">0 </span>
                                             </h4>
                                         </div>
                                         <div class="col-6">
@@ -111,12 +111,12 @@
                                         <ul class="nav justify-content-end nav-tabs-custom rounded card-header-tabs" role="tablist">
                                             <li class="nav-item">
                                                 <a class="nav-link active" data-bs-toggle="tab" href="#transactions-all-tab" role="tab">
-                                                    This Month
+                                                Last 30 Days
                                                 </a>
                                             </li>
                                             <li class="nav-item">
                                                 <a class="nav-link" data-bs-toggle="tab" href="#transactions-buy-tab" role="tab">
-                                                    This Week
+                                                Last 7 Days
                                                 </a>
                                             </li>
                                             <li class="nav-item">

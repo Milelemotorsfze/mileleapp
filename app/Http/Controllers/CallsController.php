@@ -316,4 +316,34 @@ return view('calls.resultbrand', compact('data'));
             ->with('Error','The uploaded file is invalid.');
         }
     }
+    public function checkExistence(Request $request)
+{
+    $phone = $request->input('phone');
+    $email = $request->input('email');
+    
+    $phoneCount = Calls::where('phone', $phone)->count();
+    $emailCount = Calls::where('email', $email)->count();
+    
+    $customers = Calls::where('phone', $phone)->orWhere('email', $email)->get();
+    $customerNames = $customers->pluck('name')->toArray();
+    
+    $data = [
+        'phoneCount' => $phoneCount,
+        'emailCount' => $emailCount,
+        'customerNames' => $customerNames,
+    ];
+    
+    return response()->json($data);
+}
+public function sendDetails(Request $request)
+{
+    $phone = $request->query('phone');
+    $email = $request->query('email');
+    
+    $calls = Call::where('phone', $phone)
+        ->orWhere('email', $email)
+        ->get();
+    
+    return view('calls.repeatedcustomers', compact('calls'));
+}
 }

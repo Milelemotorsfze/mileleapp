@@ -91,6 +91,7 @@ class HomeController extends Controller
     // Fetch the data from the database
 $last30Days = Carbon::now()->subDays(30);
 $last7Days = Carbon::now()->subDays(7);
+$todayl = Carbon::now();
 $variantsdays = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
               ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
@@ -107,8 +108,10 @@ $reelsdays = DB::table('varaints as v')
               ->select('v.*', 'ac.*')
               ->get();
 $countpendingreelsdays = $reelsdays->count();
+$totalleadscounttoday = Calls::where('created_at', '>=', $todayl)->count();
 $totalleadscount = Calls::where('created_at', '>=', $last30Days)->count();
 $totalleadscount7days = Calls::where('created_at', '>=', $last7Days)->count();
+$totalvariantcounttoday = AvailableColour::where('created_at', '>=', $todayl)->count();
 $totalvariantcount = AvailableColour::where('created_at', '>=', $last30Days)->count();
 $totalvariantcount7days = AvailableColour::where('created_at', '>=', $last7Days)->count();
 $totalcalls = DB::table('calls')
@@ -169,6 +172,6 @@ $totalvariantss = [
         ]
     ]
 ]; 
-       return view('home', compact('chartData', 'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days', 'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays', 'countpendingreels', 'countpendingreelsdays'));
+       return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData', 'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days', 'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays', 'countpendingreels', 'countpendingreelsdays'));
     }      
 }
