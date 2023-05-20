@@ -176,12 +176,12 @@
                             <label for="supplier" class="col-form-label text-md-end">{{ __('Supplier : ') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus required>
-                            <!-- @error('supplier')
+                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus >
+                            @error('supplier')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror -->
+                            @enderror
                             <span id="supplierError" class="required-class"></span>
                         </div>
                     </div>
@@ -213,11 +213,11 @@
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
                             <input id="contact_number" type="tel" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{ old('contact_number') }}"  autocomplete="contact_number" autofocus>
-                            <!-- @error('contact_number')
+                            @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror -->
+                            @enderror
                             <span id="contactRequired" class="email-phone required-class">One among contact number or alternative contact number or email is required</span>
                         </div>
                     </div>
@@ -282,7 +282,7 @@
                             <label for="supplier_type" class="col-form-label text-md-end">{{ __('Supplier Type : ') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <select name="supplier_type" id="supplier_type" class="form-control" required>
+                        <select name="supplier_type" id="supplier_type" class="form-control" >
                             <option value="">Choose Supplier Type</option>
                             <option value="accessories">Accessories</option>      
                             <option value="freelancer">Freelancer</option>
@@ -300,7 +300,7 @@
                             <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method : ') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control" onchange="secondaryPaymentMethods()" required>
+                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control" onchange="secondaryPaymentMethods()" >
                                 <option value="">Choose Payment Method</option>
                                 @foreach($paymentMethods as $paymentMethod)
                                 <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
@@ -648,7 +648,6 @@
         }
         function changeCurrency(i)
         {
-            alert('hlo');
             var e = document.getElementById("currency_"+i);
             var value = e.value;
             if(value == 'USD')
@@ -672,7 +671,6 @@
         }
         function calculateAED(i)
         {
-            alert('lololo');
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
             var aed = usd * 3.6725;
             if(aed == 0)

@@ -37,7 +37,7 @@
     <div class="card-body">
         @if (count($errors) > 0)
             <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <strong>Whoops!</strong> There were some problems with your input.</br></br>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -175,9 +175,54 @@
                         </div>
                     </div>
                     </br> -->
-                    <div class="row" hidden id="partNumberDiv">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                    <div class="row">
+                        <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
+                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included : ') }}</label>
+                        </div>
+                            <div class="col-xxl-3 col-lg-3 col-md-6" id="">
+                                <fieldset>
+                                    <div class="some-class">
+                                        <input type="radio" class="radioFixingCharge" name="x" value="yes" id="yes" checked />
+                                        <label for="yes">Yes</label>
+                                        <input type="radio" class="radioFixingCharge" name="x" value="no" id="no" />
+                                        <label for="no">No</label>
+                                    </div>
+                                </fieldset>
+                                @error('fixing_charges_included')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                            <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
+                            <!-- <span class="error">* </span> -->
+                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
+                        <input id="fixing_charge_amount" type="text" class="form-control form-control-sm" name="fixing_charge_amount" placeholder="Part Number" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
+                            @error('fixing_charge_amount')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror                          
+                        </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
+                            <!-- <span class="error">* </span> -->
+                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
+                        <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
+                            @error('part_number')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror                          
+                        </div>
+                    </div>
+                    </br>
+                    <!-- <div class="row" hidden id="partNumberDiv">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -189,7 +234,7 @@
                             @enderror                          
                         </div>
                     </div>
-                    <br hidden id="partNumberDivBr">  
+                    <br hidden id="partNumberDivBr">   -->
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
@@ -381,6 +426,23 @@
             });
             $("#selectModelNumber").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
             $("#selectModelNumber").select2();
+            $('.radioFixingCharge').click(function() 
+            {
+                if($(this).val() == 'yes')
+                {
+                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
+                    showFixingChargeAmount.hidden = true  
+                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
+                    showFixingChargeAmountBr.hidden = true
+                }
+                else
+                {
+                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
+                    showFixingChargeAmount.hidden = false  
+                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
+                    showFixingChargeAmountBr.hidden = false
+                }
+            });
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
             {
@@ -887,11 +949,42 @@ function closemodal()
             if(aed == 0)
             {
                 document.getElementById('addon_purchase_price_'+i).value = "";
+                setLeastAEDPrice();
             }
             else
             {
                 document.getElementById('addon_purchase_price_'+i).value = aed;
+                setLeastAEDPrice();
             }
+        }
+        function calculateUSD(i)
+        {
+            var aed = $("#addon_purchase_price_"+i).val();
+            var usd = aed / 3.6725;
+            var usd = usd.toFixed(4);
+            if(usd == 0)
+            {
+                document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+            }
+            else
+            {
+                document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+            }
+            setLeastAEDPrice();
+        }
+        function setLeastAEDPrice()
+        {
+            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
+            var arrayOfNumbers = [];
+            values.forEach(v => {
+                if(v != '')
+                {
+                    arrayOfNumbers .push(v);
+                }
+            });
+            var arrayOfNumbers = arrayOfNumbers.map(Number);
+            const minOfPrice = Math.min(...arrayOfNumbers);
+            $("#purchase_price").val(minOfPrice);
         }
         function selectBrand(id)
         {

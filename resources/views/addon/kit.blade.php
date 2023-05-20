@@ -18,6 +18,10 @@
         $('#kitSupplierIdToHideandshow').hide();
         $('#kitSupplierBrToHideandshow').hide();
         $('#kitSupplierButtonToHideandshow').hide();
+        $(".leastPurchasePriceAED").on("keyup change", function(e) {
+            setLeastPurchasePriceAED();
+        });
+        
     });
     $("body").on("click",".buttonForAddNewKitSupplier", function ()
     { 
@@ -33,7 +37,7 @@
                                     <div class="col-md-12 p-0">
                                         <div class="col-md-12 p-0">
                                             <div class="row">
-                                                <div class="col-xxl-5 col-lg-6 col-md-12">
+                                                <div class="col-xxl-3 col-lg-6 col-md-12">
                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
                                                     <select name="supplierAndPrice[1][supplier_id][]" id="kitSupplierDropdown${index}" multiple="true" style="width: 100%;">
                                                         @foreach($suppliers as $supplier)
@@ -46,13 +50,13 @@
                                                         </span>
                                                     @enderror
                                                 </div>
-                                                <div class="col-xxl-3 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                                                <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
+                                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}TotalPriceAED" type="text" class="leastPurchasePriceAED form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                                </div>
+                                                <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                     <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}TotalPriceUSD" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
-                                                </div>
-                                                <div class="col-xxl-3 col-lg-3 col-md-3" id="div_price_in_aed_1" >
-                                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}TotalPriceAED" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
                                                 </div>
                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                     <button class="btn_round removeKitSupplier" disabled>
@@ -99,11 +103,11 @@
                                                 </div>
                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}Kit1TotalPriceAED" type="text" class="form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${index},1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price]" id="Supplier${index}Kit1TotalPriceAED" type="text" class="Supplier${index}TotalPriceInAED form-control form-control-sm @error('addon_purchase_price') is-invalid @enderror" placeholder="Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${index},1)">
                                                 </div>
                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
-                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}Kit1UnitPriceUSD" type="text" class="form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${index},1)">
+                                                    <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="Supplier${index}Kit1UnitPriceUSD" type="text" class="Supplier${index}TotalPriceInUSD form-control form-control-sm @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${index},1)">
                                                 </div>
                                                 <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
@@ -152,20 +156,7 @@
     {
         $(this).closest(".addSupplierForKitRow").remove();
     });
-    function calculateUSD(i)
-    {
-        var aed = $("#addon_purchase_price_"+i).val();
-        var usd = aed / 3.6725;
-        var usd = usd.toFixed(4);
-        if(usd == 0)
-        {
-            document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
-        }
-        else
-        {
-            document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
-        }
-    }
+   
     // function removeKitItemForSupplier(supplier)
     // {
     //     alert('kok');
@@ -233,10 +224,12 @@
         if(totalPriceAED == 0)
         {
             $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val("");
+            calculateTotalPriceInAED(supplier);
         }
         else
         {
             $("#Supplier"+supplier+"Kit"+kit+"TotalPriceAED").val(totalPriceAED);
+            calculateTotalPriceInAED(supplier);
         }
         if(unitPriceUSD == 0)
         {
@@ -249,10 +242,12 @@
         if(totalPriceUSD == 0)
         {
             $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val("");
+            calculateTotalPriceInUSD(supplier);
         }
         else
         {
             $("#Supplier"+supplier+"Kit"+kit+"TotalPriceUSD").val(totalPriceUSD);
+            calculateTotalPriceInUSD(supplier);
         }
     }
     function calculateRelatedofUnitPriceAED(quantity,unitPriceAED,supplier,kit)
@@ -307,5 +302,44 @@
         totalPriceAED = parseFloat(totalPriceAED); 
         showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
     }
-                  
+    function  calculateTotalPriceInAED(supplier)
+    {                
+        const values = Array.from(document.querySelectorAll('.Supplier'+supplier+'TotalPriceInAED')).map(input => input.value)
+        var arrayOfNumbers = values.map(Number);
+        let myNums = arrayOfNumbers;
+        let sum = 0;
+        for (let i = 0; i < myNums.length; i++ ) 
+        {
+            sum += myNums[i];
+        }
+        $("#Supplier"+supplier+"TotalPriceAED").val(sum);
+        setLeastPurchasePriceAED();
+    }
+    function  calculateTotalPriceInUSD(supplier)
+    {                
+        const values = Array.from(document.querySelectorAll('.Supplier'+supplier+'TotalPriceInUSD')).map(input => input.value)
+        var arrayOfNumbers = values.map(Number);
+        let myNums = arrayOfNumbers;
+        let sum = 0;
+        for (let i = 0; i < myNums.length; i++ ) 
+        {
+            sum += myNums[i];
+        }
+        $("#Supplier"+supplier+"TotalPriceUSD").val(sum);
+    }
+    function setLeastPurchasePriceAED()
+    {
+        const values = Array.from(document.querySelectorAll('.leastPurchasePriceAED')).map(input => input.value);
+        var arrayOfNumbers = [];
+            values.forEach(v => {
+                if(v != '')
+                {
+                    arrayOfNumbers .push(v);
+                }
+            });
+            var arrayOfNumbers = arrayOfNumbers.map(Number);
+            const min = Math.min(...arrayOfNumbers);
+            $("#purchase_price").val(min);
+    }
+            
 </script>

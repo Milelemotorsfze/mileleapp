@@ -51,22 +51,23 @@ class SupplierController extends Controller
         $authId = Auth::id();
         // $validator = Validator::make($request->all(), [
         //     'supplier' => 'required',
-        //     'contact_person' => 'required',
-        //     'contact_number' => 'required',
-        //      'alternative_contact_number' => 'required',
-        //     'email' => 'required',
-        //     'person_contact_by' => 'required',
+        //     // 'contact_person' => 'required',
+        //     // 'contact_number' => 'required',
+        //     //  'alternative_contact_number' => 'required',
+        //     // 'email' => 'required',
+        //     // 'person_contact_by' => 'required',
+        //     // 'supplier_type' => 'required',
+        //     // 'is_primary_payment_method' => 'required',
+        //     // 'model' => 'required',
+        //     // 'addon_id' => 'required',
+        //     // 'payment_methods_id' => 'required',
         //     'supplier_type' => 'required',
-        //     'is_primary_payment_method' => 'required',
-        //     'model' => 'required',
-        //     'addon_id' => 'required',
-        //     'payment_methods_id' => 'required',
         // ]);
        
         // if ($validator->fails()) 
         // {
         //     // dd('hi');
-        //     return redirect(route('addon.create'))->withInput()->withErrors($validator);
+        //     return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
         // }
         // else 
         // { 
@@ -141,26 +142,33 @@ class SupplierController extends Controller
                 {
                     foreach($request->supplierAddon as $supAddon)
                     {
-                        $supAdd['currency'] = $supAddon['currency'];
-                        if($supAddon['currency'] == 'AED')
+                        if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
                         {
-                            $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price'];
-                        }
-                        elseif($supAddon['currency'] == 'USD')
-                        {
-                            $supAdd['purchase_price_usd'] = $supAddon['addon_purchase_price_in_usd'];
-                            $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price_in_usd'] * 3.6725;
-                        }
-                        foreach($supAddon['addon_id'] as $addon_code)
-                        {
-                            $supAdd['addon_details_id'] = $addon_code;
-                            $suppliers = SupplierAddons::create($supAdd);
-                        }
+                            $supAdd['currency'] = $supAddon['currency'];
+                            if($supAddon['currency'] == 'AED')
+                            {
+                                $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price'];
+                            }
+                            elseif($supAddon['currency'] == 'USD')
+                            {
+                                $supAdd['purchase_price_usd'] = $supAddon['addon_purchase_price_in_usd'];
+                                $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price_in_usd'] * 3.6725;
+                            }
+                            if(count($supAddon['addon_id']) > 0)
+                            {
+                                foreach($supAddon['addon_id'] as $addon_code)
+                                {
+                                    $supAdd['addon_details_id'] = $addon_code;
+                                    $suppliers = SupplierAddons::create($supAdd);
+                                }
+                            }
+                        } 
                     }
                 }
             }
             return redirect()->route('suppliers.index')
                              ->with('success','Addon created successfully');
+        // }
     }
 
     /**
