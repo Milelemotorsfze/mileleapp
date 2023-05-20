@@ -40,7 +40,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" >
@@ -49,7 +49,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
@@ -62,10 +62,28 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" name="date">
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                        <select class="form-control" data-trigger name="dealers" >
+                            <option value="Trans Cars">Trans Cars</option>
+                            <option value="Milele Motors">Milele Motors</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13">Shipping Mwthod</label>
+                        <select class="form-control" data-trigger name="shipment_method">
+                            <option value="CNF">CNF</option>
+                            <option value="X work">X work</option>
+                        </select>
                     </div>
                 </div>
                 <br>
@@ -107,7 +125,6 @@
                     });
                 }
             });
-
         }
     </script>
 @endpush

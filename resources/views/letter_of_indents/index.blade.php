@@ -46,7 +46,7 @@
                     <table id="new-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>ID</th>
+                            <th>S.NO</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
@@ -62,7 +62,7 @@
                         </div>
                         @foreach ($letterOfIndents as $key => $letterOfIndent)
                             <tr>
-                                <td>   {{ $letterOfIndent->id }}</td>
+                                <td> {{ ++$i }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
@@ -74,7 +74,7 @@
                                 <td><button type="button" class="btn btn-primary modal-button" data-bs-toggle="modal"
                                             data-modal-id="view-LOI-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
                                 </td>
-                                <td><a href="{{ route('letter-of-indents.generate-loi') }}"> LOI</a> </td>
+                                <td><a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}"> LOI</a> </td>
                                 <div class="modal modalhide" id="viewdealinfo-{{$letterOfIndent->id}}" >
                                     <div class="modal-header bg-primary">
                                         <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>

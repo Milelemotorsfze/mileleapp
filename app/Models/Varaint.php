@@ -21,4 +21,8 @@ class Varaint extends Model
     {
         return $this->belongsTo(MasterModelLines::class,'master_model_lines_id');
     }
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class,'brands_id');
+    }
 }

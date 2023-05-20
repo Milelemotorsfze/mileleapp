@@ -1,58 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-<style>
-    @page { size: 700pt }
-    .content{
-        font-family: arial, sans-serif;
-        background-color: #f6f5f5;
-    }
-    .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        width: 50%;
-    }
-    table {
-        font-family: arial, sans-serif;
-        border-collapse: collapse;
-        width: 100%;
-    }
+    <style>
+        @page { size: 700pt }
+        .content{
+            font-family: arial, sans-serif;
+            background-color: #f6f5f5;
+        }
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
 
-    #so-details td {
-        border: none;
-        padding: 5px;
-    }
-    #so-items td, th{
-        border: 1px solid #1c1b1b;
-        text-align: left;
-        padding: 8px;
-    }
-    .left {
-        text-align: left;
-    }
-    .right{
-       align-content: end;
-    }
-    .heading {
-        text-align: center;
-        font-weight: bold;
-    }
-    .last{
-        text-align: end;
-        margin-left: 20px;
-    }
-    .hide{
-        background-color: #0f0f0f;
-        color: #0f0f0f;
-    }
-    .header{
-        background-color: #0f0f0f;
-    }.
-     .bg-white{
-        background-color: #FFFFFF;
-     }
-</style>
+        #so-details td {
+            border: none;
+            padding: 5px;
+        }
+        #so-items td, th{
+            border: 1px solid #1c1b1b;
+            text-align: left;
+            padding: 8px;
+        }
+        .left {
+            text-align: left;
+        }
+        .right{
+            align-content: end;
+        }
+        .heading {
+            text-align: center;
+            font-weight: bold;
+        }
+        .last{
+            text-align: end;
+            margin-left: 20px;
+        }
+        .hide{
+            background-color: #0f0f0f;
+            color: #0f0f0f;
+        }
+        .header{
+            background-color: #0f0f0f;
+        }.
+         .bg-white{
+             background-color: #FFFFFF;
+         }
+    </style>
 </head>
 <body>
 <div class="page">
@@ -61,21 +61,21 @@
             <table>
                 <tr>
                     <td>
-{{--                        <img src="{{ url('bgm.png') }}" width="200px" height="100px" ><span class="logo-txt"></span>--}}
+                       <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>
                     </td>
                     {{--                <td style="color: #FFFFFF">--}}
                     {{--                    <h1 style="margin-bottom: 1px;font-size: 38px">Milele Motors</h1>--}}
                     {{--                    <h6 style="margin-top: 1px">Procuring,Sourcing & Stocking Motor Vehicles</h6>--}}
                     {{--                </td>--}}
-                    <td>
-                        <h1 class="last" style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
+                    <td class="last">
+                        <h1 style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
                     </td>
                 </tr>
             </table>
         </div>
 
         <b><p style="padding-left: 5px">Milele Motors FZCO</p></b>
-        <table id="so-details" >
+        <table id="so-details">
             <tr>
                 <td class="left">VAT TRN - 100057588400003</td>
                 <td></td>
@@ -84,7 +84,7 @@
             <tr>
                 <td class="left">Ras al khor 3, Yard 11 - DAZ</td>
                 <td></td>
-                <td class="last " >Date :
+                <td class="last" >Date :
                     <span>
                         {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}}
                     </span>
@@ -105,7 +105,7 @@
                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
                     <span>
                          @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                           {{ $letterOfIndent->customer->name }}
+                            {{ $letterOfIndent->customer->name }}
                         @else
                             {{ $letterOfIndent->customer->company ?? ''}}
                         @endif
@@ -139,6 +139,12 @@
                     <td class="hide">3</td>
                 </tr>
             @endforeach
+            <tr>
+                <td></td>
+                <td>{{ $letterOfIndent->shipment_method }} SHIPMENT AND TRANSPORTATION</td>
+                <td></td>
+                <td></td>
+            </tr>
             @for($i=0;$i<=10;$i++)
                 <tr>
                     <td></td>
@@ -147,7 +153,6 @@
                     <td></td>
                 </tr>
             @endfor
-
             <tr style="background-color: #FFFFFF">
                 <td style="border: none;">Name</td>
                 <td style="border: none">
@@ -179,13 +184,12 @@
         </table>
     </div>
 </div>
-
+</div>
 <div class="row">
-    <div style="text-align: center">
-        <p> Make all checks payable to Milele Motors FZCO </p>
+    <div style="text-align: center;position: absolute;bottom:0">
+        Make all checks payable to Milele Motors FZCO
         <p style="font-weight: bold">THANK YOU FOR YOUR BUSINESS</p>
     </div>
-</div>
 </body>
 </html>
 

@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentItem;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Monarobase\CountryList\CountryListFacade;
+use setasign\Fpdi\Fpdi;
+use Illuminate\Support\Facades\Storage;
 
 class LetterOfIndentController extends Controller
 {
@@ -16,9 +19,7 @@ class LetterOfIndentController extends Controller
      */
     public function index()
     {
-
-        $letterOfIndents = LetterOfIndent::orderBy('id','DESC')->get();
-
+        $letterOfIndents = LetterOfIndent::orderBy('id','DESC')->cursor();
         return view('letter_of_indents.index', compact('letterOfIndents'));
     }
 
@@ -50,12 +51,14 @@ class LetterOfIndentController extends Controller
             ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS)
             ->where('status', LetterOfIndent::LOI_STATUS)
             ->first();
-        if(!$LOI)
+        if (!$LOI)
         {
             $LOI = new LetterOfIndent();
             $LOI->customer_id = $request->customer_id;
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
+            $LOI->dealers = $request->dealers;
+            $LOI->shipment_method = $request->shipment_method;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS;
             $LOI->status = LetterOfIndent::LOI_STATUS;
             $LOI->save();
@@ -73,12 +76,57 @@ class LetterOfIndentController extends Controller
     }
     public function generateLOI(Request $request)
     {
-        $letterOfIndent = LetterOfIndent::find($request->id);
+        $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
-        return view('letter_of_indents.loi_document');
+//        return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+        if ($letterOfIndent->dealers == 'Trans Car') {
+            $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+
+        }else{
+            $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+
+        }
+
+//        $pdfFile = PDF::loadView('letter_of_indents.loi_document', compact('letterOfIndent','letterOfIndentItems'));
+
+//        return $pdfFile;
+//        Storage::disk('local')->makeDirectory('/GENERATE_LOI');
 //
-//        $pdf = PDF::loadView('letter_of_indents.loi_document');
-//        return $pdf->download('LOI_'.date('Y_m_d').'.pdf');
+//        $path = 'storage/GENERATE_LOI/LOI_'.$letterOfIndent->id.'.pdf';
+//        $pdfFile->save($path);
+//
+//        $pdf = new Fpdi();
+//        $pdf->setSourceFile($path);
+//
+//        // Remove metadata and date from each page
+//        $pageCount = $pdf->setSourceFile($path);
+////        return $pageCount;
+//        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+//            $tplIdx = $pdf->importPage($pageNo);
+//            $pdf->AddPage();
+//            $pdf->useTemplate($tplIdx);
+//            // Remove metadata
+//            $pdf->SetTitle('');
+//            $pdf->SetAuthor('');
+//            $pdf->SetCreator('anna');
+//            $pdf->SetSubject( '');
+//            $pdf->SetKeywords( '');
+//
+//            // Remove the date
+//            $pdf->SetX('CreationDate', '01/05/2021');
+//        }
+//
+//        Storage::disk('local')->makeDirectory('/STORE_LOI');
+//
+//        $modifiedPdfPath = 'storage/STORE_LOI/LOI_'.$letterOfIndent->id.'.pdf';
+//        $pdf->Output($modifiedPdfPath, 'F');
+
+        // Download the modified PDF
+
+        return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+//        return response()->download($modifiedPdfPath);
+
 
     }
 
