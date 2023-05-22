@@ -71,6 +71,7 @@ use App\Http\Controllers\Repeatedcustomers;
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
+    Route::post('letter-of-indents/status-change', [LetterOfIndentController::class, 'approve'])->name('letter-of-indents.status-change');
     Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('letter-of-indent-items', LOIItemsController::class);
@@ -117,7 +118,7 @@ use App\Http\Controllers\Repeatedcustomers;
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
-   
+
 
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);

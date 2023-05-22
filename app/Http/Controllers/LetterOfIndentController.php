@@ -19,8 +19,24 @@ class LetterOfIndentController extends Controller
      */
     public function index()
     {
-        $letterOfIndents = LetterOfIndent::orderBy('id','DESC')->cursor();
-        return view('letter_of_indents.index', compact('letterOfIndents'));
+        $newLOIs = LetterOfIndent::orderBy('id','DESC')
+            ->where('status',LetterOfIndent::LOI_STATUS_NEW)
+            ->cursor();
+        $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
+            ->where('status',LetterOfIndent::LOI_STATUS_APPROVED)
+            ->cursor();
+        $partialApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
+            ->where('status', LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED)
+            ->cursor();
+        $supplierApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
+            ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+            ->cursor();
+        $rejectedLOIs =  LetterOfIndent::orderBy('id','DESC')
+            ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)
+            ->cursor();
+
+        return view('letter_of_indents.index', compact('newLOIs','approvedLOIs',
+            'partialApprovedLOIs','supplierApprovedLOIs','rejectedLOIs'));
     }
 
     /**
@@ -48,8 +64,8 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
-            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS)
-            ->where('status', LetterOfIndent::LOI_STATUS)
+            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS_NEW)
+            ->where('status', LetterOfIndent::LOI_STATUS_NEW)
             ->first();
         if (!$LOI)
         {
@@ -59,8 +75,8 @@ class LetterOfIndentController extends Controller
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
             $LOI->shipment_method = $request->shipment_method;
-            $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS;
-            $LOI->status = LetterOfIndent::LOI_STATUS;
+            $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
+            $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->save();
         }
 
@@ -129,7 +145,13 @@ class LetterOfIndentController extends Controller
 
 
     }
+    public function approve(Request $request) {
+        $letterOfIndent = LetterOfIndent::find($request->id);
 
+        $letterOfIndent->status = $request->status;
+        $letterOfIndent->save();
+        return response($letterOfIndent, 200);
+    }
     /**
      * Display the specified resource.
      */
