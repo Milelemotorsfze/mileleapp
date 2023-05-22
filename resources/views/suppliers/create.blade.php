@@ -319,7 +319,7 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods : ') }}</label>
+                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">

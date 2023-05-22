@@ -31,8 +31,9 @@
             top: 0;
         }
 </style>
-
-<div class="table-responsive" id="addonListTable" hidden>     
+@if($addons)
+        @if(count($addons) > 0)
+    <div class="table-responsive" id="addonListTable" hidden>     
       <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
         <thead>
           <tr>
@@ -53,6 +54,7 @@
         <tbody>
           <div hidden>{{$i=0;}}
           </div>
+        
           @foreach ($addons as $key => $addon)
             <tr data-id="1">
               <td>{{ ++$i }}</td>
@@ -107,6 +109,9 @@
               </td>
             </tr>
           @endforeach
+        
         </tbody>
       </table>
     </div>
+    @endif
+          @endif

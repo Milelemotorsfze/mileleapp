@@ -264,15 +264,16 @@
                     <div class="card-header">
                         <h4 class="card-title">Addon Brand and Model Lines</h4>
                     </div>
-                    <div class="row">
+                    <div class="supplierWithoutKit">
+                    <div class="row supplierWithoutKitApendHere">
                                         <div class="col-xxl-4 col-lg-6 col-md-12">
                                             <div class="row">
                                                 <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="brand" class="keepDatalist col-form-label text-md-end">{{ __('Brand') }}</label>
+                                                    <label for="brand" class="keepDatalist col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="showDiv" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                        <div id="showDiv1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
                                             <div class="row">
                                                 <div class="col-xxl-12 col-lg-12 col-md-12">
                                                     <label for="model" class="col-form-label text-md-end">{{ __('Model Line') }}</label>
@@ -291,7 +292,7 @@
                                     </div>
                                     <div id="dynamic_field">
                                         <div class="row">
-                                            <div class="col-xxl-4 col-lg-6 col-md-12">
+                                            <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
                                                 <div class="row">                                   
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                                     <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control form-control-sm @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value=""  autocomplete="brand" autofocus>
@@ -308,8 +309,21 @@
                                                     @enderror
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div id="showDivdrop" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                            </div> -->
+                                            <div class="col-xxl-4 col-lg-6 col-md-12">
+                                            <select onchange=selectBrand(this.id,1) name="br[]" id="selectBrand1" multiple="true" style="width: 100%;">
+                                            <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
+                                            @foreach($brands as $brand)
+                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                                @endforeach
+                                            </select>                           
+                                            @error('supplier_id')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+                                            <div id="showDivdrop1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
                                                 <div class="row">                                 
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">                                  
                                                     <select class="compare-tag1" name="model[]" id="selectModelLine" multiple="true" style="width: 100%;">
@@ -325,7 +339,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="showModelNumberdrop" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                            <div id="showModelNumberdrop1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
                                                 <div class="row">                                 
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">                                  
                                                     <select class="compare-tag1" name="model_number[]" id="selectModelNumber" multiple="true" style="width: 100%;">
@@ -351,6 +365,7 @@
                                         </div>
                                     </div>
                                     </br>      
+                                </div>
                                 </div>
                                 <div class="card"  id="kitSupplier" >
                     <div class="card-header">
@@ -420,12 +435,16 @@
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
+            $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            $("#selectBrand1").select2({
+                maximumSelectionLength: 1,
+            });
             $("#supplierArray1").attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
             $("#selectModelNumber").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
-            $("#selectModelNumber").select2();
+            $("#selectModelNumber").select2();            
             $('.radioFixingCharge').click(function() 
             {
                 if($(this).val() == 'yes')
@@ -523,32 +542,80 @@
             });
             var j=1;
            
-           $('#add').click(function()
+        //    $('#add').click(function()
+        //    {
+        //         $('.allbrands').prop('disabled',true);
+        //        // globalThis.selectedBrands = [];
+        //        // console.log(globalThis.selectedBrands);
+        //        for (let j = 1; j <= i; j++)
+        //        {
+        //             var value =$('#selectBrand'+j).val();
+        //             // globalThis.selectedBrands .push(value);
+        //             $('.'+value).prop('disabled',true);
+        //             // globalThis.selectedBrands = [];
+        //             // globalThis.selectedBrands.push(a);
+        //        }
+        //        //         $.each(data.existingSuppliers,function(key,value)
+        //        //         {
+        //        //             var a = value.supplier_id;
+        //        //             selectedBrands.push(a);
+        //        // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
+        //        // });
+        //        // var brandvalue = $('#selectBrand').val();
+               
+        //        // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
+        //        // $('#addon_name').val(a);
+        //        var selectBrand = $("#selectBrand1").val();
+        //        i++;
+        //        // onChange="get_data('+i+')" 
+        //        var selectBrand = $("#selectModelLine").val();
+        //        // i++;
+        //        var html = '';
+        //        html += '</br>';
+        //        html += '<div id="row'+i+'" class="dynamic-added">';
+        //        html += '<div class="row">';
+        //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
+        //        html += '<div class="row">';
+        //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
+        //        html += '<select onchange=selectBrand(this.id) name="br[]" id="selectBrand'+i+'" multiple="true" style="width: 100%;">';
+        //        html += '@foreach($brands as $brand)';
+        //        html += '<option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>';
+        //        html += '@endforeach';
+        //        html += '</select>';                                     
+        //        html += '</div>';
+        //        html += '</div>';
+        //        html += '</div>';
+        //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
+        //        html += '<div class="row">';
+        //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
+        //        html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
+        //        html += '</div>';
+        //        html += '</div>';
+        //        html += '</div>';
+        //        html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
+        //        html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
+        //        html += '</div>';
+        //        html += '</div>';
+        //        html += '</div>';
+        //        $('#dynamic_field').append(html);
+        //        $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+        //         $("#selectBrand"+i).select2({
+        //             maximumSelectionLength: 1,
+        //         });
+        //    });
+        $('#add').click(function()
            {
-            //    alert(i);
-               // alert(globalThis.selectedBrands);
-               let opt = document.querySelector('option[data-value=allbrands]')
-               opt.setAttribute('disabled','disabled');
+                $('.allbrands').prop('disabled',true);
                // globalThis.selectedBrands = [];
                // console.log(globalThis.selectedBrands);
                for (let j = 1; j <= i; j++)
                {
-                   var value =$('#selectBrand'+j).val();
-                   var id = $('#cityname1 [value="' + value + '"]').data('value');
-                   // console.log(id);
-                   // globalThis.selectedBrands .push(id);
-                   // var v = "1"
-                   let opt2 = document.querySelector('option[data-value="'+id+'"]')
-                   // console.log(opt2);
-               opt2.setAttribute('disabled','disabled');
-               console.log(opt2);
-               // globalThis.selectedBrands = [];
-                   // globalThis.selectedBrands.push(a);
-                   
+                    var value =$('#selectBrand'+j).val();
+                    // globalThis.selectedBrands .push(value);
+                    $('.'+value).prop('disabled',true);
+                    // globalThis.selectedBrands = [];
+                    // globalThis.selectedBrands.push(a);
                }
-               // console.log(globalThis.selectedBrands);
-               // console.log(globalThis.selectedBrands)
-               // alert(i);
                //         $.each(data.existingSuppliers,function(key,value)
                //         {
                //             var a = value.supplier_id;
@@ -559,36 +626,106 @@
                
                // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
                // $('#addon_name').val(a);
-               var selectBrand = $("#selectBrand1").val();
-               i++;
-               // alert('j');
+            //    var selectBrand = $("#selectBrand1").val();
+            //    i++;
                // onChange="get_data('+i+')" 
-               var selectBrand = $("#selectModelLine").val();
+            //    var selectBrand = $("#selectModelLine").val();
                // i++;
-               var html = '';
-               html += '</br>';
-               html += '<div id="row'+i+'" class="dynamic-added">';
-               html += '<div class="row">';
-               html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-               html += '<div class="row">';
-               html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="cityname1" onchange=selectBrand(this.id)  id="selectBrand'+i+'" type="text" class="cityname1 form-control form-control-sm @error('addon_name') is-invalid @enderror" name="brand[]" placeholder="Choose Brand" value=""  autocomplete="addon_name" autofocus>';
-               html += '</div>';
-               html += '</div>';
-               html += '</div>';
-               html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-               html += '<div class="row">';
-               html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-               html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
-               html += '</div>';
-               html += '</div>';
-               html += '</div>';
-               html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
-               html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
-               html += '</div>';
-               html += '</div>';
-               html += '</div>';
-               $('#dynamic_field').append(html);
+            //    var html = '';
+           
+            //    $('#dynamic_field').append(html);
+            var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1; 
+        $(".supplierWithoutKit").append(`
+        <div class="row">
+                                        <div class="col-xxl-4 col-lg-6 col-md-12">
+                                            <div class="row">
+                                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                    <label for="brand" class="keepDatalist col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="showDiv${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                            <div class="row">
+                                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Line') }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="showModelNumberLabel" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                            <div class="row">
+                                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Description') }}</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xxl-1 col-lg-1 col-md-2">
+                                        </div>
+                                    </div>
+                                    <div id="dynamic_field">
+                                        <div class="row">
+                                            <div class="col-xxl-4 col-lg-6 col-md-12">
+                                            <select onchange=selectBrand(this.id,${index}) name="br[]" id="selectBrand${index}" multiple="true" style="width: 100%;">
+                                            <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
+                                            @foreach($brands as $brand)
+                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                                @endforeach
+                                            </select>                           
+                                            @error('supplier_id')
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                            @enderror
+                                        </div>
+                                            <div id="showDivdrop${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                                <div class="row">                                 
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
+                                                    <select class="compare-tag1" name="model[]" id="selectModelLine" multiple="true" style="width: 100%;">
+                                                        @foreach($modelLines as $modelLine)
+                                                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
+                                                        @endforeach
+                                                    </select>     
+                                                    @error('model')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="showModelNumberdrop${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
+                                                <div class="row">                                 
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
+                                                    <select class="compare-tag1" name="model_number[]" id="selectModelNumber" multiple="true" style="width: 100%;">
+                                                    
+                                                    @foreach($modelLines as $modelLine)
+                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
+                                                @endforeach
+                                            </select>     
+                                                    @error('model')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-1 col-lg-1 col-md-2">
+                                            </div>
+                                        </div>
+                                        <div id="newRow"></div>
+                                        <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
+                                            <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a> 
+                                        </div>
+                                    </div>
+                                    </br>      
+                                </div>
+            `); 
+            $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit:not(:first)").prop("disabled", false); $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit").first().prop("disabled", true); 
+            $("#selectBrand"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
+            $("#selectBrand"+index).select2
+            ({
+                // maximumSelectionLength: 1,
+            });
            });
            $(document).on('click', '.btn_remove', function()
             {
@@ -596,21 +733,21 @@
                 $('#row'+button_id+'').remove();
             });
             $('.modal-button').on('click', function()
-        {
-            currentAddonType =  $('#addon_type').val();
-            if(currentAddonType == '')
-            { 
-                document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
-                document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
-            }
-            else
             {
-                $("#addon_id").val('');
-                var modalId = $(this).data('modal-id');
-                $('#' + modalId).addClass('modalshow');
-                $('#' + modalId).removeClass('modalhide');
-            }
-        });
+                currentAddonType =  $('#addon_type').val();
+                if(currentAddonType == '')
+                { 
+                    document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
+                    document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
+                }
+                else
+                {
+                    $("#addon_id").val('');
+                    var modalId = $(this).data('modal-id');
+                    $('#' + modalId).addClass('modalshow');
+                    $('#' + modalId).removeClass('modalhide');
+                }
+            });
             $('.close').on('click', function()
             {
                 $('.modal').addClass('modalhide');
@@ -735,7 +872,7 @@
 // // $("#adoon_2").trigger('change');
 //                 });
         // }
-function closemodal()
+        function closemodal()
         {
             $('.modal').removeClass('modalshow');
             $('.modal').addClass('modalhide');
@@ -756,11 +893,11 @@ function closemodal()
                 document.getElementById("AddonTypeError").textContent="";
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    // showModelNumberDropdown();
+                    showModelNumberDropdown();
                 }
                 else
                 {
-                    // hideModelNumberDropdown();
+                    hideModelNumberDropdown();
                 }
                 if(value == 'SP' )
                 {    
@@ -768,8 +905,6 @@ function closemodal()
                     showPartNumber.hidden = false  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = false
-                    // shownotKitSupplier();
-                    // hidekitSupplier();
                 }
                 else
                 {
@@ -777,27 +912,16 @@ function closemodal()
                     showPartNumber.hidden = true  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true 
-                    // showkitSupplier();
-                    // hidenotKitSupplier();
                 }
                 if(value == 'K')
                 {
-                    // let showPartNumber = document.getElementById('kitSupplier');
-                    // showPartNumber.hidden = false 
-                    // alert('hi');
                     hidenotKitSupplier();
-                    showkitSupplier();
-                  
+                    showkitSupplier();                 
                 }
                 else
                 {
-                //     let hideKitSupplier = document.getElementById('kitSupplier');
-                //     hideKitSupplier.hidden = false 
-                    
-                // alert('hlo');
-                hidekitSupplier();
-                shownotKitSupplier();
-                                   
+                    hidekitSupplier();
+                    shownotKitSupplier();          
                 }
                 $.ajax
                 ({
@@ -870,23 +994,11 @@ function closemodal()
                     _token: '{{csrf_token()}}' 
                 },
                 dataType : 'json',
-                // success: function(result)
-                // {
-                //     $('#addon_code').val(result.newAddonCode);
-                //     if(result.addonMasters!='')
-                //     {
-                //         $("#addon_id").html("").trigger("change");
-                //         $.each(result.addonMasters,function(key,value)
-                //         {
-                //             $('#cityname').append("<option data-value='" + value.id + "' value='" + value.name + "'></option>");  
-                //         });
-                //     }
-                // }
                 success:function(data) 
                 {
                     $("#selectModelNumber").html("").trigger("change");
                     let ModelLineModelDescription   = [];
-                    $.each(data,function(key,value)
+                    $.each(data.model_description,function(key,value)
                     {
                         ModelLineModelDescription.push 
                         ({
@@ -986,53 +1098,37 @@ function closemodal()
             const minOfPrice = Math.min(...arrayOfNumbers);
             $("#purchase_price").val(minOfPrice);
         }
-        function selectBrand(id)
+        function selectBrand(id,row)
         {
-            // alert(id); 
-            //selectBrand1
-            // alert(i);
-            
             for (let a = 1; a <= i; a++)
-                {
-                    var value =$('#'+id).val();
-            // alert(value); // BENTLEY
-            // id="selectBrand'+i+'"
-            // '#'+id 
-                var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-                // alert(brandId); //1
+            {
+                var value =$('#'+id).val()
+                // var brandId = $('#cityname1 [value="' + value + '"]').data('value');
+                var brandId = value;
                 globalThis.selectedBrands .push(brandId);
-                // alert('i is coming');
-                // alert(globalThis.i);
-                if(brandId != 'allbrands')
+                if(brandId != '')
                 {
-                    showRelatedModal(brandId);
-                
+                    if(brandId != 'allbrands')
+                    {
+                        showRelatedModal(brandId,row);
+                    }
+                    else
+                    {
+                        hideRelatedModal(brandId,row);
+                    }
                 }
-                // alert('#selectBrand'+i);
+                else
+                {
+                    hideRelatedModal(brandId,row);
                 }
+            }
             // globalThis.selectedBrands[i] = 2;
-            // alert(selectedBrands);
-            // alert('ff');
-            // alert(id)
             // var value =$('#selectBrand'+j).val();
-            // alert('#selectBrand1'+id);
-            
             // var value =$('#'+id).val();
-            // alert(value); // BENTLEY
-            // // id="selectBrand'+i+'"
-            // // '#'+id 
             //     var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-            //     alert(brandId); //1
             //     globalThis.selectedBrands .push(brandId);
-            //     // alert('i is coming');
-            //     // alert(globalThis.i);
-            //     if(brandId != 'allbrands')
-            //     {
-            //         showRelatedModal(brandId);
-                
-            //     }
         }
-        function showRelatedModal(id)
+        function showRelatedModal(id,row)
         {
             let showDiv = document.getElementById('showDiv');
             showDiv.hidden = false
@@ -1066,38 +1162,31 @@ function closemodal()
                 }
             });
         }
+        function hideRelatedModal(id,row)
+        {
+            let showDiv = document.getElementById('showDiv'+row);
+            showDiv.hidden = true
+            let showDivdrop = document.getElementById('showDivdrop'+row);
+            showDivdrop.hidden = true
+            let showaddtrim = document.getElementById('showaddtrim'+row);
+            showaddtrim.hidden = true
+        }
         function showkitSupplier()
         {
-            // let showDivkit = document.getElementById('kitSupplier');
-            // showDivkit.hidden = false
-            // let showDivBtn = document.getElementById('kitSupplierButton');
-            // showDivBtn.hidden = false
-            // let showDivBr = document.getElementById('kitSupplierBr');
-            // showDivBr.hidden = false
             $('#kitSupplierIdToHideandshow').show();
             $('#kitSupplierBrToHideandshow').show();
             $('#kitSupplierButtonToHideandshow').show();
         }
         function hidenotKitSupplier()
-        {  
-            // let showDiv = document.getElementById('notKitSupplier');
-            // showDiv.hidden = true
+        {
             $('#notKitSupplier').hide();
         }
         function shownotKitSupplier()
         { 
-            // let showDiv = document.getElementById('notKitSupplier');
-            // showDiv.hidden = false
             $('#notKitSupplier').show();
         }
         function hidekitSupplier()
-        { 
-            // let showDivkit = document.getElementById('kitSupplier');
-            // showDivkit.hidden = true
-            // let showDivBtn = document.getElementById('kitSupplierButton');
-            // showDivBtn.hidden = true
-            // let showDivBr = document.getElementById('kitSupplierBr');
-            // showDivBr.hidden = true
+        {
             $('#kitSupplierIdToHideandshow').hide();
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();

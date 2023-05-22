@@ -298,12 +298,12 @@ body {font-family: Arial;}
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods : ') }}</label>
+                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
                        
                             <div class="col-xxl-2 col-lg-2 col-md-4" id="{{$paymentMethod->id}}">
-                                <input name="payment_methods_id[]" class="form-check-input" type="checkbox" value="$paymentMethod->id" @if (in_array($paymentMethod->id, ['1','2','3','4'])) checked="checked" @endif >                              
+                                <input name="payment_methods_id[]" class="form-check-input" type="checkbox" value="$paymentMethod->id" @if (in_array($paymentMethod->id, $array)) checked="checked" @endif >                              
                                 <label class="form-check-label" for="flexCheckIndeterminate">
                                     {{ $paymentMethod->payment_methods }}
                                 </label>

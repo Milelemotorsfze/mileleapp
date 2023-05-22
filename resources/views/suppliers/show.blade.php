@@ -120,6 +120,7 @@
                     </div>
                     </br>
                 </div>
+                @if($addons OR $addon1)
                 <div class="card-header">
                     <h4 class="card-title" style="background-color:#e6e6ff; color:Black; padding-top:5px; padding-bottom:5px;">
                         <center>
@@ -135,6 +136,7 @@
                 </div>
                 @include('addon.listbox')
                 @include('addon.table')
+                @endif
             </div>
     </div>  
     <script type="text/javascript">

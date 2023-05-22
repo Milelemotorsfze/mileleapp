@@ -207,10 +207,11 @@ class SupplierController extends Controller
         $paymentMethods = DB::table('payment_methods')->get();
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
-        // $array = json_decode($otherPaymentMethods);
+        $array = json_decode($otherPaymentMethods);
         // dd($array);
+        // dd($otherPaymentMethods);
         $addons = AddonDetails::select('id','addon_code','addon_id')->with('AddonName')->get();
-        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods'));
+        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array'));
     }
 
     /**

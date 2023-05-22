@@ -10,6 +10,7 @@ use App\Models\AddonDetails;
 use App\Models\AddonTypes;
 use App\Models\Supplier;
 use App\Models\SupplierAddons;
+use App\Models\MasterModelDescription;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -325,6 +326,11 @@ class AddonController extends Controller
         {
             $data['newAddonCode'] = "";
         }
+        return response()->json($data);
+    }
+    public function getModelDescriptionDropdown(Request $request)
+    {
+        $data['model_description'] = MasterModelDescription::whereIn('model_line_id',$request->model_line_id)->select('id','model_description')->get();
         return response()->json($data);
     }
 }

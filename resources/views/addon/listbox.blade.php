@@ -73,8 +73,11 @@
             display: none;
           } */
 </style>
+@if($addon1)
+        @if(count($addon1) > 0)
 <div class="list2" id="addonbox">
       <div class="row related-addon">
+       
         @foreach($addon1 as $addonsdata)
           <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">  
             <div class="row">
@@ -173,7 +176,9 @@
           </br>
           
         @endforeach
+       
         </br>
       </div>
     </div>
-    
+    @endif
+        @endif
