@@ -30,7 +30,7 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
-<div class="card-header">
+    <div class="card-header">
         <h4 class="card-title">Addon Master</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
@@ -56,7 +56,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <select id="addon_type" name="addon_type" class="form-control form-control-sm" onchange=getAddonCodeAndDropdown()>
+                            <select id="addon_type" name="addon_type" class="form-control form-control-sm" onchange=getAddonCodeAndDropdown() autofocus>
                                 <option value="">Choose Addon Type</option>
                                 <option value="P">Accessories</option>                          
                                 <!-- <option value="D">Documentation</option>
@@ -67,7 +67,8 @@
                                 <option value="K">Kit</option>
                                 <option value="W">Warranty</option>
                             </select>
-                            <span id="AddonTypeError" class="required-class"></span>                           
+                            <span id="AddonTypeError" class="required-class"></span>   
+                            <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>                        
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <span class="error">* </span>
@@ -80,8 +81,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror                          
-                        </div>
-                        
+                        </div>                        
                     </div>
                     </br>
                     <div class="row">
@@ -130,8 +130,7 @@
                             @enderror
                         </div>
                     </div>
-                    </br>
-                    
+                    </br>                    
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
@@ -157,24 +156,6 @@
                         </div>
                     </div>
                     </br>
-                    <!-- <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="supplier_id" class="col-form-label text-md-end">{{ __('Suppliers') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select name="supplier_id[]" id="supplier_id" multiple="true" style="width: 100%;">
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
-                                @endforeach
-                            </select>                           
-                            @error('supplier_id')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    </br> -->
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
@@ -200,7 +181,7 @@
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                        <input id="fixing_charge_amount" type="text" class="form-control form-control-sm" name="fixing_charge_amount" placeholder="Part Number" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
+                        <input id="fixing_charge_amount" type="text" class="form-control form-control-sm" name="fixing_charge_amount" placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
                             @error('fixing_charge_amount')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -221,20 +202,6 @@
                         </div>
                     </div>
                     </br>
-                    <!-- <div class="row" hidden id="partNumberDiv">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
-                            @error('part_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror                          
-                        </div>
-                    </div>
-                    <br hidden id="partNumberDivBr">   -->
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
@@ -249,9 +216,6 @@
                         </div>
                     </div>
                     </br>
-                   
-                   
-                  
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
                     <input id="image" type="file" class="form-control form-control-sm" name="image"  autocomplete="image" onchange="readURL(this);" />
@@ -259,137 +223,26 @@
                     </br>
                     <img id="blah" src="#" alt="your image" />
                 </div>
-               
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Addon Brand and Model Lines</h4>
-                    </div>
-                    <div class="supplierWithoutKit">
-                    <div class="row supplierWithoutKitApendHere">
-                                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="brand" class="keepDatalist col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="showDiv1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Line') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="showModelNumberLabel" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Description') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-1 col-lg-1 col-md-2">
-                                        </div>
-                                    </div>
-                                    <div id="dynamic_field">
-                                        <div class="row">
-                                            <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
-                                                <div class="row">                                   
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <input list="cityname1" onchange=selectBrand(this.id) id="selectBrand1" type="text" class="keepDatalist cityname1 form-control form-control-sm @error('brand') is-invalid @enderror" name="brand[]" placeholder="Choose Brand"  value=""  autocomplete="brand" autofocus>
-                                                    <datalist id="cityname1">
-                                                    <option data-value="allbrands" value="ALL BRANDS" id="allbrands"></option>
-                                                        @foreach($brands as $brand)
-                                                            <option data-value="{{$brand->id}}" value="{{$brand->brand_name}}"></option>
-                                                        @endforeach
-                                                    </datalist>
-                                                    @error('brand')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                    </div>
-                                                </div>
-                                            </div> -->
-                                            <div class="col-xxl-4 col-lg-6 col-md-12">
-                                            <select onchange=selectBrand(this.id,1) name="br[]" id="selectBrand1" multiple="true" style="width: 100%;">
-                                            <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
-                                            @foreach($brands as $brand)
-                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                @endforeach
-                                            </select>                           
-                                            @error('supplier_id')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                            <div id="showDivdrop1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                                <div class="row">                                 
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
-                                                    <select class="compare-tag1" name="model[]" id="selectModelLine" multiple="true" style="width: 100%;">
-                                                        @foreach($modelLines as $modelLine)
-                                                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                        @endforeach
-                                                    </select>     
-                                                    @error('model')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div id="showModelNumberdrop1" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                                <div class="row">                                 
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
-                                                    <select class="compare-tag1" name="model_number[]" id="selectModelNumber" multiple="true" style="width: 100%;">
-                                                    
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                @endforeach
-                                            </select>     
-                                                    @error('model')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xxl-1 col-lg-1 col-md-2">
-                                            </div>
-                                        </div>
-                                        <div id="newRow"></div>
-                                        <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
-                                            <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a> 
-                                        </div>
-                                    </div>
-                                    </br>      
-                                </div>
-                                </div>
-                                <div class="card"  id="kitSupplier" >
+                @include('addon.brandModel')
+                <div class="card"  id="kitSupplier" >
                     <div class="card-header">
                         <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
                     </div>
-                    
                     <div id="London" class="tabcontent">
                         <div class="row">
                             <div class="card-body">
-                @include('addon.kit')
-                @include('addon.supplierprice')
-                </div>
+                                @include('addon.kit')
+                                @include('addon.supplierprice')
+                            </div>
                         </div>  
                     </div>
                 </div>
-                                <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary" id="submit">Submit</button>
-                            </div>
-                            </div>
-                            </br>
-                            <div>
-                                <!--FFFFFFFFFFFFFFFFFFFFFFFF-->
-                            </div>
-                        </form>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+                </div>
+            </div>
+            </br>
+        </form>
                         <div class="modal modal-class" id="createNewAddon" >
                             <div class="modal-content">
                                 <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -418,8 +271,6 @@
                                 </form>                                         
                             </div>
                         </div> 
-                </div>  
-                </br>
                 
 <script type="text/javascript">
         var selectedSuppliers = [];
@@ -435,16 +286,12 @@
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
-            $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-            $("#selectBrand1").select2({
-                maximumSelectionLength: 1,
-            });
+            
             $("#supplierArray1").attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
-            $("#selectModelNumber").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
-            $("#selectModelNumber").select2();            
+           
             $('.radioFixingCharge').click(function() 
             {
                 if($(this).val() == 'yes')
@@ -509,31 +356,7 @@
             {
                 showAndHideSupplierDropdownOptions(1);
             });
-              $('#selectModelLine').change(function()
-            {
-                // alert('hi');
-                // alert(currentAddonType);
-                // alert($("#selectModelLine").val());
-                // if($("#selectModelLine").val() != '')
-                // {
-                //     alert('lp');
-                //     alert(count($("#selectModelLine").val()));
-                // }
-               
-                ifModelLineExist = $("#selectModelLine").val();
-            // //    alert(ifModelLineExist)
-                if(currentAddonType == 'SP' && ifModelLineExist != '')
-                {
-                    // alert('inside');
-            //     //     alert('inside when choode model line');
-                    showModelNumberDropdown();
-                }
-                else
-                {
-                    hideModelNumberDropdown();
-                }
-            //     // alert(ifModelLineExist);
-            });
+          
             $('#submit').click(function()
             {
                 var value = $('#addon_id').val();
@@ -603,130 +426,7 @@
         //             maximumSelectionLength: 1,
         //         });
         //    });
-        $('#add').click(function()
-           {
-                $('.allbrands').prop('disabled',true);
-               // globalThis.selectedBrands = [];
-               // console.log(globalThis.selectedBrands);
-               for (let j = 1; j <= i; j++)
-               {
-                    var value =$('#selectBrand'+j).val();
-                    // globalThis.selectedBrands .push(value);
-                    $('.'+value).prop('disabled',true);
-                    // globalThis.selectedBrands = [];
-                    // globalThis.selectedBrands.push(a);
-               }
-               //         $.each(data.existingSuppliers,function(key,value)
-               //         {
-               //             var a = value.supplier_id;
-               //             selectedBrands.push(a);
-               // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
-               // });
-               // var brandvalue = $('#selectBrand').val();
-               
-               // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
-               // $('#addon_name').val(a);
-            //    var selectBrand = $("#selectBrand1").val();
-            //    i++;
-               // onChange="get_data('+i+')" 
-            //    var selectBrand = $("#selectModelLine").val();
-               // i++;
-            //    var html = '';
-           
-            //    $('#dynamic_field').append(html);
-            var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1; 
-        $(".supplierWithoutKit").append(`
-        <div class="row">
-                                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="brand" class="keepDatalist col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="showDiv${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Line') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="showModelNumberLabel" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                            <div class="row">
-                                                <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                    <label for="model" class="col-form-label text-md-end">{{ __('Model Description') }}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-xxl-1 col-lg-1 col-md-2">
-                                        </div>
-                                    </div>
-                                    <div id="dynamic_field">
-                                        <div class="row">
-                                            <div class="col-xxl-4 col-lg-6 col-md-12">
-                                            <select onchange=selectBrand(this.id,${index}) name="br[]" id="selectBrand${index}" multiple="true" style="width: 100%;">
-                                            <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
-                                            @foreach($brands as $brand)
-                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                @endforeach
-                                            </select>                           
-                                            @error('supplier_id')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                            <div id="showDivdrop${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                                <div class="row">                                 
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
-                                                    <select class="compare-tag1" name="model[]" id="selectModelLine" multiple="true" style="width: 100%;">
-                                                        @foreach($modelLines as $modelLine)
-                                                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                        @endforeach
-                                                    </select>     
-                                                    @error('model')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div id="showModelNumberdrop${index}" class="col-xxl-4 col-lg-6 col-md-12" hidden>
-                                                <div class="row">                                 
-                                                    <div class="col-xxl-12 col-lg-12 col-md-12">                                  
-                                                    <select class="compare-tag1" name="model_number[]" id="selectModelNumber" multiple="true" style="width: 100%;">
-                                                    
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                @endforeach
-                                            </select>     
-                                                    @error('model')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xxl-1 col-lg-1 col-md-2">
-                                            </div>
-                                        </div>
-                                        <div id="newRow"></div>
-                                        <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
-                                            <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a> 
-                                        </div>
-                                    </div>
-                                    </br>      
-                                </div>
-            `); 
-            $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit:not(:first)").prop("disabled", false); $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit").first().prop("disabled", true); 
-            $("#selectBrand"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-            $("#selectBrand"+index).select2
-            ({
-                // maximumSelectionLength: 1,
-            });
-           });
+        
            $(document).on('click', '.btn_remove', function()
             {
                 var button_id = $(this).attr("id");
@@ -889,15 +589,22 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
+                $("#selectBrand1").removeAttr('disabled');
+                $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectBrand1").select2({
+                    maximumSelectionLength: 1,
+                }); 
                 document.getElementById("AddonTypeError").classList.remove("paragraph-class"); 
                 document.getElementById("AddonTypeError").textContent="";
+                document.getElementById("addon_type_required").textContent="";
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    showModelNumberDropdown();
+                    alert('hi');
+                    // showModelNumberDropdown(id,row);
                 }
                 else
-                {
-                    hideModelNumberDropdown();
+                {alert('hiff');
+                    // hideModelNumberDropdown(id,row);
                 }
                 if(value == 'SP' )
                 {    
@@ -966,54 +673,6 @@
             {
                 $('#addon_code').val('');
             }
-        }
-        function hideModelNumberDropdown()
-        {
-            let showPartNumber = document.getElementById('showModelNumberdrop');
-            showPartNumber.hidden = true  
-            let showPartNumberBr = document.getElementById('showModelNumberLabel');
-            showPartNumberBr.hidden = true  
-        }
-        function showModelNumberDropdown()
-        {
-            let showPartNumber = document.getElementById('showModelNumberdrop');
-            showPartNumber.hidden = false  
-            let showPartNumberBr = document.getElementById('showModelNumberLabel');
-            showPartNumberBr.hidden = false  
-            var e = document.getElementById("addon_type"); 
-            var value = e.value;
-            var selectedModelLine = $("#selectModelLine").val();
-            $.ajax
-            ({
-                url:"{{url('getModelDescriptionDropdown')}}",
-                type: "POST",
-                data: 
-                {
-                    model_line_id: selectedModelLine,
-                    addon_type: value,
-                    _token: '{{csrf_token()}}' 
-                },
-                dataType : 'json',
-                success:function(data) 
-                {
-                    $("#selectModelNumber").html("").trigger("change");
-                    let ModelLineModelDescription   = [];
-                    $.each(data.model_description,function(key,value)
-                    {
-                        ModelLineModelDescription.push 
-                        ({
-                            id: value.id,
-                            text: value.model_description
-                        });
-                    });
-                    $('#selectModelNumber').select2
-                    ({
-                        placeholder: 'Select value',
-                        allowClear: true,
-                        data: ModelLineModelDescription
-                    });
-                }
-            });
         }
         function readURL(input)
         {
@@ -1097,79 +756,6 @@
             var arrayOfNumbers = arrayOfNumbers.map(Number);
             const minOfPrice = Math.min(...arrayOfNumbers);
             $("#purchase_price").val(minOfPrice);
-        }
-        function selectBrand(id,row)
-        {
-            for (let a = 1; a <= i; a++)
-            {
-                var value =$('#'+id).val()
-                // var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-                var brandId = value;
-                globalThis.selectedBrands .push(brandId);
-                if(brandId != '')
-                {
-                    if(brandId != 'allbrands')
-                    {
-                        showRelatedModal(brandId,row);
-                    }
-                    else
-                    {
-                        hideRelatedModal(brandId,row);
-                    }
-                }
-                else
-                {
-                    hideRelatedModal(brandId,row);
-                }
-            }
-            // globalThis.selectedBrands[i] = 2;
-            // var value =$('#selectBrand'+j).val();
-            // var value =$('#'+id).val();
-            //     var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-            //     globalThis.selectedBrands .push(brandId);
-        }
-        function showRelatedModal(id,row)
-        {
-            let showDiv = document.getElementById('showDiv');
-            showDiv.hidden = false
-            let showDivdrop = document.getElementById('showDivdrop');
-            showDivdrop.hidden = false
-            let showaddtrim = document.getElementById('showaddtrim');
-            showaddtrim.hidden = false
-            $.ajax
-            ({
-                url: '/addons/brandModels/'+id,
-                type: "GET",
-                dataType: "json",
-                success:function(data) 
-                {
-                    $("#selectModelLine").html("").trigger("change");
-                    let BrandModelLine   = [];
-                    $.each(data,function(key,value)
-                    {
-                        BrandModelLine.push 
-                        ({
-                            id: value.id,
-                            text: value.model_line
-                        });
-                    });
-                    $('#selectModelLine').select2
-                    ({
-                        placeholder: 'Select value',
-                        allowClear: true,
-                        data: BrandModelLine
-                    });
-                }
-            });
-        }
-        function hideRelatedModal(id,row)
-        {
-            let showDiv = document.getElementById('showDiv'+row);
-            showDiv.hidden = true
-            let showDivdrop = document.getElementById('showDivdrop'+row);
-            showDivdrop.hidden = true
-            let showaddtrim = document.getElementById('showaddtrim'+row);
-            showaddtrim.hidden = true
         }
         function showkitSupplier()
         {

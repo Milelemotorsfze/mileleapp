@@ -65,7 +65,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
             'addon_id' => 'required',
@@ -274,15 +274,15 @@ class AddonController extends Controller
         }
     }
     public function fetchAddonData($id, $quotationId, $VehiclesId)
-{
-    $result = DB::table('addon_types')
-            ->join('addon_details', 'addon_types.addon_details_id', '=', 'addon_details.id')
-            ->join('addons', 'addon_details.addon_id', '=', 'addons.id')
-            ->where('addon_types.model_id', '=', $id)
-            ->select('*', 'addon_types.id as idp')
-            ->get();
-    return view('quotation.addone',compact('result', 'quotationId', 'VehiclesId'));
-}
+    {
+        $result = DB::table('addon_types')
+                ->join('addon_details', 'addon_types.addon_details_id', '=', 'addon_details.id')
+                ->join('addons', 'addon_details.addon_id', '=', 'addons.id')
+                ->where('addon_types.model_id', '=', $id)
+                ->select('*', 'addon_types.id as idp')
+                ->get();
+        return view('quotation.addone',compact('result', 'quotationId', 'VehiclesId'));
+    }
     public function addonView($id)
     {
         $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers.Suppliers')->first();
