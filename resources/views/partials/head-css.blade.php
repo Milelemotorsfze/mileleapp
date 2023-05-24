@@ -17,3 +17,5 @@
 <link href="{{ asset('css/customcss.css') }}" rel="stylesheet" type="text/css" />
 <!-- select 2 -->
 <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/alertify.min.css"/>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.12.0/build/css/themes/default.min.css"/>

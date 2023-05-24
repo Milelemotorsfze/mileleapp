@@ -27,8 +27,6 @@ class LOIDocumentsController extends Controller
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->get();
         $letterOfIndentDocuments = LetterOfIndentDocument::where('letter_of_indent_id', $letterOfIndent->id)->get();
 
-//        return $letterOfIndentDocuments;
-
         return view('letter-of-indent-documents.create', compact('letterOfIndent','letterOfIndentItems',
         'letterOfIndentDocuments'));
     }
@@ -38,7 +36,6 @@ class LOIDocumentsController extends Controller
      */
     public function store(Request $request)
     {
-
 //        return $request->letter_of_indent_id;
 //        $request->validate([
 //            'files' => 'required'
@@ -61,7 +58,9 @@ class LOIDocumentsController extends Controller
             }
         }
 
-//        $LoiDocument->save();
+        if ($request->page_name == 'EDIT-PAGE') {
+            return redirect()->route('letter-of-indent-documents.edit', $request->letter_of_indent_id);
+        }
 
         return redirect()->route('letter-of-indent-documents.create',['letter_of_indent_id' => $request->letter_of_indent_id]);
     }
@@ -79,7 +78,12 @@ class LOIDocumentsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $letterOfIndent = LetterOfIndent::findOrFail($id);
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->get();
+        $letterOfIndentDocuments = LetterOfIndentDocument::where('letter_of_indent_id', $letterOfIndent->id)->get();
+
+        return view('letter-of-indent-documents.edit', compact('letterOfIndent','letterOfIndentItems',
+            'letterOfIndentDocuments'));
     }
 
     /**
@@ -95,6 +99,8 @@ class LOIDocumentsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $letterOfIndentDocument = LetterOfIndentDocument::find($id);
+        $letterOfIndentDocument->delete();
+        return true;
     }
 }

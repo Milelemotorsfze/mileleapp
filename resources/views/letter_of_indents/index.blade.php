@@ -88,6 +88,11 @@
                                         <button type="button" class="btn btn-primary btn-sm">
                                             <i class="fa fa-download"></i></button>
                                     </a>
+                                        <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
+                                            <button type="button" class="btn btn-primary btn-sm">
+                                                 <i class="fa fa-edit"></i></button>
+                                        </a>
+
                                     <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="reject-LOI-{{ $letterOfIndent->id }}" > Reject </button>
 
@@ -465,6 +470,7 @@
                                             <i class="fa fa-download"></i></button>
                                     </a>
                                 </td>
+
                                     <div class="modal modalhide" id="view-approved-loi-items-{{$letterOfIndent->id}}" >
                                         <div class="modal-header bg-primary">
                                             <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>

@@ -25,10 +25,11 @@ class LOIItemsController extends Controller
     public function create(Request $request)
     {
         $letterOfIndent = LetterOfIndent::find($request->id);
-        $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
+
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
                     ->get();
         $addedModelIds = [];
-        foreach ($loiItems as $loiItem) {
+        foreach ($letterOfIndentItems as $loiItem) {
             $model = MasterModel::where('model', $loiItem->model)
                 ->where('sfx', $loiItem->sfx)
                 ->first();
@@ -44,7 +45,7 @@ class LOIItemsController extends Controller
             ->pluck('master_model_id');
 
         $models = MasterModel::whereIn('id',$supplierInventoriesModels)->get();
-        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
+       // $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
         return view('letter-of-indent-items.create',compact('letterOfIndent','letterOfIndentItems',
             'models'));
@@ -55,6 +56,7 @@ class LOIItemsController extends Controller
      */
     public function store(Request $request)
     {
+//        return $request->all();
         $request->validate([
             'model' => 'required',
             'sfx' => 'required',
@@ -71,6 +73,10 @@ class LOIItemsController extends Controller
         $LoiItem->quantity = $request->quantity;
         $LoiItem->save();
 
+        if($request->page_name == 'EDIT-PAGE') {
+            return redirect()->route('letter-of-indent-items.edit',$request->letter_of_indent_id);
+
+        }
         return redirect()->route('letter-of-indent-items.create',['id' => $request->letter_of_indent_id]);
     }
 
@@ -92,7 +98,27 @@ class LOIItemsController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $letterOfIndent = LetterOfIndent::find($id);
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $id)->get();
+        $addedModelIds = [];
+        foreach ($letterOfIndentItems as $loiItem) {
+            $model = MasterModel::where('model', $loiItem->model)
+                ->where('sfx', $loiItem->sfx)
+                ->first();
+            $addedModelIds[] = $model->id;
+        }
+
+        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->whereNull('eta_import')
+            ->whereNotIn('master_model_id', $addedModelIds)
+            ->groupBy('master_model_id')
+            ->pluck('master_model_id');
+
+        $models = MasterModel::whereIn('id',$supplierInventoriesModels)->get();
+
+        return view('letter-of-indent-items.edit', compact('letterOfIndent','letterOfIndentItems','models'));
     }
 
     /**
@@ -108,6 +134,8 @@ class LOIItemsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $letterOfIndentItem = LetterOfIndentItem::find($id);
+        $letterOfIndentItem->delete();
+        return true;
     }
 }

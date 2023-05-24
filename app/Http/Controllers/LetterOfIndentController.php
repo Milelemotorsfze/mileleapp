@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
+use App\Models\MasterModel;
+use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -58,7 +60,9 @@ class LetterOfIndentController extends Controller
         $request->validate([
             'customer_id' => 'required',
             'category' => 'required',
-            'date' => 'required'
+            'date' => 'required',
+            'shipment_method' => 'required',
+            'dealers' => 'required'
         ]);
 
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
@@ -165,7 +169,11 @@ class LetterOfIndentController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $letterOfIndent = LetterOfIndent::find($id);
+        $countries = CountryListFacade::getList('en');
+        $customers = Customer::all();
+
+        return view('letter_of_indents.edit',compact('countries','customers','letterOfIndent'));
     }
 
     /**
@@ -173,7 +181,24 @@ class LetterOfIndentController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'customer_id' => 'required',
+            'category' => 'required',
+            'date' => 'required',
+            'shipment_method' => 'required',
+            'dealers' => 'required'
+        ]);
+
+        $LOI = LetterOfIndent::find($id);
+
+        $LOI->customer_id = $request->customer_id;
+        $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
+        $LOI->category = $request->category;
+        $LOI->dealers = $request->dealers;
+        $LOI->shipment_method = $request->shipment_method;
+        $LOI->save();
+
+        return redirect()->route('letter-of-indent-items.edit', $id);
     }
 
     /**

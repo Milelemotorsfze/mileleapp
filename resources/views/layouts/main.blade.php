@@ -69,6 +69,7 @@
         <script src="{{ asset('js/app.js') }}"></script>
         <script type="text/javascript">
             $(document).ready(function() {
+                alertify.set('notifier','position', 'top-right');
         ClassicEditor
           .create(document.querySelector('#editor'))
           .catch(error => {
