@@ -4,6 +4,10 @@
         color: red;
         font-size:11px;
     }
+    .required-class
+    {
+        font-size:11px;
+    }
 </style>
 <div class="card">
     <div class="card-header">
@@ -22,20 +26,20 @@
                                             <div class="col-md-12 p-0">
                                                 <div class="col-md-12 brandModelLineDiscription p-0">
                                                     <div class="row brandModelLineDiscriptionApendHere">
-                                                        <div class="col-xxl-3 col-lg-6 col-md-12">
+                                                        <div class="col-xxl-4 col-lg-6 col-md-12">
                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                                             <select onchange=selectBrand(this.id,1) name="br[]" id="selectBrand1" multiple="true" style="width: 100%;">
                                                                 <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
                                                                 @foreach($brands as $brand)
                                                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                                                 @endforeach
-                                                            </select>     
+                                                            </select>
                                                             @error('is_primary_payment_method')
                                                                 <span class="invalid-feedback" role="alert">
                                                                     <strong>{{ $message }}</strong>
                                                                 </span>
                                                             @enderror
-                                                            <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>    
+                                                            <!-- <span id="addon_type_required" class="email-phone required-class">Please select any addon type</span>     -->
                                                         </div>
                                                         <div class="col-xxl-4 col-lg-6 col-md-12" id="showDivdrop1" hidden>
                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
@@ -50,7 +54,7 @@
                                                                 </span>
                                                             @enderror
                                                         </div>
-                                                        <div class="col-xxl-4 col-lg-6 col-md-12" id="showModelNumberdrop1" hidden>
+                                                        <div class="col-xxl-3 col-lg-6 col-md-12" id="showModelNumberdrop1" hidden>
                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                                             <select class="compare-tag1" name="model_number[]" id="selectModelNumber" multiple="true" style="width: 100%;">
                                                                 @foreach($modelLines as $modelLine)
@@ -91,7 +95,8 @@
         // $("#selectBrand1").select2({
         //     maximumSelectionLength: 1,
         // });
-        $("#selectBrand1").attr('disabled','disabled');    
+        $("#selectBrand1").attr('disabled','disabled');   
+
         $("#selectModelNumber1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
         $("#selectModelNumber1").select2();  
         $("#add").on("click", function ()
@@ -100,7 +105,7 @@
             var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1; 
             $(".brandModelLineDiscription").append(`
                 <div class="row brandModelLineDiscriptionApendHere">
-                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                    <div class="col-xxl-4 col-lg-6 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                         <select onchange=selectBrand(this.id,${index}) name="br[]" id="selectBrand${index}" multiple="true" style="width: 100%;">
                             <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
@@ -127,7 +132,7 @@
                             </span>
                         @enderror
                     </div>
-                    <div class="col-xxl-4 col-lg-6 col-md-12" id="showModelNumberdrop${index}" hidden>
+                    <div class="col-xxl-3 col-lg-6 col-md-12" id="showModelNumberdrop${index}" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1" name="model_number[]" id="selectModelNumber${index}" multiple="true" style="width: 100%;">
                             @foreach($modelLines as $modelLine)
@@ -193,7 +198,8 @@
                 { 
                     if(currentAddonType == '')
                     {
-                        document.getElementById("addon_type_required").textContent="Please select any addon type";
+                        // document.getElementById("addon_type_required").classList.add("paragraph-class");
+                        // .textContent="Please select any addon type";
                         // classList..add("paragraph-class");
                         // alert('please select any addon type');
                     }

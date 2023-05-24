@@ -1,5 +1,11 @@
 @extends('layouts.main')
 <style>
+   /* .addonCreateCard
+   {
+    top: 50%;
+            left: 50%;
+   } */
+
     .error 
     {
         color: #FF0000;
@@ -27,6 +33,21 @@
         background: #6b4acc;
         border: 1px solid #6b4acc;
     } 
+    .paragraph-class 
+    {
+        color: red;
+        font-size:11px;
+    }
+  .overlay
+  {
+    position: fixed; /* Positioning and size */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(128,128,128,0.5); /* color */
+  display: none; /* making it hidden by default */
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
@@ -159,7 +180,7 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
-                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included : ') }}</label>
+                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="">
                                 <fieldset>
@@ -188,6 +209,7 @@
                                 </span>
                             @enderror                          
                         </div>
+                        </br>
                         <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
                             <!-- <span class="error">* </span> -->
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
@@ -202,6 +224,21 @@
                         </div>
                     </div>
                     </br>
+                    <div class="row" hidden id="rowPartNumber">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <!-- <span class="error">* </span> -->
+                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-6 col-md-12">
+                            <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
+                            @error('part_number')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror                          
+                        </div> 
+                    </div>
+                    <br hidden id="rowPartNumberBr">
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
@@ -218,7 +255,9 @@
                     </br>
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <input id="image" type="file" class="form-control form-control-sm" name="image"  autocomplete="image" onchange="readURL(this);" />
+                    <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>
+                    <input id="image" type="file" class="form-control form-control-sm" name="image" autocomplete="image" onchange="readURL(this);" />
+                    <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
                     </br>
                     </br>
                     <img id="blah" src="#" alt="your image" />
@@ -243,35 +282,45 @@
             </div>
             </br>
         </form>
-                        <div class="modal modal-class" id="createNewAddon" >
-                            <div class="modal-content">
-                                <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
-                                <h3 class="modal-title" style="text-align:center;"> Create New Addon </h3>
-                                <div class="dropdown-divider"></div>
-                                <form method="POST" enctype="multipart/form-data"> 
-                                    @csrf
-                                    <div class="row modal-row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            <label for="name" class="col-form-label text-md-end ">Addon Name</label>
-                                        </div>
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                            <textarea rows="5" id="new_addon_name" type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
-                                            @error('name')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
+        <div class="overlay">
+            <div class="modal" id="createNewAddon" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Create New Addon </h5>
+                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" enctype="multipart/form-data"> 
+                                @csrf
+                                <div class="row modal-row">
+                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                        <span class="error">* </span>
+                                        <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                     </div>
-                                    <div class="row modal-button-class" >                                           
-                                        <div class="col-xs-12 col-sm-12 col-md-12" >
-                                            <a id="createAddonId" style="float: right;"  class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Submit</a>
-                                        </div>
-                                    </div> 
-                                </form>                                         
-                            </div>
-                        </div> 
-                
+                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control form-control-sm @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
+                                        <span id="newAddonError" class="required-class paragraph-class"></span>
+                                        @error('name')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </form> 
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 <script type="text/javascript">
         var selectedSuppliers = [];
         var oldselectedSuppliers = [];
@@ -279,6 +328,7 @@
         var currentAddonType = '';
         var selectedBrands = [];
         var i=1;
+        var fixingCharge = 'yes';
         $(document).ready(function ()
         {
             $('#blah').css('visibility', 'hidden');
@@ -286,7 +336,7 @@
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
-            
+            // $('#addon_id').select2();
             $("#supplierArray1").attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
@@ -294,15 +344,39 @@
            
             $('.radioFixingCharge').click(function() 
             {
+                var addon_type = $("#addon_type").val();
+                fixingCharge = $(this).val();
                 if($(this).val() == 'yes')
                 {
                     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
                     showFixingChargeAmount.hidden = true  
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
                     showFixingChargeAmountBr.hidden = true
+                    if(addon_type != '' && addon_type == 'SP')
+                    {
+                        let showPartNumber = document.getElementById('partNumberDiv');
+                        showPartNumber.hidden = false  
+                        let showPartNumberBr = document.getElementById('partNumberDivBr');
+                        showPartNumberBr.hidden = false
+                        let showrowPartNumber = document.getElementById('rowPartNumber');
+                        showrowPartNumber.hidden = true  
+                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
+                        showrowPartNumberBr.hidden = true
+                    }
                 }
                 else
                 {
+                    if(addon_type != '' && addon_type == 'SP')
+                    {
+                        let showPartNumber = document.getElementById('partNumberDiv');
+                        showPartNumber.hidden = true  
+                        let showPartNumberBr = document.getElementById('partNumberDivBr');
+                        showPartNumberBr.hidden = true
+                        let showrowPartNumber = document.getElementById('rowPartNumber');
+                        showrowPartNumber.hidden = false  
+                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
+                        showrowPartNumberBr.hidden = false
+                    }
                     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
                     showFixingChargeAmount.hidden = false  
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
@@ -441,69 +515,84 @@
                     document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
                 }
                 else
-                {
+                {                    
+                    $('.overlay').show();
                     $("#addon_id").val('');
                     var modalId = $(this).data('modal-id');
                     $('#' + modalId).addClass('modalshow');
                     $('#' + modalId).removeClass('modalhide');
                 }
             });
-            $('.close').on('click', function()
-            {
-                $('.modal').addClass('modalhide');
-                $('.modal').removeClass('modalshow');
-            });
+            // $('.modal-button').on('click', function()
+            // {alert('hhh');
+            //     currentAddonType =  $('#addon_type').val();
+            //     if(currentAddonType == '')
+            //     { 
+            //         document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
+            //         document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
+            //     }
+            //     else
+            //     {
+            //         $("#addon_id").val('');
+            //         var modalId = $(this).data('modal-id');
+            //         $('#' + modalId).addClass('modalshow');
+            //         $('#' + modalId).removeClass('modalhide');
+            //     }
+            // });
+            // $('.close').on('click', function()
+            // {
+            //     // alert('hii');
+            //     $('.overlay').hide();
+            //     $('.modal').addClass('modalhide');
+            //     $('.modal').removeClass('modalshow');
+            // });
         });
       
                         // $("#supplierArray"+index).select2();
     
-        $('.modal-button').on('click', function()
-        {
-            currentAddonType =  $('#addon_type').val();
-            if(currentAddonType == '')
-            { 
-                document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
-                document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
-            }
-            else
-            {
-                $("#addon_id").val('');
-                var modalId = $(this).data('modal-id');
-                $('#' + modalId).addClass('modalshow');
-                $('#' + modalId).removeClass('modalhide');
-            }
-        });
-        $('.close').on('click', function()
-        {
-            $('.modal').addClass('modalhide');
-            $('.modal').removeClass('modalshow');
-        });
+        
+        // $('.close').on('click', function()
+        // {alert('jj');
+        //     $('.modal').addClass('modalhide');
+        //     $('.modal').removeClass('modalshow');
+        // });
         $('#createAddonId').on('click', function()
         {
             // create new addon and list new addon in addon list
             var value = $('#new_addon_name').val();
-            currentAddonType =  $('#addon_type').val();
-            $.ajax
-            ({
-                url:"{{url('createMasterAddon')}}",
-                type: "POST",
-                data: 
-                {
-                    name: value,
-                    addon_type: currentAddonType,
-                    _token: '{{csrf_token()}}' 
-                },
-                dataType : 'json',
-                success: function(result)
-                {
-                    $('.modal').removeClass('modalshow');
-                    $('.modal').addClass('modalhide');
-                    $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");  
-                    $('#addon_id').val(result.id); 
-                    var selectedValues = new Array();       
-                    resetSelectedSuppliers(selectedValues);
-                }
-            });
+            if(value == '')
+            {
+                document.getElementById("newAddonError").textContent='Addon Name is Required';
+            }
+            else
+            {
+                currentAddonType =  $('#addon_type').val();
+                $.ajax
+                ({
+                    url:"{{url('createMasterAddon')}}",
+                    type: "POST",
+                    data: 
+                    {
+                        name: value,
+                        addon_type: currentAddonType,
+                        _token: '{{csrf_token()}}' 
+                    },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        $('.overlay').hide();
+                        $('.modal').removeClass('modalshow');
+                        $('.modal').addClass('modalhide');
+                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");  
+                        $('#addon_id').val(result.id); 
+                        var selectedValues = new Array();       
+                        resetSelectedSuppliers(selectedValues);
+                        $('#addnewAddonButton').hide();
+                        $('#new_addon_name').val("");
+                        document.getElementById("newAddonError").textContent='';
+                    }
+                });
+            }
         });
         function showAndHideSupplierDropdownOptions(i)
         {
@@ -574,6 +663,7 @@
         // }
         function closemodal()
         {
+            $('.overlay').hide();
             $('.modal').removeClass('modalshow');
             $('.modal').addClass('modalhide');
         }
@@ -589,6 +679,7 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
+
                 $("#selectBrand1").removeAttr('disabled');
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
@@ -597,21 +688,37 @@
                 document.getElementById("AddonTypeError").classList.remove("paragraph-class"); 
                 document.getElementById("AddonTypeError").textContent="";
                 document.getElementById("addon_type_required").textContent="";
+                // document.getElementById("addon_type_required").hidden = true;
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    alert('hi');
+                    // alert('hi');
                     // showModelNumberDropdown(id,row);
                 }
                 else
-                {alert('hiff');
+                {
+                    // alert('hiff');
                     // hideModelNumberDropdown(id,row);
                 }
                 if(value == 'SP' )
-                {    
-                    let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = false  
-                    let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = false
+                {                     
+                    if(fixingCharge == 'no')
+                    {
+                        let showPartNumber = document.getElementById('partNumberDiv');
+                        showPartNumber.hidden = true  
+                        let showPartNumberBr = document.getElementById('partNumberDivBr');
+                        showPartNumberBr.hidden = true
+                        let showrowPartNumber = document.getElementById('rowPartNumber');
+                        showrowPartNumber.hidden = false  
+                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
+                        showrowPartNumberBr.hidden = false
+                    }
+                    else
+                    {
+                        let showPartNumber = document.getElementById('partNumberDiv');
+                        showPartNumber.hidden = false  
+                        let showPartNumberBr = document.getElementById('partNumberDivBr');
+                        showPartNumberBr.hidden = false
+                    }
                 }
                 else
                 {
@@ -619,6 +726,10 @@
                     showPartNumber.hidden = true  
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true 
+                    let showrowPartNumber = document.getElementById('rowPartNumber');
+                    showrowPartNumber.hidden = true  
+                    let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
+                    showrowPartNumberBr.hidden = true
                 }
                 if(value == 'K')
                 {
@@ -671,20 +782,42 @@
             }
             else
             {
+                $("#selectBrand1").attr('disabled','disabled'); 
                 $('#addon_code').val('');
             }
         }
         function readURL(input)
         {
-            if (input.files && input.files[0])
+            var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
+            var fileExtension = input.value.split('.').pop().toLowerCase();
+            var isValidFile = false;
+            for(var index in allowedExtension) 
             {
-                var reader = new FileReader();
-                reader.onload = function (e)
+                if(fileExtension === allowedExtension[index]) 
                 {
-                    $('#blah').css('visibility', 'visible');
-                    $('#blah').attr('src', e.target.result).width('100%').height('#blah'.width);
-                };
-                reader.readAsDataURL(input.files[0]);
+                    isValidFile = true; 
+                    break;
+                }
+            }
+            if(!isValidFile) 
+            {               
+                $('#blah').hide();
+                document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+            }
+            else
+            {
+                if (input.files && input.files[0])
+                {
+                    var reader = new FileReader();
+                    reader.onload = function (e)
+                    {
+                        $('#blah').show();
+                        $('#blah').css('visibility', 'visible');
+                       
+                        $('#blah').attr('src', e.target.result).width('100%').height('300px');
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
             }
         }
         function changeCurrency(i)
@@ -692,8 +825,7 @@
             var e = document.getElementById("currency_"+i);
             var value = e.value;
             if(value == 'USD')
-            {
-              
+            {             
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
                 chooseCurrency.hidden = true  
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);

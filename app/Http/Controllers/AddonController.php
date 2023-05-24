@@ -76,8 +76,16 @@ class AddonController extends Controller
             'additional_remarks' => 'required',
             // 'brand' => 'required',
             // 'model' => 'required',
-            'image' => 'required|max:2048',
-            // |mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'image' => 'nullable|image|mimes:svg,jpeg,png,jpg,gif,bmp,tiff,jpe',
+            //|max:2048',
+            // nullable|image|max:1000
+            // mimes:jpeg,png,jpg,gif
+            // 'mimes:jpeg,bmp,png'
+            // mimes:jpg,jpeg,png,bmp,tiff 
+            // max:4096'
+            // Use mimetypes: rule with image/jpeg that covers 3 extension variations for the jpeg format: jpg jpeg jpe.
+
+// Use image rule which covers jpeg, png, bmp, gif, or svg including jpeg's extension variations
         ]);
         
         if ($validator->fails()) 

@@ -8,14 +8,14 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.1/js/select2.min.js"></script>
         <style>
-    .modal-content {
+     /* .modal-content {
             position:fixed;
             top: 50%;
             left: 50%;
             width:30em;
             height:18em;
-            margin-top: -9em; /*set to a negative number 1/2 of your height*/
-            margin-left: -15em; /*set to a negative number 1/2 of your width*/
+            margin-top: -9em; 
+            margin-left: -15em; 
             border: 2px solid #e3e4f1;
             background-color: white;
         }
@@ -32,7 +32,7 @@
             margin-top: 20px;
             margin-left: 20px;
             margin-right: 20px;
-        }
+        } */
         .icon-right {
             z-index: 10;
             position: absolute;

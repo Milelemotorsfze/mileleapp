@@ -37,9 +37,9 @@ use App\Http\Controllers\Repeatedcustomers;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/d', function () {
+    return view('addon.ff');
+});
     Auth::routes();
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
