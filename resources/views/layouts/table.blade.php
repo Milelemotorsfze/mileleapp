@@ -38,6 +38,7 @@
         <script>
         $(document).ready(function ()
         {
+            alertify.set('notifier','position', 'top-right','delay', 20);
 			// datatables
             $('#dtBasicExample').DataTable();
             $('#dtBasicSupplierInventory').DataTable();
