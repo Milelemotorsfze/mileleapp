@@ -98,14 +98,20 @@ class LetterOfIndentController extends Controller
     {
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
-
+         //return $request->all();
 //        return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         if ($letterOfIndent->dealers == 'Trans Car') {
-            $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-
+            if($request->download == 1) {
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view', compact('letterOfIndent','letterOfIndentItems'));
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+            }
+            return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else{
-            $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-
+            if($request->download == 1) {
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view', compact('letterOfIndent','letterOfIndentItems'));
+               return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+            }
+            return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }
 
 //        $pdfFile = PDF::loadView('letter_of_indents.loi_document', compact('letterOfIndent','letterOfIndentItems'));
@@ -144,7 +150,9 @@ class LetterOfIndentController extends Controller
 
         // Download the modified PDF
 
-        return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+
+
+        return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
 //        return response()->download($modifiedPdfPath);
 
 

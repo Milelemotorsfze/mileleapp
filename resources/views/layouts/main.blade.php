@@ -14,8 +14,8 @@
             left: 50%;
             width:30em;
             height:18em;
-            margin-top: -9em; 
-            margin-left: -15em; 
+            margin-top: -9em;
+            margin-left: -15em;
             border: 2px solid #e3e4f1;
             background-color: white;
         }
@@ -69,7 +69,7 @@
         <script src="{{ asset('js/app.js') }}"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                alertify.set('notifier','position', 'top-right');
+
         ClassicEditor
           .create(document.querySelector('#editor'))
           .catch(error => {

@@ -10,10 +10,6 @@
             width: 1000px;
             height: 550px;
         }
-        .modal{
-            z-index: -1;
-        }
-
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI Items</h4>

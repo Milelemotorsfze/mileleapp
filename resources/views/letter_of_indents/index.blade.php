@@ -86,7 +86,7 @@
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
-                                            <i class="fa fa-download"></i></button>
+                                            LOI PDF</button>
                                     </a>
                                         <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
                                             <button type="button" class="btn btn-primary btn-sm">
@@ -467,7 +467,7 @@
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
-                                            <i class="fa fa-download"></i></button>
+                                            View LOI</button>
                                     </a>
                                 </td>
 
@@ -651,6 +651,7 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
+            alertify.set('notifier','position', 'top-right');
             $('#status-change-button-approve').click(function () {
                 var id = $(this).attr('data-id');
                 var status = $(this).attr('data-status');
@@ -674,7 +675,7 @@
                     },
                     success:function (data) {
                         window.location.reload();
-                        swal(status + " Successfully!" , "success" )
+                        alertify.success(status +" Successfully")
                     }
                 });
             }
