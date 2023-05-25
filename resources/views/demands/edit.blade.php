@@ -18,8 +18,8 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Supplier</label>
-                        <input type="text" value="{{ $demand->supplier }}" id="supplier-row" class="form-control" readonly/>
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Supplier</label>
+                        <input type="text" value="{{ $demand->supplier->supplier }}" id="supplier-row" class="form-control" readonly/>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6">
@@ -35,7 +35,6 @@
                     </div>
                 </div>
             </div>
-
                 <div class="d-flex">
                     <div class="col-lg-8">
                         <div class="row">
@@ -59,7 +58,6 @@
                             @endforeach
                         </div>
                     </div>
-
                 </div>
             @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)

@@ -6,10 +6,12 @@
         </h4>
     </div>
     <div class="card-body">
+        @can('supplier-inventory-edit')
         <div class="ml-auto">
             <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
         </div>
-        <br>
+            <br>
+        @endcan
         <div class="table-responsive" >
             <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-condensed" style="">
                 <thead class="bg-soft-secondary">

@@ -21,6 +21,7 @@ class Supplier extends Model
         'updated_by',
         'deleted_by'
     ];
+    public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
     public function supplierAddons()
     {
         return $this->hasMany(SupplierAddons::class,'supplier_id','id');

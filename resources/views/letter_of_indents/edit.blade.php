@@ -18,7 +18,7 @@
             @csrf
             @method('PUT')
             <div class="row">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Select Country</label>
                         <select class="form-control" data-trigger name="country" id="country">
@@ -29,7 +29,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
                         <select class="form-control"name="customer_type" id="customer-type">
@@ -53,10 +53,23 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" >
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
+                            <option value="" disabled>Select The Supplier</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}" {{ $supplier->id == $letterOfIndent->supplier_id ? 'selected' : '' }}>
+                                    {{ $supplier->supplier }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -104,7 +117,7 @@
                 </div>
                 <br>
                 <div class="col-lg-12 col-md-12">
-                    <button type="submit" class="btn btn-dark btncenter" >Next</button>
+                    <button type="submit" class="btn btn-dark btncenter" >Update & Next</button>
                 </div>
             </div>
         </form>
@@ -112,7 +125,6 @@
 @endsection
 @push('scripts')
     <script>
-        // $(document).ready(function() {
             getCustomers();
             $('#country').change(function () {
                 getCustomers();
@@ -136,13 +148,8 @@
                     },
                     success: function (data) {
                         $('#customer').empty();
-                        // $('#customer').html('<option value=""></option>');
                         jQuery.each(data, function (key, value) {
-                            console.log(data);
                             var selectedId = '{{ $letterOfIndent->customer_id }}'
-                            if(value.id == selectedId) {
-                                // $('#customer').append('<option value="' + selectedId + ' " >' + value.name + '</option>');
-                            }
                             $('#customer').append('<option value="' + value.id + ' " >' + value.name + '</option>');
                         });
                     }

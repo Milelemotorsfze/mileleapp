@@ -8,5 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Demand extends Model
 {
     use HasFactory;
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 
 }

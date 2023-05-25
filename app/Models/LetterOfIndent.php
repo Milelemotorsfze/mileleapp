@@ -21,6 +21,10 @@ class LetterOfIndent extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
     public function LOIDocuments()
     {
         return $this->hasMany(LetterOfIndentDocument::class);

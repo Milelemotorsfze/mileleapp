@@ -15,7 +15,7 @@
             </div>
         @endif
             <div class="row">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
@@ -23,7 +23,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-2 col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
                         <select class="form-control" name="category" readonly >
@@ -38,11 +38,29 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-2 col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-1">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                     </div>
                 </div>
             </div>

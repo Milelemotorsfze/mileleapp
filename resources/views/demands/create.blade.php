@@ -18,18 +18,18 @@
         @csrf
             <div class="row">
                 <div class="row demand-div">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-3 col-md-3">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 ">Select The Supplier</label>
-                            <select class="form-control" data-trigger name="supplier" id="supplier">
+                            <label for="choices-single-default" class="form-label font-size-13 "> Supplier</label>
+                            <select class="form-control" data-trigger name="supplier_id" id="supplier">
                                 <option value="" disabled>Select The Supplier</option>
-                                <option value="TTC">TTC</option>
-                                <option value="AMS">AMS</option>
-                                <option value="CPS">CPS</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-3">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                             <select class="form-control" data-trigger name="whole_saler" id="whole-saler">
@@ -38,7 +38,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-4 col-md-3">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13">Steering</label>
                             <select class="form-control" data-trigger name="steering" id="steering">

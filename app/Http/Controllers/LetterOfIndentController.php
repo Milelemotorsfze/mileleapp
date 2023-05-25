@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
+use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
@@ -48,8 +49,8 @@ class LetterOfIndentController extends Controller
     {
         $countries = CountryListFacade::getList('en');
         $customers = Customer::all();
-
-        return view('letter_of_indents.create',compact('countries','customers'));
+        $suppliers = Supplier::where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING)->get();
+        return view('letter_of_indents.create',compact('countries','customers','suppliers'));
     }
 
     /**
@@ -62,7 +63,8 @@ class LetterOfIndentController extends Controller
             'category' => 'required',
             'date' => 'required',
             'shipment_method' => 'required',
-            'dealers' => 'required'
+            'dealers' => 'required',
+            'supplier_id' => 'required'
         ]);
 
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
@@ -79,6 +81,7 @@ class LetterOfIndentController extends Controller
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
             $LOI->shipment_method = $request->shipment_method;
+            $LOI->supplier_id = $request->supplier_id;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->save();
@@ -98,7 +101,6 @@ class LetterOfIndentController extends Controller
     {
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
-         //return $request->all();
 //        return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         if ($letterOfIndent->dealers == 'Trans Car') {
             if($request->download == 1) {
@@ -151,7 +153,6 @@ class LetterOfIndentController extends Controller
         // Download the modified PDF
 
 
-
         return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
 //        return response()->download($modifiedPdfPath);
 
@@ -194,7 +195,8 @@ class LetterOfIndentController extends Controller
             'category' => 'required',
             'date' => 'required',
             'shipment_method' => 'required',
-            'dealers' => 'required'
+            'dealers' => 'required',
+            'supplier_id' => 'required'
         ]);
 
         $LOI = LetterOfIndent::find($id);
@@ -203,12 +205,16 @@ class LetterOfIndentController extends Controller
         $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
         $LOI->category = $request->category;
         $LOI->dealers = $request->dealers;
+        $LOI->supplier_id = $request->supplier_id;
         $LOI->shipment_method = $request->shipment_method;
         $LOI->save();
 
         return redirect()->route('letter-of-indent-items.edit', $id);
     }
+    public function getSupplierLOI()
+    {
 
+    }
     /**
      * Remove the specified resource from storage.
      */

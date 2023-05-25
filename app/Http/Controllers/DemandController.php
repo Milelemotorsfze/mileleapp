@@ -6,6 +6,7 @@ use App\Models\DemandList;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
+use App\Models\Supplier;
 use App\Models\SupplierInventory;
 use App\Models\Varaint;
 use Illuminate\Http\Request;
@@ -20,26 +21,27 @@ class DemandController extends Controller
     }
     public function create()
     {
-        return view('demands.create');
+        $suppliers = Supplier::where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING)->get();
+        return view('demands.create', compact('suppliers'));
     }
     public function store(Request $request)
     {
         $this->validate($request, [
-            'supplier' => 'required',
             'whole_saler' => 'required',
-            'steering' => 'required'
+            'steering' => 'required',
+            'supplier_id' => 'required'
         ]);
 
-        $demand = Demand::where('supplier',$request->supplier)
+        $demand = Demand::where('supplier_id',$request->supplier_id)
             ->where('whole_saler', $request->whole_saler)
             ->where('steering', $request->steering)
             ->first();
 
         if (!$demand) {
             $demand = new Demand();
-            $demand->supplier = $request->input('supplier');
             $demand->whole_saler = $request->input('whole_saler');
             $demand->steering = $request->input('steering');
+            $demand->supplier_id = $request->input('supplier_id');
             $demand->created_by = Auth::id();
             $demand->save();
         }

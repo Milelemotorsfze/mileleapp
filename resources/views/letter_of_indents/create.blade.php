@@ -17,7 +17,7 @@
         <form action="{{ route('letter-of-indents.store') }}" method="POST" >
             @csrf
             <div class="row">
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Select Country</label>
                         <select class="form-control" data-trigger name="country" id="country">
@@ -28,7 +28,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
                         <select class="form-control"name="customer_type" id="customer-type">
@@ -40,11 +40,17 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" >
                         </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                        <input type="date" class="form-control" id="basicpill-firstname-input" name="date">
                     </div>
                 </div>
             </div>
@@ -64,8 +70,13 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
-                        <input type="date" class="form-control" id="basicpill-firstname-input" name="date">
+                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
+                            <option value="" disabled>Select The Supplier</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
@@ -79,7 +90,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Shipping Mwthod</label>
+                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
                         <select class="form-control" data-trigger name="shipment_method">
                             <option value="CNF">CNF</option>
                             <option value="X work">X work</option>

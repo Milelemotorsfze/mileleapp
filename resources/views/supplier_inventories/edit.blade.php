@@ -1,12 +1,13 @@
 @extends('layouts.main')
 @section('content')
     <div class="card-header">
-        <h4 class="card-title">Add/ Update Supplier Inventory Record</h4>
+        <h4 class="card-title">Add / Update Supplier Inventory Record</h4>
     </div>
     <div class="card-body">
         @if(Session::has('message'))
             <div class="alert alert-danger">
                 {{Session::get('message')}}
+                <button type="button" class="btn-close close"  aria-label="Close"></button>
             </div>
         @endif
 
@@ -15,11 +16,11 @@
             <div class="col-lg-2 col-md-6">
                 <div class="mb-3">
                     <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Supplier</label>
-                    <select class="form-control" data-trigger name="supplier" id="supplier">
+                    <select class="form-control" data-trigger name="supplier_id" id="supplier">
                         <option value="" disabled>Select The Supplier</option>
-                        <option value="TTC">TTC</option>
-                        <option value="AMS">AMS</option>
-                        <option value="CPS">CPS</option>
+                        @foreach($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
