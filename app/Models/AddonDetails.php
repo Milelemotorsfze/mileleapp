@@ -24,6 +24,8 @@ class AddonDetails extends Model
         'deleted_by',
         'image',
         'is_all_brands',
+        'fixing_charges_included',
+        'fixing_charge_amount',
         'status'
     ];
     public function AddonTypes()

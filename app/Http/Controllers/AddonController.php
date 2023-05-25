@@ -65,15 +65,31 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        // "addon_type" => "SP"
+        // "addon_code" => "SP1"
+        // "purchase_price" => "25"
+        // "selling_price" => "124"
+        // "lead_time" => "44"
+        // "payment_condition" => "435"
+        // "fixing_charges_included" => "no"
+        // "fixing_charge_amount" => "3453"
+        // "part_number" => "5345"
+        // "additional_remarks" => "hfh"
+        // "model" => array:2 [▶]
+        // "model_number" => array:2 [▶]
+        // "br" => array:1 [▶]
+        // "kitSupplierAndPrice" => array:1 [▶]
+        // "supplierAndPrice" => array:2 [▶]
+        // "image" => Illuminate\Http\UploadedFile {#1506 ▶}
+        // dd($request->all());
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
-            'addon_id' => 'required',
+            // 'addon_id' => 'required',
             // 'addon_code' => 'required',
-            'purchase_price' => 'required',
-            'selling_price' => 'required',
-            'lead_time' => 'required',
-            'additional_remarks' => 'required',
+            // 'purchase_price' => 'required',
+            // 'selling_price' => 'required',
+            // 'lead_time' => 'required',
+            // 'additional_remarks' => 'required',
             // 'brand' => 'required',
             // 'model' => 'required',
             // 'image' => 'nullable|image|mimes:svg,jpeg,png,jpg,gif,bmp,tiff,jpe',
@@ -116,6 +132,14 @@ class AddonController extends Controller
                 $inputaddontype['brand_id'] = $request->brand[$i];
                 $inputaddontype['model_id'] = $request->model[$i];
                 $addon_types = AddonTypes::create($inputaddontype);
+            }
+            if($request->addon_type == 'K')
+            {
+
+            }
+            else
+            {
+
             }
             return redirect()->route('addon.index')
                             ->with('success','Addon created successfully');

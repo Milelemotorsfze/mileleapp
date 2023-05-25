@@ -185,9 +185,9 @@
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="">
                                 <fieldset>
                                     <div class="some-class">
-                                        <input type="radio" class="radioFixingCharge" name="x" value="yes" id="yes" checked />
+                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="yes" id="yes" checked />
                                         <label for="yes">Yes</label>
-                                        <input type="radio" class="radioFixingCharge" name="x" value="no" id="no" />
+                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="no" id="no" />
                                         <label for="no">No</label>
                                     </div>
                                 </fieldset>
@@ -198,7 +198,7 @@
                                 @enderror
                             </div>
                             <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
-                            <!-- <span class="error">* </span> -->
+                            <span class="error">* </span>
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
@@ -211,11 +211,11 @@
                         </div>
                         </br>
                         <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
-                            <!-- <span class="error">* </span> -->
+                            <span class="error">* </span>
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
-                        <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
+                        <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -226,11 +226,11 @@
                     </br>
                     <div class="row" hidden id="rowPartNumber">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <!-- <span class="error">* </span> -->
+                            <span class="error">* </span>
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="part_number" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" >
+                            <input id="part_numberRaw" type="text" class="form-control form-control-sm" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -431,75 +431,75 @@
                 showAndHideSupplierDropdownOptions(1);
             });
           
-            $('#submit').click(function()
-            {
-                var value = $('#addon_id').val();
-                var a = $('#cityname [value="' + value + '"]').data('value');
-                $('#addon_name').val(a);
-            });
-            var j=1;
+            // $('#submit').click(function()
+            // {
+            //     var value = $('#addon_id').val();
+            //     var a = $('#cityname [value="' + value + '"]').data('value');
+            //     $('#addon_name').val(a);
+            // });
+            // var j=1;
            
-        //    $('#add').click(function()
-        //    {
-        //         $('.allbrands').prop('disabled',true);
-        //        // globalThis.selectedBrands = [];
-        //        // console.log(globalThis.selectedBrands);
-        //        for (let j = 1; j <= i; j++)
-        //        {
-        //             var value =$('#selectBrand'+j).val();
-        //             // globalThis.selectedBrands .push(value);
-        //             $('.'+value).prop('disabled',true);
-        //             // globalThis.selectedBrands = [];
-        //             // globalThis.selectedBrands.push(a);
-        //        }
-        //        //         $.each(data.existingSuppliers,function(key,value)
-        //        //         {
-        //        //             var a = value.supplier_id;
-        //        //             selectedBrands.push(a);
-        //        // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
-        //        // });
-        //        // var brandvalue = $('#selectBrand').val();
-               
-        //        // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
-        //        // $('#addon_name').val(a);
-        //        var selectBrand = $("#selectBrand1").val();
-        //        i++;
-        //        // onChange="get_data('+i+')" 
-        //        var selectBrand = $("#selectModelLine").val();
-        //        // i++;
-        //        var html = '';
-        //        html += '</br>';
-        //        html += '<div id="row'+i+'" class="dynamic-added">';
-        //        html += '<div class="row">';
-        //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-        //        html += '<div class="row">';
-        //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-        //        html += '<select onchange=selectBrand(this.id) name="br[]" id="selectBrand'+i+'" multiple="true" style="width: 100%;">';
-        //        html += '@foreach($brands as $brand)';
-        //        html += '<option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>';
-        //        html += '@endforeach';
-        //        html += '</select>';                                     
-        //        html += '</div>';
-        //        html += '</div>';
-        //        html += '</div>';
-        //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-        //        html += '<div class="row">';
-        //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-        //        html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
-        //        html += '</div>';
-        //        html += '</div>';
-        //        html += '</div>';
-        //        html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
-        //        html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
-        //        html += '</div>';
-        //        html += '</div>';
-        //        html += '</div>';
-        //        $('#dynamic_field').append(html);
-        //        $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-        //         $("#selectBrand"+i).select2({
-        //             maximumSelectionLength: 1,
-        //         });
-        //    });
+            //    $('#add').click(function()
+            //    {
+            //         $('.allbrands').prop('disabled',true);
+            //        // globalThis.selectedBrands = [];
+            //        // console.log(globalThis.selectedBrands);
+            //        for (let j = 1; j <= i; j++)
+            //        {
+            //             var value =$('#selectBrand'+j).val();
+            //             // globalThis.selectedBrands .push(value);
+            //             $('.'+value).prop('disabled',true);
+            //             // globalThis.selectedBrands = [];
+            //             // globalThis.selectedBrands.push(a);
+            //        }
+            //        //         $.each(data.existingSuppliers,function(key,value)
+            //        //         {
+            //        //             var a = value.supplier_id;
+            //        //             selectedBrands.push(a);
+            //        // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
+            //        // });
+            //        // var brandvalue = $('#selectBrand').val();
+                
+            //        // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
+            //        // $('#addon_name').val(a);
+            //        var selectBrand = $("#selectBrand1").val();
+            //        i++;
+            //        // onChange="get_data('+i+')" 
+            //        var selectBrand = $("#selectModelLine").val();
+            //        // i++;
+            //        var html = '';
+            //        html += '</br>';
+            //        html += '<div id="row'+i+'" class="dynamic-added">';
+            //        html += '<div class="row">';
+            //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
+            //        html += '<div class="row">';
+            //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
+            //        html += '<select onchange=selectBrand(this.id) name="br[]" id="selectBrand'+i+'" multiple="true" style="width: 100%;">';
+            //        html += '@foreach($brands as $brand)';
+            //        html += '<option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>';
+            //        html += '@endforeach';
+            //        html += '</select>';                                     
+            //        html += '</div>';
+            //        html += '</div>';
+            //        html += '</div>';
+            //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
+            //        html += '<div class="row">';
+            //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
+            //        html += '<input list="" id="addon_name1" type="text" class="form-control form-control-sm @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
+            //        html += '</div>';
+            //        html += '</div>';
+            //        html += '</div>';
+            //        html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
+            //        html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
+            //        html += '</div>';
+            //        html += '</div>';
+            //        html += '</div>';
+            //        $('#dynamic_field').append(html);
+            //        $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            //         $("#selectBrand"+i).select2({
+            //             maximumSelectionLength: 1,
+            //         });
+            //    });
         
            $(document).on('click', '.btn_remove', function()
             {
@@ -556,44 +556,7 @@
         //     $('.modal').addClass('modalhide');
         //     $('.modal').removeClass('modalshow');
         // });
-        $('#createAddonId').on('click', function()
-        {
-            // create new addon and list new addon in addon list
-            var value = $('#new_addon_name').val();
-            if(value == '')
-            {
-                document.getElementById("newAddonError").textContent='Addon Name is Required';
-            }
-            else
-            {
-                currentAddonType =  $('#addon_type').val();
-                $.ajax
-                ({
-                    url:"{{url('createMasterAddon')}}",
-                    type: "POST",
-                    data: 
-                    {
-                        name: value,
-                        addon_type: currentAddonType,
-                        _token: '{{csrf_token()}}' 
-                    },
-                    dataType : 'json',
-                    success: function(result)
-                    {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");  
-                        $('#addon_id').val(result.id); 
-                        var selectedValues = new Array();       
-                        resetSelectedSuppliers(selectedValues);
-                        $('#addnewAddonButton').hide();
-                        $('#new_addon_name').val("");
-                        document.getElementById("newAddonError").textContent='';
-                    }
-                });
-            }
-        });
+        
         function showAndHideSupplierDropdownOptions(i)
         {
             var eachSelected = [];
@@ -614,64 +577,54 @@
             });
             selectedSuppliers.forEach(function(item)
             {
-// //                 // alert('hii');
-// // //                 if ($('.'+item).attr("disabled")) {
-// // //                     // alert('disabled');
-// // //                     alert('hlo');
-// // //                     // $('.'+item).prop('disabled',false)
-// // //     // Remove disabled attribute if it is
-// // //     // $('.'+item).removeAttr("disabled");
-// // //   } else {
-    $('.'+item).prop('disabled',true)
-    
-//     // alert('enabled');
-//     // Add disabled attribute if it is not
-//     // $('.'+item).attr("disabled", "disabled");
-  });
-//                 // $('.'+item).prop('disabled',true)
-//                 // $('.'+item).prop('disabled', !$('.'+item).prop('disabled'));
-//                 // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
-// //                 $('#supplierArray1 option[value="1"]').prop('disabled',false);
+                // //                 // alert('hii');
+                // // //                 if ($('.'+item).attr("disabled")) {
+                // // //                     // alert('disabled');
+                // // //                     alert('hlo');
+                // // //                     // $('.'+item).prop('disabled',false)
+                // // //     // Remove disabled attribute if it is
+                // // //     // $('.'+item).removeAttr("disabled");
+                // // //   } else {
+                    $('.'+item).prop('disabled',true)
+                    
+                //     // alert('enabled');
+                //     // Add disabled attribute if it is not
+                //     // $('.'+item).attr("disabled", "disabled");
+                });
+                //                 // $('.'+item).prop('disabled',true)
+                //                 // $('.'+item).prop('disabled', !$('.'+item).prop('disabled'));
+                //                 // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
+                // //                 $('#supplierArray1 option[value="1"]').prop('disabled',false);
 
-// // $('#supplierArray1').select2();
-//             })
-//             $.each(selectedSuppliers, function( ind1, value1 ) 
-//             {
-//                 // $('.one').prop('disabled', !$('.one').prop('disabled'));
-//             // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
-//             //     // globalThis.selectedSuppliers[i] .push(value);
-            // });
+                // // $('#supplierArray1').select2();
+                //             })
+                //             $.each(selectedSuppliers, function( ind1, value1 ) 
+                //             {
+                //                 // $('.one').prop('disabled', !$('.one').prop('disabled'));
+                //             // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
+                //             //     // globalThis.selectedSuppliers[i] .push(value);
+                            // });
         }
         
 
-//         function changeAddon(i)
-//         {
-//             var eachSelected = [];
+            //         function changeAddon(i)
+            //         {
+            //             var eachSelected = [];
 
-//                 var eachSelected = $('#adoon_'+i).select2().val();
-//                 // globalThis.selectedSuppliers[i] = [];
-//                 $.each(eachSelected, function( ind, value ) {
-//                     // globalThis.selectedSuppliers[i] .push(value); 
-//                     globalThis.selectedSuppliers .push(value);
-//             //     // 
-//                 // alert( index + ": " + value );
-// //                 $("#adoon_1").find(':selected').attr('disabled','disabled');
-// // $("#adoon_1").trigger('change');
-// // $("#adoon_2").find(':selected').attr('disabled','disabled');
-// // $("#adoon_2").trigger('change');
-//                 });
-        // }
-        function closemodal()
-        {
-            $('.overlay').hide();
-            $('.modal').removeClass('modalshow');
-            $('.modal').addClass('modalhide');
-        }
-        function resetSelectedSuppliers(selectedValues)
-        {        
-            $('#supplier_id').val(selectedValues);
-            $('#supplier_id').trigger('change'); 
-        }
+            //                 var eachSelected = $('#adoon_'+i).select2().val();
+            //                 // globalThis.selectedSuppliers[i] = [];
+            //                 $.each(eachSelected, function( ind, value ) {
+            //                     // globalThis.selectedSuppliers[i] .push(value); 
+            //                     globalThis.selectedSuppliers .push(value);
+            //             //     // 
+            //                 // alert( index + ": " + value );
+            // //                 $("#adoon_1").find(':selected').attr('disabled','disabled');
+            // // $("#adoon_1").trigger('change');
+            // // $("#adoon_2").find(':selected').attr('disabled','disabled');
+            // // $("#adoon_2").trigger('change');
+            //                 });
+                    // }
+      
         function getAddonCodeAndDropdown()
         {
             var e = document.getElementById("addon_type"); 
@@ -731,15 +684,18 @@
                     let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                     showrowPartNumberBr.hidden = true
                 }
+                $("#purchase_price").val('');
                 if(value == 'K')
                 {
                     hidenotKitSupplier();
-                    showkitSupplier();                 
+                    showkitSupplier();   
+                    setLeastPurchasePriceAED();              
                 }
                 else
                 {
                     hidekitSupplier();
-                    shownotKitSupplier();          
+                    shownotKitSupplier(); 
+                    setLeastAEDPrice();         
                 }
                 $.ajax
                 ({
@@ -785,6 +741,60 @@
                 $("#selectBrand1").attr('disabled','disabled'); 
                 $('#addon_code').val('');
             }
+        }
+        $('#createAddonId').on('click', function()
+        {
+            // create new addon and list new addon in addon list
+            var value = $('#new_addon_name').val();
+            if(value == '')
+            {
+                document.getElementById("newAddonError").textContent='Addon Name is Required';
+            }
+            else
+            {
+                currentAddonType =  $('#addon_type').val();
+                $.ajax
+                ({
+                    url:"{{url('createMasterAddon')}}",
+                    type: "POST",
+                    data: 
+                    {
+                        name: value,
+                        addon_type: currentAddonType,
+                        _token: '{{csrf_token()}}' 
+                    },
+                    dataType : 'json',
+                    success: function(result)
+                    {
+                        $('.overlay').hide();
+                        $('.modal').removeClass('modalshow');
+                        $('.modal').addClass('modalhide');
+                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");  
+                        $('#addon_id').val(result.id); 
+                        var selectedValues = new Array();       
+                        resetSelectedSuppliers(selectedValues);
+                        $('#addnewAddonButton').hide();
+                        $('#new_addon_name').val("");
+                        document.getElementById("newAddonError").textContent='';
+                    }
+                });
+            }
+        });       
+        function setPartNumber(partNum)
+        {
+            $('#part_number').val(partNum.value);
+            $('#part_numberRaw').val(partNum.value);
+        }
+        function closemodal()
+        {
+            $('.overlay').hide();
+            $('.modal').removeClass('modalshow');
+            $('.modal').addClass('modalhide');
+        }
+        function resetSelectedSuppliers(selectedValues)
+        {        
+            $('#supplier_id').val(selectedValues);
+            $('#supplier_id').trigger('change'); 
         }
         function readURL(input)
         {
@@ -878,16 +888,23 @@
         function setLeastAEDPrice()
         {
             const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
-            var arrayOfNumbers = [];
-            values.forEach(v => {
-                if(v != '')
+            if(values != '')
+            {
+                var arrayOfNumbers = [];
+                values.forEach(v => {
+                    if(v != '')
+                    {
+                        arrayOfNumbers .push(v);
+                    }
+                });
+                var size= arrayOfNumbers.length;
+                if(size >= 1)
                 {
-                    arrayOfNumbers .push(v);
+                    var arrayOfNumbers = arrayOfNumbers.map(Number);
+                    const minOfPrice = Math.min(...arrayOfNumbers);
+                    $("#purchase_price").val(minOfPrice);
                 }
-            });
-            var arrayOfNumbers = arrayOfNumbers.map(Number);
-            const minOfPrice = Math.min(...arrayOfNumbers);
-            $("#purchase_price").val(minOfPrice);
+            } 
         }
         function showkitSupplier()
         {

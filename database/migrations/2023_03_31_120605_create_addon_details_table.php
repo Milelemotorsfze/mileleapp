@@ -34,6 +34,8 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('image2')->nullable();
             $table->enum('status', ['inactive', 'active'])->default('active');
+            $table->enum('fixing_charges_included', ['yes', 'no'])->default('yes');
+            $table->decimal('fixing_charge_amount', 10,2)->default('0.00');
             $table->timestamps();
             $table->softDeletes();
         });
