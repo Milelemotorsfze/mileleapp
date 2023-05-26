@@ -24,20 +24,36 @@
     </style>
 @section('content')
 @can('Calls-modified')
+@if ($errors->has('source_name'))
+            <div id="error-message" class="alert alert-danger">
+                {{ $errors->first('source_name') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div id="error-message" class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div id="success-message" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 <div class="card-header">
-@if (session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
         <h4 class="card-title">New Master Lead Source</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
+    <div class="row">
+            <p><span style="float:right;" class="error">* Required Field</span></p>
+			</div> 
     <form action="{{ route('lead_source.store') }}" method="post" enctype="multipart/form-data"> 
     @csrf
                 <div class="row"> 
 					<div class="col-lg-6 col-md-6">
+          <span class="error">*</span>
                         <label for="basicpill-firstname-input" class="form-label">Source Name : </label>
                         <input type="text" class="form-control" id="basicpill-firstname-input" name="source_name">
                     </div>
@@ -48,7 +64,19 @@
 				    <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
 			        </div>  
                     </form>
-		</br>
+                    <br>
+       
     </div>
-    @endcan
+    <script>
+        // Set timer for error message
+        setTimeout(function() {
+            $('#error-message').fadeOut('slow');
+        }, 2000);
+
+        // Set timer for success message
+        setTimeout(function() {
+            $('#success-message').fadeOut('slow');
+        }, 2000);
+    </script>
+@endcan
 @endsection

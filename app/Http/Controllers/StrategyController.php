@@ -36,6 +36,13 @@ class StrategyController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'start_date' => 'required',
+            'end_date' => $request->input('one_day_activity') === 'auto-assign' ? 'nullable' : 'required',
+        ], [
+            'start_date.required' => 'Please enter your Current Date.',
+            'end_date.required' => 'Please enter your Ending Date.',
+        ]);        
         $data = [
             'name' => $request->input('name'),
             'lead_source_id' => $request->input('lead_source_id'),

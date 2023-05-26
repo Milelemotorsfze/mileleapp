@@ -13,7 +13,7 @@ class LeadSourceController extends Controller
      */
     public function index()
     {
-        $data = LeadSource::orderBy('status','DESC')->whereIn('status',['active'])->get();
+        $data = LeadSource::orderBy('status','ASC')->get();
         return view('calls.lead_source',compact('data'));
     }
 
@@ -30,6 +30,11 @@ class LeadSourceController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'source_name' => 'required',
+        ], [
+            'source_name.required' => 'Please enter your source name.', // Custom error message
+        ]);     
         $sourceName = $request->input('source_name');
         $existingRecord = LeadSource::where('source_name', $sourceName)->first();
         if ($existingRecord) {

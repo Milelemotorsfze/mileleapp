@@ -10,7 +10,8 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-            Strategy Report
+<h4>Strategy Report</h4>
+            <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
         </h4>
     </div>
     <div class="card-body">

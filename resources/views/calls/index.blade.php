@@ -1,4 +1,5 @@
 @extends('layouts.table')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
   <div class="card-header">
     <h4 class="card-title">
@@ -37,8 +38,8 @@
       <button class="btn btn-success left" id="export-csv">Export CSV</button>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-              <thead>
+            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
+            <thead class="bg-soft-secondary">
                 <tr>
                   <th>S.No</th>
                   <th>Date</th>
@@ -53,7 +54,7 @@
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,7 +107,19 @@
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
     <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>{{ $calls->status }}</td>      
+    <td>
+    <div class="dropdown">
+    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
+      <i class="fa fa-bars" aria-hidden="true"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" href="{{ route('calls.edit',$calls->id) }}">Edit</a></li>
+      <li>
+  <a class="dropdown-item delete-link" href="#" data-url="{{ route('calls.destroy', $calls->id) }}">Delete</a>
+</li>
+    </ul>
+  </div>
+    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -120,8 +133,8 @@
       <button class="btn btn-success left" id="export-csv-lead">Export CSV</button>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary">
                 <tr>
                 <th>S.No</th>
                   <th>Date</th>
@@ -151,11 +164,6 @@
                     <td>{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
-                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
-                     @endphp  
-                    <td>{{ $sales_persons_name }}</td>
-                    @php
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
@@ -192,8 +200,8 @@
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>  
-    <td>{{ $calls->sales_person_remarks }}</td>       
+    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>      
+    <td>{{ $calls->sales_person_remarks }}</td>   
                   </tr>
                 @endforeach
               </tbody>
@@ -204,11 +212,11 @@
       @endcan
       @can('Calls-view')
       <div class="tab-pane fade show" id="tab3">
-      <button class="btn btn-success left" id="export-csv-so">Export CSV</button>
+      <button class="btn btn-success left" id="export-rejection">Export CSV</button>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary">
                 <tr>
                 <th>S.No</th>
                   <th>Date</th>
@@ -239,11 +247,6 @@
                     <td>{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
-                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
-                     @endphp  
-                    <td>{{ $sales_persons_name }}</td>
-                    @php
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
@@ -296,8 +299,8 @@
       <button class="btn btn-success left" id="export-csv-so">Export CSV</button>
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary">
                 <tr>
                 <th>S.No</th>
                   <th>Date</th>
@@ -326,11 +329,6 @@
                     <td>{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
-                     $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
-                     $sales_persons_name = $sales_persons->name;
-                     @endphp  
-                    <td>{{ $sales_persons_name }}</td>
-                    @php
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
@@ -381,7 +379,7 @@
   </div>
   <script type="text/javascript">
 $(document).ready(function () {
-  var dataTable = $('#dtBasicExample1').DataTable({
+  var dataTablea = $('#dtBasicExample1').DataTable({
     ordering: false,
     initComplete: function() {
       this.api()
@@ -428,9 +426,9 @@ $(document).ready(function () {
   });
 $('#my-table_filter').hide();
   $('#export-csv').on('click', function() {
-    downloadCSV(dataTable, 'Call.csv');
+    downloadCSVa(dataTablea, 'Call.csv');
   });
-  var dataTable = $('#dtBasicExample2').DataTable({
+  var dataTableb = $('#dtBasicExample2').DataTable({
     ordering: false,
     initComplete: function() {
       this.api()
@@ -476,9 +474,9 @@ $('#my-table_filter').hide();
     }
   });
   $('#export-csv-lead').on('click', function() {
-    downloadCSV(dataTable, 'Call-to-Lead.csv');
+    downloadCSVb(dataTableb, 'Call-to-Lead.csv');
   });
-  var dataTable = $('#dtBasicExample3').DataTable({
+  var dataTablec = $('#dtBasicExample3').DataTable({
     ordering: false,
     initComplete: function() {
       this.api()
@@ -526,10 +524,10 @@ $('#my-table_filter').hide();
         });
     }
   });
-  $('#export-csv-so').on('click', function() {
-    downloadCSV(dataTable, 'Lead-to-So.csv');
+  $('#export-rejection').on('click', function() {
+    downloadCSVc(dataTablec, 'rejection.csv');
   });
-  var dataTable = $('#dtBasicExample4').DataTable({
+  var dataTabled = $('#dtBasicExample4').DataTable({
     ordering: false,
     initComplete: function() {
       this.api()
@@ -575,13 +573,13 @@ $('#my-table_filter').hide();
     }
   });
   $('#export-csv-so').on('click', function() {
-    downloadCSV(dataTable, 'Lead-to-So.csv');
+    downloadCSVd(dataTabled, 'Lead-to-So.csv');
   });
 });
-function downloadCSV(dataTable, fileName) {
+function downloadCSVa(dataTablea, fileName) {
   var csv = '';
-  var rows = dataTable.rows({ 'search': 'applied' }).data();
-  var header = dataTable.columns().header();
+  var rows = dataTablea.rows({ 'search': 'applied' }).data();
+  var header = dataTablea.columns().header();
   var headerArray = [];
   $(header).each(function() {
     headerArray.push($(this).text());
@@ -601,5 +599,104 @@ function downloadCSV(dataTable, fileName) {
   link.click();
   document.body.removeChild(link);
 }
+function downloadCSVb(dataTableb, fileName) {
+  var csv = '';
+  var rows = dataTableb.rows({ 'search': 'applied' }).data();
+  var header = dataTableb.columns().header();
+  var headerArray = [];
+  $(header).each(function() {
+    headerArray.push($(this).text());
+  });
+  csv += headerArray.join(',') + '\r\n';
+  $(rows).each(function(index, row) {
+    var rowData = [];
+    $(row).each(function() {
+      rowData.push(this);
+    });
+    csv += rowData.join(',') + '\r\n';
+  });
+  var link = document.createElement('a');
+  link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+function downloadCSVc(dataTablec, fileName) {
+  var csv = '';
+  var rows = dataTablec.rows({ 'search': 'applied' }).data();
+  var header = dataTablec.columns().header();
+  var headerArray = [];
+  $(header).each(function() {
+    headerArray.push($(this).text());
+  });
+  csv += headerArray.join(',') + '\r\n';
+  $(rows).each(function(index, row) {
+    var rowData = [];
+    $(row).each(function() {
+      rowData.push(this);
+    });
+    csv += rowData.join(',') + '\r\n';
+  });
+  var link = document.createElement('a');
+  link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+function downloadCSVd(dataTabled, fileName) {
+  var csv = '';
+  var rows = dataTabled.rows({ 'search': 'applied' }).data();
+  var header = dataTabled.columns().header();
+  var headerArray = [];
+  $(header).each(function() {
+    headerArray.push($(this).text());
+  });
+  csv += headerArray.join(',') + '\r\n';
+  $(rows).each(function(index, row) {
+    var rowData = [];
+    $(row).each(function() {
+      rowData.push(this);
+    });
+    csv += rowData.join(',') + '\r\n';
+  });
+  var link = document.createElement('a');
+  link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+$(document).ready(function() {
+  $('.delete-link').click(function(e) {
+    e.preventDefault();
+
+    var url = $(this).data('url');
+
+    if (confirm('Are you sure you want to delete this item?')) {
+      $.ajax({
+        url: url,
+        type: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(result) {
+          // Handle successful deletion, e.g., show a success message
+          console.log('Item deleted successfully.');
+          location.reload();
+        },
+        error: function(xhr) {
+          // Handle error response, e.g., show an error message
+          console.log('Error deleting item.');
+          location.reload();
+        }
+      });
+    } else {
+      // If "No" is clicked, redirect back to the previous page
+      location.reload();
+    }
+  });
+});
 </script>
 @endsection

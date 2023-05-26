@@ -45,13 +45,17 @@ class CallsController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    { 
         $this->validate($request, [
             'phone' => 'nullable|required_without:email',
-            'email' => 'nullable|required_without:phone|email',            
+            'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
-        ]);
-        if($request->input('sales-option') == "auto-assign") {
+            'milelemotors' => 'required',
+            'language' => 'required',
+            'type' => 'required',
+            'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
+        ]);      
+        if ($request->input('sales-option') == "auto-assign") {
         $email = $request->input('email');
         $phone = $request->input('phone');
         $language = $request->input('language');
@@ -111,15 +115,17 @@ class CallsController extends Controller
         }  
     }
     else{
-        $sales_person_id = $request->input('sales_person'); 
+        $sales_person_id = $request->input('sales_person_id');
     }
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
+        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
         $data = [
             'name' => $request->input('name'),
-            'source' => $request->input('source'),
+            'source' => $dataValue,
             'email' => $request->input('email'),
+            'type' => $request->input('type'),
             'sales_person' => $sales_person_id,
             'remarks' => $request->input('remarks'),
             'location' => $request->input('location'),
@@ -136,18 +142,20 @@ class CallsController extends Controller
                    ->orderBy('id', 'desc')
                    ->first();
         $table_id = $lastRecord->id;
-        $modelLineIds = $request->input('model_line_id');
+        $modelLineIds = $request->input('model_line_ids');
 
-        foreach ($modelLineIds as $modelLineId) {
-            $datacalls = [
-                'lead_id' => $table_id,
-                'model_line_id' => $modelLineId,
-                'created_at' => $formattedDate
-            ];
-        
-            $model = new CallsRequirement($datacalls);
-            $model->save();
-        }
+if ($modelLineIds[0] !== null) {
+foreach ($modelLineIds as $modelLineId) {
+    $datacalls = [
+        'lead_id' => $table_id,
+        'model_line_id' => $modelLineId,
+        'created_at' => $formattedDate
+    ];
+
+    $model = new CallsRequirement($datacalls);
+    $model->save();
+}
+}
         $logdata = [
             'table_name' => "calls",
             'table_id' => $table_id,
@@ -187,26 +195,99 @@ return view('calls.resultbrand', compact('data'));
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(calls $calls)
+    public function edit($id)
     {
-        //
+        $calls = Calls::findOrFail($id);
+        $countries = CountryListFacade::getList('en');
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+        
+        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, calls $calls)
+    public function updatehol(Request $request)
     {
-        //
+        $this->validate($request, [
+            'phone' => 'nullable|required_without:email',
+            'email' => 'nullable|required_without:phone|email',           
+            'location' => 'required',
+            'milelemotors' => 'required',
+            'language' => 'required',
+            'type' => 'required',
+            'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
+        ]);      
+        if ($request->input('sales-option') == "manual-assign") 
+		{
+        $sales_person_id = $request->input('sales_person_id');
+		}
+		else{
+		$sales_person_id = $request->input('old_sales_person_id');	
+		}
+        $date = Carbon::now();
+        $date->setTimezone('Asia/Dubai');
+        $formattedDate = $date->format('Y-m-d H:i:s');
+        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
+		$call_id = $request->input('call_id');
+		$model = Calls::find($call_id);
+		if ($model) {
+		// Update the fields with the new values
+		$model->name = $request->input('name');
+		$model->source = $dataValue;
+		$model->email = $request->input('email');
+		$model->type = $request->input('type');
+		$model->sales_person = $sales_person_id;
+		$model->remarks = $request->input('remarks');
+		$model->location = $request->input('location');
+		$model->phone = $request->input('phone');
+		$model->custom_brand_model = $request->input('custom_brand_model');
+		$model->language = $request->input('language');
+		$model->status = "New";
+		$model->save();
+		}
+        $modelLineIds = $request->input('model_line_ids');
+            foreach ($modelLineIds as $modelLineId) {
+                if ($modelLineId !== null) {
+                    $datacalls = [
+                        'lead_id' => $call_id,
+                        'model_line_id' => $modelLineId,
+                        'created_at' => $formattedDate
+                    ];
+                    $model = new CallsRequirement($datacalls);
+                    $model->save();
+                }
+            }       
+       $table_id = $call_id;
+        $logdata = [
+            'table_name' => "calls",
+            'table_id' => $table_id,
+            'user_id' => Auth::id(),
+            'action' => "Update",
+        ];
+        $model = new Logs($logdata);
+        $model->save();
+        return redirect()->route('calls.index')
+        ->with('success','Call Record created successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(calls $calls)
-    {
-        //
+    public function destroy($id)
+{
+    $call = Calls::find($id);
+    $call->delete();
+    $callRequirements = CallRequirement::where('lead_id', $id)->get();
+    if ($callRequirements->isNotEmpty()) {
+        foreach ($callRequirements as $callRequirement) {
+            $callRequirement->delete();
+        }
     }
+    return response()->json(['message' => 'Item deleted successfully']);
+}
     public function getmodelline(Request $request)
     {
         $brandId = $request->input('brand'); 
@@ -318,15 +399,18 @@ return view('calls.resultbrand', compact('data'));
     }
     public function checkExistence(Request $request)
 {
+    $emailCount = 0;
+    $phoneCount = 0;
     $phone = $request->input('phone');
     $email = $request->input('email');
-    
-    $phoneCount = Calls::where('phone', $phone)->count();
-    $emailCount = Calls::where('email', $email)->count();
-    
+    if ($phone !== null) {
+        $phoneCount = Calls::where('phone', $phone)->count();
+    }
+    if ($email !== null) {
+        $emailCount = Calls::where('email', $email)->count(); 
+    }
     $customers = Calls::where('phone', $phone)->orWhere('email', $email)->get();
     $customerNames = $customers->pluck('name')->toArray();
-    
     $data = [
         'phoneCount' => $phoneCount,
         'emailCount' => $emailCount,
@@ -345,5 +429,18 @@ public function sendDetails(Request $request)
         ->get();
     
     return view('calls.repeatedcustomers', compact('calls'));
+}
+public function removeRow(Request $request)
+{
+    $callRequirementId = $request->input('call_requirement_id');
+    CallsRequirement::where('id', $callRequirementId)->delete();
+    return response()->json(['success' => true]);
+}
+public function updaterow(Request $request)
+{
+    $callRequirementId = $request->input('callRequirementId');
+    $modelLineMasterId = $request->input('modelLineMasterId');
+    CallsRequirement::where('id', $callRequirementId)->update(['model_line_id' => $modelLineMasterId]);
+    return response()->json(['message' => 'Row updated successfully']);
 }
 }

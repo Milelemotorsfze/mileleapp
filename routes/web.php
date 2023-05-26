@@ -116,12 +116,16 @@ Route::get('/d', function () {
     Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
     Route::resource('lead_source', LeadSourceController::class);
     Route::get('calls-bulk/createbulk', [CallsController::class,'createbulk'])->name('calls.createbulk');
-    Route::post('/uploadingbulk', [VariatnsPicturesController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
+    Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
 
 
+    Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
+    Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
+    Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
+    Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');

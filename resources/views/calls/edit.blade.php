@@ -47,7 +47,7 @@ input[type=number]::-webkit-outer-spin-button {
 @section('content')
 @can('Calls-modified')
 <div class="card-header">
-        <h4 class="card-title">New Calls & Messages</h4>
+        <h4 class="card-title">Edit Calls & Messages</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -64,7 +64,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!}
+        {!! Form::open(['route' => ['calls.updatehol'], 'method' => 'POST', 'id' => 'calls']) !!}
             <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
@@ -72,24 +72,30 @@ input[type=number]::-webkit-outer-spin-button {
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
+                        <input type="text" name="name" class="form-control" value="{{ $calls->name }}">
                     </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
+    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}">
 </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
+    <input type="text" name="email" class="form-control" value="{{ $calls->email }}" id="email">
     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+    <input type="hidden" name="call_id" value="{{ $calls->id }}">
     <div id="emailError" class="error-text"></div>
 </div>
+@php
+                    $leadsources = "";
+                     $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
+                     $leadsources = $leadsource->source_name;
+                     @endphp
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput">
+                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" value="{{ $leadsources }}">
                     <datalist id="milelemotorsList">
                     @foreach ($LeadSource as $source)
                     <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
@@ -99,7 +105,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput">
+    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" value="{{ $calls->language}}">
     <datalist id="laList">
         <option value="English" data-value="English">English</option>
         <option value="Arabic" data-value="English">Arabic</option>
@@ -117,18 +123,18 @@ input[type=number]::-webkit-outer-spin-button {
 </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Destination : </label>
-                        <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput">
+                    <label for="basicpill-firstname-input" class="form-label">Destination : </label>
+                    <input type="text" placeholder="Location" name="location" list="loList" class="form-control" id="locationInput" value="{{ $calls->location}}">
                     <datalist id="loList">
                     @foreach ($countries as $country)
                     <option value="{{ $country }}" data-value="{{ $country }}">{{ $country }}</option>
                     @endforeach
                     </datalist>
-                        </div>
-                        <div class="col-lg-4 col-md-6">
-                        <span class="error">* </span>
-                        <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                        <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput">
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Type : </label>
+                    <input type="text" placeholder="Type" name="type" list="typeList" class="form-control" id="typeInput" value="{{ $calls->type}}">
                     <datalist id="typeList">
                     <option value="Export" data-value="Export">Export</option>
                     <option value="Local" data-value="Export">Local</option>
@@ -139,37 +145,77 @@ input[type=number]::-webkit-outer-spin-button {
                     </br>
                     <div class="row">
                     <div class="col-lg-4 col-md-6">
-    <label for="sales-options" class="form-label">Sales Persons Options:</label>
-    <div>
-        <label>
-            <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> System Auto Assign
-        </label>
-        <label>
-            <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
-        </label>
-    </div>
-</div>
-<div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
-    <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput">
-<datalist id="salesList">
-    @foreach ($sales_persons as $sales_person)
-        @php
-            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-            $sales_person_name = $sales_person_details->name;
-        @endphp
-        <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>      
-    @endforeach
-</datalist>
-<input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
+                    <label for="sales-options" class="form-label">Sales Persons Options:</label>
+                    <div>
+                    <label>
+                     @php
+                     $sales_persons_namess = "";
+                     $sales_personsss = DB::table('users')->where('id', $calls->sales_person)->first();
+                     $sales_persons_namess = $sales_personsss->name;
+                     @endphp
+                    <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> {{ $sales_persons_namess }}
+                    </label>
+                    <input type="hidden" name="old_sales_person_id" value="{{ $calls->sales_person }}">
+                    <label>
+                    <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
+                    </label>
                     </div>
                     </div>
-                    <div class="maindd">
+                    <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
+                    <label for="manual-sales-person" class="form-label">Sales Person:</label>
+                    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput">
+                    <datalist id="salesList">
+                     @foreach ($sales_persons as $sales_person)
+                     @php
+                     $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
+                     $sales_person_name = $sales_person_details->name;
+                     @endphp
+                     <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>      
+                     @endforeach
+                    </datalist>
+                    <input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
+                    </div>
+                    </div>
+<div class="maindd">
     <div id="row-container">
+    <label for="brandInput" class="form-label">Brand & Models:</label>
+@php
+$model_line_idss = DB::table('calls_requirement')->where('lead_id', $calls->id)->get();
+@endphp
+@foreach ($model_line_idss as $model_line_idssss)
+@php
+$model_name = DB::table('master_model_lines')->where('id', $model_line_idssss->model_line_id)->first();
+$model_names = $model_name->model_line;
+$brand_ids = $model_name->brand_id;
+$brand = DB::table('brands')->where('id', $brand_ids)->first();
+$brand_name = $brand->brand_name;
+@endphp 
+<div class="row">
+    <div class="col-lg-4 col-md-6">
+        <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInputs" value="{{ $brand_name }} / {{ $model_names }}">
+        <datalist id="brandList">
+        @foreach ($modelLineMasters as $modelLineMaster)
+            @php
+            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+            $brand_name = $brand->brand_name;
+            @endphp 
+            <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+        @endforeach
+        <input type="hidden" id="callRequirementId" value="{{ $model_line_idssss->id }}" />
+        </datalist>
+        <input type="hidden" name="model_line_ids[]" id="selectedBrandId" value="">
+    </div>
+    <div class="col-lg-4 col-md-6">
+    <a href="#" class="remove-row-btn btn btn-danger" data-call-requirement-id="{{ $model_line_idssss->id }}">
+        <i class="fas fa-minus"></i> Remove
+    </a>
+</div>
+</div>
+@endforeach
+<div id="row-container">
         <div class="row">
             <div class="col-lg-4 col-md-6">
-            <label for="brandInput" class="form-label">Brand & Models:</label>
-<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
+<input type="hidden" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
 <datalist id="brandList">
     @foreach ($modelLineMasters as $modelLineMaster)
         @php
@@ -183,19 +229,19 @@ input[type=number]::-webkit-outer-spin-button {
             </div>
         </div>
     </div>
-    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+</div>
+<div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
         <div class="btn btn-primary add-row-btn">
             <i class="fas fa-plus"></i> Add More
         </div>
     </div>
-</div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
-                        {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
+                        <input type="text" placeholder="Custom Brand Model" name="custom_brand_model" class="form-control" value="{{ $calls->custom_brand_model}}">
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <label for="basicpill-firstname-input" class="form-label">Remarks : </label>
-                        <textarea name="remarks" id="editor"></textarea>
+                        <textarea name="remarks" id="editor">{{ $calls->remarks}}</textarea>
                     </div>
 			        </div>  
                     </br>
@@ -226,7 +272,6 @@ input[type=number]::-webkit-outer-spin-button {
     var max_fields = 10;
     var wrapper = $("#row-container");
     var add_button = $(".add-row-btn");
-
     var x = 1;
     $(add_button).click(function(e) {
         e.preventDefault();
@@ -245,9 +290,7 @@ input[type=number]::-webkit-outer-spin-button {
             datalist.html(options);
             var newRow = $('<div class="row"></div>');
             var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-            var label = $('<label for="brandInput' + x + '" class="form-label">Brand & Models:</label>');
             var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-            col1.append(label);
             col1.append(input);
             col1.append(datalist);
             var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
@@ -435,31 +478,80 @@ input[type=number]::-webkit-outer-spin-button {
             selectedBrandIdInput.value = '';
         }
     });
-   window.addEventListener('DOMContentLoaded', function() {
-       var input = document.querySelector("#phone");
-       var iti = window.intlTelInput(input, {
-           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-           initialCountry: "ae",
-           separateDialCode: true,
-           nationalMode: false
-       });
-       input.addEventListener('input', function() {
-           var currentValue = input.value;
-           var newValue = currentValue.replace(/[^0-9]/g, '');
-           if (newValue.charAt(0) !== '+') {
-               newValue = '+' + newValue;
-           }
-           input.value = newValue;
-       });
-       iti.events.on("countrychange", function() {
-           var countryCode = iti.getSelectedCountryData().dialCode;
-           if (input.value && input.value.charAt(0) === '+') {
-               input.value = "+" + countryCode + input.value.substr(4);
-           } else {
-               input.value = "+" + countryCode;
-           }
-       });
-   });
+    window.addEventListener('DOMContentLoaded', function() {
+    var input = document.querySelector("#phone");
+    var iti = window.intlTelInput(input, {
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+        initialCountry: "ae",
+        separateDialCode: true,
+        nationalMode: true
+    });
+    input.addEventListener('input', function() {
+        var currentValue = input.value;
+        var newValue = currentValue.replace(/[^0-9]/g, '');
+        if (newValue.charAt(0) !== '+') {
+            newValue = '+' + newValue;
+        }
+        if (newValue.length > 15) {
+            newValue = newValue.slice(5, 15); // Truncate to 15 digits
+        }
+        input.value = newValue;
+    });
+    iti.events.on("countrychange", function() {
+        var countryCode = iti.getSelectedCountryData().dialCode;
+        if (input.value && input.value.charAt(0) === '+') {
+            input.value = "+" + countryCode + input.value.substr(4);
+        } else {
+            input.value = "+" + countryCode;
+        }
+    });
+});
+   $(document).ready(function() {
+   $('.remove-row-btn').click(function(e) {
+    e.preventDefault();
+    var callRequirementId = $(this).data('call-requirement-id');
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+      url: '/calls/removerow',
+      method: 'POST',
+      data: {
+        call_requirement_id: callRequirementId,
+        _token: csrfToken
+      },
+      success: function(response) {
+        if (response.success) {
+          $(this).closest('.col-lg-4').remove();
+        }
+      }
+    });
+  });
+});
+  $(document).ready(function() {
+    $('#brandInputs').on('change', function() {
+        var selectedOption = $(this).val();
+        var modelLineMasterId = document.querySelector(`#brandList option[value="${selectedOption}"]`).getAttribute('data-value');
+        var callRequirementId = $('#callRequirementId').val();
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+      console.log(callRequirementId);
+      $.ajax({
+        url: '/calls/updaterow',
+        type: 'POST',
+        data: {
+          modelLineMasterId: modelLineMasterId,
+          callRequirementId: callRequirementId,
+          _token: csrfToken // Include the CSRF token in the request data
+        },
+        success: function(response) {
+          // Handle the response if needed
+          console.log(response);
+        },
+        error: function(xhr, status, error) {
+          // Handle the error if needed
+          console.log(error);
+        }
+      });
+    });
+  });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>

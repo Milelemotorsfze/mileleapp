@@ -34,15 +34,20 @@
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
+    <div class="row">
+            <p><span style="float:right;" class="error">* Required Field</span></p>
+			</div> 
     <form method="POST" action="{{ route('lead_source.update', $record->id) }}">
     @csrf
     @method('PUT')
                 <div class="row"> 
 					<div class="col-lg-6 col-md-6">
+          <span class="error">*</span>
                         <label for="basicpill-firstname-input" class="form-label">Source Name : </label>
                         <input type="text" name="source_name" class="form-control" value="{{ $record->source_name }}" required>
                     </div>
                     <div class="col-lg-6 col-md-6">
+                    <span class="error">*</span>
                         <label for="basicpill-firstname-input" class="form-label">Status : </label>
                         <select name="status" class="form-control">
                         <option value="active" {{ $record->status == 'active' ? 'selected' : '' }}>Active</option>

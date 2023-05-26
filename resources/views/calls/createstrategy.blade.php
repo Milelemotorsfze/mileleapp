@@ -30,26 +30,27 @@ input[type=number]::-webkit-outer-spin-button {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
 @can('Calls-modified')
+@if ($errors->has('start_date') || $errors->has('end_date'))
+    <div id="error-message" class="alert alert-danger">
+        Please Enter Dates.
+    </div>
+@endif
+        @if (session('error'))
+            <div id="error-message" class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div id="success-message" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 <div class="card-header">
         <h4 class="card-title">Lead Soruce Strategies</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-    @if (session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-    @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
             <div class="row">
 			</div>  
 			<form action="{{route('strategy.store')}}" method="post" enctype="multipart/form-data">
@@ -116,9 +117,13 @@ input[type=number]::-webkit-outer-spin-button {
                         <td>{{ $strategy->name }}</td>
                         <td>{{ $date->cost }}</td>
                         <td>{{ $startDate->format('d-m-Y') }}</td>
-            <td>{{ $endDate->format('d-m-Y') }}</td>
-            <td>{{ $numberOfDays }}</td>
-                        <td>{{ $strategy->status }}</td>
+                        <td>{{ $endDate->format('d-m-Y') }}</td>
+                        <td>{{ $numberOfDays }}</td>
+                        @if(strtotime($endDate) > time())
+                        <td><label class="badge badge-soft-success">Active</label></td>
+                        @else
+                        <td><label class="badge badge-soft-danger">In Active</label></td>
+                        @endif
                     </tr>
 		          @endforeach
                 @endforeach
@@ -129,20 +134,55 @@ input[type=number]::-webkit-outer-spin-button {
     @endcan
     <script>
     $(document).ready(function() {
-        $('#one-day-activity-checkbox').change(function() {
-            var startDateValue = $('input[name="start_date"]').val();
-            
-            if (startDateValue) {
-                if ($(this).is(':checked')) {
-                    $('#end-date-input').prop('disabled', true).val(startDateValue);
-                } else {
-                    $('#end-date-input').prop('disabled', false).val('');
-                }
+    $('#one-day-activity-checkbox').change(function() {
+        var startDateValue = $('input[name="start_date"]').val();
+        
+        if (startDateValue) {
+            if ($(this).is(':checked')) {
+                $('#end-date-input').prop('disabled', true).val(startDateValue);
             } else {
-                alert('Please enter a valid start date.');
-                $(this).prop('checked', false);
+                $('#end-date-input').prop('disabled', false).val('');
             }
-        });
+        } else {
+            alert('Please enter a valid start date.');
+            $(this).prop('checked', false);
+        }
     });
+
+    $('input[name="start_date"]').change(function() {
+        if ($('#one-day-activity-checkbox').is(':checked')) {
+            var startDateValue = $(this).val();
+            $('#end-date-input').val(startDateValue);
+        }
+    });
+});
+        // Set timer for error message
+        setTimeout(function() {
+            $('#error-message').fadeOut('slow');
+        }, 2000);
+
+        // Set timer for success message
+        setTimeout(function() {
+            $('#success-message').fadeOut('slow');
+        }, 2000);
+        document.addEventListener('DOMContentLoaded', function() {
+  var startingDateInput = document.querySelector('input[name="start_date"]');
+  var endingDateInput = document.querySelector('input[name="end_date"]');
+
+  endingDateInput.addEventListener('change', function() {
+    var startingDateValue = startingDateInput.value;
+    var endingDateValue = endingDateInput.value;
+    
+    if (startingDateValue && endingDateValue) {
+      var startingDate = new Date(startingDateValue);
+      var endingDate = new Date(endingDateValue);
+      
+      if (endingDate <= startingDate) {
+        alert('The ending date must be later than the starting date.');
+        endingDateInput.value = '';
+      }
+    }
+  });
+});
 </script>
 @endsection
