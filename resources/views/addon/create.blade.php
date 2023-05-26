@@ -1,11 +1,60 @@
 @extends('layouts.main')
 <style>
-   /* .addonCreateCard
-   {
-    top: 50%;
-            left: 50%;
-   } */
-
+    .modal-xl 
+    {
+        max-width: 99% !important;
+    }
+    #blah 
+    {
+        width: 300px;
+        height: 300px;
+    }
+    #showImage
+    {
+        width: auto;
+        height: auto;
+    }
+    @media only screen and (max-device-width: 480px) 
+    {
+        #showImage
+        {
+            width: 100%;
+            height: 100%;
+        }
+        #blah 
+        {
+            width: 200px;
+            height: 200px;
+        }
+    }
+    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait) 
+    {
+        #showImage
+        {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) 
+    {
+        #showImage
+        {
+            width: 100%;
+            height: 100%;
+        }
+    }  
+    @media only screen and (min-device-width: 1270px)
+    {
+        #showImage
+        {
+            width: 100%;
+            height: 100%;
+        }
+    }  
+    .contain 
+    {
+    object-fit: contain;
+    }
     .error 
     {
         color: #FF0000;
@@ -38,16 +87,16 @@
         color: red;
         font-size:11px;
     }
-  .overlay
-  {
-    position: fixed; /* Positioning and size */
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(128,128,128,0.5); /* color */
-  display: none; /* making it hidden by default */
-  }
+    .overlay
+    {
+        position: fixed; /* Positioning and size */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(128,128,128,0.5); /* color */
+        display: none; /* making it hidden by default */
+    }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
@@ -179,7 +228,6 @@
                     </br>
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
-                            <!-- <span class="error">* </span> -->
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="">
@@ -260,7 +308,9 @@
                     <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
                     </br>
                     </br>
-                    <img id="blah" src="#" alt="your image" />
+                    <center>
+                    <img id="blah" src="#" alt="your image" class="contain" data-modal-id="showImageModal" onclick="showImage()"/>
+                    </center>
                 </div>
                 @include('addon.brandModel')
                 <div class="card"  id="kitSupplier" >
@@ -319,8 +369,31 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="showImageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Addon Image </h5>
+                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="POST" enctype="multipart/form-data"> 
+                                @csrf
+                                <div class="row modal-row">
+                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                        <center>
+                                            <img id="showImage" src="" alt="your image" class=""/>
+                                        </center>
+                                    </div>
+                                </div>
+                            </form> 
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
 <script type="text/javascript">
         var selectedSuppliers = [];
         var oldselectedSuppliers = [];
@@ -556,7 +629,18 @@
         //     $('.modal').addClass('modalhide');
         //     $('.modal').removeClass('modalshow');
         // });
-        
+        function showImage()
+        {
+            var modal = document.getElementById("showImageModal");
+            var img = document.getElementById("blah");  
+            var image = document.getElementById("image"); 
+            var modalImg = document.getElementById("showImage");    
+            var modalImg = document.getElementById("showImage");    
+            $('.overlay').show();
+            $('#showImageModal').addClass('modalshow');
+            $('#showImageModal').removeClass('modalhide');
+            modalImg.src = img.src;    
+        }
         function showAndHideSupplierDropdownOptions(i)
         {
             var eachSelected = [];
@@ -632,7 +716,6 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
-
                 $("#selectBrand1").removeAttr('disabled');
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
@@ -644,12 +727,10 @@
                 // document.getElementById("addon_type_required").hidden = true;
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    // alert('hi');
                     // showModelNumberDropdown(id,row);
                 }
                 else
                 {
-                    // alert('hiff');
                     // hideModelNumberDropdown(id,row);
                 }
                 if(value == 'SP' )
@@ -818,13 +899,13 @@
             {
                 if (input.files && input.files[0])
                 {
+                    document.getElementById("addonImageError").textContent='';
                     var reader = new FileReader();
                     reader.onload = function (e)
-                    {
+                    {                      
                         $('#blah').show();
                         $('#blah').css('visibility', 'visible');
-                       
-                        $('#blah').attr('src', e.target.result).width('100%').height('300px');
+                        $('#blah').attr('src', e.target.result);
                     };
                     reader.readAsDataURL(input.files[0]);
                 }
