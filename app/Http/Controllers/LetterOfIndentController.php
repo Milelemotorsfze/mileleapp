@@ -82,7 +82,11 @@ class LetterOfIndentController extends Controller
     {
         $countries = CountryListFacade::getList('en');
         $customers = Customer::all();
-        $suppliers = Supplier::where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING)->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
         return view('letter_of_indents.create',compact('countries','customers','suppliers'));
     }
 
@@ -191,9 +195,9 @@ class LetterOfIndentController extends Controller
 
 
     }
-    public function approve(Request $request) {
+    public function approve(Request $request)
+    {
         $letterOfIndent = LetterOfIndent::find($request->id);
-
         $letterOfIndent->status = $request->status;
         $letterOfIndent->save();
         return response($letterOfIndent, 200);
@@ -215,7 +219,7 @@ class LetterOfIndentController extends Controller
         $countries = CountryListFacade::getList('en');
         $customers = Customer::all();
 
-        return view('letter_of_indents.edit',compact('countries','customers','letterOfIndent'));
+        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent'));
     }
 
     /**

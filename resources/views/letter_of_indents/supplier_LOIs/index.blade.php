@@ -321,6 +321,7 @@
                             <th>Category</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
+                            <th>Review</th>
                             <th>Deal Items</th>
                             <th>Deal Documents</th>
                         </tr>
@@ -336,6 +337,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
+                                <td>{{ $letterOfIndent->review }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="partial-approved-loi-items-{{ $letterOfIndent->id }}" >View </button>

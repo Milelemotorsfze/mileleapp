@@ -108,7 +108,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Shipping Mwthod</label>
+                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
                         <select class="form-control" data-trigger name="shipment_method">
                             <option value="CNF" {{ 'CNF' == $letterOfIndent->shipment_method ? 'selected' : '' }}>CNF</option>
                             <option value="X work" {{ 'X work' == $letterOfIndent->shipment_method ? 'selected' : '' }}>X work</option>

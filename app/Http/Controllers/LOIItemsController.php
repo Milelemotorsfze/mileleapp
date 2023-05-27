@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\ColorCode;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
@@ -138,4 +139,36 @@ class LOIItemsController extends Controller
         $letterOfIndentItem->delete();
         return true;
     }
+    public function mileleApproval(Request $request)
+    {
+        $letterOfIndent = LetterOfIndent::find($request->id);
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->orderBy('id','DESC')->get();
+
+        return view('letter_of_indents.approvals.milele_approval', compact('letterOfIndent','letterOfIndentItems'));
+    }
+    public function approveLOIItem(Request $request) {
+
+        $letterOfIndent = LetterOfIndent::find($request->id);
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->orderBy('id','DESC')->get();
+        $quantities = $request->quantities;
+
+        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
+        {
+            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
+            $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantities[$key];
+            $letterOfIndentItem->save();
+        }
+        foreach ($quantities as $key => $quantity) {
+            $approvedLOIItem = new ApprovedLetterOfIndentItem();
+            $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentItems[$key]['id'];
+            $approvedLOIItem->quantity = $quantity;
+            $approvedLOIItem->save();
+        }
+        if ($letterOfIndent->quantity == $letterOfIndent->approved_quantity) {
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+            $letterOfIndent->save();
+        }
+        return redirect()->route('letter-of-indents.index')->with('success', 'LOI Item successfully approved with respective quantity');
+    }
+
 }
