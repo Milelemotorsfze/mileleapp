@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-            $table->dropColumn('entity_id');
             $table->longText('review')->after('shipment_method')->nullable();
         });
     }
@@ -23,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-            $table->string('entity_id');
             $table->dropColumn('review');
         });
     }

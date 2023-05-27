@@ -24,6 +24,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('supplier_inventories', function (Blueprint $table) {
+            $table->dropForeign(['supplier_id']);
+            $table->dropIndex(['supplier_id']);
             $table->dropColumn('supplier_id');
             $table->string('supplier');
         });

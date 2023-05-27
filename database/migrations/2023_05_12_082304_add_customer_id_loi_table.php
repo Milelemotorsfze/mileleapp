@@ -23,6 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
+            $table->dropForeign(['customer_id']);
+            $table->dropIndex(['customer_id']);
             $table->dropColumn('customer_id');
         });
     }
