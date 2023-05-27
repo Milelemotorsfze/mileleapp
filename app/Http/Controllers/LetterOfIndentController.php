@@ -43,9 +43,12 @@ class LetterOfIndentController extends Controller
     }
     public function getSupplierLOI(Request $request)
     {
-        $currentTab = 1;
         $supplierId = null;
-        $suppliers = Supplier::where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING)->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
 
         $approvalPendingLOIs = LetterOfIndent::orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_NEW);
@@ -58,36 +61,19 @@ class LetterOfIndentController extends Controller
         if ($request->supplier_id)
         {
             $supplierId = $request->supplier_id;
-            if($request->tab == 'APPROVED') {
-                $currentTab = 2;
-            }else if($request->tab == 'REJECTED') {
-                $currentTab = 3;
-            }else{
-                $currentTab = 1;
-            }
-
             $approvalPendingLOIs = $approvalPendingLOIs->where('supplier_id', $request->supplier_id);
-//            return $approvedLOIs->get();
-
             $approvedLOIs =  $approvedLOIs->where('supplier_id', $request->supplier_id);
-
             $rejectedLOIs = LetterOfIndent::orderBy('id','DESC')
-                ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)->where('supplier_id', $request->supplier_id);
+                ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)
+                ->where('supplier_id', $request->supplier_id);
         }
-
 
         $approvalPendingLOIs = $approvalPendingLOIs->get();
         $approvedLOIs = $approvedLOIs->get();
         $rejectedLOIs = $rejectedLOIs->get();
 
-//        return $approvedLOIs;
-
-//        dd("rejected" .$rejectedLOIs);
-
-//        return $approvedLOIs;
-
         return view('letter_of_indents.supplier_LOIs.index', compact('approvedLOIs',
-            'approvalPendingLOIs','rejectedLOIs','suppliers','currentTab','supplierId'));
+            'approvalPendingLOIs','rejectedLOIs','suppliers','supplierId'));
     }
     /**
      * Show the form for creating a new resource.

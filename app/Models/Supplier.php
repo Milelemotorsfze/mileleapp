@@ -26,6 +26,10 @@ class Supplier extends Model
     {
         return $this->hasMany(SupplierAddons::class,'supplier_id','id');
     }
+    public function supplierTypes()
+    {
+        return $this->hasMany(SupplierType::class);
+    }
     public function paymentMethods()
     {
         return $this->hasMany(SupplierAvailablePayments::class,'supplier_id','id');
