@@ -11,7 +11,7 @@ class LetterOfIndentItem extends Model
     public $timestamps = false;
     protected $appends = [
         'steering',
-        'balance_quantity'
+        'balance_quantity',
     ];
     public function LOI()
     {
@@ -40,6 +40,5 @@ class LetterOfIndentItem extends Model
        $balanceQuantity = $totalQuantity - $approvedQuantity;
 
        return $balanceQuantity;
-
     }
 }

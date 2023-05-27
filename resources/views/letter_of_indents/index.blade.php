@@ -54,7 +54,6 @@
                             <th>Approval Status</th>
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
-                            <th>Supplier Approval</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -77,12 +76,7 @@
                                     <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="view-LOI-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
                                 </td>
-                                <td>
-                                    <button type="button" class=" btn btn-primary btn-sm" data-id="{{ $letterOfIndent->id }}"
-                                            id="status-change-button-approve" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_APPROVED }}">
-                                        Approval
-                                    </button>
-                                </td>
+
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
@@ -654,17 +648,14 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#status-change-button-approve').click(function () {
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
-                statusChange(id,status);
-            })
+
             $('.status-reject-button').click(function (e) {
                 var id = $('#id').val();
                 var status = $('#status').val();
                 statusChange(id,status)
             })
             function statusChange(id,status) {
+               var review = $('#review').val();
                 let url = '{{ route('letter-of-indents.status-change') }}';
                 $.ajax({
                     type: "POST",
@@ -673,6 +664,7 @@
                     data: {
                         id: id,
                         status: status,
+                        review:review,
                         _token: '{{ csrf_token() }}'
                     },
                     success:function (data) {

@@ -9,6 +9,7 @@ use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LOIItemsController extends Controller
 {
@@ -151,12 +152,25 @@ class LOIItemsController extends Controller
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->orderBy('id','DESC')->get();
         $quantities = $request->quantities;
+        $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
+        $approvedItems = [];
+
+        DB::beginTransaction();
 
         foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
         {
             $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
             $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantities[$key];
+            if ($letterOfIndentItem->quantity == $letterOfIndentItem->approved_quantity)
+            {
+                $approvedItems[] = $letterOfIndentItem->id;
+            }
             $letterOfIndentItem->save();
+        }
+        $result = array_diff($loiItemIds,$approvedItems);
+        if(empty($result)) {
+          $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+          $letterOfIndent->save();
         }
         foreach ($quantities as $key => $quantity) {
             $approvedLOIItem = new ApprovedLetterOfIndentItem();
@@ -164,10 +178,8 @@ class LOIItemsController extends Controller
             $approvedLOIItem->quantity = $quantity;
             $approvedLOIItem->save();
         }
-        if ($letterOfIndent->quantity == $letterOfIndent->approved_quantity) {
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-            $letterOfIndent->save();
-        }
+        DB::commit();
+
         return redirect()->route('letter-of-indents.index')->with('success', 'LOI Item successfully approved with respective quantity');
     }
 
