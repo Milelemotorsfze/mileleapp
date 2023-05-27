@@ -10,8 +10,8 @@ class PermissionTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('modules')->truncate();
-        DB::table('permissions')->truncate();
+        DB::table('modules')->delete();
+        DB::table('permissions')->delete();
 
         $modules = [
             ['1','User'],

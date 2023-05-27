@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('letter_of_indents', function (Blueprint $table) {
             $table->bigInteger('supplier_id')->unsigned()->index()->nullable()->after('review');
             $table->foreign('supplier_id')->references('id')->on('suppliers');
-            $table->dropColumn('supplier');
+          //  $table->dropColumn('supplier');
         });
     }
 
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->dropForeign(['supplier_id']);
             $table->dropIndex(['supplier_id']);
             $table->dropColumn('supplier_id');
-            $table->string('supplier');
+          //  $table->string('supplier');
         });
     }
 };
