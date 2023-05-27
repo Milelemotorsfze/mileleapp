@@ -55,11 +55,14 @@
                     </td>
                     <td>
                       @if(!empty($supplier->paymentMethods()))
+                      @if($v->PaymentMethods->payment_methods)
                         @foreach($supplier->paymentMethods as $v)
                           @if($v->is_primary_payment_method == 'yes')
+                          
                             <label class="badge badge-soft-success">{{ $v->PaymentMethods->payment_methods }}</label>
                           @endif
                         @endforeach
+                      @endif
                       @endif
                     </td>
                     <td>

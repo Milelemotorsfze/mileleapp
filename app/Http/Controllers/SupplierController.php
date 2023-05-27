@@ -15,6 +15,7 @@ use App\Models\Addon;
 use App\Models\Brand;
 use App\Models\MasterModelLines;
 use App\Models\SupplierAddonTemp;
+use App\Models\SupplierType;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -77,6 +78,19 @@ class SupplierController extends Controller
             $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
             $input['created_by'] = $authId;
             $suppliers = Supplier::create($input);
+            if($request->supplier_types != null)
+            {
+                if(count($request->supplier_types) > 0)
+                {
+                    $supplier_typeData['supplier_id'] = $suppliers->id;
+                    $supplier_typeData['created_by'] = $authId; 
+                    foreach($request->supplier_types as $supplier_typeData1)
+                    {                    
+                        $supplier_typeData['supplier_type'] = $supplier_typeData1; 
+                        $supplier_typeDataCreate = SupplierType::create($supplier_typeData);  
+                    }
+                }
+            }
             $payment_methods['supplier_id'] = $suppliers->id;
             $payment_methods['created_by'] = $authId;         
             $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;

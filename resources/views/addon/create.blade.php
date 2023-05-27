@@ -13,6 +13,7 @@
     {
         width: auto;
         height: auto;
+        max-width:1200px;
     }
     @media only screen and (max-device-width: 480px) 
     {
@@ -43,7 +44,7 @@
             height: 100%;
         }
     }  
-    @media only screen and (min-device-width: 1270px)
+    @media only screen and (max-device-width: 1280px)
     {
         #showImage
         {
@@ -51,6 +52,15 @@
             height: 100%;
         }
     }  
+    /* @media only screen and (min-device-width: 1280px)
+    {
+        #showImage
+        {
+            width: 100%;
+            height: 100%;
+            max-width:700px;
+        }
+    }   */
     .contain 
     {
     object-fit: contain;

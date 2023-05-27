@@ -282,12 +282,13 @@
                             <label for="supplier_type" class="col-form-label text-md-end">{{ __('Supplier Type : ') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <select name="supplier_type" id="supplier_type" class="form-control" >
+                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" >
                             <option value="">Choose Supplier Type</option>
                             <option value="accessories">Accessories</option>      
                             <option value="freelancer">Freelancer</option>
                             <option value="garage">Garage</option>
                             <option value="spare_parts">Spare Parts</option>
+                            <option value="warranty">Warranty</option>
                         </select>
                         </div>
                     </div>
@@ -428,6 +429,9 @@
         {
             $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             $("#adoon_1").select2();
+            $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
+            $("#supplier_type").select2();
+            
 //             $("#adoon_1").select2().on('change', function() {
 //     $('#value').select2({data:data[$(this).val()]});
 // }).trigger('change');
