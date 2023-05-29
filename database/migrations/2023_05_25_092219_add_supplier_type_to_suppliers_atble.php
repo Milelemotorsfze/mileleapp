@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('suppliers', function (Blueprint $table) {
-            $table->enum('supplier_type',['demand_planning','spare_parts'])->change();
+          
         });
     }
 

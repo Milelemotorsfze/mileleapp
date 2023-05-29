@@ -16,10 +16,28 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+
 .btn.btn-success.btncenter:hover {
   background-color: #0000ff;
   font-size: 17px;
-  border-radius: 10px;
+  border-radius: 5px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .btn.btn-success.btncenter {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 3px;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn.btn-success.btncenter {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 2px;
+  }
 }
     </style>
 @section('content')

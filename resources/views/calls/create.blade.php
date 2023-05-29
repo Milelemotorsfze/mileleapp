@@ -42,6 +42,9 @@ input[type=number]::-webkit-outer-spin-button {
     appearance: none; 
     margin: 0; 
 }
+.error-text{
+    color: #FF0000;
+}
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
@@ -223,15 +226,37 @@ input[type=number]::-webkit-outer-spin-button {
         salesOptionValueField.value = manualAssignOption.value;
     });
     $(document).ready(function() {
-    var max_fields = 10;
-    var wrapper = $("#row-container");
-    var add_button = $(".add-row-btn");
+  var max_fields = 10;
+  var wrapper = $("#row-container");
+  var add_button = $(".add-row-btn");
+  var x = 1;
 
-    var x = 1;
-    $(add_button).click(function(e) {
-        e.preventDefault();
-        if (x < max_fields) {
-            x++;
+  // Function to filter and update the dropdown list
+  function updateDropdownList() {
+    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+      return $(this).val();
+    }).get();
+
+    $('.new-select').each(function() {
+      var currentInput = $(this);
+      var datalistId = currentInput.attr('list');
+      var datalist = $('#' + datalistId);
+      var options = '';
+
+      $('#brandList option').each(function() {
+        if (selectedValues.indexOf($(this).val()) === -1) {
+          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+        }
+      });
+
+      datalist.html(options);
+    });
+  }
+
+  $(add_button).click(function(e) {
+    e.preventDefault();
+    if (x < max_fields) {
+      x++;
             var selectedValues = $('input[name="model_line_id[]"]').map(function() {
                 return $(this).val();
             }).get();
@@ -256,22 +281,25 @@ input[type=number]::-webkit-outer-spin-button {
             newRow.append(col1);
             newRow.append(col2);
             $(wrapper).append(newRow);
-        }
-    });
+      updateDropdownList();
+    }
+  });
 
-    $(wrapper).on("click", ".remove-row-btn", function(e) { 
-        e.preventDefault();
-        $(this).closest('.row').remove();
-        x--;
-    });
+  $(wrapper).on("click", ".remove-row-btn", function(e) {
+    e.preventDefault();
+    $(this).closest('.row').remove();
+    x--;
+    updateDropdownList();
+  });
 
-    $(wrapper).on("input", "input[name='model_line_id[]']", function() {
-        var selectedBrandInput = $(this);
-        var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
-        var selectedOption = selectedBrandInput.val();
-        var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-        selectedBrandIdInput.val(selectedOptionId);
-    });
+  $(wrapper).on("input", "input[name='model_line_id[]']", function() {
+    var selectedBrandInput = $(this);
+    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
+    var selectedOption = selectedBrandInput.val();
+    var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
+    selectedBrandIdInput.val(selectedOptionId);
+    updateDropdownList();
+  });
 });
     $(document).ready(function() {
         $('#phone, #email').on('input', function() {
@@ -435,31 +463,34 @@ input[type=number]::-webkit-outer-spin-button {
             selectedBrandIdInput.value = '';
         }
     });
-   window.addEventListener('DOMContentLoaded', function() {
-       var input = document.querySelector("#phone");
-       var iti = window.intlTelInput(input, {
-           utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-           initialCountry: "ae",
-           separateDialCode: true,
-           nationalMode: false
-       });
-       input.addEventListener('input', function() {
-           var currentValue = input.value;
-           var newValue = currentValue.replace(/[^0-9]/g, '');
-           if (newValue.charAt(0) !== '+') {
-               newValue = '+' + newValue;
-           }
-           input.value = newValue;
-       });
-       iti.events.on("countrychange", function() {
-           var countryCode = iti.getSelectedCountryData().dialCode;
-           if (input.value && input.value.charAt(0) === '+') {
-               input.value = "+" + countryCode + input.value.substr(4);
-           } else {
-               input.value = "+" + countryCode;
-           }
-       });
-   });
+    window.addEventListener('DOMContentLoaded', function() {
+    var input = document.querySelector("#phone");
+    var iti = window.intlTelInput(input, {
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+        initialCountry: "ae",
+        separateDialCode: false,
+        nationalMode: true
+    });
+    input.addEventListener('input', function() {
+        var currentValue = input.value;
+        var newValue = currentValue.replace(/[^0-9]/g, '');
+        if (newValue.charAt(0) !== '+') {
+            newValue = '+' + newValue;
+        }
+        if (newValue.length > 15) {
+            newValue = newValue.slice(0, 15); // Truncate to 15 digits
+        }
+        input.value = newValue;
+    });
+    iti.events.on("countrychange", function() {
+        var countryCode = iti.getSelectedCountryData().dialCode;
+        if (input.value && input.value.charAt(0) === '+') {
+            input.value = "+" + countryCode + input.value.substr(4);
+        } else {
+            input.value = "+" + countryCode;
+        }
+    });
+});
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"></script>

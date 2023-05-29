@@ -15,7 +15,10 @@ use App\Models\MasterModelLines;
 use App\Models\Logs;
 use App\Models\CallsRequirement;
 use Carbon\Carbon;
+use App\Models\Varaint;
+use App\Models\AvailableColour;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
 
 class CallsController extends Controller
 {
@@ -52,6 +55,8 @@ class CallsController extends Controller
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
+            'model_line_ids' => 'array',
+            'model_line_ids.*' => 'distinct',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
         ]);      
@@ -216,6 +221,8 @@ return view('calls.resultbrand', compact('data'));
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',
+            'model_line_ids' => 'array',
+            'model_line_ids.*' => 'distinct',
             'language' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
@@ -303,15 +310,15 @@ return view('calls.resultbrand', compact('data'));
     }
     public function uploadingbulk(Request $request)
     {
-        // Check if the file exists and is valid
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            // Get the file from the request
             $file = $request->file('file');
-            // Convert the file to an array
+            $extension = $file->getClientOriginalExtension();
+            // Check if the file is an Excel file
+            if (!in_array($extension, ['xls', 'xlsx'])) {
+                return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
+            }
             $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
-            // Separate the headers from the data
             $headers = array_shift($rows);
-            // Loop through each row and store the data in the database
             foreach ($rows as $row) {
                 $call = new Calls();
                 $name = $row[0];
@@ -393,8 +400,7 @@ return view('calls.resultbrand', compact('data'));
             return redirect()->route('calls.index')
             ->with('success','Data uploaded successfully!');
         } else {
-            return redirect()->route('calls.index')
-            ->with('Error','The uploaded file is invalid.');
+            return back()->with('error', 'Please Select The Correct File for Uploading');
         }
     }
     public function checkExistence(Request $request)
@@ -442,5 +448,100 @@ public function updaterow(Request $request)
     $modelLineMasterId = $request->input('modelLineMasterId');
     CallsRequirement::where('id', $callRequirementId)->update(['model_line_id' => $modelLineMasterId]);
     return response()->json(['message' => 'Row updated successfully']);
+}
+public function simplefile()
+{
+    $filePath = storage_path('app/public/sample/calls.xlsx'); // Path to the Excel file
+
+    if (file_exists($filePath)) {
+        // Generate a response with appropriate headers
+        return Response::download($filePath, 'calls.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    } else {
+        // File not found
+        return redirect()->back()->with('error', 'The requested file does not exist.');
+    }
+}
+public function varinatinfo()
+{
+    $Variants = AvailableColour::get();   
+    return view('variants.vairantinfo', compact('Variants'));
+}
+public function createnewvarinats()
+{
+    $interiorColors = [
+        'Black', 'Dark Gray', 'Light Gray', 'Beige', 'Tan', 'Cream',
+        'Brown', 'Ivory', 'White', 'Red', 'Blue', 'Green',
+        'Burgundy', 'Charcoal', 'Navy', 'Silver', 'Champagne', 'Pewter',
+        'Almond', 'Ebony', 'Caramel', 'Slate', 'Graphite', 'Sand',
+        'Oyster', 'Mocha', 'Parchment', 'Mahogany', 'Cocoa', 'Espresso',
+        'Platinum', 'Jet Black', 'Stone Gray', 'Cashmere', 'Granite', 'Saddle',
+        'Opal Gray', 'Pebble', 'Shadow', 'Walnut', 'Fawn', 'Pearl',
+        'Chestnut', 'Sandalwood', 'Brick', 'Tawny', 'Hickory', 'Tuscan',
+        'Driftwood', 'Olive', 'Cloud', 'Raven', 'Twilight', 'Chestnut Brown',
+        'Mink', 'Mushroom', 'Clay', 'Slate Gray', 'Flint', 'Arctic',
+        'Sandstone', 'Ebony Black', 'Cognac', 'Russet', 'Stone', 'Linen',
+        'Carbon', 'Charcoal Gray', 'Bamboo', 'Nutmeg', 'Canyon', 'Terra Cotta',
+        'Canyon Brown', 'Steel', 'Gunmetal', 'Bamboo Beige', 'Oatmeal', 'Mink Brown',
+        'Warm Gray', 'Truffle', 'Light Stone', 'Tuxedo Black', 'Chalk', 'Agate',
+        'Mojave', 'Blond', 'Ochre', 'Natural', 'Cobblestone', 'Stone Beige',
+        'Light Beige', 'Granite Gray', 'Eclipse', 'Shale', 'Pumice', 'Ice',
+        'Ash', 'Tarmac', 'Dove Gray', 'Desert Sand', 'Sable', 'Cappuccino',
+        'Sandy Beige', 'Mist', 'Storm', 'Shetland', 'Onyx', 'Chestnut Brown',
+        'Iron', 'Cashew', 'Pebble Beige', 'Storm Gray', 'Shadow Gray', 'Piano Black',
+        // Add more color names here...
+    ];
+    $exteriorColors = [
+        'Black', 'White', 'Silver', 'Gray', 'Red', 'Blue',
+        'Green', 'Brown', 'Beige', 'Yellow', 'Orange', 'Purple',
+        'Gold', 'Bronze', 'Copper', 'Charcoal', 'Navy', 'Burgundy',
+        'Pearl', 'Metallic', 'Graphite', 'Platinum', 'Champagne', 'Midnight',
+        'Ebony', 'Crimson', 'Ruby', 'Emerald', 'Sapphire', 'Amethyst',
+        'Topaz', 'Garnet', 'Opal', 'Mocha', 'Cocoa', 'Ivory',
+        'Cream', 'Tungsten', 'Quartz', 'Titanium', 'Lunar', 'Majestic',
+        'Mystic', 'Radiant', 'Moonlight', 'Ingot', 'Cobalt', 'Azure',
+        'Indigo', 'Slate', 'Shadow', 'Steel', 'Lime', 'Sunset',
+        'Tangerine', 'Lemon', 'Olive', 'Forest', 'Teal', 'Mint',
+        'Plum', 'Lavender', 'Violet', 'Coral', 'Copper', 'Bronze',
+        'Sienna', 'Mahogany', 'Terra Cotta', 'Sandstone', 'Sandy', 'Desert',
+        'Pebble', 'Stone', 'Granite', 'Graphite', 'Metallic', 'Midnight Blue',
+        'Ruby Red', 'Emerald Green', 'Sapphire Blue', 'Amethyst Purple', 'Onyx Black', 'Lunar Silver',
+        'Opulent Blue', 'Magnetic Gray', 'Pure White', 'Pearl White', 'Iridium Silver', 'Classic Red',
+        'Race Blue', 'Frozen White', 'Bright Yellow', 'Sunset Orange', 'Velvet Red', 'Deep Blue',
+        'Midnight Black', 'Galaxy Blue', 'Fire Red', 'Solar Yellow', 'Cosmic Black', 'Crystal White',
+        'Phantom Black', 'Diamond Silver', 'Ruby Red', 'Storm Gray', 'Platinum White', 'Bronze Metallic',
+        'Liquid Blue', 'Silk Silver', 'Majestic Blue', 'Metallic Black', 'Candy Red', 'Crystal Blue',
+        'Quartz Gray', 'Slate Gray', 'Shimmering Silver', 'Eclipse Black', 'Hyper Red', 'Glacier White',
+        // Add more color names here...
+    ];
+    return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
+}
+public function storenewvarinats(Request $request) {
+    $variantName = $request->input('name');
+    $existingVariant = Varaint::where('name', $variantName)->first();
+    if ($existingVariant) {
+        $variantId = $existingVariant->id;
+        $existingColor = AvailableColour::where('varaint_id', $variantId)
+            ->where('int_colour', $request->input('int_colour'))
+            ->where('ext_colour', $request->input('ext_colour'))
+            ->first();
+        if ($existingColor) {
+            return redirect()->back()->with('error', 'Color combination already exists for this variant');
+        }
+    } else {
+        $variant = new Varaint();
+        $variant->name = $variantName;
+        $variant->save();
+        $variantId = $variant->id;
+    }
+    $data = [
+        'varaint_id' => $variantId,
+        'int_colour' => $request->input('int_colour'),
+        'ext_colour' => $request->input('ext_colour')
+    ];
+    $availableColour = new AvailableColour($data);
+    $availableColour->save();
+    return redirect()->back()->with('success', 'Variant and color details stored successfully');
 }
 }

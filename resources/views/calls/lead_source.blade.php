@@ -45,7 +45,9 @@
                 <td><label class="badge badge-soft-success">Active</label></td>
                 @endif
                         <td><a title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('lead_source.edit',$lead_source->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        @if($lead_source->status == "active")
                         <a title="Create Strategy" data-placement="top" class="btn btn-sm btn-success" href="{{ route('strategy.edit',$lead_source->id) }}"><i class="fa fa-puzzle-piece" aria-hidden="true"></i></a></td>
+                    @endif
                     </tr>
                 @endforeach
                 </tbody>

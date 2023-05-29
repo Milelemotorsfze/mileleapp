@@ -88,10 +88,22 @@
                     @endcan
                     @can('variants-view')
                     <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Variants</span>
+                            <span data-key="t-extra-pages">Variants</span><div class="arrow-down"></div>
                         </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.varinatinfo') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create New Variants</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Add Pictures & Videos</span>
+                                </a>
+                            </div>
+</div>
                     </li>
                     @endcan
                     @can('sales-view')
@@ -100,6 +112,7 @@
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Leads</span>
                         </a>
+                        
                     </li>
                     @endcan
                     @can('user-create')

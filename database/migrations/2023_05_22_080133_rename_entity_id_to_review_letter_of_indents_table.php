@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-            $table->longText('review')->after('shipment_method')->nullable();
+            
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-            $table->dropColumn('review');
+           
         });
     }
 };

@@ -122,12 +122,15 @@ Route::get('/d', function () {
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
-
-
+    Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
+    Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
     Route::delete('/calls/{id}', [CallsController::class, 'destroy'])->name('calls.destroy');
     Route::post('/calls/removerow', [CallsController::class, 'removeRow'])->name('calls.removerow');
     Route::post('/calls/updaterow', [CallsController::class, 'updaterow'])->name('calls.updaterow');
     Route::post('/calls/updatehol', [CallsController::class, 'updatehol'])->name('calls.updatehol');
+    Route::get('new-variants/createnewvarinats', [CallsController::class,'createnewvarinats'])->name('calls.createnewvarinats');
+    Route::get('new-variants/varinatinfo', [CallsController::class, 'varinatinfo'])->name('calls.varinatinfo');
+    Route::post('new-variants/storenewvarinats', [CallsController::class, 'storenewvarinats'])->name('calls.storenewvarinats');
     //Sales
     Route::resource('dailyleads', DailyleadsController::class);
     Route::get('quotation-data/get-my', [QuotationController::class,'getmy'])->name('quotation.get-my');

@@ -17,9 +17,8 @@ return new class extends Migration
             $table->date('starting_date');
             $table->date('ending_date');
             $table->bigInteger('strategies_id')->unsigned()->index()->nullable();
-            $table->timestamps();
-
             $table->foreign('strategies_id')->references('id')->on('strategies');
+            $table->timestamps();
         });
     }
 

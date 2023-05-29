@@ -9,6 +9,11 @@ class AvailableColour extends Model
 {
     use HasFactory;
     protected $table = 'available_colour';
+    protected $fillable = [
+        'varaint_id',
+        'int_colour',
+        'ext_colour',
+    ];
     public function variant()
     {
         return $this->belongsTo(Variant::class);
