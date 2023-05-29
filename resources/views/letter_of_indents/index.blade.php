@@ -274,7 +274,7 @@
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
-                                            <i class="fa fa-download"></i></button>
+                                           LOI PDF</button>
                                     </a>
                                 </td>
                                 <div class="modal modalhide" id="supplier-approved-loi-items-{{$letterOfIndent->id}}" >
@@ -704,8 +704,6 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-
-
             $('.status-reject-button').click(function (e) {
                 var id = $('#id').val();
                 var status = $('#status').val();

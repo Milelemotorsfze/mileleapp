@@ -58,7 +58,6 @@ class LOIItemsController extends Controller
      */
     public function store(Request $request)
     {
-//        return $request->all();
         $request->validate([
             'model' => 'required',
             'sfx' => 'required',
@@ -147,6 +146,57 @@ class LOIItemsController extends Controller
 
         return view('letter_of_indents.approvals.milele_approval', compact('letterOfIndent','letterOfIndentItems'));
     }
+    public function updateQuantity(Request $request) {
+        $letterOfIndentItem = LetterOfIndentItem::find($request->id);
+        $approvedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
+
+        DB::beginTransaction();
+        $letterOfIndentItem->approved_quantity = $approvedQuantity;
+        $letterOfIndentItem->save();
+
+        $approvedLOIItem = new ApprovedLetterOfIndentItem();
+        $approvedLOIItem->letter_of_indent_item_id = $request->id;
+        $approvedLOIItem->quantity = $request->quantity;
+        $approvedLOIItem->save();
+
+        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
+        $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
+        $approvedItems = [];
+        $updatedItems = [];
+
+        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
+        {
+            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
+            $latestApprovedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
+            if ($letterOfIndentItem->quantity == $latestApprovedQuantity && $letterOfIndentItem->latestApprovedQuantity != 0)
+            {
+                info('quantity eqal and not 0');
+                // get id of full quantity approved item and compare with previous ids
+                $approvedItems[] = $letterOfIndentItem->id;
+            }else{
+                info('partialy approved');
+                // get ids of partialy approved items
+                $updatedItems[] = $letterOfIndentItem->id;
+            }
+
+        }
+        $result = array_diff($loiItemIds,$approvedItems);
+        $letterOfIndent = LetterOfIndent::find($request->id);
+        if(empty($result)) {
+            info("fully approved");
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+        }
+        if(!empty($updatedItems)) {
+            info("partialapproved");
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+        }
+        $letterOfIndent->save();
+        DB::commit();
+
+        return response(true);
+
+    }
+
     public function approveLOIItem(Request $request) {
 
         $letterOfIndent = LetterOfIndent::find($request->id);

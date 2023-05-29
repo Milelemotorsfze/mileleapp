@@ -55,7 +55,7 @@ class LetterOfIndentController extends Controller
             ->where('status', LetterOfIndent::LOI_STATUS_NEW);
 
         $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
-            ->where('status',LetterOfIndent::LOI_STATUS_APPROVED);
+            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
         $rejectedLOIs =  LetterOfIndent::orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_REJECTED);
 

@@ -21,7 +21,11 @@ class DemandController extends Controller
     }
     public function create()
     {
-        $suppliers = Supplier::where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING)->get();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
         return view('demands.create', compact('suppliers'));
     }
     public function store(Request $request)

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,7 +19,11 @@
             border-collapse: collapse;
             width: 100%;
         }
-
+        .overlay-image {
+            position: absolute;
+            top: 620px;
+            z-index: 1;
+        }
         #so-details td {
             border: none;
             padding: 5px;
@@ -43,6 +48,7 @@
             background-color: #0f0f0f;
         }.
     </style>
+
 </head>
 <body>
 <div class="row">
@@ -51,7 +57,7 @@
             <table>
                 <tr>
                     <td>
-                        <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>
+{{--                        <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>--}}
                     </td>
                     {{--                <td style="color: #FFFFFF">--}}
                     {{--                    <h1 style="margin-bottom: 1px;font-size: 38px">Milele Motors</h1>--}}
@@ -109,8 +115,8 @@
                 </td>
             </tr>
         </table>
-        <br>
-        <br>
+        </br>
+        </br>
         <table id="so-items" >
             <tr class="hide" style="color: #FFFFFF">
                 <th>QUANTITY</th>
@@ -140,49 +146,52 @@
                 <tr>
                     <td></td>
                     <td></td>
-                    <td></td>
-                    <td></td>
+                    <td class="hide"></td>
+                    <td class="hide"></td>
                 </tr>
             @endfor
-            <td>Name</td>
-            <td>Anu</td>
+
             <tr style="background-color: #FFFFFF">
-                <td style="border: none;">Name</td>
-                <td style="border: none">
-                        <span >
+                <td style="border: none;">Name :
+                    <span style="margin-left: 3px" >
                              @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                                {{ $letterOfIndent->customer->name }}
-                            @else
-                                {{ $letterOfIndent->customer->company ?? ''}}
-                            @endif
+                            {{ $letterOfIndent->customer->name }}
+                        @else
+                            {{ $letterOfIndent->customer->company ?? ''}}
+                        @endif
                         </span>
+                </td>
+                <td style="border: none">
+
                 </td>
                 <td style="border: none;text-align: end">SUBTOTAL</td>
                 <td class="hide" style="border: none" ></td>
             </tr>
-            <tr style="background-color: #FFFFFF">
-                <td style="border: none">Date</td>
+            <tr style="background-color: #FFFFFF" id="date-div">
+                <td style="border: none">Date :
+                <span style="margin-left: 3px"> {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}</span></td>
                 <td style="border: none">
-                    {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
+
                 </td>
                 <td style="border: none;text-align: end">SALES VAT</td>
                 <td class="hide" style="border: none" ></td>
             </tr>
             <tr style="background-color: #FFFFFF">
-                <td style="border: none">Signature</td>
-                <td style="border: none"></td>
+                <td style="border: none">Signature
+                <span style="margin-left: 3px;margin-bottom: 10px">
+                    <img src="{{ public_path('sign.jpg') }}" style="height: 50px;width: 70px"></img></span>
+                </td>
+                <td style="border: none">
+                    <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 150px; height: 150px;"></img>
+                </td>
                 <td style="border: none;text-align: end">TOTAL</td>
                 <td style="background-color: #0f0f0f;border: none" ></td>
             </tr>
         </table>
     </div>
 </div>
-<br>
-<div class="row">
-    <div class="circle">
-        <img src="{{ public_path('images/milele_seal.png') }}" style="width: 150px; height: 150px"></img>
-    </div>
-</div>
+</br>
+</br>
 
 {{--    <div class="row">--}}
 <div style="text-align: center;position: absolute;bottom: 0;padding-left: 100px;margin-left: 200px">
@@ -194,6 +203,18 @@
 
 </body>
 </html>
-<script type="text/javascript">
 
+<script>
+    let d = new Date();
+    alert("Today's date is " + d);
+    var height = document.getElementById('so-items').offsetHeight;
+    const values = ["200", "500", "300", "400", "600"];
+    const random = Math.floor(Math.random() * values.length);
+    var pixel = values[random];
+
+    var imagePosition = 620;
+
+    $('.overlay-image').css('left', pixel+'px');
+    $('.overlay-image').css('top', imagePosition+'px' )
 </script>
+
