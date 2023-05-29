@@ -50,6 +50,8 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Dealers</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
@@ -66,6 +68,8 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
+                                <td>{{ $letterOfIndent->dealers }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -162,19 +166,54 @@
                                         <button type="button" class="btn-close close"  aria-label="Close"></button>
                                     </div>
                                     <div class="modal-content p-3">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="choices-single-default" class="form-label font-size-13 text-muted">Reason</label>
-                                                    <textarea cols="75" name="review" id="review" rows="5" ></textarea>
+                                        <div class="col-12">
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Customer</label>
                                                 </div>
-                                                <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                                <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
+                                                <div class="col-10">
+                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                </div>
                                             </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
+                                                           readonly class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Reason</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
                                         </div>
-                                        <div class="row">
+                                        <div class="row mt-3">
                                             <div class="col-12">
-                                            <button type="button" class="btn btn-primary btnright status-reject-button">UPDATE</button>
+                                                <button type="button" class="btn btn-primary btnright status-reject-button">Submit</button>
                                             </div>
                                         </div>
                                     </div>
@@ -195,6 +234,8 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Dealers</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
@@ -206,11 +247,13 @@
                         <tbody>
                         <div hidden>{{$i=0;}}
                         </div>
-                        @foreach ($partialApprovedLOIs as $key => $letterOfIndent)
+                        @foreach ($supplierApprovedLOIs as $key => $letterOfIndent)
                             <tr>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
+                                <td>{{ $letterOfIndent->dealers }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -222,10 +265,11 @@
                                             data-modal-id="supplier-approved-loi-doc-{{ $letterOfIndent->id }}" >View </button>
                                 </td>
                                 <td>
-                                    <button type="button" class=" btn btn-primary btn-sm" data-id="{{ $letterOfIndent->id }}"
-                                            id="status-change-button-approve" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_APPROVED }}">
-                                        Milele Partial Approval
-                                    </button>
+                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
+                                        <button type="button" class=" btn btn-primary btn-sm" >
+                                             Partial Approval
+                                        </button>
+                                    </a>
                                 </td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
@@ -314,6 +358,8 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Dealer</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
@@ -330,6 +376,8 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
+                                <td>{{ $letterOfIndent->dealers }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -343,7 +391,7 @@
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
                                     <button type="button" class=" btn btn-primary btn-sm" >
-                                        Milele Approval
+                                        Approval
                                     </button>
                                     </a>
                                 </td>
@@ -434,6 +482,8 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Dealer</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
@@ -449,6 +499,8 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
+                                <td>{{ $letterOfIndent->dealers }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
@@ -547,6 +599,8 @@
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
+                            <th>Supplier</th>
+                            <th>Dealer</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>Review</th>
@@ -562,6 +616,8 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
                                 <td>{{ $letterOfIndent->category }}</td>
+                                <td>{{ $letterOfIndent->supplier->supplier }}</td>
+                                <td>{{ $letterOfIndent->dealers }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <th>{{ $letterOfIndent->review }}</th>
@@ -648,6 +704,7 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
+
 
             $('.status-reject-button').click(function (e) {
                 var id = $('#id').val();

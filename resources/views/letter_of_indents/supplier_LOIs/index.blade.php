@@ -8,12 +8,10 @@
             top: 50%;
             transform: translate(-50%, -50%);
         }
-        .modal-header-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 1055;
-        }
 
+        body.modal-open {
+            overflow: hidden;
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">
@@ -99,14 +97,11 @@
                                             data-modal-id="view-LOI-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
                                 </td>
                                 <td>
-                                    <button type="button" class=" btn btn-primary btn-sm status-change-button-approve" data-id="{{ $letterOfIndent->id }}"
-                                            data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_APPROVED }}">
-                                        Approval
-                                    </button>
+                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
+                                            data-modal-id="approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
                                     <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="reject-LOI-{{ $letterOfIndent->id }}" > Reject </button>
                                 </td>
-
                                 <div class="modal modalhide" id="viewdealinfo-{{$letterOfIndent->id}}" >
                                     <div class="modal-header bg-primary">
                                         <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>
@@ -178,19 +173,106 @@
                                         <button type="button" class="btn-close close"  aria-label="Close"></button>
                                     </div>
                                     <div class="modal-content p-3">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="choices-single-default" class="form-label font-size-13 text-muted">Reason</label>
-                                                    <textarea cols="75" name="review" id="review" rows="5" ></textarea>
+                                        <div class="col-12">
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Customer</label>
                                                 </div>
-                                                <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                                <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
+                                                <div class="col-10">
+                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
+                                                           readonly class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Reason</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <button type="button" class="btn btn-primary btncenter status-reject-button">Submit</button>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                    </div>
+                                </div>
+                                <div class="modal modalhide" id="approve-LOI-{{$letterOfIndent->id}}" style="width: 600px" >
+                                    <div class="modal-header bg-primary">
+                                        <h1 class="modal-title fs-5 text-white text-center"> Approve LOI</h1>
+                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-content p-3">
+                                        <div class="col-lg-12">
                                             <div class="col-12">
-                                                <button type="button" class="btn btn-primary btnright status-reject-button">UPDATE</button>
+                                                <div class="row mt-2">
+                                                    <div class="col-2">
+                                                        <label class="form-label font-size-13 text-muted">Customer</label>
+                                                    </div>
+                                                    <div class="col-10">
+                                                        <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
+                                                </div>
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col-2">
+                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
+                                                </div>
+                                                <div class="col-10">
+                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
+                                                           readonly class="form-control">
+                                                </div>
+                                            </div>
+                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED }}" id="status">
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <button type="button" class="btn btn-primary btncenter status-change-button-approve">Submit</button>
                                             </div>
                                         </div>
                                     </div>
@@ -312,7 +394,7 @@
         <div class="tab-pane fade" id="rejected-LOI">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
+                    <table id="supplier-rejected-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>supplier</th>
@@ -418,7 +500,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
@@ -429,11 +510,9 @@
             if (activeTab) {
                 $('#my-tab a[href="' + activeTab + '"]').tab('show');
             }
-
             $('.status-change-button-approve').click(function () {
-
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
+                var id = $('#id').val();
+                var status = $('#status').val();
                 statusChange(id,status);
             })
             $('.status-reject-button').click(function (e) {
@@ -443,20 +522,30 @@
             })
             function statusChange(id,status) {
                 let url = '{{ route('letter-of-indents.status-change') }}';
-                $.ajax({
-                    type: "POST",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        id: id,
-                        status: status,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success:function (data) {
-                        window.location.reload();
-                        alertify.success(status +" Successfully");
+                if(status = 'Supplier Approved') {
+                   var message = 'Approve';
+                }else{
+                    var message = 'Reject';
+                }
+                var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+                    if (e) {
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                id: id,
+                                status: status,
+
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function (data) {
+                                window.location.reload();
+                                alertify.success(status + " Successfully");
+                            }
+                        });
                     }
-                });
+                }).set({title:"Status Change"})
             }
         })
     </script>

@@ -170,8 +170,12 @@ class LOIItemsController extends Controller
         $result = array_diff($loiItemIds,$approvedItems);
         if(empty($result)) {
           $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-          $letterOfIndent->save();
+
+        }else{
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
+        $letterOfIndent->save();
+
         foreach ($quantities as $key => $quantity) {
             $approvedLOIItem = new ApprovedLetterOfIndentItem();
             $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentItems[$key]['id'];

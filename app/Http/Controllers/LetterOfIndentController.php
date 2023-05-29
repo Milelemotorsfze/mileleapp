@@ -11,6 +11,7 @@ use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Storage;
@@ -121,6 +122,7 @@ class LetterOfIndentController extends Controller
             $LOI->supplier_id = $request->supplier_id;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
+            $LOI->created_by = Auth::id();
             $LOI->save();
         }
 

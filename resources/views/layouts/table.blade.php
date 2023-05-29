@@ -38,6 +38,7 @@
         <script>
         $(document).ready(function ()
         {
+
             alertify.set('notifier','position', 'top-right','delay', 20);
 			// datatables
             $('#dtBasicExample').DataTable();
@@ -54,19 +55,42 @@
             $('#milele-approved-LOI-table').DataTable();
             $('#supplier-rejected-LOI-table').DataTable();
             $('#milele-partial-approved-LOI-table').DataTable();
+
+            $('#new-LOI-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            $('#supplier-approved-LOI-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            $('#milele-approved-LOI-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            $('#supplier-rejected-LOI-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            $('#milele-partial-approved-LOI-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+
             $('.modal-button').on('click', function()
             {
                 var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            function ModalOpen(modalId) {
                 $('#' + modalId).addClass('modalshow');
                 $('#' + modalId).removeClass('modalhide');
-                console.log('Modal Show');
-                });
-                $('.close').on('click', function(){
-                    $('.modal').addClass('modalhide');
-                    $('.modal').removeClass('modalshow');
-                    // $('.modal').hide();
-                    console.log('Modal Hidden from close button');
-                    });
+            }
+            $('.close').on('click', function(){
+                $('.modal').addClass('modalhide');
+                $('.modal').removeClass('modalshow');
+
+            });
                     // div colour
                     // alert($('.divcolorclass').val());
 
