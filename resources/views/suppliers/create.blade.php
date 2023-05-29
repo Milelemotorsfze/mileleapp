@@ -449,11 +449,7 @@
             $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             $("#adoon_1").select2();
             $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
-            $("#supplier_type").select2(
-                {
-                    theme: "bootstrap is-invalid",
-                }
-            );
+            $("#supplier_type").select2();
             // $('#supplier_type').data('select2').$container.addClass('is-invalid')
 //             $("#adoon_1").select2().on('change', function() {
 //     $('#value').select2({data:data[$(this).val()]});
