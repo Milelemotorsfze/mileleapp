@@ -30,4 +30,8 @@ class Supplier extends Model
     {
         return $this->hasMany(SupplierAvailablePayments::class,'supplier_id','id');
     }
+    public function supplierTypes()
+    {
+        return $this->hasMany(SupplierType::class,'supplier_id','id');
+    }
 }

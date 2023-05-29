@@ -9,6 +9,7 @@
     </div>
     <div class="card-body">
             <div class="row">
+                @if($supplier->supplier)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -20,6 +21,8 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($supplier->contact_person)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -31,6 +34,8 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($supplier->person_contact_by)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -42,6 +47,8 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($supplier->email)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -53,6 +60,8 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($supplier->contact_number)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -64,6 +73,8 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($supplier->alternative_contact_number)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -75,21 +86,35 @@
                     </div>
                     </br>
                 </div>
+                @endif
+                @if(count($supplierTypes) > 0)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Supplier Type') }}</label>
+                        <div class="col-xxl-4 col-lg-2 col-md-4">
+                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Supplier Type') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            @if($supplier->supplier_type == 'spare_parts')
-                            <input class="form-control" value="Spare Parts" readonly>
-                            @else
-                            <input class="form-control" value="{{ $supplier->spare_parts }}" readonly>
-                            @endif
+                        <div class="col-xxl-8 col-lg-6 col-md-12">                            
+                            <p class="form-control" readonly>
+                            @foreach($supplierTypes as $t)
+                                @if($t->supplier_type == 'spare_parts')
+                                Spare Parts ,
+                                @elseif($t->supplier_type == 'accessories')
+                                Accessories ,
+                                @elseif($t->supplier_type == 'freelancer')
+                                Freelancer ,
+                                @elseif($t->supplier_type == 'garage')
+                                Garage ,
+                                @elseif($t->supplier_type == 'warranty')
+                                Warranty ,
+                                @endif 
+                            @endforeach
+                            </p>                
                         </div>
                     </div>
                     </br>
                 </div>
+                @endif
+                @if($primaryPaymentMethod->PaymentMethods->payment_methods)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-6 col-md-12">
@@ -101,25 +126,26 @@
                     </div>
                     </br>
                 </div> 
+                @endif
+                @if(count($otherPaymentMethods) > 0)
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-4 col-lg-2 col-md-4">
                             <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         <div class="col-xxl-8 col-lg-6 col-md-12">
-                            @if(count($otherPaymentMethods) > 0)
+                            
                             <p class="form-control" readonly>
                             @foreach($otherPaymentMethods as $otherPaymentMethod)
                                 {{ $otherPaymentMethod->PaymentMethods->payment_methods }} , 
                             @endforeach
                             </p>
-                            @else
-                            <input class="form-control" value="" readonly>
-                            @endif
+                
                         </div>
                     </div>
                     </br>
                 </div>
+                @endif
                 @if($addons OR $addon1)
                 <div class="card-header">
                     <h4 class="card-title" style="background-color:#e6e6ff; color:Black; padding-top:5px; padding-bottom:5px;">

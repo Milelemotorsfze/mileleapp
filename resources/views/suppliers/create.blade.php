@@ -139,12 +139,21 @@
     }
     .paragraph-class 
     {
-        color: red;
-        font-size:11px;
+        margin-top: .25rem;
+        font-size: 80%;
+        color: #fd625e;
     }
     .required-class
     {
-        font-size:11px;
+        margin-top: .25rem;
+        font-size: 80%;
+        color: #fd625e;
+    }
+    .requiredOne
+    {
+        margin-top: .25rem;
+        font-size: 80%;
+        color: gray;
     }
 </style>
 @section('content')
@@ -153,7 +162,7 @@
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-        @if (count($errors) > 0)
+        <!-- @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
                 <ul>
@@ -162,7 +171,7 @@
                     @endforeach
                 </ul>
             </div>
-        @endif
+        @endif -->
         <form id="createSupplierForm" action="{{ route('suppliers.store') }}" method="POST" enctype="multipart/form-data"> 
         <!-- action="{{ route('suppliers.store') }}" -->
         <!-- method="POST" enctype="multipart/form-data" -->
@@ -173,16 +182,16 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="supplier" class="col-form-label text-md-end">{{ __('Supplier : ') }}</label>
+                            <label for="supplier" class="col-form-label text-md-end">{{ __('Supplier') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus >
+                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
                             @error('supplier')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                            <span id="supplierError" class="required-class"></span>
+                            <span id="supplierError" class="invalid-feedback"></span>
                         </div>
                     </div>
                     </br>
@@ -191,7 +200,7 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <!-- <span class="error">* </span> -->
-                            <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person : ') }}</label>
+                            <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
                             <input id="contact_person" type="text" class="form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
@@ -209,16 +218,16 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <!-- <span class="error">* </span> -->
-                            <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number : ') }}</label>
+                            <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="tel" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{ old('contact_number') }}"  autocomplete="contact_number" autofocus>
-                            @error('contact_number')
+                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{ old('contact_number[main]') }}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror
-                            <span id="contactRequired" class="email-phone required-class">One among contact number or alternative contact number or email is required</span>
+                            @enderror -->
+                            <span id="contactRequired" class="email-phone required-class"></span>
                         </div>
                     </div>
                     </br>
@@ -226,16 +235,16 @@
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number : ') }}</label>
+                            <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="text" class="form-control @error('alternative_contact_number') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number') }}" autocomplete="alternative_contact_number" autofocus>
+                            <input id="alternative_contact_number" type="number" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror -->
-                            <span id="alternativeContactRequired" class="email-phone required-class">One among contact number or alternative contact number or email is required</span>
+                            <span id="alternativeContactRequired" class="email-phone required-class"></span>
                         </div>
                     </div>
                     </br>
@@ -244,16 +253,16 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <!-- <span class="error">* </span> -->
-                            <label for="email" class="col-form-label text-md-end">{{ __('Email : ') }}</label>
+                            <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ old('email') }}"  autocomplete="email" autofocus>
+                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror -->
-                            <span id="emailRequired" class="email-phone required-class">One among contact number or alternative contact number or email is required</span>
+                            <span id="emailRequired" class="email-phone required-class"></span>
                         </div>
                     </div>
                     </br>
@@ -262,7 +271,7 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <!-- <span class="error">* </span> -->
-                            <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By : ') }}</label>
+                            <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
                             <input id="person_contact_by" type="text" class="form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"  autocomplete="person_contact_by" autofocus>
@@ -279,10 +288,11 @@
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="supplier_type" class="col-form-label text-md-end">{{ __('Supplier Type : ') }}</label>
+                            <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" >
+                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control " onchange="validationOnKeyUp(this)">
+                        <!-- @error('supplier_types') is-invalid @enderror -->
                             <option value="">Choose Supplier Type</option>
                             <option value="accessories">Accessories</option>      
                             <option value="freelancer">Freelancer</option>
@@ -290,18 +300,23 @@
                             <option value="spare_parts">Spare Parts</option>
                             <option value="warranty">Warranty</option>
                         </select>
+                        @error('supplier_types')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                            <span id="supplierTypeError" class=" invalid-feedback"></span>
                         </div>
                     </div>
-                    </br>
                 </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method : ') }}</label>
+                            <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control" onchange="secondaryPaymentMethods()" >
+                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
                                 <option value="">Choose Payment Method</option>
                                 @foreach($paymentMethods as $paymentMethod)
                                 <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
@@ -312,6 +327,7 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
+                            <span id="paymentMethodsError" class="invalid-feedback"></span>
                         </div>
                     </div>
                     </br>
@@ -332,6 +348,7 @@
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
+                                   
                                 @enderror
                             </div>
                         @endforeach
@@ -424,14 +441,20 @@
         // var selectedBrands = [];
         var selectedBrands = new Array();
         // globalThis.selectedBrands .push(brandId);
-      
+      var sub ='1';
         $(document).ready(function ()
         {
+            $msg ="One among contact number or alternative contact number or email is required";
+            emailContactError($msg);
             $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             $("#adoon_1").select2();
             $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
-            $("#supplier_type").select2();
-            
+            $("#supplier_type").select2(
+                {
+                    theme: "bootstrap is-invalid",
+                }
+            );
+            // $('#supplier_type').data('select2').$container.addClass('is-invalid')
 //             $("#adoon_1").select2().on('change', function() {
 //     $('#value').select2({data:data[$(this).val()]});
 // }).trigger('change');
@@ -575,6 +598,7 @@
         });
         $("form").submit(function(e) 
         {
+            sub = '2';
                         //      adoon_1 currency_1 addon_purchase_price_in_usd_1 addon_purchase_price_1
                     // var input = $('#supplier').val();
             // var input = $('#supplier').val();
@@ -582,26 +606,40 @@
             // var input = $('#supplier').val();
             // var input = $('#supplier').val();
             // var input = $('#supplier').val();
-            // var inputSupplier = $('#supplier').val();
+            var inputSupplier = $('#supplier').val();
             // var inputContactPerson = $('#contact_person').val();
             // var inputPersonContactBy = $('#person_contact_by').val();
-            // var inputSupplierType = $('#supplier_type').val();
+            var inputSupplierType = $('#supplier_type').val();
             // var inputIsPrimaryPaymentMethod = $('#is_primary_payment_method').val();
-            // var inputPaymentMethodsId = $('#payment_methods_id').val();
+            var inputPaymentMethodsId = $('#is_primary_payment_method').val();
 
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
-            // if(inputSupplier == '')
-            // {
-            //     document.getElementById("supplierError").classList.add("paragraph-class"); 
-            //     document.getElementById("supplierError").textContent="S";
-            // }
+            if(inputSupplier == '')
+            {
+                $msg = "Supplier field is required";
+                showSupplierError($msg);
+                e.preventDefault();
+            }
+            if(inputSupplierType == '')
+            {
+                $msg = "Supplier type is required";
+                showSupplierTypeError($msg);
+                e.preventDefault();
+            }
+            if(inputPaymentMethodsId == '')
+            {
+                $msg = "Primary Payment method is required";
+                showPaymentMethodsError($msg)
+                e.preventDefault();
+            }
             if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
             {
-                document.getElementById("contactRequired").classList.add("paragraph-class");
-                document.getElementById("emailRequired").classList.add("paragraph-class");
-                document.getElementById("alternativeContactRequired").classList.add("paragraph-class");
+                $msg ="One among contact number or alternative contact number or email is required";
+                showContactNumberError($msg);
+                showAlternativeContactNumberError($msg);
+                showEmailError($msg);
                 e.preventDefault();
             }
             else
@@ -618,20 +656,31 @@
                 // f.setAttribute('action',"{{ route('suppliers.store') }}");
             }
         });
-        function secondaryPaymentMethods()
+        function secondaryPaymentMethods(changePayment)
         {
             var e = document.getElementById("is_primary_payment_method");
             var value = e.value;
-            if(PreviousHidden != '')
+            if(value != '')
             {
-                let addonTable = document.getElementById(PreviousHidden);
+                if(PreviousHidden != '')
+                {
+                    let addonTable = document.getElementById(PreviousHidden);
+                    addonTable.hidden = false
+                }
+                validationOnKeyUp(changePayment);
+                let addonTable = document.getElementById('secondaryPayments');
                 addonTable.hidden = false
+                let primaryPaymentMethod = document.getElementById(value);
+                primaryPaymentMethod.hidden = true
+                PreviousHidden = value;
             }
-            let addonTable = document.getElementById('secondaryPayments');
-            addonTable.hidden = false
-            let primaryPaymentMethod = document.getElementById(value);
-            primaryPaymentMethod.hidden = true
-            PreviousHidden = value;
+            else
+            {
+                let addonTable = document.getElementById('secondaryPayments');
+                addonTable.hidden = true
+                $msg = "Primary payment method required"
+                showPaymentMethodsError($msg);
+            }
         }
         function changeAddon(i)
         {
@@ -691,5 +740,275 @@
         {
             $(this).closest(".form_field_outer_row").remove();
         });
+        function validationOnKeyUp(clickInput)
+        {
+            if(clickInput.id == 'supplier_type')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    if(value.legth != 0)
+                    {
+                        $msg = "Supplier Type is required";
+                        showSupplierTypeError($msg);
+                    }
+                }
+                else
+                {
+                    removeSupplierTypeError();
+                }
+            }
+            if(clickInput.id == 'is_primary_payment_method')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    if(value.legth != 0)
+                    {
+                        $msg = "Primary payment method is required";
+                        showPaymentMethodsError($msg);
+                    }
+                }
+                else
+                {
+                    removePaymentMethodsError();
+                }
+            }
+            if(clickInput.id == 'supplier')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    if(value.legth != 0)
+                    {
+                        $msg = "Supplier field is required";
+                        showSupplierError($msg);
+                    }
+                }
+                else
+                {
+                    removeSupplierError();
+                }
+            }
+            if(clickInput.id == 'contact_number')
+            {
+                var value = clickInput.value;
+                if(value != '')
+                {
+                    if(value.legth != 0)
+                    {
+                        if(value.length < 5)
+                        {
+                            $msg = "Minimum 5 digits required";
+                            showContactNumberError($msg);
+                        }
+                        else if(value.length > 15 )
+                        {
+                            $msg = "Maximum 15 digits allowed";
+                            showContactNumberError($msg);
+                        }
+                        else
+                        {
+                            removeContactNumberError();
+                        }
+                        removeEmailError();
+                        removeAlternativeContactNumberError();
+                    }
+                }
+                else
+                {
+                    if(sub == '2')
+                    {
+                        $msg ="One among contact number or alternative contact number or email is required";
+                        showContactNumberError($msg);
+                        showEmailError($msg);
+                        showAlternativeContactNumberError($msg);
+                    }
+                    else
+                    {
+                        removeContactNumberError();
+                    }
+                }
+            }
+            else if(clickInput.id == 'alternative_contact_number')
+            {
+                var value = clickInput.value;
+                if(value != '')
+                {
+                    if(value.legth != 0)
+                    {
+                        if(value.length < 5)
+                        {
+                            $msg = "Minimum 5 digits required";
+                            showAlternativeContactNumberError($msg);
+                        }
+                        else if(value.length > 15 )
+                        {
+                            $msg = "Maximum 15 digits allowed";
+                            showAlternativeContactNumberError($msg);
+                        }
+                        else
+                        {
+                            removeAlternativeContactNumberError();
+                        }
+                        removeEmailError();
+                        removeContactNumberError();
+                    }
+                }
+                else
+                {
+                    if(sub == '2')
+                    {
+                        $msg ="One among contact number or alternative contact number or email is required";
+                        showContactNumberError($msg);
+                        showEmailError($msg);
+                        showAlternativeContactNumberError($msg);
+                    }
+                    else
+                    {
+                        removeAlternativeContactNumberError();
+                    }
+                }
+            }
+            else if(clickInput.id == 'email')
+            {
+                var value = clickInput.value;
+                if(value != '')
+                {
+                    if(value.legth != 0)
+                    {
+                        const validateEmail = (email) => {
+                        return email.match(
+                            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                        );
+                        };
+                        const validate = () => {
+                        const $emailRequired = $('#emailRequired');
+                        const email = $('#email').val();
+                        $emailRequired.text('');
+
+                        if(validateEmail(email))
+                        {
+                            removeEmailError();
+                            removeAlternativeContactNumberError();
+                            removeContactNumberError();
+                        } 
+                        else
+                        {
+                            $msg = email + ' is invalid.'
+                            showEmailError($msg);
+                        }
+                        return false;
+                        }
+                        $('#email').on('input', validate);
+                    }
+                }
+                else
+                {
+                    if(sub == '2')
+                    {
+                        $msg ="One among contact number or alternative contact number or email is required";
+                        showContactNumberError($msg);
+                        showEmailError($msg);
+                        showAlternativeContactNumberError($msg);
+                    }
+                    else
+                    {
+                        removeEmailError();
+                    }
+                }
+            }
+        }
+        function showContactNumberError($msg)
+        {
+            document.getElementById("contactRequired").textContent=$msg;
+            document.getElementById("contactRequired").classList.remove("requiredOne");
+            document.getElementById("contactRequired").classList.add("paragraph-class");
+            document.getElementById("contact_number").classList.add("is-invalid");
+        }
+        function removeContactNumberError()
+        {
+            document.getElementById("contactRequired").textContent="";
+            document.getElementById("contactRequired").classList.remove("paragraph-class");
+            document.getElementById("contact_number").classList.remove("is-invalid");
+        }
+        function showAlternativeContactNumberError($msg)
+        {
+            document.getElementById("alternativeContactRequired").textContent=$msg;
+            document.getElementById("alternativeContactRequired").classList.remove("requiredOne");
+            document.getElementById("alternativeContactRequired").classList.add("paragraph-class");
+            document.getElementById("alternative_contact_number").classList.add("is-invalid");    
+        }
+        function removeAlternativeContactNumberError()
+        {
+            document.getElementById("alternativeContactRequired").textContent="";
+            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
+            document.getElementById("alternative_contact_number").classList.remove("is-invalid"); 
+        }
+        function showEmailError($msg)
+        {
+            document.getElementById("emailRequired").textContent=$msg;
+            document.getElementById("email").classList.add("is-invalid");
+            document.getElementById("emailRequired").classList.remove("requiredOne");
+            document.getElementById("emailRequired").classList.add("paragraph-class");
+        }
+        function removeEmailError()
+        {
+            document.getElementById("emailRequired").textContent="";
+            document.getElementById("email").classList.remove("is-invalid");
+            document.getElementById("emailRequired").classList.remove("paragraph-class");
+        }
+        function showSupplierError($msg)
+        {
+            document.getElementById("supplierError").textContent=$msg;
+            document.getElementById("supplier").classList.add("is-invalid");
+            document.getElementById("supplierError").classList.add("paragraph-class");
+        }
+        function removeSupplierError()
+        {
+            document.getElementById("supplierError").textContent="";
+            document.getElementById("supplier").classList.remove("is-invalid");
+            document.getElementById("supplierError").classList.remove("paragraph-class");
+        }
+        function showPaymentMethodsError($msg)
+        {
+            document.getElementById("paymentMethodsError").textContent=$msg;
+            document.getElementById("is_primary_payment_method").classList.add("is-invalid");
+            document.getElementById("paymentMethodsError").classList.add("paragraph-class");
+        }
+        function removePaymentMethodsError()
+        {
+            document.getElementById("paymentMethodsError").textContent="";
+            document.getElementById("is_primary_payment_method").classList.remove("is-invalid");
+            document.getElementById("paymentMethodsError").classList.remove("paragraph-class");
+        }
+        function showSupplierTypeError($msg)
+        {
+            document.getElementById("supplierTypeError").textContent=$msg;
+            document.getElementById("supplier_type").classList.add("is-invalid");
+            document.getElementById("supplierTypeError").classList.add("paragraph-class");
+            $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+            $("#supplier_type").select2({
+                containerCssClass : "form-control is-invalid"
+            });
+        }
+        function removeSupplierTypeError()
+        {
+            document.getElementById("supplierTypeError").textContent="";
+            document.getElementById("supplier_type").classList.remove("is-invalid");
+            document.getElementById("supplierTypeError").classList.remove("paragraph-class");
+        } 
+        function emailContactError()
+        {
+            document.getElementById("contactRequired").textContent=$msg;
+            document.getElementById("contactRequired").classList.remove("paragraph-class");        
+            document.getElementById("contactRequired").classList.add("requiredOne");
+            document.getElementById("alternativeContactRequired").textContent=$msg;
+            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");        
+            document.getElementById("alternativeContactRequired").classList.add("requiredOne");
+            document.getElementById("emailRequired").textContent=$msg;
+            document.getElementById("emailRequired").classList.remove("paragraph-class");        
+            document.getElementById("emailRequired").classList.add("requiredOne");
+        }
     </script>
 @endsection

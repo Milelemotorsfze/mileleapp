@@ -18,6 +18,7 @@ use App\Models\SupplierAddonTemp;
 use App\Models\SupplierType;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Validation\Rule;
 
 
 class SupplierController extends Controller
@@ -27,7 +28,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods')->get();
+        $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')->get();
         return view('suppliers.index',compact('suppliers'));
     }
 
@@ -48,32 +49,35 @@ class SupplierController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
+        // dd($request->contact_number['full']);
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
-        // $validator = Validator::make($request->all(), [
-        //     'supplier' => 'required',
-        //     // 'contact_person' => 'required',
-        //     // 'contact_number' => 'required',
-        //     //  'alternative_contact_number' => 'required',
-        //     // 'email' => 'required',
-        //     // 'person_contact_by' => 'required',
-        //     // 'supplier_type' => 'required',
-        //     // 'is_primary_payment_method' => 'required',
-        //     // 'model' => 'required',
-        //     // 'addon_id' => 'required',
-        //     // 'payment_methods_id' => 'required',
-        //     'supplier_type' => 'required',
-        // ]);
+        $validator = Validator::make($request->all(), [
+            'supplier' => 'required',
+            // 'contact_person' => 'required',
+            // 'contact_number' => 'required',
+            //  'alternative_contact_number' => 'required',
+            // 'email' => 'required',
+            // 'person_contact_by' => 'required',
+            // 'supplier_type' => 'required',
+            'is_primary_payment_method' => 'required',
+            // 'model' => 'required',
+            // 'addon_id' => 'required',
+            // 'payment_methods_id' => 'required',
+            'supplier_types' => 'required',
+            // 'contact_number' => 'required_without:alternative_contact_number',
+            // 'alternative_contact_number' => 'required_without:contact_number', 
+        ]);
        
-        // if ($validator->fails()) 
-        // {
-        //     // dd('hi');
-        //     return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
-        // }
-        // else 
-        // { 
-
+        if ($validator->fails()) 
+        {
+            // dd('hi');
+            return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
+        }
+        else 
+        { 
             $input = $request->all();
+
             $input['contact_number'] = $request->contact_number['full'];
             $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
             $input['created_by'] = $authId;
@@ -182,7 +186,7 @@ class SupplierController extends Controller
             }
             return redirect()->route('suppliers.index')
                              ->with('success','Addon created successfully');
-        // }
+        }
     }
 
     /**
@@ -190,10 +194,11 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        $addon1 = $addons = '';
+        $addon1 = $addons = $supplierTypes = '';
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->with('PaymentMethods')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->with('PaymentMethods')->get();
         $supplierAddonId = SupplierAddons::where('supplier_id',$supplier->id)->pluck('addon_details_id');
+        $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
         {
             $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines')->orderBy('id', 'ASC')->get();
@@ -209,8 +214,8 @@ class SupplierController extends Controller
                         ->orderBy('addon_details.id','ASC')
                         ->get();
         }
-         
-        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons'));
+        //  dd($supplierTypes);
+        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes'));
     }
 
     /**
@@ -222,8 +227,9 @@ class SupplierController extends Controller
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
         $array = json_decode($otherPaymentMethods);
+        
+        // $supplierTypes = json_decode($supplierType);
         // dd($array);
-        // dd($otherPaymentMethods);
         $addons = AddonDetails::select('id','addon_code','addon_id')->with('AddonName')->get();
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array'));
     }

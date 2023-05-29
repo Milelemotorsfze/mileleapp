@@ -47,22 +47,36 @@
                     <td>{{ $supplier->contact_person }}</td>
                     <td>{{ $supplier->person_contact_by }}</td>
                     <td>
-                      @if($supplier->supplier_type == 'spare_parts')
-                      Spare Parts
-                      @else
-                      {{ $supplier->supplier_type }}
+                      @if(count($supplier->supplierTypes) > 0)
+                        @foreach($supplier->supplierTypes as $t)
+                          <label class="badge badge-soft-primary">
+                            @if($t->supplier_type == 'spare_parts')
+                              Spare Parts
+                            @elseif($t->supplier_type == 'accessories')
+                              Accessories
+                            @elseif($t->supplier_type == 'freelancer')
+                              Freelancer
+                            @elseif($t->supplier_type == 'garage')
+                              Garage
+                            @elseif($t->supplier_type == 'warranty')
+                              Warranty
+                            @endif
+                          </label>
+                        @endforeach
                       @endif
                     </td>
                     <td>
-                      @if(!empty($supplier->paymentMethods()))
-                      @if($v->PaymentMethods->payment_methods)
+                      @if(count($supplier->paymentMethods) > 0)
                         @foreach($supplier->paymentMethods as $v)
+                        
+                      
                           @if($v->is_primary_payment_method == 'yes')
                           
                             <label class="badge badge-soft-success">{{ $v->PaymentMethods->payment_methods }}</label>
                           @endif
+                         
                         @endforeach
-                      @endif
+                    
                       @endif
                     </td>
                     <td>
