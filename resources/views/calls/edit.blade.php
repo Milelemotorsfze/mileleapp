@@ -493,7 +493,7 @@ $brand_name = $brand->brand_name;
             newValue = '+' + newValue;
         }
         if (newValue.length > 15) {
-            newValue = newValue.slice(5, 15); // Truncate to 15 digits
+            newValue = newValue.slice(0, 15); // Truncate to 15 digits
         }
         input.value = newValue;
     });
