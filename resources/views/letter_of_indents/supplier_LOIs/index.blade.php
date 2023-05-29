@@ -34,10 +34,9 @@
                         </select>
                     </div>
                 </div>
-                <input type="hidden" name="tab" value="" id="current-tab">
                 <div class="col-lg-3 col-md-3">
                     <div class="mt-4">
-                        <button type="submit" class="btn btn-primary" >Search</button>
+                        <button type="submit" class="btn btn-primary search-button" >Search</button>
                         <a href="{{ route('letter-of-indents.get-suppliers-LOIs') }}">
                             <button type="button" class="btn btn-secondary "> Refresh </button>
                         </a>
@@ -48,9 +47,9 @@
     </div>
 
     <div class="portfolio">
-        <ul class="nav nav-pills nav-fill">
+        <ul class="nav nav-pills nav-fill" id="my-tab">
             <li class="nav-item">
-                <a class="nav-link tab-1" data-bs-toggle="tab" data-tab="PENDING" href="#pending-approved-LOI">Pending Approval LOIs</a>
+                <a class="nav-link tab-1 active" data-bs-toggle="tab" data-tab="PENDING" href="#pending-approved-LOI">Pending Approval LOIs</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link tab-2" data-bs-toggle="tab" data-tab="APPROVED" href="#approved-LOI"> Approved LOIs</a>
@@ -217,7 +216,6 @@
                             <th>Approval Status</th>
                             <th>Deal Items</th>
                             <th>Deal Documents</th>
-
                         </tr>
                         </thead>
                         <tbody>
@@ -323,6 +321,7 @@
                             <th>Category</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
+                            <th>Review</th>
                             <th>Deal Items</th>
                             <th>Deal Documents</th>
                         </tr>
@@ -338,6 +337,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
+                                <td>{{ $letterOfIndent->review }}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="partial-approved-loi-items-{{ $letterOfIndent->id }}" >View </button>
@@ -422,15 +422,14 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            var tabNumber = '{{ $currentTab }}';
-            $('.tab-'+tabNumber).addClass('active');
-
-            $('.nav li a').click(function(){
-                var data = $(this).attr("data-tab");
-                $('#current-tab').val(data);
-                var currentTab = $('#current-tab').val();
-
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+                localStorage.setItem('activeTab', $(e.target).attr('href'));
             });
+            var activeTab = localStorage.getItem('activeTab');
+            if (activeTab) {
+                $('#my-tab a[href="' + activeTab + '"]').tab('show');
+            }
+
             $('.status-change-button-approve').click(function () {
 
                 var id = $(this).attr('data-id');

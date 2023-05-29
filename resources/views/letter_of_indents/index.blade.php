@@ -347,10 +347,11 @@
                                             data-modal-id="partial-approved-loi-doc-{{ $letterOfIndent->id }}" >View </button>
                                 </td>
                                 <td>
-                                    <button type="button" class=" btn btn-primary btn-sm" data-id="{{ $letterOfIndent->id }}"
-                                            id="status-change-button-approve" data-status="{{ \App\Models\LetterOfIndent::LOI_STATUS_APPROVED }}">
+                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
+                                    <button type="button" class=" btn btn-primary btn-sm" >
                                         Milele Approval
                                     </button>
+                                    </a>
                                 </td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
@@ -554,6 +555,7 @@
                             <th>Category</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
+                            <th>Review</th>
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
                         </tr>
@@ -568,6 +570,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
+                                <th>{{ $letterOfIndent->review }}</th>
                                 <td>
                                     <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
                                             data-modal-id="rejected-loi-items-{{ $letterOfIndent->id }}" >View </button>
@@ -632,7 +635,7 @@
                                                     <div class="d-flex">
                                                         <div class="col-lg-12">
                                                             <div class="row p-2">
-                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="200" height="600"></embed>
                                                             </div>
                                                         </div>
                                                     </div>

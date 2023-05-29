@@ -73,10 +73,12 @@ Route::get('/d', function () {
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
     Route::post('letter-of-indents/status-change', [LetterOfIndentController::class, 'approve'])->name('letter-of-indents.status-change');
     Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
+    Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
 
     Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);
     Route::resource('letter-of-indent-items', LOIItemsController::class);
+    Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
 
     // Demand & Planning
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');

@@ -10,7 +10,8 @@ class LetterOfIndentItem extends Model
     use HasFactory;
     public $timestamps = false;
     protected $appends = [
-        'steering'
+        'steering',
+        'balance_quantity'
     ];
     public function LOI()
     {
@@ -31,5 +32,14 @@ class LetterOfIndentItem extends Model
            return $mastermodel->steering;
        }
        return null;
+    }
+    public function getBalanceQuantityAttribute()
+    {
+       $totalQuantity = $this->quantity;
+       $approvedQuantity = $this->approved_quantity;
+       $balanceQuantity = $totalQuantity - $approvedQuantity;
+
+       return $balanceQuantity;
+
     }
 }

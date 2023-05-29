@@ -69,6 +69,9 @@
         <script src="{{ asset('js/app.js') }}"></script>
         <script type="text/javascript">
             $(document).ready(function() {
+                $('.close').on('click', function() {
+                    $('.alert').hide();
+                })
 
         ClassicEditor
           .create(document.querySelector('#editor'))
