@@ -24,6 +24,7 @@ use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\LOIDocumentsController;
 use App\Http\Controllers\Repeatedcustomers;
+use App\Http\Controllers\SupplierAddonController;
 
 
 /*
@@ -65,6 +66,12 @@ Route::get('/d', function () {
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
+    Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
+
+    Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
+    Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
+    Route::resource('student', SupplierAddonController::class);
+    
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
 

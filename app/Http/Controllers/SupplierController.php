@@ -19,6 +19,7 @@ use App\Models\SupplierType;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\HeadingRowImport;
 
 
 class SupplierController extends Controller
@@ -131,26 +132,42 @@ class SupplierController extends Controller
             $supAdd['created_by'] = $authId;
             if($request->activeTab == 'uploadExcel')
             {
+                // dd($request->file('file'));
                 if($request->file('file'))
                 {
-                    Excel::import(new SupplierAddonImport,$request->file('file'));
-                    $supplierAddons = SupplierAddonTemp::all();
-                    
-                    foreach($supplierAddons as $supplierAddon)
+                    $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                    if(count($headings) > 0)
                     {
-                        $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
-                        $supAdd['addon_details_id'] = $addonId->id;
-                        if($supplierAddon->currency == 'AED')
+                        foreach($headings[0] as $heading)
                         {
-                            $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                            {
+                                Excel::import(new SupplierAddonImport,request()->file('file'));
+                                $supplierAddons = SupplierAddonTemp::all();
+                                foreach($supplierAddons as $supplierAddon)
+                                {
+                                    $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
+                                    $supAdd['addon_details_id'] = $addonId->id;
+                                    if($supplierAddon->currency == 'AED')
+                                    {
+                                        $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                                    }
+                                    elseif($supplierAddon->currency == 'USD')
+                                    {
+                                        $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
+                                        $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                    }
+                                    $suppliers = SupplierAddons::create($supAdd);
+                                    // $supplierAddon->delete();
+                                }
+                            }
+                            else
+                            {
+                                dd("Uploading excel headings should be addon_code , currency and purchase_price");
+                                // $errorMsg = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                // return redirect(route('suppliers.create'))->withInput()->withErrors($errorMsg);
+                            }
                         }
-                        elseif($supplierAddon->currency == 'USD')
-                        {
-                            $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
-                            $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
-                        }
-                        $suppliers = SupplierAddons::create($supAdd);
-                        $supplierAddon->delete();
                     }
                 }
             }
@@ -248,5 +265,47 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier)
     {
         //
+    }
+    public function supplierAddonExcelValidation(Request $request)
+    {
+        dd($request);
+        if($request->file)
+                {
+                    $headings = (new HeadingRowImport)->toArray($request->file);  dd($headings);
+                    if(count($headings) > 0)
+                    {
+                        foreach($headings[0] as $heading)
+                        {
+                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                            {
+                                Excel::import(new SupplierAddonImport,$request->file);
+                                // $supplierAddons = SupplierAddonTemp::all();
+                                // foreach($supplierAddons as $supplierAddon)
+                                // {
+                                //     $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
+                                //     $supAdd['addon_details_id'] = $addonId->id;
+                                //     if($supplierAddon->currency == 'AED')
+                                //     {
+                                //         $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                                //     }
+                                //     elseif($supplierAddon->currency == 'USD')
+                                //     {
+                                //         $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
+                                //         $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                //     }
+                                //     $suppliers = SupplierAddons::create($supAdd);
+                                //     // $supplierAddon->delete();
+                                // }
+                            }
+                            else
+                            {
+                                return response()->json('Uploading excel headings should be addon_code , currency and purchase_price');
+                                // dd("Uploading excel headings should be addon_code , currency and purchase_price");
+                                // $errorMsg = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                // return redirect(route('suppliers.create'))->withInput()->withErrors($errorMsg);
+                            }
+                        }
+                    }
+                }
     }
 }

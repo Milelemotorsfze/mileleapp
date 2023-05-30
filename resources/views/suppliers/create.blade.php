@@ -157,6 +157,7 @@
     }
 </style>
 @section('content')
+
     <div class="card-header">
         <h4 class="card-title">Create Suppliers</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -172,6 +173,7 @@
                 </ul>
             </div>
         @endif -->
+  
         <form id="createSupplierForm" action="{{ route('suppliers.store') }}" method="POST" enctype="multipart/form-data"> 
         <!-- action="{{ route('suppliers.store') }}" -->
         <!-- method="POST" enctype="multipart/form-data" -->
@@ -424,11 +426,28 @@
             </div>
             <input id="activeTab" name="activeTab" hidden>
             <div id="uploadExcel" class="tabcontent">
-                <center>
+            <div class="row">
+                <!-- <center> -->
                     <!-- <input style="width:50%;" id="image" type="file" class="form-control" name="image" autocomplete="image" /> -->
-                    <input type="file" name="file" placeholder="Choose file" style="width:50%;" id="image" class="form-control">
-                </center>
+                    <div class="col-xxl-6 col-lg-6 col-md-6">
+                    <label for="choices-single-default" class="form-label font-size-13">Upload Supplier Addon Excel File</label>    
+                    <input type="file" name="file" placeholder="Choose file" id="supplierAddonExcel" class="form-control" onchange="readURL(this);">
+                    <span id="supplierAddonExcelError" class="required-class paragraph-class"></span>
+                    </div>
+                    <div class="col-xxl-6 col-lg-6 col-md-6"><center>
+                    <label for="choices-single-default" class="form-label font-size-13">Download Supplier Addon Excel Template</label>
+</br>   
+                    <a  class="btn btn-sm btn-info" href="{{ route('addon.get_student_data') }}"><i class="fa fa-arrow-down" aria-hidden="true"></i> Download Excel Template</a>
+</center></div>
+                    <!-- <div class="card-header"> -->
+        <!-- <h4 class="card-title">Create Suppliers</h4> -->
+
+    <!-- </div> -->
+                <!-- </center> -->
+
             </div>
+            </div>
+            <!--  -->
             </br>
             <div class="col-xxl-12 col-lg-12 col-md-12">
                 <button style="float:right;" type="submit" class="btn btn-sm btn-success" id="submit">Submit</button>
@@ -442,6 +461,73 @@
         var selectedBrands = new Array();
         // globalThis.selectedBrands .push(brandId);
       var sub ='1';
+      function readURL(input)
+        {
+            var allowedExtension = ['xlsx','xlsm','xlsb','xltx','xltm','xls','xlt','xls','xml','xlam','xla','xlw','xlr'];
+            var fileExtension = input.value.split('.').pop().toLowerCase();
+            var isValidFile = false;
+            for(var index in allowedExtension) 
+            {
+                if(fileExtension === allowedExtension[index]) 
+                {
+                    isValidFile = true; 
+                    break;
+                }
+            }
+            if(!isValidFile) 
+            {               
+                // $('#blah').hide();
+                document.getElementById("supplierAddonExcelError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                
+            }
+            else
+            {
+                document.getElementById("supplierAddonExcelError").textContent='';
+                var file = '';
+                var file = $('#supplierAddonExcel').val();
+                var formData =  new FormData($(this)[0]);
+                $.ajax
+                ({
+                    url:"{{url('supplierAddonExcelValidation')}}",
+                    type: "POST",
+                    data: 
+                    {
+                        formData: formData,
+                    _token: '{{csrf_token()}}' 
+                    },
+                    dataType : 'json',
+                    enctype: 'multipart/form-data',
+                    success: function(result)
+                    {
+                        console.log(result);
+                        // $.each(globalThis.OldAddons,function(key,value)
+                        // {  
+                        //     // $("#"+value).show();
+                        // });
+                        // globalThis.OldAddons = [];                     
+                        // $.each(result,function(key,value)
+                        // {  
+                        //     globalThis.OldAddons .push(value);
+                        //     // $("#"+value).hide();
+                        //     $("#"+value).addClass('hide');
+                        // });
+                    }
+                });
+                // alert('hi');
+                // if (input.files && input.files[0])
+                // {
+                //     document.getElementById("addonImageError").textContent='';
+                //     var reader = new FileReader();
+                //     reader.onload = function (e)
+                //     {                      
+                //         $('#blah').show();
+                //         $('#blah').css('visibility', 'visible');
+                //         $('#blah').attr('src', e.target.result);
+                //     };
+                //     reader.readAsDataURL(input.files[0]);
+                // }
+            }
+        }
         $(document).ready(function ()
         {
             $msg ="One among contact number or alternative contact number or email is required";
