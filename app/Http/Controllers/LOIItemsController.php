@@ -170,11 +170,9 @@ class LOIItemsController extends Controller
             $latestApprovedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
             if ($letterOfIndentItem->quantity == $latestApprovedQuantity && $letterOfIndentItem->latestApprovedQuantity != 0)
             {
-                info('quantity eqal and not 0');
                 // get id of full quantity approved item and compare with previous ids
                 $approvedItems[] = $letterOfIndentItem->id;
             }else{
-                info('partialy approved');
                 // get ids of partialy approved items
                 $updatedItems[] = $letterOfIndentItem->id;
             }
@@ -183,11 +181,9 @@ class LOIItemsController extends Controller
         $result = array_diff($loiItemIds,$approvedItems);
         $letterOfIndent = LetterOfIndent::find($request->id);
         if(empty($result)) {
-            info("fully approved");
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
         }
         if(!empty($updatedItems)) {
-            info("partialapproved");
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
         $letterOfIndent->save();

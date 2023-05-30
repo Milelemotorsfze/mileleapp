@@ -95,8 +95,8 @@
                             <div class ="row">
                                 @foreach($demandList->fiveMonthDemands as $key => $monthlyDemand)
                                     <div class="col-lg-1">
-                                        <input type="text" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}"
-                                               class="form-control demand-list-quantity-{{ $key }}" readonly />
+                                        <input type="number" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" min="0"
+                                               class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
                                     </div>
                                 @endforeach
                                     <div class="col-lg-1">
@@ -128,7 +128,7 @@
                                 </select>
                             </div>
                             <div class="col-lg-4 col-md-4">
-                                <select class="form-select text-dark" name="sfx" id="sfx">
+                                <select class="form-select text-dark" name="sfx" id="sfx" >
                                     <option value="" >Select SFX</option>
                                 </select>
                             </div>

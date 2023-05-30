@@ -28,7 +28,7 @@ class MonthlyDemandsController extends Controller
 
        foreach ($monthlyDemandIds as $key => $monthlyDemandId) {
            $monthlyDemand = MonthlyDemand::findOrFail($monthlyDemandId);
-           $monthlyDemand->quantity = $quantities[$key];
+           $monthlyDemand->quantity = !empty($quantities[$key]) ? $quantities[$key] : 0;
            $monthlyDemand->save();
        }
        return response(true);
