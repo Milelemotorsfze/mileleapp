@@ -156,7 +156,6 @@ class LetterOfIndentController extends Controller
         }
 
 //        $pdfFile = PDF::loadView('letter_of_indents.loi_document', compact('letterOfIndent','letterOfIndentItems'));
-
 //        return $pdfFile;
 //        Storage::disk('local')->makeDirectory('/GENERATE_LOI');
 //
@@ -190,7 +189,6 @@ class LetterOfIndentController extends Controller
 //        $pdf->Output($modifiedPdfPath, 'F');
 
         // Download the modified PDF
-
 
         return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
 //        return response()->download($modifiedPdfPath);

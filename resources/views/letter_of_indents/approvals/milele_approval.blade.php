@@ -150,9 +150,16 @@
                                     <input type="text" value="{{ $letterOfIndentItem->inventory_quantity }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
+                                    <?php
+                                        if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
+                                            $count = $letterOfIndentItem->inventory_quantity;
+                                        }else{
+                                            $count = $letterOfIndentItem->quantity;
+                                        }
+                                        ?>
                                     <select name="quantities[]" class="form-control approve-quantity"
                                             data-item-id="{{ $letterOfIndentItem->id }}">
-                                        @for($i=0;$i<= $letterOfIndentItem->balance_quantity;$i++)
+                                        @for($i=0;$i <= $count;$i++)
                                             <option> {{ $i }} </option>
                                         @endfor
                                     </select> </br>

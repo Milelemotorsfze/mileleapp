@@ -1,10 +1,10 @@
 @extends('layouts.main')
 <style>
-    .modal-xl 
+    .modal-xl
     {
         max-width: 99% !important;
     }
-    #blah 
+    #blah
     {
         width: 300px;
         height: 300px;
@@ -15,20 +15,20 @@
         height: auto;
         max-width:1200px;
     }
-    @media only screen and (max-device-width: 480px) 
+    @media only screen and (max-device-width: 480px)
     {
         #showImage
         {
             width: 100%;
             height: 100%;
         }
-        #blah 
+        #blah
         {
             width: 200px;
             height: 200px;
         }
     }
-    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait) 
+    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)
     {
         #showImage
         {
@@ -36,14 +36,14 @@
             height: 100%;
         }
     }
-    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape) 
+    @media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)
     {
         #showImage
         {
             width: 100%;
             height: 100%;
         }
-    }  
+    }
     @media only screen and (max-device-width: 1280px)
     {
         #showImage
@@ -51,7 +51,7 @@
             width: 100%;
             height: 100%;
         }
-    }  
+    }
     /* @media only screen and (min-device-width: 1280px)
     {
         #showImage
@@ -61,20 +61,20 @@
             max-width:700px;
         }
     }   */
-    .contain 
+    .contain
     {
     object-fit: contain;
     }
-    .error 
+    .error
     {
         color: #FF0000;
     }
-    .paragraph-class 
+    .paragraph-class
     {
         color: red;
         font-size:11px;
     }
-    .btn_round 
+    .btn_round
     {
         width: 35px;
         height: 35px;
@@ -86,13 +86,13 @@
         border: 1px solid #ccc;
         cursor: pointer;
     }
-    .btn_round:hover 
+    .btn_round:hover
     {
         color: #fff;
         background: #6b4acc;
         border: 1px solid #6b4acc;
-    } 
-    .paragraph-class 
+    }
+    .paragraph-class
     {
         color: red;
         font-size:11px;
@@ -125,7 +125,7 @@
                 </ul>
             </div>
         @endif
-        <form method="POST" enctype="multipart/form-data" action="{{ route('addon.store') }}"> 
+        <form method="POST" enctype="multipart/form-data" action="{{ route('addon.store') }}">
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -138,7 +138,7 @@
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                             <select id="addon_type" name="addon_type" class="form-control form-control-sm" onchange=getAddonCodeAndDropdown() autofocus>
                                 <option value="">Choose Addon Type</option>
-                                <option value="P">Accessories</option>                          
+                                <option value="P">Accessories</option>
                                 <!-- <option value="D">Documentation</option>
                                 <option value="DP">Documentation On Purchase</option>
                                 <option value="E">Others</option>
@@ -147,8 +147,8 @@
                                 <option value="K">Kit</option>
                                 <option value="W">Warranty</option>
                             </select>
-                            <span id="AddonTypeError" class="required-class"></span>   
-                            <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>                        
+                            <span id="AddonTypeError" class="required-class"></span>
+                            <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <span class="error">* </span>
@@ -160,8 +160,8 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror                          
-                        </div>                        
+                            @enderror
+                        </div>
                     </div>
                     </br>
                     <div class="row">
@@ -174,15 +174,15 @@
                                 @foreach($addons as $addon)
                                     <option value="{{$addon->id}}">{{$addon->name}}</option>
                                 @endforeach
-                            </select>   
+                            </select>
                             @error('addon_id')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror                           
+                            @enderror
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
-                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>                        
+                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                         </div>
                     </div>
                     </br>
@@ -210,7 +210,7 @@
                             @enderror
                         </div>
                     </div>
-                    </br>                    
+                    </br>
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
@@ -265,7 +265,7 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror                          
+                            @enderror
                         </div>
                         </br>
                         <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
@@ -278,7 +278,7 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror                          
+                            @enderror
                         </div>
                     </div>
                     </br>
@@ -293,8 +293,8 @@
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror                          
-                        </div> 
+                            @enderror
+                        </div>
                     </div>
                     <br hidden id="rowPartNumberBr">
                     <div class="row">
@@ -333,7 +333,7 @@
                                 @include('addon.kit')
                                 @include('addon.supplierprice')
                             </div>
-                        </div>  
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-12">
@@ -353,7 +353,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form method="POST" enctype="multipart/form-data"> 
+                            <form method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row modal-row">
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -370,7 +370,7 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </form> 
+                            </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
@@ -389,7 +389,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form method="POST" enctype="multipart/form-data"> 
+                            <form method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="row modal-row">
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
@@ -398,7 +398,7 @@
                                         </center>
                                     </div>
                                 </div>
-                            </form> 
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -424,25 +424,25 @@
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
-           
-            $('.radioFixingCharge').click(function() 
+
+            $('.radioFixingCharge').click(function()
             {
                 var addon_type = $("#addon_type").val();
                 fixingCharge = $(this).val();
                 if($(this).val() == 'yes')
                 {
                     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = true  
+                    showFixingChargeAmount.hidden = true
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
                     showFixingChargeAmountBr.hidden = true
                     if(addon_type != '' && addon_type == 'SP')
                     {
                         let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = false  
+                        showPartNumber.hidden = false
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = false
                         let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = true  
+                        showrowPartNumber.hidden = true
                         let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                         showrowPartNumberBr.hidden = true
                     }
@@ -452,16 +452,16 @@
                     if(addon_type != '' && addon_type == 'SP')
                     {
                         let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = true  
+                        showPartNumber.hidden = true
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = true
                         let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = false  
+                        showrowPartNumber.hidden = false
                         let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                         showrowPartNumberBr.hidden = false
                     }
                     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = false  
+                    showFixingChargeAmount.hidden = false
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
                     showFixingChargeAmountBr.hidden = false
                 }
@@ -479,12 +479,12 @@
                         url: '/addons/existingImage/'+id,
                         type: "GET",
                         dataType: "json",
-                        success:function(data) 
+                        success:function(data)
                         {
-                            document.getElementById("AddonTypeError").classList.remove("paragraph-class"); 
+                            document.getElementById("AddonTypeError").classList.remove("paragraph-class");
                             document.getElementById("AddonTypeError").textContent="";
                             $('#addon_code').val(data.newAddonCode);
-                            $("#addon_type").val(data.addon_type.addon_type); 
+                            $("#addon_type").val(data.addon_type.addon_type);
                             // this code is for showing related addons of selcted addon
                             //         var selectedValues = new Array();
                             //         $.each(data.existingSuppliers,function(key,value)
@@ -513,7 +513,7 @@
             {
                 showAndHideSupplierDropdownOptions(1);
             });
-          
+
             // $('#submit').click(function()
             // {
             //     var value = $('#addon_id').val();
@@ -521,7 +521,7 @@
             //     $('#addon_name').val(a);
             // });
             // var j=1;
-           
+
             //    $('#add').click(function()
             //    {
             //         $('.allbrands').prop('disabled',true);
@@ -542,12 +542,12 @@
             //        // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
             //        // });
             //        // var brandvalue = $('#selectBrand').val();
-                
+
             //        // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
             //        // $('#addon_name').val(a);
             //        var selectBrand = $("#selectBrand1").val();
             //        i++;
-            //        // onChange="get_data('+i+')" 
+            //        // onChange="get_data('+i+')"
             //        var selectBrand = $("#selectModelLine").val();
             //        // i++;
             //        var html = '';
@@ -561,7 +561,7 @@
             //        html += '@foreach($brands as $brand)';
             //        html += '<option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>';
             //        html += '@endforeach';
-            //        html += '</select>';                                     
+            //        html += '</select>';
             //        html += '</div>';
             //        html += '</div>';
             //        html += '</div>';
@@ -583,7 +583,7 @@
             //             maximumSelectionLength: 1,
             //         });
             //    });
-        
+
            $(document).on('click', '.btn_remove', function()
             {
                 var button_id = $(this).attr("id");
@@ -593,12 +593,12 @@
             {
                 currentAddonType =  $('#addon_type').val();
                 if(currentAddonType == '')
-                { 
-                    document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
+                {
+                    document.getElementById("AddonTypeError").classList.add("paragraph-class");
                     document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
                 }
                 else
-                {                    
+                {
                     $('.overlay').show();
                     $("#addon_id").val('');
                     var modalId = $(this).data('modal-id');
@@ -610,8 +610,8 @@
             // {alert('hhh');
             //     currentAddonType =  $('#addon_type').val();
             //     if(currentAddonType == '')
-            //     { 
-            //         document.getElementById("AddonTypeError").classList.add("paragraph-class"); 
+            //     {
+            //         document.getElementById("AddonTypeError").classList.add("paragraph-class");
             //         document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
             //     }
             //     else
@@ -630,10 +630,10 @@
             //     $('.modal').removeClass('modalshow');
             // });
         });
-      
+
                         // $("#supplierArray"+index).select2();
-    
-        
+
+
         // $('.close').on('click', function()
         // {alert('jj');
         //     $('.modal').addClass('modalhide');
@@ -642,14 +642,14 @@
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
-            var img = document.getElementById("blah");  
-            var image = document.getElementById("image"); 
-            var modalImg = document.getElementById("showImage");    
-            var modalImg = document.getElementById("showImage");    
+            var img = document.getElementById("blah");
+            var image = document.getElementById("image");
+            var modalImg = document.getElementById("showImage");
+            var modalImg = document.getElementById("showImage");
             $('.overlay').show();
             $('#showImageModal').addClass('modalshow');
             $('#showImageModal').removeClass('modalhide');
-            modalImg.src = img.src;    
+            modalImg.src = img.src;
         }
         function showAndHideSupplierDropdownOptions(i)
         {
@@ -657,7 +657,7 @@
             // var eachSelected = $('#supplierArray'+i).select2().val();
             var eachSelected = $('#supplierArray'+i).select2("val");
             // var selected1 = $('#supplierArray'+i).val();
-            
+
             globalThis.oldselectedSuppliers[i] = globalThis.selectedSuppliers[i];
             oldselectedSuppliers.forEach(function(item)
             {
@@ -665,7 +665,7 @@
                 // $("#supplierArray1").select2();
             })
             globalThis.selectedSuppliers[i] = [];
-            $.each(eachSelected, function( ind, value ) 
+            $.each(eachSelected, function( ind, value )
             {
                 globalThis.selectedSuppliers[i] .push(value);
             });
@@ -680,7 +680,7 @@
                 // // //     // $('.'+item).removeAttr("disabled");
                 // // //   } else {
                     $('.'+item).prop('disabled',true)
-                    
+
                 //     // alert('enabled');
                 //     // Add disabled attribute if it is not
                 //     // $('.'+item).attr("disabled", "disabled");
@@ -692,14 +692,14 @@
 
                 // // $('#supplierArray1').select2();
                 //             })
-                //             $.each(selectedSuppliers, function( ind1, value1 ) 
+                //             $.each(selectedSuppliers, function( ind1, value1 )
                 //             {
                 //                 // $('.one').prop('disabled', !$('.one').prop('disabled'));
                 //             // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
                 //             //     // globalThis.selectedSuppliers[i] .push(value);
                             // });
         }
-        
+
 
             //         function changeAddon(i)
             //         {
@@ -708,9 +708,9 @@
             //                 var eachSelected = $('#adoon_'+i).select2().val();
             //                 // globalThis.selectedSuppliers[i] = [];
             //                 $.each(eachSelected, function( ind, value ) {
-            //                     // globalThis.selectedSuppliers[i] .push(value); 
+            //                     // globalThis.selectedSuppliers[i] .push(value);
             //                     globalThis.selectedSuppliers .push(value);
-            //             //     // 
+            //             //     //
             //                 // alert( index + ": " + value );
             // //                 $("#adoon_1").find(':selected').attr('disabled','disabled');
             // // $("#adoon_1").trigger('change');
@@ -718,10 +718,10 @@
             // // $("#adoon_2").trigger('change');
             //                 });
                     // }
-      
+
         function getAddonCodeAndDropdown()
         {
-            var e = document.getElementById("addon_type"); 
+            var e = document.getElementById("addon_type");
             var value = e.value;
             currentAddonType = value;
             if(currentAddonType != '')
@@ -730,8 +730,8 @@
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
                     maximumSelectionLength: 1,
-                }); 
-                document.getElementById("AddonTypeError").classList.remove("paragraph-class"); 
+                });
+                document.getElementById("AddonTypeError").classList.remove("paragraph-class");
                 document.getElementById("AddonTypeError").textContent="";
                 document.getElementById("addon_type_required").textContent="";
                 // document.getElementById("addon_type_required").hidden = true;
@@ -744,22 +744,22 @@
                     // hideModelNumberDropdown(id,row);
                 }
                 if(value == 'SP' )
-                {                     
+                {
                     if(fixingCharge == 'no')
                     {
                         let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = true  
+                        showPartNumber.hidden = true
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = true
                         let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = false  
+                        showrowPartNumber.hidden = false
                         let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                         showrowPartNumberBr.hidden = false
                     }
                     else
                     {
                         let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = false  
+                        showPartNumber.hidden = false
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = false
                     }
@@ -767,11 +767,11 @@
                 else
                 {
                     let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = true  
+                    showPartNumber.hidden = true
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = true 
+                    showPartNumberBr.hidden = true
                     let showrowPartNumber = document.getElementById('rowPartNumber');
-                    showrowPartNumber.hidden = true  
+                    showrowPartNumber.hidden = true
                     let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                     showrowPartNumberBr.hidden = true
                 }
@@ -779,23 +779,23 @@
                 if(value == 'K')
                 {
                     hidenotKitSupplier();
-                    showkitSupplier();   
-                    setLeastPurchasePriceAED();              
+                    showkitSupplier();
+                    setLeastPurchasePriceAED();
                 }
                 else
                 {
                     hidekitSupplier();
-                    shownotKitSupplier(); 
-                    setLeastAEDPrice();         
+                    shownotKitSupplier();
+                    setLeastAEDPrice();
                 }
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
                     type: "POST",
-                    data: 
+                    data:
                     {
                         addon_type: value,
-                        _token: '{{csrf_token()}}' 
+                        _token: '{{csrf_token()}}'
                     },
                     dataType : 'json',
                     success: function(data)
@@ -810,7 +810,7 @@
                             let AddonDropdownData   = [];
                             $.each(data.addonMasters,function(key,value)
                             {
-                                AddonDropdownData.push 
+                                AddonDropdownData.push
                                 ({
                                     id: value.id,
                                     text: value.name
@@ -829,7 +829,7 @@
             }
             else
             {
-                $("#selectBrand1").attr('disabled','disabled'); 
+                $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
             }
         }
@@ -848,11 +848,11 @@
                 ({
                     url:"{{url('createMasterAddon')}}",
                     type: "POST",
-                    data: 
+                    data:
                     {
                         name: value,
                         addon_type: currentAddonType,
-                        _token: '{{csrf_token()}}' 
+                        _token: '{{csrf_token()}}'
                     },
                     dataType : 'json',
                     success: function(result)
@@ -860,9 +860,9 @@
                         $('.overlay').hide();
                         $('.modal').removeClass('modalshow');
                         $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");  
-                        $('#addon_id').val(result.id); 
-                        var selectedValues = new Array();       
+                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+                        $('#addon_id').val(result.id);
+                        var selectedValues = new Array();
                         resetSelectedSuppliers(selectedValues);
                         $('#addnewAddonButton').hide();
                         $('#new_addon_name').val("");
@@ -870,7 +870,7 @@
                     }
                 });
             }
-        });       
+        });
         function setPartNumber(partNum)
         {
             $('#part_number').val(partNum.value);
@@ -883,25 +883,25 @@
             $('.modal').addClass('modalhide');
         }
         function resetSelectedSuppliers(selectedValues)
-        {        
+        {
             $('#supplier_id').val(selectedValues);
-            $('#supplier_id').trigger('change'); 
+            $('#supplier_id').trigger('change');
         }
         function readURL(input)
         {
             var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
             var fileExtension = input.value.split('.').pop().toLowerCase();
             var isValidFile = false;
-            for(var index in allowedExtension) 
+            for(var index in allowedExtension)
             {
-                if(fileExtension === allowedExtension[index]) 
+                if(fileExtension === allowedExtension[index])
                 {
-                    isValidFile = true; 
+                    isValidFile = true;
                     break;
                 }
             }
-            if(!isValidFile) 
-            {               
+            if(!isValidFile)
+            {
                 $('#blah').hide();
                 document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
             }
@@ -912,7 +912,7 @@
                     document.getElementById("addonImageError").textContent='';
                     var reader = new FileReader();
                     reader.onload = function (e)
-                    {                      
+                    {
                         $('#blah').show();
                         $('#blah').css('visibility', 'visible');
                         $('#blah').attr('src', e.target.result);
@@ -926,22 +926,22 @@
             var e = document.getElementById("currency_"+i);
             var value = e.value;
             if(value == 'USD')
-            {             
+            {
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = true  
+                chooseCurrency.hidden = true
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = false  
+                currencyUSD.hidden = false
                 let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = false  
+                currencyAED.hidden = false
             }
             else
             {
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = false  
+                chooseCurrency.hidden = false
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = true  
+                currencyUSD.hidden = true
                 let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = true 
+                currencyAED.hidden = true
             }
         }
         function calculateAED(i)
@@ -995,7 +995,7 @@
                     const minOfPrice = Math.min(...arrayOfNumbers);
                     $("#purchase_price").val(minOfPrice);
                 }
-            } 
+            }
         }
         function showkitSupplier()
         {
@@ -1008,7 +1008,7 @@
             $('#notKitSupplier').hide();
         }
         function shownotKitSupplier()
-        { 
+        {
             $('#notKitSupplier').show();
         }
         function hidekitSupplier()

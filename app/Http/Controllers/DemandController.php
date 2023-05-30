@@ -48,9 +48,11 @@ class DemandController extends Controller
             $demand->supplier_id = $request->input('supplier_id');
             $demand->created_by = Auth::id();
             $demand->save();
+            return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully.');
+        }else{
+            return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand already existing.Update your Demands.');
         }
 
-        return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully');
     }
     public function edit(string $id)
     {
@@ -84,11 +86,22 @@ class DemandController extends Controller
         $monthlyDemands = MonthlyDemand::where('demand_id',$id)
             ->whereIn('month', $currentMonths)
             ->whereIn('year', $years)
+            ->where('demand_id', $id)
             ->get();
 
-        $models = MasterModel::all();
-        return view('demands.edit',
-            compact('demand','demandLists','models','months','monthlyDemands','totalYearlyQuantities'));
+        $addedModelIds = [];
+        foreach ($demandLists as $demandList) {
+            $model = MasterModel::where('model', $demandList->model)
+                ->where('sfx', $demandList->sfx)
+                ->first();
+            $addedModelIds[] = $model->id;
+        }
+
+        $models = MasterModel::whereNotIn('model',$addedModelIds)
+                            ->groupBy('model')->get();
+
+        return view('demands.edit', compact('demand','demandLists','models','months'
+            ,'monthlyDemands','totalYearlyQuantities'));
     }
     public function getSFX(Request $request)
     {
@@ -102,19 +115,28 @@ class DemandController extends Controller
         $data = MasterModel::where('model', $request->model);
             if ($request->module == 'LOI')
             {
-                $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
-                    ->get();
+                $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->get();
                 $addedModelIds = [];
                 foreach ($loiItems as $loiItem) {
                     $model = MasterModel::where('model', $loiItem->model)
-                        ->where('sfx', $loiItem->sfx)
-                        ->first();
+                        ->where('sfx', $loiItem->sfx)->first();
                     $addedModelIds[] = $model->id;
                 }
-                $data = $data->whereNotIn('id', $addedModelIds)
-                ->whereIn('id', $supplierInventoriesModels);
-            }
 
+                $data = $data->whereNotIn('id', $addedModelIds)
+                        ->whereIn('id', $supplierInventoriesModels);
+            }
+            if($request->module == 'Demand')
+            {
+                $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
+                $addedModelIds = [];
+                foreach ($demandLists as $demandList) {
+                    $model = MasterModel::where('model', $demandList->model)
+                        ->where('sfx', $demandList->sfx)->first();
+                    $addedModelIds[] = $model->id;
+                }
+                $data = $data->whereNotIn('id', $addedModelIds);
+            }
             $data = $data->pluck('sfx');
 
         return $data;

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class DemandListController extends Controller
 {
@@ -32,6 +33,9 @@ class DemandListController extends Controller
      */
     public function store(Request $request)
     {
+//       return $request->all();
+        info("reached");
+
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
@@ -59,7 +63,7 @@ class DemandListController extends Controller
 
         DB::commit();
 
-        return response($demadList, 200);
+        return redirect()->route('demands.edit',$request->demand_id)->with('message', 'Demand Item added successfully' );
 
     }
 
@@ -92,6 +96,21 @@ class DemandListController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try
+        {
+            $demandList = DemandList::find($id);
+            $monthlyDemands = MonthlyDemand::where('demand_list_id', $demandList->id)->get();
+            foreach ($monthlyDemands as $monthlyDemand) {
+                $monthlyDemand->delete();
+            }
+            $demandList->delete();
+            return response(true);
+        }
+        catch(Exception $e)
+        {
+            return $e->getMessage();
+        }
+
+
     }
 }
