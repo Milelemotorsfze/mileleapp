@@ -42,16 +42,25 @@
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    @if ($errors->has('source_name'))
+            <div id="error-message" class="alert alert-danger">
+                {{ $errors->first('source_name') }}
             </div>
         @endif
+
+        @if (session('error'))
+            <div id="error-message" class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div id="success-message" class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+<a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.simplefile') }}" text-align: right><i class="fa fa-download" aria-hidden="true"></i> Download Sample File</a>
+<br>
             <div class="row">
 			</div>  
 			<form action="{{route('calls.uploadingbulk')}}" method="post" enctype="multipart/form-data">
@@ -112,5 +121,14 @@
 $('#language').select2();
 $('#source').select2();
 $('#type').select2();
+        // Set timer for error message
+        setTimeout(function() {
+            $('#error-message').fadeOut('slow');
+        }, 2000);
+
+        // Set timer for success message
+        setTimeout(function() {
+            $('#success-message').fadeOut('slow');
+        }, 2000);
 </script>
 @endpush

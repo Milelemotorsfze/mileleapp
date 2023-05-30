@@ -237,7 +237,7 @@
                         }
                     });
                 }
-            })
+            }).set({title:"Delete Item"})
         });
         })
     </script>

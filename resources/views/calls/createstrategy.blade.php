@@ -1,4 +1,5 @@
 @extends('layouts.table')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
 .select2-container {
   width: 100% !important;
@@ -32,7 +33,7 @@ input[type=number]::-webkit-outer-spin-button {
 @can('Calls-modified')
 @if ($errors->has('start_date') || $errors->has('end_date'))
     <div id="error-message" class="alert alert-danger">
-        Please Enter Dates.
+        Please Enter the Correct Dates.
     </div>
 @endif
         @if (session('error'))
@@ -40,7 +41,6 @@ input[type=number]::-webkit-outer-spin-button {
                 {{ session('error') }}
             </div>
         @endif
-
         @if (session('success'))
             <div id="success-message" class="alert alert-success">
                 {{ session('success') }}
@@ -58,20 +58,20 @@ input[type=number]::-webkit-outer-spin-button {
                 <div class="row"> 
                     <div class="col-lg-3 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Name : </label>
-                        <input type="text" name="name" class="form-control" value="" placeholder = "Strategy Name" required>
+                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder = "Strategy Name" required>
                     </div>
                 <div class="col-lg-2 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Cost : </label>
-                        <input type="Number" name="cost" class="form-control" value="" placeholder = "Strategy Cost" required>
+                        <input type="Number" name="cost" class="form-control" value="{{ old('cost') }}" min="0" pattern="\d+" placeholder = "Strategy Cost" required>
                     </div>
                     <div class="col-lg-2 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Currency : </label>
-                        <select class="form-control" data-trigger name="currency">
-                                <option value="UED">UED</option>
-                                <option value="USD">USD</option>
-                                <option value="EURO">EURO</option>
-                            </select>
-                    </div>
+    <label for="basicpill-firstname-input" class="form-label">Currency:</label>
+    <select class="form-control" data-trigger name="currency">
+        <option value="AED" {{ old('currency') == 'AED' ? 'selected' : '' }}>AED</option>
+        <option value="USD" {{ old('currency') == 'USD' ? 'selected' : '' }}>USD</option>
+        <option value="EURO" {{ old('currency') == 'EURO' ? 'selected' : '' }}>EURO</option>
+    </select>
+</div>
                     <div class="col-lg-2 col-md-6">
     <label for="basicpill-firstname-input" class="form-label">Start Date:</label>
     <input type="date" name="start_date" class="form-control" value="" placeholder="Strategy Cost">
@@ -98,6 +98,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <th>End Date</th>
                     <th>Days</th>
                     <th>Status</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -111,7 +112,7 @@ input[type=number]::-webkit-outer-spin-button {
             @endphp
             @if ($numberOfDays == 0)
             @php
-             $numberOfDays = 1;
+             $numberOfDays = "Same Day";
            @endphp
             @endif
                         <td>{{ $strategy->name }}</td>
@@ -119,11 +120,25 @@ input[type=number]::-webkit-outer-spin-button {
                         <td>{{ $startDate->format('d-m-Y') }}</td>
                         <td>{{ $endDate->format('d-m-Y') }}</td>
                         <td>{{ $numberOfDays }}</td>
-                        @if(strtotime($endDate) > time())
-                        <td><label class="badge badge-soft-success">Active</label></td>
-                        @else
-                        <td><label class="badge badge-soft-danger">In Active</label></td>
-                        @endif
+                        @php
+    date_default_timezone_set('Asia/Dubai');
+    $currentDate = date('Y-m-d'); // Get the current date without time
+@endphp
+
+@if(strtotime($endDate) > strtotime($currentDate))
+    <td><label class="badge badge-soft-success">Active</label></td>
+@elseif(strtotime($endDate) == strtotime($currentDate))
+    <td><label class="badge badge-soft-Info">Active</label></td>
+@else
+    <td><label class="badge badge-soft-danger">In Active</label></td>
+@endif
+                        <td><a title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('strategy.show',$strategy->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        <a title="Delete"
+   data-placement="top"
+   class="btn btn-sm btn-danger"
+   onclick="deleteRow({{ $strategy->id }})">
+  <i class="fa fa-times" aria-hidden="true"></i>
+</a></td>
                     </tr>
 		          @endforeach
                 @endforeach
@@ -184,5 +199,24 @@ input[type=number]::-webkit-outer-spin-button {
     }
   });
 });
+function deleteRow(strategyId) {
+  // Show a confirmation dialog
+  if (confirm('Are you sure you want to delete this item?')) {
+    $.ajax({
+      url: '/strategy/' + strategyId,
+      type: 'DELETE',
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(response) {
+        // Reload the page after successful deletion
+        location.reload();
+      },
+      error: function(xhr, status, error) {
+        console.error(xhr.responseText);
+      }
+    });
+  }
+}
 </script>
 @endsection

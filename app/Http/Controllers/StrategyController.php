@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Strategy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +9,8 @@ use App\Models\LeadSource;
 use App\Http\Requests\StoreStrategyRequest;
 use App\Http\Requests\UpdateStrategyRequest;
 use Carbon\Carbon;
-
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 class StrategyController extends Controller
 {
     /**
@@ -36,13 +35,20 @@ class StrategyController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'start_date' => 'required',
-            'end_date' => $request->input('one_day_activity') === 'auto-assign' ? 'nullable' : 'required',
+            'end_date' => $request->input('one_day_activity') === 'auto-assign' ? 'nullable' : 'required|after:start_date',
         ], [
             'start_date.required' => 'Please enter your Current Date.',
             'end_date.required' => 'Please enter your Ending Date.',
-        ]);        
+            'end_date.after' => 'The Ending Date must be after the Current Date.',
+        ]);
+        
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }         
         $data = [
             'name' => $request->input('name'),
             'lead_source_id' => $request->input('lead_source_id'),
@@ -79,9 +85,12 @@ class StrategyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Strategy $strategy)
+    public function show($id)
     {
-        //
+        $strategies = Strategy::where('id', $id)->get();
+        $strategiesDates = StrategiesDates::whereIn('strategies_id', $strategies->pluck('id'))->get();
+    
+        return view('calls.editstrategy', compact('id','strategies', 'strategiesDates'));
     }
 
     /**
@@ -98,16 +107,57 @@ class StrategyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateStrategyRequest $request, Strategy $strategy)
-    {
-        //
+public function updaters(Request $request, $id)
+{
+    $validator = Validator::make($request->all(), [
+        'start_date' => 'required',
+        'end_date' => $request->input('one_day_activity') === 'auto-assign' ? 'nullable' : 'required|after:start_date',
+    ], [
+        'start_date.required' => 'Please enter the Current Date.',
+        'end_date.required' => 'Please enter the Ending Date.',
+        'end_date.after' => 'The Ending Date must be after the Current Date.',
+    ]);
+
+    if ($validator->fails()) {
+        return back()
+            ->withErrors($validator)
+            ->withInput();
     }
 
+    $strategy = Strategy::where('id', $id)->first(); // Assuming Strategy is the correct model class name
+
+    $strategy->name = $request->input('name');
+    $strategy->save();
+    $cost = $request->input('cost');
+    $currency = $request->input('currency');
+    $combinedValue = $cost . ' ' . $currency;
+
+    $start_date = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
+    $isOneDayActivity = $request->has('one_day_activity');
+
+    if ($isOneDayActivity) {
+        $end_date = $start_date;
+    } else {
+        $end_date = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
+    }
+
+    $strategiesDates = StrategiesDates::where('strategies_id', $id)->first();
+    if ($strategiesDates) {
+        $strategiesDates->cost = $combinedValue;
+        $strategiesDates->starting_date = $start_date;
+        $strategiesDates->ending_date = $end_date;
+        $strategiesDates->save();
+    } 
+    return redirect()->back()
+        ->with('success', 'Record Updated Successfully');
+}
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Strategy $strategy)
+    public function destroy($id)
     {
-        //
+        StrategiesDates::where('strategies_id', $id)->delete();
+        Strategy::findOrFail($id)->delete();
+        return response()->json(['message' => 'Strategy deleted successfully']);
     }
 }

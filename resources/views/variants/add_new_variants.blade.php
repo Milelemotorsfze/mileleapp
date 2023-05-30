@@ -16,14 +16,11 @@
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 .btn.btn-success.btncenter:hover {
   background-color: #0000ff;
   font-size: 17px;
   border-radius: 5px;
 }
-
-/* Responsive Styles */
 @media (max-width: 768px) {
   .btn.btn-success.btncenter {
     padding: 8px 16px;
@@ -31,7 +28,6 @@
     border-radius: 3px;
   }
 }
-
 @media (max-width: 576px) {
   .btn.btn-success.btncenter {
     padding: 6px 12px;
@@ -60,22 +56,42 @@
             </div>
         @endif
 <div class="card-header">
-        <h4 class="card-title">New Master Lead Source</h4>
+        <h4 class="card-title">New Variants With Colours</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
     <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div> 
-    <form action="{{ route('lead_source.store') }}" method="post" enctype="multipart/form-data"> 
-    @csrf
-                <div class="row"> 
-					<div class="col-lg-6 col-md-6">
-          <span class="error">*</span>
-                        <label for="basicpill-firstname-input" class="form-label">Source Name : </label>
-                        <input type="text" class="form-control" id="basicpill-firstname-input" name="source_name">
+                    <form action="{{ route('calls.storenewvarinats') }}" method="post" enctype="multipart/form-data"> 
+                    @csrf
+                    <div class="row"> 
+					<div class="col-lg-4 col-md-6">
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Variant Name : </label>
+                    <input type="text" class="form-control" id="basicpill-firstname-input" name="name">
                     </div>
-			        </div>  
+                    <div class="col-lg-4 col-md-6">
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Interior Colour:</label>
+                    <input type="text" placeholder="Interior Colour" name="int_colour" list="interiorColors" class="form-control" id="locationInput">
+                    <datalist id="interiorColors">
+                    @foreach ($interiorColors as $interiorColors)
+                    <option value="{{ $interiorColors }}" data-value="{{ $interiorColors }}">{{ $interiorColors }}</option>
+                    @endforeach
+                    </datalist>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Exterior Colour:</label>
+                    <input type="text" placeholder="Exterior Colour" name="ext_colour" list="exteriorColors" class="form-control" id="locationInput">
+                    <datalist id="exteriorColors">
+                    @foreach ($exteriorColors as $exteriorColors)
+                    <option value="{{ $exteriorColors }}" data-value="{{ $exteriorColors }}">{{ $exteriorColors }}</option>
+                    @endforeach
+                    </datalist>
+                    </div>
+                    </div>  
                     </br>
                     </br> 
 			        <div class="col-lg-12 col-md-12">
@@ -83,15 +99,11 @@
 			        </div>  
                     </form>
                     <br>
-       
     </div>
     <script>
-        // Set timer for error message
         setTimeout(function() {
             $('#error-message').fadeOut('slow');
         }, 2000);
-
-        // Set timer for success message
         setTimeout(function() {
             $('#success-message').fadeOut('slow');
         }, 2000);

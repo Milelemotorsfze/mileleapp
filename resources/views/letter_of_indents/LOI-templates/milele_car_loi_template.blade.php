@@ -4,12 +4,6 @@
         .content{
             font-family: arial, sans-serif;
         }
-        .center {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 50%;
-        }
         table {
             font-family: arial, sans-serif;
             border-collapse: collapse;
@@ -17,7 +11,10 @@
             /*background-color: #0a58ca;*/
 
         }
-
+        .overlay-image {
+            position: absolute;
+            z-index: 1;
+        }
         #so-details td {
             border: none;
             padding: 5px;
@@ -42,10 +39,6 @@
             background-color: #0f0f0f;
             padding: 10px;
         }
-        .img-div {
-            background-image: '{{ url("milele_seal.png") }}';
-            background-repeat: repeat-y;
-        }
 
     </style>
     <div class="row">
@@ -62,7 +55,7 @@
                     <table>
                         <tr>
                             <td>
-                                <img src="{{ url('bgm-min.png') }}" height="50px" width="100px" ><span class="logo-txt"></span>
+                                <img src="{{ url('bgm-min.png') }}" height="50px" width="300px" ><span class="logo-txt"></span>
                             </td>
                             <td style="text-align: end">
                                 <h1 style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
@@ -159,7 +152,7 @@
                             </tr>
                         @endfor
 
-                    <tr style="background-color: #FFFFFF";>
+                    <tr style="background-color: #FFFFFF">
                             <td style="border: none;">Name:
                                 <span style="margin-left: 10px">
                                  @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
@@ -175,14 +168,15 @@
                             <td style="border: none;text-align: end">SUBTOTAL</td>
                             <td class="hide" style="border: none" ></td>
                         </tr>
-                        <tr style="background-color: #FFFFFF">
+
+                        <tr style="background-color: #FFFFFF" id="date-div">
                             <td style="border: none">Date:
                                 <span style="margin-left: 10px">
                                     {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
                                 </span>
                             </td>
                             <td style="border: none">
-
+                                <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
                             </td>
                             <td style="border: none;text-align: end">SALES VAT</td>
                             <td class="hide" style="border: none" ></td>
@@ -201,7 +195,7 @@
                 </div>
                 <div class="row">
                     <div id="circle">
-                        <img src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
+
                     </div>
                 </div>
 
@@ -215,13 +209,16 @@
         </div>
     </div>
     </div>
-    <script type="text/javascript">
-        const values = ["200", "500", "300", "400", "100", "600"];
 
+    <script type="text/javascript">
+        var height = document.getElementById('so-items').offsetHeight;
+        const values = ["200", "500", "300", "400", "600"];
         const random = Math.floor(Math.random() * values.length);
         var pixel = values[random];
 
-        $('#circle').css('margin-left', pixel+'px')
+        var imagePosition = height - 350;
+        $('.overlay-image').css('left', pixel+'px');
+        $('.overlay-image').css('bottom', imagePosition )
 
     </script>
 @endsection

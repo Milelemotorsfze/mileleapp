@@ -11,6 +11,7 @@ use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Storage;
@@ -54,7 +55,7 @@ class LetterOfIndentController extends Controller
             ->where('status', LetterOfIndent::LOI_STATUS_NEW);
 
         $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
-            ->where('status',LetterOfIndent::LOI_STATUS_APPROVED);
+            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
         $rejectedLOIs =  LetterOfIndent::orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_REJECTED);
 
@@ -121,6 +122,7 @@ class LetterOfIndentController extends Controller
             $LOI->supplier_id = $request->supplier_id;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
+            $LOI->created_by = Auth::id();
             $LOI->save();
         }
 
@@ -199,6 +201,9 @@ class LetterOfIndentController extends Controller
     {
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndent->status = $request->status;
+        if($request->status = LetterOfIndent::LOI_STATUS_REJECTED) {
+            $letterOfIndent->review = $request->review;
+        }
         $letterOfIndent->save();
         return response($letterOfIndent, 200);
     }
@@ -218,8 +223,13 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::find($id);
         $countries = CountryListFacade::getList('en');
         $customers = Customer::all();
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
 
-        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent'));
+        return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','suppliers'));
     }
 
     /**

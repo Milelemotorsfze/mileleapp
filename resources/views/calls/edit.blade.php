@@ -269,14 +269,37 @@ $brand_name = $brand->brand_name;
         salesOptionValueField.value = manualAssignOption.value;
     });
     $(document).ready(function() {
-    var max_fields = 10;
-    var wrapper = $("#row-container");
-    var add_button = $(".add-row-btn");
-    var x = 1;
-    $(add_button).click(function(e) {
-        e.preventDefault();
-        if (x < max_fields) {
-            x++;
+  var max_fields = 10;
+  var wrapper = $("#row-container");
+  var add_button = $(".add-row-btn");
+  var x = 1;
+
+  // Function to filter and update the dropdown list
+  function updateDropdownList() {
+    var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+      return $(this).val();
+    }).get();
+
+    $('.new-select').each(function() {
+      var currentInput = $(this);
+      var datalistId = currentInput.attr('list');
+      var datalist = $('#' + datalistId);
+      var options = '';
+
+      $('#brandList option').each(function() {
+        if (selectedValues.indexOf($(this).val()) === -1) {
+          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+        }
+      });
+
+      datalist.html(options);
+    });
+  }
+
+  $(add_button).click(function(e) {
+    e.preventDefault();
+    if (x < max_fields) {
+      x++;
             var selectedValues = $('input[name="model_line_id[]"]').map(function() {
                 return $(this).val();
             }).get();
@@ -299,22 +322,25 @@ $brand_name = $brand->brand_name;
             newRow.append(col1);
             newRow.append(col2);
             $(wrapper).append(newRow);
-        }
-    });
+            updateDropdownList();
+    }
+  });
 
-    $(wrapper).on("click", ".remove-row-btn", function(e) { 
-        e.preventDefault();
-        $(this).closest('.row').remove();
-        x--;
-    });
+  $(wrapper).on("click", ".remove-row-btn", function(e) {
+    e.preventDefault();
+    $(this).closest('.row').remove();
+    x--;
+    updateDropdownList();
+  });
 
-    $(wrapper).on("input", "input[name='model_line_id[]']", function() {
-        var selectedBrandInput = $(this);
-        var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
-        var selectedOption = selectedBrandInput.val();
-        var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-        selectedBrandIdInput.val(selectedOptionId);
-    });
+  $(wrapper).on("input", "input[name='model_line_id[]']", function() {
+    var selectedBrandInput = $(this);
+    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
+    var selectedOption = selectedBrandInput.val();
+    var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
+    selectedBrandIdInput.val(selectedOptionId);
+    updateDropdownList();
+  });
 });
     $(document).ready(function() {
         $('#phone, #email').on('input', function() {
@@ -483,7 +509,7 @@ $brand_name = $brand->brand_name;
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
         initialCountry: "ae",
-        separateDialCode: true,
+        separateDialCode: false,
         nationalMode: true
     });
     input.addEventListener('input', function() {
@@ -493,7 +519,7 @@ $brand_name = $brand->brand_name;
             newValue = '+' + newValue;
         }
         if (newValue.length > 15) {
-            newValue = newValue.slice(5, 15); // Truncate to 15 digits
+            newValue = newValue.slice(0, 15); // Truncate to 15 digits
         }
         input.value = newValue;
     });

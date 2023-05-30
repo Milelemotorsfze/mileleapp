@@ -126,7 +126,7 @@
                 @csrf
                 @method('POST')
                 @if($letterOfIndentItems->count() > 0)
-                @foreach($letterOfIndentItems as $value => $letterOfIndentItem)
+                @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
                     <div class="d-flex">
                         <div class="col-lg-12">
                             <div class="row">
@@ -143,18 +143,18 @@
                                     <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
-                                    <input type="text" value="{{ $letterOfIndentItem->quantity - $letterOfIndentItem->approved_quantity }}"
+                                    <input type="text" value="{{ $letterOfIndentItem->balance_quantity }}"
                                            readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
-                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->inventory_quantity }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
-                                    <select  name="quantities[]" class="form-control">
-                                        @for($i=0;$i<= $letterOfIndentItem->balance_quantity;$i++  )
+                                    <select name="quantities[]" class="form-control approve-quantity"
+                                            data-item-id="{{ $letterOfIndentItem->id }}">
+                                        @for($i=0;$i<= $letterOfIndentItem->balance_quantity;$i++)
                                             <option> {{ $i }} </option>
                                         @endfor
-
                                     </select> </br>
                                 </div>
                             </div>
@@ -169,5 +169,28 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+    $('.approve-quantity').change(function () {
+
+        let id = $(this).attr('data-item-id');
+        let quantity = $(this).val();
+
+        let url = '{{ route('letter-of-indents.update-quantity') }}';
+        $.ajax({
+            type: "GET",
+            url: url,
+            dataType: "json",
+            data: {
+                id: id,
+                quantity: quantity,
+            },
+            success:function (data) {
+                location.reload();
+            }
+        });
+    })
+    </script>
+@endpush
 
 
