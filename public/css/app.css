@@ -1177,10 +1177,10 @@ body[data-layout-mode="dark"][data-layout-size="boxed"] {
 
 /*!
  * Waves v0.7.6
- * http://fian.my.id/Waves 
- * 
- * Copyright 2014-2018 Alfiana E. Sibuea and other contributors 
- * Released under the MIT license 
+ * http://fian.my.id/Waves
+ *
+ * Copyright 2014-2018 Alfiana E. Sibuea and other contributors
+ * Released under the MIT license
  * https://github.com/fians/Waves/blob/master/LICENSE */
 .waves-effect {
   position: relative;
@@ -3146,7 +3146,7 @@ body[data-layout-mode="dark"] .dropzone {
 body[data-layout-mode="dark"] .twitter-bs-wizard .twitter-bs-wizard-nav .nav-link::after {
   background-color: #3b403d; }
 
-/* 
+/*
 Datatable
 */
 div.dataTables_wrapper div.dataTables_filter {

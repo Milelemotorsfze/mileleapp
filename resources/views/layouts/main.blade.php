@@ -39,6 +39,9 @@
             right: 0;
             top: 0;
         }
+     .error {
+         color: #f32323;
+     }
 </style>
     </head>
     <body data-layout="horizontal">

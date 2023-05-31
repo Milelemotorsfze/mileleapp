@@ -4,14 +4,19 @@
         <h4 class="card-title">Add / Update Supplier Inventory Record</h4>
     </div>
     <div class="card-body">
-        @if(Session::has('message'))
-            <div class="alert alert-danger">
-                {{Session::get('message')}}
-                <button type="button" class="btn-close close"  aria-label="Close"></button>
-            </div>
-        @endif
-
-        <form action="{{ route('supplier-inventories.store') }}" method="POST" enctype="multipart/form-data">
+            @if (Session::has('error'))
+                <div class="alert alert-danger" >
+                    <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
+                    {{ Session::get('error') }}
+                </div>
+            @endif
+            @if (Session::has('message'))
+                <div class="alert alert-success" id="success-alert">
+                    <button type="button" class="btn-close p-0 close" data-dismiss="alert"> </button>
+                    {{ Session::get('message') }}
+                </div>
+            @endif
+        <form id="form-update" action="{{ route('supplier-inventories.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-lg-4 col-md-4">
@@ -48,7 +53,7 @@
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
                     <label for="choices-single-default" class="form-label font-size-13 text-muted">Choose File</label>
-                        <input type="file" name="file" class="form-control" >
+                        <input type="file" name="file" class="form-control text-dark" >
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-4">
@@ -63,10 +68,27 @@
             </div>
 
             <div class="col-12">
-                <button type="submit" class="btn btn-dark btncenter" > Upload </button>
+                <button type="submit" class="btn btn-dark btncenter"> Upload </button>
             </div>
-            </form>
         </form>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        $("#form-update").validate({
+            ignore: [],
+            rules: {
+                file: {
+                    required: true,
+                    extension: "csv|xlsx|xls"
+                }
+            },
+            messages: {
+                file: {
+                    extension: "Please upload valid excel file(eg: csv,xlsx,xls..)"
+                }
+            }
+        });
+    </script>
+@endpush
 

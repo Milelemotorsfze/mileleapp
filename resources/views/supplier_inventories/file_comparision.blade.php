@@ -31,7 +31,7 @@
         }
     </style>
     <div class="card-header">
-        <h4 class="card-title">File Comparision</h4>
+        <h4 class="card-title">Inventory File Comparision</h4>
     </div>
     <div class="card-body">
         @if(Session::has('message'))
@@ -39,16 +39,34 @@
                 {{Session::get('message')}}
             </div>
         @endif
-        <form action="{{ route('supplier-inventories.file-comparision-report') }}">
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br>
+                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form id="form-compare" action="{{ route('supplier-inventories.file-comparision-report') }}">
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Supplier</label>
-                        <select class="form-control" data-trigger name="supplier" id="supplier">
+                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
-                            <option value="TTC" {{ ( request()->supplier == 'TTC') ? 'selected' : '' }}>TTC</option>
-                            <option value="AMS" {{ ( request()->supplier == 'AMS') ? 'selected' : '' }}>AMS</option>
-                            <option value="CPS" {{ ( request()->supplier == 'CPS') ? 'selected' : '' }}>CPS</option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -70,22 +88,23 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">First File</label>
-                        <select class="form-control" data-trigger name="first_file" id="first-file">
-                            <option value="" >Select First File</option>
+                        <select class="form-control text-dark first" required data-trigger name="first_file" id="first-file">
+                            <option value="" disabled>First File</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Second File</label>
-                        <select class="form-control" name="second_file" id="second-file" >
-                            <option value="" >Select Second File</option>
+                        <select class="form-control text-dark" required  name="second_file" id="second-file" >
+                            <option value="" disabled>Second File</option>
+
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="col-4">
-                <button type="submit" class="btn btn-dark mt-4 compare-button"> Compare </button>
+            <div class="col-12">
+                <button type="submit" class="btn btn-dark mt-4 compare-button "> Compare </button>
                 <a href="{{ route('supplier-inventories.file-comparision') }}">
                     <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
                 </a>
@@ -180,12 +199,43 @@
 @endsection
 @push('scripts')
     <script>
-        getDates();
-        getSelectedDates();
+
         $('#supplier').select2();
         $('#wholesaler').select2();
-        // getDates();
+        getDates();
+        jQuery.validator.addMethod("greaterStart", function (value, element, params) {
+            var startDate = $('#first-file').val();
+            var endDate = $('#second-file').val();
 
+           if( startDate >= endDate) {
+               return false;
+           }else{
+               return true;
+           }
+        },'Must be greater than first file date.');
+
+        $("#form-compare").validate({
+
+            ignore: [],
+            rules: {
+                first_file: {
+                    required: true,
+
+                },
+                second_file: {
+                    required: true,
+                    // greaterStart: true
+                },
+            },
+            errorPlacement: function(error, element) {
+                if (element.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + element.attr("id") + "-container").parent();
+                    error.insertAfter(element).addClass('mt-2 text-danger');
+                }else {
+                    error.insertAfter(element).addClass('text-danger');
+                }
+            }
+        });
         $('#supplier').change(function () {
             $('select[name="first_file"]').empty();
             $('select[name="second_file"]').empty();
@@ -197,12 +247,6 @@
              getDates();
         })
 
-        function getSelectedDates() {
-            let first = '{{ request()->first_file }}';
-            let second = '{{ request()->second_file }}';
-            $("#first-file option[value='" + first + "']").prop("selected",true);
-            $("#second-file option[value='" + second + "']").prop("selected",true);
-        }
 
         function getDates() {
             let supplier = $('#supplier').val();
@@ -214,14 +258,34 @@
                 url: url,
                 dataType: "json",
                 data: {
-                    supplier: supplier,
+                    supplier_id: supplier,
                     wholesaler: wholesaler
                 },
                 success:function (data) {
+                    let first = '{{ request()->first_file }}';
+                    let second = '{{ request()->second_file }}';
+                    if(first) {
+                        $('#first-file').append($('<option>', {
+                            value: first,
+                            text: first
+                        }));
+                        // $("#first-file option[value='" + first + "']").attr("selected","selected");
+                    }else{
+                        $('select[name="first_file"]').html('<option value="" > Select First File </option>');
+                    }
+                    if(second) {
+                        $('#second-file').append($('<option>', {
+                            value: second,
+                            text: second
+                        }));
+                    }else{
+                        $('select[name="second_file"]').html('<option value="" > Select Second File </option>');
+
+                    }
                     jQuery.each(data, function(key,value){
-                        getSelectedDates();
+                        // getSelectedDates();
                         var key = key + 1;
-                        $('select[name="first_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
+                        $('select[name="first_file"]').append('<option value="'+ value +'" > File '+ key +'(' + value + ')'+'</option>');
                         $('select[name="second_file"]').append('<option value="'+ value +'"> File '+ key +'(' + value + ')'+'</option>');
                     });
                 }

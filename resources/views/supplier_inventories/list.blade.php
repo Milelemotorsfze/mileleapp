@@ -6,19 +6,30 @@
         </h4>
     </div>
     <div class="card-body">
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br>
+                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <form action="{{route('supplier-inventories.lists')}}" >
             <div class="row">
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Start Date</label>
-                        <input type="date" id="datepicker" name="start_date" value="{{ old('start_date',$startDate) }}"
+                        <input type="date" id="datepicker" required name="start_date" value="{{ old('start_date',$startDate) }}"
                                class="form-control" />
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">End Date</label>
-                        <input type="date" id="datepicker" value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
+                        <input type="date" id="datepicker" required value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -95,4 +106,9 @@
     </div>
 
 @endsection
+@push('scripts')
+    <script>
+
+    </script>
+@endpush
 

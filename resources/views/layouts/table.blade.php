@@ -89,6 +89,7 @@
             $('.close').on('click', function(){
                 $('.modal').addClass('modalhide');
                 $('.modal').removeClass('modalshow');
+                $('.alert').hide();
 
             });
                     // div colour

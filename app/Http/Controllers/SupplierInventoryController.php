@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\SupplierInventoryImport;
 use App\Models\ColorCode;
 use App\Models\MasterModel;
 use App\Models\Supplier;
@@ -9,7 +10,8 @@ use App\Models\SupplierInventory;
 use Barryvdh\DomPDF\Facade\PDF;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class SupplierInventoryController extends Controller
 {
@@ -35,22 +37,48 @@ class SupplierInventoryController extends Controller
         return view('supplier_inventories.edit', compact('suppliers'));
 
     }
+
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|max:102400',
             'whole_sales' => 'required',
             'supplier_id' =>' required',
+//            'file' => 'required|mimes:xlsx,xls,csv|max:102400',
         ]);
 
-        if ($request->file('file')) {
+        if ($request->file('file'))
+        {
+            $errors = [];
+            $numberOfFields = 9;
             $file = $request->file('file');
             $fileName = time().'.'.$file->getClientOriginalExtension();
             $destinationPath = "inventory";
             $file->move($destinationPath,$fileName);
+           // file validations
+            $path = public_path("inventory/".$fileName);
+            $fileColumns = Excel::toArray([], $path)[0][0];
+            $columnCount = count($fileColumns);
+            if($columnCount != $numberOfFields) {
+                return redirect()->back()->with(['error' => 'Invalid Column Count found!.']);
+            }
+
+//            try {
+//                $import = new SupplierInventoryImport();
+//                $import->import($path);
+//            } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+//                $failures = $e->failures();
+//
+//                foreach ($failures as $failure) {
+//                    $failure->row(); // row that went wrong
+//                    $failure->attribute(); // either heading key (if using heading row concern) or column index
+//                    $failure->errors(); // Actual error messages from Laravel validator
+//                    $failure->values(); // The values of the row that has failed.
+//                }
+//            }
+
             $file = fopen("inventory/".$fileName, "r");
             $i = 0;
-            $numberOfFields = 9;
+
             $uploadFileContents = [];
             $code_nameex = NULL;
             $extcolour = NULL;
@@ -108,7 +136,7 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
-                        $filedata[8] = Carbon::createFromFormat('d/m/Y', $filedata[8])->format('Y-m-d');
+                        $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
                     }else {
                         $filedata[8] = NULL;
                     }
@@ -529,17 +557,34 @@ class SupplierInventoryController extends Controller
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
 
-        return view('supplier_inventories.file_comparision',compact(
+        return view('supplier_inventories.file_comparision',compact('suppliers',
             'newlyAddedRows', 'deletedRows','updatedRows'));
     }
     public function FileComparisionReport(Request $request)
     {
-        if ($request->first_file > $request->second_file)
-        {
-            return redirect()->route('supplier-inventories.file-comparision-report')
-                ->with('message','The Second file date should be greater than First File Date');
-        }
+//        $request->validate([
+//            'first_file' => 'date',
+//            'second_file' =>' date|after:first_file',
+//        ]);
+
+
+//        if ($request->first_file > $request->second_file)
+//        {
+//            return redirect()->route('supplier-inventories.file-comparision-report')
+//                ->with('error','The Second file date should be greater than First File Date');
+//        }
+
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->get();
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
@@ -898,9 +943,15 @@ class SupplierInventoryController extends Controller
             $j++;
         }
         return view('supplier_inventories.file_comparision',compact('newlyAddedRows',
-            'deletedRows','updatedRows'));
+            'deletedRows','updatedRows','suppliers'));
     }
     public function lists(Request $request) {
+
+        $request->validate([
+            'start_date' => 'date',
+            'end_date' =>' date|after:start_date',
+        ]);
+
         $startDate = '';
         $endDate = ' ';
         $supplierInventories = SupplierInventory::with('masterModel')
@@ -923,7 +974,7 @@ class SupplierInventoryController extends Controller
 
     public function getDate(Request $request)
     {
-        $supplierInventoryDates = SupplierInventory::where('supplier', $request->supplier)
+        $supplierInventoryDates = SupplierInventory::where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->wholesaler)
             ->groupBy('date_of_entry')
             ->pluck('date_of_entry');
