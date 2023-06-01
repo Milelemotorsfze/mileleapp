@@ -8,7 +8,8 @@
         /*}*/
         table {
             font-family: arial, sans-serif;
-            border-collapse: collapse;
+            /*border-collapse: collapse;*/
+
             width: 100%;
         }
         #vehicle-details td, th{
@@ -22,28 +23,38 @@
 
         }
         .bg-light-grey{
-            background-color: #aeb3bb;
+            background-color: #ababaf;
+            color: #ababaf;
         }
         p {
           margin-bottom: 0px;
          }
+        .overlay-image {
+            position: absolute;
+            z-index: 1;
+        }
 
     </style>
 <div class="row">
-    <div class="container">
+    <div class="container" id="full-page">
+        <form action="{{ route('letter-of-indents.generate-loi') }}">
+            <input type="hidden" name="height" id="total-height" value="">
+            <input type="hidden" name="width" id="width" value="">
+            <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
+            <input type="hidden" name="download" value="1">
         <div class="text-end mt-3">
-            <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">
-                <button type="button" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
-            </a></button>
-            </a>
+{{--            <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}
+                <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
+
         </div>
+        </form>
         <img src="{{  url('trans_car_logo.png') }}"  alt="logo" style="width: 100px;height: 100px; margin-left: auto;display: block;
             margin-right: auto;">
         </span>
         <h4 class="fw-bold text-center pt-3">TRANSCARS</h4>
         <p class="text-center ">Convention Center, JAFZA, Dubai, United Arab Emirates </p>
         <p class="text-center">Email: qeneral@transcars.net</p>
-        <p class="text-center ">Website: www.transcars.n</p>
+        <p class="text-center ">Website: www.transcars.net</p>
         <h4 class="fw-bold text-center ">QUOTATION </h4>
         <p class="fw-bold text-center">VAT TRN NO. 100057598400003</p>
         <br>
@@ -52,24 +63,24 @@
                 <tr>
                     <td class="fw-bold">CUSTOMER:</td>
                     <td class="fw-bold">{{ strtoupper($letterOfIndent->customer->name) }}</td>
-                    <td>QUOTATION NUMBER: </td>
-                    <td><span class="bg-secondary text-secondary">53426725967498</span></td>
+                    <td class="fw-bold">QUOTATION NUMBER: </td>
+                    <td><span class="bg-light-grey ">53426725967498</span></td>
                 </tr>
                 <tr>
                     <td>Alias: </td>
-                    <td ><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                    <td ><span class="bg-light-grey ">53426725967498vfdfvdvdvfvd</span></td>
                     <td>Date: </td>
                     <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}}</td>
                 </tr>
                 <tr>
                     <td>Contact</td>
-                    <td><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                    <td><span class="bg-light-grey ">53426725967498vfdfvdvdvfvd</span></td>
                     <td>Salesperson:</td>
-                    <td><span class="bg-secondary text-secondary">53426725967498</span></td>
+                    <td><span class="bg-light-grey">53426725967498</span></td>
                 </tr>
                 <tr>
                     <td>Address</td>
-                    <td><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                    <td><span class="bg-light-grey">53426725967498vfdfvdvdvfvd</span></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -83,11 +94,11 @@
             <br>
         </div>
         <table id="vehicle-details" >
-            <tr class="bg-light-grey">
+            <tr class="bg-light-grey text-dark fw-bold"">
                 <td colspan="5">1. GENERAL INFORMATION</td>
             </tr>
-            <tr class="bg-light-grey">
-                <th>SL</th>
+            <tr class="bg-light-grey text-dark fw-bold"">
+                <th width="50px">SL</th>
                 <th>1A. VEHICLE</th>
                 <th>QTY</th>
                 <th>PRICE </th>
@@ -95,20 +106,20 @@
             </tr>
 
             @foreach($letterOfIndentItems as $key => $letterOfIndentItem)
-                <tr>
-                    <td>{{ $key + 1 }}</td>
+                <tr >
+                    <td >{{ $key + 1 }}</td>
                     <td>
                         <p> {{ $letterOfIndentItem->variant_name }} {{ $letterOfIndentItem->Variant->engine_type ?? ''}} {{ $letterOfIndentItem->steering }}</p>
                         <p>Make: {{$letterOfIndentItem->Variant->brand->brand_name ?? ''}}</p>
                         <p>Model: </p>
                     </td>
                     <td >{{$letterOfIndentItem->quantity}}</td>
-                    <td class="bg-secondary "></td>
-                    <td class="bg-secondary "></td>
+                    <td class="bg-light-grey " ></td>
+                    <td class="bg-light-grey "></td>
                 </tr>
             @endforeach
-            <tr class="bg-light-grey">
-                <td colspan="5" >1B. LOGISTICS </td>
+            <tr class="bg-light-grey text-dark fw-bold"">
+                <td colspan="5"  >1B. LOGISTICS </td>
             </tr>
             <tr>
                 <td> </td>
@@ -118,23 +129,21 @@
                 <td></td>
             </tr>
             <tr>
-                <td>
-                    <p class="fw-bold">ROSS TOTAL (USD) </p>
+                <td colspan="2">
+                    <p class="fw-bold">GROSS TOTAL (USD) </p>
                     <p class="fw-bold">DISCOUNT APPLIED </p>
                     <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                     <p>NET TOTAL VALUE (USD) TOTAL </p>
                     <p>INVOICE VALUE (AED) </p>
+                    <img src="{{ url('milele_seal.png') }}" class="overlay-image" style="height: 125px;width: 150px">
                 </td>
-                <td> </td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td class="bg-light-grey"> </td>
+                <td class="bg-light-grey"></td>
+                <td class="bg-light-grey"></td>
             </tr>
         </table>
     </div>
-    <div class="row">
 
-    </div>
     <div class="pb-2 ">
         <div style="text-align: center;bottom: 0">
             Note: If you have queries or concerns please feel free to contact us on the information provided above.
@@ -142,6 +151,19 @@
         </div>
     </div>
 </div>
+    <script type="text/javascript">
+        var height = document.getElementById('full-page').offsetHeight;
+        const values = ["500", "300", "400"];
+        const random = Math.floor(Math.random() * values.length);
+        var imageWidth = values[random];
+
+        var imageHeight = height - 200;
+        $('#total-height').val(imageHeight);
+        $('#width').val(imageWidth);
+        $('.overlay-image').css('left', imageWidth+'px');
+        $('.overlay-image').css('top', imageHeight+'px' )
+
+    </script>
 @endsection
 
 

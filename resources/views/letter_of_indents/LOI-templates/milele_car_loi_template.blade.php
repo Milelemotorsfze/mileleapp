@@ -1,6 +1,7 @@
 @extends('layouts.main')
 @section('content')
     <style>
+        /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
         }
@@ -41,16 +42,22 @@
         }
 
     </style>
-    <div class="row">
+    <div class="row" id="full-page">
+        <div class="container" style="padding-bottom: 0px;">
+            <div class="content" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
+                <form action="{{ route('letter-of-indents.generate-loi') }}">
+                    <input type="hidden" name="height" id="total-height" value="">
+                    <input type="hidden" name="width" id="width" value="">
+                    <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
+                    <input type="hidden" name="download" value="1">
 
-        <div class="container" style="padding-bottom: 0px">
-            <div class="content img-div" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
-                <div class="text-end mb-3">
-                    <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">
-                        <button type="button" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
-                    </a></button>
-                    </a>
-                </div>
+                    <div class="text-end mb-3">
+    {{--                    <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}
+                            <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
+    {{--                    </a>--}}
+                        </button>
+                    </div>
+                </form>
                 <div class="header">
                     <table>
                         <tr>
@@ -136,8 +143,8 @@
                             <td class="hide"></td>
                         </tr>
                         <?php
-                            if($letterOfIndentItems->count() >= 6) {
-                                $count = 2;
+                            if($letterOfIndentItems->count() >= 2) {
+                                $count = 0;
                             }else
                             {
                                 $count = 4;
@@ -151,51 +158,48 @@
                                 <td class="hide"></td>
                             </tr>
                         @endfor
+                             <tr id="footer-table" style="background-color: #FFFFFF">
+                                    <td style="border: none;">Name:
+                                        <span style="margin-left: 10px">
+                                         @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
+                                                {{ $letterOfIndent->customer->name }}
+                                            @else
+                                                {{ $letterOfIndent->customer->company ?? ''}}
+                                            @endif
+                                    </span>
+                                    </td>
+                                    <td style="border: none">
 
-                    <tr style="background-color: #FFFFFF">
-                            <td style="border: none;">Name:
-                                <span style="margin-left: 10px">
-                                 @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                                            {{ $letterOfIndent->customer->name }}
-                                 @else
-                                    {{ $letterOfIndent->customer->company ?? ''}}
-                                 @endif
-                            </span>
-                            </td>
-                            <td style="border: none">
+                                    </td>
+                                    <td style="border: none;text-align: end">SUBTOTAL</td>
+                                    <td class="hide" style="border: none" ></td>
+                                </tr >
+                             <tr style="background-color: #FFFFFF" id="date-div">
+                                    <td style="border: none">Date:
+                                        <span style="margin-left: 10px">
+                                            {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
+                                        </span>
+                                    </td>
+                                    <td style="border: none">
+                                        <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
+                                    </td>
+                                    <td style="border: none;text-align: end">SALES VAT</td>
+                                    <td class="hide" style="border: none" ></td>
+                                </tr>
+                             <tr style="background-color: #FFFFFF">
+                                    <td style="border: none">Signature :
+                                        <img src="{{ url('sign.jpg') }}" style="height: 50px;width: 70px"></img>
+                                    </td>
+                                    <td style="border: none">
 
-                            </td>
-                            <td style="border: none;text-align: end">SUBTOTAL</td>
-                            <td class="hide" style="border: none" ></td>
-                        </tr>
-
-                        <tr style="background-color: #FFFFFF" id="date-div">
-                            <td style="border: none">Date:
-                                <span style="margin-left: 10px">
-                                    {{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y') }}
-                                </span>
-                            </td>
-                            <td style="border: none">
-                                <img class="overlay-image" src="{{ url('milele_seal.png') }}" style="width: 170px; height: 150px;"></img>
-                            </td>
-                            <td style="border: none;text-align: end">SALES VAT</td>
-                            <td class="hide" style="border: none" ></td>
-                        </tr>
-                        <tr style="background-color: #FFFFFF">
-                            <td style="border: none">Signature :
-                                <img src="{{ url('sign.jpg') }}" style="height: 50px;width: 70px"></img>
-                            </td>
-                            <td style="border: none">
-
-                            </td>
-                            <td style="border: none;text-align: end">TOTAL</td>
-                            <td style="background-color: #0f0f0f;border: none" ></td>
-                        </tr>
+                                    </td>
+                                    <td style="border: none;text-align: end">TOTAL</td>
+                                    <td style="background-color: #0f0f0f;border: none" ></td>
+                                </tr>
                     </table>
                 </div>
                 <div class="row">
                     <div id="circle">
-
                     </div>
                 </div>
 
@@ -207,18 +211,24 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
     </div>
 
     <script type="text/javascript">
-        var height = document.getElementById('so-items').offsetHeight;
-        const values = ["200", "500", "300", "400", "600"];
-        const random = Math.floor(Math.random() * values.length);
-        var pixel = values[random];
+        var height = document.getElementById('full-page').offsetHeight;
+        var tableFooterHeight = document.getElementById('footer-table').offsetHeight;
 
-        var imagePosition = height - 350;
-        $('.overlay-image').css('left', pixel+'px');
-        $('.overlay-image').css('bottom', imagePosition )
+        const values = ["200", "500", "300", "400"];
+        const random = Math.floor(Math.random() * values.length);
+        var imageWidth = values[random];
+
+        var headerHeight = (6 * tableFooterHeight);
+
+        var imageHeight = height - headerHeight;
+        $('#total-height').val(imageHeight - 100);
+        $('#width').val(imageWidth);
+        $('.overlay-image').css('left', imageWidth+'px');
+        $('.overlay-image').css('top', imageHeight+'px' )
 
     </script>
 @endsection

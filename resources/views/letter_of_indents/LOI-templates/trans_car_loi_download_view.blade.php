@@ -24,12 +24,18 @@
 
         }
         .bg-light-grey{
-            background-color: #aeb3bb;
+            background-color: #ababaf;
+            color: #ababaf;
         }
         p {
             margin-bottom: 0px;
         }
-
+        .overlay-image {
+            position: absolute;
+            top: {{ $height }}px;
+            left: 200px;
+            z-index: 1;
+        }
 
     </style>
 </head>
@@ -50,24 +56,24 @@
             <tr>
                 <td class="fw-bold">CUSTOMER:</td>
                 <td class="fw-bold">{{ strtoupper($letterOfIndent->customer->name) }}</td>
-                <td>QUOTATION NUMBER: </td>
-                <td><span class="bg-secondary text-secondary">53426725967498</span></td>
+                <td class="fw-bold">QUOTATION NUMBER: </td>
+                <td><span class="bg-light-grey">53426725967498</span></td>
             </tr>
             <tr>
                 <td>Alias: </td>
-                <td ><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                <td ><span class="bg-light-grey">53426725967498vfdfvdvdvfvd</span></td>
                 <td>Date: </td>
                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}}</td>
             </tr>
             <tr>
                 <td>Contact</td>
-                <td><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                <td><span class="bg-light-grey">53426725967498vfdfvdvdvfvd</span></td>
                 <td>Salesperson:</td>
-                <td><span class="bg-secondary text-secondary">53426725967498</span></td>
+                <td><span class="bg-light-grey">53426725967498</span></td>
             </tr>
             <tr>
                 <td>Address</td>
-                <td><span class="bg-secondary text-secondary">53426725967498vfdfvdvdvfvd</span></td>
+                <td><span class="bg-light-grey">53426725967498vfdfvdvdvfvd</span></td>
                 <td></td>
                 <td></td>
             </tr>
@@ -82,11 +88,11 @@
     </div>
 
     <table id="vehicle-details" >
-        <tr class="bg-light-grey">
+        <tr class="bg-light-grey text-dark fw-bold">
             <td colspan="5">1. GENERAL INFORMATION</td>
         </tr>
-        <tr class="bg-light-grey">
-            <th>SL</th>
+        <tr class="bg-light-grey text-dark fw-bold">
+            <th width="50px">SL</th>
             <th>1A. VEHICLE</th>
             <th>QTY</th>
             <th>PRICE </th>
@@ -101,12 +107,12 @@
                     <p>Make: {{$letterOfIndentItem->Variant->brand->brand_name ?? ''}}</p>
                     <p>Model: </p>
                 </td>
-                <td >{{$letterOfIndentItem->quantity}}</td>
-                <td class="bg-secondary "></td>
-                <td class="bg-secondary "></td>
+                <td>{{$letterOfIndentItem->quantity}}</td>
+                <td class="bg-light-grey"></td>
+                <td class="bg-light-grey"></td>
             </tr>
         @endforeach
-        <tr class="bg-light-grey">
+        <tr class="bg-light-grey text-dark fw-bold">
             <td colspan="5" >1B. LOGISTICS </td>
         </tr>
         <tr>
@@ -117,17 +123,18 @@
             <td></td>
         </tr>
         <tr>
-            <td>
-                <p class="fw-bold">ROSS TOTAL (USD) </p>
+            <td colspan="2">
+                <p class="fw-bold">GROSS TOTAL (USD) </p>
                 <p class="fw-bold">DISCOUNT APPLIED </p>
                 <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                 <p>NET TOTAL VALUE (USD) TOTAL </p>
                 <p>INVOICE VALUE (AED) </p>
+                <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="height: 125px;width: 150px">
             </td>
-            <td> </td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td class="bg-light-grey"> </td>
+            <td class="bg-light-grey"></td>
+            <td class="bg-light-grey"></td>
+
         </tr>
     </table>
     <div class="row">
@@ -139,5 +146,6 @@
 </div>
 </body>
 </html>
+
 
 

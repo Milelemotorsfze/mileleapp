@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Demand;
+use App\Models\DemandList;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
@@ -140,17 +142,27 @@ class LetterOfIndentController extends Controller
     {
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
-//        return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        if ($letterOfIndent->dealers == 'Trans Car') {
+
+        if ($letterOfIndent->dealers == 'Trans Cars') {
+            $height = $request->height;
+            $width = $request->width;
+            info($height);
+            info($width);
+
             if($request->download == 1) {
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view', compact('letterOfIndent','letterOfIndentItems'));
-                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
+                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else{
             if($request->download == 1) {
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view', compact('letterOfIndent','letterOfIndentItems'));
-               return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                $height = $request->height;
+                $width = $request->width;
+
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
+                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+               return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }

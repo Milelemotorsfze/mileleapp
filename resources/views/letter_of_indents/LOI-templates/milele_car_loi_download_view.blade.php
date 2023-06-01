@@ -21,7 +21,8 @@
         }
         .overlay-image {
             position: absolute;
-            top: 620px;
+            top: {{ $height }}px;
+            left: {{ $width }}px;
             z-index: 1;
         }
         #so-details td {
@@ -51,13 +52,13 @@
 
 </head>
 <body>
-<div class="row">
+<div class="row" id="fullpage">
     <div class="content">
         <div class="header">
             <table>
                 <tr>
                     <td>
-{{--                        <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>--}}
+                        <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>
                     </td>
                     {{--                <td style="color: #FFFFFF">--}}
                     {{--                    <h1 style="margin-bottom: 1px;font-size: 38px">Milele Motors</h1>--}}
@@ -121,8 +122,8 @@
             <tr class="hide" style="color: #FFFFFF">
                 <th>QUANTITY</th>
                 <th>DESCRIPTION</th>
-                <th>UNIT PRICE</th>
-                <th>LINE TOTAL </th>
+                <th width="100px">UNIT PRICE</th>
+                <th width="100px">LINE TOTAL </th>
             </tr>
             @foreach($letterOfIndentItems as $letterOfIndentItem)
                 <tr>
@@ -141,8 +142,17 @@
                 <td class="hide"></td>
                 <td class="hide"></td>
             </tr>
+            <?php
+            if($letterOfIndentItems->count() >= 2) {
+                $count = 0;
+            }else
+            {
+                $count = 4;
+            }
+            ?>
+{{--            {{ $count }}fhtyty--}}
 
-            @for($i=0;$i<=2;$i++)
+            @for($i=0;$i<$count;$i++)
                 <tr>
                     <td></td>
                     <td></td>
@@ -193,6 +203,7 @@
 </br>
 </br>
 
+
 {{--    <div class="row">--}}
 <div style="text-align: center;position: absolute;bottom: 0;padding-left: 100px;margin-left: 200px">
     Make all checks payable to Milele Motors FZCO
@@ -200,21 +211,19 @@
 </div>
 {{--    </div>--}}
 </div>
-
 </body>
 </html>
 
-<script>
-    let d = new Date();
-    alert("Today's date is " + d);
-    var height = document.getElementById('so-items').offsetHeight;
-    const values = ["200", "500", "300", "400", "600"];
-    const random = Math.floor(Math.random() * values.length);
-    var pixel = values[random];
+{{--<script type="text/javascript">--}}
 
-    var imagePosition = 620;
+{{--    var height = document.getElementById('so-items').offsetHeight;--}}
+{{--    const values = ["200", "500", "300", "400", "600"];--}}
+{{--    const random = Math.floor(Math.random() * values.length);--}}
+{{--    var pixel = values[random];--}}
 
-    $('.overlay-image').css('left', pixel+'px');
-    $('.overlay-image').css('top', imagePosition+'px' )
-</script>
+{{--    var imagePosition = 500;--}}
+
+{{--    $('.overlay-image').css('left', pixel+'px');--}}
+{{--    // $('.overlay-image').css('top', imagePosition+'px' )--}}
+{{--</script>--}}
 
