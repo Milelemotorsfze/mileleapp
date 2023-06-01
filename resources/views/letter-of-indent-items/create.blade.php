@@ -159,13 +159,15 @@
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-2">
-                                <input type="number" name="quantity" class="form-control">
+                                <input type="number" name="quantity" class="form-control" step="1" oninput="validity.valid||(value='');"
+                                min="0" >
                             </div>
                             <div class="col-lg-1 col-md-1">
                                 <label class="form-label">Inventory Qty</label>
                             </div>
                             <div class="col-lg-1 col-md-1">
-                                <input type="number"  readonly id="inventory-quantity" value="" class="form-control">
+                                <input type="number"  readonly id="inventory-quantity"
+                                       value="" class="form-control">
                             </div>
 
                             <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">

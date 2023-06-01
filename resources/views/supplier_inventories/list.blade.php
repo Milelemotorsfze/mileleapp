@@ -17,19 +17,19 @@
                 </ul>
             </div>
         @endif
-        <form action="{{route('supplier-inventories.lists')}}" >
+        <form id="form-list" action="{{route('supplier-inventories.lists')}}" >
             <div class="row">
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Start Date</label>
-                        <input type="date" id="datepicker" required name="start_date" value="{{ old('start_date',$startDate) }}"
+                        <input type="date" id="start-date" name="start_date" value="{{ old('start_date',$startDate) }}"
                                class="form-control" />
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">End Date</label>
-                        <input type="date" id="datepicker" required value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
+                        <input type="date" id="end-date" value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -108,7 +108,30 @@
 @endsection
 @push('scripts')
     <script>
+        jQuery.validator.addMethod("greaterStart", function (value, element, params) {
+            var startDate = $('#start-date').val();
+            var endDate = $('#end-date').val();
 
+            if( startDate >= endDate) {
+                return false;
+            }else{
+                return true;
+            }
+        },'Must be greater than start date.');
+
+        $("#form-list").validate({
+            ignore: [],
+            rules: {
+                start_date: {
+                    required: true,
+
+                },
+                end_date: {
+                    required: true,
+                    greaterStart: true
+                },
+            },
+        });
     </script>
 @endpush
 

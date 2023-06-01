@@ -1,5 +1,10 @@
 <!doctype html>
 <html lang="en">
+<style>
+    .error {
+        color: #f32323;
+    }
+</style>
     <head>
     @include('partials/head-css')
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -30,6 +35,7 @@
         </div>
         @include('partials/right-sidebar')
         @include('partials/vendor-scripts')
+        @stack('scripts')
         <script src="{{ asset('libs/table-edits/build/table-edits.min.js')}}"></script>
         <script src="{{ asset('js/pages/table-editable.int.js')}}"></script>
         <script src="{{ asset('js/app.js')}}"></script>

@@ -129,7 +129,8 @@
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-2">
-                                <input type="number" name="quantity" class="form-control">
+                                <input type="number" name="quantity" class="form-control" step="1" oninput="validity.valid||(value='');"
+                                       min="0">
                             </div>
                             <div class="col-lg-1 col-md-1">
                                 <label class="form-label">Inventory Qty</label>

@@ -70,10 +70,10 @@
                                     <label  class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-3 col-md-3">
-                                    <label class="form-label">Varients</label>
+                                    <label class="form-label">Varient</label>
                                 </div>
                                 <div class="col-lg-3 col-md-3">
-                                    <label class="form-label">Qty</label>
+                                    <label class="form-label">Quantity</label>
                                 </div>
                             </div>
                         </div>
@@ -101,7 +101,7 @@
             @endif
         </div>
             <br>
-            <form action="{{ route('letter-of-indent-documents.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="form-doc-upload" action="{{ route('letter-of-indent-documents.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row" id="deal-doc-upload-div">
                     <div class="d-flex">
@@ -120,7 +120,7 @@
                         <div class="col-lg-12">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3">
-                                    <input type="file" name="files[]" class="form-control" multiple id="file-upload" accept="application/pdf, image/*">
+                                    <input type="file" name="files[]" class="form-control text-dark" multiple id="file-upload" accept="application/pdf, image/*">
                                 </div>
                                 <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id">
                                 <div class="col-lg-6 col-md-6">
@@ -241,6 +241,15 @@
                     });
                 }
             }).set({title:"Delete Item"})
+        });
+
+        $("#form-doc-upload").validate({
+            ignore: [],
+            rules: {
+                "files[]": {
+                    required: true,
+                }
+            },
         });
     </script>
 @endpush

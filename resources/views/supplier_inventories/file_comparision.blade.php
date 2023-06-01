@@ -215,24 +215,22 @@
         },'Must be greater than first file date.');
 
         $("#form-compare").validate({
-
             ignore: [],
             rules: {
                 first_file: {
                     required: true,
-
                 },
                 second_file: {
                     required: true,
-                    // greaterStart: true
+                    greaterStart: true
                 },
             },
             errorPlacement: function(error, element) {
                 if (element.hasClass("select2-hidden-accessible")) {
                     element = $("#select2-" + element.attr("id") + "-container").parent();
-                    error.insertAfter(element).addClass('mt-2 text-danger');
+                    error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
                 }else {
-                    error.insertAfter(element).addClass('text-danger');
+                    error.insertAfter(element).addClass('text-danger ');
                 }
             }
         });

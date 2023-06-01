@@ -156,7 +156,7 @@ class DemandController extends Controller
                     $query->where('model', $request->model);
                 })
                 ->first();
-            $data['quantity'] = $inventory->total_quantity;
+            $data['quantity'] = $inventory->actual_quantity;
         }
 
         return $data;

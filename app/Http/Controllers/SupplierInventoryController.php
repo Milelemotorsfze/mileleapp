@@ -568,17 +568,10 @@ class SupplierInventoryController extends Controller
     }
     public function FileComparisionReport(Request $request)
     {
-//        $request->validate([
-//            'first_file' => 'date',
-//            'second_file' =>' date|after:first_file',
-//        ]);
-
-
-//        if ($request->first_file > $request->second_file)
-//        {
-//            return redirect()->route('supplier-inventories.file-comparision-report')
-//                ->with('error','The Second file date should be greater than First File Date');
-//        }
+        $request->validate([
+            'first_file' => 'date',
+            'second_file' =>' date|after:first_file',
+        ]);
 
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {

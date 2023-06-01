@@ -7,6 +7,7 @@
         @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -26,7 +27,7 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
-        <form action="{{ route('letter-of-indents.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('letter-of-indents.store') }}" method="POST" >
             @csrf
             <div class="row">
                 <div class="col-lg-3 col-md-3">
@@ -55,14 +56,14 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
-                        <select class="form-control" data-trigger name="customer_id" id="customer" >
+                        <select class="form-control text-dark" data-trigger name="customer_id" id="customer" >
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
-                        <input type="date" class="form-control" id="basicpill-firstname-input" name="date">
+                        <input type="date" class="form-control text-dark" id="basicpill-firstname-input"  name="date">
                     </div>
                 </div>
             </div>
@@ -121,6 +122,43 @@
 @push('scripts')
     <script>
         getCustomers();
+
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                customer_id: {
+                    required: true,
+                },
+                category: {
+                    required: true,
+                },
+                customer_type: {
+                    required: true,
+                },
+                date: {
+                    required: true,
+                },
+                supplier_id:{
+                    required:true
+                },
+                dealers:{
+                    required:true
+                },
+                shipment_method:{
+                    required: true
+                }
+            },
+            errorPlacement: function(error, element) {
+                if (element.hasClass("select2-hidden-accessible")) {
+                    element = $("#select2-" + element.attr("id") + "-container").parent();
+                    error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
+                }else {
+                    error.insertAfter(element).addClass('text-danger');
+                }
+            }
+        });
+        $('#country').select2();
+
         $('#country').change(function (){
            getCustomers();
         });
