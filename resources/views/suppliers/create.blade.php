@@ -5,6 +5,12 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
+
 <style>
     .error 
     {
@@ -155,6 +161,16 @@
         font-size: 80%;
         color: gray;
     }
+    .overlay
+    {
+        position: fixed; /* Positioning and size */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(128,128,128,0.5); /* color */
+        display: none; /* making it hidden by default */
+    }
 </style>
 @section('content')
 
@@ -174,9 +190,10 @@
             </div>
         @endif -->
   
-        <form id="createSupplierForm" action="{{ route('suppliers.store') }}" method="POST" enctype="multipart/form-data"> 
+        <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST"> 
         <!-- action="{{ route('suppliers.store') }}" -->
         <!-- method="POST" enctype="multipart/form-data" -->
+        <!-- action="{{ route('suppliers.store') }}" method="POST"  -->
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -223,7 +240,7 @@
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{ old('contact_number[main]') }}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -425,35 +442,45 @@
                 </div>  
             </div>
             <input id="activeTab" name="activeTab" hidden>
+            <input id="hiddencontact" name="hiddencontact" value="{{old('hiddencontact')}}" hidden>
+            <input id="hiddencontactCountryCode" name="hiddencontactCountryCode" value="{{old('hiddencontactCountryCode')}}" hidden>
+
             <div id="uploadExcel" class="tabcontent">
-            <div class="row">
-                <!-- <center> -->
-                    <!-- <input style="width:50%;" id="image" type="file" class="form-control" name="image" autocomplete="image" /> -->
+                <div class="row">
                     <div class="col-xxl-6 col-lg-6 col-md-6">
-                    <label for="choices-single-default" class="form-label font-size-13">Upload Supplier Addon Excel File</label>    
-                    <input type="file" name="file" placeholder="Choose file" id="supplierAddonExcel" class="form-control" onchange="readURL(this);">
-                    <span id="supplierAddonExcelError" class="required-class paragraph-class"></span>
+                        <label for="choices-single-default" class="form-label font-size-13">Upload Supplier Addon Excel File</label>    
+                        <input type="file" name="file" placeholder="Choose file" id="supplierAddonExcel" class="form-control" onchange="readURL(this);">
+                        <span id="supplierAddonExcelError" class="required-class paragraph-class"></span>
                     </div>
                     <div class="col-xxl-6 col-lg-6 col-md-6"><center>
-                    <label for="choices-single-default" class="form-label font-size-13">Download Supplier Addon Excel Template</label>
-</br>   
-                    <a  class="btn btn-sm btn-info" href="{{ route('addon.get_student_data') }}"><i class="fa fa-arrow-down" aria-hidden="true"></i> Download Excel Template</a>
-</center></div>
-                    <!-- <div class="card-header"> -->
-        <!-- <h4 class="card-title">Create Suppliers</h4> -->
-
-    <!-- </div> -->
-                <!-- </center> -->
-
+                        <label for="choices-single-default" class="form-label font-size-13">Download Supplier Addon Excel Template</label>
+                        </br>   
+                        <a  class="btn btn-sm btn-info" href="{{ route('addon.get_student_data') }}"><i class="fa fa-arrow-down" aria-hidden="true"></i> Download Excel Template</a>
+                        </center>
+                    </div>
+                </div>
+                <br>
+                @include('suppliers.dataerrors')
             </div>
-            </div>
-            <!--  -->
             </br>
+
+            <!-- <label class="col-sm-2 control-label">Image</label>
+<div class="col-sm-12">
+<input id="image" type="file" name="image" accept="image/*" onchange="readURL1(this);">
+<input type="hidden" name="hidden_image" id="hidden_image">
+</div>
+</div>
+<img id="modal-preview" src="https://via.placeholder.com/150" alt="Preview" class="form-group hidden" width="100" height="100">
+<div class="col-sm-offset-2 col-sm-10">
+<button type="submit" class="btn btn-primary" id="btn-save" value="create">Save changes
+</button>
+</div> -->
             <div class="col-xxl-12 col-lg-12 col-md-12">
-                <button style="float:right;" type="submit" class="btn btn-sm btn-success" id="submit">Submit</button>
+                <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
             </div>
         </form> 
     </div>
+    <div class="overlay"></div>
     <script type="text/javascript">
         var activeTab = '';
         var PreviousHidden = '';
@@ -461,75 +488,29 @@
         var selectedBrands = new Array();
         // globalThis.selectedBrands .push(brandId);
       var sub ='1';
-      function readURL(input)
-        {
-            var allowedExtension = ['xlsx','xlsm','xlsb','xltx','xltm','xls','xlt','xls','xml','xlam','xla','xlw','xlr'];
-            var fileExtension = input.value.split('.').pop().toLowerCase();
-            var isValidFile = false;
-            for(var index in allowedExtension) 
-            {
-                if(fileExtension === allowedExtension[index]) 
-                {
-                    isValidFile = true; 
-                    break;
-                }
-            }
-            if(!isValidFile) 
-            {               
-                // $('#blah').hide();
-                document.getElementById("supplierAddonExcelError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
-                
-            }
-            else
-            {
-                document.getElementById("supplierAddonExcelError").textContent='';
-                var file = '';
-                var file = $('#supplierAddonExcel').val();
-                var formData =  new FormData($(this)[0]);
-                $.ajax
-                ({
-                    url:"{{url('supplierAddonExcelValidation')}}",
-                    type: "POST",
-                    data: 
-                    {
-                        formData: formData,
-                    _token: '{{csrf_token()}}' 
-                    },
-                    dataType : 'json',
-                    enctype: 'multipart/form-data',
-                    success: function(result)
-                    {
-                        console.log(result);
-                        // $.each(globalThis.OldAddons,function(key,value)
-                        // {  
-                        //     // $("#"+value).show();
-                        // });
-                        // globalThis.OldAddons = [];                     
-                        // $.each(result,function(key,value)
-                        // {  
-                        //     globalThis.OldAddons .push(value);
-                        //     // $("#"+value).hide();
-                        //     $("#"+value).addClass('hide');
-                        // });
-                    }
-                });
-                // alert('hi');
-                // if (input.files && input.files[0])
-                // {
-                //     document.getElementById("addonImageError").textContent='';
-                //     var reader = new FileReader();
-                //     reader.onload = function (e)
-                //     {                      
-                //         $('#blah').show();
-                //         $('#blah').css('visibility', 'visible');
-                //         $('#blah').attr('src', e.target.result);
-                //     };
-                //     reader.readAsDataURL(input.files[0]);
-                // }
-            }
-        }
+     
         $(document).ready(function ()
         {
+        //    alert($('#hiddencontact').val());
+
+        //    var contact_number = window.intlTelInput(document.querySelector("#contact_number"), 
+        // {
+        //     separateDialCode: true,
+        //     preferredCountries:["ae"],
+        //     hiddenInput: "full",
+        //     utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        // });
+            $.ajaxSetup
+            ({
+                headers: 
+                {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+
+
+
             $msg ="One among contact number or alternative contact number or email is required";
             emailContactError($msg);
             $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
@@ -678,8 +659,12 @@
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        $("form").submit(function(e) 
+        // $("form").submit(function(e) 
+        $('body').on('submit', '#createSupplierForm', function (e) 
+        
         {
+          
+        //    $('.overlay').show();
             sub = '2';
                         //      adoon_1 currency_1 addon_purchase_price_in_usd_1 addon_purchase_price_1
                     // var input = $('#supplier').val();
@@ -696,24 +681,31 @@
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
 
             var inputContactNumber = $('#contact_number').val();
+            
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
+            var formInputError = false;
             if(inputSupplier == '')
             {
+                // alert('ki');
                 $msg = "Supplier field is required";
                 showSupplierError($msg);
+                // $('.overlay').hide();
+                formInputError = true;
                 e.preventDefault();
             }
             if(inputSupplierType == '')
             {
                 $msg = "Supplier type is required";
                 showSupplierTypeError($msg);
+                formInputError = true;
                 e.preventDefault();
             }
             if(inputPaymentMethodsId == '')
             {
                 $msg = "Primary Payment method is required";
                 showPaymentMethodsError($msg)
+                formInputError = true;
                 e.preventDefault();
             }
             if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
@@ -722,15 +714,90 @@
                 showContactNumberError($msg);
                 showAlternativeContactNumberError($msg);
                 showEmailError($msg);
+                formInputError = true;
                 e.preventDefault();
             }
-            else
+if(formInputError == false)
+
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+            //     alert('kk');
+            // alert(full_number);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+             
                 $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
                 $("input[name='activeTab'").val(activeTab);
+                $("input[name='hiddencontact'").val(inputContactNumber);
+                $("input[name='hiddencontactCountryCode'").val(inputContactNumber);
+                e.preventDefault();
+                var actionType = $('#submit').val();
+       
+           
+           var formData = new FormData(this);
+           var $notifications = $('#notifications')
+           $('#submit').html('Sending..');
+           $('.overlay').show();
+           $.ajax({
+           type:'POST',
+           url: "{{ route('suppliers.store') }}",
+           data: formData,
+           cache:false,
+           contentType: false,
+           processData: false,
+           success: (result) => {
+            // $('.overlay').hide();
+            console.log(result)
+            let dataErrorCard = document.getElementById('dataErrorCard');
+            dataErrorCard.hidden = true
+            if(result.data.headingError)
+            {
+                document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
+                $('#submit').html('Save');
+             $('.overlay').hide();
+            }
+            else if(result.data.dataError)
+            {   
+                
+                document.getElementById("notifications").textContent = '';           
+                if(result.data.dataError.length > 0)
+                {
+                    let dataErrorCard = document.getElementById('dataErrorCard');
+                    dataErrorCard.hidden = false
+                    var i = 0;
+                    $.each(result.data.dataError, function(key, value) {
+                    i = i+1;
+              $notifications.append('<tr><td> '+i+' </td>' +
+              '<td>'+ value.addon_code + '</td>' +
+              '<td>'+ value.currency + '</td>' +
+              '<td>'+ value.purchase_price + '</td>' +
+              '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
+              '</tr>');
+                });
+                }
+                $('#submit').html('Save');
+             $('.overlay').hide();
+            }
+            else if(result.data.successStore)
+            {
+                document.location.href="{{route('suppliers.index') }}";
+            }
+
+
+            // e.preventDefault();
+        //    $('#createSupplierForm').trigger("reset");
+        //    $('#ajax-product-modal').modal('hide');
+           
+        //    var oTable = $('#laravel_datatable').dataTable();
+        //    oTable.fnDraw(false);
+           },
+           error: function(data){
+           console.log('Error:', data);
+           $('#submit').html('Save');
+             $('.overlay').hide();
+           }
+           });
+                
                 // activeTab
                 // var f = document.getElementById("createSupplierForm");
                 // f.setAttribute('method',"post");  
@@ -738,6 +805,9 @@
                 // f.setAttribute('action',"{{ route('suppliers.store') }}");
             }
         });
+     
+       
+
         function secondaryPaymentMethods(changePayment)
         {
             var e = document.getElementById("is_primary_payment_method");
@@ -1092,5 +1162,91 @@
             document.getElementById("emailRequired").classList.remove("paragraph-class");        
             document.getElementById("emailRequired").classList.add("requiredOne");
         }
+        function readURL(input)
+        {
+            var allowedExtension = ['xlsx','xlsm','xlsb','xltx','xltm','xls','xlt','xls','xml','xlam','xla','xlw','xlr'];
+            var fileExtension = input.value.split('.').pop().toLowerCase();
+            var isValidFile = false;
+            for(var index in allowedExtension) 
+            {
+                if(fileExtension === allowedExtension[index]) 
+                {
+                    isValidFile = true; 
+                    break;
+                }
+            }
+            if(!isValidFile) 
+            {               
+                // $('#blah').hide();
+                document.getElementById("supplierAddonExcelError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                
+            }
+            else
+            {
+                document.getElementById("supplierAddonExcelError").textContent='';
+                var file = '';
+                var file = $('#supplierAddonExcel').val();
+                
+                // alert('hi');
+                // if (input.files && input.files[0])
+                // {
+                //     document.getElementById("addonImageError").textContent='';
+                //     var reader = new FileReader();
+                //     reader.onload = function (e)
+                //     {                      
+                //         $('#blah').show();
+                //         $('#blah').css('visibility', 'visible');
+                //         $('#blah').attr('src', e.target.result);
+                //     };
+                //     reader.readAsDataURL(input.files[0]);
+                // }
+            }
+        }
+        // function readURL1(input, id) {
+        //     // alert('kk');
+        // id = id || '#modal-preview';
+        // if (input.files && input.files[0]) {
+        // var reader = new FileReader();
+        // reader.onload = function (e) {
+        // $(id).attr('src', e.target.result);
+        // };
+        // reader.readAsDataURL(input.files[0]);
+        // $('#modal-preview').removeClass('hidden');
+        // $('#start').hide();
+        // ggggg(input);
+        // }
+        // }
+
+    //        // $('body').on('submit', '#createSupplierForm', function (e)
+    //        function ggggg(e)
+    //      {
+    //         // alert(e);
+    //     // e.preventDefault();
+    //     var actionType = $('#btn-save').val();
+       
+    //     $('#btn-save').html('Sending..');
+    //     // var formData = new FormData(e); alert(formData);
+
+    //     $.ajax({
+    //     type:'POST',
+    //     url: "{{url('supplierAddonExcelValidation')}}",
+    //     data: formData,
+    //     cache:false,
+    //     contentType: false,
+    //     processData: false,
+    //     success: (data) => {
+    //     $('#createSupplierForm').trigger("reset");
+    //     $('#ajax-product-modal').modal('hide');
+    //     $('#btn-save').html('Save Changes');
+    //     var oTable = $('#laravel_datatable').dataTable();
+    //     oTable.fnDraw(false);
+    //     },
+    //     error: function(data){
+    //     console.log('Error:', data);
+    //     $('#btn-save').html('Save Changes');
+    //     }
+    //     });
+    //     // });
+    // }
     </script>
 @endsection

@@ -69,11 +69,11 @@ Route::get('/d', function () {
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
 
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
-    Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
     Route::resource('student', SupplierAddonController::class);
     
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
+    Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
 
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
