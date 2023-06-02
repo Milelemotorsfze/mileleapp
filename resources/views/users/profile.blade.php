@@ -863,27 +863,6 @@ function saveBasicInfo() {
       }
     });
   }
-// function savelogins() {
-//   var fullemail = document.getElementById('fullemail').value;
-//   var fullpassword = document.getElementById('fullpassword').value;
-//   console.log(fullpassword);
-//   // $.ajax({
-//   //   url: '{{ route('profile.updateEmailInfo') }}',
-//   //   type: 'POST',
-//   //   data: {
-//   //     _token: '{{ csrf_token() }}',
-//   //     fullemail: fullemail,
-//   //     fullpassword:fullpassword
-//   //   },
-//   //   success: function(response) {
-//   //     var modal = new bootstrap.Modal(document.getElementById('loginModal'));
-//   //     modal.hide();
-//   //     location.reload();
-//   //   },
-//   //   error: function(xhr) {
-//   //   }
-//   // });
-// }
 function browseFiles() {
   document.getElementById('upload-input').click();
 }
