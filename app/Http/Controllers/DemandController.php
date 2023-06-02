@@ -48,10 +48,8 @@ class DemandController extends Controller
             $demand->supplier_id = $request->input('supplier_id');
             $demand->created_by = Auth::id();
             $demand->save();
-            return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand created successfully.');
-        }else{
-            return redirect()->route('demands.edit',['demand' => $demand->id])->with('message','Demand already existing.Update your Demands.');
         }
+        return redirect()->route('demands.edit',['demand' => $demand->id]);
 
     }
     public function edit(string $id)
@@ -83,12 +81,6 @@ class DemandController extends Controller
             $years[] = date('y', mktime(0,0,0,$i, 1, date('Y')));
             $currentMonths[] = date('M', mktime(0,0,0,$i, 1, date('Y')));
         }
-        $monthlyDemands = MonthlyDemand::where('demand_id',$id)
-            ->whereIn('month', $currentMonths)
-            ->whereIn('year', $years)
-            ->where('demand_id', $id)
-            ->get();
-
         $addedModelIds = [];
         foreach ($demandLists as $demandList) {
             $model = MasterModel::where('model', $demandList->model)
@@ -96,12 +88,9 @@ class DemandController extends Controller
                 ->first();
             $addedModelIds[] = $model->id;
         }
-
         $models = MasterModel::whereNotIn('model',$addedModelIds)
                             ->groupBy('model')->get();
-
-        return view('demands.edit', compact('demand','demandLists','models','months'
-            ,'monthlyDemands','totalYearlyQuantities'));
+        return view('demands.edit', compact('demand','demandLists','models','months','totalYearlyQuantities'));
     }
     public function getSFX(Request $request)
     {

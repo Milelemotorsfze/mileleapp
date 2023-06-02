@@ -71,6 +71,9 @@
                                 <div class="col-lg-1">
                                     <label>Total </label>
                                 </div>
+                            <div class="co-1">
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -99,6 +102,17 @@
                                                class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
                                     </div>
                                 @endforeach
+                                @if($demandList->fiveMonthDemands->count() < 5)
+                                    <?php
+                                        $count =  $demandList->fiveMonthDemands->count();
+                                        ?>
+                                    @for($i = $count; $i < 5 ;$i++)
+                                      <div class="col-lg-1">
+                                          <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
+                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
+                                      </div>
+                                    @endfor
+                                @endif
                                     <div class="col-lg-1">
                                         <input type="number" class="form-control" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
                                     </div>
@@ -116,12 +130,14 @@
             @endif
             <form id="form-demand" action="{{ route('demand-lists.store') }}" method="POST" enctype="multipart/form-data" >
                 @csrf
+                <input type="hidden" value="{{ $demand->id }}" name="demand_id" id="demand-id">
+                <input type="hidden" name="module" value="Demand">
                 <div class="d-flex">
                     <div class="col-lg-7 col-md-7">
                         <div class="row">
                             <div class="col-lg-4 col-md-4">
-                                 <select class="form-select text-dark " name="model" id="model">
-                                    <option value="" disabled>Select Model</option>
+                                 <select class="form-select text-dark" name="model" id="model">
+                                     <option></option>
                                     @foreach($models as $model)
                                         <option value="{{ $model->model }}">{{ $model->model }}</option>
                                     @endforeach
@@ -129,12 +145,12 @@
                             </div>
                             <div class="col-lg-4 col-md-4">
                                 <select class="form-select text-dark" name="sfx" id="sfx" >
-                                    <option value="" >Select SFX</option>
+                                    <option></option>
                                 </select>
                             </div>
                             <div class="col-lg-4 col-md-4">
                                 <select class="form-select variant text-dark" name="variant_name" id="variant-name" >
-                                    <option value="">Select Variant</option>
+                                    <option ></option>
                                 </select>
 
                             </div>
@@ -152,6 +168,9 @@
                             @endforeach
                             <div class="col-lg-1">
                                 <input type="text" class="form-control" readonly value="" id="total"  name="total">
+                            </div>
+                            <div class="col-1">
+                                <button type="submit" class="btn btn-success add-demand-list-details"><i class="fa fa-plus"></i> Add </button>
                             </div>
                         </div>
                     </div>
@@ -175,14 +194,10 @@
 
                 </div>
                 <br/>
-                <input type="hidden" value="{{ $demand->id }}" name="demand_id" id="demand-id">
-                <input type="hidden" name="module" value="Demand">
-                <div class="col-lg-12 col-md-12">
-                    <button type="submit" class="btn btn-dark add-demand-list-details">Submit and Add New</button>
-                </div>
+
             </form>
             <div class="col-lg-12 col-md-12">
-                <button type="button" class="btn btn-dark btnright" id="update-monthly-demands">Finish</button>
+                <button type="button" class="btn btn-dark btnright" id="update-monthly-demands">Update Quantity</button>
             </div>
         </div>
     </div>
@@ -195,13 +210,18 @@
         $('.demand-list-quantity-3').attr('readonly', false);
         $('.demand-list-quantity-4').attr('readonly', false);
 
-        $('#model').select2();
-        // $('#sfx').select2();
-        // $('.variant').select2();
+        $('#model').select2({
+            placeholder : 'Select Model',
+        });
+        $('#sfx').select2({
+            placeholder : 'Select SFX',
+        });
+        $('.variant').select2({
+            placeholder : 'Select Varaint',
+        });
 
         $("#form-demand").validate({
             ignore: [],
-
             rules: {
                 model: {
                     required: true,
@@ -223,7 +243,9 @@
 
             }
         });
-
+        $('#variant-name').on('change',function() {
+            $('#variant-name-error').remove();
+        })
         $('#model').on('change',function(){
             $('#model-error').remove();
             let model = $(this).val();
@@ -250,6 +272,7 @@
             });
         });
         $('#sfx').on('change',function(){
+            $('#sfx-error').remove();
             let sfx = $(this).val();
             let model = $('#model').val();
             let url = '{{ route('demand.get-variant') }}';
@@ -272,8 +295,10 @@
                 }
             });
         });
+
         for($j=0;$j<=5;$j++) {
             $('#count-'+$j).on('keyup',function() {
+                alert('ok');
                 Total();
             });
             $('#count-'+$j).on('click',function() {
@@ -316,6 +341,7 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function (data) {
+                    // location.reload();
                     window.location.href = redirect_url;
                 }
             });
