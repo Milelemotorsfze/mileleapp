@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('supplier_addon_temps', function (Blueprint $table) {
-            $table->string('addon_code')->nullable()->change();;
-            $table->string('currency')->nullable()->change();;
-            $table->string('purchase_price')->nullable()->change();;
+            $table->string('addon_code')->nullable()->change();
+            $table->string('currency')->nullable()->change();
+            $table->string('purchase_price')->nullable()->change();
         });
     }
 

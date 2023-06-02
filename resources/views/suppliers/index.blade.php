@@ -31,7 +31,7 @@
                   <th>Supplier Type</th>
                   <th>Primary Payment Method</th>
                   <th>Other Payment Methods</th>
-                  <!-- <th>Adoon Code</th> -->
+                  <th>Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -88,6 +88,7 @@
                         @endforeach
                       @endif
                     </td>
+                    <td>{{ $supplier->status }}</td>
                     <!-- <td>
                       @if(!empty($supplier->supplierAddons()))
                         @foreach($supplier->supplierAddons as $v)
@@ -103,7 +104,7 @@
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                       <!-- @endcan -->
                       <!-- @can('user-delete') -->
-                        <!-- <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="deleteSupplier{{$supplier->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -114,14 +115,15 @@
                             <div class="dropdown-divider"></div>
                             <div class="row modal-button-class">                                           
                               <div class="col-xs-6 col-sm-6 col-md-6">
-                                <a href="{{ route('suppliers.destroy',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                                <a href="{{ route('suppliers.delete',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                               </div>
                             </div>                                          
                           </div>
-                        </div> -->
+                        </div>
                       <!-- @endcan -->
                       <!-- @can('user-make-inactive') -->
-                        <!-- <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                      @if($supplier->status == 'active')
+                        <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="makeInactiveSupplier{{$supplier->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -132,11 +134,28 @@
                             <div class="dropdown-divider"></div>
                             <div class="row modal-button-class">                                           
                               <div class="col-xs-6 col-sm-6 col-md-6">
-                                <a href="{{ route('suppliers.update',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                                <a href="{{ route('suppliers.updateStatus',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                               </div>
                             </div>                                          
                           </div>
-                        </div> -->
+                        </div>
+                        @elseif($supplier->status == 'inactive')
+                        <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveSupplier{{$supplier->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
+                        <div class="modal modal-class" id="makeActiveSupplier{{$supplier->id}}" >
+                          <div class="modal-content">
+                            <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
+                            <h3 class="modal-title" style="text-align:center;"> Make Active Supplier </h3>
+                            <div class="dropdown-divider"></div>
+                            <h4 class="modal-paragraph"> Are you sure,</h4>
+                            <h5 class="modal-paragraph"> You want to make active ?</h5>
+                            <div class="dropdown-divider"></div>
+                            <div class="row modal-button-class">                                           
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                              <a href="{{ route('suppliers.makeActive', $supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                            </div>
+                          </div>
+                        </div> 
+                        @endif
                       <!-- @endcan                               -->
                     </td>                
                   </tr>

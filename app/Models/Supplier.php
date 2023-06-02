@@ -19,7 +19,8 @@ class Supplier extends Model
         'supplier_type',
         'created_by',
         'updated_by',
-        'deleted_by'
+        'deleted_by',
+        'status'
     ];
     public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
     public function supplierAddons()

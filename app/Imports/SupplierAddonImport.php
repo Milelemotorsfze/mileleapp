@@ -91,11 +91,14 @@ class SupplierAddonImport implements ToCollection, WithHeadingRow
     // }
     foreach($rows as $row)
     {
-        SupplierAddonTemp::create([
-            'addon_code' => $row['addon_code'],
-            'currency' => $row['currency'],
-            'purchase_price' => $row['purchase_price'],
-        ]);
+        if($row['addon_code'] OR $row['currency'] OR $row['purchase_price'])
+        {
+            SupplierAddonTemp::create([
+                'addon_code' => $row['addon_code'],
+                'currency' => $row['currency'],
+                'purchase_price' => $row['purchase_price'],
+            ]);
+        }  
     }
 }
 }

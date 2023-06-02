@@ -455,13 +455,34 @@ class SupplierController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supplier $supplier)
+    public function destroy(Supplier $supplier )
     {
-        //
+        
+    }
+    public function delete($id)
+    {
+        Supplier::find($id)->delete();
+        return redirect()->route('suppliers.index')
+                        ->with('success','Suppliers deleted successfully');
+    }
+    public function makeActive($id)
+    {
+       $user = Supplier::find($id);
+       $user->status = 'active';
+       $user->update();
+       return redirect()->route('suppliers.index')
+                       ->with('success','Supplier updated successfully');
+    }
+    public function updateStatus($id)
+    {
+        $user = Supplier::find($id);
+        $user->status = 'inactive';
+        $user->update();
+        return redirect()->route('suppliers.index')
+                        ->with('success','Supplier updated successfully');
     }
     public function supplierAddonExcelValidation(Request $request)
     {
-        dd($request->file('image'));
         if($request->file)
                 {
                     $headings = (new HeadingRowImport)->toArray($request->file);  dd($headings);

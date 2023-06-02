@@ -74,7 +74,9 @@ Route::get('/d', function () {
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
     Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
-
+    Route::get('suppliers/destroy/{id}', [SupplierController::class,'delete'])->name('suppliers.delete');
+    Route::get('suppliers/makeActive/{id}', [SupplierController::class, 'makeActive'])->name('suppliers.makeActive');
+    Route::get('suppliers/updateStatus/{id}', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
