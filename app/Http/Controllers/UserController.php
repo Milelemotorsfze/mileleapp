@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
     use Spatie\Permission\Models\Role;
     use DB;
     use Hash;
+    use App\Models\Profile;
     use Illuminate\Support\Arr;
     class UserController extends Controller
     {
@@ -23,23 +24,29 @@ namespace App\Http\Controllers;
             return view('users.create',compact('roles'));
         }
         public function store(Request $request)
-        {
-            $this->validate($request, [
-                'name' => 'required',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|same:confirm-password',
-                'roles' => 'required'
-            ]);
+{
+    $this->validate($request, [
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|same:confirm-password',
+        'roles' => 'required'
+    ]);
 
-            $input = $request->all();
-            $input['password'] = Hash::make($input['password']);
+    $input = $request->all();
+    $input['password'] = Hash::make($input['password']);
 
-            $user = User::create($input);
-            $user->assignRole($request->input('roles'));
+    $user = User::create($input);
 
-            return redirect()->route('users.index')
-            ->with('success','User created successfully');
-        }
+    // Create a profile for the user and associate it with the user_id
+    $profile = new Profile();
+    $profile->user_id = $user->id;
+    $profile->save();
+
+    $user->assignRole($request->input('roles'));
+
+    return redirect()->route('users.index')
+        ->with('success','User created successfully');
+}
 
         public function show($id)
         {

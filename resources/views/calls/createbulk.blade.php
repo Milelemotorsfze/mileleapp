@@ -42,12 +42,20 @@
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-    @if ($errors->has('source_name'))
+   @if ($errors->has('source_name'))
             <div id="error-message" class="alert alert-danger">
                 {{ $errors->first('source_name') }}
             </div>
         @endif
-
+        @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
         @if (session('error'))
             <div id="error-message" class="alert alert-danger">
                 {{ session('error') }}
