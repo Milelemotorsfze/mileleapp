@@ -26,6 +26,8 @@ use App\Http\Controllers\LOIDocumentsController;
 use App\Http\Controllers\Repeatedcustomers;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
+use App\Http\Controllers\PFIController;
+use App\Http\Controllers\DemandPlanningSupplierController;
 
 
 /*
@@ -82,7 +84,7 @@ Route::get('/d', function () {
 
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
-    
+
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
     Route::post('supplierAddonExcelValidation', [SupplierController::class, 'supplierAddonExcelValidation'])->name('addon.supplierAddonExcelValidation');
@@ -90,6 +92,18 @@ Route::get('/d', function () {
     Route::get('suppliers/makeActive/{id}', [SupplierController::class, 'makeActive'])->name('suppliers.makeActive');
     Route::get('suppliers/updateStatus/{id}', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
+
+    // Demand & Planning Module
+
+    // suppliers
+    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
+
+    // Demands
+    Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
+    Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
+    Route::resource('demands', DemandController::class);
+    Route::resource('demand-lists', DemandListController::class);
+    Route::resource('monthly-demands', MonthlyDemandsController::class);
     // Letter of Indent
     Route::get('letter-of-indents/get-customers', [LetterOfIndentController::class, 'getCustomers'])->name('letter-of-indents.get-customers');
     Route::get('letter-of-indents/generateLOI', [LetterOfIndentController::class, 'generateLOI'])->name('letter-of-indents.generate-loi');
@@ -103,12 +117,8 @@ Route::get('/d', function () {
     Route::resource('letter-of-indent-items', LOIItemsController::class);
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
 
-    // Demand & Planning
-    Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
-    Route::get('demand-planning/get-variant', [DemandController::class,'getVariant'])->name('demand.get-variant');
-    Route::resource('demands', DemandController::class);
-    Route::resource('demand-lists', DemandListController::class);
-    Route::resource('monthly-demands', MonthlyDemandsController::class);
+    // PFI
+    Route::resource('pfi', PFIController::class);
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');

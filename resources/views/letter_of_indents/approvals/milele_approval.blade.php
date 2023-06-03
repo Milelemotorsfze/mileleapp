@@ -154,12 +154,20 @@
                                         if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
                                             $count = $letterOfIndentItem->inventory_quantity;
                                         }else{
+
                                             $count = $letterOfIndentItem->quantity;
                                         }
+//                                        if($letterOfIndentItem->approved_quantity >= 1) {
+//                                            $count = $count - $letterOfIndentItem->approved_quantity;
+//                                            if($count < 0) {
+//                                                $count = 0;
+//                                            }
+//                                        }
                                         ?>
                                     <select name="quantities[]" class="form-control approve-quantity"
                                             data-item-id="{{ $letterOfIndentItem->id }}">
                                         @for($i=0;$i <= $count;$i++)
+
                                             <option> {{ $i }} </option>
                                         @endfor
                                     </select> </br>

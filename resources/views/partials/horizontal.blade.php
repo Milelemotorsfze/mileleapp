@@ -100,7 +100,6 @@
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Leads</span>
                         </a>
-
                     </li>
                     @endcan
                     @can('demand-create')
@@ -112,8 +111,9 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
                                 <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-auth" role="button" >
-                                        <span data-key="t-authentication">Forecast</span>
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}"
+                                       id="topnav-auth" role="button" >
+                                        <span data-key="t-authentication">Supplier</span>
                                     </a>
                                 </div>
                                 @can('demand-create')
@@ -129,7 +129,7 @@
                                 @endcan
                                 @can('LOI-list')
                                     <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="" id="topnav-utility" role="button">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility">LOI</span>
                                             <div class="arrow-down"></div>
                                         </a>

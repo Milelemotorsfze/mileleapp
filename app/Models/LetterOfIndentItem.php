@@ -16,7 +16,7 @@ class LetterOfIndentItem extends Model
     ];
     public function LOI()
     {
-        return $this->belongsTo(LetterOfIndent::class);
+        return $this->belongsTo(LetterOfIndent::class,'letter_of_indent_id');
     }
     public function Variant()
     {

@@ -30,7 +30,7 @@
         @csrf
             <div class="row">
                 <div class="row demand-div">
-                    <div class="col-lg-3 col-md-3">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13 "> Supplier</label>
                             <select class="form-control" data-trigger name="supplier_id" id="supplier">
@@ -41,7 +41,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-3">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                             <select class="form-control" data-trigger name="whole_saler" id="whole-saler">
@@ -50,7 +50,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-3">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13">Steering</label>
                             <select class="form-control" data-trigger name="steering" id="steering">
@@ -60,8 +60,8 @@
                         </div>
                     </div>
                     </br>
-                    <div class="col-lg-12 col-md-12">
-                        <button type="submit" class="btn btn-dark btncenter" id="add-demand">Submit</button>
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-dark " id="add-demand">Submit</button>
                     </div>
                 </div>
             </div>

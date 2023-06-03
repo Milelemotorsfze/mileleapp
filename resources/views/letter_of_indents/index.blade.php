@@ -367,6 +367,7 @@
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
                             <th>Approval</th>
+                            <th>PFI</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -393,14 +394,21 @@
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
                                     <button type="button" class=" btn btn-primary btn-sm" >
-                                        Approval
+                                        Approve
                                     </button>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                        <button type="button" class=" btn btn-info btn-sm" >
+                                            Add PFI
+                                        </button>
                                     </a>
                                 </td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
-                                            <i class="fa fa-download"></i></button>
+                                            LOI PDF</button>
                                     </a>
                                 </td>
                                 <div class="modal modalhide" id="partial-approved-loi-items-{{$letterOfIndent->id}}" >
@@ -490,6 +498,7 @@
                             <th>Approval Status</th>
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
+                            <th>PFI</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -514,9 +523,16 @@
                                             data-modal-id="view-approved-loi-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
                                 </td>
                                 <td>
+                                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                        <button type="button" class="btn btn-info btn-sm" >
+                                            Add PFI
+                                        </button>
+                                    </a>
+                                </td>
+                                <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">
-                                            View LOI</button>
+                                            LOI PDF</button>
                                     </a>
                                 </td>
 

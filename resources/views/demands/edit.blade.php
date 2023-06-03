@@ -29,19 +29,19 @@
         @endif
         <div id="monthly-demand-list-div">
             <div class="row">
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Supplier</label>
                         <input type="text" value="{{ $demand->supplier->supplier }}" id="supplier-row" class="form-control" readonly/>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Dealers</label>
                         <input type="text" value="{{ $demand->whole_saler }}" id="whole-saler-row" class="form-control" readonly/>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Steering</label>
                         <input type="text" value="{{ $demand->steering }}" id="steering-row" class="form-control" readonly/>
@@ -49,56 +49,53 @@
                 </div>
             </div>
                 <div class="d-flex">
-                    <div class="col-lg-7 col-md-7">
+                    <div class="col-lg-7 col-md-7 col-sm-12">
                         <div class="row">
-                            <div class="col-lg-4 col-md-4">
+                            <div class="col-lg-4 col-md-6 col-sm-6">
                                 <label for="basicpill-firstname-input" class="form-label">Model</label>
                             </div>
-                            <div class="col-lg-4 col-md-4">
+                            <div class="col-lg-4 col-md-6 col-sm-6">
                                 <label for="basicpill-firstname-input" class="form-label">SFX</label>
                             </div>
-                            <div class="col-lg-4 col-md-4">
+                            <div class="col-lg-4 col-md-6 col-sm-6" >
                                 <label for="basicpill-firstname-input" class="form-label">Varients</label>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-9 col-md-9">
+                    <div class="col-lg-9 col-md-9 col-sm-12">
                         <div class="row" style="margin-left: 10px">
                             @foreach($months as $key => $month)
-                                <div class="col-lg-1" >
+                                <div class="col-lg-1 col-md-1 col-sm-1" >
                                     <label >{{ $month }} </label>
                                 </div>
                             @endforeach
-                                <div class="col-lg-1">
+                                <div class="col-lg-1 col-md-1 col-sm-1" >
                                     <label>Total </label>
                                 </div>
-                            <div class="co-1">
-
-                            </div>
                         </div>
                     </div>
                 </div>
             @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)
                     <div class="d-flex">
-                        <div class="col-lg-7 col-md-7">
+                        <div class="col-lg-7 col-md-7 col-sm-12">
                             <div class="row">
-                                <div class="col-lg-4 col-md-4">
+                                <div class="col-lg-4 col-md-6 col-sm-12">
                                     <input type="text" value="{{ $demandList->model }}" readonly class="form-control">
                                 </div>
-                                <div class="col-lg-4 col-md-4">
+                                <div class="col-lg-4 col-md-6 col-sm-12">
                                     <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
                                 </div>
-                                <div class="col-lg-4 col-md-4">
+                                <div class="col-lg-4 col-md-6 col-sm-12">
                                     <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
                                 </div>
                             </div>
                         </div>
                         <p>&nbsp;&nbsp;&nbsp;</p>
-                        <div class="col-lg-9 col-md-9">
+                        <div class="col-lg-9 col-md-9 col-sm-12">
                             <div class ="row">
                                 @foreach($demandList->fiveMonthDemands as $key => $monthlyDemand)
-                                    <div class="col-lg-1">
+                                    <div class="col-lg-1 col-sm-12">
                                         <input type="number" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" min="0"
                                                class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
                                     </div>
@@ -108,16 +105,16 @@
                                         $count =  $demandList->fiveMonthDemands->count();
                                         ?>
                                     @for($i = $count; $i < 5 ;$i++)
-                                      <div class="col-lg-1">
+                                      <div class="col-lg-1 col-sm-12">
                                           <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
                                                class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
                                       </div>
                                     @endfor
                                 @endif
-                                    <div class="col-lg-1">
+                                    <div class="col-lg-1  col-sm-6">
                                         <input type="number" class="form-control" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
                                     </div>
-                                    <div class="col-lg-1">
+                                    <div class="col-lg-1 col-sm-6">
                                         <button type="button" class="btn btn-danger demand-list-delete"  data-id="{{ $demandList->id }}"
                                                 data-url="{{ route('demand-lists.destroy', $demandList->id) }}">
                                             <i class="fa fa-trash"></i>
@@ -197,8 +194,8 @@
                 <br/>
 
             </form>
-            <div class="col-lg-12 col-md-12">
-                <button type="button" class="btn btn-dark btnright" id="update-monthly-demands">Update Quantity</button>
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-dark " id="update-monthly-demands">Update Quantity</button>
             </div>
         </div>
     </div>

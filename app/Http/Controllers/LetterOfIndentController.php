@@ -146,8 +146,6 @@ class LetterOfIndentController extends Controller
         if ($letterOfIndent->dealers == 'Trans Cars') {
             $height = $request->height;
             $width = $request->width;
-            info($height);
-            info($width);
 
             if($request->download == 1) {
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',

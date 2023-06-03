@@ -43,7 +43,7 @@ class SupplierInventoryController extends Controller
         $request->validate([
             'whole_sales' => 'required',
             'supplier_id' =>' required',
-//            'file' => 'required|mimes:xlsx,xls,csv|max:102400',
+            'file' => 'required|mimes:xlsx,xls,csv|max:102400',
         ]);
 
         if ($request->file('file'))

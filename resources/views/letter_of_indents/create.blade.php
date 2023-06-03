@@ -32,18 +32,18 @@
         <form id="form-create" action="{{ route('letter-of-indents.store') }}" method="POST" >
             @csrf
             <div class="row">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Select Country</label>
-                        <select class="form-control" data-trigger name="country" id="country">
-                            <option disabled>Select Country</option>
+                        <label class="form-label font-size-13 ">Select Country</label>
+                        <select class="form-control" name="country" id="country">
+                            <option ></option>
                             @foreach($countries as $country)
                                 <option value="{{$country}}"> {{ $country }} </option>
                             @endforeach
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
                         <select class="form-control"name="customer_type" id="customer-type">
@@ -55,14 +55,14 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
-                        <select class="form-control text-dark" data-trigger name="customer_id" id="customer" >
+                        <select class="form-control text-dark" name="customer_id" id="customer" >
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
                         <input type="date" class="form-control text-dark" id="basicpill-firstname-input"  name="date">
@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
@@ -83,7 +83,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
@@ -94,7 +94,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                         <select class="form-control" data-trigger name="dealers" >
@@ -103,7 +103,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
+                <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
                         <select class="form-control" data-trigger name="shipment_method">
@@ -113,8 +113,8 @@
                     </div>
                 </div>
                 <br>
-                <div class="col-lg-12 col-md-12">
-                    <button type="submit" class="btn btn-dark btncenter" >Next</button>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-dark " >Next</button>
                 </div>
             </div>
         </form>
@@ -159,7 +159,9 @@
                 }
             }
         });
-        $('#country').select2();
+        $('#country').select2({
+            placeholder : 'Select Country'
+        });
 
         $('#country').change(function (){
            getCustomers();

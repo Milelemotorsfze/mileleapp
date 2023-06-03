@@ -9,6 +9,7 @@ use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\SupplierInventory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class LOIItemsController extends Controller
@@ -157,6 +158,8 @@ class LOIItemsController extends Controller
         $approvedLOIItem = new ApprovedLetterOfIndentItem();
         $approvedLOIItem->letter_of_indent_item_id = $request->id;
         $approvedLOIItem->quantity = $request->quantity;
+        $approvedLOIItem->created_by = Auth::id();
+        $approvedLOIItem->letter_of_indent_id = $letterOfIndentItem->letter_of_indent_id;
         $approvedLOIItem->save();
 
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
@@ -176,16 +179,19 @@ class LOIItemsController extends Controller
                 // get ids of partialy approved items
                 $updatedItems[] = $letterOfIndentItem->id;
             }
-
         }
         $result = array_diff($loiItemIds,$approvedItems);
-        $letterOfIndent = LetterOfIndent::find($request->id);
+        $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
         if(empty($result)) {
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+            info($letterOfIndent);
+            info("approved");
+            $letterOfIndent->status = "Approved";
         }
         if(!empty($updatedItems)) {
+            info("partialy approved");
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
+
         $letterOfIndent->save();
         DB::commit();
 
@@ -207,12 +213,13 @@ class LOIItemsController extends Controller
         {
             $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
             $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantities[$key];
+            $letterOfIndentItem->save();
             if ($letterOfIndentItem->quantity == $letterOfIndentItem->approved_quantity)
             {
                 $approvedItems[] = $letterOfIndentItem->id;
             }
-            $letterOfIndentItem->save();
         }
+
         $result = array_diff($loiItemIds,$approvedItems);
         if(empty($result)) {
           $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
@@ -226,6 +233,7 @@ class LOIItemsController extends Controller
             $approvedLOIItem = new ApprovedLetterOfIndentItem();
             $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentItems[$key]['id'];
             $approvedLOIItem->quantity = $quantity;
+            $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
             $approvedLOIItem->save();
         }
         DB::commit();
