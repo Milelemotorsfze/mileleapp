@@ -1,15 +1,15 @@
 @extends('layouts.main')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" /> -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" />
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" /> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
 
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> -->
 
 <style>
     .error 
@@ -674,36 +674,19 @@
         });
         // $("form").submit(function(e) 
         $('body').on('submit', '#createSupplierForm', function (e) 
-        
         {
-          
-        //    $('.overlay').show();
             sub = '2';
-                        //      adoon_1 currency_1 addon_purchase_price_in_usd_1 addon_purchase_price_1
-                    // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
             var inputSupplier = $('#supplier').val();
-            // var inputContactPerson = $('#contact_person').val();
-            // var inputPersonContactBy = $('#person_contact_by').val();
             var inputSupplierType = $('#supplier_type').val();
-            // var inputIsPrimaryPaymentMethod = $('#is_primary_payment_method').val();
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
-
             var inputContactNumber = $('#contact_number').val();
-            
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
             var formInputError = false;
             if(inputSupplier == '')
             {
-                // alert('ki');
                 $msg = "Supplier field is required";
                 showSupplierError($msg);
-                // $('.overlay').hide();
                 formInputError = true;
                 e.preventDefault();
             }
@@ -731,121 +714,95 @@
                 e.preventDefault();
             }
             if(formInputError == false)
-
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-            //     alert('kk');
-            // alert(full_number);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-             
                 $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
                 $("input[name='activeTab'").val(activeTab);
-                $("input[name='hiddencontact'").val(inputContactNumber);
-                $("input[name='hiddencontactCountryCode'").val(inputContactNumber);
                 e.preventDefault();
                 var actionType = $('#submit').val();
-       
-           
-           var formData = new FormData(this);
-           var $notifications = $('#notifications')
-           $('#submit').html('Sending..');
-           $('.overlay').show();
-           $.ajax({
-           type:'POST',
-           url: "{{ route('suppliers.store') }}",
-           data: formData,
-           cache:false,
-           contentType: false,
-           processData: false,
-           success: (result) => {
-            // $('.overlay').hide();
-            console.log(result)
-            let dataErrorCard = document.getElementById('dataErrorCard');
-            dataErrorCard.hidden = true
-            if(result.data.headingError)
-            {
-                document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
-                $('#submit').html('Save');
-             $('.overlay').hide();
-            }
-            else if(result.data.dataError)
-            {   
-                
-                document.getElementById("notifications").textContent = '';           
-                if(result.data.dataError.length > 0)
+                var formData = new FormData(this);
+                console.log(formData);
+                var $notifications = $('#notifications')
+                $('#submit').html('Sending..');
+                $('.overlay').show();
+                $.ajax({
+                type:'POST',
+                url: "{{ route('suppliers.store') }}",
+                data: formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: (result) => 
                 {
+                    console.log(result)
                     let dataErrorCard = document.getElementById('dataErrorCard');
-                    dataErrorCard.hidden = false
-                    var i = 0;
-                    $.each(result.data.dataError, function(key, value) {
-                    i = i+1;
-              $notifications.append('<tr><td> '+i+' </td>' +
-              '<td>'+ value.addon_code + '</td>' +
-              '<td>'+ value.currency + '</td>' +
-              '<td>'+ value.purchase_price + '</td>' +
-              '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
-              '</tr>');
-                });
-                }
+                    dataErrorCard.hidden = true
+                    if(result.data.headingError)
+                    {
+                        document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
+                        $('#submit').html('Save');
+                    $('.overlay').hide();
+                    }
+                    else if(result.data.dataError)
+                    {  
+                        document.getElementById("notifications").textContent = '';           
+                        if(result.data.dataError.length > 0)
+                        {
+                            let dataErrorCard = document.getElementById('dataErrorCard');
+                            dataErrorCard.hidden = false
+                            var i = 0;
+                            $.each(result.data.dataError, function(key, value) 
+                            {
+                                i = i+1;
+                                $notifications.append('<tr><td> '+i+' </td>' +
+                                '<td>'+ value.addon_code + '</td>' +
+                                '<td>'+ value.currency + '</td>' +
+                                '<td>'+ value.purchase_price + '</td>' +
+                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
+                                '</tr>');
+                            });
+                        }
+                        $('#submit').html('Save');
+                        $('.overlay').hide();
+                    }
+                    else if(result.data.successStore)
+                    {
+                        document.location.href="{{route('suppliers.index') }}";
+                    }
+                },
+                error: function(data)
+                {
+                console.log('Error:', data);
                 $('#submit').html('Save');
-             $('.overlay').hide();
+                    $('.overlay').hide();
+                }
+                });
             }
-            else if(result.data.successStore)
-            {
-                document.location.href="{{route('suppliers.index') }}";
-            }
-
-
-            // e.preventDefault();
-        //    $('#createSupplierForm').trigger("reset");
-        //    $('#ajax-product-modal').modal('hide');
-           
-        //    var oTable = $('#laravel_datatable').dataTable();
-        //    oTable.fnDraw(false);
-           },
-           error: function(data){
-           console.log('Error:', data);
-           $('#submit').html('Save');
-             $('.overlay').hide();
-           }
-           });
-                
-                // activeTab
-                // var f = document.getElementById("createSupplierForm");
-                // f.setAttribute('method',"post");  
-                // f.setAttribute('enctype',"multipart/form-data"); 
-                // f.setAttribute('action',"{{ route('suppliers.store') }}");
-            }
-        });
-     
+        });   
         function resetAddonDropdown()
         {
-            // alert('ji');
-            var selectedAddons = [];
-            for (var i = 1; i <= addonDropdownCount; i++) 
-            {
-                var eachSelected = [];
-                var eachSelected = $('#adoon_'+i).val();
-                $.each(eachSelected, function( ind, value ) 
-                {
-                    selectedAddons.push(value); 
-                });
-            }
-            for (var i = 1; i <= addonDropdownCount; i++) 
-            {
-                $.each(selectedAddons, function( ind, value ) 
-                {
-                    $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
-    $('#addon_'+i).select2();
-                    // $("#adoon_"+i+">optgroup>option[value="+value+"]").attr('disabled','disabled');
-                    // $("#adoon_"+i).select2();
-                });
-                // document.querySelector('div.selector option[value=valueB]').text = 'Value whatever';
-                // $("#adoon_"+i).find(':selected').attr('disabled','disabled');
-            }
+            // var selectedAddons = [];
+            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // {
+            //     var eachSelected = [];
+            //     var eachSelected = $('#adoon_'+i).val();
+            //     $.each(eachSelected, function( ind, value ) 
+            //     {
+            //         selectedAddons.push(value);
+                     
+            //     });
+            // }
+            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // {
+            //     $.each(selectedAddons, function( ind, value ) 
+            //     {
+            //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
+            //     });
+            // }   
         }
-          //===== delete the form fieed row
+        //===== delete the form fieed row
           $("body").on("click", ".remove_node_btn_frm_field", function () 
         {
             $(this).closest(".form_field_outer_row").remove();

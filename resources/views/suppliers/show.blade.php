@@ -168,8 +168,8 @@
     <script type="text/javascript">
         $(document).ready(function ()
         {
-            $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
-            $("#adoon").select2();
+            // $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
+            // $("#adoon").select2();
         });
         var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
         separateDialCode: true,
@@ -183,12 +183,12 @@
         hiddenInput: "full",
         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        $("form").submit(function() {
-        var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-        $("input[name='contact_number[full]'").val(full_number);
-        var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-        $("input[name='alternative_contact_number[full]'").val(full_number);
-        });
+        // $("form").submit(function() {
+        // var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+        // $("input[name='contact_number[full]'").val(full_number);
+        // var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+        // $("input[name='alternative_contact_number[full]'").val(full_number);
+        // });
         function showAddonTable()
         {
             let addonTable = document.getElementById('addonListTable');

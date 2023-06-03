@@ -1,15 +1,15 @@
 @extends('layouts.main')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" />
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" /> -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" />
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" /> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
 
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> -->
 
 <style>
     .error 
@@ -175,7 +175,7 @@
 @section('content')
 
     <div class="card-header">
-        <h4 class="card-title">Create Suppliers</h4>
+        <h4 class="card-title">Edit Suppliers</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -197,6 +197,7 @@
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
+                <input id="supplier_id" name="supplier_id" value="{{ $supplier->id }}" hidden>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -204,7 +205,7 @@
                             <label for="supplier" class="col-form-label text-md-end">{{ __('Supplier') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="supplier" type="text" class="form-control @error('supplier') is-invalid @enderror" name="supplier" placeholder="Enter Supplier" value="{{ $supplier->supplier }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
                             @error('supplier')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -222,7 +223,7 @@
                             <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_person" type="text" class="form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
+                            <input id="contact_person" type="text" class="form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ $supplier->contact_person }}"  autocomplete="contact_person" autofocus>
                             @error('contact_person')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -240,7 +241,7 @@
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="tel" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -257,7 +258,7 @@
                             <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="number" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="alternative_contact_number" type="tel" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -275,7 +276,7 @@
                             <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
+                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ $supplier->email }}" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -293,7 +294,7 @@
                             <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="person_contact_by" type="text" class="form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"  autocomplete="person_contact_by" autofocus>
+                            <input id="person_contact_by" type="text" class="form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ $supplier->person_contact_by }}"  autocomplete="person_contact_by" autofocus>
                             @error('person_contact_by')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -313,11 +314,11 @@
                         <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control " onchange="validationOnKeyUp(this)">
                         <!-- @error('supplier_types') is-invalid @enderror -->
                             <option value="">Choose Supplier Type</option>
-                            <option value="accessories">Accessories</option>      
-                            <option value="freelancer">Freelancer</option>
-                            <option value="garage">Garage</option>
-                            <option value="spare_parts">Spare Parts</option>
-                            <option value="warranty">Warranty</option>
+                            <option value="accessories" @if(in_array("accessories", $supplierTypes)) selected @endif>Accessories</option>      
+                            <option value="freelancer" @if(in_array("freelancer", $supplierTypes)) selected @endif>Freelancer</option>
+                            <option value="garage" @if(in_array("garage", $supplierTypes)) selected @endif>Garage</option>
+                            <option value="spare_parts" @if(in_array("spare_parts", $supplierTypes)) selected @endif>Spare Parts</option>
+                            <option value="warranty" @if(in_array("warranty", $supplierTypes)) selected @endif>Warranty</option>
                         </select>
                         @error('supplier_types')
                                 <span class="invalid-feedback" role="alert">
@@ -338,7 +339,7 @@
                             <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
                                 <option value="">Choose Payment Method</option>
                                 @foreach($paymentMethods as $paymentMethod)
-                                <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
+                                <option value="{{$paymentMethod->id}}" {{$paymentMethod->id == $primaryPaymentMethod->payment_methods_id  ? 'selected' : ''}}>{{$paymentMethod->payment_methods}}</option>
                                 @endforeach
                             </select>
                             @error('is_primary_payment_method')
@@ -351,15 +352,18 @@
                     </div>
                     </br>
                 </div>
-                <div id="secondaryPayments" class="col-xxl-6 col-lg-6 col-md-12" hidden >
+                @if(count($array)>0)
+                <div id="secondaryPayments" class="col-xxl-6 col-lg-6 col-md-12" >
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <!-- <span class="error">* </span> -->
                             <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
+                        <!-- @if($paymentMethod->id != $primaryPaymentMethod->payment_methods_id) -->
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">
-                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}">                              
+                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}" @if (in_array($paymentMethod->id, $array)) checked="checked" @endif >                              
+                                <!-- @if ($paymentMethod->id == $primaryPaymentMethod->payment_methods_id) hidden @endif -->
                                 <label class="form-check-label" for="flexCheckIndeterminate">
                                     {{ $paymentMethod->payment_methods }}
                                 </label>
@@ -370,10 +374,12 @@
                                    
                                 @enderror
                             </div>
+                            <!-- @endif -->
                         @endforeach
                     </div>
                     </br>
                 </div> 
+                @endif
             </div>
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
@@ -484,6 +490,7 @@
 
     <script type="text/javascript">
         var activeTab = '';
+
         var PreviousHidden = '';
         // var selectedAddons = [];
         
@@ -495,7 +502,7 @@
         $(document).ready(function ()
         {
             
-
+            PreviousHidden = $('#is_primary_payment_method').val();
 // $('button').on('click', function() {
   
 // });
@@ -674,36 +681,19 @@
         });
         // $("form").submit(function(e) 
         $('body').on('submit', '#createSupplierForm', function (e) 
-        
         {
-          
-        //    $('.overlay').show();
             sub = '2';
-                        //      adoon_1 currency_1 addon_purchase_price_in_usd_1 addon_purchase_price_1
-                    // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
-            // var input = $('#supplier').val();
             var inputSupplier = $('#supplier').val();
-            // var inputContactPerson = $('#contact_person').val();
-            // var inputPersonContactBy = $('#person_contact_by').val();
             var inputSupplierType = $('#supplier_type').val();
-            // var inputIsPrimaryPaymentMethod = $('#is_primary_payment_method').val();
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
-
             var inputContactNumber = $('#contact_number').val();
-            
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
             var formInputError = false;
             if(inputSupplier == '')
             {
-                // alert('ki');
                 $msg = "Supplier field is required";
                 showSupplierError($msg);
-                // $('.overlay').hide();
                 formInputError = true;
                 e.preventDefault();
             }
@@ -731,121 +721,95 @@
                 e.preventDefault();
             }
             if(formInputError == false)
-
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-            //     alert('kk');
-            // alert(full_number);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-             
                 $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
                 $("input[name='activeTab'").val(activeTab);
-                $("input[name='hiddencontact'").val(inputContactNumber);
-                $("input[name='hiddencontactCountryCode'").val(inputContactNumber);
                 e.preventDefault();
                 var actionType = $('#submit').val();
-       
-           
-           var formData = new FormData(this);
-           var $notifications = $('#notifications')
-           $('#submit').html('Sending..');
-           $('.overlay').show();
-           $.ajax({
-           type:'POST',
-           url: "{{ route('suppliers.store') }}",
-           data: formData,
-           cache:false,
-           contentType: false,
-           processData: false,
-           success: (result) => {
-            // $('.overlay').hide();
-            console.log(result)
-            let dataErrorCard = document.getElementById('dataErrorCard');
-            dataErrorCard.hidden = true
-            if(result.data.headingError)
-            {
-                document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
-                $('#submit').html('Save');
-             $('.overlay').hide();
-            }
-            else if(result.data.dataError)
-            {   
-                
-                document.getElementById("notifications").textContent = '';           
-                if(result.data.dataError.length > 0)
+                var formData = new FormData(this);
+                console.log(formData);
+                var $notifications = $('#notifications')
+                $('#submit').html('Sending..');
+                $('.overlay').show();
+                $.ajax({
+                type:'POST',
+                url: "{{ route('suppliers.updatedetails') }}",
+                data: formData,
+                cache:false,
+                contentType: false,
+                processData: false,
+                success: (result) => 
                 {
+                    console.log(result)
                     let dataErrorCard = document.getElementById('dataErrorCard');
-                    dataErrorCard.hidden = false
-                    var i = 0;
-                    $.each(result.data.dataError, function(key, value) {
-                    i = i+1;
-              $notifications.append('<tr><td> '+i+' </td>' +
-              '<td>'+ value.addon_code + '</td>' +
-              '<td>'+ value.currency + '</td>' +
-              '<td>'+ value.purchase_price + '</td>' +
-              '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
-              '</tr>');
-                });
-                }
+                    dataErrorCard.hidden = true
+                    if(result.data.headingError)
+                    {
+                        document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
+                        $('#submit').html('Save');
+                    $('.overlay').hide();
+                    }
+                    else if(result.data.dataError)
+                    {  
+                        document.getElementById("notifications").textContent = '';           
+                        if(result.data.dataError.length > 0)
+                        {
+                            let dataErrorCard = document.getElementById('dataErrorCard');
+                            dataErrorCard.hidden = false
+                            var i = 0;
+                            $.each(result.data.dataError, function(key, value) 
+                            {
+                                i = i+1;
+                                $notifications.append('<tr><td> '+i+' </td>' +
+                                '<td>'+ value.addon_code + '</td>' +
+                                '<td>'+ value.currency + '</td>' +
+                                '<td>'+ value.purchase_price + '</td>' +
+                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
+                                '</tr>');
+                            });
+                        }
+                        $('#submit').html('Save');
+                        $('.overlay').hide();
+                    }
+                    else if(result.data.successStore)
+                    {
+                        document.location.href="{{route('suppliers.index') }}";
+                    }
+                },
+                error: function(data)
+                {
+                console.log('Error:', data);
                 $('#submit').html('Save');
-             $('.overlay').hide();
+                    $('.overlay').hide();
+                }
+                });
             }
-            else if(result.data.successStore)
-            {
-                document.location.href="{{route('suppliers.index') }}";
-            }
-
-
-            // e.preventDefault();
-        //    $('#createSupplierForm').trigger("reset");
-        //    $('#ajax-product-modal').modal('hide');
-           
-        //    var oTable = $('#laravel_datatable').dataTable();
-        //    oTable.fnDraw(false);
-           },
-           error: function(data){
-           console.log('Error:', data);
-           $('#submit').html('Save');
-             $('.overlay').hide();
-           }
-           });
-                
-                // activeTab
-                // var f = document.getElementById("createSupplierForm");
-                // f.setAttribute('method',"post");  
-                // f.setAttribute('enctype',"multipart/form-data"); 
-                // f.setAttribute('action',"{{ route('suppliers.store') }}");
-            }
-        });
-     
+        });   
         function resetAddonDropdown()
         {
-            // alert('ji');
-            var selectedAddons = [];
-            for (var i = 1; i <= addonDropdownCount; i++) 
-            {
-                var eachSelected = [];
-                var eachSelected = $('#adoon_'+i).val();
-                $.each(eachSelected, function( ind, value ) 
-                {
-                    selectedAddons.push(value); 
-                });
-            }
-            for (var i = 1; i <= addonDropdownCount; i++) 
-            {
-                $.each(selectedAddons, function( ind, value ) 
-                {
-                    $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
-    $('#addon_'+i).select2();
-                    // $("#adoon_"+i+">optgroup>option[value="+value+"]").attr('disabled','disabled');
-                    // $("#adoon_"+i).select2();
-                });
-                // document.querySelector('div.selector option[value=valueB]').text = 'Value whatever';
-                // $("#adoon_"+i).find(':selected').attr('disabled','disabled');
-            }
+            // var selectedAddons = [];
+            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // {
+            //     var eachSelected = [];
+            //     var eachSelected = $('#adoon_'+i).val();
+            //     $.each(eachSelected, function( ind, value ) 
+            //     {
+            //         selectedAddons.push(value);
+                     
+            //     });
+            // }
+            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // {
+            //     $.each(selectedAddons, function( ind, value ) 
+            //     {
+            //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
+            //     });
+            // }   
         }
-          //===== delete the form fieed row
+        //===== delete the form fieed row
           $("body").on("click", ".remove_node_btn_frm_field", function () 
         {
             $(this).closest(".form_field_outer_row").remove();
@@ -854,29 +818,30 @@
         });
         function secondaryPaymentMethods(changePayment)
         {
-            var e = document.getElementById("is_primary_payment_method");
-            var value = e.value;
-            if(value != '')
-            {
-                if(PreviousHidden != '')
-                {
-                    let addonTable = document.getElementById(PreviousHidden);
-                    addonTable.hidden = false
-                }
-                validationOnKeyUp(changePayment);
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = false
-                let primaryPaymentMethod = document.getElementById(value);
-                primaryPaymentMethod.hidden = true
-                PreviousHidden = value;
-            }
-            else
-            {
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = true
-                $msg = "Primary payment method required"
-                showPaymentMethodsError($msg);
-            }
+            // var e = document.getElementById("is_primary_payment_method");
+            // var value = e.value;
+            // if(value != '')
+            // {
+            //     if(PreviousHidden != '')
+            //     {
+            //         let addonTable = document.getElementById(PreviousHidden);
+                    
+            //         addonTable.hidden = false
+            //     }
+            //     validationOnKeyUp(changePayment);
+            //     let addonTable = document.getElementById('secondaryPayments');
+            //     addonTable.hidden = false
+            //     let primaryPaymentMethod = document.getElementById(value);
+            //     primaryPaymentMethod.hidden = true
+            //     PreviousHidden = value;
+            // }
+            // else
+            // {
+            //     let addonTable = document.getElementById('secondaryPayments');
+            //     addonTable.hidden = true
+            //     $msg = "Primary payment method required"
+            //     showPaymentMethodsError($msg);
+            // }
         }
         function changeCurrency(i)
         {
