@@ -172,9 +172,6 @@ foreach ($modelLineIds as $modelLineId) {
         return redirect()->route('calls.index')
         ->with('success','Call Record created successfully');
     }
-    /**
-     * Display the specified resource.
-     */
     public function show(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
 {   
     $brandId = $request->route('brand_id');
@@ -310,6 +307,11 @@ return view('calls.resultbrand', compact('data'));
     }
     public function uploadingbulk(Request $request)
     {
+        $this->validate($request, [
+            'language' => 'required',
+            'type' => 'required',
+            'source' => 'required',
+        ]);   
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();

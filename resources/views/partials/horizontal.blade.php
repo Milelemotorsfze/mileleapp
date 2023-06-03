@@ -22,7 +22,7 @@
         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-end">
-        <a class="dropdown-item" href="">
+        <a class="dropdown-item" href="{{ route('profile.index') }}">
             <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
         </a>
         <div class="dropdown-divider"></div>
@@ -88,23 +88,11 @@
                     @endcan
                     @can('variants-view')
                     <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Variants</span><div class="arrow-down"></div>
+                            <span data-key="t-extra-pages">Add Pictures & Videos</span>
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('calls.varinatinfo') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create New Variants</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Add Pictures & Videos</span>
-                                </a>
-                            </div>
-</div>
-                    </li>
+					</li>
                     @endcan
                     @can('sales-view')
                     <li class="nav-item dropdown">

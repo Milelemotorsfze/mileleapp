@@ -19,6 +19,8 @@
         <h4 class="card-title">
             LOI Info
         </h4>
+        <a  class="btn btn-sm btn-info float-end" href="{{route('letter-of-indents.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+
     </div>
     <div class="portfolio">
         <ul class="nav nav-pills nav-fill">

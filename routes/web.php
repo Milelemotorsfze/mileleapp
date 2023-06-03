@@ -24,6 +24,7 @@ use App\Http\Controllers\LOIItemsController;
 use App\Http\Controllers\StrategyController;
 use App\Http\Controllers\LOIDocumentsController;
 use App\Http\Controllers\Repeatedcustomers;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
 
 
@@ -45,6 +46,17 @@ Route::get('/d', function () {
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    //Profile
+    Route::resource('profile', ProfileController::class);
+    Route::post('/update-login-info', [ProfileController::class, 'updateLoginInfo'])->name('profile.updateLoginInfo');
+    Route::post('/update-email-info', [ProfileController::class, 'updateEmailInfo'])->name('profile.updateEmailInfo');
+    Route::post('/update-picture-info', [ProfileController::class, 'updatepictureInfo'])->name('profile.updatepictureInfo');
+    Route::delete('/update-delete-document/{id}', [ProfileController::class, 'deleteDocument'])->name('profile.deleteDocument');
+    Route::delete('/update-skill-document/{id}', [ProfileController::class, 'skillDocument'])->name('profile.skillDocument');
+    Route::delete('/update-history-delete/{id}', [ProfileController::class, 'historydelete'])->name('profile.historydelete');
+    Route::post('/update-save-document', [ProfileController::class, 'saveDocument'])->name('profile.saveDocument');
+    Route::post('/update-save-skill', [ProfileController::class, 'saveskill'])->name('profile.saveskill');
+    Route::post('/update-history-info', [ProfileController::class, 'updatehistoryInfo'])->name('profile.updatehistoryInfo');
     // User
     Route::resource('users', UserController::class);
     Route::get('users/updateStatus/{id}', [UserController::class, 'updateStatus'])->name('users.updateStatus');

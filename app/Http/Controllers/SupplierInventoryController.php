@@ -62,20 +62,6 @@ class SupplierInventoryController extends Controller
                 return redirect()->back()->with(['error' => 'Invalid Column Count found!.']);
             }
 
-//            try {
-//                $import = new SupplierInventoryImport();
-//                $import->import($path);
-//            } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-//                $failures = $e->failures();
-//
-//                foreach ($failures as $failure) {
-//                    $failure->row(); // row that went wrong
-//                    $failure->attribute(); // either heading key (if using heading row concern) or column index
-//                    $failure->errors(); // Actual error messages from Laravel validator
-//                    $failure->values(); // The values of the row that has failed.
-//                }
-//            }
-
             $file = fopen("inventory/".$fileName, "r");
             $i = 0;
 
@@ -136,7 +122,7 @@ class SupplierInventoryController extends Controller
                     $uploadFileContents[$i]['pord_month'] = $filedata[6];
                     $uploadFileContents[$i]['po_arm'] = $filedata[7];
                     if (!empty($filedata[8])) {
-                        $filedata[8] = \Illuminate\Support\Carbon::parse($filedata[8])->format('Y-m-d');
+                        $filedata[8] = $filedata[8];
                     }else {
                         $filedata[8] = NULL;
                     }
@@ -150,11 +136,13 @@ class SupplierInventoryController extends Controller
                 $i++;
             }
             fclose($file);
-
             $newModels = [];
             $newModelsWithSteerings = [];
             $j=0;
+
             foreach($uploadFileContents as $uploadFileContent){
+                $chaisis[] = $uploadFileContent['chasis'];
+
                 $isModelExist = MasterModel::where('model',$uploadFileContent['model'])
                                             ->where('sfx', $uploadFileContent['sfx'])
                                             ->first();
@@ -175,6 +163,14 @@ class SupplierInventoryController extends Controller
                 }
                 $j++;
             }
+
+            $chaisisNumbers = array_filter($chaisis);
+            $uniqueChaisis =  array_unique($chaisisNumbers);
+
+            if(count($chaisisNumbers) !== count($uniqueChaisis)) {
+                return redirect()->back()->with('error', "Duplicate Chasis Number found in Your File! Please upload file with unique Chasis Number.");
+            }
+
             $newModelsWithSteerings = array_map("unserialize", array_unique(array_map("serialize", $newModelsWithSteerings)));
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
             if(count($newModels) > 0 || count($newModelsWithSteerings) > 0)

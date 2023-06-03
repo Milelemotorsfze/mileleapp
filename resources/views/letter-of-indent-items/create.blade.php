@@ -2,6 +2,8 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Add New LOI Items</h4>
+        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
