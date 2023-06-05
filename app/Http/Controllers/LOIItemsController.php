@@ -151,6 +151,17 @@ class LOIItemsController extends Controller
         $letterOfIndentItem = LetterOfIndentItem::find($request->id);
         $approvedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
 
+        $masterModel = MasterModel::where('model', $letterOfIndentItem->model)
+            ->where('sfx', $letterOfIndentItem->sfx)->first();
+        $quantity = $request->quantity;
+
+        $supplierInventoriesIds = SupplierInventory::where('master_model_id', $masterModel->id)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->take($quantity)
+            ->pluck('id');
+        SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
+
         DB::beginTransaction();
         $letterOfIndentItem->approved_quantity = $approvedQuantity;
         $letterOfIndentItem->save();
@@ -183,15 +194,11 @@ class LOIItemsController extends Controller
         $result = array_diff($loiItemIds,$approvedItems);
         $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
         if(empty($result)) {
-            info($letterOfIndent);
-            info("approved");
             $letterOfIndent->status = "Approved";
         }
         if(!empty($updatedItems)) {
-            info("partialy approved");
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
-
         $letterOfIndent->save();
         DB::commit();
 
