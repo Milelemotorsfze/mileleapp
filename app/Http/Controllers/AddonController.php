@@ -23,6 +23,7 @@ class AddonController extends Controller
      */
     public function index($data)
     {
+
         $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines');
         if($data != 'all')
         {
@@ -43,7 +44,7 @@ class AddonController extends Controller
                     'master_model_lines.model_line','addon_details.status')
                     ->orderBy('addon_details.id','ASC')
                     ->get();        
-        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters'));
+        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters','data'));
     }
 
     /**
@@ -270,22 +271,56 @@ class AddonController extends Controller
     }
     public function addonFilters(Request $request) 
     {
+
+// dd($request->BrandIds);
+
         $addonIds = AddonDetails::with('AddonTypes')->whereHas('AddonTypes', function($q) use($request) {
+           
             if($request->BrandIds)
             {
-            $q->whereNotIn('brand_id',$request->BrandIds)->get();
+            $q->whereIn('brand_id',$request->BrandIds);
             }
             if($request->ModelLineIds)
             {
-            $q->whereNotIn('model_id',$request->ModelLineIds)->get();
+            $q->whereIn('model_id',$request->ModelLineIds);
             }
         });
         if($request->AddonIds)
         {
-            $addonIds = $addonIds->whereNotIn('addon_id',$request->AddonIds);
+            $addonIds = $addonIds->whereIn('addon_id',$request->AddonIds);
         }
-        $addonIds = $addonIds->pluck('id');
-        return response()->json($addonIds);
+        if($request->Data)
+        {
+            $addonIds = $addonIds->where('addon_type_name',$request->Data);
+        }
+        // $addonIds = $addonIds->pluck('id');
+        $data['addons'] = $addonIds->pluck('id');
+        // dd($data);
+        return response()->json($data);
+
+
+
+        // $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines');
+        // if($data != 'all')
+        // {
+        //     $addon1 = $addon1->where('addon_type_name',$data);
+        // }
+        // $addon1 = $addon1->orderBy('id', 'ASC')->get();
+        // $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
+        // $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
+        // $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        // // $addons = AddonDetails::with('AddonTypes.brands','AddonTypes.modelLines','AddonTypes.brands')
+        // $addons = DB::table('addon_details')
+        //             ->join('addons','addons.id','addon_details.addon_id')
+        //             ->join('addon_types','addon_types.addon_details_id','addon_details.id')
+        //             ->join('brands','brands.id','addon_types.brand_id')
+        //             ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
+        //             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+        //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
+        //             'master_model_lines.model_line','addon_details.status')
+        //             ->orderBy('addon_details.id','ASC')
+        //             ->get();        
+        // return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters'));
     }
     public function createMasterAddon(Request $request)
     {

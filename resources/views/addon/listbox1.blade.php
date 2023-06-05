@@ -75,6 +75,7 @@
 </style>
 @if($addon1)
         @if(count($addon1) > 0)
+        <div class="card-body">
 <div class="list2" id="addonbox">
       <div class="row related-addon">
        
@@ -173,12 +174,13 @@
               </div>     
             </div>
           </div>
-          <!-- </br> -->
+          </br>
           
         @endforeach
        
-        <!-- </br> -->
+        </br>
       </div>
+    </div>
     </div>
     @endif
         @endif

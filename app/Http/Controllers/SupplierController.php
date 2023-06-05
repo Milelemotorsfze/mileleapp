@@ -54,30 +54,30 @@ class SupplierController extends Controller
         // dd($request->contact_number['full']);
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
-    //     $validator = Validator::make($request->all(), [
-    //         'supplier' => 'required',
-    //         // 'contact_person' => 'required',
-    //         // 'contact_number' => 'required',
-    //         //  'alternative_contact_number' => 'required',
-    //         // 'email' => 'required',
-    //         // 'person_contact_by' => 'required',
-    //         // 'supplier_type' => 'required',
-    //         'is_primary_payment_method' => 'required',
-    //         // 'model' => 'required',
-    //         // 'addon_id' => 'required',
-    //         // 'payment_methods_id' => 'required',
-    //         'supplier_types' => 'required',
-    //         // 'contact_number' => 'required_without:alternative_contact_number',
-    //         // 'alternative_contact_number' => 'required_without:contact_number', 
-    //     ]);
-    // //    dd($request->contact_number['full']);
-    //     if ($validator->fails()) 
-    //     {
-    //         // dd('hi');
-    //         return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
-    //     }
-    //     else 
-    //     { 
+        $validator = Validator::make($request->all(), [
+            'supplier' => 'required',
+            // 'contact_person' => 'required',
+            // 'contact_number' => 'required',
+            //  'alternative_contact_number' => 'required',
+            // 'email' => 'required',
+            // 'person_contact_by' => 'required',
+            // 'supplier_type' => 'required',
+            'is_primary_payment_method' => 'required',
+            // 'model' => 'required',
+            // 'addon_id' => 'required',
+            // 'payment_methods_id' => 'required',
+            'supplier_types' => 'required',
+            // 'contact_number' => 'required_without:alternative_contact_number',
+            // 'alternative_contact_number' => 'required_without:contact_number', 
+        ]);
+    //    dd($request->contact_number['full']);
+        if ($validator->fails()) 
+        {
+            // dd('hi');
+            return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
+        }
+        else 
+        { 
             if($request->activeTab == 'uploadExcel')
             {
                
@@ -93,10 +93,10 @@ class SupplierController extends Controller
                                 Excel::import(new SupplierAddonImport,request()->file('file'));
                                 $dataError = [];
                                 $rows = SupplierAddonTemp::all();
+                                $existingAddon = [];
                                 for ($i=0; $i< count($rows); $i++) 
                                 {
                                     $currencyError = $priceErrror = $addonError = '';
-                                    $existingAddon = [];
                                     if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
                                     {
                                         if($rows[$i]['currency'] == '')
@@ -480,18 +480,18 @@ class SupplierController extends Controller
                 }
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
-                $addon_id = $request->addon_id;
-                if($addon_id != NULL)
-                {
-                    if(count($addon_id) > 0)
-                    {
-                        foreach($addon_id as $addon_id)
-                        {
-                            $supplier_addon['addon_details_id'] = $addon_id;
-                            $supplierAddon1 = SupplierAddons::create($supplier_addon);
-                        }
-                    }
-                }
+                // $addon_id = $request->addon_id;
+                // if($addon_id != NULL)
+                // {
+                //     if(count($addon_id) > 0)
+                //     {
+                //         foreach($addon_id as $addon_id)
+                //         {
+                //             $supplier_addon['addon_details_id'] = $addon_id;
+                //             $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                //         }
+                //     }
+                // }
                 $supAdd['supplier_id'] = $suppliers->id;
                 $supAdd['created_by'] = $authId;
                 if($request->activeTab == 'addSupplierDynamically')
@@ -525,6 +525,10 @@ class SupplierController extends Controller
                                                 $suppliers = SupplierAddons::create($supAdd);
                                                 array_push($addonAlredyExist, $addon_code);
                                             }
+                                            // else
+                                            // {
+                                            // dd("show error if the addon is duplicate")
+                                            // }
                                         }
                                     }
                                 }
@@ -537,7 +541,7 @@ class SupplierController extends Controller
                 return response()->json(['success' => true,'data' => $data], 200);
             }
           
-        // }
+        }
     }
 
     /**
@@ -667,37 +671,661 @@ class SupplierController extends Controller
     }
     public function updateDetails(Request $request)
     {
-        // dd($request->all());
-        $authId = Auth::id();
-        $input = $request->all();
+    //     // dd($request->all());
+    //     $authId = Auth::id();
+    //     $input = $request->all();
+    // // $input['updated_by'] = $authId;
+    // $SupplierUpdate = Supplier::find($request->supplier_id);
+    // $input['contact_number'] = $request->contact_number['full'];
+    // $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
     // $input['updated_by'] = $authId;
-    $SupplierUpdate = Supplier::find($request->supplier_id);
-    $input['contact_number'] = $request->contact_number['full'];
-    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-    $input['updated_by'] = $authId;
-    $SupplierUpdate->update($input);
-    // $inputaddontype['addon_details_id'] = $SupplierUpdate->id;
-    // $inputaddontype['created_by'] = $authId;
-    // for($i=0; $i<count($request->brand); $i++)
-    // {
-    //     if($request->addon_details_id[$i] == NULL)
+    // $SupplierUpdate->update($input);
+    // // $inputaddontype['addon_details_id'] = $SupplierUpdate->id;
+    // // $inputaddontype['created_by'] = $authId;
+    // // for($i=0; $i<count($request->brand); $i++)
+    // // {
+    // //     if($request->addon_details_id[$i] == NULL)
+    // //     {
+    // //         $inputaddontype['brand_id'] = $request->brand[$i];
+    // //         $inputaddontype['model_id'] = $request->model[$i];
+    // //         $addon_types = AddonTypes::create($inputaddontype);
+    // //     }
+    // //     else
+    // //     {
+    // //         $inputaddontype['brand_id'] = $request->brand[$i];
+    // //         $inputaddontype['model_id'] = $request->model[$i];
+    // //         $SupplierUpdate = AddonTypes::find($request->addon_details_id[$i]);
+    // //         $SupplierUpdate->update($inputaddontype);
+    // //     }
+    // // }
+    // // return redirect()->route('addon.index')
+    // //                 ->with('success','addon updated successfully');
+    // $data['successStore'] = true;
+    //             return response()->json(['success' => true,'data' => $data], 200);
+
+
+
+
+
+
+                
+        // dd($request->all());
+        // dd($request->activeTab);
+        // dd($request->contact_number['full']);
+        $payment_methods_id = $addon_id = [];
+        $authId = Auth::id();
+    //     $validator = Validator::make($request->all(), [
+    //         'supplier' => 'required',
+    //         // 'contact_person' => 'required',
+    //         // 'contact_number' => 'required',
+    //         //  'alternative_contact_number' => 'required',
+    //         // 'email' => 'required',
+    //         // 'person_contact_by' => 'required',
+    //         // 'supplier_type' => 'required',
+    //         'is_primary_payment_method' => 'required',
+    //         // 'model' => 'required',
+    //         // 'addon_id' => 'required',
+    //         // 'payment_methods_id' => 'required',
+    //         'supplier_types' => 'required',
+    //         // 'contact_number' => 'required_without:alternative_contact_number',
+    //         // 'alternative_contact_number' => 'required_without:contact_number', 
+    //     ]);
+    // //    dd($request->contact_number['full']);
+    //     if ($validator->fails()) 
     //     {
-    //         $inputaddontype['brand_id'] = $request->brand[$i];
-    //         $inputaddontype['model_id'] = $request->model[$i];
-    //         $addon_types = AddonTypes::create($inputaddontype);
+    //         // dd('hi');
+    //         return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
     //     }
-    //     else
-    //     {
-    //         $inputaddontype['brand_id'] = $request->brand[$i];
-    //         $inputaddontype['model_id'] = $request->model[$i];
-    //         $SupplierUpdate = AddonTypes::find($request->addon_details_id[$i]);
-    //         $SupplierUpdate->update($inputaddontype);
-    //     }
-    // }
-    // return redirect()->route('addon.index')
-    //                 ->with('success','addon updated successfully');
-    $data['successStore'] = true;
+    //     else 
+    //     { 
+            if($request->activeTab == 'uploadExcel')
+            { 
+                if($request->file('file'))
+                { 
+                    $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                    if(count($headings) > 0)
+                    {
+                        foreach($headings[0] as $heading)
+                        {
+                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                            {
+                                Excel::import(new SupplierAddonImport,request()->file('file'));
+                                $dataError = [];
+                                $rows = SupplierAddonTemp::all();                                
+                                $existingAddon = [];
+                                for ($i=0; $i< count($rows); $i++) 
+                                {
+                                    $currencyError = $priceErrror = $addonError = '';
+                                    if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
+                                    {
+                                        if($rows[$i]['currency'] == '')
+                                        {
+                                            $currencyError = "Currency field is required";
+                                        }
+                                        elseif(!in_array(strtoupper($rows[$i]['currency']), ['AED','USD']))
+                                        {
+                                            $currencyError = "currency should be  AED or USD";
+                                        } 
+                                        if($rows[$i]['purchase_price'] == '') 
+                                        {
+                                            $priceErrror = "Purchase price field is required";
+                                        }  
+                                        elseif(!is_numeric($rows[$i]['purchase_price']))
+                                        {   
+                                            $priceErrror = "Purchase price should be a number";
+                                        }
+                                        if($rows[$i]['addon_code'] == '')
+                                        {
+                                            $addonError = "Addon code field is required";
+                                        }
+                                        elseif(in_array(strtoupper($rows[$i]['addon_code']),$existingAddon))
+                                        {
+                                            $addonError = "This addon code is duplicate";
+                                        }
+                                        else
+                                        {
+                                            $addonId = AddonDetails::where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                            array_push($existingAddon, $rows[$i]['addon_code']);
+                                            if($addonId == '')
+                                            {
+                                                $addonError = "This addon code is not exising in the system";
+                                            }
+                                            else
+                                            {
+                                                $supAdd = SupplierAddons::where('addon_details_id',$addonId->id)->where('supplier_id',$request->supplier_id)->select('id')->first();
+                                                if($supAdd)
+                                                {
+                                                    $addonError = "This addon code is already assigned for this supplier";
+                                                }
+                                            }
+                                        }
+                                        if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
+                                        {
+                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]); 
+                                        }
+                                        $rows[$i]->delete();
+                                    }  
+                                    else
+                                    {
+                                        $rows[$i]->delete();
+                                    }                                  
+                                }
+                                if(count($dataError) > 0)
+                                {
+                                    $data['dataError'] = $dataError;
+                                    return response()->json(['success' => true,'data' => $data], 200);
+                                }
+                                else
+                                {
+                                    $input = $request->all();
+                                    $suppliers = Supplier::find($request->supplier_id);
+                                    $input['contact_number'] = $request->contact_number['full'];
+                                    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+                                    $input['updated_by'] = $authId;
+                                    $suppliers->update($input);
+                                    if($request->supplier_types != null)
+                                    {
+                                        if(count($request->supplier_types) > 0)
+                                        {
+                                            $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
+                                            $existingSupplierTypes = json_decode($existingSupplierTypes);
+                                            $supplier_typeData['supplier_id'] = $suppliers->id;
+                                            $supplier_typeData['updated_by'] = $authId;
+                                            foreach($request->supplier_types as $supplier_typeData1)
+                                            { 
+                                                if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                                                {
+                                                    $supplier_typeData['supplier_type'] = $supplier_typeData1; 
+                                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
+                                                }                                                              
+                                            }
+                                            foreach($existingSupplierTypes as $existingSupplierTypes1)
+                                            {
+                                                if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                                                {
+                                                    $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
+                                                    if($deleSupType)
+                                                    {
+                                                        $deleSupType->delete();
+                                                    }
+                                                }   
+                                            }
+                                        }
+                                    }
+                                    $payment_methods['supplier_id'] = $suppliers->id;
+                                    $payment_methods['updated_by'] = $authId;         
+                                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
+                                    $payment_methods['is_primary_payment_method'] = 'yes'; 
+                                    $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+                                    $payment_methods_id = $request->payment_methods_id;
+                                    if($payment_methods_id != null)
+                                    {
+                                        if(count($payment_methods_id) > 0)
+                                        {
+                                            $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
+                                            $existingPaymentMethods = json_decode($existingPaymentMethods);
+                                            foreach($payment_methods_id as $payment_methods_id)
+                                            {
+                                                $payment_methods['payment_methods_id'] = $payment_methods_id;
+                                                    $payment_methods['is_primary_payment_method'] = 'no'; 
+                                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                                            }
+                                            foreach($payment_methods_id as $payment_methods_id)
+                                            { 
+                                                if(!in_array($payment_methods_id,$existingPaymentMethods)) 
+                                                {
+                                                    $paymentMethodsUpdate['supplier_type'] = $payment_methods_id;                                
+                                                    $paymentMethodsUpdate['is_primary_payment_method'] = 'no'; 
+                                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate); 
+                                                }                                                              
+                                            }
+                                            foreach($existingPaymentMethods as $existingPaymentMethods1)
+                                            {
+                                                if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+                                                {
+                                                    $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
+                                                    if($delSupPayMet)
+                                                    {
+                                                        $delSupPayMet->delete();
+                                                    }
+                                                }   
+                                            }
+                                        }
+                                    }
+                                    $supplier_addon['supplier_id'] = $suppliers->id;
+                                    $isupplier_addonnput['updated_by'] = $authId;
+                                    $addon_id = $request->addon_id;
+                                    if($addon_id != NULL)
+                                    {
+                                        if(count($addon_id) > 0)
+                                        {
+                                            foreach($addon_id as $addon_id)
+                                            {
+                                                $supplier_addon['addon_details_id'] = $addon_id;
+                                                $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                                            }
+                                        }
+                                    }
+                                    $supAdd['supplier_id'] = $suppliers->id;
+                                    $supAdd['updated_by'] = $authId;
+                                    if($request->activeTab == 'uploadExcel')
+                                    {
+                                        if($request->file('file'))
+                                        {
+                                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                                            if(count($headings) > 0)
+                                            {
+                                                foreach($headings[0] as $heading)
+                                                {
+                                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                                                    {
+                                                        Excel::import(new SupplierAddonImport,request()->file('file'));
+                                                        $supplierAddons = SupplierAddonTemp::all();
+                                                        foreach($supplierAddons as $supplierAddon)
+                                                        {
+                                                            $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
+                                                            $supAdd['addon_details_id'] = $addonId->id;
+                                                            if($supplierAddon->currency == 'AED')
+                                                            {
+                                                                $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                                                            }
+                                                            elseif($supplierAddon->currency == 'USD')
+                                                            {
+                                                                $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
+                                                                $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                                            }
+                                                            $suppliers = SupplierAddons::create($supAdd);
+                                                            // $supplierAddon->delete();
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        dd("Uploading excel headings should be addon_code , currency and purchase_price");
+                                                        // $errorMsg = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                                        // return redirect(route('suppliers.create'))->withInput()->withErrors($errorMsg);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // elseif($request->activeTab == 'addSupplierDynamically')
+                                    // {
+                                    //     if(count($request->supplierAddon) > 0)
+                                    //     {
+                                    //         foreach($request->supplierAddon as $supAddon)
+                                    //         {
+                                    //             if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                                    //             {
+                                    //                 $supAdd['currency'] = $supAddon['currency'];
+                                    //                 if($supAddon['currency'] == 'AED')
+                                    //                 {
+                                    //                     $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price'];
+                                    //                 }
+                                    //                 elseif($supAddon['currency'] == 'USD')
+                                    //                 {
+                                    //                     $supAdd['purchase_price_usd'] = $supAddon['addon_purchase_price_in_usd'];
+                                    //                     $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price_in_usd'] * 3.6725;
+                                    //                 }
+                                    //                 if(count($supAddon['addon_id']) > 0)
+                                    //                 {
+                                    //                     foreach($supAddon['addon_id'] as $addon_code)
+                                    //                     {
+                                    //                         $supAdd['addon_details_id'] = $addon_code;
+                                    //                         $suppliers = SupplierAddons::create($supAdd);
+                                    //                     }
+                                    //                 }
+                                    //             } 
+                                    //         }
+                                    //     }
+                                    // }
+                                    $data['successStore'] = true;
+                                    return response()->json(['success' => true,'data' => $data], 200);
+                                    // return redirect()->route('suppliers.index')
+                                    //                  ->with('success','Addon created successfully');
+                                }
+                                
+                                // dd($dataError);
+                                // $supplierAddons = SupplierAddonTemp::all();
+                                // foreach($supplierAddons as $supplierAddon)
+                                // {
+                                //     $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
+                                //     $supAdd['addon_details_id'] = $addonId->id;
+                                //     if($supplierAddon->currency == 'AED')
+                                //     {
+                                //         $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                                //     }
+                                //     elseif($supplierAddon->currency == 'USD')
+                                //     {
+                                //         $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
+                                //         $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                //     }
+                                //     $suppliers = SupplierAddons::create($supAdd);
+                                //     // $supplierAddon->delete();
+                                // }
+                            }
+                            else
+                            {
+                                $data['headingError'] = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                return response()->json(['success' => true,'data' => $data], 200);;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    $input = $request->all();
+                    $suppliers = Supplier::find($request->supplier_id);
+                    $input['contact_number'] = $request->contact_number['full'];
+                    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+                    $input['updated_by'] = $authId;
+                    $suppliers->update($input);
+                    if($request->supplier_types != null)
+                    {
+                        if(count($request->supplier_types) > 0)
+                        {
+                            $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
+                            $existingSupplierTypes = json_decode($existingSupplierTypes);
+                            $supplier_typeData['supplier_id'] = $suppliers->id;
+                            $supplier_typeData['updated_by'] = $authId;
+                            foreach($request->supplier_types as $supplier_typeData1)
+                            { 
+                                if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                                {
+                                    $supplier_typeData['supplier_type'] = $supplier_typeData1; 
+                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
+                                }                                                              
+                            }
+                            foreach($existingSupplierTypes as $existingSupplierTypes1)
+                            {
+                                if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                                {
+                                    $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
+                                    if($deleSupType)
+                                    {
+                                        $deleSupType->delete();
+                                    }
+                                }   
+                            }
+                        }
+                    }
+                    $payment_methods['supplier_id'] = $suppliers->id;
+                    $payment_methods['updated_by'] = $authId;         
+                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
+                    $payment_methods['is_primary_payment_method'] = 'yes'; 
+                    $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+                    $payment_methods_id = $request->payment_methods_id;
+                    if($payment_methods_id != null)
+                    {
+                        if(count($payment_methods_id) > 0)
+                        {
+                            $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
+                            $existingPaymentMethods = json_decode($existingPaymentMethods);
+                            foreach($payment_methods_id as $payment_methods_id)
+                            {
+                                $payment_methods['payment_methods_id'] = $payment_methods_id;
+                                    $payment_methods['is_primary_payment_method'] = 'no'; 
+                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                            }
+                            foreach($payment_methods_id as $payment_methods_id)
+                            { 
+                                if(!in_array($payment_methods_id,$existingPaymentMethods)) 
+                                {
+                                    $paymentMethodsUpdate['supplier_type'] = $payment_methods_id;                                
+                                    $paymentMethodsUpdate['is_primary_payment_method'] = 'no'; 
+                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate); 
+                                }                                                              
+                            }
+                            foreach($existingPaymentMethods as $existingPaymentMethods1)
+                            {
+                                if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+                                {
+                                    $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
+                                    if($delSupPayMet)
+                                    {
+                                        $delSupPayMet->delete();
+                                    }
+                                }   
+                            }
+                        }
+                    }
+                    $supplier_addon['supplier_id'] = $suppliers->id;
+                    $isupplier_addonnput['updated_by'] = $authId;
+                    $addon_id = $request->addon_id;
+                    if($addon_id != NULL)
+                    {
+                        if(count($addon_id) > 0)
+                        {
+                            foreach($addon_id as $addon_id)
+                            {
+                                $supplier_addon['addon_details_id'] = $addon_id;
+                                $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                            }
+                        }
+                    }
+                    $supAdd['supplier_id'] = $suppliers->id;
+                    $supAdd['updated_by'] = $authId;
+                    if($request->activeTab == 'uploadExcel')
+                    {
+                        // dd($request->file('file'));
+                        if($request->file('file'))
+                        {
+                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                            if(count($headings) > 0)
+                            {
+                                foreach($headings[0] as $heading)
+                                {
+                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                                    {
+                                        Excel::import(new SupplierAddonImport,request()->file('file'));
+                                        $supplierAddons = SupplierAddonTemp::all();
+                                        foreach($supplierAddons as $supplierAddon)
+                                        {
+                                            $addonId = AddonDetails::where('addon_code',$supplierAddon->addon_code)->select('id')->first();
+                                            $supAdd['addon_details_id'] = $addonId->id;
+                                            if($supplierAddon->currency == 'AED')
+                                            {
+                                                $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price;
+                                            }
+                                            elseif($supplierAddon->currency == 'USD')
+                                            {
+                                                $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
+                                                $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                            }
+                                            $suppliers = SupplierAddons::create($supAdd);
+                                            // $supplierAddon->delete();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        dd("Uploading excel headings should be addon_code , currency and purchase_price");
+                                        // $errorMsg = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                        // return redirect(route('suppliers.create'))->withInput()->withErrors($errorMsg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // elseif($request->activeTab == 'addSupplierDynamically')
+                    // {
+                    //     if(count($request->supplierAddon) > 0)
+                    //     {
+                    //         foreach($request->supplierAddon as $supAddon)
+                    //         {
+                    //             if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                    //             {
+                    //                 $supAdd['currency'] = $supAddon['currency'];
+                    //                 if($supAddon['currency'] == 'AED')
+                    //                 {
+                    //                     $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price'];
+                    //                 }
+                    //                 elseif($supAddon['currency'] == 'USD')
+                    //                 {
+                    //                     $supAdd['purchase_price_usd'] = $supAddon['addon_purchase_price_in_usd'];
+                    //                     $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price_in_usd'] * 3.6725;
+                    //                 }
+                    //                 if(count($supAddon['addon_id']) > 0)
+                    //                 {
+                    //                     foreach($supAddon['addon_id'] as $addon_code)
+                    //                     {
+                    //                         $supAdd['addon_details_id'] = $addon_code;
+                    //                         $suppliers = SupplierAddons::create($supAdd);
+                    //                     }
+                    //                 }
+                    //             } 
+                    //         }
+                    //     }
+                    // }
+                    $data['successStore'] = true;
+                    return response()->json(['success' => true,'data' => $data], 200);
+                    // return redirect()->route('suppliers.index')
+                    //                  ->with('success','Addon created successfully');
+                }
+            }
+            elseif($request->activeTab == 'addSupplierDynamically')
+            {
+                $input = $request->all();
+                $suppliers = Supplier::find($request->supplier_id);
+                $input['contact_number'] = $request->contact_number['full'];
+                $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+                $input['updated_by'] = $authId;
+                $suppliers->update($input);
+                if($request->supplier_types != null)
+                {
+                    if(count($request->supplier_types) > 0)
+                    {
+                        $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
+                        $existingSupplierTypes = json_decode($existingSupplierTypes);
+                        $supplier_typeData['supplier_id'] = $suppliers->id;
+                        $supplier_typeData['updated_by'] = $authId;
+                        foreach($request->supplier_types as $supplier_typeData1)
+                        { 
+                            if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                            {
+                                $supplier_typeData['supplier_type'] = $supplier_typeData1; 
+                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
+                            }                                                              
+                        }
+                        foreach($existingSupplierTypes as $existingSupplierTypes1)
+                        {
+                            if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                            {
+                                $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
+                                if($deleSupType)
+                                {
+                                    $deleSupType->delete();
+                                }
+                            }   
+                        }
+                    }
+                }
+                $paymentMethodsUpdate = SupplierAvailablePayments::where('is_primary_payment_method','yes')->where('supplier_id',$request->supplier_id)->first();
+                $payment_methods['supplier_id'] = $request->supplier_id;
+                $payment_methods['updated_by'] = $authId;
+                $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
+                $payment_methods['is_primary_payment_method'] = 'yes';
+                $paymentMethodsUpdate->update($payment_methods);
+                $payment_methods_id = $request->payment_methods_id;
+                if($payment_methods_id != null)
+                {
+                    if(count($payment_methods_id) > 0)
+                    {
+                        $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
+                        $existingPaymentMethods = json_decode($existingPaymentMethods);
+                        foreach($payment_methods_id as $payment_methods_id)
+                        {
+                            $payment_methods['payment_methods_id'] = $payment_methods_id;
+                                $payment_methods['is_primary_payment_method'] = 'no'; 
+                            $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                        }
+                        foreach($payment_methods_id as $payment_methods_id)
+                        { 
+                            if(!in_array($payment_methods_id,$existingPaymentMethods)) 
+                            {
+                                $paymentMethodsUpdate['supplier_type'] = $payment_methods_id;                                
+                                $paymentMethodsUpdate['is_primary_payment_method'] = 'no'; 
+                                $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate); 
+                            }                                                              
+                        }
+                        foreach($existingPaymentMethods as $existingPaymentMethods1)
+                        {
+                            if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+                            {
+                                $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
+                                if($delSupPayMet)
+                                {
+                                    $delSupPayMet->delete();
+                                }
+                            }   
+                        }
+                    }
+                }
+                $supplier_addon['supplier_id'] = $suppliers->id;
+                $isupplier_addonnput['updated_by'] = $authId;
+                $addon_id = $request->addon_id;
+                if($addon_id != NULL)
+                {
+                    if(count($addon_id) > 0)
+                    {
+                        foreach($addon_id as $addon_id)
+                        {
+                            $supplier_addon['addon_details_id'] = $addon_id;
+                            $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                        }
+                    }
+                }
+                $supAdd['supplier_id'] = $suppliers->id;
+                $supAdd['updated_by'] = $authId;
+                if($request->activeTab == 'addSupplierDynamically')
+                {
+                    if(count($request->supplierAddon) > 0)
+                    {
+                        $addonAlredyExist = [];
+                        foreach($request->supplierAddon as $supAddon)
+                        {
+                            if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                            {
+                                if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')
+                                {
+                                    $supAdd['currency'] = $supAddon['currency'];
+                                    if($supAddon['currency'] == 'AED')
+                                    {
+                                        $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price'];
+                                    }
+                                    elseif($supAddon['currency'] == 'USD')
+                                    {
+                                        $supAdd['purchase_price_usd'] = $supAddon['addon_purchase_price_in_usd'];
+                                        $supAdd['purchase_price_aed'] = $supAddon['addon_purchase_price_in_usd'] * 3.6725;
+                                    }
+                                    if(count($supAddon['addon_id']) > 0)
+                                    {
+                                        foreach($supAddon['addon_id'] as $addon_code)
+                                        {
+                                            if(!in_array($addon_code, $addonAlredyExist))
+                                            {
+                                                $supAdd['addon_details_id'] = $addon_code;
+                                                $suppliers = SupplierAddons::create($supAdd);
+                                                array_push($addonAlredyExist, $addon_code);
+                                            }
+                                        }
+                                    }
+                                }                              
+                            } 
+                        }
+                    }
+                }
+                $data['successStore'] = true;
                 return response()->json(['success' => true,'data' => $data], 200);
+            }
+          
+        // }
+
+
+
+
+
+
+
+
     }
 }
 

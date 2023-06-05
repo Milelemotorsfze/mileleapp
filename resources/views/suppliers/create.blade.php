@@ -12,6 +12,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> -->
 
 <style>
+    /* html, body {
+  background: #2c1238;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background: #ffde91;
+  color: #422a4c;
+  font-size: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  text-align: center;
+}
+
+::placeholder {
+  color: #422a4c;
+} */
     .error 
     {
         color: #FF0000;
@@ -22,21 +45,25 @@
     }
     .btn_round 
     {
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 30px;
         display: inline-block;
-        border-radius: 50%;
+        /* border-radius: 50%; */
         text-align: center;
         line-height: 35px;
         margin-left: 10px;
+        margin-top: 28px;
         border: 1px solid #ccc;
+        color:#fff;
+        background-color: #fd625e;
+        border-radius:5px;
         cursor: pointer;
     }
     .btn_round:hover 
     {
         color: #fff;
-        background: #6b4acc;
-        border: 1px solid #6b4acc;
+        background: #fd625e;
+        border: 1px solid #fd625e;
     }
     .btn_content_outer 
     {
@@ -423,7 +450,7 @@
                                                 <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
                                                     <i class="fas fa-copy"></i>
                                                 </button> -->
-                                                <button class="btn_round remove_node_btn_frm_field" disabled>
+                                                <button class="btn_round remove_node_btn_frm_field" disabled hidden>
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
@@ -433,7 +460,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn"><i class="fa fa-plus" aria-hidden="true"></i> Add</a> 
+                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn" onclick="clickAdd()"><i class="fa fa-plus" aria-hidden="true"></i> Add</a> 
                                 </div>
                             </div>
                         </div>
@@ -481,7 +508,7 @@
         </form> 
     </div>
     <div class="overlay"></div>
-
+    <!-- <input id="numbers-only" type="text" placeholder="Numbers Only" /> -->
     <script type="text/javascript">
         var activeTab = '';
         var PreviousHidden = '';
@@ -494,8 +521,29 @@
       
         $(document).ready(function ()
         {
+            // var inputField = document.querySelector('#contact_number');
+            // inputField.onkeydown = function(event) 
+            // {
+            //     // Only allow if the e.key value is a number or if it's 'Backspace'
+            //     if(isNaN(event.key) && event.key !== 'Backspace') 
+            //     {
+            //         $msg = "Only Numbers Allowed";
+            //         showContactNumberError($msg);
+            //         event.preventDefault();
+            //     }  
+            // }
+            // var inputField1 = document.querySelector('#alternative_contact_number');
+            // inputField1.onkeydown = function(event) 
+            // {
+            //     // Only allow if the e.key value is a number or if it's 'Backspace'
+            //     if(isNaN(event.key) && event.key !== 'Backspace') 
+            //     {
+            //         $msg = "Only Numbers Allowed";
+            //         showAlternativeContactNumberError($msg);
+            //         event.preventDefault();
+            //     }  
+            // }
             
-
 // $('button').on('click', function() {
   
 // });
@@ -577,9 +625,36 @@
                 //count++;
                
             });
-            $("body").on("click",".add_new_frm_field_btn", function ()
+            // $("body").on("click",".add_new_frm_field_btn", function ()
+           
+          
+        });  
+        function clickAdd()
             { 
-                var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;                
+
+                var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;   
+                // globalThis.addonDropdownCount = index;  
+                // var selectedAddons = [];
+                // for (var i = 1; i <= addonDropdownCount; i++) 
+                // {
+                //     var eachSelected = [];
+                //     var eachSelected = $('#adoon_'+i).val();
+                //     $.each(eachSelected, function( ind, value ) 
+                //     {
+                //         selectedAddons.push(value);
+                        
+                //     });
+                // }
+                // alert(selectedAddons);
+                // for (var i = 1; i <= addonDropdownCount; i++) 
+                // {
+                //     $.each(selectedAddons, function( ind, value ) 
+                //     {
+                //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
+                //     });
+                // }   
+                // alert(addonDropdownCount);
+                // resetAddonDropdown();           
                 $(".form_field_outer").append(`
                     <div class="row form_field_outer_row">
                         <div class="col-xxl-6 col-lg-6 col-md-12">
@@ -632,13 +707,13 @@
                 //             $("#adoon_"+index).select2().on('change', function() {
                 //     $('#value').select2({data:data[$(this).val()]});
                 // }).trigger('change');
-                // globalThis.addonDropdownCount = index;
-                // resetAddonDropdown();
+               
+                // alert(addonDropdownCount);
+               
                 // alert(globalThis.addonDropdownCount);
             // alert(index);
-            });   
-          
-        });  
+            // }); 
+                }  
         // Get the element with id="defaultOpen" and click on it
         document.getElementById("defaultOpen").click();
         function openCity(evt, tabName) 
@@ -954,22 +1029,69 @@
                 {
                     if(value.legth != 0)
                     {
-                        if(value.length < 5)
-                        {
-                            $msg = "Minimum 5 digits required";
-                            showContactNumberError($msg);
-                        }
-                        else if(value.length > 15 )
-                        {
-                            $msg = "Maximum 15 digits allowed";
-                            showContactNumberError($msg);
-                        }
-                        else
-                        {
-                            removeContactNumberError();
-                        }
-                        removeEmailError();
-                        removeAlternativeContactNumberError();
+//                         var inputField = document.querySelector('#contact_number');
+
+// inputField.onkeydown = function(event) {
+//   // Only allow if the e.key value is a number or if it's 'Backspace'
+//   if(isNaN(event.key) && event.key !== 'Backspace') {
+//     $msg = "Only Numbers Allowed";
+//                             showContactNumberError($msg);
+//     event.preventDefault();
+//   }
+//   else{
+//     if(value.length < 5)
+//                             {
+//                                 $msg = "Minimum 5 digits required";
+//                                 showContactNumberError($msg);
+//                             }
+//                             else if(value.length > 15 )
+//                             {
+//                                 $msg = "Maximum 15 digits allowed";
+//                                 showContactNumberError($msg);
+//                             }
+//                             else
+//                             {
+//                                 removeContactNumberError();
+//                             }
+//                             removeEmailError();
+//                             removeAlternativeContactNumberError();
+//   }
+// };
+
+
+
+
+                        // if(!value.match('[0-9]'))  
+                        // {
+                        //     $msg = "Only Numbers Allowed";
+                        //     showContactNumberError($msg);
+                        // } 
+                        // else
+                        // {
+                            // if(value === parseInt(value))
+                            // {
+                                if(value.length < 5)
+                                {
+                                    $msg = "Minimum 5 digits required";
+                                    showContactNumberError($msg);
+                                }
+                                else if(value.length > 15 )
+                                {
+                                    $msg = "Maximum 15 digits allowed";
+                                    showContactNumberError($msg);
+                                }
+                                else
+                                {
+                                    removeContactNumberError();
+                                }
+                                removeEmailError();
+                                removeAlternativeContactNumberError();
+                            // }
+                            // else{
+                            //     alert('lppl')
+                            // }
+                            
+                        // }   
                     }
                 }
                 else
@@ -994,22 +1116,31 @@
                 {
                     if(value.legth != 0)
                     {
-                        if(value.length < 5)
-                        {
-                            $msg = "Minimum 5 digits required";
-                            showAlternativeContactNumberError($msg);
-                        }
-                        else if(value.length > 15 )
-                        {
-                            $msg = "Maximum 15 digits allowed";
-                            showAlternativeContactNumberError($msg);
-                        }
-                        else
-                        {
-                            removeAlternativeContactNumberError();
-                        }
-                        removeEmailError();
-                        removeContactNumberError();
+                        // if(!value.match('[0-9]'))  
+                        // {
+                        //     $msg = "Only Numbers Allowed";
+                        //     showContactNumberError($msg);
+                        // } 
+                        // else
+                        // {
+                            
+                            if(value.length < 5)
+                            {
+                                $msg = "Minimum 5 digits required";
+                                showAlternativeContactNumberError($msg);
+                            }
+                            else if(value.length > 15 )
+                            {
+                                $msg = "Maximum 15 digits allowed";
+                                showAlternativeContactNumberError($msg);
+                            }
+                            else
+                            {
+                                removeAlternativeContactNumberError();
+                            }
+                            removeEmailError();
+                            removeContactNumberError();
+                        // }
                     }
                 }
                 else
@@ -1036,7 +1167,7 @@
                     {
                         const validateEmail = (email) => {
                         return email.match(
-                            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[(com|net|org|cc|info|name|biz|tv|us|ws|mobi|de|am|fm|me|ca|bz|com.bz|net.bz|es|asia|co|se|xxx|la|buzz)]{2,}))$/
                         );
                         };
                         const validate = () => {

@@ -30,6 +30,7 @@
   </div>
   <div class="card-header">
     <form>
+      <input type="text", value="{{$data}}" id="data" hidden>
       <div class="row">
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-addon-code" multiple="true" style="width: 100%;">
@@ -41,7 +42,7 @@
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-brand" multiple="true" style="width: 100%;">
             @foreach($brandMatsers as $brandMatser)
-              <option value="{{$brandMatser->brand_name}}">{{$brandMatser->brand_name}}</option>
+              <option value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
             @endforeach
           </select>
         </div>
@@ -55,10 +56,10 @@
       </div>
     </form>
   </div>
-  <div class="card-body">
+  
     @include('addon.listbox')
     @include('addon.table')
-  </div>
+ 
   <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -124,9 +125,11 @@
       var AddonIds = [];
       var BrandIds = [];
       var ModelLineIds = [];
+      var Data = '';
       var AddonIds = $('#fltr-addon-code').val();
       var BrandIds = $('#fltr-brand').val();
       var ModelLineIds = $('#fltr-model-line').val();
+      var Data = $('#data').val();
       $.ajax
       ({
         url:"{{url('addonFilters')}}",
@@ -136,22 +139,40 @@
           AddonIds: AddonIds,
           BrandIds: BrandIds,
           ModelLineIds: ModelLineIds,
+          Data: Data,
           _token: '{{csrf_token()}}' 
         },
         dataType : 'json',
         success: function(result)
         {
-          $.each(globalThis.OldAddons,function(key,value)
-          {  
-            // $("#"+value).show();
-          });
-          globalThis.OldAddons = [];                     
-          $.each(result,function(key,value)
-          {  
-            globalThis.OldAddons .push(value);
-            // $("#"+value).hide();
-            $("#"+value).addClass('hide');
-          });
+$(".each-addon").hide();
+// $(".brr").hide();
+          // $(".related-addon").hide("")
+          $.each(result.addons, function (index, value){
+            console.log(value);
+            $("#"+value).show();
+            // $("#4").show();
+          //   $(".related-addon").append(`
+          //       <h1>vvvvvvv</h1>
+                // `); 
+            // $('.list', $unitses).append('value.name');
+//alert(response);
+        });
+          
+          // location.reload();
+          // console.log(result);
+          
+          // $.each(globalThis.OldAddons,function(key,value)
+          // {  
+          //   $("#"+value).show();
+          // });
+          // globalThis.OldAddons = [];                     
+          // $.each(result,function(key,value)
+          // {  
+          //   globalThis.OldAddons .push(value);
+          //   $("#"+value).hide();
+          //   // $("#"+value).addClass('hide');
+          // });
         }
       });
     }

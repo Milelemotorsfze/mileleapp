@@ -241,7 +241,7 @@
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="tel" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -258,7 +258,7 @@
                             <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="tel" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="alternative_contact_number" type="number" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -503,6 +503,28 @@
         {
             
             PreviousHidden = $('#is_primary_payment_method').val();
+            // var inputField = document.querySelector('#contact_number');
+            // inputField.onkeydown = function(event) 
+            // {
+            //     // Only allow if the e.key value is a number or if it's 'Backspace'
+            //     if(isNaN(event.key) && event.key !== 'Backspace') 
+            //     {
+            //         $msg = "Only Numbers Allowed";
+            //         showContactNumberError($msg);
+            //         event.preventDefault();
+            //     }  
+            // }
+            // var inputField1 = document.querySelector('#alternative_contact_number');
+            // inputField1.onkeydown = function(event) 
+            // {
+            //     // Only allow if the e.key value is a number or if it's 'Backspace'
+            //     if(isNaN(event.key) && event.key !== 'Backspace') 
+            //     {
+            //         $msg = "Only Numbers Allowed";
+            //         showAlternativeContactNumberError($msg);
+            //         event.preventDefault();
+            //     }  
+            // }
 // $('button').on('click', function() {
   
 // });

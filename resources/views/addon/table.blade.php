@@ -33,6 +33,7 @@
 </style>
 @if($addons)
         @if(count($addons) > 0)
+        <div class="card-body">
     <div class="table-responsive" id="addonListTable" hidden>     
       <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
         <thead>
@@ -112,6 +113,7 @@
         
         </tbody>
       </table>
+    </div>
     </div>
     @endif
           @endif
