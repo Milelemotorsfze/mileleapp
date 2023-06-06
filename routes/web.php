@@ -190,6 +190,10 @@ Route::get('/d', function () {
     Route::post('dailyleads/processStep', [DailyleadsController::class, 'processStep'])->name('processStep');
     Route::get('dailyleads/prospecting/{id}', [DailyleadsController::class, 'prospecting'])->name('dailyleads.prospecting');
 
+    Route::post('/update-qoutation-info', [DailyleadsController::class, 'qoutations'])->name('sales.qoutations');
+    Route::post('/update-rejection-info', [DailyleadsController::class, 'rejection'])->name('sales.rejection');
+    Route::post('/update-closed-info', [DailyleadsController::class, 'closed'])->name('sales.closed');
+
     // HR
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');

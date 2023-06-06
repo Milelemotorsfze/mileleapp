@@ -25,6 +25,7 @@ class calls extends Model
         'region',
         'custom_brand_model',
         'created_at',
+        'customer_coming_type',
     ];
     public $timestamps = false;
 }
