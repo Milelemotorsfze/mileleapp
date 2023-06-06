@@ -19,17 +19,18 @@
         </h4>
     </div>
     <div class="card-body">
-        <form action="{{ route('letter-of-indents.get-suppliers-LOIs') }}" >
+        <form id="form-search" action="{{ route('letter-of-indents.get-suppliers-LOIs') }}" >
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
-                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
-                            <option >Select The Supplier</option>
+                        <label for="choices-single-default" class="form-label">Supplier</label>
+                        <select class="form-control"  name="supplier_id"  id="supplier" required>
+                            <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}" @if($supplierId){{ $supplier->id == $supplierId ? 'selected' : '' }} @endif>{{ $supplier->supplier }}</option>
                             @endforeach
                         </select>
+
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
@@ -503,6 +504,17 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
+            $("#supplier").select2({
+                placeholder:'Select Supplier'
+            })
+            $("#form-search").validate({
+                rules: {
+                    supplier_id: {
+                        required: true,
+                    },
+                },
+            });
+
             $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
                 localStorage.setItem('activeTab', $(e.target).attr('href'));
             });
@@ -548,6 +560,7 @@
                 }).set({title:"Status Change"})
             }
         })
+
     </script>
 @endsection
 

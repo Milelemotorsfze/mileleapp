@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('content')
     <div class="card-header">
-        <h4 class="card-title">Add New Demands</h4>
+        <h4 class="card-title">Add New Supplier</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -26,20 +26,23 @@
                 {{ Session::get('message') }}
             </div>
         @endif
-        <form action="{{ route('demand-planning-suppliers.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('demand-planning-suppliers.store') }}" method="POST" >
             @csrf
             <div class="row">
-                <div class="row demand-div">
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13">Name</label>
-                          <input type="text" name="name" id="name" class="form-control">
-                        </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Name</label>
+                      <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror">
+                        @error('name')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
-                    </br>
-                    <div class="col-lg-12 col-md-12 text-center">
-                        <button type="submit" class="btn btn-dark ">Submit</button>
-                    </div>
+                </div>
+                </br>
+                <div class="col-lg-12 col-md-12 text-center">
+                    <button type="submit" class="btn btn-dark ">Submit</button>
                 </div>
             </div>
         </form>
@@ -48,16 +51,12 @@
 @endsection
 @push('scripts')
     <script>
-        $("#form-demand").validate({
-            ignore: [],
+        $("#form-create").validate({
             rules: {
                 name: {
                     required: true,
-                    unique: true
                 },
-
             },
-
         });
     </script>
 @endpush

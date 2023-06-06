@@ -46,7 +46,7 @@
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
                         <select class="form-control"name="customer_type" id="customer-type">
-                            <option value="" disabled>Select The Type</option>
+                            <option value="" disabled>Select Customer Type</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
                                 {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
                                 {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}

@@ -61,7 +61,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Supplier</label>
+                        <label for="choices-single-default" class="form-label text-muted">Supplier</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)
@@ -72,7 +72,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Select The Dealers</label>
+                        <label for="choices-single-default" class="form-label text-muted"> Dealers</label>
                         <select class="form-control" data-trigger name="whole_sales" id="wholesaler">
                             <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
                                 {{ ( request()->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ) ? 'selected' : '' }}>
@@ -87,7 +87,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">First File</label>
+                        <label for="choices-single-default" class="form-label text-muted">First File</label>
                         <select class="form-control text-dark first" required data-trigger name="first_file" id="first-file">
                             <option value="" disabled>First File</option>
                         </select>
@@ -95,10 +95,9 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Second File</label>
+                        <label for="choices-single-default" class="form-label text-muted">Second File</label>
                         <select class="form-control text-dark" required  name="second_file" id="second-file" >
                             <option value="" disabled>Second File</option>
-
                         </select>
                     </div>
                 </div>
@@ -199,7 +198,6 @@
 @endsection
 @push('scripts')
     <script>
-
         $('#supplier').select2();
         $('#wholesaler').select2();
         getDates();

@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label font-size-13 ">Select Country</label>
+                        <label class="form-label">Select Country</label>
                         <select class="form-control" name="country" id="country">
                             <option ></option>
                             @foreach($countries as $country)
@@ -45,7 +45,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
+                        <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
                         <select class="form-control"name="customer_type" id="customer-type">
                             <option value="" disabled>Select The Type</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
@@ -57,22 +57,32 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
-                        <select class="form-control text-dark" name="customer_id" id="customer" >
+                        <label for="choices-single-default" class="form-label ">Customer</label>
+                        <select class="form-control @error('customer_id') is-invalid @enderror" name="customer_id" id="customer" >
                         </select>
+                        @error('customer_id')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
-                        <input type="date" class="form-control text-dark" id="basicpill-firstname-input"  name="date">
+                        <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
+                        <input type="date" class="form-control" id="basicpill-firstname-input"  name="date">
+                        @error('date')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                        <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}">
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}
@@ -81,40 +91,60 @@
                                 {{\App\Models\LetterOfIndent::LOI_CATEGORY_SPECIAL}}
                             </option>
                         </select>
+                        @error('category')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <label for="choices-single-default" class="form-label ">Supplier</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
                             @endforeach
                         </select>
+                        @error('supplier_id')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                        <label for="choices-single-default" class="form-label">Dealers</label>
                         <select class="form-control" data-trigger name="dealers" >
                             <option value="Trans Cars">Trans Cars</option>
                             <option value="Milele Motors">Milele Motors</option>
                         </select>
+                        @error('dealers')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
+                        <label for="choices-single-default" class="form-label">Shipping Method</label>
                         <select class="form-control" data-trigger name="shipment_method">
                             <option value="CNF">CNF</option>
                             <option value="X work">X work</option>
                         </select>
+                        @error('shipment_method')
+                        <span role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                        @enderror
                     </div>
                 </div>
                 <br>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark " >Next</button>
+                    <button type="submit" class="btn btn-dark w-25" >Next</button>
                 </div>
             </div>
         </form>
@@ -150,14 +180,14 @@
                     required: true
                 }
             },
-            errorPlacement: function(error, element) {
-                if (element.hasClass("select2-hidden-accessible")) {
-                    element = $("#select2-" + element.attr("id") + "-container").parent();
-                    error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
-                }else {
-                    error.insertAfter(element).addClass('text-danger');
-                }
-            }
+            // errorPlacement: function(error, element) {
+            //     if (element.hasClass("select2-hidden-accessible")) {
+            //         element = $("#select2-" + element.attr("id") + "-container").parent();
+            //         error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
+            //     }else {
+            //         error.insertAfter(element).addClass('text-danger');
+            //     }
+            // }
         });
         $('#country').select2({
             placeholder : 'Select Country'

@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13">Customer</label>
+                    <label for="choices-single-default" class="form-label">Customer</label>
                     <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
                         <option> {{ $letterOfIndent->customer->name }}</option>
                     </select>
@@ -27,7 +27,7 @@
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                    <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                     <select class="form-control" name="category" readonly >
                         <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                             {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
@@ -42,7 +42,7 @@
             </div>
             <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                    <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                     <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                            value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                 </div>
@@ -62,7 +62,7 @@
                             <label class="form-label">Varients</label>
                         </div>
                         <div class="col-lg-2 col-md-2">
-                            <label class="form-label">Qty</label>
+                            <label class="form-label">Quantity</label>
                         </div>
 
                     </div>
@@ -98,7 +98,7 @@
                 @endforeach
             @endif
         </div>
-        <form id="form-letter-of-indent-items" action="{{ route('letter-of-indent-items.store') }}" method="POST" >
+        <form id="form-update" action="{{ route('letter-of-indent-items.store') }}" method="POST" >
             @csrf
             <div class="row">
                 <div class="d-flex">
@@ -170,6 +170,35 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $('#model').select2({
+                placeholder: 'Select Model'
+            }).on('change', function() {
+                $(this).valid();
+            });
+            $('#sfx').select2({
+                placeholder: 'Select SFX'
+            }).on('change', function() {
+                $(this).valid();
+            });
+
+            $("#form-update").validate({
+                ignore: [],
+                rules: {
+                    model: {
+                        required: true,
+                    },
+                    sfx: {
+                        required: true,
+                    },
+                    variant: {
+                        required: true,
+                    },
+                    quantity:{
+                        required:true
+                    }
+                },
+            });
+
         $('#model').on('change',function(){
             let model = $(this).val();
             let id = $('#letter_of_indent_id').val();
@@ -242,6 +271,7 @@
                 }
             }).set({title:"Delete Item"})
         });
+
         })
     </script>
 @endpush
