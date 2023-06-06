@@ -27,10 +27,10 @@ class CallsController extends Controller
      */
     public function index()
     {
-        $data = Calls::orderBy('status','DESC')->whereIn('status',['new','active'])->get();
-        $convertedleads = Calls::where('status','Converted To Leads')->get();
-        $convertedso = Calls::where('status','Converted To SO')->get();
-        $convertedrejection = Calls::where('status','Rejection')->get();
+        $data = Calls::where('STATUS', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get();    
+        $convertedleads = Calls::where('status', 'Converted To Leads')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $convertedso = Calls::where('status','Converted To SO')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $convertedrejection = Calls::where('status','Rejection')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         return view('calls.index',compact('data','convertedleads', 'convertedso','convertedrejection'));
     }
     /**
@@ -73,10 +73,12 @@ class CallsController extends Controller
             if($language == "English") {
                 $existing_email_count = Calls::where('email', $email)
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
                                              ->whereNotNull('email')
                                              ->count();
                 $existing_phone_count = Calls::where('phone', $phone)
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
                                              ->whereNotNull('phone')
                                              ->count();
                 if($existing_email_count != 0 || $existing_phone_count != 0) {
@@ -86,6 +88,7 @@ class CallsController extends Controller
                 else {
                     $new_calls_count = Calls::where('status', 'New')
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
                                              ->count();
                     if ($new_calls_count < 5) {
                         $sales_person_id = $sales_person->model_id;
@@ -102,6 +105,7 @@ class CallsController extends Controller
                 } else {
                     $new_calls_count = Calls::where('status', 'New')
                                              ->where('sales_person', $sales_person->model_id)
+                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
                                              ->count();
                     if ($new_calls_count < 5) {
                         $sales_person_id = $sales_person->model_id;
@@ -113,6 +117,7 @@ class CallsController extends Controller
         if ($sales_person_id == null) {
             $sales_person_id = Calls::select('sales_person', DB::raw('COUNT(*) as count'))
                                      ->where('status', 'New')
+                                     ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
                                      ->groupBy('sales_person')
                                      ->orderBy('count', 'ASC')
                                      ->first()
@@ -184,10 +189,12 @@ foreach ($modelLineIds as $modelLineId) {
         ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
         ->where('master_model_lines.brand_id', $brandId)
+        ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
         ->where('master_model_lines.id', $modelLineId)
         ->whereBetween('calls.created_at', [$startDate, $endDate])
         ->pluck('calls.id');   
 $data = Calls::orderBy('status', 'DESC')
+    ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
     ->whereIn('id', $callIds)
     ->whereIn('status', ['new', 'active'])
     ->get();
