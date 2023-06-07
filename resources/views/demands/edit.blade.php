@@ -31,170 +31,187 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Supplier</label>
+                        <label for="choices-single-default" class="form-label text-muted">Supplier</label>
                         <input type="text" value="{{ $demand->supplier->supplier }}" id="supplier-row" class="form-control" readonly/>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Dealers</label>
+                        <label for="choices-single-default" class="form-label text-muted">Dealers</label>
                         <input type="text" value="{{ $demand->whole_saler }}" id="whole-saler-row" class="form-control" readonly/>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Steering</label>
+                        <label for="choices-single-default" class="form-label text-muted">Steering</label>
                         <input type="text" value="{{ $demand->steering }}" id="steering-row" class="form-control" readonly/>
                     </div>
                 </div>
             </div>
-                <div class="d-flex">
-                    <div class="col-lg-7 col-md-7 col-sm-12">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6 col-sm-6">
-                                <label for="basicpill-firstname-input" class="form-label">Model</label>
+            @if($demandLists->count() > 0)
+{{--                 hide in small, medium(view)--}}
+                <div class="d-none d-lg-block d-xl-block d-xxl-block">
+                    <div class="d-flex">
+                        <div class="col-lg-7 col-md-12 col-sm-12">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-12">
+                                    <label for="basicpill-firstname-input" class="form-label">Model</label>
+                                </div>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="basicpill-firstname-input" class="form-label">SFX</label>
+                                </div>
+                                <div class="col-lg-4 col-md-5 col-sm-12">
+                                    <label for="basicpill-firstname-input" class="form-label">Varient</label>
+                                </div>
                             </div>
-                            <div class="col-lg-4 col-md-6 col-sm-6">
-                                <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                            </div>
-                            <div class="col-lg-4 col-md-6 col-sm-6" >
-                                <label for="basicpill-firstname-input" class="form-label">Varients</label>
+                        </div>
+                        <div class="col-lg-9 col-md-12 col-sm-12">
+                            <div class="row" style="margin-left: 10px">
+                                @foreach($months as $key => $month)
+                                    <div class="col-lg-1 col-md-2 col-sm-2">
+                                        <label> {{ $month }} </label>
+                                    </div>
+                                @endforeach
+                                <div class="col-lg-1 col-md-2 col-sm-2" >
+                                    <label>Total </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-9 col-md-9 col-sm-12">
+                </div>
+
+                @foreach($demandLists as $value => $demandList)
+                <div class="d-flex mt-3">
+                    <div class="col-lg-7 col-md-9 col-sm-9 col-9">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                <input type="text" value="{{ $demandList->model }}"  readonly class="form-control" >
+                            </div>
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
+                            </div>
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Varient</label>
+                                <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-md-3 col-sm-3 col-3">
                         <div class="row" style="margin-left: 10px">
                             @foreach($months as $key => $month)
-                                <div class="col-lg-1 col-md-1 col-sm-1" >
-                                    <label >{{ $month }} </label>
+                                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
+                                    <label class="d-lg-none d-xl-none d-xxl-none"> {{ $month }} </label>
+{{--                                    @foreach($demandList->fiveMonthDemands[$key] as $key => $monthlyDemand)--}}
+                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity }}" id="demand-quantity-{{$value}}-{{$key}}"
+                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
+{{--                                    @endforeach--}}
                                 </div>
                             @endforeach
-                                <div class="col-lg-1 col-md-1 col-sm-1" >
-                                    <label>Total </label>
+                            @if($demandList->fiveMonthDemands->count() < 5)
+                                    <?php
+                                    $count = $demandList->fiveMonthDemands->count();
+                                    ?>
+                                @for($i = $count; $i < 5 ;$i++)
+                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
+                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
+                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
+                                    </div>
+                                @endfor
+                            @endif
+                                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12" >
+                                    <label class="d-lg-none d-xl-none d-xxl-none">Total </label>
+                                    <input type="number" class="form-control mb-3" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
+                                </div>
+                                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" class="btn btn-danger demand-list-delete sm-mt-3"  data-id="{{ $demandList->id }}"
+                                            data-url="{{ route('demand-lists.destroy', $demandList->id) }}">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
                                 </div>
                         </div>
                     </div>
                 </div>
-            @if($demandLists->count() > 0)
-                @foreach($demandLists as $value => $demandList)
-                    <div class="d-flex">
-                        <div class="col-lg-7 col-md-7 col-sm-12">
-                            <div class="row">
-                                <div class="col-lg-4 col-md-6 col-sm-12">
-                                    <input type="text" value="{{ $demandList->model }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-4 col-md-6 col-sm-12">
-                                    <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-4 col-md-6 col-sm-12">
-                                    <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <p>&nbsp;&nbsp;&nbsp;</p>
-                        <div class="col-lg-9 col-md-9 col-sm-12">
-                            <div class ="row">
-                                @foreach($demandList->fiveMonthDemands as $key => $monthlyDemand)
-                                    <div class="col-lg-1 col-sm-12">
-                                        <input type="number" value="{{ $monthlyDemand->quantity }}" id="demand-quantity-{{$value}}-{{$key}}" min="0"
-                                               class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
-                                    </div>
-                                @endforeach
-                                @if($demandList->fiveMonthDemands->count() < 5)
-                                    <?php
-                                        $count =  $demandList->fiveMonthDemands->count();
-                                        ?>
-                                    @for($i = $count; $i < 5 ;$i++)
-                                      <div class="col-lg-1 col-sm-12">
-                                          <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
-                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
-                                      </div>
-                                    @endfor
-                                @endif
-                                    <div class="col-lg-1  col-sm-6">
-                                        <input type="number" class="form-control" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
-                                    </div>
-                                    <div class="col-lg-1 col-sm-6">
-                                        <button type="button" class="btn btn-danger demand-list-delete"  data-id="{{ $demandList->id }}"
-                                                data-url="{{ route('demand-lists.destroy', $demandList->id) }}">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br/>
                 @endforeach
             @endif
+            <br/>
             <form id="form-demand" action="{{ route('demand-lists.store') }}" method="POST" enctype="multipart/form-data" >
                 @csrf
                 <input type="hidden" value="{{ $demand->id }}" name="demand_id" id="demand-id">
                 <input type="hidden" name="module" value="Demand">
                 <div class="d-flex">
-                    <div class="col-lg-7 col-md-7">
+                    <div class="col-lg-7 col-md-9 col-sm-9 col-9">
                         <div class="row">
-                            <div class="col-lg-4 col-md-4">
-                                 <select class="form-select text-dark" name="model" id="model">
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                 <select class="form-select text-dark" name="model" id="model" autofocus="autofocus">
                                      <option></option>
                                     @foreach($models as $model)
                                         <option value="{{ $model->model }}">{{ $model->model }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-4">
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">SFX</label>
                                 <select class="form-select text-dark" name="sfx" id="sfx" >
                                     <option></option>
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-4">
+                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">Variant</label>
                                 <select class="form-select variant text-dark" name="variant_name" id="variant-name" >
                                     <option ></option>
                                 </select>
-
                             </div>
                         </div>
                     </div>
-                    <p>&nbsp;&nbsp;&nbsp;</p>
-                    <div class="col-lg-9 col-md-9">
-                        <div class ="row">
+                    <div class="col-lg-9 col-md-3 col-sm-12 col-3">
+                        <div class="row" style="margin-left: 10px">
                             @foreach($months as $key => $month)
-                                <div class="col-lg-1">
+                                <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
+                                    <label  class="form-label d-lg-none d-xl-none d-xxl-none">{{$month}}</label>
                                     <input type="hidden" value="{{$month}}" name="month[]" id="month-year"/>
                                     <input type="number" value="0" id="count-{{$key}}" name="quantity[]" step="1" oninput="validity.valid||(value='');"
                                            class="form-control quantity" min="0"/>
                                 </div>
                             @endforeach
-                            <div class="col-lg-1">
-                                <input type="text" class="form-control" readonly value="" id="total"  name="total">
+                            <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
+                                <label  class="form-label d-lg-none d-xl-none d-xxl-none">Total</label>
+                                <input type="text" class="form-control mb-3" readonly value="" id="total"  name="total">
                             </div>
-                            <div class="col-1">
-                                <button type="submit" class="btn btn-success add-demand-list-details"><i class="fa fa-plus"></i> Add </button>
+{{--                                hide in samll view--}}
+                            <div class="col-lg-1 col-sm-12 col-xs-12 d-none d-sm-block">
+                                <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <br/>
-                <div class="d-flex">
-                    <div class="col-lg-7 col-md-7">
-                    </div>
-                    <div class="col-lg-9" style="margin-left: 25px">
-                        <div class ="row">
-                            @foreach($months as $key => $month)
-                                <div class="col-lg-1 col-md-1">
-                              <span id="monthly-total-{{$key}}">
-                                  {{ $totalYearlyQuantities[$key] }}
-                              </span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
+{{--                // show only in xs or small view--}}
+                <div class="col-12 text-center d-block d-sm-none">
+                    <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
                 </div>
                 <br/>
-
+                <div class="d-none d-lg-block d-xl-block d-xxl-block">
+                    <div class="d-flex">
+                        <div class="col-lg-7 col-md-7 col-sm-7">
+                        </div>
+                        <div class="col-lg-9 col-md-9 col-sm-12" style="margin-left: 25px">
+                            <div class="row">
+                                @foreach($months as $key => $month)
+                                    <div class="col-lg-1 col-md-1 col-sm-12">
+                                  <span id="monthly-total-{{$key}}">
+                                      {{ $totalYearlyQuantities[$key] }}
+                                  </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br/>
             </form>
-            <div class="col-12 text-center">
+            <div class="col-12 text-end">
                 <button type="button" class="btn btn-dark " id="update-monthly-demands">Update Quantity</button>
             </div>
         </div>
@@ -207,7 +224,7 @@
         $('.demand-list-quantity-2').attr('readonly', false);
         $('.demand-list-quantity-3').attr('readonly', false);
         $('.demand-list-quantity-4').attr('readonly', false);
-
+        $('#model-error').addClass('marigin-top','10px')
         $('#model').select2({
             placeholder : 'Select Model',
         });
@@ -238,7 +255,6 @@
                 }else {
                     error.insertAfter(element).addClass('text-danger');
                 }
-
             }
         });
         $('#variant-name').on('change',function() {
@@ -296,7 +312,6 @@
 
         for($j=0;$j<=5;$j++) {
             $('#count-'+$j).on('keyup',function() {
-                alert('ok');
                 Total();
             });
             $('#count-'+$j).on('click',function() {

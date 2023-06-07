@@ -24,7 +24,7 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Supplier</label>
-                        <select class="form-control"  name="supplier_id"  id="supplier" required>
+                        <select class="form-control" autofocus  name="supplier_id"  id="supplier" required>
                             <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}" @if($supplierId){{ $supplier->id == $supplierId ? 'selected' : '' }} @endif>{{ $supplier->supplier }}</option>

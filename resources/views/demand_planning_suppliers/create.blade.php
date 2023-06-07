@@ -32,7 +32,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Name</label>
-                      <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror">
+                      <input type="text" name="name" id="name" value="{{ old('name') }}" autofocus class="form-control @error('name') is-invalid @enderror">
                         @error('name')
                         <span role="alert">
                             <strong>{{ $message }}</strong>

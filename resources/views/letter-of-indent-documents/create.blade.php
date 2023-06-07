@@ -129,7 +129,8 @@
                         <div class="col-lg-12">
                             <div class="row">
                                 <div class="col-lg-3 col-md-6 col-sm-12">
-                                    <input type="file" name="files[]" id="file-upload" class="form-control text-dark" multiple id="file-upload" accept="application/pdf, image/*">
+                                    <input type="file" name="files[]" id="file-upload" class="form-control text-dark" multiple
+                                          autofocus accept="application/pdf, image/*">
                                 </div>
                                 <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id">
                                 <div class="col-lg-6 col-md-6">
@@ -143,7 +144,7 @@
         <br>
             @foreach($letterOfIndentDocuments as $key => $letterOfIndentDocument)
             <div class="row p-2">
-                <div class="col-3">
+                <div class="col-12">
                     File {{ $key + 1 }}
                     <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">
                        View

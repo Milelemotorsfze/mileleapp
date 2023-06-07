@@ -22,7 +22,7 @@
                 <div class="col-md-2">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">Start Date</label>
-                        <input type="date" id="start-date" name="start_date" value="{{ old('start_date',$startDate) }}"
+                        <input type="date" id="start-date" autofocus name="start_date" value="{{ old('start_date',$startDate) }}"
                                class="form-control" />
                     </div>
                 </div>

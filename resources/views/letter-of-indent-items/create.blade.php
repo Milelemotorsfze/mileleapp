@@ -80,11 +80,12 @@
             </div>
             <br>
             @if($letterOfIndentItems->count() > 0)
+{{--                hide on small view--}}
                 <div class="row d-none d-sm-block">
                     <div class="d-flex">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="row">
-                                <div class="col-lg-2 col-md-3 col-sm-12">
+                                <div class="col-lg-3 col-md-3 col-sm-12">
                                    <label class="form-label">Model</label>
                                 </div>
                                 <div class="col-lg-2 col-md-2 col-sm-12">
@@ -93,7 +94,7 @@
                                 <div class="col-lg-4 col-md-4 col-sm-12">
                                     <label class="form-label">Variant</label>
                                 </div>
-                                <div class="col-lg-2 col-md-2 col-sm-12">
+                                <div class="col-lg-1 col-md-2 col-sm-12">
                                    <label class="form-label">Quantity</label>
                                 </div>
                             </div>
@@ -105,7 +106,7 @@
                         <div class="d-flex">
                             <div class="col-lg-12 col-md-12 col-sm-12">
                                 <div class="row mt-3">
-                                    <div class="col-lg-2 col-md-3 col-sm-12">
+                                    <div class="col-lg-3 col-md-3 col-sm-12">
                                       <label class="form-label d-block d-sm-none">Model</label>
                                             <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control" >
                                     </div>
@@ -117,11 +118,11 @@
                                         <label class="form-label d-block d-sm-none">Variant</label>
                                         <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                    <div class="col-lg-1 col-md-2 col-sm-12">
                                         <label class="form-label d-block d-sm-none">Quantity</label>
                                         <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
                                     </div>
-                                    <div class="col-lg-2 col-md-1 col-sm-12 " >
+                                    <div class="col-lg-1 col-md-1 col-sm-12" >
                                         <label class="form-label"></label>
                                         <button type="button" class="btn btn-danger btn-sm loi-item-button-delete sm-mt-3"
                                                 data-id="{{ $letterOfIndentItem->id }}" data-url="{{ route('letter-of-indent-items.destroy', $letterOfIndentItem->id) }}">
@@ -141,7 +142,7 @@
                 <div class="d-flex">
                     <div class="col-lg-12 col-md-12">
                         <div class="row">
-                            <div class="col-lg-2 col-md-3 sm-mt-20 col-sm-12">
+                            <div class="col-lg-3 col-md-3 sm-mt-20 col-sm-12">
                                 <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model</label>
                                 <select class="form-select text-dark" name="model" id="model" autofocus>
                                     <option value="" >Select Model</option>
@@ -155,10 +156,10 @@
                                     </span>
                                 @enderror
                             </div>
-                            <div class="col-lg-2 col-md-2 sm-mt-20 col-sm-12">
+                            <div class="col-lg-2 col-md-2 sm-mt-20 col-sm-12 mb-3">
                                 <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">SFX</label>
                                 <select class="form-select text-dark" name="sfx" id="sfx" >
-                                    <option value="" >Select SFX</option>
+                                    <option value="">Select SFX</option>
                                 </select>
                                 @error('sfx')
                                 <div role="alert">
@@ -166,29 +167,30 @@
                                     </div>
                                 @enderror
                             </div>
-                            <div class="col-lg-4 col-md-4 sm-mt-20 col-sm-12">
+                            <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
                                 <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Variant</label>
                                 <select class="form-select text-dark" name="variant" id="variant">
-                                    <option value="" >Select Variant</option>
+                                    <option value="">Select Variant</option>
                                 </select>
                             </div>
-                            <div class="col-lg-1 col-md-2 sm-mt-20 col-sm-12">
+                            <div class="col-lg-1 col-md-2 col-sm-12">
                                 <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Quantity</label>
                                 <input type="number" name="quantity" placeholder="Quantity" maxlength="5" class="form-control text-dark"
                                        step="1" oninput="validity.valid||(value='');" min="0" >
                             </div>
-                            <div class="col-lg-1 col-md-1 sm-mt-20 col-sm-12 d-md-none d-lg-block">
-                                <label class="form-label">Inventory Qty</label>
+                            <div class="col-lg-1 md-mt-20 col-sm-12">
+                                <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
+                                    Inventory Quantity
+                                </label>
                             </div>
                             <div class="col-lg-1 col-md-2 md-mt-20 col-sm-12">
-                                <label class="form-label d-none d-md-block d-lg-none d-sm-none">Inventory Qty</label>
-                                <input type="number" readonly id="inventory-quantity"
-                                       value="" class="form-control">
-                            </div>
-                            <div class="col-lg-1 col-md-3 col-sm-12 sm-mt-20 md-mt-26">
-                                <button type="submit" class="btn btn-success"> <i class="fa fa-plus mr-1"> &nbsp Add New Item </i> </button>
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Inventory Qty</label>
+                                <input type="number" readonly id="inventory-quantity" value="" class="form-control" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
                             </div>
                             <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
+                        </div>
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
                         </div>
                     </div>
                 </div>

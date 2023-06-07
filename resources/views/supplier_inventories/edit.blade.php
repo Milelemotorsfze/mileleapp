@@ -22,7 +22,7 @@
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted"> Supplier</label>
-                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
+                        <select class="form-control" autofocus name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>

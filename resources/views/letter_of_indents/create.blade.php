@@ -35,7 +35,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label class="form-label">Select Country</label>
-                        <select class="form-control" name="country" id="country">
+                        <select class="form-control" name="country" id="country" autofocus>
                             <option ></option>
                             @foreach($countries as $country)
                                 <option value="{{$country}}"> {{ $country }} </option>
