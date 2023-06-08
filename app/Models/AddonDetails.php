@@ -13,7 +13,6 @@ class AddonDetails extends Model
         'addon_id',
         'addon_code',
         'part_number',
-        'purchase_price',
         'selling_price',
         'payment_condition',
         'currency',

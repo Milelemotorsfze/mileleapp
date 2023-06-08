@@ -39,9 +39,19 @@
             right: 0;
             top: 0;
         }
-     .error {
-         color: #f32323;
+     /* @media only screen and (max-width: 600px) {
+         .sm-mt-20 {
+             margin-top: 20px;
+         }
+         .sm-mt-3 {
+             margin-top: 10px;
+         }
      }
+     @media only screen and (max-width: 1200px) {
+         .md-mt-26{
+             margin-top: 26px;
+         }
+     } */
 </style>
     </head>
     <body data-layout="horizontal">
@@ -81,6 +91,12 @@
           .catch(error => {
             // console.error(error);
           });
+        $('input[type=file]').on('change',function(){
+            $(this).valid();
+        });
+        $('input[type=date]').on('change',function(){
+            $(this).valid();
+        });
         });
         </script>
     </body>

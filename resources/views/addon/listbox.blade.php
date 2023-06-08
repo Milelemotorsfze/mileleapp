@@ -85,7 +85,9 @@
                 Addon Name
               </div>
               <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+                @if($addonsdata->AddonName->name != '')
                 {{$addonsdata->AddonName->name}}
+                @endif
               </div>
               <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
               @if($addonsdata->image)

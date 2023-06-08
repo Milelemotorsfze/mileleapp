@@ -218,8 +218,8 @@
   <script type="text/javascript">
     $(document).ready(function ()
     {
-      var table = $('#suppliersList');
-      table.DataTable();
+      $('#suppliersList').DataTable();
+      var table = $('#suppliersList').DataTable();
       $('.modal-button').on('click', function()
       {
         var modalId = $(this).data('modal-id');
@@ -234,7 +234,7 @@
         $('.modal').addClass('modalhide');
         $('.modal').removeClass('modalshow');
         $('.overlay').hide();
-        table.DataTable();
+        $('#suppliersList').DataTable();
       });
     });
     function closemodal()

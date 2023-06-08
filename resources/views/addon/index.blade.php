@@ -20,12 +20,12 @@
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a> 
     <ul class="nav nav-pills nav-fill">
-      <li class="nav-item">
+      <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Addons</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inactive Addons</a>
-      </li>
+      </li> -->
     </ul> 
   </div>
   <div class="card-header">
@@ -41,6 +41,7 @@
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-brand" multiple="true" style="width: 100%;">
+          <!-- <option value="yes">All Brands</option> -->
             @foreach($brandMatsers as $brandMatser)
               <option value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
             @endforeach
@@ -145,20 +146,14 @@
         dataType : 'json',
         success: function(result)
         {
-$(".each-addon").hide();
-// $(".brr").hide();
-          // $(".related-addon").hide("")
-          $.each(result.addons, function (index, value){
-            console.log(value);
+          $(".each-addon").hide();
+          $(".tr").hide();
+          $.each(result.addonsBox, function (index, value)
+          {
             $("#"+value).show();
-            // $("#4").show();
-          //   $(".related-addon").append(`
-          //       <h1>vvvvvvv</h1>
-                // `); 
-            // $('.list', $unitses).append('value.name');
-//alert(response);
-        });
-          
+            $("."+value).show();
+          });
+       
           // location.reload();
           // console.log(result);
           

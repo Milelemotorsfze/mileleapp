@@ -57,16 +57,26 @@
           </div>
         
           @foreach ($addons as $key => $addon)
-            <tr data-id="1">
+            <tr data-id="1" class="{{ $addon->addon_details_table_id }} tr">
               <td>{{ ++$i }}</td>
               <td><img src="{{ asset('addon_image/' . $addon->image) }}" style="width:100%; height:100px;" /></td>
               <td>{{ $addon->name }}</td>
               <td>{{ $addon->addon_code }}</td>
-              <td>{{ $addon->brand_name }}</td>
-              <td>{{ $addon->model_line }}</td>
+              <td>@if($addon->is_all_brands == 'no'){{ $addon->brand_name }}@elseif($addon->is_all_brands == 'yes'){{'All Brands'}}@endif</td>
+              <td>
+                @if($addon->is_all_brands == 'no')
+                  @if($addon->is_all_model_lines == 'no')
+                    {{$addon->model_line}}
+                  @elseif($addon->is_all_model_lines == 'yes')
+                    {{'All Model Lines'}}
+                  @endif
+                @elseif($addon->is_all_brands == 'yes')
+                {{'All Model Lines'}}
+                @endif
+              </td>
               <td>{{ $addon->lead_time }}</td>
               <td>{{ $addon->additional_remarks }}</td>
-              <td>{{ $addon->purchase_price }}</td>
+              <td>{{ 'purchase price' }}</td> <!--$addon->purchase_price-->
               <td>{{ $addon->selling_price }}</td>
               <td>{{ $addon->payment_condition }}</td>
               <td>

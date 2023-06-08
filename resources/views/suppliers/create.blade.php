@@ -544,18 +544,18 @@ input {
             //     }  
             // }
             
-// $('button').on('click', function() {
-  
-// });
-        //    alert($('#hiddencontact').val());
+            // $('button').on('click', function() {
+            
+            // });
+                //    alert($('#hiddencontact').val());
 
-        //    var contact_number = window.intlTelInput(document.querySelector("#contact_number"), 
-        // {
-        //     separateDialCode: true,
-        //     preferredCountries:["ae"],
-        //     hiddenInput: "full",
-        //     utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-        // });
+                //    var contact_number = window.intlTelInput(document.querySelector("#contact_number"), 
+                // {
+                //     separateDialCode: true,
+                //     preferredCountries:["ae"],
+                //     hiddenInput: "full",
+                //     utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+                // });
             $.ajaxSetup
             ({
                 headers: 

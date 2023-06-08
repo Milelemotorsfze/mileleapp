@@ -563,7 +563,7 @@ class SupplierController extends Controller
                         ->join('brands','brands.id','addon_types.brand_id')
                         ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
                         ->whereIn('addon_details.id',$supplierAddonId)
-                        ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+                        ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
                         'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                         'master_model_lines.model_line')
                         ->orderBy('addon_details.id','ASC')
