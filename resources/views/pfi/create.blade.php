@@ -29,17 +29,17 @@
             </div>
         @endif
         <div class="row">
-            <div class="col-lg-3 col-md-3">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13">Customer</label>
+                    <label for="choices-single-default" class="form-label">Customer</label>
                     <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
                         <option> {{ $letterOfIndent->customer->name }}</option>
                     </select>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-2">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                    <label for="choices-single-default" class="form-label ">LOI Category</label>
                     <select class="form-control" name="category" readonly >
                         <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                             {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
@@ -52,34 +52,36 @@
                     </select>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-2">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                    <label for="choices-single-default" class="form-label">LOI Date</label>
                     <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                            value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                 </div>
             </div>
-            <div class="col-lg-2 col-md-2">
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                    <label for="choices-single-default" class="form-label">Dealer</label>
                     <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-2">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
+                    <label for="choices-single-default" class="form-label">Shipping Method</label>
                     <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
                 </div>
             </div>
-            <div class="col-lg-1 col-md-1">
+            <div class="col-lg-4 col-md-6">
                 <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                    <label for="choices-single-default" class="form-label">Supplier</label>
                     <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                 </div>
             </div>
         </div>
-        <div class="row ">
-            <div class="d-flex">
+        <div class="row">
+            <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
                 <div class="col-lg-12">
                     <div class="row">
                         <div class="col-lg-3 col-md-3">
@@ -89,103 +91,180 @@
                             <label  class="form-label">SFX</label>
                         </div>
                         <div class="col-lg-3 col-md-3">
-                            <label class="form-label">Varients</label>
+                            <label class="form-label">Varient</label>
                         </div>
                         <div class="col-lg-2 col-md-2">
-                            <label class="form-label">Qty</label>
+                            <label class="form-label">Quantity</label>
                         </div>
-
                     </div>
                 </div>
             </div>
-
-{{--            @if($letterOfIndentItems->count() > 0)--}}
-{{--                @foreach($letterOfIndentItems as $value => $letterOfIndentItem)--}}
-{{--                    <div class="d-flex">--}}
-{{--                        <div class="col-lg-12">--}}
-{{--                            <div class="row">--}}
-{{--                                <div class="col-lg-3 col-md-3">--}}
-{{--                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">--}}
-{{--                                </div>--}}
-{{--                                <div class="col-lg-2 col-md-2">--}}
-{{--                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">--}}
-{{--                                </div>--}}
-{{--                                <div class="col-lg-3 col-md-3">--}}
-{{--                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">--}}
-{{--                                </div>--}}
-{{--                                <div class="col-lg-2 col-md-2">--}}
-{{--                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control"> </br>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-lg-2 col-md-2">--}}
-{{--                                    <button type="button" class="btn btn-danger btn-sm loi-item-button-delete"--}}
-{{--                                            data-id="{{ $letterOfIndentItem->id }}" data-url="{{ route('letter-of-indent-items.destroy', $letterOfIndentItem->id) }}">--}}
-{{--                                        <i class="fa fa-trash"></i>--}}
-{{--                                    </button>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                @endforeach--}}
-{{--            @endif--}}
+            @if($approvedPfiItems->count() > 0)
+                @foreach($approvedPfiItems as $value => $approvedPfiItem)
+                    <div class="d-flex">
+                        <div class="col-lg-12">
+                            <div class="row mt-2">
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->model }}" readonly class="form-control mb-2">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->sfx }}" readonly class="form-control mb-2">
+                                </div>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                </div>
+                                <div class="col-lg-2 col-md-4">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
+                                    <input type="text" value="{{ $approvedPfiItem->quantity }}" readonly class="form-control mb-2">
+                                </div>
+                                <div class="col-lg-2 col-md-2">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none"></label>
+                                    <button type="button" class="btn btn-danger btn-sm remove" data-id="{{ $approvedPfiItem->id }}"
+                                            data-action="REMOVE" >
+                                       Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
         </div>
-
             <div class="row">
-                <div class="d-flex">
-                    <div class="col-lg-12">
-                        <div class="row">
+                @if($pendingPfiItems->count() > 0)
+                    <p class="fw-bold font-size-16 mt-3">Approved Inventory</p>
+                    @foreach($pendingPfiItems as $value => $pendingPfiItem)
+                        <div class="d-flex">
+                            <div class="col-lg-12">
+                                <div class="row mt-2">
+                                    <div class="col-lg-3 col-md-3">
+                                        <label class="form-label d-block d-sm-none">Model</label>
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->model }}" readonly class="form-control mb-2">
+                                    </div>
+                                    <div class="col-lg-2 col-md-2">
+                                        <label class="form-label d-block d-sm-none">SFX</label>
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->sfx }}" readonly class="form-control mb-2">
+                                    </div>
+                                    <div class="col-lg-3 col-md-3">
+                                        <label class="form-label d-block d-sm-none">Variant</label>
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                    </div>
+                                    <div class="col-lg-2 col-md-2">
+                                        <label class="form-label d-block d-sm-none">Quantity</label>
+                                        <input type="text" value="{{ $pendingPfiItem->quantity }}" readonly class="form-control mb-3">
+                                    </div>
+                                    <div class="col-lg-2 col-md-2">
+                                        <button type="button" class="btn btn-info btn-sm add-now" data-id="{{ $pendingPfiItem->id }}"
+                                                data-action="ADD">
+                                            Add Now
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <br>
-                <div class="d-flex">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3">
-                                <select class="form-select" name="model" id="model">
-                                    <option value="" >Select Model</option>
-                                    @foreach($models as $model)
-                                        <option value="{{ $model->model }}">{{ $model->model }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-2">
-                                <select class="form-select" name="sfx" id="sfx">
-                                    <option value="" >Select SFX</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3 col-md-3">
-                                <select class="form-select" name="variant" id="variant">
-                                    <option value="" >Select Variant</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-2">
-                                <input type="number" name="quantity" class="form-control" step="1" oninput="validity.valid||(value='');"
-                                       min="0" >
-                            </div>
-                            <div class="col-lg-1 col-md-1">
-                                <label class="form-label">Inventory Qty</label>
-                            </div>
-                            <div class="col-lg-1 col-md-1">
-                                <input type="number"  readonly id="inventory-quantity"
-                                       value="" class="form-control">
-                            </div>
-
-                            <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="col-lg-12 col-md-12">
-                <button type="button" class="btn btn-dark ">Add New Item</button>
+                    @endforeach
+                @endif
             </div>
         <br>
-        <div class="col-lg-12 col-md-12">
-            <a href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
-                <button type="button" class="btn btn-dark btnright btn-deal-item-submit">Finish</button>
-            </a>
-        </div>
+            <form action="{{ route('pfi.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">PFI No</label>
+                           <input type="text" class="form-control" autofocus name="pfi_reference_number">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">PFI Date</label>
+                            <input type="date" class="form-control" name="pfi_date" >
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Amount</label>
+                            <input type="number" class="form-control" name="amount" min="0" >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Comment</label>
+                            <textarea class="form-control" name="comment" rows="5" cols="25" ></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">PFI Document</label>
+                           <input type="file" class="form-control" name="file" accept="application/pdf">
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
+
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-dark ">Finish</button>
+                </div>
+            </form>
     </div>
 @endsection
+@push('scripts')
+    <script>
+       $('.remove').on('click',function(){
+           let id = $(this).attr('data-id');
+           let action = $(this).attr('data-action');
+           pfi(id, action);
+       })
+       $('.add-now').on('click',function(){
+           let id = $(this).attr('data-id');
+           let action = $(this).attr('data-action');
+           pfi(id, action);
+       })
+
+       function pfi(id, action) {
+           let url = '{{ route('add_pfi') }}';
+           $.ajax({
+               type: "GET",
+               url: url,
+               dataType: "json",
+               data: {
+                   id: id,
+                   action: action,
+               },
+               success:function () {
+                   location.reload();
+               }
+           });
+       }
+       $("#form-create").validate({
+           rules: {
+               pfi_reference_number: {
+                   required: true,
+               },
+               pfi_date: {
+                   required: true,
+               },
+               amount: {
+                   required: true,
+               },
+               file:{
+                   required:true,
+                   extension: 'pdf'
+               },
+               messages: {
+                   file: {
+                       extension: "Please upload valid pdf file"
+                   }
+               }
+           }
+       });
+    </script>
+@endpush
 
 

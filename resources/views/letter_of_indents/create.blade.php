@@ -34,7 +34,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label class="form-label">Select Country</label>
+                        <label class="form-label">Country</label>
                         <select class="form-control" name="country" id="country" autofocus>
                             <option ></option>
                             @foreach($countries as $country)
@@ -46,8 +46,8 @@
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label  text-muted">Customer Type</label>
-                        <select class="form-control"name="customer_type" id="customer-type">
-                            <option value="" disabled>Select The Type</option>
+                        <select class="form-control" name="customer_type" id="customer-type">
+                            <option value="" disabled>Type</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}>{{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}>{{ \App\Models\Customer::CUSTOMER_TYPE_COMPANY }}</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}>{{ \App\Models\Customer::CUSTOMER_TYPE_GOVERMENT }}</option>
@@ -116,7 +116,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Dealers</label>
+                        <label for="choices-single-default" class="form-label">Dealer</label>
                         <select class="form-control" data-trigger name="dealers" >
                             <option value="Trans Cars">Trans Cars</option>
                             <option value="Milele Motors">Milele Motors</option>
@@ -154,7 +154,6 @@
 @push('scripts')
     <script>
         getCustomers();
-
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -180,14 +179,6 @@
                     required: true
                 }
             },
-            // errorPlacement: function(error, element) {
-            //     if (element.hasClass("select2-hidden-accessible")) {
-            //         element = $("#select2-" + element.attr("id") + "-container").parent();
-            //         error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
-            //     }else {
-            //         error.insertAfter(element).addClass('text-danger');
-            //     }
-            // }
         });
         $('#country').select2({
             placeholder : 'Select Country'
