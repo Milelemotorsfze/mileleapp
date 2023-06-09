@@ -74,7 +74,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="/" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i>
+                            <i data-feather="home"></i>
                             <span data-key="t-extra-pages">Dashboard</span>
                         </a>
                     </li>
@@ -85,6 +85,32 @@
                             <span data-key="t-extra-pages">Messages & Calls</span>
                         </a>
 					</li>
+                    @endcan
+                    @can('warehouse-view')
+                    @can('View-daily-movemnets')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movements.index') }}" id="topnav-more" role="button">
+                            <i data-feather="command"></i>
+                            <span data-key="t-extra-pages">Movements</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('view-po-details')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
+                            <i data-feather="award"></i>
+                            <span data-key="t-extra-pages">Purchasing Order</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('view-po-details')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
+                            <i data-feather="sliders"></i>
+                            <span data-key="t-extra-pages">Stocks</span>
+                        </a>
+					</li>
+                    @endcan
                     @endcan
                     @can('variants-view')
                     <li class="nav-item dropdown">

@@ -28,7 +28,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
 use App\Http\Controllers\PFIController;
 use App\Http\Controllers\DemandPlanningSupplierController;
-
+use App\Http\Controllers\PurchasingOrderController;
+use App\Http\Controllers\Movement;
+use App\Http\Controllers\VehiclesController;
 
 /*
 /*
@@ -199,4 +201,12 @@ Route::get('/d', function () {
     Route::resource('hiring', HiringController::class);
     // Route::POST('hiring', [HiringController::class, 'jobStore'])->name('jobStore');
     // Route::POST('hiring', [HiringController::class, 'jobUpdate'])->name('jobUpdate');
+
+    //WareHouse
+    Route::resource('purchasing-order', PurchasingOrderController::class);
+    Route::resource('Vehicles', VehiclesController::class);
+    Route::post('purchasing-order/check-po-number', [PurchasingOrderController::class, 'checkPONumber'])->name('purchasing-order.checkPONumber');
+    Route::post('update-data/vehicles', [VehiclesController::class, 'updatevehiclesdata'])->name('vehicles.updatevehiclesdata');
+    Route::post('fatch-data/variants', [VehiclesController::class, 'fatchvariantdetails'])->name('vehicles.fatchvariantdetails');
+    Route::resource('movements', Movement::class);
 });

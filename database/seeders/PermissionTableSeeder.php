@@ -21,6 +21,8 @@ class PermissionTableSeeder extends Seeder
             ['5','Marketing'],
             ['6','HR'],
             ['7','Demand Planning'],
+            ['8','Warehouse'],
+            ['9','Stocks'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -93,6 +95,40 @@ class PermissionTableSeeder extends Seeder
             ['7','Supplier Inventory Edit','supplier-inventory-edit','To add or update supplier Inventory with permissions.'],
             ['7','Approve LOI','LOI-approve','To Approve LOI with permissions.'],
 
+            ['8','View Warehouse','warehouse-view', 'To View the Warehouse Module'],
+            ['8','Edit Warehouse','warehouse-edit', 'To Edit the warehouse Module'],
+            ['8','View Daily Movements','View-daily-movemnets', 'To View the Daily Movement'],
+            ['8','Edit Daily Movements','edit-daily-movemnets', 'To Edit the Daily Movement'],
+            ['8','View PO Details','view-po-details', 'To View the PO Details'],
+            ['8','Create PO Details','create-po-details', 'To Create the PO Details'],
+            ['8','Edit PO Details','edit-po-details', 'To Edit the PO Details'],
+            ['8','Delete PO Details','delete-po-details', 'To Delete the PO Details'],
+
+            ['9','Full View Stock','stock-full-view', 'To View the whole stock details'],
+            ['9','Full Edit stock','stock-full-edit', 'To Edit the whole stock details'],
+            ['9','SO View','view-so', 'To View The SO Details'],
+            ['9','Edit & Create SO','edit-so', 'To Create and Edit the SO'],
+            ['9','GRN View','grn-view', 'To View the GRN Details'],
+            ['9','GRN Edit','grn-edit', 'To Create,Edit the GRN Details'],
+            ['9','GDN View','gdn-view', 'To View the GDN Details'],
+            ['9','GDN Edit','gdn-edit', 'To Create, Edit the GdN Details'],
+            ['9','Booking View','booking-view', 'To View the Booking Details'],
+            ['9','Booking Add & Edit','bokking-edit', 'To Edit the GRN Details'],
+            ['9','Remarks','remarks', 'To View, Edit the Remarks Details'],
+            ['9','Vehicles Details View','vehicles-detail-view', 'To View the Vehicles Details'],
+            ['9','Vehicles Details Edit','vehicles-detail-edit', 'To Edit the Vehicles Details'],
+            ['9','VIN, Enginee View','vin-view', 'To View the VIN Details'],
+            ['9','VIN, Enginee ADD & Create','vin-edit', 'To Edit the VIN Details'],
+            ['9','Territory view','territory-view', 'To View the Territory Details'],
+            ['9','Territory edit','territory-edit', 'To Edit the Territory Details'],
+            ['9','Colours View','colours-view', 'To View the Colour Details'],
+            ['9','Colours Add & Edit','colours-edit', 'To Edit the Colour Details'],
+            ['9','Documents View','document-view', 'To View the Document Details'],
+            ['9','Documents Add & Edit','document-edit', 'To Edit the Document Details'],
+            ['9','BL View','bl-view', 'To View the BL Details'],
+            ['9','BL Add & Edit ','bl-edit', 'To Edit the BL Details'],
+            ['9','Price View','price-view', 'To View the Price Details'],
+            ['9','Price Add & Edit','price-edit', 'To Edit the Price Details'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [
