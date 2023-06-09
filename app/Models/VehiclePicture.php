@@ -5,12 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vehicles extends Model
+class VehiclePicture extends Model
 {
     use HasFactory;
-    public $table = 'vehicles';
-    public function variant()
+    public function vehicle()
     {
-        return $this->belongsTo(Varaint::class,'varaints_id');
+        return $this->belongsTo(Vehicles::class,'vehicle_id');
     }
 }

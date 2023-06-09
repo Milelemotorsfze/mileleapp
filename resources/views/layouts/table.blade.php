@@ -57,11 +57,18 @@
             $('#milele-approved-LOI-table').DataTable();
             $('#supplier-rejected-LOI-table').DataTable();
             $('#milele-partial-approved-LOI-table').DataTable();
+            $('#supplier-pictures-table').DataTable();
+
+
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');
             //     ModalOpen(modalId);
             // });
+            $('#supplier-pictures-table').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
             $('#new-LOI-table').on( 'click', '.modal-button', function () {
                 var modalId = $(this).data('modal-id');
                 ModalOpen(modalId);

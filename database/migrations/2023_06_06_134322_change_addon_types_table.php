@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('addon_types', function (Blueprint $table) {
-            $table->dropColumn('model_number');
-           
+//            $table->dropColumn('model_number');
+
         });
     }
 
