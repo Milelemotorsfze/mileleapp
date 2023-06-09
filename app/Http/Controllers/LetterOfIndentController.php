@@ -29,10 +29,10 @@ class LetterOfIndentController extends Controller
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
         $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
-            ->where('status',LetterOfIndent::LOI_STATUS_APPROVED)
+            ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
             ->cursor();
         $partialApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED)
+            ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
             ->cursor();
         $supplierApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)

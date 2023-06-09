@@ -55,15 +55,14 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-//        return 1;
         $request->validate([
             'pfi_reference_number' => 'required',
             'pfi_date' => 'required',
             'amount'  => 'required',
-
+            'file' => 'required|mimes:pdf'
         ]);
 
-        DB::beginTransaction();
+//        DB::beginTransaction();
         $pfi = new PFI();
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
@@ -78,9 +77,9 @@ class PFIController extends Controller
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
-            $destinationPath = 'PFI-Documents';
+            $destinationPath = 'PFI_document_withoutsign';
             $file->move($destinationPath, $fileName);
-            $pfi->pfi_document = $fileName;
+            $pfi->pfi_document_without_sign = $fileName;
         }
 
         $pfi->save();
@@ -90,22 +89,27 @@ class PFIController extends Controller
                                                         ->whereNull('pfi_id')
                                                         ->get();
 
+        $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
+
+        $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
+
+        if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
+        }else{
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
+        }
+        $letterOfIndent->save();
+
         foreach ($currentlyApprovedItems as $currentlyApprovedItem)
         {
             $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem->id);
             $approvedLoiItem->pfi_id = $pfi->id;
             $approvedLoiItem->save();
         }
-        // need to be clear with requirement
-//        $letterOfIndent = LetterOfIndent::find($request->id);
-//        $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
-//        $letterOfIndent->save();
 
+//        DB::commit();
 
-
-        DB::commit();
-
-        return redirect()-route('letter-of-indents.index')->with('message', 'PFI created successfully');
+        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
 
     /**

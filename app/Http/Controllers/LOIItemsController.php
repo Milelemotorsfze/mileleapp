@@ -174,31 +174,36 @@ class LOIItemsController extends Controller
         $approvedLOIItem->save();
 
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
-        $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
-        $approvedItems = [];
-        $updatedItems = [];
-
-        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
-        {
-            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
-            $latestApprovedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
-            if ($letterOfIndentItem->quantity == $latestApprovedQuantity && $letterOfIndentItem->latestApprovedQuantity != 0)
-            {
-                // get id of full quantity approved item and compare with previous ids
-                $approvedItems[] = $letterOfIndentItem->id;
-            }else{
-                // get ids of partialy approved items
-                $updatedItems[] = $letterOfIndentItem->id;
-            }
-        }
-        $result = array_diff($loiItemIds,$approvedItems);
+      //  $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
+//        $approvedItems = [];
+//        $updatedItems = [];
         $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
-        if(empty($result)) {
-            $letterOfIndent->status = "Approved";
-        }
-        if(!empty($updatedItems)) {
+        if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+        }else{
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
+//        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
+//        {
+//            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
+//            $latestApprovedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
+////            if ($letterOfIndentItem->quantity == $latestApprovedQuantity && $letterOfIndentItem->latestApprovedQuantity != 0)
+////            {
+////                // get id of full quantity approved item and compare with previous ids
+////                $approvedItems[] = $letterOfIndentItem->id;
+////            }else{
+////                // get ids of partialy approved items
+////                $updatedItems[] = $letterOfIndentItem->id;
+////            }
+//        }
+//        $result = array_diff($loiItemIds,$approvedItems);
+//        $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
+//        if(empty($result)) {
+//            $letterOfIndent->status = "Approved";
+//        }
+//        if(!empty($updatedItems)) {
+//            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+//        }
         $letterOfIndent->save();
         DB::commit();
 
@@ -216,24 +221,30 @@ class LOIItemsController extends Controller
 
         DB::beginTransaction();
 
+        if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+        }else{
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+        }
+
         foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
         {
             $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
             $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantities[$key];
             $letterOfIndentItem->save();
-            if ($letterOfIndentItem->quantity == $letterOfIndentItem->approved_quantity)
-            {
-                $approvedItems[] = $letterOfIndentItem->id;
-            }
+//            if ($letterOfIndentItem->quantity == $letterOfIndentItem->approved_quantity)
+//            {
+//                $approvedItems[] = $letterOfIndentItem->id;
+//            }
         }
 
-        $result = array_diff($loiItemIds,$approvedItems);
-        if(empty($result)) {
-          $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-
-        }else{
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-        }
+//        $result = array_diff($loiItemIds,$approvedItems);
+//        if(empty($result)) {
+//          $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+//
+//        }else{
+//            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+//        }
         $letterOfIndent->save();
 
         foreach ($quantities as $key => $quantity) {

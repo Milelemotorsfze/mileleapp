@@ -17,7 +17,12 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_REJECTED = "Rejected";
     public const LOI_STATUS_NEW = "New";
     public const LOI_STATUS_PFI_CREATED = "PFI Created";
+    public const LOI_STATUS_PARTIAL_PFI_CREATED = "Partialy PFI Created";
 
+    protected $appends = [
+        'total_loi_quantity',
+        'total_approved_quantity'
+    ];
 
     public function customer()
     {
@@ -34,5 +39,21 @@ class LetterOfIndent extends Model
     public function letterOfIndentItems()
     {
         return $this->hasMany(LetterOfIndentItem::class,'letter_of_indent_id');
+    }
+    public function getTotalLoiQuantityAttribute() {
+        $letterOfIndentItemQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
+                                    ->sum('quantity');
+        if(!$letterOfIndentItemQty) {
+            return 0;
+        }
+        return $letterOfIndentItemQty;
+    }
+    public function getTotalApprovedQuantityAttribute() {
+        $letterOfIndentItemApprovedQty = LetterOfIndentItem::where('letter_of_indent_id', $this->id)
+            ->sum('approved_quantity');
+        if(!$letterOfIndentItemApprovedQty) {
+            return 0;
+        }
+        return $letterOfIndentItemApprovedQty;
     }
 }
