@@ -33,8 +33,8 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Select Country</label>
-                        <select class="form-control" data-trigger name="country" id="country">
+                        <label for="choices-single-default" class="form-label"> Country</label>
+                        <select class="form-control" autofocus name="country" id="country" >
                             <option disabled>Select Country</option>
                             @foreach($countries as $country)
                                 <option value="{{$country}}" {{ $country == $letterOfIndent->customer->country ? 'selected' : '' }} > {{ $country }} </option>
@@ -44,9 +44,9 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Customer Type</label>
-                        <select class="form-control"name="customer_type" id="customer-type">
-                            <option value="" disabled>Select The Type</option>
+                        <label for="choices-single-default" class="form-label text-muted">Customer Type</label>
+                        <select class="form-control" name="customer_type" id="customer-type">
+                            <option value="" disabled>Select Customer Type</option>
                             <option value={{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
                                 {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL == $letterOfIndent->customer->type ? 'selected' : ''}}>
                                 {{ \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL }}
@@ -68,14 +68,14 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
+                        <label for="choices-single-default" class="form-label">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" >
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <label for="choices-single-default" class="form-label">Supplier</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)
@@ -90,7 +90,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                        <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                         <select class="form-control" name="category" id="choices-single-default">
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                                 {{ \App\Models\LetterOfIndent::LOI_CATEGORY_REAL == $letterOfIndent->category ? 'selected' : ''}} >
@@ -105,14 +105,14 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                        <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" name="date"
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}">
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                        <label for="choices-single-default" class="form-label">Dealers</label>
                         <select class="form-control" data-trigger name="dealers" >
                             <option value="Trans Cars" {{ 'Trans Cars' == $letterOfIndent->dealers ? 'selected' : '' }}>Trans Cars</option>
                             <option value="Milele Motors" {{ 'Milele Motors' == $letterOfIndent->dealers ? 'selected' : '' }}>Milele Motors</option>
@@ -121,7 +121,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
+                        <label for="choices-single-default" class="form-label">Shipping Method</label>
                         <select class="form-control" data-trigger name="shipment_method">
                             <option value="CNF" {{ 'CNF' == $letterOfIndent->shipment_method ? 'selected' : '' }}>CNF</option>
                             <option value="X work" {{ 'X work' == $letterOfIndent->shipment_method ? 'selected' : '' }}>X work</option>
@@ -129,8 +129,8 @@
                     </div>
                 </div>
                 <br>
-                <div class="col-lg-12 col-md-12">
-                    <button type="submit" class="btn btn-dark btncenter" >Update & Next</button>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-dark " >Update & Next</button>
                 </div>
             </div>
         </form>
@@ -139,6 +139,9 @@
 @push('scripts')
     <script>
             getCustomers();
+            $('#country').select2({
+                placeholder: 'Select Country'
+            });
             $('#country').change(function () {
                 getCustomers();
             });
@@ -162,7 +165,7 @@
                     success: function (data) {
                         $('#customer').empty();
                         jQuery.each(data, function (key, value) {
-                            var selectedId = '{{ $letterOfIndent->customer_id }}'
+                            var selectedId = '{{ $letterOfIndent->customer_id }}';
                             $('#customer').append('<option value="' + value.id + ' " >' + value.name + '</option>');
                         });
                     }

@@ -56,6 +56,7 @@
             $('#dtBasicExample5').DataTable();
             $('#dtBasicExample6').DataTable();
             $('#dtBasicExample7').DataTable();
+            $('#dtBasicExample8').DataTable();
             $('#new-LOI-table').DataTable();
             $('#supplier-approved-LOI-table').DataTable();
             $('#milele-approved-LOI-table').DataTable();
@@ -101,6 +102,9 @@
                 $('.modal').removeClass('modalshow');
                 $('.alert').hide();
 
+            });
+            $('input[type=date]').on('change',function(){
+                $(this).valid();
             });
                     // div colour
                     // alert($('.divcolorclass').val());

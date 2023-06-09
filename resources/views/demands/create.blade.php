@@ -32,8 +32,8 @@
                 <div class="row demand-div">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 "> Supplier</label>
-                            <select class="form-control" data-trigger name="supplier_id" id="supplier">
+                            <label for="choices-single-default" class="form-label"> Supplier</label>
+                            <select class="form-control" autofocus name="supplier_id" id="supplier">
                                 <option value="" disabled>Select The Supplier</option>
                                 @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
@@ -43,7 +43,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
+                            <label for="choices-single-default" class="form-label">Dealers</label>
                             <select class="form-control" data-trigger name="whole_saler" id="whole-saler">
                                 <option value="Trans Cars">Trans Cars</option>
                                 <option value="Milele Motors">Milele Motors</option>
@@ -52,7 +52,7 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13">Steering</label>
+                            <label for="choices-single-default" class="form-label">Steering</label>
                             <select class="form-control" data-trigger name="steering" id="steering">
                                 <option value="LHD">LHD</option>
                                 <option value='RHD'>RHD</option>

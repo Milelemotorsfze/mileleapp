@@ -21,14 +21,14 @@
             <div class="row">
                 <div class="col-md-2">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Start Date</label>
-                        <input type="date" id="start-date" name="start_date" value="{{ old('start_date',$startDate) }}"
+                        <label for="choices-single-default" class="form-label text-muted">Start Date</label>
+                        <input type="date" id="start-date" autofocus name="start_date" value="{{ old('start_date',$startDate) }}"
                                class="form-control" />
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">End Date</label>
+                        <label for="choices-single-default" class="form-label text-muted">End Date</label>
                         <input type="date" id="end-date" value="{{ old('end_date',$endDate) }}" name="end_date" class="form-control" />
                     </div>
                 </div>

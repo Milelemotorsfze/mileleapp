@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class quotation extends Model
+class Rejection extends Model
 {
     use HasFactory;
+    protected $table = 'lead_rejection';
     protected $fillable = [
         'calls_id',
         'date',
-        'deal_value',
+        'Reason',
+        'created_by',
         'sales_notes',
-        'file_path',
     ];
     public $timestamps = false;
 }

@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
+                        <label for="choices-single-default" class="form-label ">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
                             <option> {{ $letterOfIndent->customer->name }}</option>
                         </select>
@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Category</label>
+                        <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
                         <select class="form-control" name="category" readonly >
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                                 {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
@@ -53,46 +53,51 @@
                 </div>
                 <div class="col-lg-4 col-md-6">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">LOI Date</label>
+                        <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                     </div>
                 </div>
             </div>
-        <div class="row ">
             @if($letterOfIndentItems->count() > 0)
-                <div class="d-flex">
-                    <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3">
-                                <label class="form-label">Model</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3">
-                                <label  class="form-label">SFX</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3">
-                                <label class="form-label">Varients</label>
-                            </div>
-                            <div class="col-lg-3 col-md-3">
-                                <label class="form-label">Qty</label>
+                <div class="row d-none d-sm-block">
+                    <div class="d-flex">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3">
+                                    <label class="form-label">Model</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <label  class="form-label">SFX</label>
+                                </div>
+                                <div class="col-lg-4 col-md-4">
+                                    <label class="form-label">Varient</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2">
+                                    <label class="form-label">Quantity</label>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 @foreach($letterOfIndentItems as $value => $letterOfIndentItem)
                     <div class="d-flex">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 col-md-12">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3">
+                                    <label class="form-label d-block d-sm-none">Model</label>
                                     <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-3 col-md-3">
+                                    <label class="form-label d-block d-sm-none">SFX</label>
                                     <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
                                 </div>
-                                <div class="col-lg-3 col-md-3">
+                                <div class="col-lg-4 col-md-4">
+                                    <label class="form-label d-block d-sm-none">Variant</label>
                                     <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
                                 </div>
-                                <div class="col-lg-3 col-md-3">
+                                <div class="col-lg-2 col-md-2">
+                                    <label class="form-label d-block d-sm-none">Quantity</label>
                                     <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control"><br>
                                 </div>
                             </div>
@@ -100,19 +105,18 @@
                     </div>
                 @endforeach
             @endif
-        </div>
-        <br>
-        <form action="{{ route('letter-of-indent-documents.store') }}" method="POST" enctype="multipart/form-data">
+
+        <form id="form-doc-upload" action="{{ route('letter-of-indent-documents.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="page_name" value="EDIT-PAGE">
             <div class="row" id="deal-doc-upload-div">
                 <div class="d-flex">
                     <div class="col-lg-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3">
+                        <div class="row ">
+                            <div class="col-lg-3 col-md-12">
                                 <label class="form-label">Choose Document</label>
                             </div>
-                            <div class="col-lg-6 col-md-6">
+                            <div class="col-lg-6 col-md-6 d-none d-lg-block d-xl-block d-xxl-block">
                                 <label class="form-label"></label>
                             </div>
                         </div>
@@ -121,8 +125,9 @@
                 <div class="d-flex">
                     <div class="col-lg-12">
                         <div class="row">
-                            <div class="col-lg-3 col-md-3">
-                                <input type="file" name="files[]" class="form-control" multiple id="file-upload" accept="application/pdf, image/*">
+                            <div class="col-lg-3 col-md-6">
+                                <input type="file" name="files[]" class="form-control mb-3" multiple
+                                      autofocus id="file-upload" accept="application/pdf, image/*">
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id">
                             <div class="col-lg-6 col-md-6">
@@ -136,7 +141,7 @@
         <br>
         @foreach($letterOfIndentDocuments as $key => $letterOfIndentDocument)
             <div class="row p-2">
-                <div class="col-lg-3 col-md-3">
+                <div class="col-12">
                     File {{ $key + 1 }}
                     <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">
                         View
@@ -149,7 +154,7 @@
             </div>
             <!-- Modal -->
             <div class="modal justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog ">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">LOI Document</h5>
@@ -180,8 +185,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-12 col-md-12">
-            <a href="{{ route('letter-of-indents.index') }}"> <button type="button" class="btn btn-dark btnright">Finish</button></a>
+        <div class="col-12 text-end">
+            <a href="{{ route('letter-of-indents.index') }}"> <button type="button" class="btn btn-dark">Finish</button></a>
         </div>
     </div>
 @endsection
@@ -241,6 +246,21 @@
                     });
                 }
             }).set({title:"Delete Item"})
+        });
+
+        $("#form-doc-upload").validate({
+            ignore: [],
+            rules: {
+                "files[]": {
+                    required: true,
+                    extension: "pdf|png|jpg|jpeg|svg"
+                },
+                messages: {
+                    file: {
+                        extension: "File type not allowed.Please refer file type here..(eg: pdf|png|jpg|jpeg|svg..)"
+                    }
+                }
+            },
         });
     </script>
 @endpush

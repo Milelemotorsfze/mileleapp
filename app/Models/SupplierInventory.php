@@ -13,6 +13,7 @@ class SupplierInventory extends Model
     use HasFactory;
     public $timestamps = false;
     public const VEH_STATUS_SUPPLIER_INVENTORY = "supplier inventory";
+    public const VEH_STATUS_LOI_APPROVED = "LOI Approved";
     public const VEH_STATUS_DELETED = "Deleted";
     public const DEALER_TRANS_CARS = "Trans Cars";
     public const DEALER_MILELE_MOTORS = "Milele Motors";
@@ -44,10 +45,7 @@ class SupplierInventory extends Model
     public function getTotalQuantityAttribute()
     {
         $modelId = $this->master_model_id;
-        $supplierInventories = SupplierInventory::with('masterModel')
-            ->whereHas('masterModel', function ($query) use($modelId){
-                $query->where('id', $modelId);
-            })
+        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY);
         if (!empty(request()->start_date) && !empty(request()->end_date)) {
             $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
@@ -66,10 +64,7 @@ class SupplierInventory extends Model
     public function getActualQuantityAttribute()
     {
         $modelId = $this->master_model_id;
-        $supplierInventories = SupplierInventory::with('masterModel')
-            ->whereHas('masterModel', function ($query) use($modelId){
-                $query->where('id', $modelId);
-            })
+        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->whereNull('eta_import');
 

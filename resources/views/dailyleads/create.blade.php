@@ -56,9 +56,9 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
-@can('Calls-modified')
+@can('daily-leads-create')
 <div class="card-header">
-        <h4 class="card-title">New Calls & Messages</h4>
+        <h4 class="card-title">New Leads</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -75,7 +75,7 @@ input[type=number]::-webkit-outer-spin-button {
                 </ul>
             </div>
         @endif
-        {!! Form::open(array('route' => 'calls.store','method'=>'POST', 'id' => 'calls')) !!}
+        {!! Form::open(array('route' => 'dailyleads.store','method'=>'POST', 'id' => 'calls')) !!}
             <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>  
@@ -86,46 +86,48 @@ input[type=number]::-webkit-outer-spin-button {
                         {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
                     </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">* </span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
-</div>
+                    <span class="error">* </span>
+                    <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
+                    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
+                    </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
-    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
-    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
-    <div id="emailError" class="error-text"></div>
-</div>
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
+                    {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
+                    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+                    <div id="emailError" class="error-text"></div>
+                    </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
                     <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput">
                     <datalist id="milelemotorsList">
-                    @foreach ($LeadSource as $source)
-                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
-                    @endforeach
+                    <option value="Walking Customer" data-value="Walking Customer">Walking Customer</option>
+                    <option value="Online" data-value="Online">Online</option>
+                    <option value="Direct Reference" data-value="Direct Reference">Direct Reference</option>
+                    <option value="Direct Calls" data-value="Direct Calls">Direct Calls</option>
+                    <option value="Agent" data-value="Agent">Agent</option>
                     </datalist>
                     </div>
                     <div class="col-lg-4 col-md-6">
-    <span class="error">*</span>
-    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput">
-    <datalist id="laList">
-        <option value="English" data-value="English">English</option>
-        <option value="Arabic" data-value="English">Arabic</option>
-        <option value="Russian" data-value="English">Russian</option>
-        <option value="Urdu" data-value="English">Urdu</option>
-        <option value="Hindi" data-value="English">Hindi</option>
-        <option value="Kannada" data-value="English">Kannada</option>
-        <option value="French" data-value="English">French</option>
-        <option value="Malayalam" data-value="English">Malayalam</option>
-        <option value="Tamil" data-value="English">Tamil</option>
-        <option value="Spanish" data-value="English">Spanish</option>
-        <option value="Portuguese" data-value="English">Portuguese</option>
-        <option value="Shona" data-value="English">Shona</option>
-    </datalist>
-</div>
+                    <span class="error">*</span>
+                    <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
+                    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput">
+                    <datalist id="laList">
+                        <option value="English" data-value="English">English</option>
+                        <option value="Arabic" data-value="English">Arabic</option>
+                        <option value="Russian" data-value="English">Russian</option>
+                        <option value="Urdu" data-value="English">Urdu</option>
+                        <option value="Hindi" data-value="English">Hindi</option>
+                        <option value="Kannada" data-value="English">Kannada</option>
+                        <option value="French" data-value="English">French</option>
+                        <option value="Malayalam" data-value="English">Malayalam</option>
+                        <option value="Tamil" data-value="English">Tamil</option>
+                        <option value="Spanish" data-value="English">Spanish</option>
+                        <option value="Portuguese" data-value="English">Portuguese</option>
+                        <option value="Shona" data-value="English">Shona</option>
+                    </datalist>
+                </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">
                     <span class="error">* </span>
                         <label for="basicpill-firstname-input" class="form-label">Destination : </label>
@@ -148,58 +150,31 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                     </div>
                     </br>
-                    <div class="row">
-                    <div class="col-lg-4 col-md-6">
-    <label for="sales-options" class="form-label">Sales Persons Options:</label>
-    <div>
-        <label>
-            <input type="radio" name="sales-option" id="auto-assign-option" value="auto-assign" checked> System Auto Assign
-        </label>
-        <label>
-            <input type="radio" name="sales-option" id="manual-assign-option" value="manual-assign"> Manual Assign
-        </label>
-    </div>
-</div>
-<div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
-    <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput">
-<datalist id="salesList">
-    @foreach ($sales_persons as $sales_person)
-        @php
-            $sales_person_details = DB::table('users')->where('id', $sales_person->model_id)->first();
-            $sales_person_name = $sales_person_details->name;
-        @endphp
-        <option value="{{ $sales_person_name }}" data-id="{{ $sales_person->model_id }}"></option>      
-    @endforeach
-</datalist>
-<input type="hidden" name="sales_person_id" id="selectedSalesPersonId">
-                    </div>
-                    </div>
                     <div class="maindd">
-    <div id="row-container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6">
-            <label for="brandInput" class="form-label">Brand & Models:</label>
-<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
-<datalist id="brandList">
-    @foreach ($modelLineMasters as $modelLineMaster)
-        @php
-            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
-            $brand_name = $brand->brand_name;
-        @endphp 
-        <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
-    @endforeach
-</datalist>
-<input type="hidden" name="model_line_ids[]" id="selectedBrandId">
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-        <div class="btn btn-primary add-row-btn">
-            <i class="fas fa-plus"></i> Add More
-        </div>
-    </div>
-</div>
+                    <div id="row-container">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                            <label for="brandInput" class="form-label">Brand & Models:</label>
+                <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
+                <datalist id="brandList">
+                    @foreach ($modelLineMasters as $modelLineMaster)
+                        @php
+                            $brand = DB::table('brands')->where('id', $modelLineMaster->brand_id)->first();
+                            $brand_name = $brand->brand_name;
+                        @endphp 
+                        <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
+                    @endforeach
+                </datalist>
+                <input type="hidden" name="model_line_ids[]" id="selectedBrandId">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+                        <div class="btn btn-primary add-row-btn">
+                            <i class="fas fa-plus"></i> Add More
+                        </div>
+                    </div>
+                </div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
                         {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
@@ -221,18 +196,6 @@ input[type=number]::-webkit-outer-spin-button {
 @endsection
 @push('scripts')
     <script type="text/javascript">
-    const autoAssignOption = document.getElementById('auto-assign-option');
-    const manualAssignOption = document.getElementById('manual-assign-option');
-    const manualSalesPersonList = document.getElementById('manual-sales-person-list');
-    const salesOptionValueField = document.getElementById('sales-option-value');
-    autoAssignOption.addEventListener('change', () => {
-        manualSalesPersonList.style.display = 'none';
-        salesOptionValueField.value = autoAssignOption.value;
-    });
-    manualAssignOption.addEventListener('change', () => {
-        manualSalesPersonList.style.display = 'block';
-        salesOptionValueField.value = manualAssignOption.value;
-    });
     $(document).ready(function() {
   var max_fields = 10;
   var wrapper = $("#row-container");
@@ -309,38 +272,7 @@ input[type=number]::-webkit-outer-spin-button {
     updateDropdownList();
   });
 });
-    $(document).ready(function() {
-        $('#phone, #email').on('input', function() {
-            var phone = $('#phone').val();
-            var email = $('#email').val();
-            $.ajax({
-                url: "{{ route('checkExistence') }}",
-                method: 'POST',
-                data: {
-                    phone: phone,
-                    email: email,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    $('#phoneCount').text('Phone count: ' + response.phoneCount);
-                    $('#emailCount').text('Email count: ' + response.emailCount);
-                    if (response.phoneCount > 0 || response.emailCount > 0) {
-                        var customerNames = response.customerNames.join(', ');
-                        var message = 'Customer Names: ' + customerNames + '<br>';
-                        message += 'Phone Count: ' + response.phoneCount + '<br>';
-                        message += 'Email Count: ' + response.emailCount;
-                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + phone + '&email=' + email + '" class="btn btn-primary">See Details</a>';
-                        message += '<br>' + buttonHtml;
-                        
-                        $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');
-                    } else {
-                        $('#flashMessage').html('');
-                    }
-                }
-            });
-        });
-    });
-    document.getElementById('languageInput').addEventListener('input', function(event) {
+document.getElementById('languageInput').addEventListener('input', function(event) {
         var input = event.target;
         var list = input.getAttribute('list');
         var options = document.querySelectorAll('#' + list + ' option');

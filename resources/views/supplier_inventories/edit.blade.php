@@ -21,8 +21,8 @@
             <div class="row">
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted"> Supplier</label>
-                        <select class="form-control" data-trigger name="supplier_id" id="supplier">
+                        <label for="choices-single-default" class="form-label text-muted"> Supplier</label>
+                        <select class="form-control" autofocus name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
@@ -32,7 +32,7 @@
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted"> Dealers</label>
+                        <label for="choices-single-default" class="form-label text-muted"> Dealers</label>
                         <select class="form-control" data-trigger name="whole_sales" id="wholesaler">
                             <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}">Trans Cars</option>
                             <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}">Milele Motors</option>
@@ -41,7 +41,7 @@
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted"> Country</label>
+                        <label for="choices-single-default" class="form-label text-muted"> Country</label>
                         <select class="form-control" data-trigger name="country" id="choices-single-default">
                             <option value='UAE'>UAE</option>
                             <option value='Belguim'>Belguim</option>
@@ -52,7 +52,7 @@
             <div class="row">
                 <div class="col-lg-4 col-md-4">
                     <div class="mb-3">
-                    <label for="choices-single-default" class="form-label font-size-13 text-muted">Choose File</label>
+                    <label for="choices-single-default" class="form-label text-muted">Choose File</label>
                         <input type="file" name="file" class="form-control text-dark" >
                     </div>
                 </div>
@@ -67,8 +67,8 @@
                 </div>
             </div>
 
-            <div class="col-12">
-                <button type="submit" class="btn btn-dark btncenter"> Upload </button>
+            <div class="col-12 text-center">
+                <button type="submit" class="btn btn-dark "> Upload </button>
             </div>
         </form>
     </div>
