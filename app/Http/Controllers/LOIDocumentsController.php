@@ -41,7 +41,7 @@ class LOIDocumentsController extends Controller
 //            'files' => 'required'
 //        ]);
 
-        if (($request->has('files')))
+        if ($request->has('files'))
         {
             foreach ($request->file('files') as $file)
             {

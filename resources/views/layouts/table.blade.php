@@ -1,10 +1,5 @@
 <!doctype html>
 <html lang="en">
-<style>
-    .error {
-        color: #f32323;
-    }
-</style>
     <head>
     @include('partials/head-css')
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

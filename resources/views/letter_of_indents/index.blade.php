@@ -162,7 +162,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal modalhide" id="reject-LOI-{{$letterOfIndent->id}}" style="width: 600px" >
+                                <div class="modal modalhide" id="reject-LOI-{{$letterOfIndent->id}}" style="width: 600px" aria-hidden="true">
                                     <div class="modal-header bg-primary modal-header-sticky">
                                         <h1 class="modal-title fs-5 text-white text-center" > Reject LOI</h1>
                                         <button type="button" class="btn-close close"  aria-label="Close"></button>

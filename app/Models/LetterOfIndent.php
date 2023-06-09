@@ -16,6 +16,8 @@ class LetterOfIndent extends Model
     public const LOI_STATUS_APPROVED = "Approved";
     public const LOI_STATUS_REJECTED = "Rejected";
     public const LOI_STATUS_NEW = "New";
+    public const LOI_STATUS_PFI_CREATED = "PFI Created";
+
 
     public function customer()
     {

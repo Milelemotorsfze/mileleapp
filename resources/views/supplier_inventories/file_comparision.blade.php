@@ -56,7 +56,6 @@
                 </ul>
             </div>
         @endif
-
         <form id="form-compare" action="{{ route('supplier-inventories.file-comparision-report') }}">
             <div class="row">
                 <div class="col-lg-3 col-md-3">
@@ -242,7 +241,6 @@
             $('select[name="second_file"]').empty();
              getDates();
         })
-
 
         function getDates() {
             let supplier = $('#supplier').val();

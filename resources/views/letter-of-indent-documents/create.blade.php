@@ -10,7 +10,6 @@
             height: 550px;
         }
 
-
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI Items</h4>

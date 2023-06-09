@@ -119,6 +119,7 @@ Route::get('/d', function () {
 
     // PFI
     Route::resource('pfi', PFIController::class);
+    Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');
