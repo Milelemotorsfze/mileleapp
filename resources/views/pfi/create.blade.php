@@ -187,7 +187,7 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">PFI Date</label>
-                            <input type="date" class="form-control" name="pfi_date" >
+                            <input type="date" class="form-control" name="pfi_date">
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
@@ -207,7 +207,7 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Comment</label>
-                            <textarea class="form-control" name="comment" rows="5" cols="25" ></textarea>
+                            <textarea class="form-control" name="comment" rows="5" cols="25"></textarea>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-6" id="file-preview">

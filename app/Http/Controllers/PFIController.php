@@ -10,6 +10,7 @@ use App\Models\PFI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use setasign\Fpdi\Tcpdf\Fpdi;
 
 class PFIController extends Controller
 {
@@ -107,6 +108,23 @@ class PFIController extends Controller
             $approvedLoiItem->save();
         }
 
+        $pdf = new Fpdi();
+// add a page
+        $pdf->AddPage();
+// set the source file
+        $pdf->setSourceFile('PdfDocument.pdf');
+// import page 1
+        $tplIdx = $pdf->importPage(1);
+// use the imported page and place it at position 10,10 with a width of 100 mm
+        $pdf->useTemplate($tplIdx, 10, 10, 100);
+
+// now write some text above the imported page
+        $pdf->SetFont('Helvetica');
+        $pdf->SetTextColor(255, 0, 0);
+        $pdf->SetXY(30, 30);
+        $pdf->Write(0, 'This is just a simple text');
+
+        $pdf->Output('I', 'generated.pdf');
 //        DB::commit();
 
         return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
