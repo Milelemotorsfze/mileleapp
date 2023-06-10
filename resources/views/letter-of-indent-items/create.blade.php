@@ -191,19 +191,20 @@
                         </div>
                         <div class="col-12 text-end mt-4">
                             <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
+                            @if($letterOfIndentItems->count() > 0)
+                                <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
+                                    <button type="button" class="btn btn-dark  btn-deal-item-submit" >
+                                        Next
+                                    </button>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </form>
             <br>
-            <div class="col-12 text-end mt-4">
-                <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
-                   <button type="button" class="btn btn-dark  btn-deal-item-submit" >
-                       Next
-                   </button>
-                </a>
-            </div>
+
     </div>
 @endsection
 @push('scripts')

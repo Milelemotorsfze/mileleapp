@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        iframe{
+            height: 400px;
+            margin-bottom: 10px;
+        }
+    </style>
     <div class="card-header">
         <h4 class="card-title">Create New PFI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -80,7 +86,7 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+            <div class="row">
             <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
                 <div class="col-lg-12">
                     <div class="row">
@@ -169,53 +175,71 @@
                 @endif
             </div>
         <br>
-            <form action="{{ route('pfi.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('pfi.store') }}" id="form-create" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">PFI No</label>
-                           <input type="text" class="form-control" autofocus name="pfi_reference_number">
+                           <input type="text" class="form-control" autofocus name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">PFI Date</label>
                             <input type="date" class="form-control" name="pfi_date" >
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Amount</label>
                             <input type="number" class="form-control" name="amount" min="0" >
                         </div>
                     </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">PFI Document</label>
+                            <input type="file" id="file" class="form-control" name="file" accept="application/pdf">
+                        </div>
+                    </div>
                 </div>
-
                 <div class="row">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Comment</label>
                             <textarea class="form-control" name="comment" rows="5" cols="25" ></textarea>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">PFI Document</label>
-                           <input type="file" class="form-control" name="file" accept="application/pdf">
-                        </div>
+                    <div class="col-lg-6 col-md-6" id="file-preview">
                     </div>
                 </div>
                 <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
-
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark ">Finish</button>
-                </div>
+                @if($approvedPfiItems->count() > 0)
+                    <div class="col-12 text-center">
+                        <button type="submit" class="btn btn-dark">Finish</button>
+                    </div>
+                @endif
             </form>
     </div>
 @endsection
 @push('scripts')
     <script>
+        const fileInputLicense = document.querySelector("#file");
+        const previewFile = document.querySelector("#file-preview");
+        fileInputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile.firstChild) {
+                previewFile.removeChild(previewFile.firstChild);
+            }
+                const file = files[0];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile.appendChild(iframe);
+                }
+        });
        $('.remove').on('click',function(){
            let id = $(this).attr('data-id');
            let action = $(this).attr('data-action');
@@ -226,7 +250,6 @@
            let action = $(this).attr('data-action');
            pfi(id, action);
        })
-
        function pfi(id, action) {
            let url = '{{ route('add_pfi') }}';
            $.ajax({

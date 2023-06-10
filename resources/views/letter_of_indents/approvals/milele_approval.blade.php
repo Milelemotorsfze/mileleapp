@@ -140,14 +140,16 @@
                                     <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
-                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}" readonly class="form-control">
-                                </div>
-                                <div class="col-lg-1 col-md-1">
-                                    <input type="text" value="{{ $letterOfIndentItem->balance_quantity }}"
+                                    <input type="text" value="{{ $letterOfIndentItem->quantity }}"
                                            readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
-                                    <input type="text" value="{{ $letterOfIndentItem->inventory_quantity }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->balance_quantity }}" id="balance-qty-{{$key}}"
+                                           readonly class="form-control">
+                                </div>
+                                <div class="col-lg-1 col-md-1">
+                                    <input type="text" value="{{ $letterOfIndentItem->inventory_quantity }}" id="inventory-qty-{{$key}}"
+                                           readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-1">
                                     <?php
@@ -164,8 +166,8 @@
 //                                            }
 //                                        }
                                         ?>
-                                    <select name="quantities[]" class="form-control approve-quantity"
-                                            data-item-id="{{ $letterOfIndentItem->id }}">
+                                    <select name="quantities[]" class="form-control approve-quantity" id="quantity-{{$key}}" data-key="{{$key}}"
+                                    data-balance-quantity="{{  }}">
                                         @for($i=0;$i <= $count;$i++)
 
                                             <option> {{ $i }} </option>
@@ -186,24 +188,20 @@
 @endsection
 @push('scripts')
     <script>
+    let count = '{{ $letterOfIndentItems->count() }}';
     $('.approve-quantity').change(function () {
-
-        let id = $(this).attr('data-item-id');
-        let quantity = $(this).val();
-
-        let url = '{{ route('letter-of-indents.update-quantity') }}';
-        $.ajax({
-            type: "GET",
-            url: url,
-            dataType: "json",
-            data: {
-                id: id,
-                quantity: quantity,
-            },
-            success:function (data) {
-                location.reload();
-            }
-        });
+       let key = $(this).attr('data-key');
+       let inventoryQuantity = $('#inventory-qty-'+key).val();
+       let balanceQuantity = $('#balance-qty-'+key).val();
+       let quantity = $('#quantity-'+key).val();
+       let balanceQty = balanceQuantity - quantity;
+       let inventoryQty = inventoryQuantity - quantity;
+       if(inventoryQty <= 0) {
+           let inventoryQty = 0;
+       }
+       $('#balance-qty-'+key).val(balanceQty);
+       $('#inventory-qty-'+key).val(inventoryQty);
+        // alert(inventoryQuantity);
     })
     </script>
 @endpush

@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('addon_details', function (Blueprint $table) {
-//            $table->decimal('selling_price', 10,2)->default('0.00')->nullable()->change();
-//            $table->decimal('fixing_charge_amount', 10,2)->default('0.00')->nullable()->change();
+        Schema::table('supplier_addons', function (Blueprint $table) {
+            $table->enum('status', ['active', 'rejected','pending','inactive']);
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('addon_details', function (Blueprint $table) {
+        Schema::table('supplier_addons', function (Blueprint $table) {
             //
         });
     }

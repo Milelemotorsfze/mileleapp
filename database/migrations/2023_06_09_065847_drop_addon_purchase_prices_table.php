@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('addon_types', function (Blueprint $table) {
-//            $table->dropColumn('model_number');
-
-        });
+        Schema::dropIfExists('addon_purchase_prices');
     }
 
     /**
@@ -22,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('addon_types', function (Blueprint $table) {
-            //
-        });
+       
     }
 };

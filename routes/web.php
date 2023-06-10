@@ -28,9 +28,11 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SupplierAddonController;
 use App\Http\Controllers\PFIController;
 use App\Http\Controllers\DemandPlanningSupplierController;
+use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\Movement;
 use App\Http\Controllers\VehiclesController;
+use App\Http\Controllers\VariantController;
 
 /*
 /*
@@ -178,6 +180,14 @@ Route::get('/d', function () {
     $count = DB::table('vehiclescarts')->where('created_by', $userId)->count();
     return $count;
     });
+
+    // vehicle pictures
+     Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
+     Route::resource('vehicle-pictures', VehiclePicturesController::class);
+
+     // Variants
+    Route::resource('variants', VariantController::class);
+
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');
     Route::post('quotation-data/addone-insert', [QuotationController::class,'addqaddone'])->name('quotation.addone-insert');

@@ -9,6 +9,9 @@ class Varaint extends Model
 {
     use HasFactory;
     protected $table = 'varaints';
+    protected $appends = [
+        'is_deletable',
+    ];
     public function availableColors()
     {
         return $this->hasMany(AvailableColour::class, 'varaint_id');
@@ -24,5 +27,23 @@ class Varaint extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class,'brands_id');
+    }
+    public function getIsDeletableAttribute() {
+
+        $variant = Varaint::find($this->id);
+        $vehicles = Vehicles::where('varaints_id', $this->id)->get();
+        if($vehicles->count() <= 0) {
+            $loiItem = LetterOfIndentItem::where('variant_name', $variant->name)->get();
+            if($loiItem->count() <= 0) {
+                $demandLists = DemandList::where('variant_name', $variant->name)->get();
+                if($demandLists->count() <= 0) {
+                    $availableColors = AvailableColour::where('varaint_id', $this->id)->get();
+                    if($availableColors->count() <= 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

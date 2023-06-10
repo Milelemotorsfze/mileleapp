@@ -14,6 +14,7 @@ class SupplierAddons extends Model
         'addon_details_id',
         'purchase_price_aed',
         'purchase_price_usd',
+        'status',
         'created_by',
         'updated_by',
         'deleted_by'

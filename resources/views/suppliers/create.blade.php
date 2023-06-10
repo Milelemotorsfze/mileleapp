@@ -885,7 +885,7 @@ input {
             // resetAddonDropdown(); 
         });
         function secondaryPaymentMethods(changePayment)
-        {
+        { 
             var e = document.getElementById("is_primary_payment_method");
             var value = e.value;
             if(value != '')

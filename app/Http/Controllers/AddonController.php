@@ -46,7 +46,7 @@ class AddonController extends Controller
                     ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
                     ->select('addons.name',
                     'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code',
-                    'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+                    'addon_details.payment_condition','addon_details.lead_time',
                     'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                     'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                     'master_model_lines.model_line','addon_details.status')
@@ -65,7 +65,7 @@ class AddonController extends Controller
                                 ->where('addon_types.is_all_model_lines','yes')
                                 ->select('addons.name',
                                 'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code',
-                                'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+                                'addon_details.payment_condition','addon_details.lead_time',
                                 'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                                 'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                                 'addon_details.status')
@@ -81,7 +81,7 @@ class AddonController extends Controller
                      $addons2= $addons2
                      ->join('addons','addons.id','addon_details.addon_id')
                                 ->where('addon_details.is_all_brands','yes')
-                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.payment_condition',
                                 'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
                                 ->get()->toArray(); 
@@ -113,7 +113,7 @@ class AddonController extends Controller
     //                 ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
     //                 ->select('addons.name',
     //                 'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
-    //                 'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+    //                 'addon_details.payment_condition','addon_details.lead_time',
     //                 'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
     //                 'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
     //                 'master_model_lines.model_line','addon_details.status')
@@ -132,7 +132,7 @@ class AddonController extends Controller
     //                             ->where('addon_types.is_all_model_lines','yes')
     //                             ->select('addons.name',
     //                             'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
-    //                             'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+    //                             'addon_details.payment_condition','addon_details.lead_time',
     //                             'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
     //                             'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
     //                             'addon_details.status')
@@ -148,7 +148,7 @@ class AddonController extends Controller
     //                  $addons2= $addons2
     //                  ->join('addons','addons.id','addon_details.addon_id')
     //                             ->where('addon_details.is_all_brands','yes')
-    //                             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+    //                             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
     //                             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
     //                             ->orderBy('addon_details.id','ASC')
     //                             ->get()->toArray(); 
@@ -179,7 +179,6 @@ class AddonController extends Controller
         // "addon_type" => "SP"
         // "addon_code" => "SP1"
         // "purchase_price" => "25"
-        // "selling_price" => "124"
         // "lead_time" => "44"
         // "payment_condition" => "435"
         // "fixing_charges_included" => "no"
@@ -200,7 +199,6 @@ class AddonController extends Controller
 //             'addon_type' => 'required',
 //             'fixing_charges_included' => 'required'
 //             // 'purchase_price' => 'required',
-//             // 'selling_price' => 'required',
 //             // 'lead_time' => 'required',
 //             // 'additional_remarks' => 'required',
 //             // 'brand' => 'required',
@@ -479,7 +477,6 @@ class AddonController extends Controller
             'addon_id' => 'required',
             'addon_code' => 'required',
             'purchase_price' => 'required',
-            'selling_price' => 'required',
             'lead_time' => 'required',
             'additional_remarks' => 'required',
             'brand' => 'required',
@@ -517,7 +514,7 @@ class AddonController extends Controller
         //             ->where('addon_details.addon_id',$id)
         //             ->join('addons','addons.id','addon_details.addon_id')
         //             ->join('addon_types','addon_types.addon_details_id','addon_details.id')
-        //             ->select('addons.name','addon_details.id','addon_details.addon_id','addon_details.addon_code','addon_details.selling_price','addon_details.currency',
+        //             ->select('addons.name','addon_details.id','addon_details.addon_id','addon_details.addon_code',
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_types.brand_id','addon_types.model_id')
         //             ->orderBy('addon_details.id','ASC')
         //             ->get();
@@ -602,7 +599,7 @@ class AddonController extends Controller
                     ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
                     ->select('addons.name',
                     'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
-                    'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+                    'addon_details.payment_condition','addon_details.lead_time',
                     'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                     'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                     'master_model_lines.model_line','addon_details.status')
@@ -621,7 +618,7 @@ class AddonController extends Controller
                                 ->where('addon_types.is_all_model_lines','yes')
                                 ->select('addons.name',
                                 'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
-                                'addon_details.selling_price','addon_details.payment_condition','addon_details.currency','addon_details.lead_time',
+                                'addon_details.payment_condition','addon_details.lead_time',
                                 'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                                 'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                                 'addon_details.status')
@@ -637,7 +634,7 @@ class AddonController extends Controller
                      $addons2= $addons2
                      ->join('addons','addons.id','addon_details.addon_id')
                                 ->where('addon_details.is_all_brands','yes')
-                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
                                 'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
                                 ->get()->toArray(); 
@@ -667,7 +664,7 @@ class AddonController extends Controller
         //     {
         //         $addons= $addons->whereIn('addon_details.addon_id',$request->AddonIds);
         //     }
-        //             $addons= $addons->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+        //             $addons= $addons->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
         //             'master_model_lines.model_line','addon_details.status')
         //             ->orderBy('addon_details.id','ASC')
@@ -693,7 +690,7 @@ class AddonController extends Controller
         //             ->join('addon_types','addon_types.addon_details_id','addon_details.id')
         //             ->join('brands','brands.id','addon_types.brand_id')
         //             ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
-        //             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.selling_price','addon_details.payment_condition','addon_details.currency',
+        //             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
         //             'master_model_lines.model_line','addon_details.status')
         //             ->orderBy('addon_details.id','ASC')
