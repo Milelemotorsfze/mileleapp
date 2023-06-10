@@ -362,7 +362,7 @@
                         @foreach($paymentMethods as $paymentMethod)
                         
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">
-                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}" @if (in_array($paymentMethod->id, $array)) checked="checked" @endif >                              
+                                <input id="payment_methods_id_{{ $paymentMethod->id }}" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}" @if (in_array($paymentMethod->id, $array)) checked="checked" @endif >                              
                                
                                 <label class="form-check-label" for="flexCheckIndeterminate">
                                     {{ $paymentMethod->payment_methods }}
@@ -496,6 +496,7 @@
         // var selectedAddons = [];
         
         var addonDropdownCount = 1;
+        // var previousremoveChecked = '';
         // globalThis.selectedAddons .push(brandId);
       var sub ='1';
             
@@ -504,6 +505,8 @@
         {
             // var PreviousHidden = '';
             PreviousHidden = $('#is_primary_payment_method').val();
+            // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
+            // uncheckedPaymentMethod.checked = false;
             let addonTable = document.getElementById(PreviousHidden);
             addonTable.hidden = true
             // var inputField = document.querySelector('#contact_number');
@@ -845,14 +848,19 @@
         { 
             var e = document.getElementById("is_primary_payment_method");
             var value = e.value;
+            // alert(value);
             if(value != '')
             {
                 if(PreviousHidden != '')
                 {
                     let addonTable = document.getElementById(PreviousHidden);
                     addonTable.hidden = false
+                    // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
+                    // uncheckedPaymentMethod.checked = false;
+
                 }
                 validationOnKeyUp(changePayment);
+                
                 let addonTable = document.getElementById('secondaryPayments');
                 addonTable.hidden = false
                 let primaryPaymentMethod = document.getElementById(value);

@@ -56,10 +56,6 @@
                 <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
                 <div class="dropdown-divider"></div>
             @endcan
-            @can('addon-view')
-                <a class="dropdown-item" href="{{ route('addon.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Addon </a>
-                <div class="dropdown-divider"></div>
-            @endcan
             <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                 <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -78,6 +74,60 @@
                             <span data-key="t-extra-pages">Dashboard</span>
                         </a>
                     </li>
+                    @can('user-view')
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Addons</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Addons</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">List Addons </span>
+                                    <div class="arrow-down"></div>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
+                                    <!-- <a href="{{route('addon.list','D')}}" class="dropdown-item" data-key="t-login">Documentation</a>
+                                    <a href="{{route('addon.list','DP')}}" class="dropdown-item" data-key="t-login">Documentation On Purchase</a>
+                                    <a href="{{route('addon.list','E')}}" class="dropdown-item" data-key="t-login">Others</a>
+                                    <a href="{{route('addon.list','S')}}" class="dropdown-item" data-key="t-login">Shipping Cost</a> -->
+                                    <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
+                                    <a href="{{route('addon.list','W')}}" class="dropdown-item" data-key="t-login">Warranty</a>
+                                    <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kit</a>
+                                    <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    @endcan
+                    @can('user-view')
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Warranty</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Warranty</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Warranty Info </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    @endcan
                     @can('Calls-view')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
@@ -310,39 +360,7 @@
                         </a>
 					</li>
                     @endcan
-                    @can('user-view')
-                    <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Addons</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Addons</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">List Addons </span>
-                                    <div class="arrow-down"></div>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
-                                    <!-- <a href="{{route('addon.list','D')}}" class="dropdown-item" data-key="t-login">Documentation</a>
-                                    <a href="{{route('addon.list','DP')}}" class="dropdown-item" data-key="t-login">Documentation On Purchase</a>
-                                    <a href="{{route('addon.list','E')}}" class="dropdown-item" data-key="t-login">Others</a>
-                                    <a href="{{route('addon.list','S')}}" class="dropdown-item" data-key="t-login">Shipping Cost</a> -->
-                                    <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
-                                    <a href="{{route('addon.list','W')}}" class="dropdown-item" data-key="t-login">Warranty</a>
-                                    <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kit</a>
-                                    <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    @endcan
+                
                 </ul>
             </div>
         </nav>

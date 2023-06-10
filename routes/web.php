@@ -32,6 +32,7 @@ use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\Movement;
 use App\Http\Controllers\VehiclesController;
+use App\Http\Controllers\WarrantyController;
 
 /*
 /*
@@ -87,6 +88,9 @@ Route::get('/d', function () {
 
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
+
+    // Warranty
+    Route::resource('warranty', WarrantyController::class);
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
