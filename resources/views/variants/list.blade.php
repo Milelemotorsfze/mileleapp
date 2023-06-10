@@ -2,9 +2,9 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-            Vehicle Pictures
+            Variants
         </h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('vehicle-pictures.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -29,32 +29,34 @@
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
-                    <th>VIN</th>
-                    <th>GRN link</th>
-                    <th>GDN link</th>
-                    <th>Modified link</th>
+                    <th>Name</th>
+                    <th>Brand</th>
+                    <th>Model Line</th>
+                    <th>My</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 <div hidden>{{$i=0;}}
                 </div>
-                @foreach ($vehiclePictures as $key => $vehiclePicture)
+                @foreach ($variants as $key => $variant)
                     <tr data-id="1">
                         <td>{{ ++$i }}</td>
-                        <td>{{ $vehiclePicture->vehicle->vin ?? '' }}</td>
-                        <td>{{ $vehiclePicture->GRN_link ?? '' }}</td>
-                        <td>{{ $vehiclePicture->GDN_link ?? '' }}</td>
-                        <td>{{ $vehiclePicture->modification_link ?? ''  }}</td>
+                        <td>{{ $variant->name }}</td>
+                        <td>{{ $variant->brand->brand_name ?? ''}}</td>
+                        <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
+                        <td>{{ $variant->my }}</td>
                         <td>
-                            <a href="{{ route('vehicle-pictures.show',$vehiclePicture->id) }}">
+                            <a href="{{ route('variants.show', $variant->id) }}">
                                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
                             </a>
-                            <a href="{{ route('vehicle-pictures.edit',$vehiclePicture->id) }}">
+                            <a href="{{ route('variants.edit', $variant->id) }}">
                                 <button type="button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> </button>
                             </a>
-                            <button type="button" data-id="{{ $vehiclePicture->id }}" data-url="{{ route('vehicle-pictures.destroy',$vehiclePicture->id) }}"
+                            @if($variant->is_deletable == true)
+                            <button type="button" data-id="{{ $variant->id }}" data-url="{{ route('variants.destroy',$variant->id) }}"
                                     class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -63,7 +65,6 @@
         </div>
     </div>
     <script>
-
         $('.btn-delete').on('click',function(e){
             e.preventDefault();
             let id = $(this).attr('data-id');

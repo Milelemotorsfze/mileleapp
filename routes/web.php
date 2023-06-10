@@ -32,6 +32,7 @@ use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\Movement;
 use App\Http\Controllers\VehiclesController;
+use App\Http\Controllers\VariantController;
 
 /*
 /*
@@ -184,6 +185,8 @@ Route::get('/d', function () {
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
 
+     // Variants
+    Route::resource('variants', VariantController::class);
 
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');

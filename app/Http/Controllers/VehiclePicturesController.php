@@ -68,13 +68,11 @@ class VehiclePicturesController extends Controller
         $vehiclePicture = VehiclePicture::findOrFail($id);
 
         $alreadyAddedVehicleIds = VehiclePicture::whereNot('id', $vehiclePicture->id)
-        ->pluck('vehicle_id');
+                                                    ->pluck('vehicle_id');
         $vins = Vehicles::whereNotIn('id', $alreadyAddedVehicleIds)
-            ->get();
+                            ->get();
 
         return view('vehicle_pictures.edit',compact('vins','vehiclePicture'));
-
-
     }
 
     /**
