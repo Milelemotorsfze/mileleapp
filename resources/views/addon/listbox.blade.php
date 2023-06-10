@@ -120,7 +120,7 @@
                     Selling Price
                   </div>
                   <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-5">
-                    {{$addonsdata->selling_price}} {{$addonsdata->currency}}
+                    Selling Price
                   </div>
                   @if($addonsdata->lead_time)
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">

@@ -75,7 +75,7 @@
                             <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price ( AED )') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="selling_price" type="text" class="form-control @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ $addonDetails->selling_price }}" required autocomplete="selling_price" autofocus>
+                            <input id="selling_price" type="text" class="form-control @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="" required autocomplete="selling_price" autofocus>
                             @error('selling_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

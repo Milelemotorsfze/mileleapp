@@ -241,7 +241,7 @@
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="tel" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -258,7 +258,7 @@
                             <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="number" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="alternative_contact_number" type="tel" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -352,7 +352,7 @@
                     </div>
                     </br>
                 </div>
-                @if(count($array)>0)
+                <!-- @if ($paymentMethod->id == $primaryPaymentMethod->payment_methods_id) hidden @endif -->
                 <div id="secondaryPayments" class="col-xxl-6 col-lg-6 col-md-12" >
                     <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
@@ -360,26 +360,27 @@
                             <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
-                        <!-- @if($paymentMethod->id != $primaryPaymentMethod->payment_methods_id) -->
+                        
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">
                                 <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}" @if (in_array($paymentMethod->id, $array)) checked="checked" @endif >                              
-                                <!-- @if ($paymentMethod->id == $primaryPaymentMethod->payment_methods_id) hidden @endif -->
+                               
                                 <label class="form-check-label" for="flexCheckIndeterminate">
                                     {{ $paymentMethod->payment_methods }}
                                 </label>
-                                @error('payment_methods_id')
+                               
+                            </div>
+                         
+                        @endforeach
+                        @error('payment_methods_id')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                    
                                 @enderror
-                            </div>
-                            <!-- @endif -->
-                        @endforeach
                     </div>
                     </br>
                 </div> 
-                @endif
+                
             </div>
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
@@ -501,8 +502,10 @@
       
         $(document).ready(function ()
         {
-            
+            // var PreviousHidden = '';
             PreviousHidden = $('#is_primary_payment_method').val();
+            let addonTable = document.getElementById(PreviousHidden);
+            addonTable.hidden = true
             // var inputField = document.querySelector('#contact_number');
             // inputField.onkeydown = function(event) 
             // {
@@ -839,31 +842,30 @@
             // resetAddonDropdown(); 
         });
         function secondaryPaymentMethods(changePayment)
-        {
-            // var e = document.getElementById("is_primary_payment_method");
-            // var value = e.value;
-            // if(value != '')
-            // {
-            //     if(PreviousHidden != '')
-            //     {
-            //         let addonTable = document.getElementById(PreviousHidden);
-                    
-            //         addonTable.hidden = false
-            //     }
-            //     validationOnKeyUp(changePayment);
-            //     let addonTable = document.getElementById('secondaryPayments');
-            //     addonTable.hidden = false
-            //     let primaryPaymentMethod = document.getElementById(value);
-            //     primaryPaymentMethod.hidden = true
-            //     PreviousHidden = value;
-            // }
-            // else
-            // {
-            //     let addonTable = document.getElementById('secondaryPayments');
-            //     addonTable.hidden = true
-            //     $msg = "Primary payment method required"
-            //     showPaymentMethodsError($msg);
-            // }
+        { 
+            var e = document.getElementById("is_primary_payment_method");
+            var value = e.value;
+            if(value != '')
+            {
+                if(PreviousHidden != '')
+                {
+                    let addonTable = document.getElementById(PreviousHidden);
+                    addonTable.hidden = false
+                }
+                validationOnKeyUp(changePayment);
+                let addonTable = document.getElementById('secondaryPayments');
+                addonTable.hidden = false
+                let primaryPaymentMethod = document.getElementById(value);
+                primaryPaymentMethod.hidden = true
+                PreviousHidden = value;
+            }
+            else
+            {
+                let addonTable = document.getElementById('secondaryPayments');
+                addonTable.hidden = true
+                $msg = "Primary payment method required"
+                showPaymentMethodsError($msg);
+            }
         }
         function changeCurrency(i)
         {

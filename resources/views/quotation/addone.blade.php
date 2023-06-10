@@ -37,7 +37,7 @@
                                         <td>{{ $addon->addon_code }}</td>
                                         <td>{{ $addon->lead_time }}</td>
                                         <td>{{ $addon->additional_remarks }}</td>
-                                        <td>{{ $addon->selling_price }}</td>
+                                        <td>Selling Price</td>
                                         <td>
                                         <a href="#" class="plus-circle-link addadones" id="addadones_{{ $addon->idp }}">
                                          <i class="fa fa-plus-circle" aria-hidden="true"></i>

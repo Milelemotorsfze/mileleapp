@@ -77,7 +77,7 @@
               <td>{{ $addon->lead_time }}</td>
               <td>{{ $addon->additional_remarks }}</td>
               <td>{{ 'purchase price' }}</td> <!--$addon->purchase_price-->
-              <td>{{ $addon->selling_price }}</td>
+              <td>Selling Price</td>
               <td>{{ $addon->payment_condition }}</td>
               <td>
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addon->addon_details_table_id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
