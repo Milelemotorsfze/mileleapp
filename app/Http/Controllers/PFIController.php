@@ -82,7 +82,6 @@ class PFIController extends Controller
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
-
         $pfi->save();
 
         $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
@@ -112,22 +111,24 @@ class PFIController extends Controller
 // add a page
         $pdf->AddPage();
 // set the source file
-        $pdf->setSourceFile('PdfDocument.pdf');
+        $pdf->setSourceFile('PFI_document_withoutsign/'.$fileName);
 // import page 1
         $tplIdx = $pdf->importPage(1);
 // use the imported page and place it at position 10,10 with a width of 100 mm
-        $pdf->useTemplate($tplIdx, 10, 10, 100);
+        $pdf->useTemplate($tplIdx);
 
 // now write some text above the imported page
-        $pdf->SetFont('Helvetica');
-        $pdf->SetTextColor(255, 0, 0);
-        $pdf->SetXY(30, 30);
-        $pdf->Write(0, 'This is just a simple text');
+//        $pdf->SetFont('Helvetica');
+//        $pdf->SetTextColor(255, 0, 0);
+//        $pdf->SetXY(30, 30);
+        $pdf->Image('trans_car_logo.png', 100, 230, -500);
+//        $pdf->Write(0, 'This is just a simple text');
 
-        $pdf->Output('I', 'generated.pdf');
-//        DB::commit();
+//        $this->setHeader('Content-Type', 'application/pdf');
+        $pdf->Output();
 
-        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
+
+//        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
 
     /**
