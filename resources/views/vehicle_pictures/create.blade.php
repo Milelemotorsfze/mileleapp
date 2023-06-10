@@ -43,26 +43,26 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Vehicle Detail</label>
-                            <input type="text" value="" class="form-control" readonly placeholder="Vehicle Details">
+                            <label for="choices-single-default" class="form-label">Variant Detail</label>
+                            <input type="text" value="" class="form-control" id="variant-detail" readonly placeholder="Vehicle Details">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">GRN</label>
-                            <input type="text" value="{{ old('GRN_link') }}" name="GRN_link" class="form-control" placeholder="GRN">
+                            <input type="text" value="{{ old('GRN_link') }}" name="GRN_link" class="form-control mygroup" placeholder="GRN Link">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">GDN</label>
-                            <input type="text" value="{{ old('GDN_link') }}" name="GDN_link" class="form-control" placeholder="GDN">
+                            <input type="text" value="{{ old('GDN_link') }}" name="GDN_link" class="form-control mygroup" placeholder="GDN Link">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Modification Link</label>
-                            <input type="text" value="{{ old('modification_link') }}" name="modification_link" class="form-control"
+                            <input type="text" value="{{ old('modification_link') }}" name="modification_link" class="form-control mygroup"
                                    placeholder="Modification Link">
                         </div>
                     </div>
@@ -81,6 +81,22 @@
         $('#vin').select2({
             placeholder: 'Select VIN'
         })
+        $('#vin').on('change',function(){
+            $('#vin-error').remove();
+            var vehicle_id = $('#vin').val();
+            let url = '{{ route('vehicle-pictures.variant-details') }}'
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: vehicle_id,
+                },
+                success:function (response) {
+                 $('#variant-detail').val(response.data);
+                }
+            });
+        })
         $("#form-create").validate({
             ignore: [],
             rules: {
@@ -88,14 +104,20 @@
                     required: true,
                 },
                 modification_link:{
-                    url:true
+                    url:true,
+                    require_from_group: [1, '.mygroup']
                 },
                 GDN_link:{
-                    url:true
+                    url:true,
+                    require_from_group: [1, '.mygroup']
                 },
                 GRN_link:{
-                    url:true
-                }
+                    url:true,
+                    require_from_group: [1, '.mygroup']
+                },
+                groups: {
+                    mygroup: "GDN_link GRN_link modification_link"
+                },
             }
         });
     </script>

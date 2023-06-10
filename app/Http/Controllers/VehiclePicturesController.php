@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Varaint;
 use App\Models\VehiclePicture;
 use App\Models\Vehicles;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class VehiclePicturesController extends Controller
      */
     public function index()
     {
-        $vehiclePictures = VehiclePicture::all();
+        $vehiclePictures = VehiclePicture::orderBy('id','DESC')->get();
         return view('vehicle_pictures.index',compact('vehiclePictures'));
     }
 
@@ -53,7 +54,10 @@ class VehiclePicturesController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $vehiclePicture = VehiclePicture::findOrFail($id);
+
+        return view('vehicle_pictures.show',compact('vehiclePicture'));
+
     }
 
     /**
@@ -98,8 +102,16 @@ class VehiclePicturesController extends Controller
     public function destroy(string $id)
     {
         $vehiclePicture = VehiclePicture::findOrFail($id);
-//        $vehiclePicture->delete();
+        $vehiclePicture->delete();
 
         return response(true);
+    }
+    public function getVariantDetail(Request $request)
+    {
+        $vehicle = Vehicles::find($request->id);
+        $data = $vehicle->variant->detail;
+
+        return response(['data'=> $data, true]);
+
     }
 }

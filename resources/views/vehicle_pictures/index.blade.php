@@ -64,12 +64,11 @@
         </div>
     </div>
     <script>
-        // var table = $('#supplier-pictures-table').DataTable();
 
-        $('.btn-delete').on('click',function(){
+        $('.btn-delete').on('click',function(e){
+            e.preventDefault();
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
-            alert(url);
             var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
                 if (e) {
                     $.ajax({

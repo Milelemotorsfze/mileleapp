@@ -128,6 +128,12 @@
                         </a>
                     </li>
                     @endcan
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i>
+                            <span data-key="t-extra-pages">Vehicle Pictures</span>
+                        </a>
+                    </li>
                     @can('demand-create')
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
@@ -142,6 +148,7 @@
                                         <span data-key="t-authentication">Supplier</span>
                                     </a>
                                 </div>
+
                                 @can('demand-create')
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
@@ -278,16 +285,6 @@
 {{--                                    @can('LOI-list')--}}
 {{--                                       <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>--}}
 {{--                                    @endcan--}}
-                                </div>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Vehicle Pictures </span>
-                                    <div class="arrow-down"></div>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="{{ route('vehicle-pictures.create') }}" class="dropdown-item" data-key="t-login">Add New  </a>
-                                    <a href="{{ route('vehicle-pictures.index') }}" class="dropdown-item" data-key="t-login"> Info </a>
                                 </div>
                             </div>
                         </div>
