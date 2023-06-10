@@ -114,7 +114,6 @@ Route::get('/d', function () {
     Route::post('letter-of-indents/status-change', [LetterOfIndentController::class, 'approve'])->name('letter-of-indents.status-change');
     Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
     Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
-    Route::get('letter-of-indents/update-quantity', [LOIItemsController::class, 'updateQuantity'])->name('letter-of-indents.update-quantity');
 
     Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);

@@ -105,7 +105,7 @@
                             <label  class="form-label">SFX</label>
                         </div>
                         <div class="col-lg-3 col-md-3">
-                            <label class="form-label">Varients</label>
+                            <label class="form-label">Varient</label>
                         </div>
                         <div class="col-lg-1 col-md-1">
                             <label class="form-label">LOI Qty</label>
@@ -154,7 +154,12 @@
                                 <div class="col-lg-1 col-md-1">
                                     <?php
                                         if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
-                                            $count = $letterOfIndentItem->inventory_quantity;
+                                            if($letterOfIndentItem->approved_quantity > 0) {
+                                                $count = $letterOfIndentItem->balance_quantity;
+                                            }else{
+                                                $count = $letterOfIndentItem->inventory_quantity;
+
+                                            }
                                         }else{
 
                                             $count = $letterOfIndentItem->quantity;
@@ -167,7 +172,7 @@
 //                                        }
                                         ?>
                                     <select name="quantities[]" class="form-control approve-quantity" id="quantity-{{$key}}" data-key="{{$key}}"
-                                    data-balance-quantity="{{  }}">
+                                    data-balance-qty="{{$letterOfIndentItem->balance_quantity}}" data-inventory-qty="{{ $letterOfIndentItem->inventory_quantity }}">
                                         @for($i=0;$i <= $count;$i++)
 
                                             <option> {{ $i }} </option>
@@ -188,20 +193,15 @@
 @endsection
 @push('scripts')
     <script>
-    let count = '{{ $letterOfIndentItems->count() }}';
     $('.approve-quantity').change(function () {
        let key = $(this).attr('data-key');
-       let inventoryQuantity = $('#inventory-qty-'+key).val();
-       let balanceQuantity = $('#balance-qty-'+key).val();
+       let inventoryQuantity = $(this).attr('data-inventory-qty');
+       let balanceQuantity = $(this).attr('data-balance-qty');
        let quantity = $('#quantity-'+key).val();
-       let balanceQty = balanceQuantity - quantity;
-       let inventoryQty = inventoryQuantity - quantity;
-       if(inventoryQty <= 0) {
-           let inventoryQty = 0;
-       }
-       $('#balance-qty-'+key).val(balanceQty);
-       $('#inventory-qty-'+key).val(inventoryQty);
-        // alert(inventoryQuantity);
+       let updatedBalanceQty = balanceQuantity - quantity;
+       let updatedInventoryQty = inventoryQuantity - quantity;
+        $('#inventory-qty-'+key).val(updatedInventoryQty);
+        $('#balance-qty-'+key).val(updatedBalanceQty);
     })
     </script>
 @endpush

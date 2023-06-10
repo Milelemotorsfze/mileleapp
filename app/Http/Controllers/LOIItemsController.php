@@ -147,79 +147,42 @@ class LOIItemsController extends Controller
 
         return view('letter_of_indents.approvals.milele_approval', compact('letterOfIndent','letterOfIndentItems'));
     }
-    public function updateQuantity(Request $request) {
-        $letterOfIndentItem = LetterOfIndentItem::find($request->id);
-        $approvedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
-
-        $masterModel = MasterModel::where('model', $letterOfIndentItem->model)
-            ->where('sfx', $letterOfIndentItem->sfx)->first();
-        $quantity = $request->quantity;
-
-        $supplierInventoriesIds = SupplierInventory::where('master_model_id', $masterModel->id)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->take($quantity)
-            ->pluck('id');
-        SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
-
-        DB::beginTransaction();
-        $letterOfIndentItem->approved_quantity = $approvedQuantity;
-        $letterOfIndentItem->save();
-
-        $approvedLOIItem = new ApprovedLetterOfIndentItem();
-        $approvedLOIItem->letter_of_indent_item_id = $request->id;
-        $approvedLOIItem->quantity = $request->quantity;
-        $approvedLOIItem->created_by = Auth::id();
-        $approvedLOIItem->letter_of_indent_id = $letterOfIndentItem->letter_of_indent_id;
-        $approvedLOIItem->save();
-
-        $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->orderBy('id','DESC')->get();
-      //  $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
-//        $approvedItems = [];
-//        $updatedItems = [];
-        $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
-        if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-        }else{
-            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-        }
-//        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
-//        {
-//            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
-//            $latestApprovedQuantity = $letterOfIndentItem->approved_quantity + $request->quantity;
-////            if ($letterOfIndentItem->quantity == $latestApprovedQuantity && $letterOfIndentItem->latestApprovedQuantity != 0)
-////            {
-////                // get id of full quantity approved item and compare with previous ids
-////                $approvedItems[] = $letterOfIndentItem->id;
-////            }else{
-////                // get ids of partialy approved items
-////                $updatedItems[] = $letterOfIndentItem->id;
-////            }
-//        }
-//        $result = array_diff($loiItemIds,$approvedItems);
-//        $letterOfIndent = LetterOfIndent::find($letterOfIndentItem->letter_of_indent_id);
-//        if(empty($result)) {
-//            $letterOfIndent->status = "Approved";
-//        }
-//        if(!empty($updatedItems)) {
-//            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-//        }
-        $letterOfIndent->save();
-        DB::commit();
-
-        return response(true);
-
-    }
-
     public function approveLOIItem(Request $request) {
 
         $letterOfIndent = LetterOfIndent::find($request->id);
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)->orderBy('id','DESC')->get();
         $quantities = $request->quantities;
-        $loiItemIds = $letterOfIndentItems->pluck('id')->toArray();
-        $approvedItems = [];
 
         DB::beginTransaction();
+        // loi status change based on approval quantity
+
+
+        foreach ($quantities as $key => $quantity) {
+            $letterOfIndentId = $letterOfIndentItems[$key]['id'];
+            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentId);
+
+            $masterModel = MasterModel::where('model', $letterOfIndentItem->model)
+                ->where('sfx', $letterOfIndentItem->sfx)->first();
+            // update approved qty in loi item table
+            $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantity;
+            $letterOfIndentItem->save();
+
+            // add approved details in approvedLOIitem table
+            $approvedLOIItem = new ApprovedLetterOfIndentItem();
+            $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentId;
+            $approvedLOIItem->quantity = $quantity;
+            $approvedLOIItem->created_by = Auth::id();
+            $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
+            $approvedLOIItem->save();
+
+            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $masterModel->id)
+                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->whereNull('eta_import')
+                ->take($quantity)
+                ->pluck('id');
+            SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
+        }
 
         if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
@@ -227,33 +190,8 @@ class LOIItemsController extends Controller
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
         }
 
-        foreach ($letterOfIndentItems as $key => $letterOfIndentItem)
-        {
-            $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentItem->id);
-            $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantities[$key];
-            $letterOfIndentItem->save();
-//            if ($letterOfIndentItem->quantity == $letterOfIndentItem->approved_quantity)
-//            {
-//                $approvedItems[] = $letterOfIndentItem->id;
-//            }
-        }
-
-//        $result = array_diff($loiItemIds,$approvedItems);
-//        if(empty($result)) {
-//          $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
-//
-//        }else{
-//            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
-//        }
         $letterOfIndent->save();
 
-        foreach ($quantities as $key => $quantity) {
-            $approvedLOIItem = new ApprovedLetterOfIndentItem();
-            $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentItems[$key]['id'];
-            $approvedLOIItem->quantity = $quantity;
-            $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
-            $approvedLOIItem->save();
-        }
         DB::commit();
 
         return redirect()->route('letter-of-indents.index')->with('success', 'LOI Item successfully approved with respective quantity');
