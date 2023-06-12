@@ -6,6 +6,7 @@ use App\Models\PurchasingOrder;
 use App\Models\PurchasingOrderItems;
 use Illuminate\Http\Request;
 use App\Models\Varaint;
+use App\Models\Supplier;
 use App\Models\Vehicles;
 
 class PurchasingOrderController extends Controller
@@ -23,10 +24,20 @@ class PurchasingOrderController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        $variants = Varaint::get();
-        return view('warehouse.create',compact('variants'));
-    }
+{
+    $suppliers = Supplier::with('supplierTypes')
+        ->whereHas('supplierTypes', function ($query) {
+            $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+        })
+        ->get();
+
+    $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
+        ->get();
+
+    return view('warehouse.create', compact('variants', 'suppliers'));
+}
 
     /**
      * Store a newly created resource in storage.
@@ -42,9 +53,11 @@ class PurchasingOrderController extends Controller
         }
         $poDate = $request->input('po_date');
         $poNumber = $request->input('po_number');
+        $suppliers_id = $request->input('suppliers_id');
         $purchasingOrder = new PurchasingOrder();
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->po_number = $poNumber;
+        $purchasingOrder->suppliers_id = $suppliers_id;
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $variantNames = $request->input('variant_id');
@@ -58,6 +71,8 @@ class PurchasingOrderController extends Controller
             $purchasingOrderItem->save();
         }
         $vins = $request->input('vin');
+        $ex_colours = $request->input('ex_colour');
+        $int_colours = $request->input('int_colour');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -65,9 +80,13 @@ class PurchasingOrderController extends Controller
         }
         $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
         $vin = $vins[$key];
+        $ex_colour = $ex_colours[$key];
+        $int_colour = $int_colours[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;
         $vehicle->vin = $vin;
+        $vehicle->ex_colour = $ex_colour;
+        $vehicle->int_colour = $int_colour;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
     }
@@ -87,10 +106,14 @@ class PurchasingOrderController extends Controller
      */
     public function edit($id)
 {
-    $variants = Varaint::get();
+    $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
+        ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
-    return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles'));
+    $supplierName = Supplier::where('id', $purchasingOrder->suppliers_id)->value('supplier');
+    return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles', 'supplierName'));
 }
     /**
      * Update the specified resource in storage.
@@ -99,10 +122,14 @@ class PurchasingOrderController extends Controller
 {
     $variantIds = $request->input('id');
     $newVins = $request->input('oldvin');
+    $newex_colours = $request->input('oldex_colour');
+    $newint_colours = $request->input('oldint_colour');
     foreach ($variantIds as $index => $variantId) {
         $vehicle = Vehicles::find($variantId);
         if ($vehicle) {
             $vehicle->vin = $newVins[$index];
+            $vehicle->ex_colour = $newex_colours[$index];
+            $vehicle->int_colour = $newint_colours[$index];
             $vehicle->save();
         }
     }
@@ -118,16 +145,22 @@ class PurchasingOrderController extends Controller
             $purchasingOrderItem->save();
         }
         $vins = $request->input('vin');
+        $ex_colours = $request->input('ex_colour');
+        $int_colours = $request->input('int_colour');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
         continue;
         }
         $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
+        $ex_colour = $ex_colours[$key];
+        $int_colour = $int_colours[$key];
         $vin = $vins[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;
         $vehicle->vin = $vin;
+        $vehicle->ex_colour = $ex_colour;
+        $vehicle->int_colour = $int_colour;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
     }

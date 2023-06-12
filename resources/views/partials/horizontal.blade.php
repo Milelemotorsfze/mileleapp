@@ -67,7 +67,7 @@
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ">
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="/" id="topnav-more" role="button">
                             <i data-feather="home"></i>
@@ -160,6 +160,12 @@
                             <span data-key="t-extra-pages">Stocks</span>
                         </a>
 					</li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
+                            <i data-feather="sliders"></i>
+                            <span data-key="t-extra-pages">Supplier</span>
+                        </a>
+					</li>
                     @endcan
                     @endcan
                     @can('variants-view')
@@ -198,7 +204,6 @@
                                         <span data-key="t-authentication">Supplier</span>
                                     </a>
                                 </div>
-
                                 @can('demand-create')
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">

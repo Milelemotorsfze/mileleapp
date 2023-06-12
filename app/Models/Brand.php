@@ -9,4 +9,13 @@ class Brand extends Model
 {
     use HasFactory;
     protected $table = "brands";
+    public function varaint()
+    {
+        return $this->hasOne(Varaint::class);
+    }
+
+    public function masterModelLines()
+    {
+        return $this->belongsTo(MasterModelLines::class);
+    }
 }

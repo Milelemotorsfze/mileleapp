@@ -87,43 +87,73 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Number : </label>
-            <input type="number" id="po_number" name="po_number" class="form-control" placeholder="PO Number" required>
+            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" pattern="[0-9]{4,5}" title="Please enter a valid PO number with 4 to 5 digits" required>
             <span id="poNumberError" class="error" style="display: none;"></span>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <span class="error">* </span>
+            <label for="basicpill-firstname-input" class="form-label">Suppliers : </label>
+            <select class="form-control" autofocus name="suppliers_id" id="supplier">
+                                <option value="" disabled>Select The Supplier</option>
+                                @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                                @endforeach
+            </select>
         </div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
     <div class="bar">Stock Vehicles</div>
     <div class="row">
-        <div class="col-lg-3 col-md-6">
+        <div class="col-lg-1 col-md-6">
             <label for="brandInput" class="form-label">Variants:</label>
         </div>
-        <div class="col-lg-6 col-md-6">
+        <div class="col-lg-1 col-md-6">
+            <label for="QTY" class="form-label">Brand:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="QTY" class="form-label">Model Line:</label>
+        </div>
+        <div class="col-lg-5 col-md-6">
             <label for="QTY" class="form-label">Variants Detail:</label>
         </div>
-        <div class="col-lg-3 col-md-6">
+        <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Exterior Color:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="intColour" class="form-label">Interior Color:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">VIN:</label>
         </div>
     </div>
-    </div>
+</div>
         <div class="bar">Add New Vehicles Into Stock</div>
         <div class="row">
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-2 col-md-6">
                 <label for="brandInput" class="form-label">Variants:</label>
                 <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id">
                 <datalist id="variantslist">
-                    @foreach ($variants as $variant)
-                    <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}">{{ $variant->name }}</option>
-                    @endforeach
-                </datalist>
+    @foreach ($variants as $variant)
+    <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
+    @endforeach
+</datalist>
                 </div>
-                <div class="col-lg-6 col-md-6">
-                    <label for="QTY" class="form-label">Variants Detail:</label>
-                    <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label for="QTY" class="form-label">QTY:</label>
-                    <input type="number" id="QTY" name="QTYer" class="form-control" placeholder="QTY">
-                </div>
+                <div class="col-lg-1 col-md-6">
+        <label for="QTY" class="form-label">Brand:</label>
+        <input type="text" id="brands_id" name="brands_id" class="form-control" placeholder="Brand" readonly>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <label for="QTY" class="form-label">Model Line:</label>
+        <input type="text" id="master_model_lines_id" name="master_model_lines_id" class="form-control" placeholder="Model Line" readonly>
+    </div>
+    <div class="col-lg-4 col-md-6">
+        <label for="QTY" class="form-label">Variants Detail:</label>
+        <input type="text" id="details" name="details" class="form-control" placeholder="Variants Detail" readonly>
+    </div>
+    <div class="col-lg-1 col-md-6">
+        <label for="QTY" class="form-label">QTY:</label>
+        <input type="number" id="QTY" name="QTY" class="form-control" placeholder="QTY">
+    </div>
                 <div class="col-lg-1 col-md-6 upernac">
                     <div class="btn btn-primary add-row-btn">
                         <i class="fas fa-plus"></i> Add More
@@ -139,6 +169,10 @@ input[type=number]::-webkit-outer-spin-button {
 		</br>
     </div>
     @endcan
+    @php
+    $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
+    $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+@endphp
 @endsection
 @push('scripts')
 <style>
@@ -159,61 +193,90 @@ input[type=number]::-webkit-outer-spin-button {
 <script>
 $(document).ready(function() {
     $('#variants_id').on('input', function() {
-    var selectedVariant = $(this).val();
-    var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
-    if (variantOption.length > 0) {
-        var detail = variantOption.data('detail');
-        $('#details').val(detail);
-        $('#SelectVariantsId').val(selectedVariant);
-    }
-});
-            $('.add-row-btn').click(function() {
-            var selectedVariant = $('#variants_id').val();
-            var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
-            if (variantOption.length === 0) {
-            alert('Invalid variant selected');
-             return;
-            }
-            var qty = $('#QTY').val();
-            var selectedVariant = $('#variants_id').val();
-            var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
+        var selectedVariant = $(this).val();
+        var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
+        if (variantOption.length > 0) {
             var detail = variantOption.data('detail');
-            $('.bar').show();
-            for (var i = 0; i < qty; i++) {
-                var newRow = $('<div class="row row-space"></div>');
-                var variantCol = $('<div class="col-lg-3 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
-                var detailCol = $('<div class="col-lg-6 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
-                var vinCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
-                var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
-                newRow.append(variantCol, detailCol, vinCol, removeBtn);
-                $('#variantRowsContainer').append(newRow);
-            }
-            $('#variants_id').val('');
-            $('#details').val('');
-            $('#QTY').val('');
-            $('#variantRowsContainer').show();
-        });
-
-        $(document).on('click', '.remove-row-btn', function() {
-            var variant = $(this).closest('.row').find('input[name="variant_id[]"]').val();
-            var existingOption = $('#variantslist').find('option[value="' + variant + '"]');
-            if (existingOption.length === 0) {
-                var variantOption = $('<option value="' + variant + '">' + variant + '</option>');
-                $('#variantslist').append(variantOption);
-            }
-
-            $(this).closest('.row').remove();
-            $('.row-space').each(function() {
-                if ($(this).next().length === 0) {
-                    $(this).removeClass('row-space');
-                }
-            });
-            if ($('#variantRowsContainer').find('.row').length === 1) {
-                $('.bar').hide();
-                $('#variantRowsContainer').hide();
-            }
-        });
+            var brands_id = variantOption.data('brands_id');
+            var master_model_lines_id = variantOption.data('master_model_lines_id');
+            $('#details').val(detail);
+            $('#brands_id').val(brands_id);
+            $('#master_model_lines_id').val(master_model_lines_id);
+            $('#SelectVariantsId').val(selectedVariant);
+        }
     });
+
+
+    $('.add-row-btn').click(function() {
+    var selectedVariant = $('#variants_id').val();
+    var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
+    if (variantOption.length === 0) {
+        alert('Invalid variant selected');
+        return;
+    }
+    var qty = $('#QTY').val();
+    var detail = variantOption.data('detail');
+    var brand = variantOption.data('brands_id');
+    var masterModelLine = variantOption.data('master_model_lines_id');
+    $('.bar').show();
+
+    // Move the declaration and assignment inside the click event function
+    var exColours = <?= json_encode($exColours) ?>;
+    var intColours = <?= json_encode($intColours) ?>;
+
+    for (var i = 0; i < qty; i++) {
+            var newRow = $('<div class="row row-space"></div>');
+            var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
+            var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
+            var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
+            var detailCol = $('<div class="col-lg-5 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+            var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
+            var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+            var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+            var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
+            
+            // Populate Exterior Colors dropdown
+var exColourDropdown = exColourCol.find('select');
+for (var id in exColours) {
+    if (exColours.hasOwnProperty(id)) {
+        exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
+}
+}
+
+// Populate Interior Colors dropdown
+var intColourDropdown = intColourCol.find('select');
+for (var id in intColours) {
+    if (intColours.hasOwnProperty(id)) {
+        intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
+    }
+}
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, vinCol, removeBtn);
+            $('#variantRowsContainer').append(newRow);
+        }
+        $('#variants_id').val('');
+        $('#QTY').val('');
+        $('#variantRowsContainer').show();
+    });
+
+    $(document).on('click', '.remove-row-btn', function() {
+        var variant = $(this).closest('.row').find('input[name="variant_id[]"]').val();
+        var existingOption = $('#variantslist').find('option[value="' + variant + '"]');
+        if (existingOption.length === 0) {
+            var variantOption = $('<option value="' + variant + '">' + variant + '</option>');
+            $('#variantslist').append(variantOption);
+        }
+        $(this).closest('.row').remove();
+        $('.row-space').each(function() {
+            if ($(this).next().length === 0) {
+                $(this).removeClass('row-space');
+            }
+        });
+        if ($('#variantRowsContainer').find('.row').length === 1) {
+            $('.bar').hide();
+            $('#variantRowsContainer').hide();
+        }
+    });
+});
     $(document).ready(function() {
     $('#po_number').on('blur', function() {
         var poNumber = $(this).val();
