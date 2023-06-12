@@ -32,6 +32,7 @@ use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\Movement;
 use App\Http\Controllers\VehiclesController;
+use App\Http\Controllers\WarrantyController;
 
 /*
 /*
