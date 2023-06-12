@@ -10,6 +10,8 @@ use App\Models\PFI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 class PFIController extends Controller
@@ -63,7 +65,7 @@ class PFIController extends Controller
             'file' => 'required|mimes:pdf'
         ]);
 
-//        DB::beginTransaction();
+        DB::beginTransaction();
         $pfi = new PFI();
 
         $pfi->pfi_reference_number = $request->pfi_reference_number;
@@ -73,15 +75,19 @@ class PFIController extends Controller
         $pfi->created_by = Auth::id();
         $pfi->comment = $request->comment;
         $pfi->status = PFI::PFI_STATUS_NEW;
+
+        $destinationPath = 'PFI_document_withoutsign';
+        $destination = 'PFI_document_withsign';
+
         if ($request->has('file'))
         {
             $file = $request->file('file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
-            $destinationPath = 'PFI_document_withoutsign';
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
+
         $pfi->save();
 
         $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
@@ -108,26 +114,20 @@ class PFIController extends Controller
         }
 
         $pdf = new Fpdi();
-// add a page
-        $pdf->AddPage();
-// set the source file
-        $pdf->setSourceFile('PFI_document_withoutsign/'.$fileName);
-// import page 1
-        $tplIdx = $pdf->importPage(1);
-// use the imported page and place it at position 10,10 with a width of 100 mm
-        $pdf->useTemplate($tplIdx);
+        $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+        for ($i=1; $i <= $pageCount; $i++)
+        {
+            $pdf->AddPage();
+            $tplIdx = $pdf->importPage($i);
+            $pdf->useTemplate($tplIdx);
+            if($i==1) {
+                $pdf->Image('milele_seal.png', 80, 230, 50,35);
+            }
+        }
 
-// now write some text above the imported page
-//        $pdf->SetFont('Helvetica');
-//        $pdf->SetTextColor(255, 0, 0);
-//        $pdf->SetXY(30, 30);
-        $pdf->Image('trans_car_logo.png', 100, 230, -500);
-//        $pdf->Write(0, 'This is just a simple text');
-
-//        $this->setHeader('Content-Type', 'application/pdf');
+        $signedFileName = 'signed_'.time().'.'.$extension;
+        $pdf->Output( public_path($destination.'/'.$signedFileName), 'F');
         $pdf->Output();
-
-
 //        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
 
