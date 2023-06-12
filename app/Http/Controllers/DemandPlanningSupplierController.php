@@ -47,11 +47,9 @@ class DemandPlanningSupplierController extends Controller
         $supplierType->created_by = Auth::id();
         $supplierType->save();
 
-        return redirect()->back()->with('message','Supplier created successfully.');
-
         DB::commit();
 
-
+        return redirect()->back()->with('message','Supplier created successfully.');
     }
 
     /**

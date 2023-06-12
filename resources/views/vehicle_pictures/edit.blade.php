@@ -2,6 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Edit Vehicle Picture</h4>
+        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -43,27 +44,30 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Vehicle Detail</label>
-                            <input type="text" value="{{ $vehiclePicture->vehicle->variant->detail ?? '' }}" class="form-control" readonly >
+                            <label for="choices-single-default" class="form-label">Variant Detail</label>
+                            <input type="text" value="{{ $vehiclePicture->vehicle->variant->detail ?? '' }}" id="variant-detail"
+                                   class="form-control" readonly >
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">GRN</label>
-                            <input type="text" value="{{ old('GRN_link', $vehiclePicture->GRN_link) }}" name="GRN_link" class="form-control" placeholder="GRN">
+                            <input type="text" value="{{ old('GRN_link', $vehiclePicture->GRN_link) }}" name="GRN_link"
+                                   class="form-control mygroup" placeholder="GRN">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">GDN</label>
-                            <input type="text" value="{{ old('GDN_link', $vehiclePicture->GDN_link) }}" name="GDN_link" class="form-control" placeholder="GDN">
+                            <input type="text" value="{{ old('GDN_link', $vehiclePicture->GDN_link) }}" name="GDN_link"
+                                   class="form-control mygroup" placeholder="GDN">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Modification Link</label>
-                            <input type="text" value="{{ old('modification_link', $vehiclePicture->modification_link) }}" name="modification_link" class="form-control"
-                                   placeholder="Modification Link">
+                            <input type="text" value="{{ old('modification_link', $vehiclePicture->modification_link) }}" name="modification_link"
+                                   class="form-control mygroup" placeholder="Modification Link">
                         </div>
                     </div>
                     </br>
@@ -80,6 +84,22 @@
         $('#vin').select2({
             placeholder: 'Select VIN'
         })
+        $('#vin').on('change',function(){
+            $('#vin-error').remove();
+            var vehicle_id = $('#vin').val();
+            let url = '{{ route('vehicle-pictures.variant-details') }}'
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    id: vehicle_id,
+                },
+                success:function (response) {
+                    $('#variant-detail').val(response.data);
+                }
+            });
+        })
         $("#form-update").validate({
             ignore: [],
             rules: {
@@ -87,14 +107,20 @@
                     required: true,
                 },
                 modification_link:{
-                    url:true
+                    url:true,
+                    require_from_group: [1, '.mygroup']
                 },
                 GDN_link:{
-                    url:true
+                    url:true,
+                    require_from_group: [1, '.mygroup']
                 },
                 GRN_link:{
-                    url:true
-                }
+                    url:true,
+                    require_from_group: [1, '.mygroup']
+                },
+                groups: {
+                    mygroup: "GDN_link GRN_link modification_link"
+                },
             }
         });
     </script>

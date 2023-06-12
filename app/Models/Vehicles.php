@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Vehicles extends Model
 {
     use HasFactory;
-    public $table = 'vehicles';
+    protected $table = 'vehicles';
     public function variant()
     {
-        return $this->belongsTo(Varaint::class,'varaints_id');
+        return $this->belongsTo(Varaint::class,'varaints_id','id');
     }
 }

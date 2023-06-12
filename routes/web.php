@@ -32,7 +32,6 @@ use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\Movement;
 use App\Http\Controllers\VehiclesController;
-use App\Http\Controllers\WarrantyController;
 
 /*
 /*
@@ -117,7 +116,6 @@ Route::get('/d', function () {
     Route::post('letter-of-indents/status-change', [LetterOfIndentController::class, 'approve'])->name('letter-of-indents.status-change');
     Route::get('letter-of-indents/suppliers-LOIs', [LetterOfIndentController::class, 'getSupplierLOI'])->name('letter-of-indents.get-suppliers-LOIs');
     Route::get('letter-of-indents/milele-approval', [LOIItemsController::class, 'mileleApproval'])->name('letter-of-indents.milele-approval');
-    Route::get('letter-of-indents/update-quantity', [LOIItemsController::class, 'updateQuantity'])->name('letter-of-indents.update-quantity');
 
     Route::resource('letter-of-indent-documents', LOIDocumentsController::class);
     Route::resource('letter-of-indents', LetterOfIndentController::class);
@@ -185,8 +183,11 @@ Route::get('/d', function () {
     });
 
     // vehicle pictures
+     Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
 
+     // Variants
+    Route::resource('variants', VariantController::class);
 
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');

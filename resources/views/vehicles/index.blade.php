@@ -148,6 +148,12 @@
                      $varaints_detail = "";
                      $brand_name = "";
                      $model_line = "";
+                     $varaints_my = "";
+                     $varaints_steering = "";
+                     $varaints_fuel_type = "";
+                     $varaints_seat = "";
+                     $varaints_gearbox = "";
+                     $varaints_upholestry = "";
                      $po = DB::table('purchasing_order')->where('id', $vehicles->purchasing_order_id)->first();
                      $po_date = $po->po_date;
                      $po_number = $po->po_number;
@@ -214,27 +220,67 @@
         @endforeach
     </datalist>
 </td>
-                        <td class="nowrap-td" id="varaints_detail">{{ $varaints_detail }}</td>
-                        <td class="nowrap-td" id="brand_name">{{ $brand_name }}</td>
-                        <td class="nowrap-td" id="model_line">{{ $model_line }}</td>
+                        <td class="nowrap-td" id="varaints_detail_{{$vehicles->id}}">{{ $varaints_detail }}</td>
+                        <td class="nowrap-td" id="brand_name_{{$vehicles->id}}">{{ $brand_name }}</td>
+                        <td class="nowrap-td" id="model_line_{{$vehicles->id}}">{{ $model_line }}</td>
                         <td class="nowrap-td">{{ $vehicles->vin }}</td>
                         <td class="nowrap-td"><input type="text" name="vin" value="{{ $vehicles->vin }}"></td>
                         <td class="nowrap-td"><input type="text" name="engine" value="{{ $vehicles->engine }}"></td>
-                        <td class="nowrap-td" id="my">{{ $varaints_my }}</td>
-                        <td class="nowrap-td" id="steering">{{ $varaints_steering }}</td>
-                        <td class="nowrap-td" id="seat">{{ $varaints_seat }}</td>
-                        <td class="nowrap-td" id="fuel">{{ $varaints_fuel_type }}</td>
-                        <td class="nowrap-td" id="gearbox">{{ $varaints_gearbox }}</td>
+                        <td class="nowrap-td" id="my_{{$vehicles->id}}">{{ $varaints_my }}</td>
+                        <td class="nowrap-td" id="steering_{{$vehicles->id}}">{{ $varaints_steering }}</td>
+                        <td class="nowrap-td" id="seat_{{$vehicles->id}}">{{ $varaints_seat }}</td>
+                        <td class="nowrap-td" id="fuel_{{$vehicles->id}}">{{ $varaints_fuel_type }}</td>
+                        <td class="nowrap-td" id="gearbox_{{$vehicles->id}}">{{ $varaints_gearbox }}</td>
                         <td class="nowrap-td"><input type="text" name="ex_colour" value="{{ $vehicles->ex_colour }}"></td>
                         <td class="nowrap-td"><input type="text" name="int_colour" value="{{ $vehicles->int_colour }}"></td>
-                        <td class="nowrap-td" id="upholestry">{{ $varaints_upholestry }}</td>
+                        <td class="nowrap-td" id="upholestry_{{$vehicles->id}}">{{ $varaints_upholestry }}</td>
                         <td class="nowrap-td"><input type="text" name="ppmmyyy" value="{{ $vehicles->ppmmyyy }}"></td>
                         <td class="nowrap-td">{{ $vehicles->vin }}</td>
                         <td class="nowrap-td"><input type="text" name="price" value="{{ $vehicles->price }}"></td>
                         <td class="nowrap-td"><input type="text" name="territory" value="{{ $vehicles->territory }}"></td>
-                        <td class="nowrap-td"><input type="text" name="import_type" value="{{ $vehicles->import_type }}"></td>
-                        <td class="nowrap-td"><input type="text" name="owership" value="{{ $vehicles->owership }}"></td>
-                        <td class="nowrap-td"><input type="text" name="document_with" value="{{ $vehicles->document_with }}"></td>
+                        <td class="nowrap-td">
+                        <input type="text" id="import_type" name="import_type" list="importList" value="{{ $import_type }}">
+                        <datalist id="importList">
+                        <option value="Finance Department">Finance Department</option>
+                        <option value="Import Department">Import Department</option>
+                        <option value="Missing">Missing</option>
+                        <option value="Not Applicable">Not Applicable</option>
+                        <option value="Supplier">Supplier</option>
+                        </datalist>
+                        </td>
+                        <td class="nowrap-td">
+                        <input type="text" id="owership" name="owership" list="owerList" value="{{ $owership }}">
+                        <datalist id="owerList">
+                        <option value="Abdul Azeem">Abdul Azeem</option>
+                        <option value="Barwil (Supplier)">Barwil (Supplier)</option>
+                        <option value="Faisal Raiz">Faisal Raiz</option>
+                        <option value="Feroz Raiz">Feroz Raiz</option>
+                        <option value="Globelink (Supplier)">Globelink (Supplier)</option>
+                        <option value="Milele Car Trading LLC">Milele Car Trading LLC</option>
+                        <option value="Milele Motors FZE">Milele Motors FZE</option>
+                        <option value="No Record">No Record</option>
+                        <option value="One World Limousine">One World Limousine</option>
+                        <option value="Supplier">Supplier</option>
+                        <option value="Trans Car FZE">Trans Car FZE</option>
+                        <option value="Zimbabwe Docs">Zimbabwe Docs</option>
+                        </datalist>
+                        </td>
+                        <td class="nowrap-td">
+                        <input type="text" id="document_with" name="document_with" list="docwithList" value="{{ $document_with }}">
+                        <datalist id="docwithList">
+                        <option value="Belgium Doc">Belgium Doc</option>
+                        <option value="BOE + VCC + Exit">BOE + VCC + Exit</option>
+                        <option value="Cross Trade">Cross Trade</option>
+                        <option value="Dubai Trade">Dubai Trade</option>
+                        <option value="Incoming">Incoming</option>
+                        <option value="No Record">No Record</option>
+                        <option value="RTA Possession">RTA Possession</option>
+                        <option value="RTA Registration">RTA Registration</option>
+                        <option value="Supplier Docs">Supplier Docs</option>
+                        <option value="VCC">VCC</option>
+                        <option value="Zimbabwe Docs">Zimbabwe Docs</option>
+                        </datalist>
+                        </td>
                         <td class="nowrap-td">
                         <select name="documzinout">
                         <option value="">-</option>
@@ -249,35 +295,54 @@
             </table>
         </div>
         <script>
-  $(document).ready(function() {
-    $('.select2').select2();
-    var dataTable = $('#dtBasicSupplierInventory').DataTable({
-      ordering: false,
-      initComplete: function() {
-        this.api().columns().every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicSupplierInventory th").eq([d]).text();
-          if (d === 12) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          $('<span class="caret"></span>').appendTo($(column.header()).find('select'));
+$(document).ready(function() {
+  $('.select2').select2();
+  var dataTable = $('#dtBasicSupplierInventory').DataTable({
+    ordering: false,
+    initComplete: function() {
+      this.api().columns().every(function(d) {
+        var column = this;
+        var theadname = $("#dtBasicSupplierInventory th").eq([d]).text();
+        if (d === 12) {
+          return;
+        }
+        var select = $('<select class="form-control my-1"><option value="">All</option></select>')
+          .appendTo($(column.header()))
+          .on('change', function() {
+            var val = $.fn.dataTable.util.escapeRegex($(this).val());
+            column.search(val ? '^' + val + '$' : '', true, false).draw();
+          });
 
+        // Remove any existing caret span element
+        $(column.header()).find('.caret').remove();
+
+        // Check if the column contains input fields
+        if ($(column.header()).find('input').length > 0) {
+          $(column.header()).addClass('nowrap-td');
+
+          // Get the unique values from input fields
+          var uniqueValues = column.data().toArray().map(function(value) {
+            return $(value).find('input').val();
+          }).filter(function(value, index, self) {
+            return self.indexOf(value) === index;
+          });
+
+          uniqueValues.sort().forEach(function(value) {
+            select.append('<option value="' + value + '">' + value + '</option>');
+          });
+        } else {
           column.data().unique().sort().each(function(d, j) {
             select.append('<option value="' + d + '">' + d + '</option>');
           });
-        });
-      }
-    });
-    $('.dataTables_filter input').on('keyup', function() {
-      dataTable.search(this.value).draw();
-    });  
+        }
+      });
+    }
   });
+
+  $('.dataTables_filter input').on('keyup', function() {
+    dataTable.search(this.value).draw();
+  });
+});
         setTimeout(function() {
             $('#error-message').fadeOut('slow');
         }, 2000);
@@ -309,37 +374,39 @@
           'X-CSRF-TOKEN': csrfToken
         },
         data: {
-          value: value
+          value: value,
+          vehicles_id: vehiclesId
         },
         success: function(response) {
-          console.log(response);
-  // Check if properties are null and display "null" if necessary
-  var varaintsDetail = response.varaints_detail !== null ? response.varaints_detail : "null";
-  var brandName = response.brand_name !== null ? response.brand_name : "null";
-  var modelLine = response.model_line !== null ? response.model_line : "null";
-  var my = response.my !== null ? response.my : "null";
-  var steering = response.steering !== null ? response.steering : "null";
-  var seat = response.seat !== null ? response.seat : "null";
-  var fuel = response.fuel !== null ? response.fuel : "null";
-  var gearbox = response.gearbox !== null ? response.gearbox : "null";
-  var upholestry = response.upholestry !== null ? response.upholestry : "null";
-  
-  // Update the UI with the fetched values
-  $('#varaints_detail').text(varaintsDetail);
-  $('#brand_name').text(brandName);
-  $('#model_line').text(modelLine);
-  $('#my').text(my);
-  $('#steering').text(steering);
-  $('#seat').text(seat);
-  $('#fuel').text(fuel);
-  $('#gearbox').text(gearbox);
-  $('#upholestry').text(upholestry);
-},
+          console.log(response.vehicles_id);
+          // Check if properties are null and display "null" if necessary
+          var varaintsDetail = response.varaints_detail !== null ? response.varaints_detail : "null";
+          var brandName = response.brand_name !== null ? response.brand_name : "null";
+          var modelLine = response.model_line !== null ? response.model_line : "null";
+          var my = response.my !== null ? response.my : "null";
+          var steering = response.steering !== null ? response.steering : "null";
+          var seat = response.seat !== null ? response.seat : "null";
+          var fuel = response.fuel !== null ? response.fuel : "null";
+          var gearbox = response.gearbox !== null ? response.gearbox : "null";
+          var upholestry = response.upholestry !== null ? response.upholestry : "null";
+
+          // Update the UI with the fetched values
+          $('#varaints_detail_' + response.vehicles_id).text(varaintsDetail);
+          $('#brand_name_' + response.vehicles_id).text(brandName);
+          $('#model_line_' + response.vehicles_id).text(modelLine);
+          $('#my_' + response.vehicles_id).text(my);
+          $('#steering_' + response.vehicles_id).text(steering);
+          $('#seat_' + response.vehicles_id).text(seat);
+          $('#fuel_' + response.vehicles_id).text(fuel);
+          $('#gearbox_' + response.vehicles_id).text(gearbox);
+          $('#upholestry_' + response.vehicles_id).text(upholestry);
+        },
         error: function(xhr, status, error) {
           console.log(error); // Handle the error gracefully
         }
       });
     }
+    console.log(columnName);
     axios
       .post("{{ route('vehicles.updatevehiclesdata') }}", {
         vehicles_id: vehiclesId,

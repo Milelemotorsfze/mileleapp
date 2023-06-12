@@ -6,6 +6,7 @@ use App\Models\PurchasingOrder;
 use App\Models\Varaint;
 use App\Models\grn;
 use App\Models\Gdn;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -182,7 +183,7 @@ class VehiclesController extends Controller
                     $newGdn = new Gdn();
                     $newGdn->date = $value;
                     $newGdn->save();
-                    $vehicle->grn_id = $newGdn->id;
+                    $vehicle->gdn_id = $newGdn->id;
                     $vehicle->save();
                 }
             }
@@ -201,25 +202,78 @@ class VehiclesController extends Controller
                     $newGdn = new Gdn();
                     $newGdn->gdn_number = $value;
                     $newGdn->save();
-                    $vehicle->grn_id = $newGdn->id;
+                    $vehicle->gdn_id = $newGdn->id;
                     $vehicle->save();
                 }
             }
         }  
-        if($column === "varaints_name")
+        if($column === "variants_name")
         {
-        
+            $variant = Varaint::where('name', $value)->first();
+            if ($variant) {
+                Vehicles::where('id', $vehiclesId)
+                ->update(['varaints_id' => $variant->id]);
+            }
         }
         if($column === "import_type")
         {
-       
+            $vehicle = Vehicles::find($vehiclesId);
+            if ($vehicle) {
+                $documents_id = $vehicle->documents_id;
+                if ($documents_id) {
+                    $documents = Document::find($documents_id);
+                    if ($documents) {
+                        $documents->import_type = $value;
+                        $documents->save();
+                    }
+                } else {
+                    $newdocument = new Document();
+                    $newdocument->import_type = $value;
+                    $newdocument->save();
+                    $vehicle->documents_id = $newdocument->id;
+                    $vehicle->save();
+                }
+            }
         }
         if($column === "owership")
         {
-       
+            $vehicle = Vehicles::find($vehiclesId);
+            if ($vehicle) {
+                $documents_id = $vehicle->documents_id;
+                if ($documents_id) {
+                    $documents = Document::find($documents_id);
+                    if ($documents) {
+                        $documents->owership = $value;
+                        $documents->save();
+                    }
+                } else {
+                    $newdocument = new Document();
+                    $newdocument->owership = $value;
+                    $newdocument->save();
+                    $vehicle->documents_id = $newdocument->id;
+                    $vehicle->save();
+                }
+            }
         }
         if($column === "document_with")
         {
+            $vehicle = Vehicles::find($vehiclesId);
+            if ($vehicle) {
+                $documents_id = $vehicle->documents_id;
+                if ($documents_id) {
+                    $documents = Document::find($documents_id);
+                    if ($documents) {
+                        $documents->document_with = $value;
+                        $documents->save();
+                    }
+                } else {
+                    $newdocument = new Document();
+                    $newdocument->document_with = $value;
+                    $newdocument->save();
+                    $vehicle->documents_id = $newdocument->id;
+                    $vehicle->save();
+                }
+            }
        
         }
         return response()->json(['message' => 'Vehicle data updated successfully']);
@@ -228,7 +282,6 @@ class VehiclesController extends Controller
     public function fatchvariantdetails(Request $request)
 {
     $variantName = $request->input('value');
-
     // Fetch the updated values from the database based on the selected variant
     $result = DB::table('varaints')
     ->join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -248,6 +301,7 @@ class VehiclesController extends Controller
         'fuel' => $result->fuel_type ?? null,
         'seat' => $result->seat ?? null,
         'gearbox' => $result->gearbox ?? null,
+        'vehicles_id' => $request->input('vehicles_id'),
     ];
 
     return response()->json($responseData);

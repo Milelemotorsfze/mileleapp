@@ -10,6 +10,7 @@ use App\Models\PFI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use setasign\Fpdi\Tcpdf\Fpdi;
 
 class PFIController extends Controller
 {
@@ -81,7 +82,6 @@ class PFIController extends Controller
             $file->move($destinationPath, $fileName);
             $pfi->pfi_document_without_sign = $fileName;
         }
-
         $pfi->save();
 
         $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)
@@ -107,9 +107,28 @@ class PFIController extends Controller
             $approvedLoiItem->save();
         }
 
-//        DB::commit();
+        $pdf = new Fpdi();
+// add a page
+        $pdf->AddPage();
+// set the source file
+        $pdf->setSourceFile('PFI_document_withoutsign/'.$fileName);
+// import page 1
+        $tplIdx = $pdf->importPage(1);
+// use the imported page and place it at position 10,10 with a width of 100 mm
+        $pdf->useTemplate($tplIdx);
 
-        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
+// now write some text above the imported page
+//        $pdf->SetFont('Helvetica');
+//        $pdf->SetTextColor(255, 0, 0);
+//        $pdf->SetXY(30, 30);
+        $pdf->Image('trans_car_logo.png', 100, 230, -500);
+//        $pdf->Write(0, 'This is just a simple text');
+
+//        $this->setHeader('Content-Type', 'application/pdf');
+        $pdf->Output();
+
+
+//        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
 
     /**
