@@ -64,4 +64,17 @@ class WarrantyController extends Controller
     {
         //
     }
+    public function getBranchForWarranty(Request $request)
+    {
+        $data = Brand::select('id','brand_name');
+        if($request->filteredArray)
+        {
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id',$request->filteredArray);
+            }
+        }
+        $data = $data->get();
+        return response()->json($data);
+    }
 }
