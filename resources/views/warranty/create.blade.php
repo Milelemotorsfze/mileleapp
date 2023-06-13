@@ -142,9 +142,9 @@
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
-                                <select name="brands1[]" id="brands1" multiple="true" style="width: 100%;"  class="form-control" autofocus onchange="changeBranch(this)">
+                                <select name="brands1[]" id="brands1" multiple="true" style="width: 100%;"  class="form-control" autofocus>
                                     @foreach($brands as $brand)
-                                        <option value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                        <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                     @endforeach   
                                 </select>                      
                                 <span id="supplierError" class="invalid-feedback"></span>
@@ -178,9 +178,11 @@
                 </div>
     </form>
 </div>
-<script type="text/javascript">  
+<script type="text/javascript"> 
+    var oldSelectedBrands = [];
     var selectedBrands = [];
     var totalRow = 1;
+    var filteredArray = [];
     $(document).ready(function ()
     {
         $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
@@ -189,12 +191,118 @@
             minimumResultsForSearch: -1,
             templateResult: hideSelected,
         });
-    }); 
-    function changeBranch()
-    {
-        alert(this.value);
-    }
+        $("#brands1").data('originalvalues', []);
+        $("#brands1").on('change', function(e) 
+        {
+            var that = this;
+            removed = []
+            $($(this).data('originalvalues')).each(function(k, v) 
+            {
+                if (!$(that).val()) 
+                {
+                    removed[removed.length] = v;
+                    return false;
+                }
+                if ($(that).val().indexOf(v) == -1) 
+                {
+                    removed[removed.length] = v;
+                    $.each(removed, function( ind, value ) 
+                    {
+                        filteredArray = selectedBrands.filter(function(e) { return e !== value })
+                    });
+                    $.ajax
+                    ({
+                        url:"{{url('getBranchForWarranty')}}",
+                        type: "POST",
+                        data:
+                        {
+                            filteredArray: filteredArray,
+                            _token: '{{csrf_token()}}'
+                        },
+                        dataType : 'json',
+                        success: function(data)
+                        { 
+                            myarray = data;
+                            var size= myarray.length;
+                            if(size >= 1)
+                            {
+                                let brandDropdownData   = [];
+                                $.each(data,function(key,value)
+                                {
+                                    brandDropdownData.push
+                                    ({
+                                        id: value.id,
+                                        text: value.brand_name
+                                    });
+                                });
+                                for(let i=1; i<=totalRow; i++)
+                                {
+                                    var brandRowID = "brands"+i;
+                                    var brandRowSelectedValue = [];
+                                    if(brandRowID != "brands1")
+                                    {
+                                        var brandRowSelectedValue = $("#brands"+i).val();
+                                        $('#'+brandRowID).html("");
+                                        $('#'+brandRowID).select2
+                                        ({
+                                            placeholder: 'Select value',
+                                            allowClear: true,
+                                            data: brandDropdownData,
+                                            maximumSelectionLength: 1,
+                                        });
+                                        $("#"+brandRowID).val(brandRowSelectedValue).trigger('change');
+                                    }
+                                }    
+                            }
+                        }
+                    });
+                    for(let i=1; i<=totalRow; i++)
+                    {
+                        var brandRowID = "brands"+i;
+                        if(brandRowID != "brands1")
+                        {
 
+                        }
+                    }
+                }
+            });
+            if ($(this).val()) 
+            {
+                $(this).data('originalvalues', $(this).val());
+            } 
+            else 
+            {
+                $(this).data('originalvalues', []);
+            }
+            if(removed != '')
+            {
+                for(let i=1; i<=totalRow; i++)
+                {
+                    var brandRowID = "brands"+i;
+                    if(brandRowID != "brands1")
+                    {
+                        $('#'+brandRowID+' option[value='+removed+']').detach();
+                    }
+                }
+                selectedBrands = $(this).val();
+            }
+            else
+            {
+                selectedBrands = $(this).val();
+                var diff = $(selectedBrands).not(oldSelectedBrands).get();
+                for(let i=1; i<=totalRow; i++)
+                {
+                    var brandRowID = "brands"+i;
+                    if(brandRowID != "brands1")
+                    {
+                       
+                        $('#'+brandRowID+' option[value='+diff+']').detach();
+                    }
+                }
+                oldSelectedBrands = selectedBrands;
+            }   
+        });
+    }); 
     function clickAdd()
     { 
         var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;              
@@ -230,7 +338,7 @@
         `); 
         $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); 
         $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
-        alert(globalThis.totalRow);
+        globalThis.totalRow = globalThis.totalRow+1;
         setDropdownValue(index);
     }  
     function setDropdownValue(index)

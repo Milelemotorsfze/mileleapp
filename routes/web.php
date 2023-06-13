@@ -91,6 +91,7 @@ Route::get('/d', function () {
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);
+    Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
