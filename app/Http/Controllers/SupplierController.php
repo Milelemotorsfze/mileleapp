@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Validator;
-
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
 use App\Models\SupplierAvailablePayments;
@@ -29,9 +28,12 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')->get();
+        $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')
+            ->whereHas('supplierTypes', function ($query){
+                $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })->get();
 
-        if(Auth::user()->hasPermissionTo('supplier-list')) {
+        if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {
              $suppliers = Supplier::with('supplierTypes')
                  ->whereHas('supplierTypes', function ($query){
                      $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -47,6 +49,10 @@ class SupplierController extends Controller
     {
         $paymentMethods = DB::table('payment_methods')->get();
         $addons = AddonDetails::select('id','addon_code','addon_id')->with('AddonName')->get();
+        if(Auth::user()->hasPermissionTo('demand-planning-supplier-create') && !Auth::user()->hasPermissionTo('addon-supplier-create'))
+        {
+            return view('demand_planning_suppliers.create');
+        }
         return view('suppliers.create',compact('paymentMethods','addons'));
     }
 
@@ -83,6 +89,11 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
+        if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
+        {
+            $supplier = Supplier::findOrFail($supplier->id);
+            return view('demand_planning_suppliers.edit', compact('supplier'));
+        }
         $paymentMethods = DB::table('payment_methods')->get();
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)
@@ -97,7 +108,12 @@ class SupplierController extends Controller
     }
     public function delete($id)
     {
+        DB::beginTransaction();
+
+        SupplierType::where('supplier_id', $id)->delete();
         Supplier::find($id)->delete();
+
+        DB::commit();
         return redirect()->route('suppliers.index')
                         ->with('success','Suppliers deleted successfully');
     }

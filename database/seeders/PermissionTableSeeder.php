@@ -23,6 +23,7 @@ class PermissionTableSeeder extends Seeder
             ['7','Demand Planning'],
             ['8','Warehouse'],
             ['9','Stocks'],
+            ['10', 'Addons']
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -102,8 +103,8 @@ class PermissionTableSeeder extends Seeder
             ['7','Supplier Inventory Edit','supplier-inventory-edit','To add or update supplier Inventory with permissions.'],
             ['7','Approve LOI','LOI-approve','To Approve LOI with permissions.'],
             ['7','List Supplier','demand-planning-supplier-list','To view List of Demand Planning Suppliers with permissions.'],
-            ['7','Create Supplier','demand-planning-supplier-create','To create Demand Planning Suppliers with permissions.'],
-            ['7','Edit Supplier','demand-planning-supplier-edit','To create Demand Planning Suppliers with permissions.'],
+            ['7','Create Supplier','demand-planning-supplier-create','To Create Demand Planning Suppliers with permissions.'],
+            ['7','Edit Supplier','demand-planning-supplier-edit','To Edit Demand Planning Suppliers with permissions.'],
 
             ['8','View Warehouse','warehouse-view', 'To View the Warehouse Module'],
             ['8','Edit Warehouse','warehouse-edit', 'To Edit the warehouse Module'],
@@ -141,10 +142,18 @@ class PermissionTableSeeder extends Seeder
             ['9','Price Add & Edit','price-edit', 'To Edit the Price Details'],
 
             ['9','Vehicle Pictures List','vehicles-picture-list', 'To view List of Vehicle Pictures'],
-            ['9','Vehicle Picture Create','vehicles-picture-create', 'To view Create of Vehicle Pictures'],
-            ['9','Vehicle Picture Edit','vehicles-picture-edit', 'To Edit Vehicle Pictures'],
-            ['9','Vehicle Picture Delete','vehicles-picture-delete', 'To Delete Vehicle Pictures'],
-            ['9','Vehicle Picture View','vehicles-picture-view', 'To View Vehicle Pictures'],
+            ['9','Vehicle Picture Create','vehicles-picture-create', 'To  Create the Vehicle Pictures'],
+            ['9','Vehicle Picture Edit','vehicles-picture-edit', 'To Edit the Vehicle Pictures'],
+            ['9','Vehicle Picture Delete','vehicles-picture-delete', 'To Delete the Vehicle Pictures'],
+            ['9','Vehicle Picture View','vehicles-picture-view', 'To View the Vehicle Pictures'],
+
+            ['10','Supplier List','addon-supplier-list', 'To View List of Suppliers'],
+            ['10','Supplier Create','addon-supplier-create', 'To Create the Suppliers'],
+            ['10','Supplier Edit','addon-supplier-edit', 'To Edit the Suppliers'],
+            ['10','Supplier Delete','addon-supplier-delete', 'To Delete the Supplier'],
+            ['10','Supplier View','addon-supplier-view', 'To View the Supplier'],
+            ['10','Supplier Active','supplier-active-inactive', 'To Activate and Inactivate the Supplier'],
+
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

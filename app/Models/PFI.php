@@ -10,6 +10,9 @@ class PFI extends Model
     use HasFactory;
     protected $table = "pfi";
     public const PFI_STATUS_NEW = 'New';
-
+    public function letterOfIndent()
+    {
+        return $this->belongsTo(LetterOfIndent::class);
+    }
 
 }

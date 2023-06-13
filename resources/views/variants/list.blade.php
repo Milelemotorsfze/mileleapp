@@ -65,7 +65,6 @@
                                         class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
                                 @endif
                             @endcan
-
                         </td>
                     </tr>
                 @endforeach

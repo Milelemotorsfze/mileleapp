@@ -49,7 +49,7 @@ class DemandPlanningSupplierController extends Controller
 
         DB::commit();
 
-        return redirect()->back()->with('message','Supplier created successfully.');
+        return redirect()->route('suppliers.index')->with('message','Supplier created successfully.');
     }
 
     /**
@@ -65,7 +65,8 @@ class DemandPlanningSupplierController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $supplier = Supplier::findOrFail($id);
+        return view('demand_planning_suppliers.edit', compact('supplier'));
     }
 
     /**
@@ -73,7 +74,16 @@ class DemandPlanningSupplierController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $supplier = Supplier::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|unique:suppliers,supplier,'.$supplier->id.'|max:255'
+        ]);
+
+        $supplier->supplier = $request->input('name');
+        $supplier->save();
+
+        return redirect()->route('suppliers.index')->with('message', 'Supplier updated successfully.');
     }
 
     /**
