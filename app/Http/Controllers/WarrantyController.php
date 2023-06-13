@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\MasterWarrantyPolicies;
+use App\Models\Brand;
 class WarrantyController extends Controller
 {
     /**
@@ -19,7 +20,9 @@ class WarrantyController extends Controller
      */
     public function create()
     {
-        return view('warranty.create');
+        $policyNames = MasterWarrantyPolicies::select('id','name')->get();
+        $brands = Brand::select('id','brand_name')->get();
+        return view('warranty.create', compact('policyNames','brands'));
     }
 
     /**
