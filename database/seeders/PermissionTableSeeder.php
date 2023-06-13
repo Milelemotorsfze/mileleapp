@@ -68,6 +68,9 @@ class PermissionTableSeeder extends Seeder
             ['5','Add,Edit, Delete Calls','Calls-modified', 'Add, Edit, Delete Calls'],
             ['5','View Variants','variants-view', 'To View the Vairants'],
             ['5','List Variants','variants-list', 'To View the List of the Variants'],
+            ['5','Create Variants','variants-create', 'To Create the Variants'],
+            ['5','Edit Variants','variants-edit', 'To Edit the Variants'],
+            ['5','Delete Variants','variants-delete', 'To Delete the Variants'],
             ['5','List With Missing Variants','variants-list-missing', 'To View the List of the Missing pictures and other data of Variants'],
             ['5','View Variants Details', 'variants-details-view', 'To view the details of the list of the Variants'],
             ['5','Update Variants Pictures','variants-update-pictures', 'To Update the Pictures of the Variants'],
@@ -90,10 +93,17 @@ class PermissionTableSeeder extends Seeder
             ['7','View LOI ', 'LOI-view','To view the LOI details with permissions.'],
             ['7','Edit LOI','LOI-edit','To edit LOI with permissions.'],
             ['7','Delete LOI','LOI-delete','To delete LOI.'],
+            ['7','Download LOI','LOI-download','To download LOI.'],
+
+            ['7','Create PFI','PFI-create','To create new PFI with permissions.'],
+            ['7','List PFI','PFI-list','To view the list of PFI with permissions.'],
 
             ['7','Supplier Inventory List','supplier-inventory-list','To list supplier Inventory with permissions.'],
             ['7','Supplier Inventory Edit','supplier-inventory-edit','To add or update supplier Inventory with permissions.'],
             ['7','Approve LOI','LOI-approve','To Approve LOI with permissions.'],
+            ['7','List Supplier','demand-planning-supplier-list','To view List of Demand Planning Suppliers with permissions.'],
+            ['7','Create Supplier','demand-planning-supplier-create','To create Demand Planning Suppliers with permissions.'],
+            ['7','Edit Supplier','demand-planning-supplier-edit','To create Demand Planning Suppliers with permissions.'],
 
             ['8','View Warehouse','warehouse-view', 'To View the Warehouse Module'],
             ['8','Edit Warehouse','warehouse-edit', 'To Edit the warehouse Module'],
@@ -129,6 +139,12 @@ class PermissionTableSeeder extends Seeder
             ['9','BL Add & Edit ','bl-edit', 'To Edit the BL Details'],
             ['9','Price View','price-view', 'To View the Price Details'],
             ['9','Price Add & Edit','price-edit', 'To Edit the Price Details'],
+
+            ['9','Vehicle Pictures List','vehicles-picture-list', 'To view List of Vehicle Pictures'],
+            ['9','Vehicle Picture Create','vehicles-picture-create', 'To view Create of Vehicle Pictures'],
+            ['9','Vehicle Picture Edit','vehicles-picture-edit', 'To Edit Vehicle Pictures'],
+            ['9','Vehicle Picture Delete','vehicles-picture-delete', 'To Delete Vehicle Pictures'],
+            ['9','Vehicle Picture View','vehicles-picture-view', 'To View Vehicle Pictures'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

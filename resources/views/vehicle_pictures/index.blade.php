@@ -4,7 +4,9 @@
         <h4 class="card-title">
             Vehicle Pictures
         </h4>
+        @can('vehicles-picture-create')
         <a  class="btn btn-sm btn-info float-end" href="{{ route('vehicle-pictures.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @endcan
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -47,14 +49,20 @@
                         <td>{{ $vehiclePicture->GDN_link ?? '' }}</td>
                         <td>{{ $vehiclePicture->modification_link ?? ''  }}</td>
                         <td>
+                            @can('vehicles-picture-view')
                             <a href="{{ route('vehicle-pictures.show',$vehiclePicture->id) }}">
                                 <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
                             </a>
+                            @endcan
+                            @can('vehicles-picture-edit')
                             <a href="{{ route('vehicle-pictures.edit',$vehiclePicture->id) }}">
                                 <button type="button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> </button>
                             </a>
+                            @endcan
+                            @can('vehicles-picture-delete')
                             <button type="button" data-id="{{ $vehiclePicture->id }}" data-url="{{ route('vehicle-pictures.destroy',$vehiclePicture->id) }}"
                                     class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
+                            @endcan
                         </td>
                     </tr>
                 @endforeach
@@ -63,7 +71,6 @@
         </div>
     </div>
     <script>
-
         $('.btn-delete').on('click',function(e){
             e.preventDefault();
             let id = $(this).attr('data-id');

@@ -7,8 +7,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(128,128,128,0.5); 
-    display: none; 
+    background-color: rgba(128,128,128,0.5);
+    display: none;
     opacity:0.5;
   }
 </style>
@@ -18,18 +18,17 @@
     <h4 class="card-title">
       Suppliers Info
     </h4>
-    <!-- @can('user-create') -->
+{{--    <!-- @can('user-create') -->--}}
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New Supplier
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <div class="clearfix"></div>
       <br>
-    <!-- @endcan -->      
+{{--    <!-- @endcan -->--}}
   </div>
   <div class="tab-content">
-    <!-- @can('user-list-active') -->
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="suppliersList" class="table table-striped table-editable table-edits table">
@@ -107,15 +106,15 @@
                       @endif
                     </td>
                     <td>
-                      <!-- @can('user-view') -->
+{{--                      <!-- @can('user-view') -->--}}
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                      <!-- @endcan -->
-                      <!-- @can('user-edit') -->
+{{--                      <!-- @endcan -->--}}
+{{--                      <!-- @can('user-edit') -->--}}
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                      <!-- @endcan -->
-                      <!-- @can('user-delete') -->
+{{--                      <!-- @endcan -->--}}
+{{--                      <!-- @can('user-delete') -->--}}
                         <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
-                          <div class="overlay"> </div>                       
+                          <div class="overlay"> </div>
                           <div class="modal" id="deleteSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
@@ -140,11 +139,11 @@
                               </div>
                             </div>
                           </div>
-                      <!-- @endcan -->
-                      <!-- @can('user-make-inactive') -->
+{{--                      <!-- @endcan -->--}}
+{{--                      <!-- @can('user-make-inactive') -->--}}
                       @if($supplier->status == 'active')
                         <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div>  
+                        <div class="overlay"> </div>
                         <div class="modal" id="makeInactiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
@@ -171,7 +170,7 @@
                           </div>
                         @elseif($supplier->status == 'inactive')
                         <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveSupplier{{$supplier->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div> 
+                        <div class="overlay"> </div>
                         <div class="modal" id="makeActiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
@@ -197,24 +196,24 @@
                             </div>
                           </div>
                         @endif
-                      <!-- @endcan                               -->
-                    </td>                
+{{--                      <!-- @endcan                               -->--}}
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
-        </div>  
-      </div>  
-    <!-- @endcan       -->
+          </div>
+        </div>
+      </div>
+{{--    <!-- @endcan       -->--}}
       </div><!-- end tab-content-->
     </div>
   </div>
- 
-  
 
 
-  
+
+
+
   <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -225,7 +224,7 @@
         var modalId = $(this).data('modal-id');
         $('#' + modalId).addClass('modalshow');
         $('#' + modalId).removeClass('modalhide');
-        
+
         $('.overlay').show();
         table.destroy();
       });
@@ -284,4 +283,4 @@
             top: 0;
         }
 </style> -->
-   
+

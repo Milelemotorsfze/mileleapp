@@ -184,12 +184,14 @@
                         </a>
                     </li>
                     @endcan
+                    @can('vehicles-picture-list')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Vehicle Pictures</span>
                         </a>
                     </li>
+                    @endcan
                     @can('demand-create')
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
@@ -199,7 +201,7 @@
                             </a>
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
                                 <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}"
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}"
                                        id="topnav-auth" role="button" >
                                         <span data-key="t-authentication">Supplier</span>
                                     </a>
@@ -289,11 +291,13 @@
                                     <a href="" class="dropdown-item" data-key="t-login">Model Info </a>
                                 </div>
                             </div>
+                            @can('variants-list')
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Variants </span>
                                 </a>
                             </div>
+                            @endcan
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
                                     <span data-key="t-authentication">Colours </span>
@@ -357,7 +361,7 @@
                         </a>
 					</li>
                     @endcan
-                
+
                 </ul>
             </div>
         </nav>

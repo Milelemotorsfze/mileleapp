@@ -4,7 +4,9 @@
         <h4 class="card-title">
             Variants
         </h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @can('variants-create')
+            <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @endcan
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -47,16 +49,23 @@
                         <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
                         <td>{{ $variant->my }}</td>
                         <td>
-                            <a href="{{ route('variants.show', $variant->id) }}">
-                                <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
-                            </a>
-                            <a href="{{ route('variants.edit', $variant->id) }}">
-                                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> </button>
-                            </a>
-                            @if($variant->is_deletable == true)
-                            <button type="button" data-id="{{ $variant->id }}" data-url="{{ route('variants.destroy',$variant->id) }}"
-                                    class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
-                            @endif
+                            @can('variants-show')
+                                <a href="{{ route('variants.show', $variant->id) }}">
+                                    <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
+                                </a>
+                            @endcan
+                            @can('variants-edit')
+                                <a href="{{ route('variants.edit', $variant->id) }}">
+                                    <button type="button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> </button>
+                                </a>
+                            @endcan
+                            @can('variants-delete')
+                                @if($variant->is_deletable == true)
+                                <button type="button" data-id="{{ $variant->id }}" data-url="{{ route('variants.destroy',$variant->id) }}"
+                                        class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
+                                @endif
+                            @endcan
+
                         </td>
                     </tr>
                 @endforeach

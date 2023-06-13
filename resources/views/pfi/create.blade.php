@@ -210,11 +210,7 @@
                             <textarea class="form-control" name="comment" rows="5" cols="25"></textarea>
                         </div>
                     </div>
-
-{{--                    <input type=button id=choose_pics value='Choose'>--}}
-
                     <div class="col-lg-6 col-md-6" id="file-preview">
-
                     </div>
                 </div>
                 <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
@@ -228,7 +224,6 @@
 @endsection
 @push('scripts')
     <script>
-
         const fileInputLicense = document.querySelector("#file");
         const previewFile = document.querySelector("#file-preview");
         fileInputLicense.addEventListener("change", function(event) {
@@ -270,28 +265,28 @@
                }
            });
        }
-       // $("#form-create").validate({
-       //     rules: {
-       //         pfi_reference_number: {
-       //             required: true,
-       //         },
-       //         pfi_date: {
-       //             required: true,
-       //         },
-       //         amount: {
-       //             required: true,
-       //         },
-       //         file:{
-       //             required:true,
-       //             extension: 'pdf'
-       //         },
-       //         messages: {
-       //             file: {
-       //                 extension: "Please upload valid pdf file"
-       //             }
-       //         }
-       //     }
-       // });
+       $("#form-create").validate({
+           rules: {
+               pfi_reference_number: {
+                   required: true,
+               },
+               pfi_date: {
+                   required: true,
+               },
+               amount: {
+                   required: true,
+               },
+               file:{
+                   required:true,
+                   extension: 'pdf'
+               },
+               messages: {
+                   file: {
+                       extension: "Please upload valid pdf file"
+                   }
+               }
+           }
+       });
     </script>
 @endpush
 

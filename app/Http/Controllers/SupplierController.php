@@ -30,6 +30,13 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')->get();
+
+        if(Auth::user()->hasPermissionTo('supplier-list')) {
+             $suppliers = Supplier::with('supplierTypes')
+                 ->whereHas('supplierTypes', function ($query){
+                     $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+                 })->get();
+         }
         return view('suppliers.index',compact('suppliers'));
     }
 
@@ -114,7 +121,7 @@ class SupplierController extends Controller
     {
         if($request->file)
                 {
-                    $headings = (new HeadingRowImport)->toArray($request->file);  
+                    $headings = (new HeadingRowImport)->toArray($request->file);
                     if(count($headings) > 0)
                     {
                         foreach($headings[0] as $heading)
@@ -157,17 +164,17 @@ class SupplierController extends Controller
             'is_primary_payment_method' => 'required',
             'supplier_types' => 'required',
         ]);
-        if ($validator->fails()) 
+        if ($validator->fails())
         {
             return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
         }
-        else 
-        { 
+        else
+        {
             if($request->activeTab == 'uploadExcel')
             {
                 if($request->file('file'))
-                { 
-                    $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                {
+                    $headings = (new HeadingRowImport)->toArray($request->file('file'));
                     if(count($headings) > 0)
                     {
                         foreach($headings[0] as $heading)
@@ -178,7 +185,7 @@ class SupplierController extends Controller
                                 $dataError = [];
                                 $rows = SupplierAddonTemp::all();
                                 $existingAddon = [];
-                                for ($i=0; $i< count($rows); $i++) 
+                                for ($i=0; $i< count($rows); $i++)
                                 {
                                     $currencyError = $priceErrror = $addonError = '';
                                     if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
@@ -190,13 +197,13 @@ class SupplierController extends Controller
                                         elseif(!in_array(strtoupper($rows[$i]['currency']), ['AED','USD']))
                                         {
                                             $currencyError = "currency should be  AED or USD";
-                                        } 
-                                        if($rows[$i]['purchase_price'] == '') 
+                                        }
+                                        if($rows[$i]['purchase_price'] == '')
                                         {
                                             $priceErrror = "Purchase price field is required";
-                                        }  
+                                        }
                                         elseif(!is_numeric($rows[$i]['purchase_price']))
-                                        {   
+                                        {
                                             $priceErrror = "Purchase price should be a number";
                                         }
                                         if($rows[$i]['addon_code'] == '')
@@ -218,14 +225,14 @@ class SupplierController extends Controller
                                         }
                                         if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
                                         {
-                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]); 
+                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]);
                                         }
                                         $rows[$i]->delete();
-                                    }  
+                                    }
                                     else
                                     {
                                         $rows[$i]->delete();
-                                    }                                  
+                                    }
                                 }
                                 if(count($dataError) > 0)
                                 {
@@ -245,18 +252,18 @@ class SupplierController extends Controller
                                         if(count($request->supplier_types) > 0)
                                         {
                                             $supplier_typeData['supplier_id'] = $suppliers->id;
-                                            $supplier_typeData['created_by'] = $authId; 
+                                            $supplier_typeData['created_by'] = $authId;
                                             foreach($request->supplier_types as $supplier_typeData1)
-                                            {                    
-                                                $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);  
+                                            {
+                                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
                                             }
                                         }
                                     }
                                     $payment_methods['supplier_id'] = $suppliers->id;
-                                    $payment_methods['created_by'] = $authId;         
+                                    $payment_methods['created_by'] = $authId;
                                     $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-                                    $payment_methods['is_primary_payment_method'] = 'yes'; 
+                                    $payment_methods['is_primary_payment_method'] = 'yes';
                                     $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                                     $payment_methods_id = $request->payment_methods_id;
                                     if($payment_methods_id != null)
@@ -266,8 +273,8 @@ class SupplierController extends Controller
                                             foreach($payment_methods_id as $payment_methods_id)
                                             {
                                                 $payment_methods['payment_methods_id'] = $payment_methods_id;
-                                                    $payment_methods['is_primary_payment_method'] = 'no'; 
-                                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                                                    $payment_methods['is_primary_payment_method'] = 'no';
+                                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                                             }
                                         }
                                     }
@@ -291,7 +298,7 @@ class SupplierController extends Controller
                                     {
                                         if($request->file('file'))
                                         {
-                                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                                            $headings = (new HeadingRowImport)->toArray($request->file('file'));
                                             if(count($headings) > 0)
                                             {
                                                 foreach($headings[0] as $heading)
@@ -349,18 +356,18 @@ class SupplierController extends Controller
                         if(count($request->supplier_types) > 0)
                         {
                             $supplier_typeData['supplier_id'] = $suppliers->id;
-                            $supplier_typeData['created_by'] = $authId; 
+                            $supplier_typeData['created_by'] = $authId;
                             foreach($request->supplier_types as $supplier_typeData1)
-                            {                    
-                                $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);  
+                            {
+                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
                             }
                         }
                     }
                     $payment_methods['supplier_id'] = $suppliers->id;
-                    $payment_methods['created_by'] = $authId;         
+                    $payment_methods['created_by'] = $authId;
                     $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-                    $payment_methods['is_primary_payment_method'] = 'yes'; 
+                    $payment_methods['is_primary_payment_method'] = 'yes';
                     $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                     $payment_methods_id = $request->payment_methods_id;
                     if($payment_methods_id != null)
@@ -370,8 +377,8 @@ class SupplierController extends Controller
                             foreach($payment_methods_id as $payment_methods_id)
                             {
                                 $payment_methods['payment_methods_id'] = $payment_methods_id;
-                                    $payment_methods['is_primary_payment_method'] = 'no'; 
-                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                                    $payment_methods['is_primary_payment_method'] = 'no';
+                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                             }
                         }
                     }
@@ -395,7 +402,7 @@ class SupplierController extends Controller
                     {
                         if($request->file('file'))
                         {
-                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                            $headings = (new HeadingRowImport)->toArray($request->file('file'));
                             if(count($headings) > 0)
                             {
                                 foreach($headings[0] as $heading)
@@ -445,18 +452,18 @@ class SupplierController extends Controller
                     if(count($request->supplier_types) > 0)
                     {
                         $supplier_typeData['supplier_id'] = $suppliers->id;
-                        $supplier_typeData['created_by'] = $authId; 
+                        $supplier_typeData['created_by'] = $authId;
                         foreach($request->supplier_types as $supplier_typeData1)
-                        {                    
-                            $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                            $supplier_typeDataCreate = SupplierType::create($supplier_typeData);  
+                        {
+                            $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                            $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
                         }
                     }
                 }
                 $payment_methods['supplier_id'] = $suppliers->id;
-                $payment_methods['created_by'] = $authId;         
+                $payment_methods['created_by'] = $authId;
                 $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-                $payment_methods['is_primary_payment_method'] = 'yes'; 
+                $payment_methods['is_primary_payment_method'] = 'yes';
                 $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                 $payment_methods_id = $request->payment_methods_id;
                 if($payment_methods_id != null)
@@ -466,8 +473,8 @@ class SupplierController extends Controller
                         foreach($payment_methods_id as $payment_methods_id)
                         {
                             $payment_methods['payment_methods_id'] = $payment_methods_id;
-                                $payment_methods['is_primary_payment_method'] = 'no'; 
-                            $paymentMethods = SupplierAvailablePayments::create($payment_methods);  
+                                $payment_methods['is_primary_payment_method'] = 'no';
+                            $paymentMethods = SupplierAvailablePayments::create($payment_methods);
                         }
                     }
                 }
@@ -509,15 +516,15 @@ class SupplierController extends Controller
                                         }
                                     }
                                 }
-                            
-                            } 
+
+                            }
                         }
                     }
                 }
                 $data['successStore'] = true;
                 return response()->json(['success' => true,'data' => $data], 200);
             }
-        
+
         }
     }
     public function updateDetails(Request $request)
@@ -529,17 +536,17 @@ class SupplierController extends Controller
             'is_primary_payment_method' => 'required',
             'supplier_types' => 'required',
         ]);
-        if ($validator->fails()) 
+        if ($validator->fails())
         {
             return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
         }
-        else 
-        { 
+        else
+        {
             if($request->activeTab == 'uploadExcel')
-            { 
+            {
                 if($request->file('file'))
-                { 
-                    $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                {
+                    $headings = (new HeadingRowImport)->toArray($request->file('file'));
                     if(count($headings) > 0)
                     {
                         foreach($headings[0] as $heading)
@@ -548,9 +555,9 @@ class SupplierController extends Controller
                             {
                                 Excel::import(new SupplierAddonImport,request()->file('file'));
                                 $dataError = [];
-                                $rows = SupplierAddonTemp::all();                                
+                                $rows = SupplierAddonTemp::all();
                                 $existingAddon = [];
-                                for ($i=0; $i< count($rows); $i++) 
+                                for ($i=0; $i< count($rows); $i++)
                                 {
                                     $currencyError = $priceErrror = $addonError = '';
                                     if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
@@ -562,13 +569,13 @@ class SupplierController extends Controller
                                         elseif(!in_array(strtoupper($rows[$i]['currency']), ['AED','USD']))
                                         {
                                             $currencyError = "currency should be  AED or USD";
-                                        } 
-                                        if($rows[$i]['purchase_price'] == '') 
+                                        }
+                                        if($rows[$i]['purchase_price'] == '')
                                         {
                                             $priceErrror = "Purchase price field is required";
-                                        }  
+                                        }
                                         elseif(!is_numeric($rows[$i]['purchase_price']))
-                                        {   
+                                        {
                                             $priceErrror = "Purchase price should be a number";
                                         }
                                         if($rows[$i]['addon_code'] == '')
@@ -598,14 +605,14 @@ class SupplierController extends Controller
                                         }
                                         if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
                                         {
-                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]); 
+                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]);
                                         }
                                         $rows[$i]->delete();
-                                    }  
+                                    }
                                     else
                                     {
                                         $rows[$i]->delete();
-                                    }                                  
+                                    }
                                 }
                                 if(count($dataError) > 0)
                                 {
@@ -629,23 +636,23 @@ class SupplierController extends Controller
                                             $supplier_typeData['supplier_id'] = $suppliers->id;
                                             $supplier_typeData['updated_by'] = $authId;
                                             foreach($request->supplier_types as $supplier_typeData1)
-                                            { 
-                                                if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                                            {
+                                                if(!in_array($supplier_typeData1,$existingSupplierTypes))
                                                 {
-                                                    $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
-                                                }                                                              
+                                                    $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
+                                                }
                                             }
                                             foreach($existingSupplierTypes as $existingSupplierTypes1)
                                             {
-                                                if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                                                if(!in_array($existingSupplierTypes1,$request->supplier_types))
                                                 {
                                                     $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
                                                     if($deleSupType)
                                                     {
                                                         $deleSupType->delete();
                                                     }
-                                                }   
+                                                }
                                             }
                                         }
                                     }
@@ -665,25 +672,25 @@ class SupplierController extends Controller
                                             $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
                                             $paymentMethodsUpdate1['updated_by'] = $authId;
                                             foreach($payment_methods_id as $payment_methods_id1)
-                                            { 
-                                                if(!in_array($payment_methods_id1,$existingPaymentMethods)) 
+                                            {
+                                                if(!in_array($payment_methods_id1,$existingPaymentMethods))
                                                 {
-                                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;                           
-                                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no'; 
-                                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1); 
-                                                }                                                              
+                                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
+                                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
+                                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
+                                                }
                                             }
                                             foreach($existingPaymentMethods as $existingPaymentMethods1)
                                             {
 
-                                                if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+                                                if(!in_array($existingPaymentMethods1,$payment_methods_id))
                                                 {
                                                     $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
                                                     if($delSupPayMet)
                                                     {
                                                         $delSupPayMet->delete();
                                                     }
-                                                }   
+                                                }
                                             }
                                         }
                                     }
@@ -707,7 +714,7 @@ class SupplierController extends Controller
                                     {
                                         if($request->file('file'))
                                         {
-                                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                                            $headings = (new HeadingRowImport)->toArray($request->file('file'));
                                             if(count($headings) > 0)
                                             {
                                                 foreach($headings[0] as $heading)
@@ -769,23 +776,23 @@ class SupplierController extends Controller
                             $supplier_typeData['supplier_id'] = $suppliers->id;
                             $supplier_typeData['updated_by'] = $authId;
                             foreach($request->supplier_types as $supplier_typeData1)
-                            { 
-                                if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                            {
+                                if(!in_array($supplier_typeData1,$existingSupplierTypes))
                                 {
-                                    $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
-                                }                                                              
+                                    $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
+                                }
                             }
                             foreach($existingSupplierTypes as $existingSupplierTypes1)
                             {
-                                if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                                if(!in_array($existingSupplierTypes1,$request->supplier_types))
                                 {
                                     $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
                                     if($deleSupType)
                                     {
                                         $deleSupType->delete();
                                     }
-                                }   
+                                }
                             }
                         }
                     }
@@ -805,25 +812,25 @@ class SupplierController extends Controller
                             $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
                             $paymentMethodsUpdate1['updated_by'] = $authId;
                             foreach($payment_methods_id as $payment_methods_id1)
-                            { 
-                                if(!in_array($payment_methods_id1,$existingPaymentMethods)) 
+                            {
+                                if(!in_array($payment_methods_id1,$existingPaymentMethods))
                                 {
-                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;                           
-                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no'; 
-                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1); 
-                                }                                                              
+                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
+                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
+                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
+                                }
                             }
                             foreach($existingPaymentMethods as $existingPaymentMethods1)
                             {
-    
-                                if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+
+                                if(!in_array($existingPaymentMethods1,$payment_methods_id))
                                 {
                                     $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
                                     if($delSupPayMet)
                                     {
                                         $delSupPayMet->delete();
                                     }
-                                }   
+                                }
                             }
                         }
                     }
@@ -847,7 +854,7 @@ class SupplierController extends Controller
                     {
                         if($request->file('file'))
                         {
-                            $headings = (new HeadingRowImport)->toArray($request->file('file'));  
+                            $headings = (new HeadingRowImport)->toArray($request->file('file'));
                             if(count($headings) > 0)
                             {
                                 foreach($headings[0] as $heading)
@@ -885,14 +892,14 @@ class SupplierController extends Controller
                 }
             }
             elseif($request->activeTab == 'addSupplierDynamically')
-            { 
+            {
                 $input = $request->all();
                 $suppliers = Supplier::find($request->supplier_id);
                 $input['contact_number'] = $request->contact_number['full'];
                 $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
                 $input['updated_by'] = $authId;
                 $suppliers->update($input);
-               
+
                 if($request->supplier_types != null)
                 {
                     if(count($request->supplier_types) > 0)
@@ -902,23 +909,23 @@ class SupplierController extends Controller
                         $supplier_typeData['supplier_id'] = $suppliers->id;
                         $supplier_typeData['updated_by'] = $authId;
                         foreach($request->supplier_types as $supplier_typeData1)
-                        { 
-                            if(!in_array($supplier_typeData1,$existingSupplierTypes)) 
+                        {
+                            if(!in_array($supplier_typeData1,$existingSupplierTypes))
                             {
-                                $supplier_typeData['supplier_type'] = $supplier_typeData1; 
-                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData); 
-                            }                                                              
+                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
+                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
+                            }
                         }
                         foreach($existingSupplierTypes as $existingSupplierTypes1)
                         {
-                            if(!in_array($existingSupplierTypes1,$request->supplier_types)) 
+                            if(!in_array($existingSupplierTypes1,$request->supplier_types))
                             {
                                 $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
                                 if($deleSupType)
                                 {
                                     $deleSupType->delete();
                                 }
-                            }   
+                            }
                         }
                     }
                 }
@@ -938,24 +945,24 @@ class SupplierController extends Controller
                         $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
                         $paymentMethodsUpdate1['updated_by'] = $authId;
                         foreach($payment_methods_id as $payment_methods_id1)
-                        { 
-                            if(!in_array($payment_methods_id1,$existingPaymentMethods)) 
+                        {
+                            if(!in_array($payment_methods_id1,$existingPaymentMethods))
                             {
-                                $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;                           
-                                $paymentMethodsUpdate1['is_primary_payment_method'] = 'no'; 
-                                $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1); 
-                            }                                                              
+                                $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
+                                $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
+                                $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
+                            }
                         }
                         foreach($existingPaymentMethods as $existingPaymentMethods1)
                         {
-                            if(!in_array($existingPaymentMethods1,$payment_methods_id)) 
+                            if(!in_array($existingPaymentMethods1,$payment_methods_id))
                             {
                                 $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
                                 if($delSupPayMet)
                                 {
                                     $delSupPayMet->delete();
                                 }
-                            }   
+                            }
                         }
                     }
                 }
@@ -1008,14 +1015,14 @@ class SupplierController extends Controller
                                             }
                                         }
                                     }
-                                }                              
-                            } 
+                                }
+                            }
                         }
                     }
                 }
                 $data['successStore'] = true;
                 return response()->json(['success' => true,'data' => $data], 200);
-            }   
+            }
         }
     }
 }

@@ -4,6 +4,7 @@
         <h4 class="card-title"> Vehicle Picture Details</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
+    @can('vehicles-picture-view')
     <div class="card-body">
         <div class="row">
             <div class="col-lg-2 col-md-3 col-sm-12">
@@ -47,6 +48,7 @@
             </div>
         </div>
     </div>
+    @endcan
 @endsection
 
 
