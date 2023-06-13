@@ -25,6 +25,8 @@ class Supplier extends Model
     protected $appends = [
         'is_deletable'
     ];
+    public const SUPPLIER_STATUS_ACTIVE = 'active';
+    public const SUPPLIER_STATUS_INACTIVE = 'inactive';
     public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
     public function supplierAddons()
     {

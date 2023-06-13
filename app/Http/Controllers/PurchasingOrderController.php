@@ -17,7 +17,7 @@ class PurchasingOrderController extends Controller
     public function index()
     {
         $data = PurchasingOrder::with('purchasing_order_items')->get();
-        return view('warehouse.index', compact('data'));        
+        return view('warehouse.index', compact('data'));
     }
 
     /**
@@ -29,6 +29,7 @@ class PurchasingOrderController extends Controller
         ->whereHas('supplierTypes', function ($query) {
             $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
         })
+        ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
         ->get();
 
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')

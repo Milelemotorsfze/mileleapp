@@ -31,13 +31,17 @@ class SupplierController extends Controller
         $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')
             ->whereHas('supplierTypes', function ($query){
                 $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })->get();
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->get();
 
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {
              $suppliers = Supplier::with('supplierTypes')
                  ->whereHas('supplierTypes', function ($query){
                      $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-                 })->get();
+                 })
+                 ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+                 ->get();
          }
         return view('suppliers.index',compact('suppliers'));
     }
