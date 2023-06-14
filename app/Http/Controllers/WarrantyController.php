@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\MasterWarrantyPolicies;
 use App\Models\Brand;
+use App\Models\WarrantyPremiums;
+use App\Models\WarrantyBrands;
 class WarrantyController extends Controller
 {
     /**
@@ -12,7 +15,8 @@ class WarrantyController extends Controller
      */
     public function index()
     {
-        return view('warranty.index');
+        $premiums = WarrantyPremiums::with('PolicyName')->get();
+        return view('warranty.index', compact('premiums'));
     }
 
     /**
@@ -30,9 +34,36 @@ class WarrantyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($request->all());
+        $authId = Auth::id();
+        $input = $request->all();
+        $input['created_by'] = $authId;
+        $premium = WarrantyPremiums::create($input);
+        if($request->brandPrice)
+        {
+            $inputbrandPrice['created_by'] = $authId;
+            $inputbrandPrice['warranty_premiums_id'] = $premium->id;
+            if(count($request->brandPrice) > 0)
+            {
+                foreach($request->brandPrice as $brandPrice)
+                {
+                    $inputbrandPrice['price'] = $brandPrice['purchase_price'];
+                    if(isset($brandPrice['brands']))
+                    {
+                        if(count($brandPrice['brands']) > 0)
+                        {
+                            foreach($brandPrice['brands'] as $brandData)
+                            {
+                                $inputbrandPrice['brand_id'] = $brandData;
+                                $createBrandPrice = WarrantyBrands::create($inputbrandPrice);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return redirect()->route('warranty.index')->with('success','Addon created successfully');
     }
-
     /**
      * Display the specified resource.
      */
@@ -40,13 +71,17 @@ class WarrantyController extends Controller
     {
         //
     }
-
+    
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $premium = WarrantyPremiums::where('id',$id)->with('PolicyName')->first();
+        $brandPrice = WarrantyBrands::where('warranty_premiums_id',$id)->groupBy('price')->get();
+        $brands = Brand::select('id','brand_name')->get();
+        $policyNames = MasterWarrantyPolicies::select('id','name')->get();
+        return view('warranty.edit', compact('premium','brands','policyNames'));
     }
 
     /**
@@ -76,5 +111,9 @@ class WarrantyController extends Controller
         }
         $data = $data->get();
         return response()->json($data);
+    }
+    public function updateWarranty(Request $request)
+    {
+        dd($request->all());
     }
 }

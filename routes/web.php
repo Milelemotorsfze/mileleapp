@@ -92,6 +92,7 @@ Route::get('/d', function () {
     // Warranty
     Route::resource('warranty', WarrantyController::class);
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
+    Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
@@ -100,7 +101,8 @@ Route::get('/d', function () {
     Route::get('suppliers/makeActive/{id}', [SupplierController::class, 'makeActive'])->name('suppliers.makeActive');
     Route::get('suppliers/updateStatus/{id}', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
-
+    Route::get('supplier/addon/price/{id}', [SupplierController::class, 'addonprice'])->name('suppliers.addonprice');
+    // suppliers.addonprice
     // Demand & Planning Module
 
     // suppliers

@@ -109,7 +109,9 @@
                     <td>
                       <!-- @can('user-view') -->
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                      <!-- @endcan -->
+                        <a data-toggle="popover" data-trigger="hover" title="Addon Price" data-placement="top" class="btn btn-sm btn-warning" href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
+
+                        <!-- @endcan -->
                       <!-- @can('user-edit') -->
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                       <!-- @endcan -->

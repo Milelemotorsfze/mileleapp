@@ -1,0 +1,714 @@
+@extends('layouts.main')
+<style>
+    .error
+    {
+        color: #FF0000;
+    }
+    input:focus 
+    {
+        border-color: #495057!important;
+    }
+    select:focus 
+    {
+        border-color: #495057!important;
+    }
+    .widthinput
+    {
+        height:32px!important;
+    }
+    .paragraph-class
+    {
+        color: red;
+        font-size:11px;
+    }
+    .overlay
+    {
+        position: fixed; /* Positioning and size */
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(128,128,128,0.5); /* color */
+        display: none; /* making it hidden by default */
+    }
+</style>
+@section('content')
+    <div class="card-header">
+        <h4 class="card-title">Edit Warranty</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    </div>
+    <div class="card-body">
+        <form id="createWarrantyForm" name="createWarrantyForm" method="POST" enctype="multipart/form-data" action="{{ route('warranty.updateWarranty') }}">
+            @csrf
+            <div class="row">
+                <p><span style="float:right;" class="error">* Required Field</span></p>     
+                <input name="id" value="{{ $premium->id}}" hidden>         
+                <div class="row">
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Policy Name') }}</label>
+                        <select name="warranty_policies_id" id="warranty_policies_id" class="form-control" autofocus>
+                            @foreach($policyNames as $policyName)
+                                <option value="{{$policyName->id}}" {{$policyName->id == $premium->warranty_policies_id  ? 'selected' : ''}}>{{$policyName->name}}</option>
+                            @endforeach
+                        </select>               
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 1') }}</label>
+                        <select name="vehicle_category1" id="vehicle_category1" class="form-control" autofocus>
+                                <option value="non_electric" {{"non_electric" == $premium->vehicle_category1  ? 'selected' : ''}}>Non Electric</option>
+                                <option value="electric" {{"electric" == $premium->vehicle_category1  ? 'selected' : ''}}>Electric</option>
+                        </select> 
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 2') }}</label>
+                        <select name="vehicle_category2" id="vehicle_category2" class="form-control" autofocus>
+                            <option value="normal_and_premium" {{"normal_and_premium" == $premium->vehicle_category2  ? 'selected' : ''}}>Normal And Premium</option>
+                            <option value="lux_sport_exotic" {{"lux_sport_exotic" == $premium->vehicle_category2  ? 'selected' : ''}}>Lux/Sport/Exotic</option>
+                        </select> 
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Years') }}</label>
+                        <div class="input-group">
+                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" value="{{ $premium->eligibility_year }}" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Years</span>
+                            </div>
+                            <span id="EligibilityYearsError" class="invalid-feedback"></span>      
+                        </div>            
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Mileage') }}</label>
+                        <div class="input-group">
+                            <input name="eligibility_milage" id="eligibility_milage" onkeyup="validationOnKeyUp(this)" value="{{ $premium->eligibility_milage }}" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Mileage" aria-label="measurement" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">KM</span>
+                            </div>                           
+                            <span id="EligibilityMileageError" class="invalid-feedback"></span>
+                        </div> 
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Is Open Mileage') }}</label>
+                        <fieldset>
+                            <div class="row some-class">
+                                <div class="col-xxl-6 col-lg-6 col-md-6">
+                                    <input type="radio" class="radioFixingCharge" name="is_open_milage" value="yes" id="yes" {{"yes" == $premium->is_open_milage  ? 'checked' : ''}} />
+                                    <label for="yes">Yes</label>
+                                </div>
+                                <div class="col-xxl-6 col-lg-6 col-md-6">
+                                    <input type="radio" class="radioFixingCharge" name="is_open_milage" value="no" id="no" {{"no" == $premium->is_open_milage  ? 'checked' : ''}} />
+                                    <label for="no">No</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Period') }}</label>
+                        <div class="input-group">
+                            <input name="extended_warranty_period" id="extended_warranty_period" onkeyup="validationOnKeyUp(this)" value="{{ $premium->extended_warranty_period }}" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Extended Warranty Period" aria-label="measurement" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">Months</span>
+                            </div>
+                            <span id="ExtendedWarrantyPeriodError" class="invalid-feedback"></span>     
+                        </div>                  
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
+                        <div class="input-group">
+                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" value="{{ $premium->claim_limit_in_aed }}" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">AED</span>
+                            </div>                                   
+                            <span id="ClaimLimitError" class="invalid-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4" id="ExtendedWarrantyMileageDiv" hidden>
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Mileage') }}</label>
+                        <div class="input-group">
+                            <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)" value="{{ $premium->extended_warranty_milage }}" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="basic-addon2">KM</span>
+                            </div>                         
+                            <span id="ExtendedWarrantyMilageError" class="invalid-feedback"></span>   
+                        </div>                  
+                    </div>
+                </div>
+            </div>
+            </br>
+            <div class="card"  id="kitSupplier" >
+                <div class="card-header">
+                    <center>
+                        <h4 class="card-title">Purchase Prices</h4>
+                    </center>
+                </div>
+                <div class="card-body">
+                    <div class="form_field_outer">
+                        <div class="row form_field_outer_row">
+                            <div class="col-xxl-9 col-lg-8 col-md-8">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
+                                <select name="brandPrice[1][brands][]" id="brands1" multiple="true" style="width: 100%;"  class="form-control" autofocus>
+                                    @foreach($brands as $brand)
+                                        <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                    @endforeach   
+                                </select>                      
+                                <span id="Brand1Error" class="invalid-feedback"></span>
+                            </div>                                      
+                            <div class="col-xxl-2 col-lg-3 col-md-3">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>                                 
+                                    <span id="Price1Error" class="invalid-feedback"></span>
+                                </div>  
+                            </div>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                        <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit">
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add
+                        </a> 
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary btn-sm" id="submit" style="float:right;">Submit</button>
+            </div>    
+        </form>
+    </div> 
+    <div class="overlay"></div>
+    <script type="text/javascript"> 
+    var oldSelectedBrands = [];
+    var selectedBrands = [];
+    var totalRow = 1;
+    var filteredArray = [];
+    var IsOpenMileage = 'yes';
+    var sites = {!! json_encode($premium->toArray()) !!};
+    $(document).ready(function ()
+    {
+        if(sites.is_open_milage == 'no')
+        {
+            showExtendedWarrantyMileage();
+        }
+        $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
+        // $('#brands1').select2();
+        $('#brands1').select2({
+            allowClear: true,
+            minimumResultsForSearch: -1,
+            templateResult: hideSelected,
+        });
+        $("#brands1").data('originalvalues', []);
+        $("#brands1").on('change', function(e) 
+        {
+            var that = this;
+            removed = []
+            $($(this).data('originalvalues')).each(function(k, v) 
+            {
+                if (!$(that).val()) 
+                {
+                    removed[removed.length] = v;
+                    return false;
+                }
+                if ($(that).val().indexOf(v) == -1) 
+                {
+                    removed[removed.length] = v;
+                    $.each(removed, function( ind, value ) 
+                    {
+                        filteredArray = selectedBrands.filter(function(e) { return e !== value })
+                    });
+                    $.ajax
+                    ({
+                        url:"{{url('getBranchForWarranty')}}",
+                        type: "POST",
+                        data:
+                        {
+                            filteredArray: filteredArray,
+                            _token: '{{csrf_token()}}'
+                        },
+                        dataType : 'json',
+                        success: function(data)
+                        { 
+                            myarray = data;
+                            var size= myarray.length;
+                            if(size >= 1)
+                            {
+                                let brandDropdownData   = [];
+                                $.each(data,function(key,value)
+                                {
+                                    brandDropdownData.push
+                                    ({
+                                        id: value.id,
+                                        text: value.brand_name
+                                    });
+                                });
+                                for(let i=1; i<=totalRow; i++)
+                                {
+                                    var brandRowID = "brands"+i;
+                                    var brandRowSelectedValue = [];
+                                    if(brandRowID != "brands1")
+                                    {
+                                        var brandRowSelectedValue = $("#brands"+i).val();
+                                        $('#'+brandRowID).html("");
+                                        $('#'+brandRowID).select2
+                                        ({
+                                            placeholder: 'Select value',
+                                            allowClear: true,
+                                            data: brandDropdownData,
+                                            minimumResultsForSearch: -1,
+                                            templateResult: hideSelected,
+                                        });
+                                        // $("#"+brandRowID).val(brandRowSelectedValue).trigger('change');
+                                    }
+                                }    
+                            }
+                        }
+                    });
+                    for(let i=1; i<=totalRow; i++)
+                    {
+                        var brandRowID = "brands"+i;
+                        if(brandRowID != "brands1")
+                        {
+
+                        }
+                    }
+                }
+            });
+            if ($(this).val()) 
+            {
+                $(this).data('originalvalues', $(this).val());
+            } 
+            else 
+            {
+                $(this).data('originalvalues', []);
+            }
+            if(removed != '')
+            {
+                for(let i=1; i<=totalRow; i++)
+                {
+                    var brandRowID = "brands"+i;
+                    if(brandRowID != "brands1")
+                    {
+                        $('#'+brandRowID+' option[value='+removed+']').detach();
+                    }
+                }
+                selectedBrands = $(this).val();
+            }
+            else
+            {
+                selectedBrands = $(this).val();
+                var diff = $(selectedBrands).not(oldSelectedBrands).get();
+                for(let i=1; i<=totalRow; i++)
+                {
+                    var brandRowID = "brands"+i;
+                    if(brandRowID != "brands1")
+                    {
+                       
+                        $('#'+brandRowID+' option[value='+diff+']').detach();
+                    }
+                }
+                oldSelectedBrands = selectedBrands;
+            }   
+        });
+    }); 
+     
+    $('body').on('submit', '#createWarrantyForm', function (e) 
+    {
+        var inputEligibilityYears = $('#eligibility_year').val();
+        var inputEligibilityMileage = $('#eligibility_milage').val();
+        var inputExtendedWarrantyPeriod = $('#extended_warranty_period').val();
+        var inputClaimLimit = $('#claim_limit_in_aed').val();
+        var inputBrands1 = $('#brands1').val();
+        var inputPurchasePrice1 = $('#purchase_price1').val();
+        // var formInputError = false;
+        if(inputEligibilityYears == '')
+        {
+            $msg = "Eligibility Years is required";
+            showEligibilityYearsError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputEligibilityMileage == '')
+        {
+            $msg = "Eligibility Mileage is required";
+            showEligibilityMileageError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputExtendedWarrantyPeriod == '')
+        {
+            $msg = "Extended Warranty Period is required";
+            showExtendedWarrantyPeriodError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputClaimLimit == '')
+        {
+            $msg = "Claim Limit is required";
+            showClaimLimitError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(IsOpenMileage == 'no')
+        {
+            var inputExtendedWarrantyMilage = $('#extended_warranty_milage').val();
+            if(inputExtendedWarrantyMilage == '')
+            {
+                $msg = "Extended Warranty Milage is required";
+                showExtendedWarrantyMilageError($msg);
+                formInputError = true;
+                e.preventDefault();
+            }
+        }
+        if(inputBrands1 == '')
+        {
+            $msg = "Brand is required";
+            showBrand1Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputPurchasePrice1 == '')
+        {
+            $msg = "Price is required";
+            showPrice1Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        // if(formInputError == false)
+        // {
+        //     var actionType = $('#submit').val();
+        //     var formData = new FormData(this);
+        //     $('#submit').html('Sending..');
+        //     $('.overlay').show();
+        //     $.ajax({
+        //     type:'POST',
+        //     url: "{{ route('warranty.store') }}",
+        //     data: formData,
+        //     cache:false,
+        //     contentType: false,
+        //     processData: false,
+        //     success: (result) => 
+        //     {
+        //         console.log(result)
+        //             // let dataErrorCard = document.getElementById('dataErrorCard');
+        //             // dataErrorCard.hidden = true
+        //             // if(result.data.successStore)
+        //             // {
+        //             //     document.location.href="{{route('suppliers.index') }}";
+        //             // }
+        //         },
+        //         });
+        // }
+    });
+    function clickAdd()
+    {  
+        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;  
+        var selectedBrands = [];       
+        for(let i=1; i<index; i++)
+        {
+            var eachSelectedBrand = $("#brands"+i).val();
+            $.each(eachSelectedBrand, function( ind, value ) 
+            {
+                selectedBrands.push(value);
+            });  
+        } 
+        $.ajax
+        ({
+            url:"{{url('getBranchForWarranty')}}",
+            type: "POST",
+            data:
+            {
+                filteredArray: selectedBrands,
+                _token: '{{csrf_token()}}'
+            },
+            dataType : 'json',
+            success: function(data)
+            { 
+                myarray = data;
+                var size= myarray.length;
+                if(size >= 1)
+                {
+                    $(".form_field_outer").append(`
+                        <div class="row form_field_outer_row">
+                            <div class="col-xxl-9 col-lg-8 col-md-8">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" multiple="true" style="width: 100%;"  class="form-control" autofocus>
+                                    
+                                </select>                      
+                                <span id="supplierError" class="invalid-feedback"></span>
+                            </div>                                      
+                            <div class="col-xxl-2 col-lg-3 col-md-3">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>                                   
+                                <span id="supplierError" class="invalid-feedback"></span>
+                            </div>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `); 
+                    $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); 
+                    $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
+                    let brandDropdownData   = [];
+                    $.each(data,function(key,value)
+                    {
+                        brandDropdownData.push
+                        ({
+                            id: value.id,
+                            text: value.brand_name
+                        });
+                    });
+                    $('#brands'+index).html("");
+                    $('#brands'+index).select2
+                    ({
+                        placeholder: 'Select value',
+                        allowClear: true,
+                        data: brandDropdownData,
+                        minimumResultsForSearch: -1,
+                        templateResult: hideSelected,
+                    });
+                }
+            }
+        });
+    } 
+     function validationOnKeyUp(clickInput)
+    {
+        if(save == 2)
+        {
+            if(clickInput.id == 'eligibility_year')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Eligibility Years is required";
+                    showEligibilityYearsError($msg);
+                }
+                else
+                {
+                    removeEligibilityYearsError();
+                }
+            }
+            if(clickInput.id == 'eligibility_milage')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Eligibility Mileage is required";
+                    showEligibilityMileageError($msg);
+                }
+                else
+                {
+                    removeEligibilityMileageError();
+                }
+            }
+            if(clickInput.id == 'extended_warranty_period')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Extended Warranty Period is required";
+                    showExtendedWarrantyPeriodError($msg);
+                }
+                else
+                {
+                    removeExtendedWarrantyPeriodError();
+                }
+            }
+            if(clickInput.id == 'claim_limit_in_aed')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Claim Limit is required";
+                    showClaimLimitError($msg);
+                }
+                else
+                {
+                    removeClaimLimitError();
+                }
+            }
+            if(clickInput.id == 'extended_warranty_milage')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Extended Warranty Milage is required";
+                    showExtendedWarrantyMilageError($msg);
+                }
+                else
+                {
+                    removeExtendedWarrantyMilageError();
+                }
+            }
+            if(clickInput.id == 'purchase_price1')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Purchase Price is required";
+                    showPrice1Error($msg);
+                }
+                else
+                {
+                    removePrice1Error();
+                }
+            } 
+            if(clickInput.id == 'brands1')
+            {
+                value = $('#brands1').val(); 
+                if(value == '')
+                {
+                    $msg = "Brand is required";
+                    showBrand1Error($msg);
+                }
+                else
+                {
+                    removeBrand1Error();
+                }
+            }
+        }
+    }   
+    function setDropdownValue(index)
+    {
+        $("#brands"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
+        $('#brands'+index).select2({
+            allowClear: true,
+            minimumResultsForSearch: -1,
+            templateResult: hideSelected,
+        });
+    }
+    function hideSelected(value) 
+    {
+        if (value && !value.selected) {
+            return $('<span>' + value.text + '</span>');
+        } 
+    }
+    $('.radioFixingCharge').click(function()
+    {
+        IsOpenMileage = $(this).val();
+        if($(this).val() == 'yes')
+        {
+            hideExtendedWarrantyMileage();  
+        }
+        else
+        {
+            showExtendedWarrantyMileage();
+        }
+    });
+    function showExtendedWarrantyMileage()
+    {
+        let showExtendedWarrantyMilage = document.getElementById('ExtendedWarrantyMileageDiv');
+        showExtendedWarrantyMilage.hidden = false
+    }
+    function hideExtendedWarrantyMileage()
+    {
+        let showExtendedWarrantyMilage = document.getElementById('ExtendedWarrantyMileageDiv');
+        showExtendedWarrantyMilage.hidden = true
+    }
+    function showEligibilityYearsError($msg)
+    {
+        document.getElementById("EligibilityYearsError").textContent=$msg;
+        document.getElementById("eligibility_year").classList.add("is-invalid");
+        document.getElementById("EligibilityYearsError").classList.add("paragraph-class");
+    }
+    function removeEligibilityYearsError()
+    {
+        document.getElementById("EligibilityYearsError").textContent="";
+        document.getElementById("eligibility_year").classList.remove("is-invalid");
+        document.getElementById("EligibilityYearsError").classList.remove("paragraph-class");
+    }
+    function showEligibilityMileageError($msg)
+    {
+        document.getElementById("EligibilityMileageError").textContent=$msg;
+        document.getElementById("eligibility_milage").classList.add("is-invalid");
+        document.getElementById("EligibilityMileageError").classList.add("paragraph-class");
+    }
+    function removeEligibilityMileageError()
+    {
+        document.getElementById("EligibilityMileageError").textContent="";
+        document.getElementById("eligibility_milage").classList.remove("is-invalid");
+        document.getElementById("EligibilityMileageError").classList.remove("paragraph-class");
+    }
+    function showExtendedWarrantyPeriodError($msg)
+    {
+        document.getElementById("ExtendedWarrantyPeriodError").textContent=$msg;
+        document.getElementById("extended_warranty_period").classList.add("is-invalid");
+        document.getElementById("ExtendedWarrantyPeriodError").classList.add("paragraph-class");
+    }
+    function removeExtendedWarrantyPeriodError()
+    {
+        document.getElementById("ExtendedWarrantyPeriodError").textContent="";
+        document.getElementById("extended_warranty_period").classList.remove("is-invalid");
+        document.getElementById("ExtendedWarrantyPeriodError").classList.remove("paragraph-class");
+    }
+    function showClaimLimitError($msg)
+    {
+        document.getElementById("ClaimLimitError").textContent=$msg;
+        document.getElementById("claim_limit_in_aed").classList.add("is-invalid");
+        document.getElementById("ClaimLimitError").classList.add("paragraph-class");
+    }
+    function removeClaimLimitError()
+    {
+        document.getElementById("ClaimLimitError").textContent="";
+        document.getElementById("claim_limit_in_aed").classList.remove("is-invalid");
+        document.getElementById("ClaimLimitError").classList.remove("paragraph-class");
+    }
+    function showExtendedWarrantyMilageError($msg)
+    {
+        document.getElementById("ExtendedWarrantyMilageError").textContent=$msg;
+        document.getElementById("extended_warranty_milage").classList.add("is-invalid");
+        document.getElementById("ExtendedWarrantyMilageError").classList.add("paragraph-class");
+    }
+    function removeExtendedWarrantyMilageError()
+    {
+        document.getElementById("ExtendedWarrantyMilageError").textContent="";
+        document.getElementById("extended_warranty_milage").classList.remove("is-invalid");
+        document.getElementById("ExtendedWarrantyMilageError").classList.remove("paragraph-class");
+    }
+    function showBrand1Error($msg)
+    {
+        document.getElementById("Brand1Error").textContent=$msg;
+        document.getElementById("brands1").classList.add("is-invalid");
+        document.getElementById("Brand1Error").classList.add("paragraph-class");
+    }
+    function removeBrand1Error()
+    {
+        document.getElementById("Brand1Error").textContent="";
+        document.getElementById("brands1").classList.remove("is-invalid");
+        document.getElementById("Brand1Error").classList.remove("paragraph-class");
+    }
+    function showPrice1Error($msg)
+    {
+        document.getElementById("Price1Error").textContent=$msg;
+        document.getElementById("purchase_price1").classList.add("is-invalid");
+        document.getElementById("Price1Error").classList.add("paragraph-class");
+    }
+    function removePrice1Error()
+    {
+        document.getElementById("Price1Error").textContent="";
+        document.getElementById("purchase_price1").classList.remove("is-invalid");
+        document.getElementById("Price1Error").classList.remove("paragraph-class");
+    }
+</script>    
+@endsection

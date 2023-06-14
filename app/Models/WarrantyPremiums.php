@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class WarrantyPremiums extends Model
 {
     use HasFactory;
-    protected $table = "master_model_descriptions";
+    protected $table = "warranty_premiums";
     protected $fillable = [
         'warranty_policies_id',
         'vehicle_category1',
@@ -23,6 +23,13 @@ class WarrantyPremiums extends Model
         'created_by',
         'updated_by',
         'deleted_by',
-
     ];
+    public function PolicyName()
+    {
+        return $this->hasOne(MasterWarrantyPolicies::class,'id','warranty_policies_id');
+    }
+    public function BrandPrice()
+    {
+        return $this->hasMany(WarrantyBrands::class,'warranty_premiums_id','id');
+    }
 }

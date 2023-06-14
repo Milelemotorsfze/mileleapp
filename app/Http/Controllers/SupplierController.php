@@ -46,6 +46,11 @@ class SupplierController extends Controller
     /**
      * Display the specified resource.
      */
+    public function addonprice($id)
+    {
+        $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
+        return view('suppliers.addonprice',compact('supplierAddons'));
+    }
     public function show(Supplier $supplier)
     {
         $addon1 = $addons = $supplierTypes = '';
