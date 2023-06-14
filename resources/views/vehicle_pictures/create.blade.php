@@ -68,9 +68,11 @@
                         </div>
                     </div>
                     </br>
+                    @can('vehicles-picture-create')
                     <div class="col-12 text-center">
                         <button type="submit" class="btn btn-dark">Submit</button>
                     </div>
+                    @endcan
                 </div>
             </div>
         </form>

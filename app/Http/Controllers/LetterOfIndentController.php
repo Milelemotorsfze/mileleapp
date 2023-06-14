@@ -51,6 +51,7 @@ class LetterOfIndentController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
         $approvalPendingLOIs = LetterOfIndent::orderBy('id','DESC')
@@ -89,6 +90,7 @@ class LetterOfIndentController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
         return view('letter_of_indents.create',compact('countries','customers','suppliers'));
     }
@@ -235,6 +237,7 @@ class LetterOfIndentController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
         return view('letter_of_indents.edit', compact('countries','customers','letterOfIndent','suppliers'));

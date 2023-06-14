@@ -21,7 +21,8 @@ class PFIController extends Controller
      */
     public function index()
     {
-        //
+        $pfis = PFI::all();
+        return view('pfi.index', compact('pfis'));
     }
 
     /**
@@ -126,6 +127,8 @@ class PFIController extends Controller
         }
 
         $signedFileName = 'signed_'.time().'.'.$extension;
+        $pdf->pfi_document_with_sign = $signedFileName;
+        $pdf->save();
         $pdf->Output( public_path($destination.'/'.$signedFileName), 'F');
         $pdf->Output();
 //        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');

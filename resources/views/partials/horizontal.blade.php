@@ -74,6 +74,190 @@
                             <span data-key="t-extra-pages">Dashboard</span>
                         </a>
                     </li>
+                    @can('user-view')
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Addons</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Addons</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">List Addons </span>
+                                    <div class="arrow-down"></div>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                    <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
+                                    <!-- <a href="{{route('addon.list','D')}}" class="dropdown-item" data-key="t-login">Documentation</a>
+                                    <a href="{{route('addon.list','DP')}}" class="dropdown-item" data-key="t-login">Documentation On Purchase</a>
+                                    <a href="{{route('addon.list','E')}}" class="dropdown-item" data-key="t-login">Others</a>
+                                    <a href="{{route('addon.list','S')}}" class="dropdown-item" data-key="t-login">Shipping Cost</a> -->
+                                    <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
+                                    <a href="{{route('addon.list','W')}}" class="dropdown-item" data-key="t-login">Warranty</a>
+                                    <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kit</a>
+                                    <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    @endcan
+                    @can('demand-create')
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i>
+                                <span data-key="t-extra-pages">Demand & Planning</span>
+                                <div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                @can('demand-planning-supplier-list')
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}"
+                                       id="topnav-auth" role="button" >
+                                        <span data-key="t-authentication">Supplier</span>
+                                    </a>
+                                </div>
+                                @endcan
+                                @can('demand-create')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Demand</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                        </div>
+                                    </div>
+                                @endcan
+                                @can('supplier-inventory-list')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Supplier Inventory</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                            <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
+                                            <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                        </div>
+                                    </div>
+                                @endcan
+                                @can('LOI-list')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">LOI</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            @can('LOI-list')
+                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
+                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
+                                            @endcan
+                                        </div>
+                                    </div>
+                                @endcan
+                                @can('PFI-list')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('pfi.index') }}"
+                                           id="topnav-auth" role="button" >
+                                            <span data-key="t-authentication">PFI</span>
+                                        </a>
+                                    </div>
+                                @endcan
+
+                            </div>
+                        </li>
+                    @endcan
+                    @can('user-view')
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Warranty</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Warranty</span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Warranty Info </span>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    @endcan
+                    @can('Calls-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
+                            <i data-feather="phone-call"></i>
+                            <span data-key="t-extra-pages">Messages & Calls</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('warehouse-view')
+                    @can('View-daily-movemnets')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movements.index') }}" id="topnav-more" role="button">
+                            <i data-feather="command"></i>
+                            <span data-key="t-extra-pages">Movements</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('view-po-details')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
+                            <i data-feather="award"></i>
+                            <span data-key="t-extra-pages">Purchasing Order</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('view-po-details')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
+                            <i data-feather="sliders"></i>
+                            <span data-key="t-extra-pages">Stocks</span>
+                        </a>
+					</li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
+                            <i data-feather="sliders"></i>
+                            <span data-key="t-extra-pages">Supplier</span>
+                        </a>
+					</li>
+                    @endcan
+                    @endcan
+                    @can('variants-view')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i>
+                            <span data-key="t-extra-pages">Add Pictures & Videos</span>
+                        </a>
+					</li>
+                    @endcan
+                    @can('sales-view')
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i>
+                            <span data-key="t-extra-pages">Leads</span>
+                        </a>
+                    </li>
+                    @endcan
+                    @can('vehicles-picture-list')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
+                            <i data-feather="film"></i>
+                            <span data-key="t-extra-pages">Vehicle Pictures</span>
+                        </a>
+                    </li>
+                    @endcan
                     @can('user-create')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
@@ -166,181 +350,6 @@
                         </div>
                     </li>
                     @endcan
-                    @can('user-view')
-                    <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Addons</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Addons</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">List Addons </span>
-                                    <div class="arrow-down"></div>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
-                                    <!-- <a href="{{route('addon.list','D')}}" class="dropdown-item" data-key="t-login">Documentation</a>
-                                    <a href="{{route('addon.list','DP')}}" class="dropdown-item" data-key="t-login">Documentation On Purchase</a>
-                                    <a href="{{route('addon.list','E')}}" class="dropdown-item" data-key="t-login">Others</a>
-                                    <a href="{{route('addon.list','S')}}" class="dropdown-item" data-key="t-login">Shipping Cost</a> -->
-                                    <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
-                                    <a href="{{route('addon.list','W')}}" class="dropdown-item" data-key="t-login">Warranty</a>
-                                    <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kit</a>
-                                    <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    @endcan
-                    @can('user-view')
-                    <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Warranty</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Warranty</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Warranty Info </span>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    @endcan
-                    @can('Calls-view')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
-                            <i data-feather="phone-call"></i>
-                            <span data-key="t-extra-pages">Messages & Calls</span>
-                        </a>
-					</li>
-                    @endcan
-                    @can('warehouse-view')
-                    @can('View-daily-movemnets')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movements.index') }}" id="topnav-more" role="button">
-                            <i data-feather="command"></i>
-                            <span data-key="t-extra-pages">Movements</span>
-                        </a>
-					</li>
-                    @endcan
-                    @can('view-po-details')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
-                            <i data-feather="award"></i>
-                            <span data-key="t-extra-pages">Purchasing Order</span>
-                        </a>
-					</li>
-                    @endcan
-                    @can('view-po-details')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
-                            <i data-feather="sliders"></i>
-                            <span data-key="t-extra-pages">Stocks</span>
-                        </a>
-					</li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
-                            <i data-feather="sliders"></i>
-                            <span data-key="t-extra-pages">Supplier</span>
-                        </a>
-					</li>
-                    @endcan
-                    @endcan
-                    @can('variants-view')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
-                            <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Add Pictures & Videos</span>
-                        </a>
-					</li>
-                    @endcan
-                    @can('sales-view')
-                    <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
-                            <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Leads</span>
-                        </a>
-                    </li>
-                    @endcan
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
-                            <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Vehicle Pictures</span>
-                        </a>
-                    </li>
-                    @can('demand-create')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                                <i data-feather="file-text"></i>
-                                <span data-key="t-extra-pages">Demand & Planning</span>
-                                <div class="arrow-down"></div>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}"
-                                       id="topnav-auth" role="button" >
-                                        <span data-key="t-authentication">Supplier</span>
-                                    </a>
-                                </div>
-                                @can('demand-create')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Demand</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
-                                        </div>
-                                    </div>
-                                @endcan
-                                @can('LOI-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">LOI</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            @can('LOI-create')
-                                                <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
-                                            @endcan
-                                            @can('LOI-list')
-                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
-                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
-                                            @endcan
-                                        </div>
-                                    </div>
-                                @endcan
-                                @can('supplier-inventory-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Supplier Inventory</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
-                                            <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
-                                            <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
-                                        </div>
-                                    </div>
-                                @endcan
-                            </div>
-                        </li>
-                    @endcan
-                    
                     @can('HR-view')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('hiring.index') }}" id="topnav-more" role="button">
@@ -358,7 +367,7 @@
                         </a>
 					</li>
                     @endcan
-                
+
                 </ul>
             </div>
         </nav>

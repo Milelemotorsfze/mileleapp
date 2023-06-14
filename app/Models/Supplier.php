@@ -22,6 +22,11 @@ class Supplier extends Model
         'deleted_by',
         'status'
     ];
+    protected $appends = [
+        'is_deletable'
+    ];
+    public const SUPPLIER_STATUS_ACTIVE = 'active';
+    public const SUPPLIER_STATUS_INACTIVE = 'inactive';
     public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
     public function supplierAddons()
     {
@@ -34,5 +39,19 @@ class Supplier extends Model
     public function paymentMethods()
     {
         return $this->hasMany(SupplierAvailablePayments::class,'supplier_id','id');
+    }
+    public function getIsDeletableAttribute()
+    {
+        $supplierInventories = SupplierInventory::where('supplier_id', $this->id)->count();
+        if($supplierInventories <= 0) {
+            $demands = Demand::where('supplier_id', $this->id)->count();
+            if($demands <= 0) {
+                $letterOfIndents = LetterOfIndent::where('supplier_id', $this->id)->count();
+                if($letterOfIndents <= 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SalesPersonLanguagesController;
+use App\Http\Controllers\VariantController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;

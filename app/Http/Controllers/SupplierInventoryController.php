@@ -33,6 +33,7 @@ class SupplierInventoryController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
         return view('supplier_inventories.edit', compact('suppliers'));
 
@@ -557,6 +558,7 @@ class SupplierInventoryController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
         return view('supplier_inventories.file_comparision',compact('suppliers',
@@ -573,6 +575,7 @@ class SupplierInventoryController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
         $newlyAddedRows = [];
         $deletedRows = [];

@@ -7,8 +7,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: rgba(128,128,128,0.5); 
-    display: none; 
+    background-color: rgba(128,128,128,0.5);
+    display: none;
     opacity:0.5;
   }
 </style>
@@ -18,18 +18,17 @@
     <h4 class="card-title">
       Suppliers Info
     </h4>
-    <!-- @can('user-create') -->
+   @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New Supplier
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <div class="clearfix"></div>
       <br>
-    <!-- @endcan -->      
+      @endcanany
   </div>
   <div class="tab-content">
-    <!-- @can('user-list-active') -->
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="suppliersList" class="table table-striped table-editable table-edits table">
@@ -37,6 +36,7 @@
                 <tr>
                   <th>No</th>
                   <th>Name</th>
+                  @can('addon-supplier-list')
                   <th>Email</th>
                   <th>contact Number</th>
                   <th>Alternative Contact</th>
@@ -45,6 +45,7 @@
                   <th>Supplier Type</th>
                   <th>Primary Payment Method</th>
                   <th>Other Payment Methods</th>
+                    @endcan
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -55,6 +56,7 @@
                   <tr data-id="1">
                     <td>{{ ++$i }}</td>
                     <td>{{ $supplier->supplier }}</td>
+                      @can('addon-supplier-list')
                     <td>{{ $supplier->email }}</td>
                     <td>{{ $supplier->contact_number }}</td>
                     <td>{{ $supplier->alternative_contact_number }}</td>
@@ -99,6 +101,7 @@
                         @endforeach
                       @endif
                     </td>
+                      @endcan
                     <td>
                       @if($supplier->status == 'active')
                         <label class="badge badge-soft-success">{{ $supplier->status }}</label>
@@ -107,46 +110,48 @@
                       @endif
                     </td>
                     <td>
-                      <!-- @can('user-view') -->
-                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                        <a data-toggle="popover" data-trigger="hover" title="Addon Price" data-placement="top" class="btn btn-sm btn-warning" href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus-square" aria-hidden="true"></i></a>
-
-                        <!-- @endcan -->
-                      <!-- @can('user-edit') -->
-                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                      <!-- @endcan -->
-                      <!-- @can('user-delete') -->
-                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
-                          <div class="overlay"> </div>                       
-                          <div class="modal" id="deleteSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Delete Supplier </h5>
-                                  <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                      <h5 class="modal-paragraph"> Are you sure,</h5>
-                                      <h6 class="modal-paragraph"> You want to delete the supplier ?</h6>
+                        @can('addon-supplier-view')
+                           <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
+                              href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                        @endcan
+                        @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
+                            <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                                href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        @endcanany
+                        @can('addon-supplier-delete')
+                        @if($supplier->is_deletable)
+                            <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                              <div class="overlay"> </div>
+                              <div class="modal" id="deleteSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Delete Supplier </h5>
+                                      <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
+                                        <span aria-hidden="true">X</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <div class="row modal-row">
+                                        <div class="col-xxl-12 col-lg-12 col-md-12">
+                                          <h5 class="modal-paragraph"> Are you sure,</h5>
+                                          <h6 class="modal-paragraph"> You want to delete the supplier ?</h6>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <!-- <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button> -->
+                                      <a href="{{ route('suppliers.delete',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                                     </div>
                                   </div>
                                 </div>
-                                <div class="modal-footer">
-                                  <!-- <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button> -->
-                                  <a href="{{ route('suppliers.delete',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
-                                </div>
                               </div>
-                            </div>
-                          </div>
-                      <!-- @endcan -->
-                      <!-- @can('user-make-inactive') -->
+                          @endif
+                        @endcan
+{{--                      <!-- @can('supplier-active-inactive') -->--}}
                       @if($supplier->status == 'active')
                         <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div>  
+                        <div class="overlay"> </div>
                         <div class="modal" id="makeInactiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
@@ -173,7 +178,7 @@
                           </div>
                         @elseif($supplier->status == 'inactive')
                         <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveSupplier{{$supplier->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div> 
+                        <div class="overlay"> </div>
                         <div class="modal" id="makeActiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                               <div class="modal-content">
@@ -199,24 +204,24 @@
                             </div>
                           </div>
                         @endif
-                      <!-- @endcan                               -->
-                    </td>                
+{{--                      <!-- @endcan                               -->--}}
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
-        </div>  
-      </div>  
-    <!-- @endcan       -->
+          </div>
+        </div>
+      </div>
+{{--    <!-- @endcan       -->--}}
       </div><!-- end tab-content-->
     </div>
   </div>
- 
-  
 
 
-  
+
+
+
   <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -227,7 +232,7 @@
         var modalId = $(this).data('modal-id');
         $('#' + modalId).addClass('modalshow');
         $('#' + modalId).removeClass('modalhide');
-        
+
         $('.overlay').show();
         table.destroy();
       });
@@ -286,4 +291,4 @@
             top: 0;
         }
 </style> -->
-   
+

@@ -25,6 +25,7 @@ class DemandController extends Controller
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
         return view('demands.create', compact('suppliers'));
     }
