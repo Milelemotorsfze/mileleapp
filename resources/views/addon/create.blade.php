@@ -202,10 +202,15 @@
                     </br>
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price ( AED )') }}</label>
+                            <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="purchase_price" type="text" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" readonly>
+                        <div class="input-group">
+                        <input id="purchase_price" type="text" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" readonly>
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -213,10 +218,15 @@
                             @enderror
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price ( AED )') }}</label>
+                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="selling_price" type="number" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+                        <div class="input-group">
+                        <input id="selling_price" type="number" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                             @error('selling_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -319,7 +329,7 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control widthinput @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" autofocus></textarea>
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" autofocus></textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

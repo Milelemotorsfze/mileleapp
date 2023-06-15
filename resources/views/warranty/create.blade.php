@@ -46,7 +46,7 @@
                 <div class="row">
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Policy Name') }}</label>
-                        <select name="warranty_policies_id" id="warranty_policies_id" class="form-control" autofocus>
+                        <select name="warranty_policies_id" id="warranty_policies_id" class="form-control widthinput" autofocus>
                             @foreach($policyNames as $policyName)
                                 <option value="{{$policyName->id}}">{{$policyName->name}}</option>
                             @endforeach
@@ -54,14 +54,14 @@
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 1') }}</label>
-                        <select name="vehicle_category1" id="vehicle_category1" class="form-control" autofocus>
+                        <select name="vehicle_category1" id="vehicle_category1" class="form-control widthinput" autofocus>
                                 <option value="non_electric">Non Electric</option>
                                 <option value="electric">Electric</option>
                         </select> 
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 2') }}</label>
-                        <select name="vehicle_category2" id="vehicle_category2" class="form-control" autofocus>
+                        <select name="vehicle_category2" id="vehicle_category2" class="form-control widthinput" autofocus>
                             <option value="normal_and_premium">Normal And Premium</option>
                             <option value="lux_sport_exotic">Lux/Sport/Exotic</option>
                         </select> 
@@ -70,9 +70,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Years') }}</label>
                         <div class="input-group">
-                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2">Years</span>
+                                <span class="input-group-text widthinput" id="basic-addon2">Years</span>
                             </div>
                             <span id="EligibilityYearsError" class="invalid-feedback"></span>      
                         </div>            
@@ -81,9 +81,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Mileage') }}</label>
                         <div class="input-group">
-                            <input name="eligibility_milage" id="eligibility_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Mileage" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="eligibility_milage" id="eligibility_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Mileage" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2">KM</span>
+                                <span class="input-group-text widthinput" id="basic-addon2">KM</span>
                             </div>                           
                             <span id="EligibilityMileageError" class="invalid-feedback"></span>
                         </div> 
@@ -108,9 +108,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Period') }}</label>
                         <div class="input-group">
-                            <input name="extended_warranty_period" id="extended_warranty_period" onkeyup="validationOnKeyUp(this)" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Extended Warranty Period" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="extended_warranty_period" id="extended_warranty_period" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Extended Warranty Period" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2">Months</span>
+                                <span class="input-group-text widthinput" id="basic-addon2">Months</span>
                             </div>
                             <span id="ExtendedWarrantyPeriodError" class="invalid-feedback"></span>     
                         </div>                  
@@ -119,9 +119,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
                         <div class="input-group">
-                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2">AED</span>
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                             </div>                                   
                             <span id="ClaimLimitError" class="invalid-feedback"></span>
                         </div>
@@ -130,9 +130,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Mileage') }}</label>
                         <div class="input-group">
-                            <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control" onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <span class="input-group-text" id="basic-addon2">KM</span>
+                                <span class="input-group-text widthinput" id="basic-addon2">KM</span>
                             </div>                         
                             <span id="ExtendedWarrantyMilageError" class="invalid-feedback"></span>   
                         </div>                  
@@ -152,7 +152,7 @@
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
-                                <select name="brandPrice[1][brands][]" id="brands1" multiple="true" style="width: 100%;"  class="form-control" autofocus>
+                                <select name="brandPrice[1][brands][]" id="brands1" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
                                     @foreach($brands as $brand)
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                     @endforeach   
@@ -448,7 +448,7 @@
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" multiple="true" style="width: 100%;"  class="form-control" autofocus>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
                                     
                                 </select>                      
                                 <span id="supplierError" class="invalid-feedback"></span>

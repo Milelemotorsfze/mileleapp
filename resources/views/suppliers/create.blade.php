@@ -253,7 +253,7 @@ input {
                             <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_person" type="text" class="form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
+                            <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
                             @error('contact_person')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -271,7 +271,7 @@ input {
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -288,7 +288,7 @@ input {
                             <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="number" class="form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="alternative_contact_number" type="number" class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}" autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('alternative_contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -306,7 +306,7 @@ input {
                             <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
+                        <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('email')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -324,7 +324,7 @@ input {
                             <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="person_contact_by" type="text" class="form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"  autocomplete="person_contact_by" autofocus>
+                            <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"  autocomplete="person_contact_by" autofocus>
                             @error('person_contact_by')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -341,7 +341,7 @@ input {
                             <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control " onchange="validationOnKeyUp(this)">
+                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput" onchange="validationOnKeyUp(this)">
                         <!-- @error('supplier_types') is-invalid @enderror -->
                             <option value="">Choose Supplier Type</option>
                             <option value="accessories">Accessories</option>      
@@ -366,7 +366,7 @@ input {
                             <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
+                            <select id="is_primary_payment_method" name="is_primary_payment_method" class="widthinput form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
                                 <option value="">Choose Payment Method</option>
                                 @foreach($paymentMethods as $paymentMethod)
                                 <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
@@ -439,16 +439,33 @@ input {
                                                 </select>
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
-                                                <label for="choices-single-default" class="widthinput form-label font-size-13 ">Purchase Price In USD</label>
-                                                <input id="" type="text" class="form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
+                                                <div class="input-group">
+                                                <input id="" type="text" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                            </div>
+                                 
+                        </div> 
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                                <div class="input-group">
                                                 <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                                 
+                        </div> 
                                             </div>
                                             <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                                <div class="input-group">
                                                 <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                 <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
@@ -684,15 +701,33 @@ input {
                         </div>
                         <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
+                            <div class="input-group">
                             <input id="addon_purchase_price_in_usd_${index}" type="text" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                            </div>
+                                 
+                        </div> 
                         </div>
                         <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_${index}" hidden>
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                            <div class="input-group">
                             <input id="addon_purchase_price_${index}" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                                 
+                        </div> 
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_${index}">
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                            <div class="input-group">
                             <input id="addon_purchase_price_${index}" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                                 
+                        </div> 
                         </div>
                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                             <button class="btn_round remove_node_btn_frm_field" disabled>
