@@ -112,6 +112,10 @@
         background-color: rgba(128,128,128,0.5); /* color */
         display: none; /* making it hidden by default */
     }
+    .widthinput
+    {
+        height:32px!important;
+    }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')

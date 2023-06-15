@@ -171,6 +171,10 @@
         background-color: rgba(128,128,128,0.5); /* color */
         display: none; /* making it hidden by default */
     }
+    .widthinput
+    {
+        height:32px!important;
+    }
 </style>
 @section('content')
 @can('addon-supplier-edit')
@@ -409,22 +413,22 @@
                                             </div>
                                             <div class="col-xxl-1 col-lg-1 col-md-1">
                                                 <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                                                <select name="supplierAddon[1][currency]" id="currency_1" class="form-control" onchange="changeCurrency(1)">
+                                                <select name="supplierAddon[1][currency]" id="currency_1" class="widthinput form-control" onchange="changeCurrency(1)">
                                                     <option value="AED">AED</option>      
                                                     <option value="USD">USD</option>
                                                 </select>
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                                                <input id="" type="text" class="form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                <input id="" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
                                             </div>
                                             <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                <input id="" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                 <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
@@ -632,22 +636,22 @@
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
                             <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                            <select name="supplierAddon[${index}][currency]" id="currency_${index}" class="form-control" onchange="changeCurrency(${index})">
+                            <select name="supplierAddon[${index}][currency]" id="currency_${index}" class="widthinput form-control" onchange="changeCurrency(${index})">
                                 <option value="AED">AED</option>      
                                 <option value="USD">USD</option>
                             </select>
                         </div>
                         <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                            <input id="addon_purchase_price_in_usd_${index}" type="text" class="form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
+                            <input id="addon_purchase_price_in_usd_${index}" type="text" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
                         </div>
                         <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_${index}" hidden>
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                            <input id="addon_purchase_price_${index}" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                            <input id="addon_purchase_price_${index}" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_${index}">
                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                            <input id="addon_purchase_price_${index}" type="text" class="form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                            <input id="addon_purchase_price_${index}" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                         </div>
                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                             <button class="btn_round remove_node_btn_frm_field" disabled>
