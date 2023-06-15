@@ -33,6 +33,7 @@
     }
 </style>
 @section('content')
+@can('warranty-edit')
     <div class="card-header">
         <h4 class="card-title">Edit Warranty</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -190,6 +191,7 @@
         </form>
     </div> 
     <div class="overlay"></div>
+    @endcan
     <script type="text/javascript"> 
     var oldSelectedBrands = [];
     var selectedBrands = [];

@@ -3,6 +3,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
+@can('addon-supplier-view')
     <div class="card-header">
         <h4 class="card-title">Supplier Details</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -165,6 +166,7 @@
                 @endif
             </div>
     </div>  
+    @endcan
     <script type="text/javascript">
         $(document).ready(function ()
         {

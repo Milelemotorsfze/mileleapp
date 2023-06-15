@@ -200,7 +200,7 @@ input {
     }
 </style>
 @section('content')
-
+@can('addon-supplier-create')
     <div class="card-header">
         <h4 class="card-title">Create Suppliers</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -508,6 +508,7 @@ input {
         </form> 
     </div>
     <div class="overlay"></div>
+    @endcan
     <!-- <input id="numbers-only" type="text" placeholder="Numbers Only" /> -->
     <script type="text/javascript">
         var activeTab = '';

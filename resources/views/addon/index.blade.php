@@ -6,6 +6,7 @@
     width :20%;
   }
   </style>
+  @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
   <div class="card-header">
     <h4 class="card-title">
       Addon Info
@@ -13,12 +14,14 @@
     <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Addon
     </a>
+    @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
     </a>  
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a> 
+    @endcanany
     <ul class="nav nav-pills nav-fill">
       <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Addons</a>
@@ -60,7 +63,7 @@
   
     @include('addon.listbox')
     @include('addon.table')
- 
+ @endcanany
   <script type="text/javascript">
     $(document).ready(function ()
     {

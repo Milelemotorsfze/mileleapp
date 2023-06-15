@@ -80,8 +80,13 @@
               <td>Selling Price</td>
               <td>{{ $addon->payment_condition }}</td>
               <td>
+                @can('addon-view')
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addon->addon_details_table_id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                @endcan
+                @can('addon-edit')
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->addon_details_table_id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                @endcan
+                @can('addon-active-inactive')
                 @if( $addon->status == 'active')
                 <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveAddon{{$addon->addon_details_table_id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="makeInactiveAddon{{$addon->addon_details_table_id}}" >
@@ -117,6 +122,7 @@
                               </div>
                             </div>
                         @endif
+                        @endcan
               </td>
             </tr>
           @endforeach

@@ -1,5 +1,6 @@
 @extends('layouts.table')
 @section('content')
+@can('supplier-addon-price')
   <div class="card-header">
     <h4 class="card-title">
       Supplier Addon prices Info
@@ -41,6 +42,7 @@
       </div><!-- end tab-content-->
     </div>
   </div>
+  @endcan
   <script type="text/javascript">
     $(document).ready(function ()
     {

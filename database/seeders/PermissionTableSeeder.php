@@ -23,7 +23,9 @@ class PermissionTableSeeder extends Seeder
             ['7','Demand Planning'],
             ['8','Warehouse'],
             ['9','Stocks'],
-            ['10', 'Addons']
+            ['10', 'Addon Suppliers'],
+            ['11', 'Warranty'],
+            ['12', 'Addons'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -153,6 +155,27 @@ class PermissionTableSeeder extends Seeder
             ['10','Supplier Delete','addon-supplier-delete', 'To Delete the Supplier'],
             ['10','Supplier View','addon-supplier-view', 'To View the Supplier'],
             ['10','Supplier Active','supplier-active-inactive', 'To Activate and Inactivate the Supplier'],
+            ['10','Supplier Add New Purchase Price','supplier-new-purchase-price', 'To Add New Purchase Price'],
+            ['10','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
+            ['10','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
+            ['10','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
+
+            ['11','Warranty List','warranty-list', 'To View List of Warranty'],
+            ['11','Warranty Create','warranty-create', 'To Create the Warranty'],
+            ['11','Warranty Edit','warranty-edit', 'To Edit the Warranty'],
+            ['11','Warranty Delete','warranty-delete', 'To Delete the Warranty'],
+            ['11','Warranty View','warranty-view', 'To View the Warranty'],
+            ['11','Warranty Active','warranty-active-inactive', 'To Activate and Inactivate the Warranty'],
+
+            ['12','Accessories List','accessories-list', 'To View List of Accessories'],
+            ['12','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],
+            ['12','Kit List','kit-list', 'To View List of Kit'],
+            ['12','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
+            ['12','Addons Create','addon-create', 'To Create the Addons'],
+            ['12','Addons Edit','addon-edit', 'To Edit the Addons'],
+            ['12','Addons Delete','addon-delete', 'To Delete the Addons'],
+            ['12','Addons View','addon-view', 'To View the Addons'],
+            ['12','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
 
             ];
         foreach ($Permissions as $key => $value):

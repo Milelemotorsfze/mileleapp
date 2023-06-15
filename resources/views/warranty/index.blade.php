@@ -1,9 +1,12 @@
 @extends('layouts.table')
 @section('content')
+@can('warranty-list')
   <div class="card-header">
     <h4 class="card-title">Warranty Info</h4>
+    @can('warranty-create')
       <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>  
-  </div>
+    @endcan
+    </div>
     <div class="card-body">
       <div class="table-responsive">
         <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
@@ -58,14 +61,22 @@
                 @endif
               </td>
               <td>
+                @can('warranty-view')
                 <a class="btn btn-sm btn-success" href=""><i class="fa fa-eye" aria-hidden="true"></i></a>
+                @endcan
+                @can('warranty-edit')
                 <a class="btn btn-sm btn-info" href="{{ route('warranty.edit',$premium->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                @endcan
+                @can('warranty-delete')
                 <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id=""> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                @endcan
+                @can('warranty-active-inactive')
                 @if($premium->status == 'active')
                   <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id=""><i class="fa fa-ban" aria-hidden="true"></i></a>
                 @elseif($premium->status == 'inactive')
                   <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id=""><i class="fa fa-check" aria-hidden="true"></i></a>
                 @endif
+                @endcan
               </td>
             </tr>
           @endforeach
@@ -75,5 +86,6 @@
     </div>
  
 
-@endsection
+@endcan
+    @endsection
 
