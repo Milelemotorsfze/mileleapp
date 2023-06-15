@@ -421,7 +421,7 @@
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                 <div class="input-group">
-                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                <input id="addon_purchase_price_in_usd_1" type="text" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                                     </div>  
@@ -430,7 +430,7 @@
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                 <div class="input-group">
-                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                                                <input id="addon_purchase_price_1" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -439,7 +439,7 @@
                                             <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                 <div class="input-group">
-                                                <input id="" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                                <input id="addon_purchase_price_1" type="text" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -573,8 +573,8 @@
 
 
 
-            $msg ="One among contact number or alternative contact number or email is required";
-            emailContactError($msg);
+            // $msg ="One among contact number or alternative contact number or email is required";
+            // emailContactError($msg);
             $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             $("#adoon_1").select2();
             $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
