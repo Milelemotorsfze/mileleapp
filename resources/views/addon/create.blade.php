@@ -240,7 +240,12 @@
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="lead_time" type="text" class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}"  autocomplete="lead_time">
+                        <div class="input-group">
+                        <input id="lead_time" type="text" class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}"  autocomplete="lead_time">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                    </div>  
+                                                </div> 
                             @error('lead_time')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -284,7 +289,12 @@
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
+                        <div class="input-group">
                         <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                             @error('fixing_charge_amount')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -388,7 +398,7 @@
                                         <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control widthinput @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
+                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
