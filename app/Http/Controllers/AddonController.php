@@ -598,7 +598,7 @@ class AddonController extends Controller
                     ->join('brands','brands.id','addon_types.brand_id')
                     ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
                     ->select('addons.name',
-                    'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
+                    'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code',
                     'addon_details.payment_condition','addon_details.lead_time',
                     'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                     'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
@@ -617,7 +617,7 @@ class AddonController extends Controller
                                 ->join('brands','brands.id','addon_types.brand_id')
                                 ->where('addon_types.is_all_model_lines','yes')
                                 ->select('addons.name',
-                                'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price',
+                                'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code',
                                 'addon_details.payment_condition','addon_details.lead_time',
                                 'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands',
                                 'addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
@@ -634,7 +634,7 @@ class AddonController extends Controller
                      $addons2= $addons2
                      ->join('addons','addons.id','addon_details.addon_id')
                                 ->where('addon_details.is_all_brands','yes')
-                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
+                                ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.payment_condition',
                                 'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
                                 ->get()->toArray(); 

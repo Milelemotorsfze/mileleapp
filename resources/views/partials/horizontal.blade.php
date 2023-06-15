@@ -74,6 +74,56 @@
                             <span data-key="t-extra-pages">Dashboard</span>
                         </a>
                     </li>
+                    @canany(['addon-supplier-create', 'addon-supplier-list'])
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Supplier</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            @can('addon-supplier-create')
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Supplier</span>
+                                </a>
+                            </div>
+                            @endcan
+                            @can('addon-supplier-list')
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Supplier Info </span>
+                                </a>
+                            </div>
+                            @endcan
+                        </div>
+                    </li>
+                    @endcanany
+                    @canany(['warranty-create', 'warranty-list'])
+                    <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                            <i data-feather="grid"></i>
+                            <span data-key="t-extra-pages">Warranty</span>
+                            <div class="arrow-down"></div>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            @can('warranty-create')
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
+                                    <span data-key="t-authentication">Create Warranty</span>
+                                </a>
+                            </div>
+                            @endcan
+                            @can('warranty-list')
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Warranty Info </span>
+                                </a>
+                            </div>
+                            @endcan
+                        </div>
+                    </li>
+                    @endcanany
                     @canany(['addon-list', 'addon-create'])
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
@@ -185,56 +235,8 @@
                             </div>
                         </li>
                     @endcan
-                    @canany(['warranty-create', 'warranty-list'])
-                    <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Warranty</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            @can('warranty-create')
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Warranty</span>
-                                </a>
-                            </div>
-                            @endcan
-                            @can('warranty-list')
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Warranty Info </span>
-                                </a>
-                            </div>
-                            @endcan
-                        </div>
-                    </li>
-                    @endcanany
-                    @canany(['addon-supplier-create', 'addon-supplier-list'])
-                    <li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Supplier</span>
-                            <div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            @can('addon-supplier-create')
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Supplier</span>
-                                </a>
-                            </div>
-                            @endcan
-                            @can('addon-supplier-list')
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Supplier Info </span>
-                                </a>
-                            </div>
-                            @endcan
-                        </div>
-                    </li>
-                    @endcanany
+                    
+                   
                     @can('Calls-view')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
