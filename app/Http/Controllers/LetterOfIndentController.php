@@ -25,19 +25,24 @@ class LetterOfIndentController extends Controller
      */
     public function index()
     {
-        $newLOIs = LetterOfIndent::orderBy('id','DESC')
+        $newLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_NEW)
             ->cursor();
-        $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
+        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->whereIn('status',[LetterOfIndent::LOI_STATUS_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
             ->cursor();
-        $partialApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
+        $partialApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->whereIn('status', [LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED,LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED])
             ->cursor();
-        $supplierApprovedLOIs =  LetterOfIndent::orderBy('id','DESC')
+        $supplierApprovedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
             ->cursor();
-        $rejectedLOIs =  LetterOfIndent::orderBy('id','DESC')
+        $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)
             ->cursor();
 
@@ -54,12 +59,15 @@ class LetterOfIndentController extends Controller
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
-        $approvalPendingLOIs = LetterOfIndent::orderBy('id','DESC')
+        $approvalPendingLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_NEW);
 
-        $approvedLOIs = LetterOfIndent::orderBy('id','DESC')
+        $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
-        $rejectedLOIs =  LetterOfIndent::orderBy('id','DESC')
+        $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
+            ->orderBy('id','DESC')
             ->where('status', LetterOfIndent::LOI_STATUS_REJECTED);
 
         if ($request->supplier_id)

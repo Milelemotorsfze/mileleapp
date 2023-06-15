@@ -186,7 +186,7 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">PFI Date</label>
+                            <label for="choices-single-default" class="form-label">Released Date</label>
                             <input type="date" class="form-control" name="pfi_date">
                         </div>
                     </div>

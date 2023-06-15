@@ -27,7 +27,7 @@
             </div>
         @endif
         <div class="table-responsive">
-            <table id="supplier-pictures-table" class="table table-striped table-editable table-edits table">
+            <table id="vehicle-pictures-table" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>

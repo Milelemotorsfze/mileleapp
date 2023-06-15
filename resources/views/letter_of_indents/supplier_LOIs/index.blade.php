@@ -90,190 +90,238 @@
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="viewdealinfo-{{ $letterOfIndent->id }}" data-modal-type="ITEM">View </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#view-new-loi-items-{{$letterOfIndent->id}}">View
+                                    </button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#view-new-loi-docs-{{$letterOfIndent->id}}">View
+                                    </button>
                                 </td>
                                 <td>
                                     <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="view-LOI-doc-{{ $letterOfIndent->id }}"  data-modal-type="DOC">View </button>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+                                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+
                                     <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="reject-LOI-{{ $letterOfIndent->id }}" > Reject </button>
+                                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
                                 </td>
-                                <div class="modal modalhide" id="viewdealinfo-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Model</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Varients</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Qty</label>
-                                                </div>
-                                                @foreach($letterOfIndent->letterOfIndentItems()->get() as $LOIItem)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class= "row">
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="model" value="{{$LOIItem->model}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="sfx" value="{{$LOIItem->sfx}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="varient" value="{{$LOIItem->variant_name}}" readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="quantity" value="{{$LOIItem->quantity}}"  readonly="true">
+                                <div class="modal fade" id="view-new-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">LOI Items</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-3">
+                                                @if($letterOfIndent->letterOfIndentItems->count() > 0)
+                                                    <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
+                                                        <div class="d-flex">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Model</label>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label  class="form-label">SFX</label>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Variant</label>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Quantity</label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal modalhide" id="view-LOI-doc-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary modal-header-sticky">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Documents</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                @foreach($letterOfIndent->LOIDocuments()->get() as $letterOfIndentDocument)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class="row p-2">
-                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="400"></embed>
+                                                    @foreach($letterOfIndent->letterOfIndentItems as $value => $LOIItem)
+                                                        <div class="row">
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="row mt-3">
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                        </div>
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
+                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
+                                                                            <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                @endforeach
+                                                    @endforeach
+                                                @else
+                                                    <span class="text-center"> No Data Available! </span>
+                                                @endif
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal modalhide" id="reject-LOI-{{$letterOfIndent->id}}" style="width: 600px" >
-                                    <div class="modal-header bg-primary modal-header-sticky">
-                                        <h1 class="modal-title fs-5 text-white text-center" > Reject LOI</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-3">
-                                        <div class="col-12">
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Customer</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                <div class="modal fade" id="view-new-loi-docs-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="col-lg-12">
+                                                    <div class="row p-2">
+                                                        @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12">
+                                                                    <div class="row p-2">
+                                                                        <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" width="400" height="600"
+                                                                        ></embed>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Category</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
-                                                           readonly class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Reason</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
-                                                </div>
-                                            </div>
-                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
-                                        </div>
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary btncenter status-reject-button">Submit</button>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal modalhide" id="approve-LOI-{{$letterOfIndent->id}}" style="width: 600px" >
-                                    <div class="modal-header bg-primary">
-                                        <h1 class="modal-title fs-5 text-white text-center"> Approve LOI</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-3">
-                                        <div class="col-lg-12">
-                                            <div class="col-12">
-                                                <div class="row mt-2">
-                                                    <div class="col-2">
-                                                        <label class="form-label font-size-13 text-muted">Customer</label>
+                                <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel"> Reject LOI </h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-3">
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-center">Customer</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
+                                                                           readonly class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Reason</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                                            <input type="hidden" value="REJECTED" id="status-reject">
+                                                        </div>
                                                     </div>
-                                                    <div class="col-10">
-                                                        <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
-                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Category</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
-                                                </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary status-reject-button">Submit</button>
                                             </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
-                                                </div>
-                                            </div>
-                                            <div class="row mt-2">
-                                                <div class="col-2">
-                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
-                                                </div>
-                                                <div class="col-10">
-                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
-                                                           readonly class="form-control">
-                                                </div>
-                                            </div>
-                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED }}" id="status">
                                         </div>
-                                        <div class="row mt-3">
-                                            <div class="col-12">
-                                                <button type="button" class="btn btn-primary btncenter status-change-button-approve">Submit</button>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="approve-LOI-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel"> Approve LOI </h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-3">
+                                                <div class="col-lg-12">
+                                                    <div class="row">
+                                                        <div class="col-12">
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-center">Customer</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Category</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
+                                                                </div>
+                                                                <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
+                                                                           readonly class="form-control">
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
+                                                            <input type="hidden" value="APPROVE" id="status-approve">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary status-change-button-approve">Submit</button>
                                             </div>
                                         </div>
                                     </div>
@@ -313,74 +361,107 @@
                                 <td>{{ $letterOfIndent->submission_status }}</td>
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="supplier-approved-loi-items-{{ $letterOfIndent->id }}" >View </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#supplier-approved-loi-items-{{$letterOfIndent->id}}">View
+                                    </button>
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="supplier-approved-loi-doc-{{ $letterOfIndent->id }}" >View </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#supplier-approved-loi-doc-{{$letterOfIndent->id}}">View
+                                    </button>
                                 </td>
-                                <div class="modal modalhide" id="supplier-approved-loi-items-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Model</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Varients</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Qty</label>
-                                                </div>
-                                                @foreach($letterOfIndent->letterOfIndentItems()->get() as $LOIItem)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class= "row">
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="model" value="{{$LOIItem->model}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="sfx" value="{{$LOIItem->sfx}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="varient" value="{{$LOIItem->variant_name}}" readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="quantity" value="{{$LOIItem->quantity}}"  readonly="true">
+                                <div class="modal fade" id="supplier-approved-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">LOI Items</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-3">
+                                                @if($letterOfIndent->letterOfIndentItems->count() > 0)
+                                                    <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
+                                                        <div class="d-flex">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Model</label>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label  class="form-label">SFX</label>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Variant</label>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Quantity</label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                    @foreach($letterOfIndent->letterOfIndentItems as $value => $LOIItem)
+                                                        <div class="row">
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="row mt-3">
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                        </div>
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
+                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
+                                                                            <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <span class="text-center"> No Data Available! </span>
+                                                @endif
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal modalhide" id="supplier-approved-loi-doc-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary modal-header-sticky">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Documents</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                @foreach($letterOfIndent->LOIDocuments()->get() as $letterOfIndentDocument)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class="row p-2">
-                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                <div class="modal fade" id="supplier-approved-loi-doc-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="col-lg-12">
+                                                    <div class="row p-2">
+                                                        @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12">
+                                                                    <div class="row p-2">
+                                                                        <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" width="400" height="600"
+                                                                        ></embed>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        @endforeach
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
@@ -422,74 +503,107 @@
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>{{ $letterOfIndent->review }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="partial-approved-loi-items-{{ $letterOfIndent->id }}" >View </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#supplier-rejected-loi-items-{{$letterOfIndent->id}}">View
+                                    </button>
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-modal-id="partial-approved-loi-doc-{{ $letterOfIndent->id }}" >View </button>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#supplier-rejected-loi-doc-{{$letterOfIndent->id}}">View
+                                    </button>
                                 </td>
-                                <div class="modal modalhide" id="partial-approved-loi-items-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Items</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Model</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Varients</label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-3">
-                                                    <label for="basicpill-firstname-input" class="form-label">Qty</label>
-                                                </div>
-                                                @foreach($letterOfIndent->letterOfIndentItems()->get() as $LOIItem)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class= "row">
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="model" value="{{$LOIItem->model}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="sfx" value="{{$LOIItem->sfx}}"  readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="varient" value="{{$LOIItem->variant_name}}" readonly="true">
-                                                                </div>
-                                                                <div class="col-lg-3 col-md-3">
-                                                                    <input type="text" class="form-control mb-1" name="quantity" value="{{$LOIItem->quantity}}"  readonly="true">
+                                <div class="modal fade" id="supplier-rejected-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">LOI Items</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body p-3">
+                                                @if($letterOfIndent->letterOfIndentItems->count() > 0)
+                                                    <div class="row  d-none d-lg-block d-xl-block d-xxl-block">
+                                                        <div class="d-flex">
+                                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                <div class="row">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Model</label>
+                                                                    </div>
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label  class="form-label">SFX</label>
+                                                                    </div>
+                                                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Variant</label>
+                                                                    </div>
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <label class="form-label">Quantity</label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @endforeach
+                                                    @foreach($letterOfIndent->letterOfIndentItems as $value => $LOIItem)
+                                                        <div class="row">
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="row mt-3">
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
+                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                        </div>
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
+                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-4 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
+                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                        </div>
+                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                            <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
+                                                                            <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <span class="text-center"> No Data Available! </span>
+                                                @endif
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal modalhide" id="partial-approved-loi-doc-{{$letterOfIndent->id}}" >
-                                    <div class="modal-header bg-primary modal-header-sticky">
-                                        <h1 class="modal-title fs-5 text-white text-center" > LOI Documents</h1>
-                                        <button type="button" class="btn-close close"  aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-content p-5">
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                @foreach($letterOfIndent->LOIDocuments()->get() as $letterOfIndentDocument)
-                                                    <div class="d-flex">
-                                                        <div class="col-lg-12">
-                                                            <div class="row p-2">
-                                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}"  width="400" height="600"></embed>
+                                <div class="modal fade" id="supplier-rejected-loi-doc-{{$letterOfIndent->id}}" data-bs-backdrop="static"
+                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="col-lg-12">
+                                                    <div class="row p-2">
+                                                        @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)
+                                                            <div class="d-flex">
+                                                                <div class="col-lg-12">
+                                                                    <div class="row p-2">
+                                                                        <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" width="400" height="600"
+                                                                        ></embed>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        @endforeach
                                                     </div>
-                                                @endforeach
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
@@ -502,68 +616,71 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $(document).ready(function () {
+
+@endsection
+@push('scripts')
+        <script type="text/javascript">
+            $(document).ready(function () {
+
             $("#supplier").select2({
                 placeholder:'Select Supplier'
             })
             $("#form-search").validate({
-                rules: {
-                    supplier_id: {
-                        required: true,
+            rules: {
+                supplier_id: {
+                    required: true,
                     },
                 },
             });
 
             $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-                localStorage.setItem('activeTab', $(e.target).attr('href'));
+            localStorage.setItem('activeTab', $(e.target).attr('href'));
             });
             var activeTab = localStorage.getItem('activeTab');
             if (activeTab) {
-                $('#my-tab a[href="' + activeTab + '"]').tab('show');
-            }
+            $('#my-tab a[href="' + activeTab + '"]').tab('show');
+        }
             $('.status-change-button-approve').click(function () {
-                var id = $('#id').val();
-                var status = $('#status').val();
-                statusChange(id,status);
-            })
+            var id = $('#id').val();
+            var status = $('#status-approve').val();
+            statusChange(id,status);
+        })
             $('.status-reject-button').click(function (e) {
-                var id = $('#id').val();
-                var status = $('#status').val();
-                statusChange(id,status)
-            })
+            var id = $('#id').val();
+            var status = $('#status-reject').val();
+            statusChange(id,status)
+        })
             function statusChange(id,status) {
-                let url = '{{ route('letter-of-indents.status-change') }}';
-                if(status = 'Supplier Approved') {
-                   var message = 'Approve';
-                }else{
-                    var message = 'Reject';
-                }
-                var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
-                    if (e) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                id: id,
-                                status: status,
+            let url = '{{ route('letter-of-indents.status-change') }}';
+            if(status == 'REJECTED') {
+            var message = 'Reject';
+        }else{
+            var message = 'Approve';
+        }
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+            if (e) {
+            $.ajax({
+            type: "POST",
+            url: url,
+            dataType: "json",
+            data: {
+            id: id,
+            status: status,
 
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function (data) {
-                                window.location.reload();
-                                alertify.success(status + " Successfully");
-                            }
-                        });
-                    }
-                }).set({title:"Status Change"})
-            }
+            _token: '{{ csrf_token() }}'
+        },
+            success: function (data) {
+            window.location.reload();
+            alertify.success(status + " Successfully");
+        }
+        });
+        }
+        }).set({title:"Status Change"})
+        }
         })
 
     </script>
-@endsection
-
+@endpush
 
 
 

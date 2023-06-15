@@ -57,44 +57,24 @@
             $('#milele-approved-LOI-table').DataTable();
             $('#supplier-rejected-LOI-table').DataTable();
             $('#milele-partial-approved-LOI-table').DataTable();
-            $('#supplier-pictures-table').DataTable();
-
-
+            $('#vehicle-pictures-table').DataTable();
+            $('#PFI-table').DataTable();
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');
             //     ModalOpen(modalId);
             // });
-            $('#supplier-pictures-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
-            $('#new-LOI-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
-            $('#supplier-approved-LOI-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
-            $('#milele-approved-LOI-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
-            $('#supplier-rejected-LOI-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
-            $('#milele-partial-approved-LOI-table').on( 'click', '.modal-button', function () {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
 
-            $('.modal-button').on('click', function()
-            {
-                var modalId = $(this).data('modal-id');
-                ModalOpen(modalId);
-            });
+            // $('#supplier-pictures-table').on( 'click', '.modal-button', function () {
+            //     var modalId = $(this).data('modal-id');
+            //     ModalOpen(modalId);
+            // });
+
+            // $('.modal-button').on('click', function()
+            // {
+            //     var modalId = $(this).data('modal-id');
+            //     ModalOpen(modalId);
+            // });
             function ModalOpen(modalId) {
                 $('#' + modalId).addClass('modalshow');
                 $('#' + modalId).removeClass('modalhide');
