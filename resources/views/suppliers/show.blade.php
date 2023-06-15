@@ -168,17 +168,23 @@
     </div>  
     @endcan
     <script type="text/javascript">
+        var data = {!! json_encode($supplier) !!};
+        console.log(data)
         $(document).ready(function ()
         {
             // $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             // $("#adoon").select2();
         });
-        var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
-        separateDialCode: true,
-        preferredCountries:["ae"],
-        hiddenInput: "full",
-        utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-        });
+        if(data.contact_number != '')
+        {
+            var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
+            separateDialCode: true,
+            preferredCountries:["ae"],
+            hiddenInput: "full",
+            utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        }
+       
         var alternative_contact_number = window.intlTelInput(document.querySelector("#alternative_contact_number"), {
         separateDialCode: true,
         preferredCountries:["ae"],
