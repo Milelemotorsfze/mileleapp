@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-          
+            $table->bigInteger('supplier_id')->unsigned()->index()->nullable()->after('review');
+            $table->foreign('supplier_id')->references('id')->on('suppliers');
+
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
-           
+            $table->dropForeign(['supplier_id']);
+            $table->dropIndex(['supplier_id']);
+            $table->dropColumn('supplier_id');
         });
     }
 };
