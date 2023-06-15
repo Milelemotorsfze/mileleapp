@@ -60,7 +60,7 @@
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                            <select class="form-control form-control-sm" name="kitSupplierAndPrice[1][item][1][kit_item_id]" id="kitSupplier1Item1" multiple="true" style="width: 100%;">
+                                            <select class="form-control widthinput" name="kitSupplierAndPrice[1][item][1][kit_item_id]" id="kitSupplier1Item1" multiple="true" style="width: 100%;">
                                                 @foreach($kitItemDropdown as $kitItemDropdownData)
                                                     <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
                                                 @endforeach
