@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('letter_of_indents', function (Blueprint $table) {
             $table->dropColumn('LOI_reference');
-            $table->dropColumn('review');
+            // $table->dropColumn('review');
             $table->dropColumn('value');
 //            $table->dropForeign('entity_id');
         });
