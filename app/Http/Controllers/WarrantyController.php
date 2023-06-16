@@ -18,7 +18,8 @@ class WarrantyController extends Controller
      */
     public function index()
     {
-        $premiums = WarrantyPremiums::with('PolicyName')->get();
+        $premiums = WarrantyPremiums::with('PolicyName')
+            ->where('status','active')->get();
         return view('warranty.index', compact('premiums'));
     }
 
@@ -86,10 +87,15 @@ class WarrantyController extends Controller
     public function edit(string $id)
     {
         $premium = WarrantyPremiums::where('id',$id)->with('PolicyName')->first();
-        $brandPrice = WarrantyBrands::where('warranty_premiums_id',$id)->groupBy('price')->get();
+        $warrantyBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
         $brands = Brand::select('id','brand_name')->get();
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
-        return view('warranty.edit', compact('premium','brands','policyNames'));
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
+            })
+            ->get();
+        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands'));
     }
 
     /**
@@ -97,7 +103,46 @@ class WarrantyController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+//        dd($request->all());
+        $this->validate($request, [
+            'warranty_policies_id' => 'required',
+            'supplier_id' => 'required',
+            'vehicle_category1' => 'required',
+            'vehicle_category2' => 'required',
+            'eligibility_year' => 'required',
+            'eligibility_milage' => 'required',
+            'extended_warranty_period' => 'required',
+            'claim_limit_in_aed' => 'required'
+        ]);
+
+        $input = $request->all();
+        $input['updated_by'] = Auth::id();
+        $premium = WarrantyPremiums::findorFail($id);
+        $premium->update($input);
+        if($request->brandPrice)
+        {
+            $inputbrandPrice['created_by'] = Auth::id();
+            $inputbrandPrice['warranty_premiums_id'] = $id;
+            if(count($request->brandPrice) > 0)
+            {
+                foreach($request->brandPrice as $brandPrice)
+                {
+                    $inputbrandPrice['price'] = $brandPrice['purchase_price'];
+                    if(isset($brandPrice['brands']))
+                    {
+                        if(count($brandPrice['brands']) > 0)
+                        {
+                            foreach($brandPrice['brands'] as $brandData)
+                            {
+                                $inputbrandPrice['brand_id'] = $brandData;
+                                $createBrandPrice = WarrantyBrands::create($inputbrandPrice);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return redirect()->route('warranty.index')->with('success','Warrant updated successfully');
     }
 
     /**

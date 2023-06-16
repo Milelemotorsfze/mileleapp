@@ -19,4 +19,8 @@ class WarrantyBrands extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
 }

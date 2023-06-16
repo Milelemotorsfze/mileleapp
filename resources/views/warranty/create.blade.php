@@ -129,13 +129,13 @@
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">Supplier</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus required>
+                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus onkeyup="validationOnKeyUp(this)" >
                             <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
                             @endforeach
                         </select>
-                        <span id="SupplierError" class="invalid-feedback"></span>
+                        <p id="SupplierError" class="invalid-feedback "></p>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4" id="ExtendedWarrantyMileageDiv" hidden>
                         <span class="error">* </span>
@@ -288,6 +288,7 @@
         var inputEligibilityMileage = $('#eligibility_milage').val();
         var inputExtendedWarrantyPeriod = $('#extended_warranty_period').val();
         var inputClaimLimit = $('#claim_limit_in_aed').val();
+        var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
         var inputPurchasePrice1 = $('#purchase_price1').val();
         // var formInputError = false;
@@ -316,6 +317,13 @@
         {
             $msg = "Claim Limit is required";
             showClaimLimitError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputSupplierId == '')
+        {
+            $msg = "Supplier is required";
+            showSupplierError($msg);
             formInputError = true;
             e.preventDefault();
         }
