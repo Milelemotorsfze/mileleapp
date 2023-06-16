@@ -4,11 +4,11 @@
     {
         color: #FF0000;
     }
-    input:focus 
+    input:focus
     {
         border-color: #495057!important;
     }
-    select:focus 
+    select:focus
     {
         border-color: #495057!important;
     }
@@ -42,7 +42,7 @@
         <form id="createWarrantyForm" name="createWarrantyForm" method="POST" enctype="multipart/form-data" action="{{ route('warranty.store') }}">
             @csrf
             <div class="row">
-                <p><span style="float:right;" class="error">* Required Field</span></p>                
+                <p><span style="float:right;" class="error">* Required Field</span></p>
                 <div class="row">
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Policy Name') }}</label>
@@ -50,21 +50,21 @@
                             @foreach($policyNames as $policyName)
                                 <option value="{{$policyName->id}}">{{$policyName->name}}</option>
                             @endforeach
-                        </select>               
+                        </select>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 1') }}</label>
                         <select name="vehicle_category1" id="vehicle_category1" class="form-control widthinput" autofocus>
                                 <option value="non_electric">Non Electric</option>
                                 <option value="electric">Electric</option>
-                        </select> 
+                        </select>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 2') }}</label>
                         <select name="vehicle_category2" id="vehicle_category2" class="form-control widthinput" autofocus>
                             <option value="normal_and_premium">Normal And Premium</option>
                             <option value="lux_sport_exotic">Lux/Sport/Exotic</option>
-                        </select> 
+                        </select>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
@@ -74,8 +74,8 @@
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">Years</span>
                             </div>
-                            <span id="EligibilityYearsError" class="invalid-feedback"></span>      
-                        </div>            
+                            <span id="EligibilityYearsError" class="invalid-feedback"></span>
+                        </div>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
@@ -84,9 +84,9 @@
                             <input name="eligibility_milage" id="eligibility_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Mileage" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">KM</span>
-                            </div>                           
+                            </div>
                             <span id="EligibilityMileageError" class="invalid-feedback"></span>
-                        </div> 
+                        </div>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
@@ -112,8 +112,8 @@
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">Months</span>
                             </div>
-                            <span id="ExtendedWarrantyPeriodError" class="invalid-feedback"></span>     
-                        </div>                  
+                            <span id="ExtendedWarrantyPeriodError" class="invalid-feedback"></span>
+                        </div>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
@@ -122,7 +122,7 @@
                             <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                            </div>                                   
+                            </div>
                             <span id="ClaimLimitError" class="invalid-feedback"></span>
                         </div>
                     </div>
@@ -133,9 +133,9 @@
                             <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">KM</span>
-                            </div>                         
-                            <span id="ExtendedWarrantyMilageError" class="invalid-feedback"></span>   
-                        </div>                  
+                            </div>
+                            <span id="ExtendedWarrantyMilageError" class="invalid-feedback"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,18 +147,18 @@
                     </center>
                 </div>
                 <div class="card-body">
-                    <div class="form_field_outer">
+                    <div class="form_field_outer" id="row-1">
                         <div class="row form_field_outer_row">
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
-                                <select name="brandPrice[1][brands][]" id="brands1" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
+                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control widthinput brands" autofocus>
                                     @foreach($brands as $brand)
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                    @endforeach   
-                                </select>                      
+                                    @endforeach
+                                </select>
                                 <span id="Brand1Error" class="invalid-feedback"></span>
-                            </div>                                      
+                            </div>
                             <div class="col-xxl-2 col-lg-3 col-md-3">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
@@ -166,12 +166,12 @@
                                     <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>                                 
+                                    </div>
                                     <span id="Price1Error" class="invalid-feedback"></span>
-                                </div>  
+                                </div>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
+                                <button class="btn_round  removeButton" id="remove-1" disabled hidden>
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -180,150 +180,95 @@
                     <div class="col-xxl-12 col-lg-12 col-md-12">
                         <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add
-                        </a> 
+                        </a>
                     </div>
                 </div>
             </div>
             <div class="col-md-12">
                 <button type="submit" class="btn btn-primary btn-sm" id="submit" style="float:right;">Submit</button>
-            </div>    
+            </div>
         </form>
-    </div> 
+    </div>
+    <input type="hidden" id="indexValue" value="">
     <div class="overlay"></div>
     @endcan
-    <script type="text/javascript"> 
+    <script type="text/javascript">
     var oldSelectedBrands = [];
     var selectedBrands = [];
     var totalRow = 1;
     var filteredArray = [];
     var IsOpenMileage = 'yes';
     var save = 1;
-   
+
     $(document).ready(function ()
     {
-        
-        $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
+
+        // $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
         // $('#brands1').select2();
         $('#brands1').select2({
             allowClear: true,
             minimumResultsForSearch: -1,
-            templateResult: hideSelected,
+            placeholder:"Choose Brands....     Or     Type Here To Search....",
+            // templateResult: hideSelected,
         });
-        $("#brands1").data('originalvalues', []);
-        $("#brands1").on('change', function(e) 
-        {
-            var that = this;
-            removed = []
-            $($(this).data('originalvalues')).each(function(k, v) 
-            {
-                if (!$(that).val()) 
-                {
-                    removed[removed.length] = v;
-                    return false;
-                }
-                if ($(that).val().indexOf(v) == -1) 
-                {
-                    removed[removed.length] = v;
-                    $.each(removed, function( ind, value ) 
-                    {
-                        filteredArray = selectedBrands.filter(function(e) { return e !== value })
-                    });
-                    $.ajax
-                    ({
-                        url:"{{url('getBranchForWarranty')}}",
-                        type: "POST",
-                        data:
-                        {
-                            filteredArray: filteredArray,
-                            _token: '{{csrf_token()}}'
-                        },
-                        dataType : 'json',
-                        success: function(data)
-                        { 
-                            myarray = data;
-                            var size= myarray.length;
-                            if(size >= 1)
-                            {
-                                let brandDropdownData   = [];
-                                $.each(data,function(key,value)
-                                {
-                                    brandDropdownData.push
-                                    ({
-                                        id: value.id,
-                                        text: value.brand_name
-                                    });
-                                });
-                                for(let i=1; i<=totalRow; i++)
-                                {
-                                    var brandRowID = "brands"+i;
-                                    var brandRowSelectedValue = [];
-                                    if(brandRowID != "brands1")
-                                    {
-                                        var brandRowSelectedValue = $("#brands"+i).val();
-                                        $('#'+brandRowID).html("");
-                                        $('#'+brandRowID).select2
-                                        ({
-                                            placeholder: 'Select value',
-                                            allowClear: true,
-                                            data: brandDropdownData,
-                                            minimumResultsForSearch: -1,
-                                            templateResult: hideSelected,
-                                        });
-                                        // $("#"+brandRowID).val(brandRowSelectedValue).trigger('change');
-                                    }
-                                }    
-                            }
-                        }
-                    });
-                    for(let i=1; i<=totalRow; i++)
-                    {
-                        var brandRowID = "brands"+i;
-                        if(brandRowID != "brands1")
-                        {
+        // $("#brands1").data('originalvalues', []);
+        var index = 1;
+        $('#indexValue').val(index);
 
-                        }
-                    }
-                }
-            });
-            if ($(this).val()) 
-            {
-                $(this).data('originalvalues', $(this).val());
-            } 
-            else 
-            {
-                $(this).data('originalvalues', []);
-            }
-            if(removed != '')
-            {
-                for(let i=1; i<=totalRow; i++)
-                {
-                    var brandRowID = "brands"+i;
-                    if(brandRowID != "brands1")
-                    {
-                        $('#'+brandRowID+' option[value='+removed+']').detach();
-                    }
-                }
-                selectedBrands = $(this).val();
-            }
-            else
-            {
-                selectedBrands = $(this).val();
-                var diff = $(selectedBrands).not(oldSelectedBrands).get();
-                for(let i=1; i<=totalRow; i++)
-                {
-                    var brandRowID = "brands"+i;
-                    if(brandRowID != "brands1")
-                    {
-                       
-                        $('#'+brandRowID+' option[value='+diff+']').detach();
-                    }
-                }
-                oldSelectedBrands = selectedBrands;
-            }   
+        $(document.body).on('select2:select', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var value = e.params.data.id;
+            hideOption(index,value);
         });
-    }); 
-     
-    $('body').on('submit', '#createWarrantyForm', function (e) 
+        $(document.body).on('select2:unselect', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var data = e.params.data;
+            appendOption(index,data);
+        });
+        $(document.body).on('click', ".removeButton", function (e) {
+            var indexNumber = $(this).attr('data-index');
+
+            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+               var id = (this.value);
+               var text = (this.text);
+                addOption(id,text)
+            });
+
+            $(this).closest('#row-'+indexNumber).remove();
+
+            // for (var i = index; i <= indexValue; i++) {
+            //     var index = $(".form_field_outer").find(".form_field_outer_row").length - 1;
+            // }
+            // $('#indexValue').val(index);
+            // $(".form_field_outer select:eq(" + (index - 1) + ")").after(this);
+        })
+        function addOption(id,text) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+              $('#brands'+i).append($('<option>', {value: id, text :text}))
+            }
+        }
+
+        function hideOption(index,value) {
+            var indexValue = $('#indexValue').val();
+            for (var i = 1; i <= indexValue; i++) {
+                if (i != index) {
+                    var currentId = 'brands' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();
+                }
+            }
+        }
+        function appendOption(index,data) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+                if(i != index) {
+                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+                }
+            }
+        }
+    });
+
+    $('body').on('submit', '#createWarrantyForm', function (e)
     {
         save = 2;
         var inputEligibilityYears = $('#eligibility_year').val();
@@ -402,7 +347,7 @@
         //     cache:false,
         //     contentType: false,
         //     processData: false,
-        //     success: (result) => 
+        //     success: (result) =>
         //     {
         //         console.log(result)
         //             // let dataErrorCard = document.getElementById('dataErrorCard');
@@ -416,43 +361,43 @@
         // }
     });
     function clickAdd()
-    {  
-        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;  
-        var selectedBrands = [];       
+    {
+        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+        var selectedBrands = [];
         for(let i=1; i<index; i++)
         {
             var eachSelectedBrand = $("#brands"+i).val();
-            $.each(eachSelectedBrand, function( ind, value ) 
+            $.each(eachSelectedBrand, function( ind, value )
             {
                 selectedBrands.push(value);
-            });  
-        } 
+            });
+        }
         $.ajax
         ({
             url:"{{url('getBranchForWarranty')}}",
             type: "POST",
             data:
-            {
-                filteredArray: selectedBrands,
-                _token: '{{csrf_token()}}'
-            },
+                {
+                    filteredArray: selectedBrands,
+                    _token: '{{csrf_token()}}'
+                },
             dataType : 'json',
             success: function(data)
-            { 
+            {
                 myarray = data;
                 var size= myarray.length;
                 if(size >= 1)
                 {
                     $(".form_field_outer").append(`
-                        <div class="row form_field_outer_row">
+                        <div class="row form_field_outer_row" id="row-${index}" >
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>                                                                 
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
-                                    
-                                </select>                      
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
+
+                                </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
-                            </div>                                      
+                            </div>
                             <div class="col-xxl-2 col-lg-3 col-md-3">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
@@ -461,18 +406,18 @@
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
-                                </div>                                   
+                                </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
-                                    <i class="fas fa-trash-alt"></i>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" hidden>
+                                <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
+                                    <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                         </div>
-                    `); 
-                    $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); 
-                    $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
+                    `);
+                    $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false);
+                    $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true);
                     let brandDropdownData   = [];
                     $.each(data,function(key,value)
                     {
@@ -485,17 +430,18 @@
                     $('#brands'+index).html("");
                     $('#brands'+index).select2
                     ({
-                        placeholder: 'Select value',
+                        placeholder:"Choose Brands....     Or     Type Here To Search....",
                         allowClear: true,
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
-                        templateResult: hideSelected,
+                        // templateResult: hideSelected,
                     });
                 }
             }
         });
-    } 
-     function validationOnKeyUp(clickInput)
+    }
+
+    function validationOnKeyUp(clickInput)
     {
         if(save == 2)
         {
@@ -576,10 +522,10 @@
                 {
                     removePrice1Error();
                 }
-            } 
+            }
             if(clickInput.id == 'brands1')
             {
-                value = $('#brands1').val(); 
+                value = $('#brands1').val();
                 if(value == '')
                 {
                     $msg = "Brand is required";
@@ -591,7 +537,7 @@
                 }
             }
         }
-    }   
+    }
     function setDropdownValue(index)
     {
         $("#brands"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
@@ -601,18 +547,18 @@
             templateResult: hideSelected,
         });
     }
-    function hideSelected(value) 
-    {
-        if (value && !value.selected) {
-            return $('<span>' + value.text + '</span>');
-        } 
-    }
+    // function hideSelected(value)
+    // {
+    //     if (value && !value.selected) {
+    //         return $('<span>' + value.text + '</span>');
+    //     }
+    // }
     $('.radioFixingCharge').click(function()
     {
         IsOpenMileage = $(this).val();
         if($(this).val() == 'yes')
         {
-            hideExtendedWarrantyMileage();  
+            hideExtendedWarrantyMileage();
         }
         else
         {
@@ -713,5 +659,5 @@
         document.getElementById("purchase_price1").classList.remove("is-invalid");
         document.getElementById("Price1Error").classList.remove("paragraph-class");
     }
-</script>    
+</script>
 @endsection
