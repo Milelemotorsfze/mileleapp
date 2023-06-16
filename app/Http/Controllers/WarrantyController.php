@@ -78,7 +78,8 @@ class WarrantyController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $premium = WarrantyPremiums::findOrFail($id);
+        return view('warranty.show', compact('premium'));
     }
 
     /**

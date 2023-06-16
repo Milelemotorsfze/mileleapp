@@ -62,7 +62,7 @@
               </td>
               <td>
                 @can('warranty-view')
-                <a class="btn btn-sm btn-success" href=""><i class="fa fa-eye" aria-hidden="true"></i></a>
+                <a class="btn btn-sm btn-success" href="{{ route('warranty.show',$premium->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                 @endcan
                 @can('warranty-edit')
                 <a class="btn btn-sm btn-info" href="{{ route('warranty.edit',$premium->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>

@@ -34,4 +34,8 @@ class WarrantyPremiums extends Model
     {
         return $this->hasMany(WarrantyBrands::class,'warranty_premiums_id','id');
     }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
 }
