@@ -134,7 +134,7 @@
                 </ul>
             </div>
         @endif
-        <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data">
+        <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.store') }}">
         <!-- {{ route('addon.store') }} -->
         <!-- method="POST" enctype="multipart/form-data" action="" -->
         <!--  action="{{ route('addon.store') }}" -->
@@ -148,7 +148,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <select id="addon_type" name="addon_type" class="form-control widthinput" onchange=getAddonCodeAndDropdown() autofocus>
+                            <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus>
                                 <option value="">Choose Addon Type</option>
                                 <option value="P">Accessories</option>
                                 <!-- <option value="D">Documentation</option>
@@ -206,7 +206,8 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                        <input id="purchase_price" type="text" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" readonly>
+
+                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -222,7 +223,7 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                        <input id="selling_price" type="number" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+                        <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  

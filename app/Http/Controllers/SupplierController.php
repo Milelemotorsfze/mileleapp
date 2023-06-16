@@ -77,7 +77,7 @@ class SupplierController extends Controller
         $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
         {
-            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices')->orderBy('id', 'ASC')->get();
+            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice')->orderBy('id', 'ASC')->get();
             // dd($addon1);
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')
@@ -995,17 +995,17 @@ class SupplierController extends Controller
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['updated_by'] = $authId;
                 $addon_id = $request->addon_id;
-                if($addon_id != NULL)
-                {
-                    if(count($addon_id) > 0)
-                    {
-                        foreach($addon_id as $addon_id)
-                        {
-                            $supplier_addon['addon_details_id'] = $addon_id;
-                            $supplierAddon1 = SupplierAddons::create($supplier_addon);
-                        }
-                    }
-                }
+                // if($addon_id != NULL)
+                // {dd('hi');
+                //     if(count($addon_id) > 0)
+                //     {
+                //         foreach($addon_id as $addon_id)
+                //         {
+                //             $supplier_addon['addon_details_id'] = $addon_id;
+                //             $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                //         }
+                //     }
+                // }
                 $supAdd['supplier_id'] = $suppliers->id;
                 $supAdd['updated_by'] = $authId;
                 if($request->activeTab == 'addSupplierDynamically')

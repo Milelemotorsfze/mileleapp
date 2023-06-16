@@ -12,6 +12,7 @@ use App\Models\Supplier;
 use App\Models\SupplierAddons;
 use App\Models\MasterModelDescription;
 use App\Models\KitItems;
+use App\Models\AddonSellingPrice;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -224,6 +225,7 @@ class AddonController extends Controller
 //         }
 //          else 
 //         {
+    $input = $request->all();
     if($request->image)
     {
         $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();  
@@ -233,8 +235,7 @@ class AddonController extends Controller
         $input['image'] = $fileName;
     }
             
-            $input = $request->all();
-            $input['addon_id'] = $request->addon_name;
+            $input['addon_id'] = $request->addon_id;
             $input['currency'] = 'AED';
             $input['created_by'] = $authId;
             
@@ -244,8 +245,7 @@ class AddonController extends Controller
             // $newAddonCode = "P".$newAddonCodeNumber;
             // $input['addon_code'] = $newAddonCode;
             $masterAddonByType = Addon::where('addon_type',$request->addon_type)->pluck('id');
-
-            if($masterAddonByType != '')
+            if(count($masterAddonByType) > 0)
             {
                 $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
                 if($lastAddonCode != '')
@@ -253,18 +253,27 @@ class AddonController extends Controller
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
                     $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
                     $newAddonCodeNumber =  $lastAddonCodeNumber+1;
-                    $inputaddontype['addon_code'] = $request->addon_type.$newAddonCodeNumber;
+                    $input['addon_code'] = $request->addon_type.$newAddonCodeNumber;
                 }
                 else
                 {
-                    $inputaddontype['addon_code'] = $request->addon_type."1";
+                    $input['addon_code'] = $request->addon_type."1";
                 }  
             }
             else
             {
-                $inputaddontype['addon_code'] = $request->addon_type."1";
+                $input['addon_code'] = $request->addon_type."1";
             }
+            // dd($input);
             $addon_details = AddonDetails::create($input);
+            if($request->selling_price != '')
+            {
+                $createsellingPriceInput['addon_details_id'] = $addon_details->id;
+                $createsellingPriceInput['selling_price'] = $request->selling_price;
+                $createsellingPriceInput['status'] = 'active';
+                $createsellingPriceInput['created_by'] = $authId;
+                AddonSellingPrice::create($createsellingPriceInput);
+            }
             if($request->addon_type == 'SP')
             {
                 if($request->brand)
@@ -427,7 +436,8 @@ class AddonController extends Controller
                     }
                 }
             }
-            return redirect()->route('addon.index')
+            $data = 'all';
+            return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
         // }
     }

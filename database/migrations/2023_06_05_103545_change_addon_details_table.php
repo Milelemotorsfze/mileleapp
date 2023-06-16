@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('addon_details', function (Blueprint $table) {
-//            $table->decimal('selling_price', 10,2)->default('0.00')->nullable()->change();
-//            $table->decimal('fixing_charge_amount', 10,2)->default('0.00')->nullable()->change();
+           $table->decimal('selling_price', 10,2)->default('0.00')->nullable()->change();
+           $table->decimal('fixing_charge_amount', 10,2)->default('0.00')->nullable()->change();
         });
     }
 

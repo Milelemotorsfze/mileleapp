@@ -70,7 +70,7 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Years') }}</label>
                         <div class="input-group">
-                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" step="any" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">Years</span>
                             </div>
