@@ -46,19 +46,39 @@
                 </div>
                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
+                    <div class="input-group">
                     <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_aed]" id="Supplier${supplier}Kit${index}UnitPriceAED" type="number" class="form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyUniTPriceAED(${supplier},${index})">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                 </div>
                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
+                    <div class="input-group">
                     <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_aed]" id="Supplier${supplier}Kit${index}TotalPriceAED" type="number" class="Supplier${supplier}TotalPriceInAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${supplier},${index})">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                 </div>
                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
+                    <div class="input-group">
                     <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_usd]" id="Supplier${supplier}Kit${index}UnitPriceUSD" type="number" class="Supplier${supplier}TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${supplier},${index})">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>  
+                                                </div> 
                 </div>
                 <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: #F8F8F8;">
                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
+                    <div class="input-group">
                     <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_usd]" id="Supplier${supplier}Kit${index}TotalPriceUSD" type="number" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyTotalPriceUSD(${supplier},${index})">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>  
+                                                </div> 
                 </div>
                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                     <button class="btn_round removeKitItemForSupplier${supplier}" onclick=del(this,${supplier}) disabled>
@@ -119,11 +139,21 @@
                                                 </div>
                                                 <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                                    <div class="input-group">
                                                     <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_aed]" id="Supplier${index}TotalPriceAED" type="text" class="leastPurchasePriceAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
+                                                    <div class="input-group">
                                                     <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_usd]" id="Supplier${index}TotalPriceUSD" type="text" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                     <button class="btn_round removeKitSupplier" disabled>
@@ -166,19 +196,39 @@
                                                 </div>
                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
+                                                    <div class="input-group">
                                                     <input  name="kitSupplierAndPrice[${index}][item][1][unit_price_in_aed]" id="Supplier${index}Kit1UnitPriceAED" type="number" class="form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyUniTPriceAED(${index},1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
+                                                    <div class="input-group">
                                                     <input  name="kitSupplierAndPrice[${index}][item][1][total_price_in_aed]" id="Supplier${index}Kit1TotalPriceAED" type="number" class="Supplier${index}TotalPriceInAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${index},1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
+                                                    <div class="input-group">
                                                     <input  name="kitSupplierAndPrice[${index}][item][1][unit_price_in_usd]" id="Supplier${index}Kit1UnitPriceUSD" type="number" class="Supplier${index}TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${index},1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
+                                                    <div class="input-group">
                                                     <input  name="kitSupplierAndPrice[${index}][item][1][total_price_in_usd]" id="Supplier${index}Kit1TotalPriceUSD" type="number" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyTotalPriceUSD(${index},1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>  
+                                                </div> 
                                                 </div>
                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                     <button  class="btn_round removeKitItemForSupplier${index}" onclick=del(this,${index}) disabled hidden>
