@@ -202,6 +202,18 @@ input {
     {
         height:32px!important;
     }
+    input:focus 
+    {
+        border-color: #495057!important;
+    }
+    select:focus 
+    {
+        border-color: #495057!important;
+    }
+    button:focus 
+    {
+        border-color: #495057!important;
+    }
 </style>
 @section('content')
 @can('addon-supplier-create')
