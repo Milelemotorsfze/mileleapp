@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MasterWarrantyPolicies;
 use App\Models\Brand;
 use App\Models\WarrantyPremiums;
 use App\Models\WarrantyBrands;
+use Illuminate\Support\Facades\DB;
+
 class WarrantyController extends Controller
 {
     /**
@@ -26,7 +29,12 @@ class WarrantyController extends Controller
     {
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
-        return view('warranty.create', compact('policyNames','brands'));
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
+            })
+            ->get();
+        return view('warranty.create', compact('policyNames','brands','suppliers'));
     }
 
     /**
@@ -97,7 +105,13 @@ class WarrantyController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $warranty = WarrantyPremiums::findOrFail($id);
+        DB::beginTransaction();
+            WarrantyBrands::where('warranty_premiums_id', $id)->delete();
+            $warranty->delete();
+        DB::commit();
+
+        return response(true);
     }
     public function getBranchForWarranty(Request $request)
     {

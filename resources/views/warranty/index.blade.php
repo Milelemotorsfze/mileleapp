@@ -68,7 +68,10 @@
                 <a class="btn btn-sm btn-info" href="{{ route('warranty.edit',$premium->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                 @endcan
                 @can('warranty-delete')
-                <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id=""> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                    <button type="button" class="btn btn-danger btn-sm warranty-delete sm-mt-3"
+                            data-id="{{ $premium->id }}" data-url="{{ route('warranty.destroy', $premium->id) }}">
+                        <i class="fa fa-trash"></i>
+                    </button>
                 @endcan
                 @can('warranty-active-inactive')
                 @if($premium->status == 'active')
@@ -86,5 +89,31 @@
     </div>
 
 @endcan
-    @endsection
+@endsection
+@push('scripts')
+    <script>
+        $('.warranty-delete').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            _method: 'DELETE',
+                            id: 'id',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Item Deleted successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
 
+    </script>
+@endpush

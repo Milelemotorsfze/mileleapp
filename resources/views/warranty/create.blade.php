@@ -126,6 +126,17 @@
                             <span id="ClaimLimitError" class="invalid-feedback"></span>
                         </div>
                     </div>
+                    <div class="col-xxl-2 col-lg-3 col-md-4">
+                        <span class="error">* </span>
+                        <label for="supplier" class="col-form-label text-md-end">Supplier</label>
+                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus required>
+                            <option></option>
+                            @foreach($suppliers as $supplier)
+                                <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
+                            @endforeach
+                        </select>
+                        <span id="SupplierError" class="invalid-feedback"></span>
+                    </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4" id="ExtendedWarrantyMileageDiv" hidden>
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Mileage') }}</label>
@@ -202,7 +213,9 @@
 
     $(document).ready(function ()
     {
-
+        $('#supplier_id').select2({
+            placeholder:"Choose Supplier",
+        });
         // $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
         // $('#brands1').select2();
         $('#brands1').select2({
@@ -498,6 +511,19 @@
                     removeClaimLimitError();
                 }
             }
+            if(clickInput.id == 'supplier_id')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Supplier is required";
+                    showSupplierError($msg);
+                }
+                else
+                {
+                    removeSupplierError();
+                }
+            }
             if(clickInput.id == 'extended_warranty_milage')
             {
                 var value = clickInput.value;
@@ -623,6 +649,18 @@
         document.getElementById("ClaimLimitError").textContent="";
         document.getElementById("claim_limit_in_aed").classList.remove("is-invalid");
         document.getElementById("ClaimLimitError").classList.remove("paragraph-class");
+    }
+    function showSupplierError($msg)
+    {
+        document.getElementById("SupplierError").textContent=$msg;
+        document.getElementById("supplier_id").classList.add("is-invalid");
+        document.getElementById("SupplierError").classList.add("paragraph-class");
+    }
+    function removeSupplierError()
+    {
+        document.getElementById("SupplierError").textContent="";
+        document.getElementById("supplier_id").classList.remove("is-invalid");
+        document.getElementById("SupplierError").classList.remove("paragraph-class");
     }
     function showExtendedWarrantyMilageError($msg)
     {
