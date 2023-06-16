@@ -110,12 +110,16 @@
                   <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-7">
                     {{$addonsdata->addon_code}}
                   </div>
+                  @if($addonsdata->LeastPurchasePrices!= null)
+                  @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
-                    Purchase Price
+                    Least Purchase Price
                   </div>
                   <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-7">
-                    {{$addonsdata->purchase_price}} AED
+                    {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
                   </div>
+                  @endif
+                  @endif
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
                     Selling Price
                   </div>

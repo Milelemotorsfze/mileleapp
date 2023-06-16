@@ -25,7 +25,7 @@ class AddonController extends Controller
     public function index($data)
     {
 
-        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines');
+        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices');
         if($data != 'all')
         {
             $addon1 = $addon1->where('addon_type_name',$data);
@@ -34,7 +34,6 @@ class AddonController extends Controller
         $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        // $addons = AddonDetails::with('AddonTypes.brands','AddonTypes.modelLines','AddonTypes.brands')
         $addons = DB::table('addon_details');
         if($data != 'all')
         {
@@ -44,6 +43,9 @@ class AddonController extends Controller
                     ->join('addon_types','addon_types.addon_details_id','addon_details.id')
                     ->join('brands','brands.id','addon_types.brand_id')
                     ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
+                    // ->join('supplier_addons','supplier_addons.addon_details_id','addon_details.id')
+                    // ->where('supplier_addons.status', '=', 'active')
+                    // ->where('')
                     ->select('addons.name',
                     'addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code',
                     'addon_details.payment_condition','addon_details.lead_time',

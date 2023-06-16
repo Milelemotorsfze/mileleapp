@@ -46,7 +46,7 @@
             <th>Model Line</th>
             <th>Lead Time</th>
             <th>Additional Remarks</th>
-            <th>Purchase Price(AED)</th>
+            <th>Least Purchase Price</th>
             <th>Selling Price(AED)</th>
             <th>Payment Condition</th>
             <th>Action</th>
