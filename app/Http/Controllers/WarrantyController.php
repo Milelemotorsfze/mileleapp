@@ -27,7 +27,7 @@ class WarrantyController extends Controller
         $index = 0;
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
-        return view('warranty.test', compact('policyNames','brands','index'));
+        return view('warranty.create', compact('policyNames','brands','index'));
     }
 
     /**
@@ -35,7 +35,7 @@ class WarrantyController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+//         dd($request->all());
         $authId = Auth::id();
         $input = $request->all();
         $input['created_by'] = $authId;

@@ -147,12 +147,12 @@
                     </center>
                 </div>
                 <div class="card-body">
-                    <div class="form_field_outer">
+                    <div class="form_field_outer" id="row-1">
                         <div class="row form_field_outer_row">
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[1][brands][]" id="brands1" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
+                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control widthinput brands" autofocus>
                                     @foreach($brands as $brand)
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                     @endforeach
@@ -171,7 +171,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
+                                <button class="btn_round  removeButton" id="remove-1" disabled hidden>
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
@@ -189,6 +189,7 @@
             </div>
         </form>
     </div>
+    <input type="hidden" id="indexValue" value="">
     <div class="overlay"></div>
     @endcan
     <script type="text/javascript">
@@ -202,125 +203,69 @@
     $(document).ready(function ()
     {
 
-        $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
+        // $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
         // $('#brands1').select2();
         $('#brands1').select2({
             allowClear: true,
             minimumResultsForSearch: -1,
-            templateResult: hideSelected,
+            placeholder:"Choose Brands....     Or     Type Here To Search....",
+            // templateResult: hideSelected,
         });
-        $("#brands1").data('originalvalues', []);
-        $("#brands1").on('change', function(e)
-        {
-            var that = this;
-            removed = []
-            $($(this).data('originalvalues')).each(function(k, v)
-            {
-                if (!$(that).val())
-                {
-                    removed[removed.length] = v;
-                    return false;
-                }
-                if ($(that).val().indexOf(v) == -1)
-                {
-                    removed[removed.length] = v;
-                    $.each(removed, function( ind, value )
-                    {
-                        filteredArray = selectedBrands.filter(function(e) { return e !== value })
-                    });
-                    $.ajax
-                    ({
-                        url:"{{url('getBranchForWarranty')}}",
-                        type: "POST",
-                        data:
-                        {
-                            filteredArray: filteredArray,
-                            _token: '{{csrf_token()}}'
-                        },
-                        dataType : 'json',
-                        success: function(data)
-                        {
-                            myarray = data;
-                            var size= myarray.length;
-                            if(size >= 1)
-                            {
-                                let brandDropdownData   = [];
-                                $.each(data,function(key,value)
-                                {
-                                    brandDropdownData.push
-                                    ({
-                                        id: value.id,
-                                        text: value.brand_name
-                                    });
-                                });
-                                for(let i=1; i<=totalRow; i++)
-                                {
-                                    var brandRowID = "brands"+i;
-                                    var brandRowSelectedValue = [];
-                                    if(brandRowID != "brands1")
-                                    {
-                                        var brandRowSelectedValue = $("#brands"+i).val();
-                                        $('#'+brandRowID).html("");
-                                        $('#'+brandRowID).select2
-                                        ({
-                                            placeholder: 'Select value',
-                                            allowClear: true,
-                                            data: brandDropdownData,
-                                            minimumResultsForSearch: -1,
-                                            templateResult: hideSelected,
-                                        });
-                                        // $("#"+brandRowID).val(brandRowSelectedValue).trigger('change');
-                                    }
-                                }
-                            }
-                        }
-                    });
-                    for(let i=1; i<=totalRow; i++)
-                    {
-                        var brandRowID = "brands"+i;
-                        if(brandRowID != "brands1")
-                        {
+        // $("#brands1").data('originalvalues', []);
+        var index = 1;
+        $('#indexValue').val(index);
 
-                        }
-                    }
-                }
+        $(document.body).on('select2:select', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var value = e.params.data.id;
+            hideOption(index,value);
+        });
+        $(document.body).on('select2:unselect', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var data = e.params.data;
+            appendOption(index,data);
+        });
+        $(document.body).on('click', ".removeButton", function (e) {
+            var indexNumber = $(this).attr('data-index');
+
+            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+               var id = (this.value);
+               var text = (this.text);
+                addOption(id,text)
             });
-            if ($(this).val())
-            {
-                $(this).data('originalvalues', $(this).val());
-            }
-            else
-            {
-                $(this).data('originalvalues', []);
-            }
-            if(removed != '')
-            {
-                for(let i=1; i<=totalRow; i++)
-                {
-                    var brandRowID = "brands"+i;
-                    if(brandRowID != "brands1")
-                    {
-                        $('#'+brandRowID+' option[value='+removed+']').detach();
-                    }
-                }
-                selectedBrands = $(this).val();
-            }
-            else
-            {
-                selectedBrands = $(this).val();
-                var diff = $(selectedBrands).not(oldSelectedBrands).get();
-                for(let i=1; i<=totalRow; i++)
-                {
-                    var brandRowID = "brands"+i;
-                    if(brandRowID != "brands1")
-                    {
 
-                        $('#'+brandRowID+' option[value='+diff+']').detach();
-                    }
-                }
-                oldSelectedBrands = selectedBrands;
+            $(this).closest('#row-'+indexNumber).remove();
+
+            // for (var i = index; i <= indexValue; i++) {
+            //     var index = $(".form_field_outer").find(".form_field_outer_row").length - 1;
+            // }
+            // $('#indexValue').val(index);
+            // $(".form_field_outer select:eq(" + (index - 1) + ")").after(this);
+        })
+        function addOption(id,text) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+              $('#brands'+i).append($('<option>', {value: id, text :text}))
             }
-        });
+        }
+
+        function hideOption(index,value) {
+            var indexValue = $('#indexValue').val();
+            for (var i = 1; i <= indexValue; i++) {
+                if (i != index) {
+                    var currentId = 'brands' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();
+                }
+            }
+        }
+        function appendOption(index,data) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+                if(i != index) {
+                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+                }
+            }
+        }
     });
 
     $('body').on('submit', '#createWarrantyForm', function (e)
@@ -432,10 +377,10 @@
             url:"{{url('getBranchForWarranty')}}",
             type: "POST",
             data:
-            {
-                filteredArray: selectedBrands,
-                _token: '{{csrf_token()}}'
-            },
+                {
+                    filteredArray: selectedBrands,
+                    _token: '{{csrf_token()}}'
+                },
             dataType : 'json',
             success: function(data)
             {
@@ -444,11 +389,11 @@
                 if(size >= 1)
                 {
                     $(".form_field_outer").append(`
-                        <div class="row form_field_outer_row">
+                        <div class="row form_field_outer_row" id="row-${index}" >
                             <div class="col-xxl-9 col-lg-8 col-md-8">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" multiple="true" style="width: 100%;"  class="form-control widthinput" autofocus>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
 
                                 </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
@@ -464,9 +409,9 @@
                                 </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
-                                    <i class="fas fa-trash-alt"></i>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" hidden>
+                                <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
+                                    <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                         </div>
@@ -485,17 +430,18 @@
                     $('#brands'+index).html("");
                     $('#brands'+index).select2
                     ({
-                        placeholder: 'Select value',
+                        placeholder:"Choose Brands....     Or     Type Here To Search....",
                         allowClear: true,
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
-                        templateResult: hideSelected,
+                        // templateResult: hideSelected,
                     });
                 }
             }
         });
     }
-     function validationOnKeyUp(clickInput)
+
+    function validationOnKeyUp(clickInput)
     {
         if(save == 2)
         {
@@ -601,12 +547,12 @@
             templateResult: hideSelected,
         });
     }
-    function hideSelected(value)
-    {
-        if (value && !value.selected) {
-            return $('<span>' + value.text + '</span>');
-        }
-    }
+    // function hideSelected(value)
+    // {
+    //     if (value && !value.selected) {
+    //         return $('<span>' + value.text + '</span>');
+    //     }
+    // }
     $('.radioFixingCharge').click(function()
     {
         IsOpenMileage = $(this).val();
