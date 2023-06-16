@@ -363,6 +363,7 @@
     function clickAdd()
     {
         var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+        $('#indexValue').val(index);
         var selectedBrands = [];
         for(let i=1; i<index; i++)
         {

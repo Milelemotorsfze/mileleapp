@@ -4,7 +4,7 @@
   <div class="card-header">
     <h4 class="card-title">Warranty Info</h4>
     @can('warranty-create')
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>  
+      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
     @endcan
     </div>
     <div class="card-body">
@@ -29,17 +29,17 @@
             @foreach ($premiums as $key => $premium)
             <tr data-id="1">
               <td>{{ ++$i }}</td>
-              <td>{{ $premium->PolicyName->name }}</td>
+              <td>{{ $premium->PolicyName->name ?? ''}}</td>
               <td>
                 @if($premium->vehicle_category1 == 'non_electric')
-                  Non Electric / 
+                  Non Electric /
                 @elseif($premium->vehicle_category1 == 'electric')
-                  Electric / 
+                  Electric /
                 @endif
                 @if($premium->vehicle_category2 == 'normal_and_premium')
-                  Normal And Premium  
+                  Normal And Premium
                 @elseif($premium->vehicle_category2 == 'lux_sport_exotic')
-                  Lux Sport Exotic  
+                  Lux Sport Exotic
                 @endif
               </td>
               <td>{{ $premium->eligibility_year }} Years</td>
@@ -47,7 +47,7 @@
               <td>{{ $premium->extended_warranty_period }} Months</td>
               <td>
                 @if($premium->is_open_milage == 'yes')
-                  Open Mileage 
+                  Open Mileage
                 @elseif($premium->is_open_milage == 'no')
                   {{$premium->extended_warranty_milage}} KM
                 @endif
@@ -84,7 +84,6 @@
         </table>
       </div>
     </div>
- 
 
 @endcan
     @endsection

@@ -24,10 +24,9 @@ class WarrantyController extends Controller
      */
     public function create()
     {
-        $index = 0;
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
-        return view('warranty.create', compact('policyNames','brands','index'));
+        return view('warranty.create', compact('policyNames','brands'));
     }
 
     /**
