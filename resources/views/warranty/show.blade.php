@@ -124,6 +124,11 @@
                                         <td>{{ $warrantBrand->brand->brand_name }}</td>
                                         <td>{{ $warrantBrand->price }}</td>
                                         <td>
+                                            @can('warranty-view')
+                                                <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm ">
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            @endcan
                                             @can('warranty-edit')
                                                 <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantBrand->id}}">
                                                     <i class="fa fa-edit"></i></button>
