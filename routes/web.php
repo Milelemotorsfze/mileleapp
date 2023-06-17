@@ -104,6 +104,7 @@ Route::get('/d', function () {
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
     Route::get('supplier/addon/price/{id}', [SupplierController::class, 'addonprice'])->name('suppliers.addonprice');
     Route::post('createNewSupplierAddonPrice', [SupplierController::class, 'createNewSupplierAddonPrice'])->name('addon.createNewSupplierAddonPrice');
+    Route::get('supplier/purchasepricehistory/{id}', [SupplierController::class, 'purchasepricehistory'])->name('suppliers.purchasepricehistory');
     // Demand & Planning Module
 
     // suppliers

@@ -68,8 +68,16 @@ class SupplierController extends Controller
         $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
         return view('suppliers.addonprice',compact('supplierAddons'));
     }
+    public function purchasepricehistory($id)
+    {
+        $currentPrice = SupplierAddons::where('id',$id)->first();
+        $history = SupplierAddons::where('supplier_id',$currentPrice->supplier_id)->where('addon_details_id',$currentPrice->addon_details_id)
+        ->with('supplierAddonDetails.AddonName','CreatedBy','updatedBy')->latest('updated_at')->get();
+        // $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
+        return view('suppliers.pricehistory',compact('history'));
+    }
     public function createNewSupplierAddonPrice(Request $request)
-    {dd($request->all());
+    {
         $authId = Auth::id();
         // $validator = Validator::make($request->all(), [
         //    'name' => 'required',
@@ -81,9 +89,20 @@ class SupplierController extends Controller
         // else 
         // {
             $input = $request->all();
-
-            $input['created_by'] = $authId;
-            $addons = Addon::create($input);
+            $existibgData = SupplierAddons::where('id',$request->inputId)->where('status','active')->latest('updated_at')->first();
+            if($existibgData)
+            {
+                $existibgData->updated_by = $authId;
+                $existibgData->status = 'inactive';
+                $existibgData->update();
+                $input['supplier_id'] = $existibgData->supplier_id;
+                $input['addon_details_id'] = $existibgData->addon_details_id;
+                $input['purchase_price_aed'] = $request->name;
+                $input['created_by'] = $authId;
+                $addons = SupplierAddons::create($input);
+                $addons = SupplierAddons::where('id',$addons->id)->first();
+            }
+            
             return response()->json($addons);
         // }
     }

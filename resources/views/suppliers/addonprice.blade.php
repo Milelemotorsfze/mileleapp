@@ -42,7 +42,7 @@
                     <td>{{++$i}}</td>
                     <td>{{$supplierAddon->supplierAddonDetails->AddonName->name}}</td>                   
                     <td>{{$supplierAddon->supplierAddonDetails->addon_code}}</td>
-                    <td>{{$supplierAddon->purchase_price_aed}} AED</td>
+                    <td id="{{$supplierAddon->id}}">{{$supplierAddon->purchase_price_aed}} AED</td>
                     <td>
                       @can('supplier-new-purchase-price')
                         <!-- <a data-toggle="popover" data-trigger="hover" title="Add New Price" data-placement="top" class="btn btn-sm btn-success"
@@ -67,9 +67,14 @@
                                         <label for="name" class="col-form-label text-md-end ">Add New Purchase Price</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <input hidden id="" type="text" class="form-control @error('name') is-invalid @enderror" name="id" value="{{}}" placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
-
-                                        <input id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
+                                    <input hidden id="inputId" type="text" class="form-control @error('name') is-invalid @enderror" name="id" value="{{ $supplierAddon->id }}" placeholder="Enter New Purchase Price"  autofocus>
+                                    <div class="input-group">
+                                    <input id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                                 
+                        </div> 
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
@@ -92,7 +97,7 @@
                         <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="">
                          <i class="fa fa-trash" aria-hidden="true"></i></a>
                       @endcan
-                      <a data-toggle="popover" data-trigger="hover" title="View History" data-placement="top" class="btn btn-sm btn-info modal-button" data-modal-id="">
+                      <a title="View History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.purchasepricehistory',$supplierAddon->id) }}">
                          <i class="fa fa-history" aria-hidden="true"></i></a>
                     </td>
                   </tr>
@@ -136,13 +141,13 @@
         {
             // create new addon and list new addon in addon list
             var value = $('#new_addon_name').val();
+            var inputId = $('#inputId').val();
             if(value == '')
             {
                 document.getElementById("newAddonError").textContent='Addon Name is Required';
             }
             else
             {
-                currentAddonType =  $('#addon_type').val();
                 $.ajax
                 ({
                     url:"{{url('createNewSupplierAddonPrice')}}",
@@ -150,24 +155,28 @@
                     data:
                     {
                         name: value,
-                        addon_type: currentAddonType,
+                        inputId:inputId,
                         _token: '{{csrf_token()}}'
                     },
                     dataType : 'json',
                     success: function(result)
                     {
+                      console.log('#'+inputId);
                         $('.overlay').hide();
                         $('.modal').removeClass('modalshow');
                         $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        $('#addon_id').val(result.id);
-                        var selectedValues = new Array();
-                        resetSelectedSuppliers(selectedValues);
-                        $('#addnewAddonButton').hide();
-                        $('#new_addon_name').val("");
-                        document.getElementById("newAddonError").textContent='';
-                        $msg = "";
-                        removeAddonNameError($msg);
+                        $msg = result.purchase_price_aed + "AED";
+                        document.getElementById(inputId).textContent=$msg;
+                        // $('#'+inputId).val(result.purchase_price_aed);
+                        // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+                        // $('#addon_id').val(result.id);
+                        // var selectedValues = new Array();
+                        // resetSelectedSuppliers(selectedValues);
+                        // $('#addnewAddonButton').hide();
+                        // $('#new_addon_name').val("");
+                        // document.getElementById("newAddonError").textContent='';
+                        // $msg = "";
+                        // removeAddonNameError($msg);
                     }
                 });
             }

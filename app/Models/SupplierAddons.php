@@ -27,5 +27,12 @@ class SupplierAddons extends Model
     {
         return $this->hasOne(AddonDetails::class,'id','addon_details_id');
     }
-   
+    public function updatedBy()
+    {
+        return $this->hasOne(User::class,'id','updated_by');
+    }
+    public function CreatedBy()
+    {
+        return $this->hasOne(User::class,'id','created_by');
+    }
 }
