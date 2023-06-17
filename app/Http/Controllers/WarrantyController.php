@@ -18,7 +18,8 @@ class WarrantyController extends Controller
      */
     public function index()
     {
-        $premiums = WarrantyPremiums::with('PolicyName')->get();
+        $premiums = WarrantyPremiums::with('PolicyName')
+                    ->orderBy('id','desc')->get();
         return view('warranty.index', compact('premiums'));
     }
 
@@ -56,6 +57,7 @@ class WarrantyController extends Controller
                 foreach($request->brandPrice as $brandPrice)
                 {
                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
+                    $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
                     if(isset($brandPrice['brands']))
                     {
                         if(count($brandPrice['brands']) > 0)

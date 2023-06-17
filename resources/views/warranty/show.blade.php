@@ -40,6 +40,14 @@
             </div>
             <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-12">
+                    <label for="choices-single-default" class="form-label"> Supplier</label>
+                </div>
+                <div class="col-lg-6 col-md-9 col-sm-12">
+                    <span>{{$premium->supplier->supplier}}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-12">
                     <label for="choices-single-default" class="form-label">Vehicle Category 1</label>
                 </div>
                 <div class="col-lg-6 col-md-9 col-sm-12">
@@ -106,82 +114,109 @@
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                            <table id="warranty-brands-table" class="table table-striped table-editable table-edits table table-condensed" >
-                                <thead class="bg-soft-secondary">
-                                <tr>
-                                    <th>S.NO</th>
-                                    <th>Brand</th>
-                                    <th>Price</th>
-                                    <th>Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <div hidden>{{$i=0;}}
-                                </div>
-                                @foreach ($warrantBrands as $key => $warrantBrand)
-                                    <tr>
-                                        <td> {{ ++$i }}</td>
-                                        <td>{{ $warrantBrand->brand->brand_name }}</td>
-                                        <td>{{ $warrantBrand->price }}</td>
-                                        <td>
-                                            @can('warranty-view')
-                                                <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm ">
-                                                    <i class="fa fa-eye"></i>
-                                                </a>
-                                            @endcan
-                                            @can('warranty-edit')
-                                                <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantBrand->id}}">
-                                                    <i class="fa fa-edit"></i></button>
-                                            @endcan
-                                            @can('warranty-delete')
-                                                <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantBrand->id }}"
-                                                        data-url="{{ route('warranty-brands.destroy', $warrantBrand->id) }}">
-                                                    <i class="fa fa-trash"></i></button>
-                                            @endcan
-                                        </td>
-                                        <div class="modal fade" id="edit-price-{{$warrantBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog ">
-                                                <form id="form-update" action="{{ route('warranty-brands.update', $warrantBrand->id) }}" method="POST" >
-                                                    @method('PUT')
-                                                    @csrf
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Price</h1>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body p-3">
-                                                            <div class="col-lg-12">
-                                                                <div class="row">
-                                                                    <div class="row mt-2">
-                                                                        <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                            <label class="form-label font-size-13 text-muted">Price</label>
-                                                                        </div>
-                                                                        <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                            <input type="number" name="price" class="form-control" id="price"  placeholder="Enter Price"
-                                                                                   oninput="validity.valid||(value='');" min="0">
-                                                                            @error('price')
-                                                                            <div role="alert">
-                                                                                <strong>{{ $message }}</strong>
-                                                                            </div>
-                                                                            @enderror
+                    <table id="warranty-brands-table" class="table table-striped table-editable table-edits table table-condensed" >
+                        <thead class="bg-soft-secondary">
+                        <tr>
+                            <th>S.NO</th>
+                            <th>Brand</th>
+                            <th>Purchase Price</th>
+                            <th>Selling Price</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <div hidden>{{$i=0;}}
+                        </div>
+                        @foreach ($warrantBrands as $key => $warrantBrand)
+                            <tr>
+                                <td> {{ ++$i }}</td>
+                                <td>{{ $warrantBrand->brand->brand_name }}</td>
+                                <td>{{ $warrantBrand->price }} AED</td>
+                                <td>{{ $warrantBrand->selling_price }} AED</td>
+                                <td>
+                                    @can('warranty-view')
+                                        <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm ">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+                                    @endcan
+                                    @can('warranty-edit')
+                                        <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantBrand->id}}">
+                                            <i class="fa fa-edit"></i></button>
+                                    @endcan
+                                    @can('warranty-delete')
+                                        <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantBrand->id }}"
+                                                data-url="{{ route('warranty-brands.destroy', $warrantBrand->id) }}">
+                                            <i class="fa fa-trash"></i></button>
+                                    @endcan
+                                </td>
+                                <div class="modal fade" id="edit-price-{{$warrantBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog ">
+                                        <form id="form-update" action="{{ route('warranty-brands.update', $warrantBrand->id) }}" method="POST" >
+                                            @method('PUT')
+                                            @csrf
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Prices</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Purchase Price</label>
+                                                                </div>
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="input-group">
+                                                                        <input type="number" name="price" class="form-control" id="price"  placeholder="Enter Purchase Price"
+                                                                           oninput="validity.valid||(value='');" min="0">
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
+                                                                    @error('price')
+                                                                    <div role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </div>
+                                                                    @enderror
+                                                                </div>
+                                                            </div>
+                                                            <div class="row mt-2">
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <label class="form-label font-size-13 text-muted">Selling Price</label>
+                                                                </div>
+                                                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                    <div class="input-group">
+                                                                        <input type="number" name="selling_price" class="form-control" placeholder="Enter Selling Price"
+                                                                               oninput="validity.valid||(value='');" min="0">
+                                                                        <div class="input-group-append">
+                                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    @error('selling_price')
+                                                                    <div role="alert">
+                                                                        <strong>{{ $message }}</strong>
+                                                                    </div>
+                                                                    @enderror
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                            <button type="submit" class="btn btn-primary ">Submit</button>
-                                                        </div>
                                                     </div>
-                                                </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary ">Submit</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     @endcan

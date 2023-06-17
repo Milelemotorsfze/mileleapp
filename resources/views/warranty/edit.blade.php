@@ -156,7 +156,7 @@
             <div class="card"  id="kitSupplier" >
                 <div class="card-header">
                     <center>
-                        <h4 class="card-title">Purchase Prices</h4>
+                        <h4 class="card-title">Warranty Brands</h4>
                     </center>
                 </div>
                 <div class="card-body">
@@ -491,8 +491,7 @@
                     $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true);
                     let brandDropdownData   = [];
                     $.each(data,function(key,value)
-                    {
-
+                    {-
                         brandDropdownData.push
                         ({
                             id: value.id,
@@ -509,7 +508,6 @@
                         minimumResultsForSearch: -1,
                         // templateResult: hideSelected,
                     });
-
                 }
             }
         });

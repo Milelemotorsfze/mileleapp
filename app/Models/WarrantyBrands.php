@@ -14,6 +14,7 @@ class WarrantyBrands extends Model
         'warranty_premiums_id',
         'brand_id',
         'price',
+        'selling_price',
         'status',
         'created_by',
         'updated_by',
