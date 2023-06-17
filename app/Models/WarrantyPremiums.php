@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WarrantyPremiums extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "warranty_premiums";
     protected $fillable = [
         'warranty_policies_id',
+        'supplier_id',
         'vehicle_category1',
         'vehicle_category2',
         'eligibility_year',
@@ -31,5 +33,9 @@ class WarrantyPremiums extends Model
     public function BrandPrice()
     {
         return $this->hasMany(WarrantyBrands::class,'warranty_premiums_id','id');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

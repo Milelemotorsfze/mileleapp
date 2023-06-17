@@ -183,13 +183,14 @@
                         </a>
                     </div>
                 </div>
-                <input type="type" id="indexValue" value="1">
+
             </div>
             <div class="col-md-12">
                 <button type="submit" class="btn btn-primary btn-sm" id="submit" style="float:right;">Submit</button>
             </div>
         </form>
     </div>
+    <input type="hidden" id="indexValue" value="">
     <div class="overlay"></div>
     <script type="text/javascript">
 
@@ -197,36 +198,37 @@
             $('#brands1').select2({
                 placeholder: 'Select Brands'
             });
+           var index = 1;
+           $('#indexValue').val(index);
 
+            $(document.body).on('select2:select', ".brands", function (e) {
+                var index = $(this).attr('data-index');
+                var value = e.params.data.id;
+                removeOption(index,value);
+            });
+            $(document.body).on('select2:unselect', ".brands", function (e) {
+                var index = $(this).attr('data-index');
+                var data = e.params.data;
+                appendOption(index,data);
+            });
 
-            // $(".brands").on('change', function (e) {
-            //     // var index = $(this).attr('data-index');
-            //    var ind = $(this).attr('data-index').val();
-            //     alert("index".ind);
-            // })
-            //     for(let i=1; i<=3; i++) {
-
-                    $(document.body).on('select2:select',"#brands2", function (e) {
-                        // alert("ok");
-                        var indexValue = $('#indexValue').val();
-                        let id = e.params.data.id;
-                        for(var i=0;i<=indexValue;i++) {
-                            if(i !== 2) {
-                                var currentId = 'brands'+i;
-                                $('#'+currentId+' option[value='+id+']').detach();
-                            }
-                        }
-                    });
-            $(document.body).on('select2:unselect',"#brands2", function (e) {
-                // alert("ok");
+            function removeOption(index,value) {
                 var indexValue = $('#indexValue').val();
-                let data = e.params.data;
+                for (var i = 0; i <= indexValue; i++) {
+                    if (i != index) {
+                        var currentId = 'brands' + i;
+                        $('#' + currentId + ' option[value=' + value + ']').detach();
+                    }
+                }
+            }
+            function appendOption(index,data) {
+                var indexValue = $('#indexValue').val();
                 for(var i=0;i<=indexValue;i++) {
-                    if(i !== 2) {
+                    if(i != index) {
                         $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
                     }
                 }
-            });
+            }
         })
         function clickAdd()
         {
@@ -299,7 +301,7 @@
                         $('#brands'+index).html("");
                         $('#brands'+index).select2
                         ({
-                            placeholder: 'Select value',
+                            placeholder: 'Select Brands',
                             allowClear: true,
                             data: brandDropdownData,
                             minimumResultsForSearch: -1,
