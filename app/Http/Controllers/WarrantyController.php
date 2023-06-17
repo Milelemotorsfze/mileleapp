@@ -71,7 +71,7 @@ class WarrantyController extends Controller
                 }
             }
         }
-        return redirect()->route('warranty.index')->with('success','Addon created successfully');
+        return redirect()->route('warranty.index')->with('success','Warranty created successfully');
     }
     /**
      * Display the specified resource.
@@ -79,7 +79,8 @@ class WarrantyController extends Controller
     public function show(string $id)
     {
         $premium = WarrantyPremiums::findOrFail($id);
-        return view('warranty.show', compact('premium'));
+        $warrantBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
+        return view('warranty.show', compact('premium','warrantBrands'));
     }
 
     /**
@@ -143,7 +144,7 @@ class WarrantyController extends Controller
                 }
             }
         }
-        return redirect()->route('warranty.index')->with('success','Warrant updated successfully');
+        return redirect()->route('warranty.index')->with('success','Warranty updated successfully');
     }
 
     /**

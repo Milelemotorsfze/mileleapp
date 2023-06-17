@@ -59,6 +59,7 @@
             $('#milele-partial-approved-LOI-table').DataTable();
             $('#vehicle-pictures-table').DataTable();
             $('#PFI-table').DataTable();
+            $('#warranty-brands-table').DataTable();
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');

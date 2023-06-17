@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\WarrantyBrands;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class WarrantyBrandsController extends Controller
@@ -54,7 +55,15 @@ class WarrantyBrandsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $this->validate($request, [
+            'price' => 'required',
+        ]);
+        $warrantBrand = WarrantyBrands::findOrFail($id);
+        $warrantBrand->price = $request->price;
+        $warrantBrand->updated_by = Auth::id();
+        $warrantBrand->save();
+
+        return redirect()->route('warranty.show',  $warrantBrand->warranty_premiums_id)->with('success','Warranty updated successfully');
     }
 
     /**
