@@ -225,15 +225,6 @@
                     required:true
                 }
             },
-
-            // errorPlacement: function(error, element) {
-            //     if (element.hasClass("select2-hidden-accessible")) {
-            //         element = $("#select2-container").parent();
-            //         error.insertAfter(element).addClass('mt-2 mb-0 text-danger');
-            //     }else {
-            //         error.insertAfter(element).addClass('text-danger');
-            //     }
-            // }
         });
         $('#model').select2({
             placeholder : 'Select Model'

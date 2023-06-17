@@ -3,6 +3,7 @@
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\WarrantyBrandsController;
+use App\Http\Controllers\WarrantyPriceHistoriesController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -95,6 +96,9 @@ Route::get('/d', function () {
     // Warranty
     Route::resource('warranty', WarrantyController::class);
     Route::resource('warranty-brands', WarrantyBrandsController::class);
+    Route::resource('warranty-price-histories', WarrantyPriceHistoriesController::class);
+    Route::post('warranty-brands/status-change', [WarrantyController::class, 'statusChange'])->name('warranty-brands.status-change');
+
 
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
     Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');

@@ -154,13 +154,13 @@
             <div class="card"  id="kitSupplier" >
                 <div class="card-header">
                     <center>
-                        <h4 class="card-title">Purchase Prices</h4>
+                        <h4 class="card-title">Warranty Brands</h4>
                     </center>
                 </div>
                 <div class="card-body">
                     <div class="form_field_outer" id="row-1">
                         <div class="row form_field_outer_row">
-                            <div class="col-xxl-9 col-lg-8 col-md-8">
+                            <div class="col-xxl-8 col-lg-7 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control widthinput brands" autofocus>
@@ -170,7 +170,7 @@
                                 </select>
                                 <span id="Brand1Error" class="invalid-feedback"></span>
                             </div>
-                            <div class="col-xxl-2 col-lg-3 col-md-3">
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
@@ -181,6 +181,18 @@
                                     <span id="Price1Error" class="invalid-feedback"></span>
                                 </div>
                             </div>
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <span class="error">* </span>
+                                <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)"
+                                           type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                    <span id="SellingPrice1Error" class="invalid-feedback"></span>
+                                </div>
+                            </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                 <button class="btn_round  removeButton" id="remove-1" disabled hidden>
                                     <i class="fas fa-trash-alt"></i>
@@ -189,7 +201,7 @@
                         </div>
                     </div>
                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit">
+                        <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit mt-2">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add
                         </a>
                     </div>
@@ -412,7 +424,7 @@
                 {
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-9 col-lg-8 col-md-8">
+                            <div class="col-xxl-8 col-lg-9 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
@@ -420,16 +432,29 @@
                                 </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                            <div class="col-xxl-2 col-lg-3 col-md-3">
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput"
+                                    onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
                                 </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
+                            </div>
+                             <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput"
+                                    onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                                <span id="sellingError" class="invalid-feedback"></span>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" hidden>
                                 <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >

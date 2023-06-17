@@ -19,7 +19,7 @@ class WarrantyController extends Controller
     public function index()
     {
         $premiums = WarrantyPremiums::with('PolicyName')
-            ->where('status','active')->get();
+                    ->orderBy('id','desc')->get();
         return view('warranty.index', compact('premiums'));
     }
 
@@ -57,6 +57,7 @@ class WarrantyController extends Controller
                 foreach($request->brandPrice as $brandPrice)
                 {
                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
+                    $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
                     if(isset($brandPrice['brands']))
                     {
                         if(count($brandPrice['brands']) > 0)
@@ -71,7 +72,7 @@ class WarrantyController extends Controller
                 }
             }
         }
-        return redirect()->route('warranty.index')->with('success','Addon created successfully');
+        return redirect()->route('warranty.index')->with('success','Warranty created successfully');
     }
     /**
      * Display the specified resource.
@@ -79,7 +80,8 @@ class WarrantyController extends Controller
     public function show(string $id)
     {
         $premium = WarrantyPremiums::findOrFail($id);
-        return view('warranty.show', compact('premium'));
+        $warrantBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
+        return view('warranty.show', compact('premium','warrantBrands'));
     }
 
     /**
@@ -88,15 +90,20 @@ class WarrantyController extends Controller
     public function edit(string $id)
     {
         $premium = WarrantyPremiums::where('id',$id)->with('PolicyName')->first();
+        $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
         $warrantyBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
-        $brands = Brand::select('id','brand_name')->get();
+        $brands = Brand::select('id','brand_name')
+                ->whereNotIn('id',$alreadyAddedBrandIds)->get();
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
             })
             ->get();
-        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands'));
+        $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
+//        $alreadyAddedBrandsList = [];
+
+        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands','alreadyAddedBrands'));
     }
 
     /**
@@ -143,7 +150,7 @@ class WarrantyController extends Controller
                 }
             }
         }
-        return redirect()->route('warranty.index')->with('success','Warrant updated successfully');
+        return redirect()->route('warranty.index')->with('success','Warranty updated successfully');
     }
 
     /**
@@ -172,8 +179,13 @@ class WarrantyController extends Controller
         $data = $data->get();
         return response()->json($data);
     }
-    public function updateWarranty(Request $request)
+    public function statusChange(Request $request)
     {
-        dd($request->all());
+        $warranty = WarrantyPremiums::find($request->id);
+        $warranty->status = $request->status;
+
+        $warranty->save();
+        return response($warranty, 200);
     }
+
 }
