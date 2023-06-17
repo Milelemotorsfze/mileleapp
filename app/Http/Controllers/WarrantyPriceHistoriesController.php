@@ -25,6 +25,9 @@ class WarrantyPriceHistoriesController extends Controller
         return view('warranty.price_histories.index', compact('priceHistories','pendingSellingPriceHistories',
         'approvedSellingPriceHistories','rejectedSellingPriceHistories'));
     }
+    public function approveSellingPrice() {
+
+    }
 
     /**
      * Show the form for creating a new resource.

@@ -98,6 +98,7 @@ Route::get('/d', function () {
     Route::resource('warranty-brands', WarrantyBrandsController::class);
     Route::resource('warranty-price-histories', WarrantyPriceHistoriesController::class);
     Route::post('warranty-brands/status-change', [WarrantyController::class, 'statusChange'])->name('warranty-brands.status-change');
+    Route::post('warranty-brands/approve-selling-price', [WarrantyPriceHistoriesController::class, 'approveSellingPrice'])->name('warranty-brands.approve-selling-price');
 
 
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');

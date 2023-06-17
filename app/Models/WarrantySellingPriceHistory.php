@@ -16,4 +16,8 @@ class WarrantySellingPriceHistory extends Model
     {
         return $this->belongsTo(User::class,'status_updated_by');
     }
+    public function warrantyBrand()
+    {
+        return $this->belongsTo(WarrantyBrands::class,'warranty_brand_id');
+    }
 }

@@ -22,7 +22,7 @@
       <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="supplierAddonPrices" class="table table-striped table-editable table-edits table">
@@ -40,8 +40,8 @@
                 @foreach ($supplierAddons as $key => $supplierAddon)
                   <tr data-id="1">
                     <td>{{++$i}}</td>
-                    <td>{{$supplierAddon->supplierAddonDetails->AddonName->name}}</td>                   
-                    <td>{{$supplierAddon->supplierAddonDetails->addon_code}}</td>
+                    <td>{{$supplierAddon->supplierAddonDetails->AddonName->name ?? ''}}</td>
+                    <td>{{$supplierAddon->supplierAddonDetails->addon_code ?? ''}}</td>
                     <td id="{{$supplierAddon->id}}">{{$supplierAddon->purchase_price_aed}} AED</td>
                     <td>
                       @can('supplier-new-purchase-price')
@@ -73,8 +73,8 @@
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                             </div>
-                                 
-                        </div> 
+
+                        </div>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
@@ -104,8 +104,8 @@
                 @endforeach
               </tbody>
             </table>
-          </div>  
-        </div>  
+          </div>
+        </div>
       </div>
     </div>
   @endcan
@@ -200,4 +200,4 @@
   </script>
 @endsection
 
-   
+

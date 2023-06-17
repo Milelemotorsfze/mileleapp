@@ -91,10 +91,52 @@
                                         <button type="button" class="btn btn-success btn-sm">
                                             Approve
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm">
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#reject-selling-price-{{$pendingSellingPriceHistory->id}}" data-status="reject">
                                             Reject
                                         </button>
                                     </td>
+                                    <div class="modal fade" id="reject-selling-price-{{$pendingSellingPriceHistory->id}}"
+                                         tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Selling Price Rejection</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-center">Current Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                        <input type="text" value="{{  $pendingSellingPriceHistory->warrantyBrand->price }}"
+                                                                               class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-2 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-muted">New Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-10 col-md-12 col-sm-12">
+                                                                        <input type="text" value="{{ $pendingSellingPriceHistory->selling_price }}" class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary  status-reject-button">Submit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </tr>
                             @endforeach
                             </tbody>
@@ -170,7 +212,32 @@
     @endcan
 @endsection
 @push('scripts')
-    <script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.status-reject-button').click(function (e) {
+                var id = $(this).attr('data-id');
+                var status = $(this).attr('data-status');
+                statusChange(id,status)
+            })
+            function statusChange(id,status) {
 
+                let url = '{{ route('warranty-brands.approve-selling-price') }}';
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        id: id,
+                        status: status,
+                        review:review,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success:function (data) {
+                        window.location.reload();
+                        alertify.success(status +" Successfully")
+                    }
+                });
+            }
+        })
     </script>
 @endpush

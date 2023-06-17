@@ -55,7 +55,7 @@ class AddonController extends Controller
                     'master_model_lines.model_line','addon_details.status')
                     ->orderBy('addon_details.id','ASC')
                     ->get()
-                    ->toArray();  
+                    ->toArray();
 
                     $addons3 = DB::table('addon_details');
                     if($data != 'all')
@@ -74,7 +74,7 @@ class AddonController extends Controller
                                 'addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
                                 ->get()
-                                ->toArray(); 
+                                ->toArray();
 
                     $addons2 = DB::table('addon_details');
                     if($data != 'all')
@@ -87,7 +87,7 @@ class AddonController extends Controller
                                 ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.payment_condition',
                                 'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
-                                ->get()->toArray(); 
+                                ->get()->toArray();
                                 $addons= array_merge($addons,$addons3);
                                 $addons= array_merge($addons,$addons2);
         // dd($addons);
@@ -122,7 +122,7 @@ class AddonController extends Controller
     //                 'master_model_lines.model_line','addon_details.status')
     //                 ->orderBy('addon_details.id','ASC')
     //                 ->get();
-    //                 ->toArray();  
+    //                 ->toArray();
 
     //                 $addons3 = DB::table('addon_details');
     //                 if($data != 'all')
@@ -141,7 +141,7 @@ class AddonController extends Controller
     //                             'addon_details.status')
     //                             ->orderBy('addon_details.id','ASC')
     //                             ->get()
-    //                             ->toArray(); 
+    //                             ->toArray();
 
     //                 $addons2 = DB::table('addon_details');
     //                 if($data != 'all')
@@ -154,7 +154,7 @@ class AddonController extends Controller
     //                             ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.purchase_price','addon_details.payment_condition',
     //                             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
     //                             ->orderBy('addon_details.id','ASC')
-    //                             ->get()->toArray(); 
+    //                             ->get()->toArray();
     //                             $addons= array_merge($addons,$addons3);
     //                             $addons= array_merge($addons,$addons2);
 
@@ -211,34 +211,34 @@ class AddonController extends Controller
 //             // nullable|image|max:1000
 //             // mimes:jpeg,png,jpg,gif
 //             // 'mimes:jpeg,bmp,png'
-//             // mimes:jpg,jpeg,png,bmp,tiff 
+//             // mimes:jpg,jpeg,png,bmp,tiff
 //             // max:4096'
 //             // Use mimetypes: rule with image/jpeg that covers 3 extension variations for the jpeg format: jpg jpeg jpe.
 
 // // Use image rule which covers jpeg, png, bmp, gif, or svg including jpeg's extension variations
 //         ]);
-        
-//         if ($validator->fails()) 
+
+//         if ($validator->fails())
 //         {
 //             dd('hi');
 //             // return redirect(route('addon.create'))->withInput()->withErrors($validator);
 //         }
-//          else 
+//          else
 //         {
     $input = $request->all();
     if($request->image)
     {
-        $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();  
+        $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
         $type = $request->image->getClientMimeType();
         $size = $request->image->getSize();
         $request->image->move(public_path('addon_image'), $fileName);
         $input['image'] = $fileName;
     }
-            
+
             $input['addon_id'] = $request->addon_id;
             $input['currency'] = 'AED';
             $input['created_by'] = $authId;
-            
+
             // $lastAddonCode = AddonDetails::orderBy('id', 'desc')->first()->addon_code;
             // $lastAddonCodeNumber = substr($lastAddonCode, 1, 5);
             // $newAddonCodeNumber =  $lastAddonCodeNumber+1;
@@ -265,7 +265,7 @@ class AddonController extends Controller
                 else
                 {
                     $input['addon_code'] = $request->addon_type."1";
-                }  
+                }
             }
             else
             {
@@ -330,7 +330,7 @@ class AddonController extends Controller
                                                         $creBranModelDes = AddonTypes::create($createAddType);
                                                     }
                                                 }
-                                            }                                       
+                                            }
                                         }
                                     }
                                 }
@@ -458,7 +458,7 @@ class AddonController extends Controller
      */
     public function show(Addon $addon)
     {
-       
+
     }
 
     /**
@@ -466,9 +466,9 @@ class AddonController extends Controller
      */
     public function edit(Addon $addon)
     {
-        
+
     }
-  
+
     /**
      * Update the specified resource in storage.
      */
@@ -485,7 +485,7 @@ class AddonController extends Controller
         //
     }
     public function editAddonDetails($id)
-    { 
+    {
         $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName')->first();
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
@@ -534,7 +534,7 @@ class AddonController extends Controller
                         ->with('success','addon updated successfully');
     }
     public function existingImage($id)
-    { 
+    {
         // $data['relatedAddons'] = DB::table('addon_details')
         //             ->where('addon_details.addon_id',$id)
         //             ->join('addons','addons.id','addon_details.addon_id')
@@ -543,7 +543,7 @@ class AddonController extends Controller
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_types.brand_id','addon_types.model_id')
         //             ->orderBy('addon_details.id','ASC')
         //             ->get();
-        // $data['existingSuppliers'] = SupplierAddons::where('addon_details_id',$id)->select('supplier_id')->get(); 
+        // $data['existingSuppliers'] = SupplierAddons::where('addon_details_id',$id)->select('supplier_id')->get();
         $data['addon_type'] = Addon::where('id',$id)->select('addon_type')->first();
         if($data['addon_type']->addon_type != '')
         {
@@ -562,7 +562,7 @@ class AddonController extends Controller
                 else
                 {
                     $data['newAddonCode'] = $addonType."1";
-                }  
+                }
             }
             else
             {
@@ -575,13 +575,13 @@ class AddonController extends Controller
         }
         return response()->json($data);
     }
-    public function addonFilters(Request $request) 
+    public function addonFilters(Request $request)
     {
 
 // dd($request->BrandIds);
 
         $addonIds = AddonDetails::with('AddonTypes')->whereHas('AddonTypes', function($q) use($request) {
-            
+
             if($request->BrandIds)
             {
                 // if($request->BrandIds == 'yes')
@@ -630,7 +630,7 @@ class AddonController extends Controller
                     'master_model_lines.model_line','addon_details.status')
                     ->orderBy('addon_details.id','ASC')
                     ->get()
-                    ->toArray();  
+                    ->toArray();
 
                     $addons3 = DB::table('addon_details')->whereIn('addon_details.id',$addonIds);
                     if($data != 'all')
@@ -649,7 +649,7 @@ class AddonController extends Controller
                                 'addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
                                 ->get()
-                                ->toArray(); 
+                                ->toArray();
 
                     $addons2 = DB::table('addon_details')->whereIn('addon_details.id',$addonIds);
                     if($data != 'all')
@@ -662,7 +662,7 @@ class AddonController extends Controller
                                 ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.payment_condition',
                                 'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status')
                                 ->orderBy('addon_details.id','ASC')
-                                ->get()->toArray(); 
+                                ->get()->toArray();
                                 $addons= array_merge($addons,$addons3);
                                 $addons= array_merge($addons,$addons2);
                                 $data['addonsTable'] = $addons;
@@ -693,8 +693,8 @@ class AddonController extends Controller
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
         //             'master_model_lines.model_line','addon_details.status')
         //             ->orderBy('addon_details.id','ASC')
-        //             ->get();   
-        //   $data['addons1']  
+        //             ->get();
+        //   $data['addons1']
 
         return response()->json($data);
 
@@ -719,7 +719,7 @@ class AddonController extends Controller
         //             'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
         //             'master_model_lines.model_line','addon_details.status')
         //             ->orderBy('addon_details.id','ASC')
-        //             ->get();        
+        //             ->get();
         // return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters'));
     }
     public function createMasterAddon(Request $request)
@@ -728,11 +728,11 @@ class AddonController extends Controller
         $validator = Validator::make($request->all(), [
            'name' => 'required',
         ]);
-        if ($validator->fails()) 
+        if ($validator->fails())
         {
             return redirect(route('addon.create'))->withInput()->withErrors($validator);
         }
-        else 
+        else
         {
             $input = $request->all();
             $input['created_by'] = $authId;
@@ -787,7 +787,7 @@ class AddonController extends Controller
                 else
                 {
                     $data['newAddonCode'] = $request->addon_type."1";
-                }  
+                }
             }
             else
             {
