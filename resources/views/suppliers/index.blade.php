@@ -109,15 +109,16 @@
                         <label class="badge badge-soft-danger">{{ $supplier->status }}</label>
                       @endif
                     </td>
-                    <td>
+                    <td> @can('supplier-addon-price')
+                           <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
+                              href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                              
+                        @endcan
                         @can('addon-supplier-view')
                            <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
                               href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                         @endcan
-                        @can('supplier-addon-price')
-                           <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
-                              href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                        @endcan
+                       
                         @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                             <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
                                 href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
@@ -208,6 +209,7 @@
                             </div>
                           </div>
                         @endif
+                        
 {{--                      <!-- @endcan                               -->--}}
                     </td>
                   </tr>
@@ -248,6 +250,7 @@
         $('#suppliersList').DataTable();
       });
     });
+
     function closemodal()
     {
       // $('.modal').removeClass('modalshow');

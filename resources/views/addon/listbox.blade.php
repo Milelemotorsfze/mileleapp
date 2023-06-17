@@ -110,6 +110,22 @@
                   <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-7">
                     {{$addonsdata->addon_code}}
                   </div>
+                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                    Addon Type
+                  </div>
+                  <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-7">
+                    {{$addonsdata->addon_code}}
+                  </div>
+                  @if($addonsdata->PurchasePrices!= null)
+                  @if($addonsdata->PurchasePrices->purchase_price_aed != '')
+                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                    Purchase Price
+                  </div>
+                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-7">
+                    {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
+                  </div>
+                  @endif
+                  @endif
                   @if($addonsdata->LeastPurchasePrices!= null)
                   @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
@@ -120,18 +136,23 @@
                   </div>
                   @endif
                   @endif
+                  @if($addonsdata->SellingPrice!= null)
+                  @if($addonsdata->SellingPrice->selling_price != '')
+                  
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
                     Selling Price
                   </div>
                   <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-5">
-                    Selling Price
+                    {{$addonsdata->SellingPrice->selling_price}} AED
                   </div>
+                  @endif
+                  @endif
                   @if($addonsdata->lead_time)
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
                     Lead Time
                   </div>
                   <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-5">
-                    {{$addonsdata->lead_time}}
+                    {{$addonsdata->lead_time}} Days
                   </div>
                   @endif
                   @if($addonsdata->is_all_brands == 'yes')
