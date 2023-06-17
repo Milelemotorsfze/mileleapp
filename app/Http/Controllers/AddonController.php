@@ -252,6 +252,13 @@ class AddonController extends Controller
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
                     $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
+                    if($request->addon_type == 'SP')
+                    {
+                        $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
+                    }
+                   else{
+                    $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
+                   }
                     $newAddonCodeNumber =  $lastAddonCodeNumber+1;
                     $input['addon_code'] = $request->addon_type.$newAddonCodeNumber;
                 }
@@ -265,6 +272,8 @@ class AddonController extends Controller
                 $input['addon_code'] = $request->addon_type."1";
             }
             // dd($input);
+            $input['addon_type_name'] = $request->addon_type;
+            $input['addon_id']= $request->addon_id;
             $addon_details = AddonDetails::create($input);
             if($request->selling_price != '')
             {
@@ -387,6 +396,8 @@ class AddonController extends Controller
                         $supPriInput['created_by'] = $authId;
                         foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
                         {
+                            $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
+                            $supPriInput['addon_details_id'] = $addon_details->id;
                             $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
                             $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
                             $CreateSupAddPri = SupplierAddons::create($supPriInput);
@@ -763,7 +774,13 @@ class AddonController extends Controller
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
+                    if($request->addon_type == 'SP')
+                    {
+                        $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
+                    }
+                   else{
                     $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
+                   }
                     $newAddonCodeNumber =  $lastAddonCodeNumber+1;
                     $data['newAddonCode'] = $request->addon_type.$newAddonCodeNumber;
                 }
@@ -788,5 +805,13 @@ class AddonController extends Controller
     {
         $data['model_description'] = MasterModelDescription::whereIn('model_line_id',$request->model_line_id)->select('id','model_description')->get();
         return response()->json($data);
+    }
+    public function kitItems($id)
+    {
+        $supplierAddon = [];
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->get();
+        $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
+        // dd($supplierAddonDetails);
+        return view('addon.kititems',compact('supplierAddonDetails'));
     }
 }

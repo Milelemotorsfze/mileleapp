@@ -833,10 +833,11 @@
                     formInputError = true;
                 }
             }
-            if(formInputError == true)
-            {
-                e.preventDefault();
-            }
+            // if(formInputError == true)
+            // {
+            //     e.preventDefault();
+            // }
+            // alert(formInputError);
         });
         function validationOnKeyUp(clickInput)
         {
@@ -857,6 +858,22 @@
                 }
             }
         }
+        function showSupplierTypeError($msg)
+        {
+            // document.getElementById("supplierError").textContent=$msg;
+            // document.getElementById("supplier_type").classList.add("is-invalid");
+            // document.getElementById("supplierError").classList.add("paragraph-class");
+            // $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+            // $("#supplier_type").select2({
+            //     containerCssClass : "form-control is-invalid"
+            // });
+        }
+        function removeSupplierTypeError()
+        {
+            // document.getElementById("supplierError").textContent="";
+            // document.getElementById("supplier_type").classList.remove("is-invalid");
+            // document.getElementById("supplierError").classList.remove("paragraph-class");
+        } 
         function showBrandError($msg)
         {
             document.getElementById("brandError").textContent=$msg;

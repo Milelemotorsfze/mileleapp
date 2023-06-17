@@ -12,6 +12,7 @@ class AddonDetails extends Model
     protected $fillable = [
         'addon_id',
         'addon_code',
+        'addon_type_name',
         'part_number',
         'payment_condition',
         'lead_time',

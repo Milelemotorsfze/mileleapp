@@ -89,49 +89,96 @@
                 {{$addonsdata->AddonName->name}}
                 @endif
               </div>
-              <div class="col-xxl-4 col-lg-4 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-              @if($addonsdata->image)
-                <img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:115px;" alt="Addon Image" />
+              @if($addonsdata->payment_condition)
+              <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+              Payment Condition
+              </div>
+              <div class="labellist databack2 col-xxl-8 col-lg-8 col-md-8">
+              {{$addonsdata->payment_condition}}
+              </div>
+              @endif
+              @if($addonsdata->additional_remarks)
+              <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+              Additional Remarks
+              </div>
+              <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+              {{$addonsdata->additional_remarks}}
+              </div>
+              @endif 
+              <!-- @if($addonsdata->payment_condition)
+              <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+              Payment Condition
+              </div>
+              <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+              {{$addonsdata->payment_condition}}
+              @endif
+              @if($addonsdata->additional_remarks)
+              <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+              Additional Remarks
+              </div>
+              <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+              {{$addonsdata->additional_remarks}}
+              </div>
+              @endif -->
+              <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
+                @if($addonsdata->image)
+                <img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:155px;" alt="Addon Image" onclick="showImage()" />
                 @endif
-                @if($addonsdata->additional_remarks)
+                <!-- @if($addonsdata->additional_remarks)
                 <div class="labellist labeldesign col-xxl-12 col-lg-12 col-md-12">
                   <center>Additional Remarks</center>
                 </div>
                 <div class=" labellist databack1 col-xxl-12 col-lg-12 col-md-12">
                   {{$addonsdata->additional_remarks}}
                 </div>
-                @endif
+                @endif -->
+                <!-- @if($addonsdata->payment_condition)
+                <div class="labellist labeldesign col-xxl-12 col-lg-12 col-md-12">
+                  <center>Payment Condition</center>
+                </div>
+                <div class=" labellist databack1 col-xxl-12 col-lg-12 col-md-12">
+                  {{$addonsdata->payment_condition}}
+                </div>
+                @endif -->
+                
               </div>
-              <div class="col-xxl-8 col-lg-8 col-md-8 col-sm-8" >
+              
+              <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                 <div class="row" style="padding-right:3px; padding-left:3px;">
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
                     Addon Code
                   </div>
-                  <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-7">
+                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->addon_code}}
                   </div>
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Addon Type
                   </div>
-                  <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-7">
-                    {{$addonsdata->addon_code}}
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                    @if($addonsdata->addon_type_name == 'K')
+                    Kit
+                    @elseif($addonsdata->addon_type_name == 'P')
+                    Accessories
+                    @elseif($addonsdata->addon_type_name == 'SP')
+                    Spare Parts
+                    @endif
                   </div>
                   @if($addonsdata->PurchasePrices!= null)
                   @if($addonsdata->PurchasePrices->purchase_price_aed != '')
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Purchase Price
                   </div>
-                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-7">
+                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                   </div>
                   @endif
                   @endif
                   @if($addonsdata->LeastPurchasePrices!= null)
                   @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-5">
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Least Purchase Price
                   </div>
-                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-7">
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
                   </div>
                   @endif
@@ -139,27 +186,49 @@
                   @if($addonsdata->SellingPrice!= null)
                   @if($addonsdata->SellingPrice->selling_price != '')
                   
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
-                    Selling Price
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                    Selling Price 
                   </div>
-                  <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-5">
+                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->SellingPrice->selling_price}} AED
                   </div>
                   @endif
                   @endif
+                  @if($addonsdata->fixing_charge_amount)
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                  Fixing Charge
+                  </div>
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                    {{$addonsdata->fixing_charge_amount}} AED
+                  </div>
+                  @endif
                   @if($addonsdata->lead_time)
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Lead Time
                   </div>
-                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-5">
+                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->lead_time}} Days
                   </div>
                   @endif
-                  @if($addonsdata->is_all_brands == 'yes')
-                  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-7">
+                  @if($addonsdata->part_number)
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                  Part Number
+                  </div>
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                    {{$addonsdata->part_number}} 
+                  </div>
+                  @endif
+                
+                  
+                 
+                </div>                     
+              </div> 
+               
+              @if($addonsdata->is_all_brands == 'yes')
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Brand
                   </div>
-                  <div class="labellist databack2 col-xxl-7 col-lg-6 col-md-5">
+                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                    All Brands
                   </div>
                   @else
@@ -183,13 +252,16 @@
                     @endif
                     </div>
                   @endforeach
-                  @endif
-                </div>                     
-              </div>          
+                  @endif      
             </div> 
             </br>
             <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
+                @if($addonsdata->addon_type_name == 'K')
+                <a class="btn btn-sm btn-primary" href="{{ route('addon.kitItems',$addonsdata->id) }}">
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i> Items
+                </a>
+                @endif
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
                   <i class="fa fa-eye" aria-hidden="true"></i> View
                 </a>

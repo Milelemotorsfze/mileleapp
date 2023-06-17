@@ -35,4 +35,8 @@ class SupplierAddons extends Model
     {
         return $this->hasOne(User::class,'id','created_by');
     }
+    public function Kit()
+    {
+        return $this->hasMany(KitItems::class,'supplier_addon_id','id');
+    }
 }

@@ -21,4 +21,8 @@ class KitItems extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function addon()
+    {
+        return $this->hasOne(AddonDetails::class,'id','addon_details_id');
+    }
 }
