@@ -18,8 +18,7 @@ class WarrantyController extends Controller
      */
     public function index()
     {
-        $premiums = WarrantyPremiums::with('PolicyName')
-            ->where('status','active')->get();
+        $premiums = WarrantyPremiums::with('PolicyName')->get();
         return view('warranty.index', compact('premiums'));
     }
 
@@ -89,15 +88,20 @@ class WarrantyController extends Controller
     public function edit(string $id)
     {
         $premium = WarrantyPremiums::where('id',$id)->with('PolicyName')->first();
+        $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
         $warrantyBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
-        $brands = Brand::select('id','brand_name')->get();
+        $brands = Brand::select('id','brand_name')
+                ->whereNotIn('id',$alreadyAddedBrandIds)->get();
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
             })
             ->get();
-        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands'));
+        $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
+//        $alreadyAddedBrandsList = [];
+
+        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands','alreadyAddedBrands'));
     }
 
     /**
@@ -173,8 +177,13 @@ class WarrantyController extends Controller
         $data = $data->get();
         return response()->json($data);
     }
-    public function updateWarranty(Request $request)
+    public function statusChange(Request $request)
     {
-        dd($request->all());
+        $warranty = WarrantyPremiums::find($request->id);
+        $warranty->status = $request->status;
+
+        $warranty->save();
+        return response($warranty, 200);
     }
+
 }

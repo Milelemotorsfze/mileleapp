@@ -75,9 +75,12 @@
                 @endcan
                 @can('warranty-active-inactive')
                 @if($premium->status == 'active')
-                  <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id=""><i class="fa fa-ban" aria-hidden="true"></i></a>
+                  <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
+                          data-id="{{ $premium->id }}" data-status="inactive" >
+                      <i class="fa fa-ban" aria-hidden="true"></i></button>
                 @elseif($premium->status == 'inactive')
-                  <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id=""><i class="fa fa-check" aria-hidden="true"></i></a>
+                  <a data-id="{{ $premium->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
+                      <i class="fa fa-check" aria-hidden="true"></i></a>
                 @endif
                 @endcan
               </td>
@@ -115,5 +118,44 @@
             }).set({title:"Delete Item"})
         });
 
+        $('.status-active-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+        $('.status-inactive-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+
+        function statusChange(id,status) {
+            let url = '{{ route('warranty-brands.status-change') }}';
+            if(status == 'active') {
+                var message = 'Active';
+            }else{
+                var message = 'Inactive';
+            }
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status: status,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                            alertify.success(status + " Successfully");
+                        }
+                    });
+                }
+            }).set({title:"Status Change"})
+        }
     </script>
 @endpush

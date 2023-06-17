@@ -634,48 +634,50 @@
             });
 
             $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-            localStorage.setItem('activeTab', $(e.target).attr('href'));
+                localStorage.setItem('activeTab', $(e.target).attr('href'));
             });
+
             var activeTab = localStorage.getItem('activeTab');
             if (activeTab) {
-            $('#my-tab a[href="' + activeTab + '"]').tab('show');
-        }
-            $('.status-change-button-approve').click(function () {
-            var id = $('#id').val();
-            var status = $('#status-approve').val();
-            statusChange(id,status);
-        })
-            $('.status-reject-button').click(function (e) {
-            var id = $('#id').val();
-            var status = $('#status-reject').val();
-            statusChange(id,status)
-        })
-            function statusChange(id,status) {
-            let url = '{{ route('letter-of-indents.status-change') }}';
-            if(status == 'REJECTED') {
-            var message = 'Reject';
-        }else{
-            var message = 'Approve';
-        }
-            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
-            if (e) {
-            $.ajax({
-            type: "POST",
-            url: url,
-            dataType: "json",
-            data: {
-            id: id,
-            status: status,
+                $('#my-tab a[href="' + activeTab + '"]').tab('show');
+            }
 
-            _token: '{{ csrf_token() }}'
-        },
-            success: function (data) {
-            window.location.reload();
-            alertify.success(status + " Successfully");
-        }
-        });
-        }
-        }).set({title:"Status Change"})
+            $('.status-change-button-approve').click(function () {
+                var id = $('#id').val();
+                var status = $('#status-approve').val();
+                statusChange(id,status);
+            })
+            $('.status-reject-button').click(function (e) {
+                var id = $('#id').val();
+                var status = $('#status-reject').val();
+                statusChange(id,status)
+            })
+            function statusChange(id,status) {
+                let url = '{{ route('warranty-brands.status-change') }}';
+                if(status == 'REJECTED') {
+                        var message = 'Reject';
+                    }else{
+                        var message = 'Approve';
+                    }
+                var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status: status,
+
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                            alertify.success(status + " Successfully");
+                        }
+                    });
+                }
+            }).set({title:"Status Change"})
         }
         })
 

@@ -492,12 +492,14 @@
                     let brandDropdownData   = [];
                     $.each(data,function(key,value)
                     {
+
                         brandDropdownData.push
                         ({
                             id: value.id,
                             text: value.brand_name
                         });
                     });
+                    console.log("brand_data".brandDropdownData);
                     $('#brands'+index).html("");
                     $('#brands'+index).select2
                     ({
@@ -507,6 +509,7 @@
                         minimumResultsForSearch: -1,
                         // templateResult: hideSelected,
                     });
+
                 }
             }
         });

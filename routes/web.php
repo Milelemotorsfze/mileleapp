@@ -94,6 +94,8 @@ Route::get('/d', function () {
     // Warranty
     Route::resource('warranty', WarrantyController::class);
     Route::resource('warranty-brands', WarrantyBrandsController::class);
+    Route::post('warranty-brands/status-change', [WarrantyController::class, 'statusChange'])->name('warranty-brands.status-change');
+
 
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
     Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');
