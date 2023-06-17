@@ -68,6 +68,25 @@ class SupplierController extends Controller
         $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
         return view('suppliers.addonprice',compact('supplierAddons'));
     }
+    public function createNewSupplierAddonPrice(Request $request)
+    {dd($request->all());
+        $authId = Auth::id();
+        // $validator = Validator::make($request->all(), [
+        //    'name' => 'required',
+        // ]);
+        // if ($validator->fails()) 
+        // {
+        //     return redirect(route('addon.create'))->withInput()->withErrors($validator);
+        // }
+        // else 
+        // {
+            $input = $request->all();
+
+            $input['created_by'] = $authId;
+            $addons = Addon::create($input);
+            return response()->json($addons);
+        // }
+    }
     public function show(Supplier $supplier)
     {
         $addon1 = $addons = $supplierTypes = '';
@@ -77,7 +96,12 @@ class SupplierController extends Controller
         $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
         {
-            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice')->orderBy('id', 'ASC')->get();
+            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice')
+            ->with('PurchasePrices', function($q) use($supplier){
+                // dd($supplier->id);
+                $q->where('supplier_id', $supplier->id);
+            })
+            ->orderBy('id', 'ASC')->get();
             // dd($addon1);
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')
