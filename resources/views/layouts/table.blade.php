@@ -61,6 +61,11 @@
             $('#PFI-table').DataTable();
             $('#warranty-table').DataTable();
             $('#warranty-brands-table').DataTable();
+            $('#purchase-price-histories-table').DataTable();
+            $('#pending-selling-price-histories-table').DataTable();
+            $('#approved-selling-price-histories-table').DataTable();
+            $('#rejected-selling-price-histories-table').DataTable();
+
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
             //     var modalId = $(this).data('modal-id');

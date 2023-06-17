@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\WarrantyPriceHistory;
+use App\Models\WarrantySellingPriceHistory;
 use Illuminate\Http\Request;
 
 class WarrantyPriceHistoriesController extends Controller
@@ -14,7 +15,15 @@ class WarrantyPriceHistoriesController extends Controller
     public function index(Request $request)
     {
         $priceHistories = WarrantyPriceHistory::where('warranty_brand_id', $request->id)->get();
-        return view('warranty.price_histories.index', compact('priceHistories'));
+        $pendingSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
+                                            ->where('status', 'pending')->get();
+        $approvedSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
+                                            ->where('status', 'approve')->get();
+        $rejectedSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
+                                            ->where('status', 'reject')->get();
+
+        return view('warranty.price_histories.index', compact('priceHistories','pendingSellingPriceHistories',
+        'approvedSellingPriceHistories','rejectedSellingPriceHistories'));
     }
 
     /**
