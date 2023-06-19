@@ -82,11 +82,11 @@ class SupplierController extends Controller
         // $validator = Validator::make($request->all(), [
         //    'name' => 'required',
         // ]);
-        // if ($validator->fails()) 
+        // if ($validator->fails())
         // {
         //     return redirect(route('addon.create'))->withInput()->withErrors($validator);
         // }
-        // else 
+        // else
         // {
             $input = $request->all();
             $existibgData = SupplierAddons::where('id',$request->inputId)->where('status','active')->latest('updated_at')->first();
@@ -102,7 +102,7 @@ class SupplierController extends Controller
                 $addons = SupplierAddons::create($input);
                 $addons = SupplierAddons::where('id',$addons->id)->first();
             }
-            
+
             return response()->json($addons);
         // }
     }
@@ -1093,5 +1093,25 @@ class SupplierController extends Controller
                 return response()->json(['success' => true,'data' => $data], 200);
             }
         }
+    }
+
+    public function getAddonForSupplier(Request $request){
+
+        $data = Addon::select('id','name');
+
+        if($request->filteredArray)
+        {
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id',$request->filteredArray);
+            }
+        }
+//        if($request->id) {
+//            $id = $request->id;
+//            $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
+//            $data = $data->whereNotIn('id', $alreadyAddedBrandIds);
+//        }
+        $data = $data->get();
+        return response()->json($data);
     }
 }
