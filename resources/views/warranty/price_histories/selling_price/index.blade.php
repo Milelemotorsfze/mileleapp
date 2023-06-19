@@ -123,7 +123,6 @@
                                             </form>
                                         </div>
                                     </div>
-
                                     <div class="modal fade" id="approve-selling-price-{{$pendingSellingPriceHistory->id}}"
                                          tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog ">
@@ -166,7 +165,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="modal fade" id="reject-selling-price-{{$pendingSellingPriceHistory->id}}"
                                          tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog ">

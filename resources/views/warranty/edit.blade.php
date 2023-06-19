@@ -153,53 +153,52 @@
                 </div>
             </div>
             </br>
-            <div class="card"  id="kitSupplier" >
+            <div class="card" >
                 <div class="card-header">
                     <center>
                         <h4 class="card-title">Warranty Brands</h4>
                     </center>
                 </div>
                 <div class="card-body">
+                    <div class="row">
+                        @foreach($warrantyBrands as $key => $warrantyBrand)
+                            <div class="col-xxl-7 col-lg-7 col-md-5">
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
+                                <select class="form-control" readonly>
+                                    <option>{{$warrantyBrand->brand->brand_name}}</option>
+                                </select>
+                            </div>
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
+                                <div class="input-group">
+                                    <input value="{{$warrantyBrand->price}}" readonly type="number" class="form-control widthinput">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                    <span id="Price1Error" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
+                                <div class="input-group">
+                                    <input value="{{$warrantyBrand->selling_price ?? ''}}" readonly type="number" class="form-control widthinput">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                    <span id="Price1Error" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1" style="margin-top: 36px">
+
+                                <button type="button" class="btn btn-danger remove-item"  data-id="{{ $warrantyBrand->id }}"
+                                        data-url="{{ route('warranty-brands.destroy', $warrantyBrand->id) }}">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
                     <div class="form_field_outer">
                         <div class="row form_field_outer_row">
-                            @foreach($warrantyBrands as $key => $warrantyBrand)
-                                <div class="col-xxl-7 col-lg-7 col-md-5">
-                                    <span class="error">* </span>
-                                    <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                       <select class="form-control" readonly>
-                                           <option>{{$warrantyBrand->brand->brand_name}}</option>
-                                       </select>
-                                </div>
-                                <div class="col-xxl-2 col-lg-2 col-md-3">
-                                    <span class="error">* </span>
-                                    <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
-                                    <div class="input-group">
-                                        <input value="{{$warrantyBrand->price}}" readonly type="number" class="form-control widthinput">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                        </div>
-                                        <span id="Price1Error" class="invalid-feedback"></span>
-                                    </div>
-                                </div>
-                                <div class="col-xxl-2 col-lg-2 col-md-3">
-                                    <span class="error">* </span>
-                                    <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
-                                    <div class="input-group">
-                                        <input value="{{$warrantyBrand->selling_price ?? ''}}" readonly type="number" class="form-control widthinput">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                        </div>
-                                        <span id="Price1Error" class="invalid-feedback"></span>
-                                    </div>
-                                </div>
-                                <div class="form-group col-xxl-1 col-lg-1 col-md-1" style="margin-top: 36px">
-
-                                    <button type="button" class="btn btn-danger remove-item"  data-id="{{ $warrantyBrand->id }}"
-                                            data-url="{{ route('warranty-brands.destroy', $warrantyBrand->id) }}">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
-                                </div>
-                            @endforeach
                             <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
@@ -221,7 +220,7 @@
                                     <span id="Price1Error" class="invalid-feedback"></span>
                                 </div>
                             </div>
-                                <div class="col-xxl-2 col-lg-2 col-md-3">
+                             <div class="col-xxl-2 col-lg-2 col-md-3">
                                     <span class="error">* </span>
                                     <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                     <div class="input-group">
@@ -241,7 +240,7 @@
                         </div>
                     </div>
                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit mt-2">
+                        <a onclick="clickAdd()" style="float: right;" class="btn btn-sm btn-info mt-2">
                             <i class="fa fa-plus" aria-hidden="true"></i> Add
                         </a>
                     </div>
@@ -257,9 +256,7 @@
     <div class="overlay"></div>
     @endcan
 <script type="text/javascript">
-    var oldSelectedBrands = [];
     var selectedBrands = [];
-    var totalRow = 1;
     var filteredArray = [];
     var IsOpenMileage = 'yes';
     var save = 1;
@@ -273,7 +270,6 @@
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
-            // templateResult: hideSelected,
         });
         $('.remove-item').on('click',function(){
             let id = $(this).attr('data-id');
@@ -321,11 +317,23 @@
             });
             $(this).closest('#row-'+indexNumber).remove();
 
-            // for (var i = index; i <= indexValue; i++) {
-            //     var index = $(".form_field_outer").find(".form_field_outer_row").length - 1;
-            // }
-            // $('#indexValue').val(index);
-            // $(".form_field_outer select:eq(" + (index - 1) + ")").after(this);
+            $('.form_field_outer_row').each(function(i){
+                var index = +i + +1;
+                $(this).attr('id','row-'+ index);
+                $(this).find('select').attr('data-index', index);
+                $(this).find('select').attr('id','brands'+ index);
+                $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
+                $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
+                $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
+                $(this).find('button').attr('data-index', index);
+                $(this).find('button').attr('id','remove-'+ index);
+                $('#brands'+index).select2
+                ({
+                    placeholder:"Choose Brands....     Or     Type Here To Search....",
+                    allowClear: true,
+                    minimumResultsForSearch: -1,
+                });
+            });
         })
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
@@ -427,31 +435,7 @@
             formInputError = true;
             e.preventDefault();
         }
-        // if(formInputError == false)
-        // {
-        //     var actionType = $('#submit').val();
-        //     var formData = new FormData(this);
-        //     $('#submit').html('Sending..');
-        //     $('.overlay').show();
-        //     $.ajax({
-        //     type:'POST',
-        //     url: "{{ route('warranty.store') }}",
-        //     data: formData,
-        //     cache:false,
-        //     contentType: false,
-        //     processData: false,
-        //     success: (result) =>
-        //     {
-        //         console.log(result)
-        //             // let dataErrorCard = document.getElementById('dataErrorCard');
-        //             // dataErrorCard.hidden = true
-        //             // if(result.data.successStore)
-        //             // {
-        //             //     document.location.href="{{route('suppliers.index') }}";
-        //             // }
-        //         },
-        //         });
-        // }
+
     });
     function clickAdd()
     {
@@ -473,6 +457,7 @@
             data:
                 {
                     filteredArray: selectedBrands,
+                    id: '{{ $premium->id }}',
                     _token: '{{csrf_token()}}'
                 },
             dataType : 'json',
@@ -496,9 +481,9 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput purchase-price" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                        <span class="input-group-text widthinput" >AED</span>
                                     </div>
                                 </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
@@ -507,26 +492,25 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput"
+                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput selling-price"
                                     onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
                                     <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                        <span class="input-group-text widthinput" >AED</span>
                                     </div>
                                 </div>
                                 <span id="sellingError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" hidden>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
                                 <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                     `);
-                    $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false);
-                    $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true);
                     let brandDropdownData   = [];
+
                     $.each(data,function(key,value)
-                    {-
+                    {
                         brandDropdownData.push
                         ({
                             id: value.id,
@@ -633,21 +617,7 @@
 
         }
     }
-    function setDropdownValue(index)
-    {
-        $("#brands"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-        $('#brands'+index).select2({
-            allowClear: true,
-            minimumResultsForSearch: -1,
-            templateResult: hideSelected,
-        });
-    }
-    // function hideSelected(value)
-    // {
-    //     if (value && !value.selected) {
-    //         return $('<span>' + value.text + '</span>');
-    //     }
-    // }
+
     $('.radioFixingCharge').click(function()
     {
         IsOpenMileage = $(this).val();
@@ -742,6 +712,7 @@
         document.getElementById("extended_warranty_milage").classList.remove("is-invalid");
         document.getElementById("ExtendedWarrantyMilageError").classList.remove("paragraph-class");
     }
+
 
 </script>
 @endsection
