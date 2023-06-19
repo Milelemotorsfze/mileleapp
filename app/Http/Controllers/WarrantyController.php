@@ -35,6 +35,7 @@ class WarrantyController extends Controller
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
             })
             ->get();
+
         return view('warranty.create', compact('policyNames','brands','suppliers'));
     }
 
@@ -101,7 +102,6 @@ class WarrantyController extends Controller
             })
             ->get();
         $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
-//        $alreadyAddedBrandsList = [];
 
         return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands','alreadyAddedBrands'));
     }
@@ -129,13 +129,14 @@ class WarrantyController extends Controller
         $premium->update($input);
         if($request->brandPrice)
         {
-            $inputbrandPrice['created_by'] = Auth::id();
+            $inputbrandPrice['updated_by'] = Auth::id();
             $inputbrandPrice['warranty_premiums_id'] = $id;
             if(count($request->brandPrice) > 0)
             {
                 foreach($request->brandPrice as $brandPrice)
                 {
                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
+                    $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
                     if(isset($brandPrice['brands']))
                     {
                         if(count($brandPrice['brands']) > 0)
@@ -168,13 +169,20 @@ class WarrantyController extends Controller
     }
     public function getBranchForWarranty(Request $request)
     {
+
         $data = Brand::select('id','brand_name');
+
         if($request->filteredArray)
         {
             if(count($request->filteredArray) > 0)
             {
                 $data = $data->whereNotIn('id',$request->filteredArray);
             }
+        }
+        if($request->id) {
+            $id = $request->id;
+            $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
+            $data = $data->whereNotIn('id', $alreadyAddedBrandIds);
         }
         $data = $data->get();
         return response()->json($data);

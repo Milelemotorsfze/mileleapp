@@ -166,6 +166,13 @@ class PermissionTableSeeder extends Seeder
             ['11','Warranty Delete','warranty-delete', 'To Delete the Warranty'],
             ['11','Warranty View','warranty-view', 'To View the Warranty'],
             ['11','Warranty Active','warranty-active-inactive', 'To Activate and Inactivate the Warranty'],
+            ['11','Warranty Brand List','warranty-brand-list', 'To View List of Warranty Brand'],
+            ['11','Warranty Brand Delete','warranty-brand-delete', 'To Delete the Warranty Brand'],
+            ['11','Warranty Brand Edit','warranty-brand-edit', 'To Edit Warranty Brand'],
+            ['11','Warranty Purchase Price Histories List','warranty-purchase-price-histories-list', 'To View List of Warranty Purchase Price Histories'],
+            ['11','Warranty Selling Price Histories List','warranty-selling-price-histories-list', 'To View List of Warranty Selling Price Histories'],
+            ['11','Warranty Selling Price Histories Edit','warranty-selling-price-histories-edit', 'To View List of Warranty Selling Price Histories'],
+            ['11','Warranty Selling Price Approve','warranty-selling-price-approve', 'To Approve or Reject Warranty Selling Price.'],
 
             ['12','Accessories List','accessories-list', 'To View List of Accessories'],
             ['12','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],

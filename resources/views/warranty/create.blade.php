@@ -158,9 +158,9 @@
                     </center>
                 </div>
                 <div class="card-body">
-                    <div class="form_field_outer" id="row-1">
-                        <div class="row form_field_outer_row">
-                            <div class="col-xxl-8 col-lg-7 col-md-6">
+                    <div class="form_field_outer" >
+                        <div class="row form_field_outer_row" id="row-1">
+                            <div class="col-xxl-7 col-lg-7 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control widthinput brands" autofocus>
@@ -216,9 +216,7 @@
     <div class="overlay"></div>
     @endcan
     <script type="text/javascript">
-    var oldSelectedBrands = [];
     var selectedBrands = [];
-    var totalRow = 1;
     var filteredArray = [];
     var IsOpenMileage = 'yes';
     var save = 1;
@@ -228,18 +226,13 @@
         $('#supplier_id').select2({
             placeholder:"Choose Supplier",
         });
-        // $("#brands1").attr("data-placeholder","Choose Brands....     Or     Type Here To Search....");
-        // $('#brands1').select2();
         $('#brands1').select2({
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
-            // templateResult: hideSelected,
         });
-        // $("#brands1").data('originalvalues', []);
         var index = 1;
         $('#indexValue').val(index);
-
         $(document.body).on('select2:select', ".brands", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
@@ -260,12 +253,23 @@
             });
 
             $(this).closest('#row-'+indexNumber).remove();
-
-            // for (var i = index; i <= indexValue; i++) {
-            //     var index = $(".form_field_outer").find(".form_field_outer_row").length - 1;
-            // }
-            // $('#indexValue').val(index);
-            // $(".form_field_outer select:eq(" + (index - 1) + ")").after(this);
+            $('.form_field_outer_row').each(function(i){
+               var index = +i + +1;
+                $(this).attr('id','row-'+ index);
+                $(this).find('select').attr('data-index', index);
+                $(this).find('select').attr('id','brands'+ index);
+                $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
+                $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
+                $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
+                $(this).find('button').attr('data-index', index);
+                $(this).find('button').attr('id','remove-'+ index);
+                $('#brands'+index).select2
+                ({
+                    placeholder:"Choose Brands....     Or     Type Here To Search....",
+                    allowClear: true,
+                    minimumResultsForSearch: -1,
+                });
+            });
         })
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
@@ -303,6 +307,8 @@
         var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
         var inputPurchasePrice1 = $('#purchase_price1').val();
+        var inputSellingPrice1 = $('#selling_price1').val();
+
         // var formInputError = false;
         if(inputEligibilityYears == '')
         {
@@ -362,40 +368,24 @@
         }
         if(inputPurchasePrice1 == '')
         {
-            $msg = "Price is required";
+            $msg = "Purchase Price is required";
             showPrice1Error($msg);
             formInputError = true;
             e.preventDefault();
         }
-        // if(formInputError == false)
-        // {
-        //     var actionType = $('#submit').val();
-        //     var formData = new FormData(this);
-        //     $('#submit').html('Sending..');
-        //     $('.overlay').show();
-        //     $.ajax({
-        //     type:'POST',
-        //     url: "{{ route('warranty.store') }}",
-        //     data: formData,
-        //     cache:false,
-        //     contentType: false,
-        //     processData: false,
-        //     success: (result) =>
-        //     {
-        //         console.log(result)
-        //             // let dataErrorCard = document.getElementById('dataErrorCard');
-        //             // dataErrorCard.hidden = true
-        //             // if(result.data.successStore)
-        //             // {
-        //             //     document.location.href="{{route('suppliers.index') }}";
-        //             // }
-        //         },
-        //         });
-        // }
+        if(inputSellingPrice1 == '')
+        {
+            $msg = "Selling Price is required";
+            showSellingPrice1Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+
     });
     function clickAdd()
     {
         var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+
         $('#indexValue').val(index);
         var selectedBrands = [];
         for(let i=1; i<index; i++)
@@ -424,10 +414,10 @@
                 {
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-8 col-lg-9 col-md-6">
+                            <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
 
                                 </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
@@ -436,7 +426,7 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput"
+                                    <input name="brandPrice[${index}][purchase_price]" type="number" required class="form-control widthinput purchase-price"
                                     onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -448,7 +438,7 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput"
+                                    <input name="brandPrice[${index}][selling_price]" type="number" required class="form-control widthinput selling-price"
                                     onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -456,15 +446,13 @@
                                 </div>
                                 <span id="sellingError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" hidden>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
                                 <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                     `);
-                    $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false);
-                    $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true);
                     let brandDropdownData   = [];
                     $.each(data,function(key,value)
                     {
@@ -481,7 +469,6 @@
                         allowClear: true,
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
-                        // templateResult: hideSelected,
                     });
                 }
             }
@@ -596,23 +583,22 @@
                     removeBrand1Error();
                 }
             }
+            if(clickInput.id == 'selling_price1')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    $msg = "Selling Price is required";
+                    showSellingPrice1Error($msg);
+                }
+                else
+                {
+                    removeSellingPrice1Error();
+                }
+            }
         }
     }
-    function setDropdownValue(index)
-    {
-        $("#brands"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-        $('#brands'+index).select2({
-            allowClear: true,
-            minimumResultsForSearch: -1,
-            templateResult: hideSelected,
-        });
-    }
-    // function hideSelected(value)
-    // {
-    //     if (value && !value.selected) {
-    //         return $('<span>' + value.text + '</span>');
-    //     }
-    // }
+
     $('.radioFixingCharge').click(function()
     {
         IsOpenMileage = $(this).val();
@@ -730,6 +716,18 @@
         document.getElementById("Price1Error").textContent="";
         document.getElementById("purchase_price1").classList.remove("is-invalid");
         document.getElementById("Price1Error").classList.remove("paragraph-class");
+    }
+    function showSellingPrice1Error($msg)
+    {
+        document.getElementById("SellingPrice1Error").textContent=$msg;
+        document.getElementById("selling_price1").classList.add("is-invalid");
+        document.getElementById("SellingPrice1Error").classList.add("paragraph-class");
+    }
+    function removeSellingPrice1Error()
+    {
+        document.getElementById("SellingPrice1Error").textContent="";
+        document.getElementById("selling_price1").classList.remove("is-invalid");
+        document.getElementById("SellingPrice1Error").classList.remove("paragraph-class");
     }
 </script>
 @endsection
