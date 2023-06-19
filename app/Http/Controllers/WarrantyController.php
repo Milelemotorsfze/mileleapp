@@ -129,7 +129,7 @@ class WarrantyController extends Controller
         $premium->update($input);
         if($request->brandPrice)
         {
-            $inputbrandPrice['created_by'] = Auth::id();
+            $inputbrandPrice['updated_by'] = Auth::id();
             $inputbrandPrice['warranty_premiums_id'] = $id;
             if(count($request->brandPrice) > 0)
             {

@@ -97,12 +97,16 @@ Route::get('/d', function () {
     Route::resource('warranty', WarrantyController::class);
     Route::resource('warranty-brands', WarrantyBrandsController::class);
     Route::resource('warranty-price-histories', WarrantyPriceHistoriesController::class);
+    Route::get('warranty-selling-price-histories', [WarrantyPriceHistoriesController::class, 'listSellingPrices'])
+            ->name('warranty-selling-price-histories.index');
+
     Route::post('warranty-brands/status-change', [WarrantyController::class, 'statusChange'])->name('warranty-brands.status-change');
-    Route::post('warranty-brands/approve-selling-price', [WarrantyPriceHistoriesController::class, 'approveSellingPrice'])->name('warranty-brands.approve-selling-price');
+    Route::post('warranty-brands/update-selling-price', [WarrantyBrandsController::class, 'updateSellingPrice'])
+            ->name('warranty-brands.update-selling-price');
 
 
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
-    Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');
+//    Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);

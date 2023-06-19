@@ -65,6 +65,8 @@ class WarrantyBrandsController extends Controller
 
         DB::beginTransaction();
         $warrantyBrand = WarrantyBrands::findOrFail($id);
+        $message1 = '';
+        $message2 = '';
         if($request->price) {
             if($warrantyBrand->price != $request->price) {
 
@@ -79,6 +81,7 @@ class WarrantyBrandsController extends Controller
                 $warrantyBrand->updated_by = Auth::id();
                 $warrantyBrand->save();
             }
+            $message1 = 'Warranty Price Updated Successfully.';
         }
        if($request->selling_price)
        {
@@ -88,16 +91,18 @@ class WarrantyBrandsController extends Controller
                $warrantySellingPriceHistory->warranty_brand_id = $id;
                $warrantySellingPriceHistory->old_price = $warrantyBrand->selling_price ?? '';
                $warrantySellingPriceHistory->updated_price = $request->selling_price;
-               $warrantySellingPriceHistory->updated_by = Auth::id();
+               $warrantySellingPriceHistory->created_by = Auth::id();
                $warrantySellingPriceHistory->status_updated_by = Auth::id();
                $warrantySellingPriceHistory->status = 'pending';
                $warrantySellingPriceHistory->save();
            }
+           $message2 = ' Selling Price send for Approval';
+
        }
 
         DB::commit();
 
-        return redirect()->route('warranty.show',  $warrantyBrand->warranty_premiums_id)->with('success','Warranty price updated successfully');
+        return redirect()->route('warranty.show',  $warrantyBrand->warranty_premiums_id)->with('success',$message1.$message2);
     }
 
     /**
@@ -107,6 +112,24 @@ class WarrantyBrandsController extends Controller
     {
         $warrantyBrand = WarrantyBrands::findOrFail($id);
         $warrantyBrand->delete();
+
+        return response(true);
+    }
+    public function updateSellingPrice(Request $request)
+    {
+        $warrantyPriceHistory = WarrantySellingPriceHistory::find($request->id);
+        $status = $request->status;
+
+        if($status == 'approved')
+        {
+           $warrantyBrand = WarrantyBrands::find($warrantyPriceHistory->warranty_brand_id);
+           $warrantyBrand->selling_price = $request->updated_price;
+           $warrantyBrand->save();
+
+        }
+        $warrantyPriceHistory->status = $request->status;
+        $warrantyPriceHistory->status_updated_by = Auth::id();
+        $warrantyPriceHistory->save();
 
         return response(true);
     }

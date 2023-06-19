@@ -108,7 +108,8 @@
                 </div>
             </div>
         </div>
-        <div class="card" style="margin-bottom: 0" >
+        @can('warranty-brand-list')
+            <div class="card" style="margin-bottom: 0" >
             <div class="card-header">
                 <h2 class="card-title">Warranty Brands</h2>
             </div>
@@ -134,16 +135,23 @@
                                 <td>{{ $warrantBrand->price }} AED</td>
                                 <td>{{ $warrantBrand->selling_price }} AED</td>
                                 <td>
-                                    @can('warranty-view')
-                                        <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm ">
-                                            <i class="fa fa-eye"></i>
+                                    @can('warranty-purchase-price-histories-list')
+                                        <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm "
+                                           title="Purchase Price Histories" >
+                                            <i class="fa fa-history"></i>
                                         </a>
                                     @endcan
-                                    @can('warranty-edit')
+                                    @can('warranty-selling-price-histories-list')
+                                    <a href="{{ route('warranty-selling-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-warning btn-sm "
+                                       title="Selling Price Histories">
+                                        <i class="fa fa-history"></i>
+                                    </a>
+                                    @endcan
+                                    @can('warranty-brand-edit')
                                         <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantBrand->id}}">
                                             <i class="fa fa-edit"></i></button>
                                     @endcan
-                                    @can('warranty-delete')
+                                    @can('warranty-brand-delete')
                                         <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantBrand->id }}"
                                                 data-url="{{ route('warranty-brands.destroy', $warrantBrand->id) }}">
                                             <i class="fa fa-trash"></i></button>
@@ -174,11 +182,11 @@
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
-                                                                    @error('price')
-                                                                    <div role="alert">
-                                                                        <strong>{{ $message }}</strong>
-                                                                    </div>
-                                                                    @enderror
+{{--                                                                    @error('price')--}}
+{{--                                                                    <div role="alert">--}}
+{{--                                                                        <strong>{{ $message }}</strong>--}}
+{{--                                                                    </div>--}}
+{{--                                                                    @enderror--}}
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-2">
@@ -193,12 +201,11 @@
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
-
-                                                                    @error('selling_price')
-                                                                    <div role="alert">
-                                                                        <strong>{{ $message }}</strong>
-                                                                    </div>
-                                                                    @enderror
+{{--                                                                    @error('selling_price')--}}
+{{--                                                                    <div role="alert">--}}
+{{--                                                                        <strong>{{ $message }}</strong>--}}
+{{--                                                                    </div>--}}
+{{--                                                                    @enderror--}}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -219,19 +226,13 @@
                 </div>
             </div>
         </div>
+        @endcan
     @endcan
 @endsection
 @push('scripts')
     <script>
         $(document).ready(function () {
-            $("#exampleModalLabel  form").validate({
-                ignore: [],
-                rules: {
-                    price: {
-                        required: true,
-                    }
-                },
-            });
+
             $('.delete-button').on('click',function(){
                 let id = $(this).attr('data-id');
                 let url =  $(this).attr('data-url');
