@@ -808,9 +808,11 @@ class AddonController extends Controller
     }
     public function kitItems($id)
     {
-        $supplierAddon = [];
-        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->get();
-        $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
+        $supplierAddonDetails = [];
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->first();
+        // 
+        // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
         return view('addon.kititems',compact('supplierAddonDetails'));
     }
