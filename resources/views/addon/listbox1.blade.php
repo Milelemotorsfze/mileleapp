@@ -1,16 +1,22 @@
 <style>
- .showImage
+  /* .contain
     {
-        width: auto;
-        height: auto;
-        max-width:1200px;
-        max-height:1200px;
+    object-fit: contain;
+    } */
+    /* .blah
+    {
+        width: 300px;
+        height: 300px;
     }
+     */
     .modal-xl
     {
         max-width: 99% !important;
     }
-    
+    .modal-content
+    {
+      max-width: 99% !important;
+    }
             .related-addon-header
             {
                 background-color:#5156be;
@@ -144,7 +150,7 @@
               </div>
               @endif -->
               <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-             <!-- Extra large modal -->
+             
                 @if($addonsdata->image)
 
                 <img id="{{$addonsdata->id}}" src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:155px;" alt="Addon Image" class="modal-button" data-modal-id="showImageModal{{$addonsdata->id}}" />
@@ -164,7 +170,7 @@
                                 <div class="row modal-row">
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                         <center>
-                                            <img id="showImage{{$addonsdata->id}}" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="your image" class="showImage" />
+                                            <img id="showImage{{$addonsdata->id}}" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="your image" class="" />
                                         </center>
                                     </div>
                                 </div>
@@ -309,51 +315,10 @@
             <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
                 @if($addonsdata->addon_type_name == 'K')
-                <a class="btn btn-sm btn-info" href="{{ route('addon.kitItems',$addonsdata->id) }}">
+                <a class="btn btn-sm btn-primary" href="{{ route('addon.kitItems',$addonsdata->id) }}">
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> Items
                 </a>
                 @endif
-                <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" class="btn btn-sm btn-success modal-button" 
-                    data-modal-id="createNewAddon{{$addonsdata->SellingPrice->id}}">
-                  <i class="fa fa-plus" aria-hidden="true"></i> Price</a>
-                <div class="modal" id="createNewAddon{{$addonsdata->SellingPrice->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Add New Selling Price </h5>
-                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                <span aria-hidden="true">X</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <span class="error">* </span>
-                                        <label for="name" class="col-form-label text-md-end ">New Selling Price</label>
-                                    </div>
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <div class="input-group">
-                                      <input value="{{$addonsdata->SellingPrice->id}}" name='id' id="createNew" hidden>
-                                  <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button> -->
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <a title="History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.sellingPriceHistory',$addonsdata->id) }}">
-                         <i class="fa fa-history" aria-hidden="true"></i> History</a>
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
                   <i class="fa fa-eye" aria-hidden="true"></i> View
                 </a>
@@ -375,41 +340,6 @@
     @endif
         @endif
         <script type="text/javascript">
-           $('#createAddonId').on('click', function()
-        {
-
-            // create new addon and list new addon in addon list
-            var value = $('#selling_price').val();
-            var id = $('#createNew').val();
-                $.ajax
-                ({
-                    url:"{{url('newSellingPriceRequest')}}",
-                    type: "POST",
-                    data:
-                    {
-                        name: value,
-                        id: id,
-                        _token: '{{csrf_token()}}'
-                    },
-                    dataType : 'json',
-                    success: function(result)
-                    {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        // $('#addon_id').val(result.id);
-                        // var selectedValues = new Array();
-                        // resetSelectedSuppliers(selectedValues);
-                        // $('#addnewAddonButton').hide();
-                        // $('#new_addon_name').val("");
-                        // document.getElementById("newAddonError").textContent='';
-                        // $msg = "";
-                        // removeAddonNameError($msg);
-                    }
-                });
-            
-        });
         // function showImage(ImgId)
         // {
         //     var modal = document.getElementById("showImageModal");

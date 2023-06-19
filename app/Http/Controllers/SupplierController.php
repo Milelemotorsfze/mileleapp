@@ -15,6 +15,7 @@ use App\Models\Brand;
 use App\Models\MasterModelLines;
 use App\Models\SupplierAddonTemp;
 use App\Models\SupplierType;
+use App\Models\AddonSellingPrice;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
@@ -72,9 +73,26 @@ class SupplierController extends Controller
     {
         $currentPrice = SupplierAddons::where('id',$id)->first();
         $history = SupplierAddons::where('supplier_id',$currentPrice->supplier_id)->where('addon_details_id',$currentPrice->addon_details_id)
-        ->with('supplierAddonDetails.AddonName','CreatedBy','updatedBy')->latest('updated_at')->get();
+        ->with('supplierAddonDetails.AddonName','CreatedBy')->latest()->get();
         // $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
         return view('suppliers.pricehistory',compact('history'));
+    }
+    public function sellingPriceHistory($id)
+    {
+        $history =  AddonSellingPrice::where('addon_details_id',$id)->with('StatusUpdatedBy','CreatedBy')->get();
+        // dd($history);
+        return view('addons.sellingPricehistory',compact('history'));
+    }
+    public function newSellingPriceRequest(Request $request)
+    {
+        $authId = Auth::id();
+        $existingSellingprice = AddonSellingPrice::where('id',$request->id)->where('status','active')->latest()->first();
+        $input['addon_details_id'] = $existingSellingprice->addon_details_id;
+        $input['selling_price'] = $request->name;
+        $input['created_by'] = $authId;
+        $input['status'] = 'pending';
+        $createInput = AddonSellingPrice::create($input);
+        return response()->json($createInput);
     }
     public function createNewSupplierAddonPrice(Request $request)
     {
