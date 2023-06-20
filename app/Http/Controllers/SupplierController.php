@@ -79,8 +79,9 @@ class SupplierController extends Controller
     }
     public function sellingPriceHistory($id)
     {
+        $currentPrice = AddonSellingPrice::where('addon_details_id',$id)->where('status','active')->select('selling_price')->first();
         $history =  AddonSellingPrice::where('addon_details_id',$id)->with('StatusUpdatedBy','CreatedBy')->get();
-        return view('addon.sellingPricehistory',compact('history'));
+        return view('addon.sellingPricehistory',compact('history','currentPrice'));
     }
     public function newSellingPriceRequest(Request $request)
     {
