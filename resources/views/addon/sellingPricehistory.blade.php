@@ -17,9 +17,32 @@
   @can('supplier-addon-price')
     <div class="card-header">
       <h4 class="card-title">
-        Supplier Addon prices History
+        Addon Selling Prices History
       </h4>
       <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+      @if (count($errors) > 0)
+                <div class="alert alert-danger">
+                    <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                    <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            @if (Session::has('error'))
+                <div class="alert alert-danger" >
+                    <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                    {{ Session::get('error') }}
+                </div>
+            @endif
+            @if (Session::has('success'))
+                <div class="alert alert-success" id="success-alert">
+                    <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                    {{ Session::get('success') }}
+                </div>
+            @endif
     </div>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
@@ -33,6 +56,9 @@
                   <th>Status</th>
                   <th>Created Date And Time</th>
                   <th>Created By</th>
+                  <th>Approved/Rejected Date And Time</th>
+                  <th>Approved/Rejected By</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -40,10 +66,208 @@
                 @foreach ($history as $key => $historyData)
                   <tr data-id="1">
                     <td>{{++$i}}</td>
-                    <td >{{$historyData->purchase_price_aed}} AED</td>
-                    <td >{{$historyData->status}}</td>
+                    <td >{{$historyData->selling_price}} AED</td>
+                    <td>
+                        @if($historyData->status == 'active')
+                        <label class="badge badge-soft-success">Active</label>
+                        @elseif($historyData->status == 'inactive')
+                        <label class="badge badge-soft-secondary">Inactive</label>
+                        @elseif($historyData->status == 'rejected')
+                        <label class="badge badge-soft-danger">Rejected</label>
+                        @elseif($historyData->status == 'pending')
+                        <label class="badge badge-soft-info">Pending</label>
+                        @endif
+                    </td>
                     <td>{{$historyData->created_at}}</td>  
                     <td>{{$historyData->CreatedBy->name}}</td> 
+                    @isset($historyData->StatusUpdatedBy)
+                    <td>{{$historyData->updated_at}}</td>  
+                    <td>{{$historyData->StatusUpdatedBy->name}}</td> 
+                    @else
+                    <td></td>
+                    <td></td>
+                    @endif
+                    <!-- <td>
+                        @if($historyData->status == 'pending')
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                                href=""><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                <a data-id="{{ $historyData->id }}" data-status="active" title="Edit" data-placement="top" class="btn btn-sm btn-info price-edit-button" >
+                      <i class="fa fa-edit" aria-hidden="true"></i></a>
+                                <a data-id="{{ $historyData->id }}" data-status="active" title="Approved" data-placement="top" class="btn btn-sm btn-success status-active-button" >
+                      <i class="fa fa-check" aria-hidden="true"></i></a>
+                                <button title="Rejected" data-placement="top" class="btn btn-sm btn-danger status-inactive-button"
+                          data-id="{{ $historyData->id }}" data-status="rejected" >
+                      <i class="fa fa-ban" aria-hidden="true"></i></button>
+                    
+                        @endif
+                    </td> -->
+                    <td>
+                    @if($historyData->status == 'pending')
+                                        @can('warranty-selling-price-histories-edit')
+                                            <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal"
+                                                    data-bs-target="#edit-selling-price-{{$historyData->id}}">
+                                                <i class="fa fa-edit"></i></button>
+                                        @endcan
+                                        @can('warranty-selling-price-approve')
+                                            <button type="button" title="Approved" class="btn btn-success btn-sm"  data-bs-toggle="modal"
+                                                    data-bs-target="#approve-selling-price-{{$historyData->id}}">
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                            </button>
+                                            <button type="button" title="Rejected" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#reject-selling-price-{{$historyData->id}}">
+                                                    <i class="fa fa-ban" aria-hidden="true"></i>
+                                            </button>
+                                        @endcan
+                                        @endif
+                                    </td>
+                                    <div class="modal fade" id="edit-selling-price-{{$historyData->id}}"  tabindex="-1"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <form id="form-update" action="{{ route('addon.UpdateSellingPrice', $historyData->id) }}"
+                                                  method="POST" >
+                                                @csrf
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Selling Price</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-3">
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-muted">Selling Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <div class="input-group">
+                                                                            <input type="number" min="0" step="any" name="selling_price" class="form-control"
+                                                                                   placeholder="Enter Selling Price" value="{{$historyData->selling_price}}"
+                                                                                    >
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary ">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" id="approve-selling-price-{{$historyData->id}}"
+                                         tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Addon Selling Price Approval</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-center">Current Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                        
+                                                                               <div class="input-group">
+                                                                               <input type="text" value="{{$currentPrice->selling_price}}"
+                                                                               class="form-control" readonly >
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13">New Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                        
+                                                                               <div class="input-group">
+                                                                               <input type="text" value="{{$historyData->selling_price}}"
+                                                                               id="updated-price"  class="form-control" readonly >
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                 
+                                                    <button type="button" class="btn btn-primary status-active-button"
+                                                            data-id="{{ $historyData->id }}" data-status="active">Approve</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" id="reject-selling-price-{{$historyData->id}}"
+                                         tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Addon Selling Price Rejection</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-center">Current Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                               <div class="input-group">
+                                                                               <input type="text" value="{{$currentPrice->selling_price}}"
+                                                                               class="form-control" readonly >
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13">New Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                        
+                                                                               <div class="input-group">
+                                                                               <input type="text" value="{{$historyData->selling_price}}"
+                                                                               id="updated-price"  class="form-control" readonly >
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary  status-inactive-button" data-id="{{ $historyData->id }}"
+                                                            data-status="rejected">Reject</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                   </tr>
                 @endforeach
               </tbody>
@@ -101,4 +325,46 @@
   </script>
 @endsection
 
-   
+@push('scripts')
+    <script>
+        $('.status-active-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+        $('.status-inactive-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+
+        function statusChange(id,status) {
+            let url = '{{ route('addon.status-change') }}';
+            if(status == 'active') {
+                var message = 'Approve';
+            }else{
+                var message = 'Reject';
+            }
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status: status,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                            alertify.success(status + " Successfully");
+                        }
+                    });
+                }
+            }).set({title:"Status Change"})
+        }
+    </script>
+@endpush

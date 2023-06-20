@@ -816,4 +816,32 @@ class AddonController extends Controller
         // dd($supplierAddonDetails);
         return view('addon.kititems',compact('supplierAddonDetails'));
     }
+    public function statusChange(Request $request)
+    {
+        $authId = Auth::id();
+        $sellingPrice = AddonSellingPrice::find($request->id);
+        if($request->status == 'active')
+        {
+            $oldSellingPrice = AddonSellingPrice::where('addon_details_id',$sellingPrice->addon_details_id)->where('status','active')->first();
+            $oldSellingPrice->status = 'inactive';
+            $oldSellingPrice->updated_by = $authId;
+            $oldSellingPrice->save();
+        }
+        $sellingPrice->status = $request->status;
+        $sellingPrice->status_updated_by = $authId;
+        $sellingPrice->save();
+        return response($sellingPrice, 200);
+    }
+    public function UpdateSellingPrice(Request $request, $id)
+    {
+        $request->validate([
+            'selling_price' => 'required'
+        ]);
+        $authId = Auth::id();
+        $data = AddonSellingPrice::find($id);
+        $data->selling_price = $request->selling_price;
+        $data->updated_by = $authId;
+        $data->save();
+        return redirect()->back()->with('success','Addon Selling Price Updated successfully.');
+    }
 }

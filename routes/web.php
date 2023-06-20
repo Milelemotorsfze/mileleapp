@@ -88,6 +88,8 @@ Route::get('/d', function () {
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
     Route::get('addon/kitItems/{id}', [AddonController::class, 'kitItems'])->name('addon.kitItems');
+    Route::post('addon-selling-price/status-change', [AddonController::class, 'statusChange'])->name('addon.status-change');
+    Route::post('update-addon-selling-price/{id}', [AddonController::class, 'updateSellingPrice'])->name('addon.UpdateSellingPrice');
 
 
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
@@ -122,7 +124,6 @@ Route::get('/d', function () {
 
     Route::post('newSellingPriceRequest', [SupplierController::class, 'newSellingPriceRequest'])->name('addon.newSellingPriceRequest');
     Route::get('sellingPriceHistory/{id}', [SupplierController::class, 'sellingPriceHistory'])->name('suppliers.sellingPriceHistory');
-
 
     // Demand & Planning Module
 
