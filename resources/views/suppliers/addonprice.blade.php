@@ -97,8 +97,10 @@
                         <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="">
                          <i class="fa fa-trash" aria-hidden="true"></i></a>
                       @endcan
+                      @can('supplier-addon-purchase-price-history')
                       <a title="View History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.purchasepricehistory',$supplierAddon->id) }}">
                          <i class="fa fa-history" aria-hidden="true"></i></a>
+                         @endcan
                     </td>
                   </tr>
                 @endforeach

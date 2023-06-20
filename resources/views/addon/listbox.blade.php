@@ -214,6 +214,7 @@
                     Spare Parts
                     @endif
                   </div>
+                  @if($content == '')
                   @if($addonsdata->PurchasePrices!= null)
                   @if($addonsdata->PurchasePrices->purchase_price_aed != '')
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -222,6 +223,7 @@
                   <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                   </div>
+                  @endif
                   @endif
                   @endif
                   @if($addonsdata->LeastPurchasePrices!= null)
@@ -313,45 +315,52 @@
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> Items
                 </a>
                 @endif
-                <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" class="btn btn-sm btn-success modal-button" 
-                    data-modal-id="createNewAddon{{$addonsdata->SellingPrice->id}}">
-                  <i class="fa fa-plus" aria-hidden="true"></i> Price</a>
-                <div class="modal" id="createNewAddon{{$addonsdata->SellingPrice->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Add New Selling Price </h5>
-                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                <span aria-hidden="true">X</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <span class="error">* </span>
-                                        <label for="name" class="col-form-label text-md-end ">New Selling Price</label>
+                <button type="button" class="btn btn-success btn-sm " data-bs-toggle="modal"
+                                                    data-bs-target="#edit-selling-price-{{$addonsdata->SellingPrice->id}}">
+                                                <i class="fa fa-plus"></i> Price</button>
+                                                <div class="modal fade" id="edit-selling-price-{{$addonsdata->SellingPrice->id}}"  tabindex="-1"
+                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <form id="form-update" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}"
+                                                  method="POST" >
+                                                @csrf
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Selling Price</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body p-3">
+                                                        <div class="col-lg-12">
+                                                            <div class="row">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-muted">Selling Price</label>
+                                                                    </div>
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <div class="input-group">
+                                                                        <input value="{{$addonsdata->SellingPrice->id}}" name='id' id="createNew" hidden>
+
+                                                                        <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit"  class="btn btn-primary createAddonId">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <div class="input-group">
-                                      <input value="{{$addonsdata->SellingPrice->id}}" name='id' id="createNew" hidden>
-                                  <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button> -->
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
             <a title="History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.sellingPriceHistory',$addonsdata->id) }}">
                          <i class="fa fa-history" aria-hidden="true"></i> History</a>
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
@@ -375,41 +384,42 @@
     @endif
         @endif
         <script type="text/javascript">
-           $('#createAddonId').on('click', function()
-        {
+        //    $('.createAddonId').on('click', function()
+        // {
 
-            // create new addon and list new addon in addon list
-            var value = $('#selling_price').val();
-            var id = $('#createNew').val();
-                $.ajax
-                ({
-                    url:"{{url('newSellingPriceRequest')}}",
-                    type: "POST",
-                    data:
-                    {
-                        name: value,
-                        id: id,
-                        _token: '{{csrf_token()}}'
-                    },
-                    dataType : 'json',
-                    success: function(result)
-                    {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        // $('#addon_id').val(result.id);
-                        // var selectedValues = new Array();
-                        // resetSelectedSuppliers(selectedValues);
-                        // $('#addnewAddonButton').hide();
-                        // $('#new_addon_name').val("");
-                        // document.getElementById("newAddonError").textContent='';
-                        // $msg = "";
-                        // removeAddonNameError($msg);
-                    }
-                });
+        //     // create new addon and list new addon in addon list
+        //     var value = $('#selling_price').val();
+        //     var id = $('#createNew').val();
+        //     alert(id);
+        //         $.ajax
+        //         ({
+        //             url:"{{url('newSellingPriceRequest')}}",
+        //             type: "POST",
+        //             data:
+        //             {
+        //                 name: value,
+        //                 id: id,
+        //                 _token: '{{csrf_token()}}'
+        //             },
+        //             dataType : 'json',
+        //             success: function(result)
+        //             {
+        //                 $('.overlay').hide();
+        //                 $('.modal').removeClass('modalshow');
+        //                 $('.modal').addClass('modalhide');
+        //                 // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+        //                 // $('#addon_id').val(result.id);
+        //                 // var selectedValues = new Array();
+        //                 // resetSelectedSuppliers(selectedValues);
+        //                 // $('#addnewAddonButton').hide();
+        //                 // $('#new_addon_name').val("");
+        //                 // document.getElementById("newAddonError").textContent='';
+        //                 // $msg = "";
+        //                 // removeAddonNameError($msg);
+        //             }
+        //         });
             
-        });
+        // });
         // function showImage(ImgId)
         // {
         //     var modal = document.getElementById("showImageModal");

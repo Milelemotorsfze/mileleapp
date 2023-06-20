@@ -32,8 +32,9 @@
         }
 </style>
 @if($addons)
-        @if(count($addons) > 0)
-        <div class="card-body">
+  @if(count($addons) > 0)
+  @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
+  <div class="card-body">
     <div class="table-responsive" id="addonListTable" hidden>     
       <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
         <thead>
@@ -47,7 +48,9 @@
             <th>Lead Time</th>
             <th>Additional Remarks</th>
             <th>Least Purchase Price</th>
+            @can('addon-selling-price-view')
             <th>Selling Price(AED)</th>
+            @endcan
             <th>Payment Condition</th>
             <th>Action</th>
           </tr>
@@ -77,7 +80,9 @@
               <td>{{ $addon->lead_time }}</td>
               <td>{{ $addon->additional_remarks }}</td>
               <td>{{ 'purchase price' }}</td> <!--$addon->purchase_price-->
+              @can('addon-selling-price-view')
               <td>Selling Price</td>
+              @endcan
               <td>{{ $addon->payment_condition }}</td>
               <td>
                 @can('addon-view')
@@ -131,5 +136,6 @@
       </table>
     </div>
     </div>
+    @endcanany
     @endif
           @endif

@@ -153,7 +153,7 @@
                               </div>
                           @endif
                         @endcan
-{{--                      <!-- @can('supplier-active-inactive') -->--}}
+                      @can('supplier-active-inactive') 
                       @if($supplier->status == 'active')
                         <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
                         <div class="overlay"> </div>
@@ -175,7 +175,6 @@
                                   </div>
                                 </div>
                                 <div class="modal-footer">
-                                  <!-- <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button> -->
                                   <a href="{{ route('suppliers.updateStatus',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                                 </div>
                               </div>
@@ -202,15 +201,13 @@
                                   </div>
                                 </div>
                                 <div class="modal-footer">
-                                  <!-- <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button> -->
                                   <a href="{{ route('suppliers.makeActive', $supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                                 </div>
                               </div>
                             </div>
                           </div>
                         @endif
-                        
-{{--                      <!-- @endcan                               -->--}}
+                       @endcan                               
                     </td>
                   </tr>
                 @endforeach
@@ -219,8 +216,7 @@
           </div>
         </div>
       </div>
-{{--    <!-- @endcan       -->--}}
-      </div><!-- end tab-content-->
+      </div>
     </div>
   </div>
 

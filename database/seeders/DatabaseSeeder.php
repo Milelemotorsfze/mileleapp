@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CreateAdminUserSeeder::class);
         $this->call(AddonTableSeeder::class);
         $this->call(BrandsTableSeeder::class);
-        $this->call(AddonDetailsTableSeeder::class);
+        // $this->call(AddonDetailsTableSeeder::class);
         $this->call(PaymentMethodsMasterTableSeeder::class);
         $this->call(ModelDescriptionMasterTableSeeder::class);
         $this->call(WarrantyMasterDataSeeder::class);

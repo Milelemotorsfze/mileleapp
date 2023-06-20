@@ -25,7 +25,7 @@ class AddonController extends Controller
      */
     public function index($data)
     {
-
+        $content = 'addon';
         $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice');
         if($data != 'all')
         {
@@ -91,7 +91,7 @@ class AddonController extends Controller
                                 $addons= array_merge($addons,$addons3);
                                 $addons= array_merge($addons,$addons2);
         // dd($addons);
-        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters','data'));
+        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
     }
     // {
 
@@ -421,7 +421,7 @@ class AddonController extends Controller
                 }
             }
             else
-            {
+            {dd($request->supplierAndPrice);
                 if($request->supplierAndPrice)
                 {
                     if(count($request->supplierAndPrice) > 0)
@@ -432,6 +432,7 @@ class AddonController extends Controller
                             $supPriInput['purchase_price_aed'] = $supplierAndPrice1['addon_purchase_price_in_aed'];
                             $supPriInput['purchase_price_usd'] = $supplierAndPrice1['addon_purchase_price_in_usd'];
                             $supPriInput['created_by'] = $authId;
+                            
                             if($supplierAndPrice1['supplier_id'])
                             {
                                 if(count($supplierAndPrice1['supplier_id']) > 0)
@@ -810,7 +811,12 @@ class AddonController extends Controller
     {
         $supplierAddonDetails = [];
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->first();
-        // 
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
+        // {
+        //     return $q->where('status','active')->min('purchase_price_aed');
+        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
+        // })->first();
         // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);

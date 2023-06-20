@@ -150,13 +150,14 @@
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->SellingPrice->selling_price}} AED</span>
                     </div>
-
+                    @if($supplierAddonDetails->LeastPurchasePrices != '')
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Least Purchase Price :</label>
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->LeastPurchasePrices->purchase_price_aed}} AED</span>
                     </div>
+                    @endif
                 </div>
             </div>
             <div class="col-xxl-2 col-lg-2 col-md-2">

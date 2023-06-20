@@ -103,12 +103,10 @@
                     </td> -->
                     <td>
                     @if($historyData->status == 'pending')
-                                        @can('warranty-selling-price-histories-edit')
                                             <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal"
                                                     data-bs-target="#edit-selling-price-{{$historyData->id}}">
                                                 <i class="fa fa-edit"></i></button>
-                                        @endcan
-                                        @can('warranty-selling-price-approve')
+                                       
                                             <button type="button" title="Approved" class="btn btn-success btn-sm"  data-bs-toggle="modal"
                                                     data-bs-target="#approve-selling-price-{{$historyData->id}}">
                                                     <i class="fa fa-check" aria-hidden="true"></i>
@@ -117,7 +115,7 @@
                                                     data-bs-target="#reject-selling-price-{{$historyData->id}}">
                                                     <i class="fa fa-ban" aria-hidden="true"></i>
                                             </button>
-                                        @endcan
+                                       
                                         @endif
                                     </td>
                                     <div class="modal fade" id="edit-selling-price-{{$historyData->id}}"  tabindex="-1"
