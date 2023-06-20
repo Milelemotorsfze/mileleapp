@@ -51,6 +51,7 @@
                                 <th>No</th>
                                 <th>Old Price (AED)</th>
                                 <th>Requested Price (AED)</th>
+                                <th>Created By</th>
                                 <th>Updated By</th>
                                 <th>Date & Time</th>
                                 <th>Actions</th>
@@ -63,7 +64,8 @@
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $pendingSellingPriceHistory->old_price ?? '' }}</td>
                                     <td>{{ $pendingSellingPriceHistory->updated_price ?? '' }}</td>
-                                    <td>{{ $pendingSellingPriceHistory->updatedUser->name }} </td>
+                                    <td>{{ $pendingSellingPriceHistory->createdUser->name ?? '' }}</td>
+                                    <td>{{ $pendingSellingPriceHistory->updatedUser->name ?? '' }} </td>
                                     <td>{{ $pendingSellingPriceHistory->updated_at }} </td>
                                     <td>
                                         @can('warranty-selling-price-histories-edit')

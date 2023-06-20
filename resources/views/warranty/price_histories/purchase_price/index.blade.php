@@ -36,6 +36,7 @@
                         <th>No</th>
                         <th>Old Price (AED)</th>
                         <th>Updated Price (AED)</th>
+                        <th>Created By</th>
                         <th>Updated By</th>
                         <th>Date & Time</th>
                     </tr>
@@ -45,9 +46,10 @@
                     @foreach ($priceHistories as $key => $priceHistory)
                         <tr data-id="1">
                             <td>{{ ++$i }}</td>
-                            <td>{{ $priceHistory->old_price }}</td>
+                            <td>{{ $priceHistory->old_price ?? ''}}</td>
                             <td>{{ $priceHistory->updated_price }}</td>
-                            <td>{{ $priceHistory->user->name }} </td>
+                            <td>{{ $priceHistory->createdBy->name ?? '' }}</td>
+                            <td>{{ $priceHistory->user->name ?? '' }} </td>
                             <td>{{ $priceHistory->updated_at }} </td>
                         </tr>
                     @endforeach

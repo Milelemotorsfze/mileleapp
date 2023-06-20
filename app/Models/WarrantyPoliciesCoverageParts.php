@@ -17,4 +17,8 @@ class WarrantyPoliciesCoverageParts extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function warrantyCoveragePart() {
+        return $this->belongsTo(MasterWarrantyCoverageParts::class,'parts_id');
+    }
 }

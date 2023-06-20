@@ -104,6 +104,11 @@ class WarrantyController extends Controller
         $warrantyBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
         return view('warranty.show', compact('premium','warrantyBrands'));
     }
+    public function view()
+    {
+        $warrantyBrands = WarrantyBrands::groupBy('warranty_premiums_id','selling_price')->get();
+        return view('warranty.sales_view.show', compact('warrantyBrands'));
+    }
 
     /**
      * Show the form for editing the specified resource.

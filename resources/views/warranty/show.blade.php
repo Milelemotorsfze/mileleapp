@@ -48,7 +48,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-12">
-                    <label for="choices-single-default" class="form-label">Vehicle Category 1</label>
+                    <label for="choices-single-default" class="form-label">Vehicle Category </label>
                 </div>
                 <div class="col-lg-6 col-md-9 col-sm-12">
                     <span>
@@ -120,8 +120,9 @@
                         <tr>
                             <th>S.NO</th>
                             <th>Brand</th>
-                            <th>Purchase Price</th>
-                            <th>Selling Price</th>
+                            <th>Purchase Price (AED)</th>
+                            <th>Selling Price (AED) </th>
+                            <th> Created By </th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -132,19 +133,21 @@
                             <tr>
                                 <td> {{ ++$i }}</td>
                                 <td>{{ $warrantyBrand->brand->brand_name }}</td>
-                                <td>{{ $warrantyBrand->price }} AED</td>
+                                <td>{{ $warrantyBrand->price }} </td>
+
                                 <td>
                                     @if($warrantyBrand->selling_price)
                                         @if($warrantyBrand->is_selling_price_approved == false)
-                                            {{ $warrantyBrand->selling_price }} AED (Not Approved)
+                                            {{ $warrantyBrand->selling_price }}  (Not Approved)
                                         @else
-                                            {{ $warrantyBrand->selling_price }} AED
+                                            {{ $warrantyBrand->selling_price }}
                                         @endif
 
                                     @else
                                         Selling Price Not Added
                                    @endif
                                 </td>
+                                <td>{{ $warrantyBrand->user->name ?? '' }}</td>
                                 <td>
                                     @can('warranty-purchase-price-histories-list')
                                         <a href="{{ route('warranty-price-histories.index',['id' => $warrantyBrand->id]) }}" class="btn btn-info btn-sm "

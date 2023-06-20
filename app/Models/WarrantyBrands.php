@@ -20,8 +20,29 @@ class WarrantyBrands extends Model
         'updated_by',
         'deleted_by'
     ];
+    public $appends = [
+        'policy_brands'
+    ];
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'created_by');
+    }
+    public function premium()
+    {
+        return $this->belongsTo(WarrantyPremiums::class,'warranty_premiums_id');
+    }
+    public function getPolicyBrandsAttribute()
+    {
+        $brands = Brand::whereHas('warrantyBrands', function ($query) {
+            $query->where('selling_price',$this->selling_price)
+                ->where('warranty_premiums_id',$this->warranty_premiums_id);
+        })->get();
+
+        return $brands;
     }
 }

@@ -12,6 +12,10 @@ class WarrantySellingPriceHistory extends Model
     {
         return $this->belongsTo(User::class,'updated_by');
     }
+    public function createdUser()
+    {
+        return $this->belongsTo(User::class,'created_by');
+    }
     public function statusUpdatedUser()
     {
         return $this->belongsTo(User::class,'status_updated_by');
