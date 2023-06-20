@@ -88,11 +88,11 @@ class SupplierController extends Controller
         $authId = Auth::id();
         $existingSellingprice = AddonSellingPrice::where('id',$request->id)->where('status','active')->latest()->first();
         $input['addon_details_id'] = $existingSellingprice->addon_details_id;
-        $input['selling_price'] = $request->name;
+        $input['selling_price'] = $request->selling_price;
         $input['created_by'] = $authId;
         $input['status'] = 'pending';
         $createInput = AddonSellingPrice::create($input);
-        return response()->json($createInput);
+        return redirect()->back()->with('success','Addon Selling Price Updated successfully.');
     }
     public function createNewSupplierAddonPrice(Request $request)
     {

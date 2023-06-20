@@ -810,7 +810,12 @@ class AddonController extends Controller
     {
         $supplierAddonDetails = [];
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->first();
-        // 
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
+        // {
+        //     return $q->where('status','active')->min('purchase_price_aed');
+        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
+        // })->first();
         // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
