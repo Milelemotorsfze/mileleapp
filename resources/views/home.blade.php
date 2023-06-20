@@ -14,6 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
 @can('Calls-view')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 <div class="row">
                         <div class="col-xl-5 col-md-6">
                             <!-- card -->
@@ -37,7 +38,7 @@
                                 </div><!-- end card body -->
                             </div><!-- end card -->
                         </div><!-- end col -->
-
+@if (Auth::user()->selectedRole === '4')
                         <div class="col-xl-5 col-md-6">
                             <!-- card -->
                             <div class="card card-h-100">
@@ -59,6 +60,8 @@
                                 </div><!-- end card body -->
                             </div><!-- end card -->
                         </div><!-- end col-->
+						@endif
+						@if (Auth::user()->selectedRole === '4')
                         <div class="col-xl-2 col-md-6">
                             <!-- card -->
                             <div class="card card-h-50">
@@ -92,7 +95,7 @@
                             </div><!-- end card -->
                         </div><!-- end col -->
                     </div><!-- end row-->
-
+@endif
               <div class="row">
               <div class="col-xl-8">
                 
@@ -309,6 +312,7 @@
                         </div>
                         <!-- end col -->
 </div>
+@if (Auth::user()->selectedRole === '4')
 <div class="row">
                         <div class="col-xl-6">
                         <div class = "card">
@@ -404,6 +408,7 @@
           </div>
           </div>
                         </div>
+                        @endif
                         <!-- end col -->
 <script>
 var chartData = {!! json_encode($chartData) !!};
@@ -483,5 +488,6 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
     });
     
     </script>
+    @endif
     @endcan
 @endsection

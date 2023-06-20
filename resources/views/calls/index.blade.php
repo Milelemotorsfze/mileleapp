@@ -1,6 +1,7 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
   <div class="card-header">
     <h4 class="card-title">
      Calls & Messages Info
@@ -699,4 +700,9 @@ $(document).ready(function() {
   });
 });
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

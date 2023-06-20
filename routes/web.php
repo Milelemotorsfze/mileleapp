@@ -33,9 +33,11 @@ use App\Http\Controllers\PFIController;
 use App\Http\Controllers\DemandPlanningSupplierController;
 use App\Http\Controllers\VehiclePicturesController;
 use App\Http\Controllers\PurchasingOrderController;
-use App\Http\Controllers\Movement;
+use App\Http\Controllers\MovementController;
 use App\Http\Controllers\VehiclesController;
 use App\Http\Controllers\WarrantyController;
+use App\Http\Controllers\HorizontalController;
+
 
 /*
 /*
@@ -245,5 +247,21 @@ Route::get('/d', function () {
     Route::post('purchasing-order/check-po-number', [PurchasingOrderController::class, 'checkPONumber'])->name('purchasing-order.checkPONumber');
     Route::post('update-data/vehicles', [VehiclesController::class, 'updatevehiclesdata'])->name('vehicles.updatevehiclesdata');
     Route::post('fatch-data/variants', [VehiclesController::class, 'fatchvariantdetails'])->name('vehicles.fatchvariantdetails');
-    Route::resource('movements', Movement::class);
+    Route::get('view-details/purchasing-order/{id}', [PurchasingOrderController::class, 'viewdetails'])->name('purchasing-order.viewdetails');
+    Route::post('/vehicles/updatedata', [VehiclesController::class, 'updatedata'])->name('vehicles.updatedata');
+    Route::resource('movement', MovementController::class);
+    Route::get('/last-reference/{currentId}', [MovementController::class, 'lastReference'])->name('movement.lastReference');
+    Route::post('movemnet/get-vehicles-details', [MovementController::class, 'vehiclesdetails'])->name('vehicles.vehiclesdetails');
+    Route::get('podelete/{id}', [PurchasingOrderController::class, 'deletes'])->name('podelete.deletes');
+    Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
+    Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
+    Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
+    Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
+    Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+
+
+    Route::get('horizontal-menu', [HorizontalController::class, 'showMenu'])->name('showHorizontalMenu');
+    Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');
+    Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
+
 });

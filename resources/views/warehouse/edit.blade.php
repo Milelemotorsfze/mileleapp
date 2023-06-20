@@ -56,31 +56,29 @@ input[type=number]::-webkit-outer-spin-button {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
 @can('create-po-details')
+@if (Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
 @php
     $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
     $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
 @endphp
 <div class="card-header">
-        <h4 class="card-title">New Purchasing Order</h4>
+        <h4 class="card-title">Edit Purchasing Order</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div> 
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> 
     </div>
     <div class="card-body">
-    <div class="col-lg-12">
-    <div id="flashMessage"></div>
-</div>
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+    @if(session('error'))
+    <div id="error-message" class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+@if(session('success'))
+    <div id="success-message" class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
         {!! Form::model($purchasingOrder, ['route' => ['purchasing-order.update', $purchasingOrder->id], 'method' => 'PATCH', 'id' => 'purchasing-order']) !!}
     <div class="row">
         <div class="col-lg-2 col-md-6">
@@ -113,7 +111,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">Model Line:</label>
         </div>
-        <div class="col-lg-5 col-md-6">
+        <div class="col-lg-4 col-md-6">
             <label for="QTY" class="form-label">Variants Detail:</label>
         </div>
         <div class="col-lg-1 col-md-6">
@@ -121,6 +119,9 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="intColour" class="form-label">Interior Color:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="payment" class="form-label">Payment Status:</label>
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">VIN:</label>
@@ -132,6 +133,10 @@ input[type=number]::-webkit-outer-spin-button {
     @php
     $variant = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
     $name = $variant->name;
+    $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;
+    $ex_colours = $exColour ? $exColour->name : null;
+    $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;
+    $int_colours = $exColour ? $intColour->name : null;
     $detail = $variant->detail;
     $brands_id = $variant->brands_id;
     $master_model_lines_id = $variant->master_model_lines_id;
@@ -140,7 +145,7 @@ input[type=number]::-webkit-outer-spin-button {
     $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();
     $model_line = $master_model_lines_ids->model_line;
     @endphp 
-        <input type="text" name="oldvariant_id[]" value="{{$name}}" class="form-control" readonly>
+    <input type="text" name="oldvariant_id[]" value="{{$name}}" class="form-control" readonly>
         </div>
         <div class="col-lg-1 col-md-6">
         <input type="text" name="oldbrand[]" value="{{$brand_names}}" class="form-control" readonly>
@@ -148,9 +153,18 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
         <input type="text" name="oldmodel_line[]" value="{{$model_line}}" class="form-control" readonly>
         </div>
-        <div class="col-lg-5 col-md-6">
+        <div class="col-lg-4 col-md-6">
         <input type="text" name="olddetail[]" value="{{$detail}}" class="form-control" readonly>
         </div>
+    @if (Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+    <div class="col-lg-1 col-md-6">
+    <input type="text" name="oldex_colour[]" value="{{$ex_colours}}" class="form-control" readonly>
+</div>
+<div class="col-lg-1 col-md-6">
+    <input type="text" name="oldint_colour[]" value="{{$int_colours}}" class="form-control" readonly>
+</div>
+    @endif
+    @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
         <div class="col-lg-1 col-md-6">
     <select name="oldex_colour[]" class="form-control" placeholder="Exterior Color">
         <option value="">Exterior Color</option>
@@ -163,10 +177,9 @@ input[type=number]::-webkit-outer-spin-button {
         @endforeach
     </select>
 </div>
-
 <div class="col-lg-1 col-md-6">
     <select name="oldint_colour[]" class="form-control" placeholder="Interior Color">
-        <option value="">Interior Color</option>
+        <option value="">Exterior Color</option>
         @foreach ($intColours as $id => $intColour)
             @if ($id == $vehicles->int_colour)
                 <option value="{{ $id }}" selected>{{ $intColour }}</option>
@@ -176,25 +189,54 @@ input[type=number]::-webkit-outer-spin-button {
         @endforeach
     </select>
 </div>
+@endif
+    @if (Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+    <div class="col-lg-1 col-md-6">
+    <select name="oldpayment[]" class="form-control">
+        <option value="Not Paid" {{ $vehicles->payment_status == 'Not Paid' ? 'selected' : '' }}>Not Paid</option>
+        <option value="Paid" {{ $vehicles->payment_status == 'Paid' ? 'selected' : '' }}>Paid</option>
+    </select>
+    </div>
+    <div class="col-lg-1 col-md-6">
+        <input type="text" name="oldvin[]" value="{{$vehicles->vin}}" class="form-control" readonly>
+        <input type="hidden" name="id[]" value="{{$vehicles->id}}" class="form-control" placeholder="VIN">
+		</div>
+    @endif
+    @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+    <div class="col-lg-1 col-md-6">
+    <input type="text" name="oldpayment[]" class="form-control" value="{{$vehicles->payment_status}}" readonly>
+    </div>
         <div class="col-lg-1 col-md-6">
         <input type="text" name="oldvin[]" value="{{$vehicles->vin}}" class="form-control" placeholder="VIN">
         <input type="hidden" name="id[]" value="{{$vehicles->id}}" class="form-control" placeholder="VIN">
 		</div>
+        <div class="col-lg-1 col-md-6">
+    @if ($vehicles->status == 'cancel')
+        <button class="btn btn-sm btn-danger" disabled>
+            Cancelled
+        </button>
+    @else
+        <a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehiclesde.deletes',$vehicles->id) }}" onclick="return confirmCancel();">
+            <i class="fa fa-times" aria-hidden="true"></i> Cancel
+        </a>
+    @endif
+</div>
+@endif
 		</div>
         <br>
-    @endforeach
-    </div>
-    </div>
-    <div class="bar">Add New Vehicles Into Stock</div>
+        @endforeach
+        </div>
+        @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+        <div class="bar">Add New Vehicles Into Stock</div>
         <div class="row">
             <div class="col-lg-2 col-md-6">
                 <label for="brandInput" class="form-label">Variants:</label>
                 <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id">
                 <datalist id="variantslist">
-    @foreach ($variants as $variant)
-    <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
-    @endforeach
-</datalist>
+        @foreach ($variants as $variant)
+        <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
+        @endforeach
+        </datalist>
                 </div>
                 <div class="col-lg-1 col-md-6">
         <label for="QTY" class="form-label">Brand:</label>
@@ -218,6 +260,7 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                 </div>
             </div>
+            @endif
 <br>
 <br>
     <div class="col-lg-12 col-md-12">
@@ -226,6 +269,11 @@ input[type=number]::-webkit-outer-spin-button {
 {!! Form::close() !!}
 		</br>
     </div>
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
     @endcan
 @endsection
 @push('scripts')
@@ -259,8 +307,6 @@ $(document).ready(function() {
             $('#SelectVariantsId').val(selectedVariant);
         }
     });
-
-
     $('.add-row-btn').click(function() {
     var selectedVariant = $('#variants_id').val();
     var variantOption = $('#variantslist').find('option[value="' + selectedVariant + '"]');
@@ -273,38 +319,32 @@ $(document).ready(function() {
     var brand = variantOption.data('brands_id');
     var masterModelLine = variantOption.data('master_model_lines_id');
     $('.bar').show();
-
-    // Move the declaration and assignment inside the click event function
     var exColours = <?= json_encode($exColours) ?>;
     var intColours = <?= json_encode($intColours) ?>;
-
     for (var i = 0; i < qty; i++) {
             var newRow = $('<div class="row row-space"></div>');
             var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
             var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
             var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-            var detailCol = $('<div class="col-lg-5 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+            var detailCol = $('<div class="col-lg-4 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
+            var paymentCol = $('<div class="col-lg-1 col-md-6"><select name="payment[]" class="form-control"><option value="Not Paid">Not Paid</option><option value="paid">Paid</option></select></div>');
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
-            
-            // Populate Exterior Colors dropdown
 var exColourDropdown = exColourCol.find('select');
 for (var id in exColours) {
     if (exColours.hasOwnProperty(id)) {
         exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
 }
 }
-
-// Populate Interior Colors dropdown
 var intColourDropdown = intColourCol.find('select');
 for (var id in intColours) {
     if (intColours.hasOwnProperty(id)) {
         intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
     }
 }
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, vinCol, removeBtn);
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, vinCol, paymentCol, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
         $('#variants_id').val('');
@@ -331,5 +371,23 @@ for (var id in intColours) {
         }
     });
 });
+</script>
+<script>
+  function confirmCancel() {
+    var confirmDialog = confirm("Are you sure you want to cancel this Vehicles?");
+    if (confirmDialog) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
+<script>
+    setTimeout(function() {
+        $('#error-message').fadeOut('slow');
+    }, 3000);
+    setTimeout(function() {
+        $('#success-message').fadeOut('slow');
+    }, 3000);
 </script>
 @endpush

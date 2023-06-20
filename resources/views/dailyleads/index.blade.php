@@ -1,6 +1,7 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
+@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
   <div class="card-header">
   <style>
   .wrapper 
@@ -928,4 +929,9 @@ function openModalclosed(callId) {
     xhr.send(formData);
   }
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

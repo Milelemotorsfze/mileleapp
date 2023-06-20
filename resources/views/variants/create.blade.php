@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
     <div class="card-header">
         <h4 class="card-title">Add New Variant</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -106,6 +107,11 @@
         </form>
     </div>
     </div>
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection
 @push('scripts')
     <script>

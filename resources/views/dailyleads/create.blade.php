@@ -56,6 +56,7 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
+@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
 @can('daily-leads-create')
 <div class="card-header">
         <h4 class="card-title">New Leads</h4>
@@ -193,6 +194,11 @@ input[type=number]::-webkit-outer-spin-button {
 		</br>
     </div>
     @endcan
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection
 @push('scripts')
     <script type="text/javascript">

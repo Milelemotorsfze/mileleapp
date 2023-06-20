@@ -23,6 +23,7 @@
 }
     </style>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 @can('Calls-modified')
 <div class="card-header">
 @if (session('error'))
@@ -64,4 +65,9 @@
 		</br>
     </div>
     @endcan
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

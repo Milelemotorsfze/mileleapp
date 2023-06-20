@@ -8,6 +8,7 @@
     }
 </style>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
     <div class="card-header">
         <h4 class="card-title">
 <h4>Strategy Report</h4>
@@ -184,4 +185,9 @@ $last120Days = date('Y-m-d', strtotime($last90Days . " -31 days"));
 </table>
         </div>
     </div>
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

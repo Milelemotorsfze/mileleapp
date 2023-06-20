@@ -1,5 +1,6 @@
 @extends('layouts.table')
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
   <div class="card-header">
     <h4 class="card-title">
      Calls & Messages Info
@@ -168,4 +169,9 @@ function downloadCSV(dataTable, fileName) {
   document.body.removeChild(link);
 }
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

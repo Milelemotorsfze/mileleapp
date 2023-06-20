@@ -26,6 +26,7 @@ class PermissionTableSeeder extends Seeder
             ['10', 'Addon Suppliers'],
             ['11', 'Warranty'],
             ['12', 'Addons'],
+            ['13','Logistics'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -55,7 +56,7 @@ class PermissionTableSeeder extends Seeder
 
             ['3','View Sales','sales-view', 'To View the sales department'],
             ['3','List Daily Leads','daily-leads-list', 'To View the List of the Daily Leads'],
-            ['3','View  Quotation Details', 'daily-leads-view', 'To view the Quotation Details and Listing'],
+            ['3','View  Quotation Details', 'daily-leads-view', 'To View the Quotation Details and Listing'],
             ['3','Create Quotation','daily-leads-create', 'To create New Quotation'],
             ['3','Edit Quotation','daily-leads-edit', 'To Edit the Quotation'],
 

@@ -9,6 +9,9 @@ use App\Models\Gdn;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\ModelHasRoles;
+use App\Models\So;
 use Illuminate\Support\Facades\DB;
 
 
@@ -20,9 +23,12 @@ class VehiclesController extends Controller
      */
     public function index()
     {
-        $data = Vehicles::get();
+        $data = Vehicles::where('status', '!=', 'cancel')->get();
         $varaint = Varaint::get();
-        return view('vehicles.index', compact('data', 'varaint'));  
+        $sales_persons = ModelHasRoles::get();
+        $sales_ids = $sales_persons->pluck('model_id');
+        $sales = User::whereIn('id', $sales_ids)->get();
+        return view('vehicles.index', compact('data', 'varaint', 'sales'));  
     }    
 
     /**
@@ -83,12 +89,6 @@ class VehiclesController extends Controller
         $vehicle->vin = $value;
         $vehicle->save();
         }
-        if($column === "price")
-        {
-        $vehicle = Vehicles::find($vehiclesId);
-        $vehicle->price = $value;
-        $vehicle->save();
-        }
         if($column === "int_colour")
         {
         $vehicle = Vehicles::find($vehiclesId);
@@ -130,82 +130,6 @@ class VehiclesController extends Controller
         $vehicle = Vehicles::find($vehiclesId);
         $vehicle->ppmmyyy = $value;
         $vehicle->save();
-        }
-        if ($column === "grn_date") {
-            $vehicle = Vehicles::find($vehiclesId);
-            if ($vehicle) {
-                $grnId = $vehicle->grn_id;
-                if ($grnId) {
-                    $grn = Grn::find($grnId);
-                    if ($grn) {
-                        $grn->date = $value;
-                        $grn->save();
-                    }
-                } else {
-                    $newGrn = new Grn();
-                    $newGrn->date = $value;
-                    $newGrn->save();
-                    $vehicle->grn_id = $newGrn->id;
-                    $vehicle->save();
-                }
-            }
-        } 
-        if ($column === "grn_number") {
-            $vehicle = Vehicles::find($vehiclesId);
-            if ($vehicle) {
-                $grnId = $vehicle->grn_id;
-                if ($grnId) {
-                    $grn = Grn::find($grnId);
-                    if ($grn) {
-                        $grn->grn_number = $value;
-                        $grn->save();
-                    }
-                } else {
-                    $newGrn = new Grn();
-                    $newGrn->grn_number = $value;
-                    $newGrn->save();
-                    $vehicle->grn_id = $newGrn->id;
-                    $vehicle->save();
-                }
-            }
-        }
-        if ($column === "gdn_date") {
-            $vehicle = Vehicles::find($vehiclesId);
-            if ($vehicle) {
-                $gdnId = $vehicle->gdn_id;
-                if ($gdnId) {
-                    $gdn = Gdn::find($gdnId);
-                    if ($gdn) {
-                        $gdn->date = $value;
-                        $gdn->save();
-                    }
-                } else {
-                    $newGdn = new Gdn();
-                    $newGdn->date = $value;
-                    $newGdn->save();
-                    $vehicle->gdn_id = $newGdn->id;
-                    $vehicle->save();
-                }
-            }
-        }  
-        if ($column === "gdn_number") {
-            $vehicle = Vehicles::find($vehiclesId);
-            if ($vehicle) {
-                $gdnId = $vehicle->gdn_id;
-                if ($gdnId) {
-                    $gdn = Gdn::find($gdnId);
-                    if ($gdn) {
-                        $gdn->gdn_number = $value;
-                        $gdn->save();
-                    }
-                } else {
-                    $newGdn = new Gdn();
-                    $newGdn->gdn_number = $value;
-                    $newGdn->save();
-                    $vehicle->gdn_id = $newGdn->id;
-                    $vehicle->save();
-                }
-            }
         }  
         if($column === "variants_name")
         {
@@ -282,15 +206,12 @@ class VehiclesController extends Controller
     public function fatchvariantdetails(Request $request)
 {
     $variantName = $request->input('value');
-    // Fetch the updated values from the database based on the selected variant
     $result = DB::table('varaints')
     ->join('brands', 'varaints.brands_id', '=', 'brands.id')
     ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
     ->where('varaints.name', $variantName)
     ->select('varaints.name', 'varaints.my', 'varaints.detail', 'varaints.upholestry', 'varaints.steering', 'varaints.fuel_type', 'varaints.seat','varaints.gearbox', 'brands.brand_name AS brand_name', 'master_model_lines.model_line')
     ->first();
-
-    // Prepare the response data
     $responseData = [
         'varaints_detail' => $result->detail ?? null,
         'brand_name' => $result->brand_name ?? null,
@@ -303,7 +224,72 @@ class VehiclesController extends Controller
         'gearbox' => $result->gearbox ?? null,
         'vehicles_id' => $request->input('vehicles_id'),
     ];
-
     return response()->json($responseData);
-}
-}
+    }
+    public function updatedata(Request $request)
+    {
+        $id = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($id);
+        $variants_name = $request->input('variants_name');
+        $variants_id = Varaint::where('name', $variants_name)->value('id');
+        $vehicle->varaints_id = $variants_id;
+        $vehicle->vin = $request->input('vin');
+        $vehicle->engine = $request->input('engine');
+        $vehicle->ex_colour = $request->input('ex_colour');
+        $vehicle->int_colour = $request->input('int_colour');
+        $vehicle->territory = $request->input('territory');
+        $vehicle->ppmmyyy = $request->input('ppmmyy');
+        $vehicle->remarks = $request->input('remarks');
+        $vehicle->save();
+        return redirect()->back()->with('success', 'Vehicle details updated successfully.');
+    }
+    public function updateso(Request $request)
+    {
+    $vehicleId = $request->input('vehicle_id');
+    $vehicle = Vehicles::find($vehicleId);
+    $soId = $vehicle->so_id;
+    if ($soId) {
+        $so = So::find($soId);
+        $so->so_number = $request->input('so_number');
+        $so->so_date = $request->input('so_date');
+        $so->sales_person_id = $request->input('sales_person');
+        $so->payment_percentage = $request->input('payment_percentage');
+        $so->save();
+    } else {
+        $so = new So();
+        $so->so_number = $request->input('so_number');
+        $so->so_date = $request->input('so_date');
+        $so->sales_person_id = $request->input('sales_person');
+        $so->payment_percentage = $request->input('payment_percentage');
+        $so->save();
+        $vehicle->so_id = $so->id;
+        $vehicle->save();
+    }
+    return redirect()->back()->with('success', 'Vehicle details updated successfully.');
+    }
+    public function deletes($id)
+    {
+    $vehicle = Vehicles::find($id); // Assuming you have a "Vehicle" model
+    
+    if ($vehicle->grn_id === null) {
+        $vehicle->status = 'cancel';
+        $vehicle->save();
+        // You can also use $vehicle->update(['status' => 'cancel']);
+        
+        return redirect()->back()->with('success', 'Vehicle status updated to "cancel" successfully.');
+    } else {
+        return redirect()->back()->with('error', 'Vehicle has already been delivered and cannot be canceled.');
+    }
+    }
+    public function viewLogDetails($id)
+    {
+        $lastIdDetails = Vehicles::find($id);
+        $previousId = Vehicles::where('id', '<', $id)->max('id');
+        $nextId = Vehicles::where('id', '>', $id)->min('id');
+        return view('vehicles.vehicleslog', [
+               'currentId' => $id,
+               'previousId' => $previousId,
+               'nextId' => $nextId
+           ]);
+    }
+    }

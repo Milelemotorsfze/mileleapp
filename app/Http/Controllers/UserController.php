@@ -8,6 +8,8 @@ namespace App\Http\Controllers;
     use DB;
     use Hash;
     use App\Models\Profile;
+    use Illuminate\Support\Facades\Auth;
+    use Illuminate\Support\Facades\Session;
     use Illuminate\Support\Arr;
     class UserController extends Controller
     {
@@ -112,5 +114,13 @@ namespace App\Http\Controllers;
             User::withTrashed()->find($id)->restore();
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
+        }        
+        public function updateRole(Request $request, $roleId)
+        {
+        $user = Auth::user();
+        $user->selected_role = $roleId;
+        $user->save();
+        Session::put('selectedRole', $roleId);
+        return redirect()->back();
         }
-    }
+        }
