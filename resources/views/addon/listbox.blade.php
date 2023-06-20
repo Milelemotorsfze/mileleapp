@@ -214,6 +214,7 @@
                     Spare Parts
                     @endif
                   </div>
+                  @if($content == '')
                   @if($addonsdata->PurchasePrices!= null)
                   @if($addonsdata->PurchasePrices->purchase_price_aed != '')
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -222,6 +223,7 @@
                   <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                   </div>
+                  @endif
                   @endif
                   @endif
                   @if($addonsdata->LeastPurchasePrices!= null)

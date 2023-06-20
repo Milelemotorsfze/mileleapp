@@ -126,6 +126,7 @@ class SupplierController extends Controller
     }
     public function show(Supplier $supplier)
     {
+        $content = '';
         $addon1 = $addons = $supplierTypes = '';
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->with('PaymentMethods')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->with('PaymentMethods')->get();
@@ -152,7 +153,7 @@ class SupplierController extends Controller
                         ->orderBy('addon_details.id','ASC')
                         ->get();
         }
-        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes'));
+        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes','content'));
     }
 
     /**

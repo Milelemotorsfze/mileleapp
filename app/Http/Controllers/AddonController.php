@@ -25,7 +25,7 @@ class AddonController extends Controller
      */
     public function index($data)
     {
-
+        $content = 'addon';
         $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice');
         if($data != 'all')
         {
@@ -91,7 +91,7 @@ class AddonController extends Controller
                                 $addons= array_merge($addons,$addons3);
                                 $addons= array_merge($addons,$addons2);
         // dd($addons);
-        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters','data'));
+        return view('addon.index',compact('addons','addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
     }
     // {
 
