@@ -8,7 +8,7 @@
 
 
 
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>  
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> -->
 
 <style>
@@ -35,15 +35,15 @@ input {
 ::placeholder {
   color: #422a4c;
 } */
-    .error 
+    .error
     {
         color: #FF0000;
     }
-    .iti 
-    { 
-        width: 100%; 
+    .iti
+    {
+        width: 100%;
     }
-    .btn_round 
+    .btn_round
     {
         width: 30px;
         height: 30px;
@@ -59,18 +59,18 @@ input {
         border-radius:5px;
         cursor: pointer;
     }
-    .btn_round:hover 
+    .btn_round:hover
     {
         color: #fff;
         background: #fd625e;
         border: 1px solid #fd625e;
     }
-    .btn_content_outer 
+    .btn_content_outer
     {
         display: inline-block;
         width: 85%;
     }
-    .close_c_btn 
+    .close_c_btn
     {
         width: 30px;
         height: 30px;
@@ -85,7 +85,7 @@ input {
         text-align: center;
         cursor: pointer;
     }
-    .add_icon 
+    .add_icon
     {
         padding: 10px;
         border: 1px dashed #aaa;
@@ -93,30 +93,30 @@ input {
         border-radius: 50%;
         margin-right: 10px;
     }
-    .add_group_btn 
+    .add_group_btn
     {
         display: flex;
     }
-    .add_group_btn i 
+    .add_group_btn i
     {
         font-size: 32px;
         display: inline-block;
         margin-right: 10px;
     }
-    .add_group_btn span 
+    .add_group_btn span
     {
         margin-top: 8px;
     }
     .add_group_btn,
-    .clone_sub_task 
+    .clone_sub_task
     {
         cursor: pointer;
     }
-    .sub_task_append_area .custom_square 
+    .sub_task_append_area .custom_square
     {
         cursor: move;
     }
-    .del_btn_d 
+    .del_btn_d
     {
         display: inline-block;
         position: absolute;
@@ -129,19 +129,19 @@ input {
         text-align: center;
         font-size: 18px;
     }
-    body 
+    body
     {
         font-family: Arial;
     }
     /* Style the tab */
-    .tab 
+    .tab
     {
         overflow: hidden;
         border: 1px solid #ccc;
         background-color: #f1f1f1;
     }
     /* Style the h6 inside the tab */
-    .tab h6 
+    .tab h6
     {
         background-color: inherit;
         float: left;
@@ -153,24 +153,24 @@ input {
         font-size: 17px;
     }
     /* Change background color of h6 on hover */
-    .tab h6:hover 
+    .tab h6:hover
     {
         background-color: #ddd;
     }
     /* Create an active/current tablink class */
-    .tab h6.active 
+    .tab h6.active
     {
         background-color: #ccc;
     }
     /* Style the tab content */
-    .tabcontent 
+    .tabcontent
     {
         display: none;
         padding: 6px 12px;
         border: 1px solid #ccc;
         border-top: none;
     }
-    .paragraph-class 
+    .paragraph-class
     {
         margin-top: .25rem;
         font-size: 80%;
@@ -202,15 +202,15 @@ input {
     {
         height:32px!important;
     }
-    input:focus 
+    input:focus
     {
         border-color: #495057!important;
     }
-    select:focus 
+    select:focus
     {
         border-color: #495057!important;
     }
-    button:focus 
+    button:focus
     {
         border-color: #495057!important;
     }
@@ -232,8 +232,8 @@ input {
                 </ul>
             </div>
         @endif -->
-  
-        <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST"> 
+
+        <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST">
         <!-- action="{{ route('suppliers.store') }}" -->
         <!-- method="POST" enctype="multipart/form-data" -->
         <!-- action="{{ route('suppliers.store') }}" method="POST"  -->
@@ -271,7 +271,7 @@ input {
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                          
+
                         </div>
                     </div>
                     </br>
@@ -356,7 +356,7 @@ input {
                         <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput" onchange="validationOnKeyUp(this)">
                         <!-- @error('supplier_types') is-invalid @enderror -->
                             <option value="">Choose Supplier Type</option>
-                            <option value="accessories">Accessories</option>      
+                            <option value="accessories">Accessories</option>
                             <option value="freelancer">Freelancer</option>
                             <option value="garage">Garage</option>
                             <option value="spare_parts">Spare Parts</option>
@@ -402,7 +402,7 @@ input {
                         </div>
                         @foreach($paymentMethods as $paymentMethod)
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">
-                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}">                              
+                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}">
                                 <label class="form-check-label" for="flexCheckIndeterminate">
                                     {{ $paymentMethod->payment_methods }}
                                 </label>
@@ -410,13 +410,13 @@ input {
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
-                                   
+
                                 @enderror
                             </div>
                         @endforeach
                     </div>
                     </br>
-                </div> 
+                </div>
             </div>
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
@@ -429,10 +429,11 @@ input {
                             <div class="row">
                                 <div class="col-md-12 p-0">
                                     <div class="col-md-12 form_field_outer p-0">
-                                        <div class="row form_field_outer_row">
+                                        <div class="row form_field_outer_row" id="row-1">
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                                <select class="addonClass" id="adoon_1" name="supplierAddon[1][addon_id][]" multiple="true" style="width: 100%;" onchange="resetAddonDropdown()">
+                                                <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1][addon_id][]" multiple="true" style="width: 100%;"
+                                                        onchange="resetAddonDropdown()">
                                                 @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                     @endforeach
@@ -446,29 +447,27 @@ input {
                                             <div class="col-xxl-1 col-lg-1 col-md-1">
                                                 <label for="choices-single-default" class="form-label font-size-13">Currency</label>
                                                 <select name="supplierAddon[1][currency]" id="currency_1" class="widthinput form-control" onchange="changeCurrency(1)">
-                                                    <option value="AED">AED</option>      
+                                                    <option value="AED">AED</option>
                                                     <option value="USD">USD</option>
                                                 </select>
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                 <div class="input-group">
-                                                <input id="addon_purchase_price_in_usd_1" type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">USD</span>
-                            </div>
-                                 
-                        </div> 
+                                                    <input id="addon_purchase_price_in_usd_1" type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                 <div class="input-group">
-                                                <input id="addon_purchase_price_1" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                            </div>
-                                 
-                        </div> 
+                                                    <input id="addon_purchase_price_1" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                        </div>
+                                                </div>
                                             </div>
                                             <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
@@ -476,8 +475,8 @@ input {
                                                 <input id="addon_purchase_price_1" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                 <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
@@ -493,13 +492,13 @@ input {
                             </div>
                             <div class="row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn" onclick="clickAdd()"><i class="fa fa-plus" aria-hidden="true"></i> Add</a> 
+                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn" onclick="clickAdd()"><i class="fa fa-plus" aria-hidden="true"></i> Add</a>
                                 </div>
                             </div>
                         </div>
                         </br>
                     </div>
-                </div>  
+                </div>
             </div>
             <input id="activeTab" name="activeTab" hidden>
             <input id="hiddencontact" name="hiddencontact" value="{{old('hiddencontact')}}" hidden>
@@ -508,13 +507,13 @@ input {
             <div id="uploadExcel" class="tabcontent">
                 <div class="row">
                     <div class="col-xxl-6 col-lg-6 col-md-6">
-                        <label for="choices-single-default" class="form-label font-size-13">Upload Supplier Addon Excel File</label>    
+                        <label for="choices-single-default" class="form-label font-size-13">Upload Supplier Addon Excel File</label>
                         <input type="file" name="file" placeholder="Choose file" id="supplierAddonExcel" class="form-control" onchange="readURL(this);">
                         <span id="supplierAddonExcelError" class="required-class paragraph-class"></span>
                     </div>
                     <div class="col-xxl-6 col-lg-6 col-md-6"><center>
                         <label for="choices-single-default" class="form-label font-size-13">Download Supplier Addon Excel Template</label>
-                        </br>   
+                        </br>
                         <a  class="btn btn-sm btn-info" href="{{ route('addon.get_student_data') }}"><i class="fa fa-arrow-down" aria-hidden="true"></i> Download Excel Template</a>
                         </center>
                     </div>
@@ -538,8 +537,9 @@ input {
             <div class="col-xxl-12 col-lg-12 col-md-12">
                 <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
             </div>
-        </form> 
+        </form>
     </div>
+    <input type="hidden" value="" id="indexValue">
     <div class="overlay"></div>
     @endcan
     <!-- <input id="numbers-only" type="text" placeholder="Numbers Only" /> -->
@@ -547,260 +547,249 @@ input {
         var activeTab = '';
         var PreviousHidden = '';
         // var selectedAddons = [];
-        
+        var filteredArray = [];
         var addonDropdownCount = 1;
         // globalThis.selectedAddons .push(brandId);
       var sub ='1';
-            
-      
+
+
         $(document).ready(function ()
         {
-            // var inputField = document.querySelector('#contact_number');
-            // inputField.onkeydown = function(event) 
-            // {
-            //     // Only allow if the e.key value is a number or if it's 'Backspace'
-            //     if(isNaN(event.key) && event.key !== 'Backspace') 
-            //     {
-            //         $msg = "Only Numbers Allowed";
-            //         showContactNumberError($msg);
-            //         event.preventDefault();
-            //     }  
-            // }
-            // var inputField1 = document.querySelector('#alternative_contact_number');
-            // inputField1.onkeydown = function(event) 
-            // {
-            //     // Only allow if the e.key value is a number or if it's 'Backspace'
-            //     if(isNaN(event.key) && event.key !== 'Backspace') 
-            //     {
-            //         $msg = "Only Numbers Allowed";
-            //         showAlternativeContactNumberError($msg);
-            //         event.preventDefault();
-            //     }  
-            // }
-            
-            // $('button').on('click', function() {
-            
-            // });
-                //    alert($('#hiddencontact').val());
 
-                //    var contact_number = window.intlTelInput(document.querySelector("#contact_number"), 
-                // {
-                //     separateDialCode: true,
-                //     preferredCountries:["ae"],
-                //     hiddenInput: "full",
-                //     utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-                // });
-            $.ajaxSetup
-            ({
-                headers: 
-                {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
+            $('#addon_1').select2({
+                allowClear: true,
+                minimumResultsForSearch: -1,
+                placeholder:"Choose Addon Code....     Or     Type Here To Search....",
             });
-
-
-
-
-            // $msg ="One among contact number or alternative contact number or email is required";
-            // emailContactError($msg);
-            $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
-            $("#adoon_1").select2();
             $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
             $("#supplier_type").select2();
-            // $('#supplier_type').data('select2').$container.addClass('is-invalid')
-            //             $("#adoon_1").select2().on('change', function() {
-            //     $('#value').select2({data:data[$(this).val()]});
-            // }).trigger('change');
-                        // $(document.body).on("change","#adoon_1",function()
-                        // {
-                        //     // globalThis.selectedAddons .push(this.value);
-                        //     alert(this.value);
-                        //     // alert(selectedAddons);
-                        // });
-            //             $('#adoon_1').on("select2:select", function (e) {
-            //                 var eachSelected = [];
-            //                 var eachSelected = $('#adoon_1').select2().val();
-            //                 globalThis.selectedAddons[1] = [];
-            //                 $.each(eachSelected, function( i, value ) {
-            //                     globalThis.selectedAddons[1] .push(value); 
-            //                     alert(selectedAddons);
-            //             //     // 
-            //                 // alert( index + ": " + value );
-            // //                 $("#adoon_1").find(':selected').attr('disabled','disabled');
-            // // $("#adoon_1").trigger('change');
-            // // $("#adoon_2").find(':selected').attr('disabled','disabled');
-            // // $("#adoon_2").trigger('change');
-            //                 });
-            // });
 
-            // document.getElementById('adoon_1').addEventListener('change', function() {
-            //     console.log('You selected: ', this.value);
-            // });
-            ///======Clone method
-            // $("body").on("click", ".add_node_btn_frm_field", function (e) 
-            // {
-            //     var index = $(e.target).closest(".form_field_outer").find(".form_field_outer_row").length + 1;
-            //     var cloned_el = $(e.target).closest(".form_field_outer_row").clone(true);
-            //     $(e.target).closest(".form_field_outer").last().append(cloned_el).find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false);
-            //     $(e.target).closest(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true);
-            //     //change id
-            //     $(e.target)
-            //     .closest(".form_field_outer")
-            //     .find(".form_field_outer_row")
-            //     .last()
-            //     .find("input[type='text']")
-            //     .attr("id", "mobileb_no_" + index);
-            //     $(e.target)
-            //     .closest(".form_field_outer")
-            //     .find(".form_field_outer_row")
-            //     .last()
-            //     .find("select")
-            //     .attr("id", "no_type_" + index);
-            //     //count++;
-               
-            // });
-            // $("body").on("click",".add_new_frm_field_btn", function ()
-           
-          
-        });  
+            var index = 1;
+            $('#indexValue').val(index);
+            $(document.body).on('select2:select', ".addons", function (e) {
+                var index = $(this).attr('data-index');
+                var value = e.params.data.id;
+                hideOption(index,value);
+            });
+            $(document.body).on('select2:unselect', ".addons", function (e) {
+                var index = $(this).attr('data-index');
+                var data = e.params.data;
+                appendOption(index,data);
+            });
+            function hideOption(index,value) {
+                var indexValue = $('#indexValue').val();
+                for (var i = 1; i <= indexValue; i++) {
+                    if (i != index) {
+                        var currentId = 'addon_' + i;
+                        $('#' + currentId + ' option[value=' + value + ']').detach();
+                    }
+                }
+            }
+            function appendOption(index,data) {
+                var indexValue = $('#indexValue').val();
+                for(var i=1;i<=indexValue;i++) {
+                    if(i != index) {
+                        $('#addon_'+i).append($('<option>', {value: data.id, text : data.text}))
+                    }
+                }
+            }
+            $(document.body).on('click', ".removeButton", function (e) {
+                var indexNumber = $(this).attr('data-index');
+
+                $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = (this.value);
+                    var text = (this.text);
+                    addOption(id,text)
+                });
+
+                $(this).closest('#row-'+indexNumber).remove();
+                $('.form_field_outer_row').each(function(i){
+                    var index = +i + +1;
+                    $(this).attr('id','row-'+ index);
+                    $(this).find('select').attr('data-index', index);
+                    $(this).find('select').attr('id','addon_'+ index);
+                    $(this).find('.currency').attr('name','supplierAddon['+ index +'][currency]');
+                    $(this).find('.addons').attr('name','supplierAddon['+ index +'][addon_id]');
+                    $(this).find('.purchase_price_in_USD').attr('name','supplierAddon['+ index +'][addon_purchase_price_in_usd]');
+                    $(this).find('.purchase_price_in_AED').attr('name','supplierAddon['+ index +'][addon_purchase_price]');
+                    $(this).find('.div-purchase_price_in_AED').attr('id','div_price_in_aed_' + index);
+                    $(this).find('.purchase_price_in_AED').attr('id','addon_purchase_price_'+ index);
+                    $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
+
+                    $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
+                    $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
+                    $(this).find('.purchase_price').attr('id', 'addon_purchase_price_'+ index);
+                    $(this).find('.purchase_price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]'+ index);
+
+                    $(this).find('button').attr('data-index', index);
+                    $(this).find('button').attr('id','remove-'+ index);
+                    $('#addon_'+index).select2
+                    ({
+                        placeholder:"Choose Addon....     Or     Type Here To Search....",
+                        allowClear: true,
+                        minimumResultsForSearch: -1,
+                    });
+                });
+            })
+            function addOption(id,text) {
+                var indexValue = $('#indexValue').val();
+                for(var i=1;i<=indexValue;i++) {
+                    $('#brands'+i).append($('<option>', {value: id, text :text}))
+                }
+            }
+        });
+
         function clickAdd()
-            { 
+        {
+            var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-                var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;   
-                // globalThis.addonDropdownCount = index;  
-                // var selectedAddons = [];
-                // for (var i = 1; i <= addonDropdownCount; i++) 
-                // {
-                //     var eachSelected = [];
-                //     var eachSelected = $('#adoon_'+i).val();
-                //     $.each(eachSelected, function( ind, value ) 
-                //     {
-                //         selectedAddons.push(value);
-                        
-                //     });
-                // }
-                // alert(selectedAddons);
-                // for (var i = 1; i <= addonDropdownCount; i++) 
-                // {
-                //     $.each(selectedAddons, function( ind, value ) 
-                //     {
-                //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
-                //     });
-                // }   
-                // alert(addonDropdownCount);
-                // resetAddonDropdown();           
-                $(".form_field_outer").append(`
-                    <div class="row form_field_outer_row">
-                        <div class="col-xxl-6 col-lg-6 col-md-12">
-                            <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                            <select class="addonClass"  id="adoon_${index}" name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;" onchange="resetAddonDropdown()">
-                            @foreach($addons as $addon)
-                                    <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
-                                @endforeach
-                            </select>
-                            @error('is_primary_payment_method')
+            $('#indexValue').val(index);
+            var selectedAddons = [];
+            for(let i=1; i<index; i++)
+            {
+                var eachSelectedAddon = $("#addon_"+i).val();
+                $.each(eachSelectedAddon, function( ind, value )
+                {
+                    selectedAddons.push(value);
+                });
+            }
+            $.ajax
+            ({
+                url:"{{ route('addon.getAddonForSupplier')}}",
+                type: "POST",
+                data:
+                    {
+                        filteredArray: selectedAddons,
+                        _token: '{{csrf_token()}}'
+                    },
+                dataType : 'json',
+                success: function(data)
+                {
+                    myarray = data;
+                    var size= myarray.length;
+                    if(size >= 1)
+                    {
+                        $(".form_field_outer").append(`
+                            <div class="row form_field_outer_row" id="row-${index}">
+                                <div class="col-xxl-6 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
+                                    <select class="addons"  id="addon_${index}" data-index="${index}" name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;" onchange="resetAddonDropdown()">
+                                    @foreach($addons as $addon)
+                                <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
+                                        @endforeach
+                                </select>
+                                    @error('is_primary_payment_method')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="col-xxl-1 col-lg-1 col-md-1">
-                            <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                            <select name="supplierAddon[${index}][currency]" id="currency_${index}" class="widthinput form-control" onchange="changeCurrency(${index})">
-                                <option value="AED">AED</option>      
-                                <option value="USD">USD</option>
-                            </select>
-                        </div>
-                        <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
-                            <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                            <div class="input-group">
-                            <input id="addon_purchase_price_in_usd_${index}" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                        </span>
+                                    @enderror
+                                </div>
+                                <div class="col-xxl-1 col-lg-1 col-md-1">
+                                    <label for="choices-single-default" class="form-label font-size-13">Currency</label>
+                                    <select name="supplierAddon[${index}][currency]"  id="currency_${index}" class="widthinput form-control currency" onchange="changeCurrency(${index})">
+                                        <option value="AED">AED</option>
+                                        <option value="USD">USD</option>
+                                    </select>
+                                </div>
+                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
+                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
+                                    <div class="input-group">
+                                    <input id="addon_purchase_price_in_usd_${index}" type="number" min="0" step="any" class="widthinput form-control purchase_price_in_USD
+                                     @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD"
+                                      value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                    </div>
+
+                                </div>
+                                </div>
+                                <div class="col-xxl-2 col-lg-3 col-md-3 div-purchase_price_in_AED" id="div_price_in_aed_${index}" hidden>
+                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                    <div class="input-group">
+                                    <input id="addon_purchase_price_${index}" type="number" min="0" step="any" class="widthinput
+                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" name="supplierAddon[${index}][addon_purchase_price]"
+                                    placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                                </div>
+                                <div class="col-xxl-4 col-lg-6 col-md-6 addon-purchase-price-div" id="div_price_in_aedOne_${index}">
+                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                    <div class="input-group">
+                                    <input id="addon_purchase_price_${index}" type="number" min="0" step="any" class="widthinput form-control purchase-price
+                                     @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]"
+                                      placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+
+                                </div>
+                                </div>
+                                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                    <button class="btn_round removeButton" id="remove-${index}" data-index="${index}">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
                             </div>
-                                 
-                        </div> 
-                        </div>
-                        <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_${index}" hidden>
-                            <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                            <div class="input-group">
-                            <input id="addon_purchase_price_${index}" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                            </div>
-                                 
-                        </div> 
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_${index}">
-                            <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                            <div class="input-group">
-                            <input id="addon_purchase_price_${index}" type="number" min="0" step="any" class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                            </div>
-                                 
-                        </div> 
-                        </div>
-                        <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                            <button class="btn_round remove_node_btn_frm_field" disabled>
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                `); 
-                $(".form_field_outer").find(".remove_node_btn_frm_field:not(:first)").prop("disabled", false); $(".form_field_outer").find(".remove_node_btn_frm_field").first().prop("disabled", true); 
-                $("#adoon_"+index).attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
-                $("#adoon_"+index).select2();
-                // $("#adoon_"+index).on("select2:select", function (e) {
-                    
-                //     alert($("#adoon_"+index).select2().val());
-                // });
-            
-                //             $("#adoon_"+index).select2().on('change', function() {
-                //     $('#value').select2({data:data[$(this).val()]});
-                // }).trigger('change');
-               
-                // alert(addonDropdownCount);
-               
-                // alert(globalThis.addonDropdownCount);
-            // alert(index);
-            // }); 
-                }  
+                            `);
+                        let addonDropdownData   = [];
+                        $.each(data,function(key,value)
+                        {
+                            addonDropdownData.push
+                            ({
+                                id: value.id,
+                                text: value.name
+                            });
+                        });
+                        $('#addon_'+index).html("");
+                        $('#addon_'+index).select2
+                        ({
+                            placeholder:"Choose Addons....     Or     Type Here To Search....",
+                            allowClear: true,
+                            data: addonDropdownData,
+                            minimumResultsForSearch: -1,
+                        });
+                    }
+                }
+            });
+        }
+
         // Get the element with id="defaultOpen" and click on it
         document.getElementById("defaultOpen").click();
-        function openCity(evt, tabName) 
+        function openCity(evt, tabName)
         {
             activeTab = tabName;
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) 
+            for (i = 0; i < tabcontent.length; i++)
             {
                 tabcontent[i].style.display = "none";
             }
             tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) 
+            for (i = 0; i < tablinks.length; i++)
             {
                 tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
             document.getElementById(tabName).style.display = "block";
             evt.currentTarget.className += " active";
         }
-        var contact_number = window.intlTelInput(document.querySelector("#contact_number"), 
+        var contact_number = window.intlTelInput(document.querySelector("#contact_number"),
         {
             separateDialCode: true,
             preferredCountries:["ae"],
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        var alternative_contact_number = window.intlTelInput(document.querySelector("#alternative_contact_number"), 
+        var alternative_contact_number = window.intlTelInput(document.querySelector("#alternative_contact_number"),
         {
             separateDialCode: true,
             preferredCountries:["ae"],
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        // $("form").submit(function(e) 
-        $('body').on('submit', '#createSupplierForm', function (e) 
+        // $("form").submit(function(e)
+        $('body').on('submit', '#createSupplierForm', function (e)
         {
             sub = '2';
             var inputSupplier = $('#supplier').val();
@@ -861,7 +850,7 @@ input {
                 cache:false,
                 contentType: false,
                 processData: false,
-                success: (result) => 
+                success: (result) =>
                 {
                     console.log(result)
                     let dataErrorCard = document.getElementById('dataErrorCard');
@@ -873,14 +862,14 @@ input {
                     $('.overlay').hide();
                     }
                     else if(result.data.dataError)
-                    {  
-                        document.getElementById("notifications").textContent = '';           
+                    {
+                        document.getElementById("notifications").textContent = '';
                         if(result.data.dataError.length > 0)
                         {
                             let dataErrorCard = document.getElementById('dataErrorCard');
                             dataErrorCard.hidden = false
                             var i = 0;
-                            $.each(result.data.dataError, function(key, value) 
+                            $.each(result.data.dataError, function(key, value)
                             {
                                 i = i+1;
                                 $notifications.append('<tr><td> '+i+' </td>' +
@@ -907,37 +896,32 @@ input {
                 }
                 });
             }
-        });   
+        });
         function resetAddonDropdown()
         {
             // var selectedAddons = [];
-            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // for (var i = 1; i <= addonDropdownCount; i++)
             // {
             //     var eachSelected = [];
             //     var eachSelected = $('#adoon_'+i).val();
-            //     $.each(eachSelected, function( ind, value ) 
+            //     $.each(eachSelected, function( ind, value )
             //     {
             //         selectedAddons.push(value);
-                     
+
             //     });
             // }
-            // for (var i = 1; i <= addonDropdownCount; i++) 
+            // for (var i = 1; i <= addonDropdownCount; i++)
             // {
-            //     $.each(selectedAddons, function( ind, value ) 
+            //     $.each(selectedAddons, function( ind, value )
             //     {
             //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
             //     });
-            // }   
+            // }
         }
         //===== delete the form fieed row
-          $("body").on("click", ".remove_node_btn_frm_field", function () 
-        {
-            $(this).closest(".form_field_outer_row").remove();
-                // addonDropdownCount = addonDropdownCount-1;
-            // resetAddonDropdown(); 
-        });
+
         function secondaryPaymentMethods(changePayment)
-        { 
+        {
             var e = document.getElementById("is_primary_payment_method");
             var value = e.value;
             if(value != '')
@@ -969,20 +953,20 @@ input {
             if(value == 'USD')
             {
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = true  
+                chooseCurrency.hidden = true
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = false  
+                currencyUSD.hidden = false
                 let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = false  
+                currencyAED.hidden = false
             }
             else
             {
                 let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = false  
+                chooseCurrency.hidden = false
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = true  
+                currencyUSD.hidden = true
                 let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = true 
+                currencyAED.hidden = true
             }
         }
         function calculateAED(i)
@@ -998,24 +982,24 @@ input {
                 document.getElementById('addon_purchase_price_'+i).value = aed;
             }
         }
-      
-    
+
+
         function readURL(input)
         {
             var allowedExtension = ['xlsx','xlsm','xlsb','xltx','xltm','xls','xlt','xls','xml','xlam','xla','xlw','xlr'];
             var fileExtension = input.value.split('.').pop().toLowerCase();
             var isValidFile = false;
-            for(var index in allowedExtension) 
+            for(var index in allowedExtension)
             {
-                if(fileExtension === allowedExtension[index]) 
+                if(fileExtension === allowedExtension[index])
                 {
-                    isValidFile = true; 
+                    isValidFile = true;
                     break;
                 }
             }
-            if(!isValidFile) 
-            {  
-                document.getElementById("supplierAddonExcelError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');          
+            if(!isValidFile)
+            {
+                document.getElementById("supplierAddonExcelError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
             }
             else
             {
@@ -1113,11 +1097,11 @@ input {
 
 
 
-                        // if(!value.match('[0-9]'))  
+                        // if(!value.match('[0-9]'))
                         // {
                         //     $msg = "Only Numbers Allowed";
                         //     showContactNumberError($msg);
-                        // } 
+                        // }
                         // else
                         // {
                             // if(value === parseInt(value))
@@ -1142,8 +1126,8 @@ input {
                             // else{
                             //     alert('lppl')
                             // }
-                            
-                        // }   
+
+                        // }
                     }
                 }
                 else
@@ -1168,14 +1152,14 @@ input {
                 {
                     if(value.legth != 0)
                     {
-                        // if(!value.match('[0-9]'))  
+                        // if(!value.match('[0-9]'))
                         // {
                         //     $msg = "Only Numbers Allowed";
                         //     showContactNumberError($msg);
-                        // } 
+                        // }
                         // else
                         // {
-                            
+
                             if(value.length < 5)
                             {
                                 $msg = "Minimum 5 digits required";
@@ -1232,7 +1216,7 @@ input {
                             removeEmailError();
                             removeAlternativeContactNumberError();
                             removeContactNumberError();
-                        } 
+                        }
                         else
                         {
                             $msg = email + ' is invalid.'
@@ -1277,13 +1261,13 @@ input {
             document.getElementById("alternativeContactRequired").textContent=$msg;
             document.getElementById("alternativeContactRequired").classList.remove("requiredOne");
             document.getElementById("alternativeContactRequired").classList.add("paragraph-class");
-            document.getElementById("alternative_contact_number").classList.add("is-invalid");    
+            document.getElementById("alternative_contact_number").classList.add("is-invalid");
         }
         function removeAlternativeContactNumberError()
         {
             document.getElementById("alternativeContactRequired").textContent="";
             document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
-            document.getElementById("alternative_contact_number").classList.remove("is-invalid"); 
+            document.getElementById("alternative_contact_number").classList.remove("is-invalid");
         }
         function showEmailError($msg)
         {
@@ -1337,17 +1321,17 @@ input {
             document.getElementById("supplierTypeError").textContent="";
             document.getElementById("supplier_type").classList.remove("is-invalid");
             document.getElementById("supplierTypeError").classList.remove("paragraph-class");
-        } 
+        }
         function emailContactError()
         {
             document.getElementById("contactRequired").textContent=$msg;
-            document.getElementById("contactRequired").classList.remove("paragraph-class");        
+            document.getElementById("contactRequired").classList.remove("paragraph-class");
             document.getElementById("contactRequired").classList.add("requiredOne");
             document.getElementById("alternativeContactRequired").textContent=$msg;
-            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");        
+            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
             document.getElementById("alternativeContactRequired").classList.add("requiredOne");
             document.getElementById("emailRequired").textContent=$msg;
-            document.getElementById("emailRequired").classList.remove("paragraph-class");        
+            document.getElementById("emailRequired").classList.remove("paragraph-class");
             document.getElementById("emailRequired").classList.add("requiredOne");
         }
     </script>
