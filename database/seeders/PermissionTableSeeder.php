@@ -159,6 +159,7 @@ class PermissionTableSeeder extends Seeder
             ['10','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
             ['10','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
             ['10','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
+            ['10','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
 
             ['11','Warranty List','warranty-list', 'To View List of Warranty'],
             ['11','Warranty Create','warranty-create', 'To Create the Warranty'],
@@ -183,7 +184,7 @@ class PermissionTableSeeder extends Seeder
             ['12','Addons Delete','addon-delete', 'To Delete the Addons'],
             ['12','Addons View','addon-view', 'To View the Addons'],
             ['12','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
-
+            ['12','View Addon Selling Price','addon-selling-price-view', 'To View Addon Selling Price'],
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

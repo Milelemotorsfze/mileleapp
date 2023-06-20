@@ -421,7 +421,7 @@ class AddonController extends Controller
                 }
             }
             else
-            {
+            {dd($request->supplierAndPrice);
                 if($request->supplierAndPrice)
                 {
                     if(count($request->supplierAndPrice) > 0)
@@ -432,6 +432,7 @@ class AddonController extends Controller
                             $supPriInput['purchase_price_aed'] = $supplierAndPrice1['addon_purchase_price_in_aed'];
                             $supPriInput['purchase_price_usd'] = $supplierAndPrice1['addon_purchase_price_in_usd'];
                             $supPriInput['created_by'] = $authId;
+                            
                             if($supplierAndPrice1['supplier_id'])
                             {
                                 if(count($supplierAndPrice1['supplier_id']) > 0)
