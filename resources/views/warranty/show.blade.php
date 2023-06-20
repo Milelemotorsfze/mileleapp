@@ -128,38 +128,55 @@
                         <tbody>
                         <div hidden>{{$i=0;}}
                         </div>
-                        @foreach ($warrantBrands as $key => $warrantBrand)
+                        @foreach ($warrantyBrands as $key => $warrantyBrand)
                             <tr>
                                 <td> {{ ++$i }}</td>
-                                <td>{{ $warrantBrand->brand->brand_name }}</td>
-                                <td>{{ $warrantBrand->price }} AED</td>
-                                <td>{{ $warrantBrand->selling_price }} AED</td>
+                                <td>{{ $warrantyBrand->brand->brand_name }}</td>
+                                <td>{{ $warrantyBrand->price }} AED</td>
+                                <td>
+                                    @if($warrantyBrand->selling_price)
+                                        @if($warrantyBrand->is_selling_price_approved == false)
+                                            {{ $warrantyBrand->selling_price }} AED (Not Approved)
+                                        @else
+                                            {{ $warrantyBrand->selling_price }} AED
+                                        @endif
+
+                                    @else
+                                        Selling Price Not Added
+                                   @endif
+                                </td>
                                 <td>
                                     @can('warranty-purchase-price-histories-list')
-                                        <a href="{{ route('warranty-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-info btn-sm "
+                                        <a href="{{ route('warranty-price-histories.index',['id' => $warrantyBrand->id]) }}" class="btn btn-info btn-sm "
                                            title="Purchase Price Histories" >
                                             <i class="fa fa-history"></i>
                                         </a>
                                     @endcan
+                                    @can('warranty-brand-edit')
+                                        <button type="button" title="Update Purchase Price" class="btn btn-info btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantyBrand->id}}">
+                                            <i class="fa fa-edit"></i></button>
+                                    @endcan
                                     @can('warranty-selling-price-histories-list')
-                                    <a href="{{ route('warranty-selling-price-histories.index',['id' => $warrantBrand->id]) }}" class="btn btn-warning btn-sm "
+                                    <a href="{{ route('warranty-selling-price-histories.index',['id' => $warrantyBrand->id]) }}" class="btn btn-warning btn-sm "
                                        title="Selling Price Histories">
                                         <i class="fa fa-history"></i>
                                     </a>
                                     @endcan
                                     @can('warranty-brand-edit')
-                                        <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantBrand->id}}">
+                                        <button type="button" title="Update Selling Price" class="btn btn-warning btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#edit-selling-price-{{$warrantyBrand->id}}">
                                             <i class="fa fa-edit"></i></button>
                                     @endcan
+
                                     @can('warranty-brand-delete')
-                                        <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantBrand->id }}"
-                                                data-url="{{ route('warranty-brands.destroy', $warrantBrand->id) }}">
+                                        <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantyBrand->id }}"
+                                                data-url="{{ route('warranty-brands.destroy', $warrantyBrand->id) }}">
                                             <i class="fa fa-trash"></i></button>
                                     @endcan
                                 </td>
-                                <div class="modal fade" id="edit-price-{{$warrantBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="edit-price-{{$warrantyBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog ">
-                                        <form id="form-update" action="{{ route('warranty-brands.update', $warrantBrand->id) }}" method="POST" >
+                                        <form id="form-update" action="{{ route('warranty-brands.update', $warrantyBrand->id) }}" method="POST" >
                                             @method('PUT')
                                             @csrf
                                             <div class="modal-content">
@@ -177,18 +194,37 @@
                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                                                     <div class="input-group">
                                                                         <input type="number" name="price" class="form-control" id="price"  placeholder="Enter Purchase Price"
-                                                                           oninput="validity.valid||(value='');" min="0">
+                                                                               step="any" min="0">
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
-{{--                                                                    @error('price')--}}
-{{--                                                                    <div role="alert">--}}
-{{--                                                                        <strong>{{ $message }}</strong>--}}
-{{--                                                                    </div>--}}
-{{--                                                                    @enderror--}}
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary ">Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="modal fade" id="edit-selling-price-{{$warrantyBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog ">
+                                        <form id="form-update" action="{{ route('warranty-brands.update', $warrantyBrand->id) }}" method="POST" >
+                                            @method('PUT')
+                                            @csrf
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Selling Prices</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                                                     <label class="form-label font-size-13 text-muted">Selling Price</label>
@@ -196,16 +232,12 @@
                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                                                     <div class="input-group">
                                                                         <input type="number" name="selling_price" class="form-control" placeholder="Enter Selling Price"
-                                                                               oninput="validity.valid||(value='');" min="0">
+                                                                               step="any" min="0">
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
                                                                     </div>
-{{--                                                                    @error('selling_price')--}}
-{{--                                                                    <div role="alert">--}}
-{{--                                                                        <strong>{{ $message }}</strong>--}}
-{{--                                                                    </div>--}}
-{{--                                                                    @enderror--}}
+
                                                                 </div>
                                                             </div>
                                                         </div>

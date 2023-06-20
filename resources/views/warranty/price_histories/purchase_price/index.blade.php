@@ -34,8 +34,8 @@
                     <thead>
                     <tr>
                         <th>No</th>
-                        <th>Old Price</th>
-                        <th>Updated Price</th>
+                        <th>Old Price (AED)</th>
+                        <th>Updated Price (AED)</th>
                         <th>Updated By</th>
                         <th>Date & Time</th>
                     </tr>

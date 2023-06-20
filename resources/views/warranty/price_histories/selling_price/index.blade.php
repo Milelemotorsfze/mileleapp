@@ -49,8 +49,8 @@
                             <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Old Price</th>
-                                <th>Requested Price</th>
+                                <th>Old Price (AED)</th>
+                                <th>Requested Price (AED)</th>
                                 <th>Updated By</th>
                                 <th>Date & Time</th>
                                 <th>Actions</th>
@@ -61,8 +61,8 @@
                             @foreach ($pendingSellingPriceHistories as $key => $pendingSellingPriceHistory)
                                 <tr data-id="1">
                                     <td>{{ ++$i }}</td>
-                                    <td>{{ $pendingSellingPriceHistory->old_price }}</td>
-                                    <td>{{ $pendingSellingPriceHistory->updated_price }}</td>
+                                    <td>{{ $pendingSellingPriceHistory->old_price ?? '' }}</td>
+                                    <td>{{ $pendingSellingPriceHistory->updated_price ?? '' }}</td>
                                     <td>{{ $pendingSellingPriceHistory->updatedUser->name }} </td>
                                     <td>{{ $pendingSellingPriceHistory->updated_at }} </td>
                                     <td>
@@ -105,7 +105,7 @@
                                                                         <div class="input-group">
                                                                             <input type="number" name="selling_price" class="form-control"
                                                                                    placeholder="Enter Selling Price" value="{{$pendingSellingPriceHistory->updated_price}}"
-                                                                                   oninput="validity.valid||(value='');" min="0">
+                                                                                  step="any" min="0">
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                             </div>

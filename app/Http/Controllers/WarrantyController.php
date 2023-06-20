@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
+use App\Models\WarrantyPriceHistory;
+use App\Models\WarrantySellingPriceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MasterWarrantyPolicies;
@@ -66,7 +68,25 @@ class WarrantyController extends Controller
                             foreach($brandPrice['brands'] as $brandData)
                             {
                                 $inputbrandPrice['brand_id'] = $brandData;
+                                $inputbrandPrice['is_selling_price_approved'] = false;
                                 $createBrandPrice = WarrantyBrands::create($inputbrandPrice);
+
+                                $priceHistory = new WarrantyPriceHistory();
+                                $priceHistory->warranty_brand_id  = $createBrandPrice->id;
+                                $priceHistory->updated_price = $brandPrice['purchase_price'];
+                                $priceHistory->created_by = Auth::id();
+                                $priceHistory->updated_by = Auth::id();
+                                $priceHistory->save();
+                                if($brandPrice['selling_price']) {
+                                    $sellingPriceHistory = new WarrantySellingPriceHistory();
+                                    $sellingPriceHistory->warranty_brand_id = $createBrandPrice->id;
+                                    $sellingPriceHistory->updated_price = $brandPrice['selling_price'];
+                                    $sellingPriceHistory->updated_by = Auth::id();
+                                    $sellingPriceHistory->created_by = Auth::id();
+                                    $sellingPriceHistory->status = 'pending';
+                                    $sellingPriceHistory->save();
+                                }
+
                             }
                         }
                     }
@@ -81,8 +101,8 @@ class WarrantyController extends Controller
     public function show(string $id)
     {
         $premium = WarrantyPremiums::findOrFail($id);
-        $warrantBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
-        return view('warranty.show', compact('premium','warrantBrands'));
+        $warrantyBrands = WarrantyBrands::where('warranty_premiums_id',$id)->get();
+        return view('warranty.show', compact('premium','warrantyBrands'));
     }
 
     /**
