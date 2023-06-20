@@ -33,6 +33,9 @@
                   <th>Status</th>
                   <th>Created Date And Time</th>
                   <th>Created By</th>
+                  <th>Approved/Rejected Date And Time</th>
+                  <th>Approved/Rejected By</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -40,10 +43,33 @@
                 @foreach ($history as $key => $historyData)
                   <tr data-id="1">
                     <td>{{++$i}}</td>
-                    <td >{{$historyData->purchase_price_aed}} AED</td>
-                    <td >{{$historyData->status}}</td>
+                    <td >{{$historyData->selling_price}} AED</td>
+                    <td>
+                        @if($historyData->status == 'active')
+                        <label class="badge badge-soft-success">Active</label>
+                        @elseif($historyData->status == 'inactive')
+                        <label class="badge badge-soft-secondary">Inactive</label>
+                        @elseif($historyData->status == 'rejected')
+                        <label class="badge badge-soft-danger">Rejected</label>
+                        @elseif($historyData->status == 'pending')
+                        <label class="badge badge-soft-info">Pending</label>
+                        @endif
+                    </td>
                     <td>{{$historyData->created_at}}</td>  
                     <td>{{$historyData->CreatedBy->name}}</td> 
+                    @isset($historyData->StatusUpdatedBy)
+                    <td>{{$historyData->updated_at}}</td>  
+                    <td>{{$historyData->StatusUpdatedBy->name}}</td> 
+                    @else
+                    <td></td>
+                    <td></td>
+                    @endif
+                    <td>
+                        @if($historyData->status == 'pending')
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                                href=""><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        @endif
+                    </td>
                   </tr>
                 @endforeach
               </tbody>

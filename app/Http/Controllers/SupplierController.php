@@ -80,8 +80,7 @@ class SupplierController extends Controller
     public function sellingPriceHistory($id)
     {
         $history =  AddonSellingPrice::where('addon_details_id',$id)->with('StatusUpdatedBy','CreatedBy')->get();
-        // dd($history);
-        return view('addons.sellingPricehistory',compact('history'));
+        return view('addon.sellingPricehistory',compact('history'));
     }
     public function newSellingPriceRequest(Request $request)
     {
