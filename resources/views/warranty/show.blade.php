@@ -155,8 +155,9 @@
                                             <i class="fa fa-history"></i>
                                         </a>
                                     @endcan
-                                    @can('warranty-brand-edit')
-                                        <button type="button" title="Update Purchase Price" class="btn btn-info btn-sm " data-bs-toggle="modal" data-bs-target="#edit-price-{{$warrantyBrand->id}}">
+                                    @can('warranty-purchase-price-edit')
+                                        <button type="button" title="Update Purchase Price" class="btn btn-info btn-sm " data-bs-toggle="modal"
+                                                data-bs-target="#edit-price-{{$warrantyBrand->id}}">
                                             <i class="fa fa-edit"></i></button>
                                     @endcan
                                     @can('warranty-selling-price-histories-list')
@@ -165,7 +166,7 @@
                                         <i class="fa fa-history"></i>
                                     </a>
                                     @endcan
-                                    @can('warranty-brand-edit')
+                                    @can('warranty-selling-price-edit')
                                         <button type="button" title="Update Selling Price" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#edit-selling-price-{{$warrantyBrand->id}}">
                                             <i class="fa fa-edit"></i></button>

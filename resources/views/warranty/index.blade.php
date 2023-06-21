@@ -6,7 +6,7 @@
     @can('warranty-create')
       <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
     @endcan
-      @can('warranty-view')
+      @can('warranty-sales-view')
       <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" href="{{ route('warranty.view') }}" text-align: right><i class="fa fa-table" aria-hidden="true"></i></a>
       @endcan
     </div>

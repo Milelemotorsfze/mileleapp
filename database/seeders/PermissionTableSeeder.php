@@ -181,8 +181,12 @@ class PermissionTableSeeder extends Seeder
             ['11','Warranty Selling Price Histories List','warranty-selling-price-histories-list', 'To View List of Warranty Selling Price Histories'],
             ['11','Warranty Selling Price Histories Edit','warranty-selling-price-histories-edit', 'To View List of Warranty Selling Price Histories'],
             ['11','Warranty Selling Price Approve','warranty-selling-price-approve', 'To Approve or Reject Warranty Selling Price.'],
-            
-            // Master Addon 
+            ['11','Warranty Selling Price Edit','warranty-selling-price-edit', 'To Edit or Add New Warranty Selling Price.'],
+            ['11','Warranty Purchase Price Edit','warranty-purchase-price-edit', 'To Edit Warranty Purchase Price.'],
+            ['11','Warranty Sales View','warranty-sales-view', 'To View List of Warranty policy For Sales People.'],
+
+
+            // Master Addon
             ['12','Master Addons Create','master-addon-create', 'To Create the Master-Addons'],
 
             // Addons

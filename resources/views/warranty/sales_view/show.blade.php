@@ -7,7 +7,7 @@
         }
 
     </style>
-    @can('warranty-list')
+    @can('warranty-sales-view')
         <div class="card-header">
             <h4 class="card-title">Warranty Info</h4>
         </div>
