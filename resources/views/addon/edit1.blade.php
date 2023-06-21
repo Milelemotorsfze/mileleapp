@@ -197,3 +197,23 @@
 		</br>
     </div>
 @endsection
+
+
+
+
+
+
+@include('addon.brandModel')
+                <div class="card"  id="kitSupplier" >
+                    <div class="card-header">
+                        <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
+                    </div>
+                    <div id="London" class="tabcontent">
+                        <div class="row">
+                            <div class="card-body">
+                                @include('addon.kit')
+                                @include('addon.supplierprice')
+                            </div>
+                        </div>
+                    </div>
+                </div>

@@ -545,10 +545,7 @@
                     $('#addnewAddonButton').show();
                 }
             });
-            $('#supplierArray1').change(function()
-            {
-                showAndHideSupplierDropdownOptions(1);
-            });
+          
 
             // $('#submit').click(function()
             // {
@@ -1095,54 +1092,7 @@
             $('#showImageModal').removeClass('modalhide');
             modalImg.src = img.src;
         }
-        function showAndHideSupplierDropdownOptions(i)
-        {
-            var eachSelected = [];
-            // var eachSelected = $('#supplierArray'+i).select2().val();
-            var eachSelected = $('#supplierArray'+i).select2("val");
-            // var selected1 = $('#supplierArray'+i).val();
-
-            globalThis.oldselectedSuppliers[i] = globalThis.selectedSuppliers[i];
-            oldselectedSuppliers.forEach(function(item)
-            {
-                $('.'+item).prop('disabled',false)
-                // $("#supplierArray1").select2();
-            })
-            globalThis.selectedSuppliers[i] = [];
-            $.each(eachSelected, function( ind, value )
-            {
-                globalThis.selectedSuppliers[i] .push(value);
-            });
-            selectedSuppliers.forEach(function(item)
-            {
-                // //                 // alert('hii');
-                // // //                 if ($('.'+item).attr("disabled")) {
-                // // //                     // alert('disabled');
-                // // //                     alert('hlo');
-                // // //                     // $('.'+item).prop('disabled',false)
-                // // //     // Remove disabled attribute if it is
-                // // //     // $('.'+item).removeAttr("disabled");
-                // // //   } else {
-                    $('.'+item).prop('disabled',true)
-
-                //     // alert('enabled');
-                //     // Add disabled attribute if it is not
-                //     // $('.'+item).attr("disabled", "disabled");
-                });
-                //                 // $('.'+item).prop('disabled',true)
-                //                 // $('.'+item).prop('disabled', !$('.'+item).prop('disabled'));
-                //                 // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
-                // //                 $('#supplierArray1 option[value="1"]').prop('disabled',false);
-
-                // // $('#supplierArray1').select2();
-                //             })
-                //             $.each(selectedSuppliers, function( ind1, value1 )
-                //             {
-                //                 // $('.one').prop('disabled', !$('.one').prop('disabled'));
-                //             // $("#supplierArray1>optgroup>option[value='1']").attr('disabled','disabled');
-                //             //     // globalThis.selectedSuppliers[i] .push(value);
-                            // });
-        }
+       
 
 
             //         function changeAddon(i)

@@ -69,16 +69,16 @@
 <script type="text/javascript">
     $(document).ready(function ()
     {
-        alert(currentAddonType);
-        $("#itemArr1").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
-        $("#itemArr1").select2
-        ({
-            maximumSelectionLength: 1,
-        });
+        // alert(currentAddonType);
+        // $("#itemArr1").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+        // $("#itemArr1").select2
+        // ({
+        //     maximumSelectionLength: 1,
+        // });
     });
     $("body").on("click",".addSupplierAndPriceWithoutKit", function ()
     { 
-        alert(currentAddonType);
+        // alert(currentAddonType);
         var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1; 
         $(".supplierWithoutKit").append(`
             <div class="row supplierWithoutKitApendHere">
@@ -121,11 +121,11 @@
             </div>
             `); 
             $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit:not(:first)").prop("disabled", false); $(".supplierWithoutKit").find(".removeButtonSupplierWithoutKit").first().prop("disabled", true); 
-            $("#supplierArray"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-            $("#supplierArray"+index).select2
-            ({
-                maximumSelectionLength: 1,
-            });
+            // $("#supplierArray"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
+            // $("#supplierArray"+index).select2
+            // ({
+            //     maximumSelectionLength: 1,
+            // });
         }); 
 
         //===== delete the form fieed row
