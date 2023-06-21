@@ -1126,26 +1126,14 @@
                 $("#selectBrand1").select2({
                     maximumSelectionLength: 1,
                 });
-
-                // document.getElementById("AddonTypeError").classList.remove("paragraph-class");
-                // document.getElementById("AddonTypeError").classList.remove("paragraph-class");
-                // document.getElementById("AddonTypeError").textContent="";
                 document.getElementById("addon_type_required").textContent="";
                 $msg = "";
                 removeAddonTypeError($msg);
-                // document.getElementById("addon_type_required").hidden = true;
                 if(currentAddonType == 'SP' && ifModelLineExist != '')
                 {
-                    // alert('ji');
-                    
-                    
-                    // showModelNumberDropdown(id,row);
-                   
                 }
                 else
                 {
-                    // hideModelNumberDropdown(id,row);
-                    
                 }
                 if(value == 'SP' )
                 {
@@ -1164,11 +1152,6 @@
                         showrowPartNumber.hidden = false
                         let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
                         showrowPartNumberBr.hidden = false
-                        // let showrowPartNumberBr1 = document.getElementById('brandModelLineClass');
-                        // showrowPartNumberBr1.hidden = true
-                        // let showrowPartNumberBr2 = document.getElementById('brandModelNumberClass');
-                        // showrowPartNumberBr2.hidden = false
-                        
                     }
                     else
                     {
@@ -1176,13 +1159,7 @@
                         showPartNumber.hidden = false
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = false
-                        // let showrowPartNumberBr1 = document.getElementById('brandModelLineClass');
-                        // showrowPartNumberBr1.hidden = false
-                        // let showrowPartNumberBr2 = document.getElementById('brandModelNumberId');
-                        // showrowPartNumberBr2.hidden = true
-                       
-                    }
-                    
+                    }  
                 }
                 else
                 {
