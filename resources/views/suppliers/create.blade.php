@@ -606,6 +606,7 @@ input {
                 $('.form_field_outer_row').each(function(i){
                     var index = +i + +1;
                     $(this).attr('id','row-'+ index);
+                    $(this).attr('data-select2-id','select2-data-row-'+ index);
                     $(this).find('.addons').attr('data-index', index);
                     $(this).find('.addons').attr('id','addon_'+ index);
                     $(this).find('.currency').attr('id','currency_' + index);
