@@ -28,6 +28,8 @@ class Supplier extends Model
     public const SUPPLIER_STATUS_ACTIVE = 'active';
     public const SUPPLIER_STATUS_INACTIVE = 'inactive';
     public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
+    public const SUPPLIER_TYPE_SPARE_PARTS = 'spare_parts';
+    public const SUPPLIER_TYPE_ACCESSORIES = 'accessories';
     public const SUPPLIER_TYPE_WARRANTY = 'warranty';
 
     public function supplierAddons()

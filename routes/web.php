@@ -92,6 +92,8 @@ Route::get('/d', function () {
     Route::get('addon/kitItems/{id}', [AddonController::class, 'kitItems'])->name('addon.kitItems');
     Route::post('addon-selling-price/status-change', [AddonController::class, 'statusChange'])->name('addon.status-change');
     Route::post('update-addon-selling-price/{id}', [AddonController::class, 'updateSellingPrice'])->name('addon.UpdateSellingPrice');
+    Route::post('getSupplierForAddon', [AddonController::class, 'getSupplierForAddon'])->name('get-addon-supplier');
+
 
 
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
@@ -110,7 +112,6 @@ Route::get('/d', function () {
 
 
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
-//    Route::post('warranty/details/update', [WarrantyController::class, 'updateWarranty'])->name('warranty.updateWarranty');
 
     // Suppliers
     Route::resource('suppliers', SupplierController::class);
