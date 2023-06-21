@@ -507,6 +507,8 @@
             </div>
         </form>
     </div>
+    <input type="hidden" value="" id="indexValue">
+
     <div class="overlay"></div>
 @endcan
     <script type="text/javascript">
