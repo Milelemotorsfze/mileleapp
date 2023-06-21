@@ -47,7 +47,9 @@
             <th>Model Line</th>
             <th>Lead Time</th>
             <th>Additional Remarks</th>
+            @can('addon-least-purchase-price-view')
             <th>Least Purchase Price</th>
+            @endcan
             @can('addon-selling-price-view')
             <th>Selling Price(AED)</th>
             @endcan
@@ -79,7 +81,9 @@
               </td>
               <td>{{ $addon->lead_time }}</td>
               <td>{{ $addon->additional_remarks }}</td>
+              @can('addon-least-purchase-price-view')
               <td>{{ 'purchase price' }}</td> <!--$addon->purchase_price-->
+              @endcan
               @can('addon-selling-price-view')
               <td>Selling Price</td>
               @endcan

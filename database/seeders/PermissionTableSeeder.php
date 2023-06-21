@@ -23,9 +23,16 @@ class PermissionTableSeeder extends Seeder
             ['7','Demand Planning'],
             ['8','Warehouse'],
             ['9','Stocks'],
-            ['10', 'Addon Suppliers'],
+            ['10', 'Suppliers'],
             ['11', 'Warranty'],
             ['12', 'Addons'],
+            ['13', 'Addons'],
+            ['14', 'Addon Purchase Prices'],
+            ['15', 'Addon Selling Prices'],
+            ['16', 'Supplier Addons'],
+            ['17', 'Accessories'],
+            ['18', 'Spare Parts'],
+            ['19', 'Kits'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -36,6 +43,7 @@ class PermissionTableSeeder extends Seeder
         DB::table('modules')->insert($module);
 
         $Permissions = [
+            // Users
             ['1','List Active User','user-list-active','To view the list of active users.'],
             ['1','List Inactive User','user-list-inactive','To view the list of inactive users.'],
             ['1','List Deleted User','user-list-deleted','To view the list of deleted users.'],
@@ -47,6 +55,7 @@ class PermissionTableSeeder extends Seeder
             ['1','Edit User','user-edit','To edit a user.'],
             ['1','Delete User','user-delete','To delete a user.'],
 
+            // Roles
             ['2','List Role','role-list','To view the list of all roles.'],
             ['2','View Role Details', 'role-view','To view the role details with permissions.'],
             ['2','Create Role','role-create','To create a new role with permissions.'],
@@ -149,18 +158,15 @@ class PermissionTableSeeder extends Seeder
             ['9','Vehicle Picture Delete','vehicles-picture-delete', 'To Delete the Vehicle Pictures'],
             ['9','Vehicle Picture View','vehicles-picture-view', 'To View the Vehicle Pictures'],
 
+            // Suppliers
             ['10','Supplier List','addon-supplier-list', 'To View List of Suppliers'],
             ['10','Supplier Create','addon-supplier-create', 'To Create the Suppliers'],
             ['10','Supplier Edit','addon-supplier-edit', 'To Edit the Suppliers'],
             ['10','Supplier Delete','addon-supplier-delete', 'To Delete the Supplier'],
             ['10','Supplier View','addon-supplier-view', 'To View the Supplier'],
             ['10','Supplier Active','supplier-active-inactive', 'To Activate and Inactivate the Supplier'],
-            ['10','Supplier Add New Purchase Price','supplier-new-purchase-price', 'To Add New Purchase Price'],
-            ['10','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
-            ['10','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
-            ['10','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
-            ['10','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
 
+            // Warranty
             ['11','Warranty List','warranty-list', 'To View List of Warranty'],
             ['11','Warranty Create','warranty-create', 'To Create the Warranty'],
             ['11','Warranty Edit','warranty-edit', 'To Edit the Warranty'],
@@ -174,17 +180,47 @@ class PermissionTableSeeder extends Seeder
             ['11','Warranty Selling Price Histories List','warranty-selling-price-histories-list', 'To View List of Warranty Selling Price Histories'],
             ['11','Warranty Selling Price Histories Edit','warranty-selling-price-histories-edit', 'To View List of Warranty Selling Price Histories'],
             ['11','Warranty Selling Price Approve','warranty-selling-price-approve', 'To Approve or Reject Warranty Selling Price.'],
+            
+            // Master Addon 
+            ['12','Master Addons Create','master-addon-create', 'To Create the Master-Addons'],
 
-            ['12','Accessories List','accessories-list', 'To View List of Accessories'],
-            ['12','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],
-            ['12','Kit List','kit-list', 'To View List of Kit'],
-            ['12','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
-            ['12','Addons Create','addon-create', 'To Create the Addons'],
-            ['12','Addons Edit','addon-edit', 'To Edit the Addons'],
-            ['12','Addons Delete','addon-delete', 'To Delete the Addons'],
-            ['12','Addons View','addon-view', 'To View the Addons'],
-            ['12','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
-            ['12','View Addon Selling Price','addon-selling-price-view', 'To View Addon Selling Price'],
+            // Addons
+            ['13','Addons Create','addon-create', 'To Create the Addons'],
+            ['13','Addons Edit','addon-edit', 'To Edit the Addons'],
+            ['13','Addons Delete','addon-delete', 'To Delete the Addons'],
+            ['13','Addons View','addon-view', 'To View the Addons'],
+            ['13','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
+
+            //Addon Purchase Prices
+            ['14','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
+            ['14','View Addon Least Purchase Price','addon-least-purchase-price-view', 'To View Addon Least Purchase Price'],
+            // Addon Selling Prices
+            ['15','View Addon Selling Price','addon-selling-price-view', 'To View Addon Selling Price'],
+            ['15','Edit Addon New Selling Price','edit-addon-new-selling-price', 'To Edit Addon New Selling Price'],
+            ['15','Approve Addon New Selling Price','approve-addon-new-selling-price', 'To Approve Addon New Selling Price'],
+            ['15','Reject Addon New Selling Price','reject-addon-new-selling-price', 'To Reject Addon New Selling Price'],
+            ['15','Add New Addon Selling Price','add-new-addon-selling-price', 'To Add New Addon Selling Price'],
+            ['15','View Addon Selling Price History','view-addon-selling-price-history', 'To View Addon Selling Price History'],
+
+            // Supplier Addons
+            ['16','Supplier Add New Purchase Price','supplier-new-purchase-price', 'To Add New Purchase Price'],
+            ['16','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
+            ['16','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
+            ['16','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
+            ['16','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
+            ['16','View Supplier Addon Purchase Price','supplier-addon-purchase-price-view', 'To View Supplier Addon Purchase Price'],
+
+            // Accessories
+            ['17','Accessories List','accessories-list', 'To View List of Accessories'],
+
+            // Spare Parts
+            ['18','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],
+
+            //Kit
+            ['19','Kit List','kit-list', 'To View List of Kit'],
+            ['19','View Kit Item Details','view-kit-item-details', 'To View Kit Item Details'],
+            ['19','View Addon Kit Item Purchase Price','view-addon-kit-item-purchase-price', 'To View Addon Kit Item Purchase Price'],
+
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

@@ -217,34 +217,39 @@
                   @if($content == '')
                   @if($addonsdata->PurchasePrices!= null)
                   @if($addonsdata->PurchasePrices->purchase_price_aed != '')
+                  @can('supplier-addon-purchase-price-view')
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Purchase Price
                   </div>
                   <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                   </div>
+                  @endcan
                   @endif
                   @endif
                   @endif
                   @if($addonsdata->LeastPurchasePrices!= null)
                   @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                  @can('addon-least-purchase-price-view')
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Least Purchase Price
                   </div>
                   <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
                   </div>
+                  @endcan
                   @endif
                   @endif
                   @if($addonsdata->SellingPrice!= null)
                   @if($addonsdata->SellingPrice->selling_price != '')
-                  
+                  @can('addon-selling-price-view')
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                     Selling Price 
                   </div>
                   <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->SellingPrice->selling_price}} AED
                   </div>
+                  @endcan
                   @endif
                   @endif
                   @if($addonsdata->fixing_charge_amount)
@@ -311,13 +316,17 @@
             <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
                 @if($addonsdata->addon_type_name == 'K')
+                @can('view-kit-item-details')
                 <a class="btn btn-sm btn-info" href="{{ route('addon.kitItems',$addonsdata->id) }}">
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> Items
                 </a>
+                @endcan
                 @endif
+                @can('add-new-addon-selling-price')
                 <button type="button" class="btn btn-success btn-sm " data-bs-toggle="modal"
                                                     data-bs-target="#edit-selling-price-{{$addonsdata->SellingPrice->id}}">
                                                 <i class="fa fa-plus"></i> Price</button>
+@endcan
                                                 <div class="modal fade" id="edit-selling-price-{{$addonsdata->SellingPrice->id}}"  tabindex="-1"
                                          aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog ">
@@ -360,16 +369,20 @@
                                         </div>
                                     </div>
 
-
+@can('view-addon-selling-price-history')
             <a title="History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.sellingPriceHistory',$addonsdata->id) }}">
                          <i class="fa fa-history" aria-hidden="true"></i> History</a>
+                         @endcan
+                  @can('addon-view')       
                 <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
                   <i class="fa fa-eye" aria-hidden="true"></i> View
                 </a>
+                @endcan
+                @can('addon-edit')
                 <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
                   <i class="fa fa-edit" aria-hidden="true"></i> Edit
                 </a>
-                
+                @endcan
               </div>     
             </div>
           </div>

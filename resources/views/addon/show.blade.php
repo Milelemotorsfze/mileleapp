@@ -37,9 +37,9 @@
                             @enderror
                             
                         </div>
-                        <div class="col-xxl-1 col-lg-1 col-md-1">
+                        <!-- <div class="col-xxl-1 col-lg-1 col-md-1">
                             <a style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a> 
-                        </div>
+                        </div> -->
                     </div>
                     </br>
                     <div class="row">
