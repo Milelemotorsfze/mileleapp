@@ -387,8 +387,7 @@
                 selectedBrands.push(value);
             });
         }
-        $.ajax
-        ({
+        $.ajax({
             url:"{{url('getBranchForWarranty')}}",
             type: "POST",
             data:

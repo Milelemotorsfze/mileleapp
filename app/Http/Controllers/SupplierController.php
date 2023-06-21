@@ -1125,11 +1125,13 @@ class SupplierController extends Controller
                 $data = $data->whereNotIn('id',$request->filteredArray);
             }
         }
-//        if($request->id) {
-//            $id = $request->id;
-//            $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
-//            $data = $data->whereNotIn('id', $alreadyAddedBrandIds);
-//        }
+        if($request->id) {
+            $id = $request->id;
+            $alreadyAddedAddonIds = AddonDetails::whereHas('AddonSuppliers', function ($query) use($id) {
+                $query->where('supplier_id', $id);
+            })->pluck('addon_id');
+            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+        }
         $data = $data->get();
         return response()->json($data);
     }
