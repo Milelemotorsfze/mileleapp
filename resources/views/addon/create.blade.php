@@ -157,7 +157,7 @@
                                 <option value="S">Shipping Cost</option> -->
                                 <option value="SP">Spare Parts</option>
                                 <option value="K">Kit</option>
-                                <option value="W">Warranty</option>
+                                <!-- <option value="W">Warranty</option> -->
                             </select>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
                             
