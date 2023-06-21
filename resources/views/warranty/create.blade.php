@@ -307,7 +307,6 @@
         var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
         var inputPurchasePrice1 = $('#purchase_price1').val();
-        var inputSellingPrice1 = $('#selling_price1').val();
 
         // var formInputError = false;
         if(inputEligibilityYears == '')
@@ -373,14 +372,6 @@
             formInputError = true;
             e.preventDefault();
         }
-        if(inputSellingPrice1 == '')
-        {
-            $msg = "Selling Price is required";
-            showSellingPrice1Error($msg);
-            formInputError = true;
-            e.preventDefault();
-        }
-
     });
     function clickAdd()
     {
@@ -438,13 +429,13 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" type="number" required class="form-control widthinput selling-price"
+                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput selling-price"
                                     onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
                                 </div>
-                                <span id="sellingError" class="invalid-feedback"></span>
+
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
                                 <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
@@ -583,19 +574,7 @@
                     removeBrand1Error();
                 }
             }
-            if(clickInput.id == 'selling_price1')
-            {
-                var value = clickInput.value;
-                if(value == '')
-                {
-                    $msg = "Selling Price is required";
-                    showSellingPrice1Error($msg);
-                }
-                else
-                {
-                    removeSellingPrice1Error();
-                }
-            }
+
         }
     }
 
@@ -717,17 +696,6 @@
         document.getElementById("purchase_price1").classList.remove("is-invalid");
         document.getElementById("Price1Error").classList.remove("paragraph-class");
     }
-    function showSellingPrice1Error($msg)
-    {
-        document.getElementById("SellingPrice1Error").textContent=$msg;
-        document.getElementById("selling_price1").classList.add("is-invalid");
-        document.getElementById("SellingPrice1Error").classList.add("paragraph-class");
-    }
-    function removeSellingPrice1Error()
-    {
-        document.getElementById("SellingPrice1Error").textContent="";
-        document.getElementById("selling_price1").classList.remove("is-invalid");
-        document.getElementById("SellingPrice1Error").classList.remove("paragraph-class");
-    }
+
 </script>
 @endsection

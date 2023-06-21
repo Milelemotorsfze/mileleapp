@@ -606,8 +606,11 @@ input {
                 $('.form_field_outer_row').each(function(i){
                     var index = +i + +1;
                     $(this).attr('id','row-'+ index);
-                    $(this).find('select').attr('data-index', index);
-                    $(this).find('select').attr('id','addon_'+ index);
+                    $(this).find('.addons').attr('data-index', index);
+                    $(this).find('.addons').attr('id','addon_'+ index);
+                    $(this).find('.currency').attr('id','currency_' + index);
+                    $(this).find('.currency').attr('onchange','changeCurrency(' + index + ')');
+                    $(this).find('.usd-price-div').attr('id','div_price_in_usd_' + index);
                     $(this).find('.currency').attr('name','supplierAddon['+ index +'][currency]');
                     $(this).find('.addons').attr('name','supplierAddon['+ index +'][addon_id]');
                     $(this).find('.purchase_price_in_USD').attr('name','supplierAddon['+ index +'][addon_purchase_price_in_usd]');
@@ -615,12 +618,11 @@ input {
                     $(this).find('.div-purchase_price_in_AED').attr('id','div_price_in_aed_' + index);
                     $(this).find('.purchase_price_in_AED').attr('id','addon_purchase_price_'+ index);
                     $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
-
+                    $(this).find('.purchase_price_in_USD').attr('onkeyup','calculateAED('+ index +')');
                     $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
                     $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
-                    $(this).find('.purchase_price').attr('id', 'addon_purchase_price_'+ index);
-                    $(this).find('.purchase_price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]'+ index);
-
+                    $(this).find('.addon-purchase-price').attr('id', 'addon_purchase_price_'+ index);
+                    $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
                     $(this).find('button').attr('data-index', index);
                     $(this).find('button').attr('id','remove-'+ index);
                     $('#addon_'+index).select2
@@ -634,7 +636,7 @@ input {
             function addOption(id,text) {
                 var indexValue = $('#indexValue').val();
                 for(var i=1;i<=indexValue;i++) {
-                    $('#brands'+i).append($('<option>', {value: id, text :text}))
+                    $('#addon_'+i).append($('<option>', {value: id, text :text}))
                 }
             }
         });
@@ -691,7 +693,7 @@ input {
                                         <option value="USD">USD</option>
                                     </select>
                                 </div>
-                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_${index}" hidden>
+                                <div class="col-xxl-2 col-lg-3 col-md-3 usd-price-div" id="div_price_in_usd_${index}" hidden>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                     <div class="input-group">
                                     <input id="addon_purchase_price_in_usd_${index}" type="number" min="0" step="any" class="widthinput form-control purchase_price_in_USD
@@ -717,9 +719,10 @@ input {
                                 <div class="col-xxl-4 col-lg-6 col-md-6 addon-purchase-price-div" id="div_price_in_aedOne_${index}">
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                     <div class="input-group">
-                                    <input id="addon_purchase_price_${index}" type="number" min="0" step="any" class="widthinput form-control purchase-price
-                                     @error('addon_purchase_price') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price]"
-                                      placeholder="Enter Addons Purchase Price in AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                    <input id="addon_purchase_price_${index}" type="number" min="0" step="any"
+                                     class="widthinput form-control addon-purchase-price @error('addon_purchase_price') is-invalid @enderror"
+                                     name="supplierAddon[${index}][addon_purchase_price] placeholder="Enter Addons Purchase Price in AED"
+                                      value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>

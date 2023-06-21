@@ -30,6 +30,7 @@ class WarrantyPremiums extends Model
     {
         return $this->hasOne(MasterWarrantyPolicies::class,'id','warranty_policies_id');
     }
+
     public function BrandPrice()
     {
         return $this->hasMany(WarrantyBrands::class,'warranty_premiums_id','id');

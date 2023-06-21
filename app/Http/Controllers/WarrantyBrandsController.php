@@ -58,18 +58,14 @@ class WarrantyBrandsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $this->validate($request, [
-            'price' => 'required_without:selling_price',
-            'selling_price' => 'required_without:price'
-        ]);
-
-        DB::beginTransaction();
         $warrantyBrand = WarrantyBrands::findOrFail($id);
-        $message1 = '';
-        $message2 = '';
         if($request->price) {
-            if($warrantyBrand->price != $request->price) {
 
+            $this->validate($request, [
+                'price' => 'required',
+            ]);
+            if($warrantyBrand->price != $request->price) {
+                DB::beginTransaction();
                 $warrantyPriceHistory = new WarrantyPriceHistory();
                 $warrantyPriceHistory->warranty_brand_id = $id;
                 $warrantyPriceHistory->old_price = $warrantyBrand->price;
@@ -80,29 +76,35 @@ class WarrantyBrandsController extends Controller
                 $warrantyBrand->price = $request->price;
                 $warrantyBrand->updated_by = Auth::id();
                 $warrantyBrand->save();
+                DB::commit();
             }
-            $message1 = 'Warranty Price Updated Successfully.';
+            return redirect()->route('warranty.show', $warrantyBrand->warranty_premiums_id)->with('success','Warranty Price Updated Successfully.');
         }
        if($request->selling_price)
        {
+           $this->validate($request, [
+               'selling_price' => 'required'
+           ]);
+
            if($warrantyBrand->selling_price != $request->selling_price)
            {
+               if(!$warrantyBrand->selling_price) {
+                   $warrantyBrand->selling_price = $request->selling_price;
+                   $warrantyBrand->is_selling_price_approved = false;
+                   $warrantyBrand->save();
+               }
                $warrantySellingPriceHistory = new WarrantySellingPriceHistory();
                $warrantySellingPriceHistory->warranty_brand_id = $id;
                $warrantySellingPriceHistory->old_price = $warrantyBrand->selling_price ?? '';
                $warrantySellingPriceHistory->updated_price = $request->selling_price;
                $warrantySellingPriceHistory->created_by = Auth::id();
+               $warrantySellingPriceHistory->updated_by = Auth::id();
                $warrantySellingPriceHistory->status_updated_by = Auth::id();
                $warrantySellingPriceHistory->status = 'pending';
                $warrantySellingPriceHistory->save();
            }
-           $message2 = ' Selling Price send for Approval';
-
+           return redirect()->route('warranty.show', $warrantyBrand->warranty_premiums_id)->with('success','Warranty Selling Price send for Approval');
        }
-
-        DB::commit();
-
-        return redirect()->route('warranty.show',  $warrantyBrand->warranty_premiums_id)->with('success',$message1.$message2);
     }
 
     /**
@@ -124,6 +126,7 @@ class WarrantyBrandsController extends Controller
         {
            $warrantyBrand = WarrantyBrands::find($warrantyPriceHistory->warranty_brand_id);
            $warrantyBrand->selling_price = $request->updated_price;
+           $warrantyBrand->is_selling_price_Approved = true;
            $warrantyBrand->save();
 
         }

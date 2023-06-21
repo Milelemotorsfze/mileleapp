@@ -25,14 +25,15 @@ class PermissionTableSeeder extends Seeder
             ['9','Stocks'],
             ['10', 'Suppliers'],
             ['11', 'Warranty'],
-            ['12', 'Addons'],
-            ['13', 'Addons'],
-            ['14', 'Addon Purchase Prices'],
-            ['15', 'Addon Selling Prices'],
-            ['16', 'Supplier Addons'],
-            ['17', 'Accessories'],
-            ['18', 'Spare Parts'],
-            ['19', 'Kits'],
+            ['12', 'Master Addons'],
+            ['13','Logistics'],
+            ['14','Addons'],
+            ['15','Addon Purchase Prices'],
+            ['16','Addon Selling Prices'],
+            ['17','Supplier Addons'],
+            ['18','Accessories'],
+            ['19','Spare Parts'],
+            ['20','Kit'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -64,7 +65,7 @@ class PermissionTableSeeder extends Seeder
 
             ['3','View Sales','sales-view', 'To View the sales department'],
             ['3','List Daily Leads','daily-leads-list', 'To View the List of the Daily Leads'],
-            ['3','View  Quotation Details', 'daily-leads-view', 'To view the Quotation Details and Listing'],
+            ['3','View  Quotation Details', 'daily-leads-view', 'To View the Quotation Details and Listing'],
             ['3','Create Quotation','daily-leads-create', 'To create New Quotation'],
             ['3','Edit Quotation','daily-leads-edit', 'To Edit the Quotation'],
 
@@ -185,41 +186,41 @@ class PermissionTableSeeder extends Seeder
             ['12','Master Addons Create','master-addon-create', 'To Create the Master-Addons'],
 
             // Addons
-            ['13','Addons Create','addon-create', 'To Create the Addons'],
-            ['13','Addons Edit','addon-edit', 'To Edit the Addons'],
-            ['13','Addons Delete','addon-delete', 'To Delete the Addons'],
-            ['13','Addons View','addon-view', 'To View the Addons'],
-            ['13','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
+            ['14','Addons Create','addon-create', 'To Create the Addons'],
+            ['14','Addons Edit','addon-edit', 'To Edit the Addons'],
+            ['14','Addons Delete','addon-delete', 'To Delete the Addons'],
+            ['14','Addons View','addon-view', 'To View the Addons'],
+            ['14','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
 
             //Addon Purchase Prices
-            ['14','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
-            ['14','View Addon Least Purchase Price','addon-least-purchase-price-view', 'To View Addon Least Purchase Price'],
+            ['15','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
+            ['15','View Addon Least Purchase Price','addon-least-purchase-price-view', 'To View Addon Least Purchase Price'],
             // Addon Selling Prices
-            ['15','View Addon Selling Price','addon-selling-price-view', 'To View Addon Selling Price'],
-            ['15','Edit Addon New Selling Price','edit-addon-new-selling-price', 'To Edit Addon New Selling Price'],
-            ['15','Approve Addon New Selling Price','approve-addon-new-selling-price', 'To Approve Addon New Selling Price'],
-            ['15','Reject Addon New Selling Price','reject-addon-new-selling-price', 'To Reject Addon New Selling Price'],
-            ['15','Add New Addon Selling Price','add-new-addon-selling-price', 'To Add New Addon Selling Price'],
-            ['15','View Addon Selling Price History','view-addon-selling-price-history', 'To View Addon Selling Price History'],
+            ['16','View Addon Selling Price','addon-selling-price-view', 'To View Addon Selling Price'],
+            ['16','Edit Addon New Selling Price','edit-addon-new-selling-price', 'To Edit Addon New Selling Price'],
+            ['16','Approve Addon New Selling Price','approve-addon-new-selling-price', 'To Approve Addon New Selling Price'],
+            ['16','Reject Addon New Selling Price','reject-addon-new-selling-price', 'To Reject Addon New Selling Price'],
+            ['16','Add New Addon Selling Price','add-new-addon-selling-price', 'To Add New Addon Selling Price'],
+            ['16','View Addon Selling Price History','view-addon-selling-price-history', 'To View Addon Selling Price History'],
 
             // Supplier Addons
-            ['16','Supplier Add New Purchase Price','supplier-new-purchase-price', 'To Add New Purchase Price'],
-            ['16','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
-            ['16','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
-            ['16','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
-            ['16','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
-            ['16','View Supplier Addon Purchase Price','supplier-addon-purchase-price-view', 'To View Supplier Addon Purchase Price'],
+            ['17','Supplier Add New Purchase Price','supplier-new-purchase-price', 'To Add New Purchase Price'],
+            ['17','Delete Suplier Addon','supplier-addon-delete', 'To Delete Supplier Addon'],
+            ['17','Approve OR Reject New Price','supplier-price-action', 'To Approve OR Reject New purchase Price'],
+            ['17','View Addons and Prices','supplier-addon-price', 'View Addons and Prices'],
+            ['17','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
+            ['17','View Supplier Addon Purchase Price','supplier-addon-purchase-price-view', 'To View Supplier Addon Purchase Price'],
 
             // Accessories
-            ['17','Accessories List','accessories-list', 'To View List of Accessories'],
+            ['18','Accessories List','accessories-list', 'To View List of Accessories'],
 
             // Spare Parts
-            ['18','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],
+            ['19','Spare Parts List','spare-parts-list', 'To View List of Spare Parts'],
 
             //Kit
-            ['19','Kit List','kit-list', 'To View List of Kit'],
-            ['19','View Kit Item Details','view-kit-item-details', 'To View Kit Item Details'],
-            ['19','View Addon Kit Item Purchase Price','view-addon-kit-item-purchase-price', 'To View Addon Kit Item Purchase Price'],
+            ['20','Kit List','kit-list', 'To View List of Kit'],
+            ['20','View Kit Item Details','view-kit-item-details', 'To View Kit Item Details'],
+            ['20','View Addon Kit Item Purchase Price','view-addon-kit-item-purchase-price', 'To View Addon Kit Item Purchase Price'],
 
             ];
         foreach ($Permissions as $key => $value):

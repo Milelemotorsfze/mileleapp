@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Varaint;
 use App\Models\Supplier;
 use App\Models\Vehicles;
+use App\Models\Movement;
 
 class PurchasingOrderController extends Controller
 {
@@ -59,6 +60,7 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->po_number = $poNumber;
         $purchasingOrder->suppliers_id = $suppliers_id;
+        $purchasingOrder->status = "Active";
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $variantNames = $request->input('variant_id');
@@ -74,6 +76,7 @@ class PurchasingOrderController extends Controller
         $vins = $request->input('vin');
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
+        $payment_status = $request->input('payment');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -83,11 +86,13 @@ class PurchasingOrderController extends Controller
         $vin = $vins[$key];
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
+        $payment_statu = $payment_status[$key];
         $vehicle = new Vehicles();
-        $vehicle->varaints_id = $variantId;
+        $vehicle->varaints_id = $variantId;       
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
+        $vehicle->payment_status = $payment_statu;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
     }
@@ -125,12 +130,14 @@ class PurchasingOrderController extends Controller
     $newVins = $request->input('oldvin');
     $newex_colours = $request->input('oldex_colour');
     $newint_colours = $request->input('oldint_colour');
+    $oldpayments = $request->input('oldpayment');
     foreach ($variantIds as $index => $variantId) {
         $vehicle = Vehicles::find($variantId);
         if ($vehicle) {
             $vehicle->vin = $newVins[$index];
             $vehicle->ex_colour = $newex_colours[$index];
             $vehicle->int_colour = $newint_colours[$index];
+            $vehicle->payment_status = $oldpayments[$index];
             $vehicle->save();
         }
     }
@@ -148,6 +155,7 @@ class PurchasingOrderController extends Controller
         $vins = $request->input('vin');
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
+        $payment_status = $request->input('payment');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -156,12 +164,14 @@ class PurchasingOrderController extends Controller
         $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
+        $payment_statu = $payment_status[$key];
         $vin = $vins[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
+        $vehicle->payment_status = $payment_statu;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
     }
@@ -172,10 +182,28 @@ class PurchasingOrderController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(PurchasingOrder $purchasingOrder)
-    {
-        //
+    public function deletes($id)
+{
+    $notPaidCount = Vehicles::where('purchasing_order_id', $id)
+        ->where('payment_status', 'Paid')
+        ->count();
+    
+    if ($notPaidCount > 0) {
+        return back()->with('error', 'Cannot delete. Some vehicles have payment status is "Paid"');
+    } else {
+        // Delete purchasing order items
+        PurchasingOrderItems::where('purchasing_order_id', $id)->delete();
+        
+        // Delete vehicles
+        Vehicles::where('purchasing_order_id', $id)->delete();
+        
+        // Delete purchasing order
+        $purchasingOrder = PurchasingOrder::find($id);
+        $purchasingOrder->delete();
+        
+        return back()->with('success', 'Deletion successful');
     }
+}
     public function checkPONumber(Request $request)
     {
         $poNumber = $request->input('poNumber');
@@ -185,4 +213,13 @@ class PurchasingOrderController extends Controller
         }
         return response()->json(['success' => 'PO number is valid'], 200);
     }
+
+    public function viewdetails($id)
+{
+    $varaint = Varaint::get();
+    $purchasingOrder = PurchasingOrder::findOrFail($id);
+    $data = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'cancel')->get();
+    $supplierName = Supplier::where('id', $purchasingOrder->suppliers_id)->value('supplier');
+    return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'supplierName'));
+}
 }

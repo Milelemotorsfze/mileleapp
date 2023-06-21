@@ -40,6 +40,7 @@
 }
 </style>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 <div class="card-header">
         <h4 class="card-title">Add New Videos</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('variant_pictures.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -124,4 +125,9 @@
         });
     });
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

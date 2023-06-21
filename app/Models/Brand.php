@@ -18,4 +18,8 @@ class Brand extends Model
     {
         return $this->belongsTo(MasterModelLines::class);
     }
+    public function warrantyBrands()
+    {
+        return $this->hasMany(WarrantyBrands::class);
+    }
 }

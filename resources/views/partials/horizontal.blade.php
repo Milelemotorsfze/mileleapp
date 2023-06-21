@@ -9,7 +9,6 @@
   <span class="cart-icon-number"></span>
 </div>
 @endcan
-
 <div class="cart-icon-container">
   <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -22,48 +21,39 @@
         <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
     </button>
     <div class="dropdown-menu dropdown-menu-end">
-        <a class="dropdown-item" href="{{ route('profile.index') }}">
-            <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
+    <a class="dropdown-item" href="{{ route('profile.index') }}">
+        <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
+    </a>
+    <div class="dropdown-divider"></div>
+    @foreach ($assignedRoles as $role)
+        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
+            <i class="fa fa-users" aria-hidden="true"></i> {{ $role->name }}
         </a>
         <div class="dropdown-divider"></div>
-        @can('user-view')
-        <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
-        <div class="dropdown-divider"></div>
-        @endcan
-        @can('role-list')
-        <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
-        <div class="dropdown-divider"></div>
-        @endcan
-        <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
+    @endforeach
+    @can('user-view')
+        <a class="dropdown-item" href="{{ route('users.index') }}">
+            <i class="fa fa-users" aria-hidden="true"></i> Users
         </a>
-    </div>
-               </div>
-<div class="topnav">
-        <div class="dropdown-menu dropdown-menu-end">
-            <a class="dropdown-item" href="profile">
-                <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
-            </a>
-            <div class="dropdown-divider"></div>
-            @can('user-view')
-                <a class="dropdown-item" href="{{ route('users.index') }}"><i class="fa fa-users" aria-hidden="true"></i> Users </a>
-                <div class="dropdown-divider"></div>
-            @endcan
-            @can('role-list')
-                <a class="dropdown-item" href="{{ route('roles.index') }}"><i class="fa fa-user-circle" aria-hidden="true"></i> Roles </a>
-                <div class="dropdown-divider"></div>
-            @endcan
-            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            </a>
-        </div>
+        <div class="dropdown-divider"></div>
+    @endcan
+
+    @can('role-list')
+        <a class="dropdown-item" href="{{ route('roles.index') }}">
+            <i class="fa fa-user-circle" aria-hidden="true"></i> Roles
+        </a>
+        <div class="dropdown-divider"></div>
+    @endcan
+
+    <a class="dropdown-item" href="{{ route('logout') }}"
+       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+        <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+    </a>
 </div>
+               </div>
     <div class="container-fluid">
         <nav class="navbar navbar-light navbar-expand-lg topnav-menu">
             <div class="collapse navbar-collapse" id="topnav-menu-content">
@@ -238,93 +228,142 @@
                     
                    
                     @can('Calls-view')
+                    @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
                             <i data-feather="phone-call"></i>
                             <span data-key="t-extra-pages">Messages & Calls</span>
                         </a>
 					</li>
+                    @endif
                     @endcan
-                    @can('warehouse-view')
                     @can('View-daily-movemnets')
+                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movements.index') }}" id="topnav-more" role="button">
+                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movement.index') }}" id="topnav-more" role="button">
                             <i data-feather="command"></i>
                             <span data-key="t-extra-pages">Movements</span>
                         </a>
 					</li>
+                    @endif
                     @endcan
                     @can('view-po-details')
+                    @if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
                             <i data-feather="award"></i>
                             <span data-key="t-extra-pages">Purchasing Order</span>
                         </a>
 					</li>
+                    @endif
                     @endcan
-                    @can('view-po-details')
+                    @can('stock-full-view')
+                    @if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16'|| Auth::user()->selectedRole === '17'|| Auth::user()->selectedRole === '18'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
-                            <span data-key="t-extra-pages">Stocks</span>
+                            <span data-key="t-extra-pages">Full Stocks</span>
                         </a>
 					</li>
+                    @endif
+                    @endcan
+                    @can('edit-po-details')
+                    @if (Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
                             <span data-key="t-extra-pages">Supplier</span>
                         </a>
 					</li>
-                    @endcan
+                    @endif
                     @endcan
                     @can('variants-view')
+                    @if (Auth::user()->selectedRole === '4')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Add Pictures & Videos</span>
                         </a>
 					</li>
+                    @endif
                     @endcan
                     @can('sales-view')
+                    @if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
                     <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Leads</span>
                         </a>
                     </li>
+                    @endif
                     @endcan
-                    @can('vehicles-picture-list')
-                    <li class="nav-item dropdown">
+                    <!-- <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Vehicle Pictures</span>
                         </a>
-                    </li>
+                    </li> -->
+                    @can('demand-create')
+                    @if (Auth::user()->selectedRole === '17' || Auth::user()->selectedRole === '18')
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
+                                <i data-feather="file-text"></i>
+                                <span data-key="t-extra-pages">Demand & Planning</span>
+                                <div class="arrow-down"></div>
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                <div class="dropdown">
+                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}"
+                                       id="topnav-auth" role="button" >
+                                        <span data-key="t-authentication">Supplier</span>
+                                    </a>
+                                </div>
+                                @can('demand-create')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Demand</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                        </div>
+                                    </div>
+                                @endcan
+                                @can('LOI-list')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">LOI</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            @can('LOI-create')
+                                                <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
+                                            @endcan
+                                            @can('LOI-list')
+                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
+                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
+                                            @endcan
+                                        </div>
+                                    </div>
+                                @endcan
+                                @can('supplier-inventory-list')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">Supplier Inventory</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                            <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
+                                            <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                        </div>
+                                    </div>
+                                @endcan
+                            </div>
+                        </li>
+                        @endif
                     @endcan
                     @can('user-create')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                            <i data-feather="file-text"></i>
-                            <span data-key="t-extra-pages">BL Form</span><div class="arrow-down"></div>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('blform.index') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create New BL</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">View VINs</span>
-                                </a>
-                            </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="/addnewvariants" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Change Country</span>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -385,7 +424,7 @@
                                 <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                     <a href="{{route('suppliers.create')}}" class="dropdown-item" data-key="t-login">Add New Supplier </a>
                                     <a href="{{route('suppliers.index')}}" class="dropdown-item" data-key="t-login">Supplier Info </a>
-{{--                                    @can('LOI-list')--}}
+{{--@can('LOI-list')--}}
 {{--                                       <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>--}}
 {{--                                    @endcan--}}
                                 </div>
@@ -394,6 +433,7 @@
                     </li>
                     @endcan
                     @can('HR-view')
+                    @if (Auth::user()->selectedRole === '19' || Auth::user()->selectedRole === '20')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('hiring.index') }}" id="topnav-more" role="button">
                             <i data-feather="file-text"></i>
@@ -401,14 +441,17 @@
                         </a>
                     </li>
                     </li>
+                    @endif
                     @endcan
                     @can('Calls-view')
+                    @if (Auth::user()->selectedRole === '4')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
                             <i data-feather="server"></i>
                             <span data-key="t-extra-pages">Master Lead Source</span>
                         </a>
 					</li>
+                    @endif
                     @endcan
 
                 </ul>

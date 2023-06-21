@@ -41,6 +41,7 @@
 }
     </style>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 @can('Calls-modified')
 @if ($errors->has('source_name'))
             <div id="error-message" class="alert alert-danger">
@@ -97,4 +98,9 @@
         }, 2000);
     </script>
 @endcan
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

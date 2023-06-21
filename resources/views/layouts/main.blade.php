@@ -39,25 +39,19 @@
             right: 0;
             top: 0;
         }
-<<<<<<< HEAD
      /* @media only screen and (max-width: 600px) {
-=======
      @media only screen and (max-width: 600px) {
->>>>>>> ebcecfdbbb7947cc6c0b979f385137852a0a1e6f
          .sm-mt-20 {
              margin-top: 20px;
          }
          .sm-mt-3 {
              margin-top: 10px;
          }
-<<<<<<< HEAD
-=======
      }
      @media only screen and (max-width: 1200px) {
          .md-mt-26{
              margin-top: 26px;
          }
->>>>>>> ebcecfdbbb7947cc6c0b979f385137852a0a1e6f
      }
      @media only screen and (max-width: 1200px) {
          .md-mt-26{
@@ -68,7 +62,7 @@
     </head>
     <body data-layout="horizontal">
         <div id="layout-wrapper">
-            @include('partials/horizontal')
+        @include('partials.horizontal')
             <div class="main-content">
                 <div class="page-content">
                     <div class="container-fluid">

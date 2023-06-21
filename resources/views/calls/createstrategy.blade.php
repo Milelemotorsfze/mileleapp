@@ -30,6 +30,7 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 @can('Calls-modified')
 @if ($errors->has('start_date') || $errors->has('end_date'))
     <div id="error-message" class="alert alert-danger">
@@ -219,4 +220,9 @@ function deleteRow(strategyId) {
   }
 }
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection

@@ -8,7 +8,7 @@
 </head>
 <body data-layout="horizontal">
     <div id="layout-wrapper">
-    @include('partials/horizontal')
+    @include('partials.horizontal')
     <div class="main-content">
         <div class="page-content">
             <div class="container-fluid">

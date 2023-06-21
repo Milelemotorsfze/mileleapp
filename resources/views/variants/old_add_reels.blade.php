@@ -16,6 +16,7 @@
 }
     </style>
 @section('content')
+@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">Variant Reels</h4>
@@ -87,6 +88,11 @@
         var videoDropzone = new Dropzone('#video-dropzone');
         videoDropzone.options.url = '{{ route('variant_pictures.uploadingreal') }}';
     </script>
+    @else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection
 <style>
     .card {

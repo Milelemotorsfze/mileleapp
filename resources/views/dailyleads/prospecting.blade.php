@@ -18,6 +18,7 @@ textarea {
 }
     </style>
 @section('content')
+@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
 @can('daily-leads-create')
 <div class="card-header">
     <h4 class="card-title">Prospecting</h4>
@@ -229,4 +230,9 @@ textarea {
     });
 });
 </script>
+@else
+    @php
+        redirect()->route('home')->send();
+    @endphp
+@endif
 @endsection
