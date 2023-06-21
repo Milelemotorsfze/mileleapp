@@ -370,11 +370,12 @@
                     <div id="London" class="tabcontent">
                         <div class="row">
                             <div class="card-body">
-                                @include('addon.supplierprice')
+                                @include('addon.editsupplierprice')
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                 </div>
