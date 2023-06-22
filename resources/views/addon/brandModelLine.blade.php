@@ -58,7 +58,6 @@
                     <div class="col-xxl-4 col-lg-6 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                         <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" id="selectBrand${index}" multiple="true" style="width: 100%;">
-                            <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
                                 @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                 @endforeach
