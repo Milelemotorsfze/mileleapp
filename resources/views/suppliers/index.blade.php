@@ -18,45 +18,54 @@
     <h4 class="card-title">
       Suppliers Info
     </h4>
-   @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
+    @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New Supplier
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <div class="clearfix"></div>
       <br>
-      @endcanany
-      @if (Session::has('error'))
-            <div class="alert alert-danger" >
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('error') }}
-            </div>
-        @endif
-        @if (Session::has('success'))
-            <div class="alert alert-success" id="success-alert">
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
-                {{ Session::get('success') }}
-            </div>
-        @endif
+    @endcanany
+    @if (Session::has('error'))
+      <div class="alert alert-danger" >
+        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+          {{ Session::get('error') }}
+        </div>
+    @endif
+    @if (Session::has('success'))
+      <div class="alert alert-success" id="success-alert">
+        <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+        {{ Session::get('success') }}
+      </div>
+    @endif
   </div>
-  <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1">
-        <div class="card-body">
-          <div class="table-responsive">
+  <div class="portfolio">
+            <ul class="nav nav-pills nav-fill" id="my-tab">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="pill" href="#active-suppliers-list">Active </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="pill" href="#inactive-suppliers-list">Inactive </a>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content" id="selling-price-histories" >
+            <div class="tab-pane fade show active" id="active-suppliers-list">
+            <div class="table-responsive">
             <table id="suppliersList" class="table table-striped table-editable table-edits table">
               <thead>
                 <tr>
                   <th>No</th>
                   <th>Name</th>
-                  @can('addon-supplier-list')
-                  <th>Email</th>
-                  <th>contact Number</th>
-                  <th>Alternative Contact</th>
-                  <th>Contact Person</th>
-                  <th>Person Contact By</th>
-                  <th>Supplier Type</th>
-                  <th>Primary Payment Method</th>
-                  <th>Other Payment Methods</th>
+                    @can('addon-supplier-list')
+                    <th>Email</th>
+                    <th>contact Number</th>
+                    <th>Alternative Contact</th>
+                    <th>Contact Person</th>
+                    <th>Person Contact By</th>
+                    <th>Supplier Type</th>
+                    <th>Primary Payment Method</th>
+                    <th>Other Payment Methods</th>
                     @endcan
                   <th>Status</th>
                   <th>Action</th>
@@ -69,50 +78,50 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $supplier->supplier }}</td>
                       @can('addon-supplier-list')
-                    <td>{{ $supplier->email }}</td>
-                    <td>{{ $supplier->contact_number }}</td>
-                    <td>{{ $supplier->alternative_contact_number }}</td>
-                    <td>{{ $supplier->contact_person }}</td>
-                    <td>{{ $supplier->person_contact_by }}</td>
-                    <td>
-                      @if(count($supplier->supplierTypes) > 0)
-                        @foreach($supplier->supplierTypes as $t)
-                          <label class="badge badge-soft-primary">
-                            @if($t->supplier_type == 'spare_parts')
-                              Spare Parts
-                            @elseif($t->supplier_type == 'accessories')
-                              Accessories
-                            @elseif($t->supplier_type == 'freelancer')
-                              Freelancer
-                            @elseif($t->supplier_type == 'garage')
-                              Garage
-                            @elseif($t->supplier_type == 'warranty')
-                              Warranty
-                            @elseif($t->supplier_type == 'demand_planning')
-                            Demand Planning
-                            @endif
-                          </label>
-                        @endforeach
-                      @endif
-                    </td>
-                    <td>
-                      @if(count($supplier->paymentMethods) > 0)
-                        @foreach($supplier->paymentMethods as $v)
-                          @if($v->is_primary_payment_method == 'yes')
-                            <label class="badge badge-soft-info">{{ $v->PaymentMethods->payment_methods }}</label>
+                        <td>{{ $supplier->email }}</td>
+                        <td>{{ $supplier->contact_number }}</td>
+                        <td>{{ $supplier->alternative_contact_number }}</td>
+                        <td>{{ $supplier->contact_person }}</td>
+                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>
+                          @if(count($supplier->supplierTypes) > 0)
+                            @foreach($supplier->supplierTypes as $t)
+                              <label class="badge badge-soft-primary">
+                                @if($t->supplier_type == 'spare_parts')
+                                  Spare Parts
+                                @elseif($t->supplier_type == 'accessories')
+                                  Accessories
+                                @elseif($t->supplier_type == 'freelancer')
+                                  Freelancer
+                                @elseif($t->supplier_type == 'garage')
+                                  Garage
+                                @elseif($t->supplier_type == 'warranty')
+                                  Warranty
+                                @elseif($t->supplier_type == 'demand_planning')
+                                Demand Planning
+                                @endif
+                              </label>
+                            @endforeach
                           @endif
-                        @endforeach
-                      @endif
-                    </td>
-                    <td>
-                      @if(!empty($supplier->paymentMethods()))
-                        @foreach($supplier->paymentMethods as $v)
-                          @if($v->is_primary_payment_method == 'no')
-                            <label class="badge badge-soft-warning">{{ $v->PaymentMethods->payment_methods }}</label>
+                        </td>
+                        <td>
+                          @if(count($supplier->paymentMethods) > 0)
+                            @foreach($supplier->paymentMethods as $v)
+                              @if($v->is_primary_payment_method == 'yes')
+                                <label class="badge badge-soft-info">{{ $v->PaymentMethods->payment_methods }}</label>
+                              @endif
+                            @endforeach
                           @endif
-                        @endforeach
-                      @endif
-                    </td>
+                        </td>
+                        <td>
+                          @if(!empty($supplier->paymentMethods()))
+                            @foreach($supplier->paymentMethods as $v)
+                              @if($v->is_primary_payment_method == 'no')
+                                <label class="badge badge-soft-warning">{{ $v->PaymentMethods->payment_methods }}</label>
+                              @endif
+                            @endforeach
+                          @endif
+                        </td>
                       @endcan
                     <td>
                       @if($supplier->status == 'active')
@@ -121,83 +130,163 @@
                         <label class="badge badge-soft-danger">{{ $supplier->status }}</label>
                       @endif
                     </td>
-                    <td> @can('supplier-addon-price')
-                           <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
-                              href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                              
-                        @endcan
-                        @can('addon-supplier-view')
-                           <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
-                              href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                        @endcan
-                       
-                        @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
-                            <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
-                                href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                        @endcanany
-                        @can('addon-supplier-delete')
+                    <td>
+                      @can('supplier-addon-price')
+                        <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>                              
+                      @endcan
+                      @can('addon-supplier-view')
+                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
+                            href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endcan                       
+                      @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                          href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endcanany
+                      @can('addon-supplier-delete')
                         @if($supplier->is_deletable)
-                        <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
+                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
                             data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                            <!-- <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
-                              <div class="overlay"> </div>
-                              <div class="modal" id="deleteSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered" role="document">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
-                                      <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Delete Supplier </h5>
-                                      <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                        <span aria-hidden="true">X</span>
-                                      </button>
-                                    </div>
-                                    <div class="modal-body">
-                                      <div class="row modal-row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12">
-                                          <h5 class="modal-paragraph"> Are you sure,</h5>
-                                          <h6 class="modal-paragraph"> You want to delete the supplier ?</h6>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                      <a href="{{ route('suppliers.delete',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div> -->
+                            <i class="fa fa-trash"></i>
+                          </button>
                         @endif
-                        @endcan
+                      @endcan
                       @can('supplier-active-inactive') 
-                      @if($supplier->status == 'active')
-                      <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
-                          data-id="{{ $supplier->id }}" data-status="inactive" >
-                      <i class="fa fa-ban" aria-hidden="true"></i></button>
-                      @elseif($supplier->status == 'inactive')
-                      <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
-                      <i class="fa fa-check" aria-hidden="true"></i></a>
-                @endif
-               
-                      
-                      
-
-
-
-
-                       
-                       @endcan                               
+                        @if($supplier->status == 'active')
+                          <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
+                            data-id="{{ $supplier->id }}" data-status="inactive" >
+                            <i class="fa fa-ban" aria-hidden="true"></i>
+                          </button>
+                        @elseif($supplier->status == 'inactive')
+                          <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button">
+                          <i class="fa fa-check" aria-hidden="true"></i></a>
+                        @endif
+                      @endcan                               
                     </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
           </div>
+            </div>
+            <div class="tab-pane fade show" id="inactive-suppliers-list">
+            <table id="inactiveSuppliersList" class="table table-striped table-editable table-edits table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Name</th>
+                    @can('addon-supplier-list')
+                    <th>Email</th>
+                    <th>contact Number</th>
+                    <th>Alternative Contact</th>
+                    <th>Contact Person</th>
+                    <th>Person Contact By</th>
+                    <th>Supplier Type</th>
+                    <th>Primary Payment Method</th>
+                    <th>Other Payment Methods</th>
+                    @endcan
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <div hidden>{{$i=0;}}</div>
+                @foreach ($inactiveSuppliers as $key => $supplier)
+                  <tr data-id="1">
+                    <td>{{ ++$i }}</td>
+                    <td>{{ $supplier->supplier }}</td>
+                      @can('addon-supplier-list')
+                        <td>{{ $supplier->email }}</td>
+                        <td>{{ $supplier->contact_number }}</td>
+                        <td>{{ $supplier->alternative_contact_number }}</td>
+                        <td>{{ $supplier->contact_person }}</td>
+                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>
+                          @if(count($supplier->supplierTypes) > 0)
+                            @foreach($supplier->supplierTypes as $t)
+                              <label class="badge badge-soft-primary">
+                                @if($t->supplier_type == 'spare_parts')
+                                  Spare Parts
+                                @elseif($t->supplier_type == 'accessories')
+                                  Accessories
+                                @elseif($t->supplier_type == 'freelancer')
+                                  Freelancer
+                                @elseif($t->supplier_type == 'garage')
+                                  Garage
+                                @elseif($t->supplier_type == 'warranty')
+                                  Warranty
+                                @elseif($t->supplier_type == 'demand_planning')
+                                Demand Planning
+                                @endif
+                              </label>
+                            @endforeach
+                          @endif
+                        </td>
+                        <td>
+                          @if(count($supplier->paymentMethods) > 0)
+                            @foreach($supplier->paymentMethods as $v)
+                              @if($v->is_primary_payment_method == 'yes')
+                                <label class="badge badge-soft-info">{{ $v->PaymentMethods->payment_methods }}</label>
+                              @endif
+                            @endforeach
+                          @endif
+                        </td>
+                        <td>
+                          @if(!empty($supplier->paymentMethods()))
+                            @foreach($supplier->paymentMethods as $v)
+                              @if($v->is_primary_payment_method == 'no')
+                                <label class="badge badge-soft-warning">{{ $v->PaymentMethods->payment_methods }}</label>
+                              @endif
+                            @endforeach
+                          @endif
+                        </td>
+                      @endcan
+                    <td>
+                      @if($supplier->status == 'active')
+                        <label class="badge badge-soft-success">{{ $supplier->status }}</label>
+                      @elseif($supplier->status == 'inactive')
+                        <label class="badge badge-soft-danger">{{ $supplier->status }}</label>
+                      @endif
+                    </td>
+                    <td>
+                      @can('supplier-addon-price')
+                        <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>                              
+                      @endcan
+                      @can('addon-supplier-view')
+                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
+                            href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endcan                       
+                      @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                          href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endcanany
+                      @can('addon-supplier-delete')
+                        @if($supplier->is_deletable)
+                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
+                            data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
+                            <i class="fa fa-trash"></i>
+                          </button>
+                        @endif
+                      @endcan
+                      @can('supplier-active-inactive') 
+                        @if($supplier->status == 'active')
+                          <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
+                            data-id="{{ $supplier->id }}" data-status="inactive" >
+                            <i class="fa fa-ban" aria-hidden="true"></i>
+                          </button>
+                        @elseif($supplier->status == 'inactive')
+                          <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button">
+                          <i class="fa fa-check" aria-hidden="true"></i></a>
+                        @endif
+                      @endcan                               
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+            </div>
         </div>
-      </div>
-      </div>
-    </div>
-  </div>
-
 
 
 
@@ -267,6 +356,7 @@
     $(document).ready(function ()
     {
       $('#suppliersList').DataTable();
+      $('#inactiveSuppliersList').DataTable();
       var table = $('#suppliersList').DataTable();
       $('.modal-button').on('click', function()
       {
