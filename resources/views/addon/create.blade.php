@@ -1137,7 +1137,6 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
-                $("#selectBrand1").removeAttr('disabled');
                 $("#selectBrandMo1").removeAttr('disabled');
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
@@ -1278,7 +1277,6 @@
             {
                 $('#kitSupplier').hide();
                 $('#branModaDiv').hide();
-                $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);

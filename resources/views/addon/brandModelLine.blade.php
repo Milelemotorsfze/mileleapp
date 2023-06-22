@@ -48,8 +48,6 @@
         $("#selectBrand1").select2({
             maximumSelectionLength: 1,
         });
-        // $("#selectBrand1").attr('disabled','disabled'); 
-        // $("showaddtrim").attr('disabled','disabled'); 
         $("#add").on("click", function ()
         {
             $('.allbrands').prop('disabled',true);
