@@ -85,8 +85,8 @@
         $("#selectModelLineNum1Des1").select2({
             maximumSelectionLength: 1,
         });
-        $("#selectBrand1").attr('disabled','disabled'); 
-        $("#showaddtrim").attr('disabled','disabled'); 
+        // $("#selectBrand1").attr('disabled','disabled'); 
+        // $("#showaddtrim").attr('disabled','disabled'); 
         $("#selectModelNumberDiscri1Des1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
         $("#selectModelNumberDiscri1Des1").select2();  
         $("#addDis").on("click", function ()

@@ -1252,7 +1252,7 @@
             }
             else
             {
-                $("#selectBrand1").attr('disabled','disabled');
+                // $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
