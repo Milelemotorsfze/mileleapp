@@ -180,15 +180,12 @@ class SupplierController extends Controller
     }
     public function destroy($id)
     {
-        
+        $supplier = Supplier::findOrFail($id);
         DB::beginTransaction();
-
         SupplierType::where('supplier_id', $id)->delete();
-        Supplier::find($id)->delete();
-
+            $supplier->delete();
         DB::commit();
-        return redirect()->route('suppliers.index')
-                        ->with('success','Suppliers deleted successfully');
+        return response(true);
     }
     public function makeActive($id)
     {
@@ -206,6 +203,7 @@ class SupplierController extends Controller
         return redirect()->route('suppliers.index')
                         ->with('success','Supplier updated successfully');
     }
+    
     public function supplierAddonExcelValidation(Request $request)
     {
         if($request->file)

@@ -166,62 +166,25 @@
                                   </div>
                                 </div>
                               </div> -->
-                          @endif
+                        @endif
                         @endcan
                       @can('supplier-active-inactive') 
                       @if($supplier->status == 'active')
-                        <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveSupplier{{$supplier->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div>
-                        <div class="modal" id="makeInactiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Make Inactive Supplier </h5>
-                                  <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                      <h5 class="modal-paragraph"> Are you sure,</h5>
-                                      <h6 class="modal-paragraph"> You want to make inactive ?</h6>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <a href="{{ route('suppliers.updateStatus',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        @elseif($supplier->status == 'inactive')
-                        <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveSupplier{{$supplier->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
-                        <div class="overlay"> </div>
-                        <div class="modal" id="makeActiveSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;">Make Active Supplier </h5>
-                                  <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                    <span aria-hidden="true">X</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                      <h5 class="modal-paragraph"> Are you sure,</h5>
-                                      <h6 class="modal-paragraph"> You want to make active ?</h6>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div class="modal-footer">
-                                  <a href="{{ route('suppliers.makeActive', $supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        @endif
+                  <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
+                          data-id="{{ $supplier->id }}" data-status="inactive" >
+                      <i class="fa fa-ban" aria-hidden="true"></i></button>
+                      @elseif($supplier->status == 'inactive')
+                  <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
+                      <i class="fa fa-check" aria-hidden="true"></i></a>
+                @endif
+                      
+                      
+                      
+
+
+
+
+                       
                        @endcan                               
                     </td>
                   </tr>
@@ -240,10 +203,10 @@
 
 
   <script type="text/javascript">
-    $('.supplier-delete').on('click',function(){
+     $('.supplier-delete').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
-            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+            var confirm = alertify.confirm('Are you sure you want to Delete this Supplier ?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",
@@ -260,8 +223,47 @@
                         }
                     });
                 }
-            }).set({title:"Delete Item"})
+            }).set({title:"Delete Supplier"})
         });
+        $('.status-active-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+        $('.status-inactive-button').click(function (e) {
+            // alert("ok");
+            var status = $(this).attr('data-status');
+            var id =  $(this).attr('data-id');
+            statusChange(id,status)
+        })
+
+        function statusChange(id,status) {
+            let url = '{{ route('suppliers.updateStatus') }}';
+            if(status == 'active') {
+                var message = 'Active';
+            }else{
+                var message = 'Inactive';
+            }
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            id: id,
+                            status: status,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                            alertify.success(status + " Successfully");
+                        }
+                    });
+                }
+            }).set({title:"Status Change"})
+        }
     $(document).ready(function ()
     {
       $('#suppliersList').DataTable();
