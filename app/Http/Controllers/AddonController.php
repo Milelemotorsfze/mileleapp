@@ -23,49 +23,6 @@ class AddonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getSupplierForAddon(Request $request)
-    {
-        info("test");
-        $data = Supplier::select('id','supplier');
-
-        info($request->filteredArray);
-        $addonType = $request->addonType;
-        if($addonType == 'P'){
-            $data = Supplier::with('supplierTypes')
-                ->whereHas('supplierTypes', function ($query) {
-                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_ACCESSORIES);
-                })->select('id','supplier');
-        }else if($addonType == 'SP') {
-            $data = Supplier::with('supplierTypes')
-                ->whereHas('supplierTypes', function ($query) {
-                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_SPARE_PARTS);
-                })->select('id','supplier');
-        }
-        else if($addonType == 'K') {
-            $data = Supplier::with('supplierTypes')
-                ->whereHas('supplierTypes', function ($query) {
-                    $query->whereIn('supplier_type', [Supplier::SUPPLIER_TYPE_SPARE_PARTS, Supplier::SUPPLIER_TYPE_ACCESSORIES]);
-                })->select('id','supplier');
-        }
-        if($request->filteredArray)
-        {
-            info($request->filteredArray);
-            if(count($request->filteredArray) > 0)
-            {
-                $data = $data->whereNotIn('id', $request->filteredArray);
-            }
-        }
-//        if($request->id) {
-//            $id = $request->id;
-//            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
-//                $query->where('supplier_id', $id);
-//            })->pluck('addon_id');
-//            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
-//        }
-        info($data->get());
-        $data = $data->get();
-        return response()->json($data);
-    }
     public function index($data)
     {
         $content = 'addon';
@@ -1040,5 +997,74 @@ class AddonController extends Controller
         $data->updated_by = $authId;
         $data->save();
         return redirect()->back()->with('success','Addon Selling Price Updated successfully.');
+    }
+    public function getSupplierForAddon(Request $request)
+    {
+        info("test");
+        $data = Supplier::select('id','supplier');
+
+        info($request->filteredArray);
+        $addonType = $request->addonType;
+        if($addonType == 'P'){
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_ACCESSORIES);
+                })->select('id','supplier');
+        }else if($addonType == 'SP') {
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_SPARE_PARTS);
+                })->select('id','supplier');
+        }
+        else if($addonType == 'K') {
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->whereIn('supplier_type', [Supplier::SUPPLIER_TYPE_SPARE_PARTS, Supplier::SUPPLIER_TYPE_ACCESSORIES]);
+                })->select('id','supplier');
+        }
+        if($request->filteredArray)
+        {
+            info($request->filteredArray);
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id', $request->filteredArray);
+            }
+        }
+//        if($request->id) {
+//            $id = $request->id;
+//            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
+//                $query->where('supplier_id', $id);
+//            })->pluck('addon_id');
+//            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+//        }
+
+        $data = $data->get();
+        return response()->json($data);
+    }
+    public function getSupplierForAddonType(Request $request)
+    {
+        info("ok");
+        $addonType = $request->addonType;
+        if($addonType == 'P'){
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_ACCESSORIES);
+                });
+        }else if($addonType == 'SP') {
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->where('supplier_type', Supplier::SUPPLIER_TYPE_SPARE_PARTS);
+                });
+        }
+        else if($addonType == 'K') {
+            $data = Supplier::with('supplierTypes')
+                ->whereHas('supplierTypes', function ($query) {
+                    $query->whereIn('supplier_type', [Supplier::SUPPLIER_TYPE_SPARE_PARTS, Supplier::SUPPLIER_TYPE_ACCESSORIES]);
+                });
+        }
+
+        $data = $data->get();
+
+        return $data;
     }
 }
