@@ -33,7 +33,7 @@ class SupplierController extends Controller
             ->whereHas('supplierTypes', function ($query){
                 $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
-            // ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {

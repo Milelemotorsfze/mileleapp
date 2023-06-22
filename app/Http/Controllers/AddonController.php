@@ -943,6 +943,29 @@ class AddonController extends Controller
                 $data['newAddonCode'] = $request->addon_type."1";
             }
             $data['addonMasters'] = Addon::whereIn('id',$masterAddonByType)->select('id','name')->orderBy('name', 'ASC')->get();
+
+            $addonType = $request->addon_type;
+            if($addonType == 'P'){
+                $data['suppliers'] = Supplier::with('supplierTypes')
+                    ->whereHas('supplierTypes', function ($query) {
+                        $query->where('supplier_type', Supplier::SUPPLIER_TYPE_ACCESSORIES);
+                    });
+            }else if($addonType == 'SP') {
+                $data['suppliers'] = Supplier::with('supplierTypes')
+                    ->whereHas('supplierTypes', function ($query) {
+                        $query->where('supplier_type', Supplier::SUPPLIER_TYPE_SPARE_PARTS);
+                    });
+            }
+            else if($addonType == 'K') {
+                $data['suppliers'] = Supplier::with('supplierTypes')
+                    ->whereHas('supplierTypes', function ($query) {
+                        $query->whereIn('supplier_type', [Supplier::SUPPLIER_TYPE_SPARE_PARTS, Supplier::SUPPLIER_TYPE_ACCESSORIES]);
+                    });
+            }
+
+            $data['suppliers'] = $data['suppliers']->get();
+
+
         }
         else
         {
