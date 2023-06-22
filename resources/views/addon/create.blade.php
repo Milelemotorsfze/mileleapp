@@ -456,8 +456,7 @@
         var fixingCharge = 'yes';
         $(document).ready(function ()
         {
-            $("#addon_type").change(function (e) {
-                e.preventDefault();
+            $("#addon_type").change(function () {
                 let url = '{{ url('supplier-change-addon-type') }}';
                 $.ajax({
                     type: "GET",
