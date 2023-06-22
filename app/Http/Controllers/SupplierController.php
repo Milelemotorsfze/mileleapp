@@ -178,8 +178,9 @@ class SupplierController extends Controller
         $addons = AddonDetails::whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes'));
     }
-    public function delete($id)
+    public function destroy($id)
     {
+        
         DB::beginTransaction();
 
         SupplierType::where('supplier_id', $id)->delete();

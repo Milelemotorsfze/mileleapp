@@ -26,6 +26,18 @@
       <div class="clearfix"></div>
       <br>
       @endcanany
+      @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
   </div>
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1">
@@ -125,7 +137,11 @@
                         @endcanany
                         @can('addon-supplier-delete')
                         @if($supplier->is_deletable)
-                            <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                        <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
+                            data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                            <!-- <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteSupplier{{$supplier->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                               <div class="overlay"> </div>
                               <div class="modal" id="deleteSupplier{{$supplier->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -145,12 +161,11 @@
                                       </div>
                                     </div>
                                     <div class="modal-footer">
-                                      <!-- <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button> -->
                                       <a href="{{ route('suppliers.delete',$supplier->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
+                              </div> -->
                           @endif
                         @endcan
                       @can('supplier-active-inactive') 
@@ -225,6 +240,28 @@
 
 
   <script type="text/javascript">
+    $('.supplier-delete').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            _method: 'DELETE',
+                            id: 'id',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Supplier Deleted successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
     $(document).ready(function ()
     {
       $('#suppliersList').DataTable();
