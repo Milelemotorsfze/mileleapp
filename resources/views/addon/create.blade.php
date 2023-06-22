@@ -463,6 +463,8 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $('#kitSupplier').hide();
+            $('#branModaDiv').hide();
             $('#blah').css('visibility', 'hidden');
             $("#addon_id").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
             $("#addon_id").select2({
@@ -1179,12 +1181,16 @@
                 $("#purchase_price").val('');
                 if(value == 'K')
                 {
+                    $('#kitSupplier').show();
+                    $('#branModaDiv').show();
                     hidenotKitSupplier();
                     showkitSupplier();
                     setLeastPurchasePriceAED();
                 }
                 else
                 {
+                    $('#kitSupplier').show();
+                    $('#branModaDiv').show();
                     hidekitSupplier();
                     shownotKitSupplier();
                     setLeastAEDPrice();
@@ -1230,6 +1236,8 @@
             }
             else
             {
+                $('#kitSupplier').hide();
+                $('#branModaDiv').hide();
                 $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
