@@ -457,6 +457,7 @@
         $(document).ready(function ()
         {
             $("#addon_type").change(function () {
+                var addonType = $(this).val();
                 let url = '{{ url('supplier-change-addon-type') }}';
                 $.ajax({
                     type: "GET",
