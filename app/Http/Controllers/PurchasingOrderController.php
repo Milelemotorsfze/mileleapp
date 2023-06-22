@@ -9,6 +9,8 @@ use App\Models\Varaint;
 use App\Models\Supplier;
 use App\Models\Vehicles;
 use App\Models\Movement;
+use App\Models\User;
+use App\Models\ModelHasRoles;
 
 class PurchasingOrderController extends Controller
 {
@@ -220,6 +222,9 @@ class PurchasingOrderController extends Controller
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $data = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'cancel')->get();
     $supplierName = Supplier::where('id', $purchasingOrder->suppliers_id)->value('supplier');
-    return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'supplierName'));
+    $sales_persons = ModelHasRoles::get();
+    $sales_ids = $sales_persons->pluck('model_id');
+    $sales = User::whereIn('id', $sales_ids)->get();
+    return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'supplierName', 'sales'));
 }
 }

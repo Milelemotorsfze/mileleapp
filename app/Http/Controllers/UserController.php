@@ -85,7 +85,7 @@ namespace App\Http\Controllers;
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
-        public function destroy($id)
+        public function delete($id)
         {
             User::find($id)->delete();
             return redirect()->route('users.index')

@@ -160,6 +160,7 @@
                     </li>
                     @endcanany
                     @can('demand-create')
+                    @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                 <i data-feather="file-text"></i>
@@ -224,6 +225,7 @@
 
                             </div>
                         </li>
+                        @endif
                     @endcan
                     
                    

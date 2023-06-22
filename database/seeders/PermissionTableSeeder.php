@@ -152,7 +152,6 @@ class PermissionTableSeeder extends Seeder
             ['9','BL Add & Edit ','bl-edit', 'To Edit the BL Details'],
             ['9','Price View','price-view', 'To View the Price Details'],
             ['9','Price Add & Edit','price-edit', 'To Edit the Price Details'],
-
             ['9','Vehicle Pictures List','vehicles-picture-list', 'To view List of Vehicle Pictures'],
             ['9','Vehicle Picture Create','vehicles-picture-create', 'To  Create the Vehicle Pictures'],
             ['9','Vehicle Picture Edit','vehicles-picture-edit', 'To Edit the Vehicle Pictures'],

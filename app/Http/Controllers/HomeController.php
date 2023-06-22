@@ -108,9 +108,9 @@ $reelsdays = DB::table('varaints as v')
               ->select('v.*', 'ac.*')
               ->get();
 $countpendingreelsdays = $reelsdays->count();
-$totalleadscounttoday = Calls::where('created_at', '>=', $todayl)->count();
-$totalleadscount = Calls::where('created_at', '>=', $last30Days)->count();
-$totalleadscount7days = Calls::where('created_at', '>=', $last7Days)->count();
+$totalleadscounttoday = DB::table('calls')->where('created_at', '>=', $todayl)->count();
+$totalleadscount = DB::table('calls')->where('created_at', '>=', $last30Days)->count();
+$totalleadscount7days = DB::table('calls')->where('created_at', '>=', $last7Days)->count();
 $totalvariantcounttoday = AvailableColour::where('created_at', '>=', $todayl)->count();
 $totalvariantcount = AvailableColour::where('created_at', '>=', $last30Days)->count();
 $totalvariantcount7days = AvailableColour::where('created_at', '>=', $last7Days)->count();

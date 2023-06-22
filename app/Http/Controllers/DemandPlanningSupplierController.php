@@ -39,12 +39,12 @@ class DemandPlanningSupplierController extends Controller
         DB::beginTransaction();
         $supplier = new Supplier();
         $supplier->supplier = $request->name;
+        $supplier->status = Supplier::SUPPLIER_STATUS_ACTIVE;
         $supplier->save();
 
         $supplierType = new SupplierType();
         $supplierType->supplier_id = $supplier->id;
         $supplierType->supplier_type = Supplier::SUPPLIER_TYPE_DEMAND_PLANNING;
-        $supplierType->status = Supplier::SUPPLIER_STATUS_ACTIVE;
         $supplierType->created_by = Auth::id();
         $supplierType->save();
 
