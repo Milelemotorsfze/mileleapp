@@ -33,7 +33,7 @@ class SupplierController extends Controller
             ->whereHas('supplierTypes', function ($query){
                 $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
             })
-            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
+            // ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {
@@ -187,23 +187,32 @@ class SupplierController extends Controller
         DB::commit();
         return response(true);
     }
-    public function makeActive($id)
+    // public function makeActive($id)
+    // {
+    //    $user = Supplier::find($id);
+    //    $user->status = 'active';
+    //    $user->update();
+    //    return redirect()->route('suppliers.index')
+    //                    ->with('success','Supplier updated successfully');
+    // }
+    public function updateStatus(Request $request)
     {
-       $user = Supplier::find($id);
-       $user->status = 'active';
-       $user->update();
-       return redirect()->route('suppliers.index')
-                       ->with('success','Supplier updated successfully');
+        $supplier = Supplier::find($request->id);
+        $supplier->status = $request->status;
+
+        $supplier->save();
+        // return response($supplier, 200);
+        return response(true);
     }
-    public function updateStatus($id)
-    {
-        $user = Supplier::find($id);
-        $user->status = 'inactive';
-        $user->update();
-        return redirect()->route('suppliers.index')
-                        ->with('success','Supplier updated successfully');
-    }
-    
+    // public function statusChange(Request $request)
+    // {
+    //     $supplier = Supplier::find($request->id);
+    //     $supplier->status = $request->status;
+
+    //     $supplier->save();
+    //     // return response($supplier, 200);
+    //     return response(true);
+    // }
     public function supplierAddonExcelValidation(Request $request)
     {
         if($request->file)

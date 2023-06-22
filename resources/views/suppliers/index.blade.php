@@ -170,14 +170,14 @@
                         @endcan
                       @can('supplier-active-inactive') 
                       @if($supplier->status == 'active')
-                  <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
+                      <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
                           data-id="{{ $supplier->id }}" data-status="inactive" >
                       <i class="fa fa-ban" aria-hidden="true"></i></button>
                       @elseif($supplier->status == 'inactive')
-                  <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
+                      <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
                       <i class="fa fa-check" aria-hidden="true"></i></a>
                 @endif
-                      
+               
                       
                       
 
@@ -245,7 +245,7 @@
             }else{
                 var message = 'Inactive';
             }
-            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this supplier ?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",
