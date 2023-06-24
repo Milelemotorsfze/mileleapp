@@ -44,7 +44,7 @@
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-brand" multiple="true" style="width: 100%;">
-          <!-- <option value="yes">All Brands</option> -->
+          <option value="yes">All Brands</option>
             @foreach($brandMatsers as $brandMatser)
               <option value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
             @endforeach
@@ -52,6 +52,7 @@
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-model-line" multiple="true" style="width: 100%;">
+          <option value="yes">All Model Lines</option>
           @foreach($modelLineMasters as $modelLineMaster)
           <option value="{{$modelLineMaster->id}}">{{$modelLineMaster->model_line}}</option>
           @endforeach
