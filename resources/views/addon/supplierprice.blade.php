@@ -13,9 +13,9 @@
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
                                             <select name="supplierAndPrice[1][supplier_id][]" data-index="1" id="suppliers1" multiple="true" style="width: 100%;"
                                                     onchange="validationOnKeyUp(this)" class="suppliers">
-                                                @foreach($suppliers as $supplier)
-                                                    <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>
-                                                @endforeach
+{{--                                                @foreach($suppliers as $supplier)--}}
+{{--                                                    <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>--}}
+{{--                                                @endforeach--}}
                                             </select>
                                             @error('supplier_id')
                                                 <span class="invalid-feedback" role="alert">
@@ -29,7 +29,7 @@
                                             <label for="choices-single-default" class="form-label font-size-13">Purchase Price In AED</label>
                                             <div class="input-group">
                                             <input  name="supplierAndPrice[1][addon_purchase_price_in_aed]" id="addon_purchase_price_1" type="number" min="0" step="any"
-                                                    class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice form-control
+                                                    class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice form-control  purchase_price_AED
                                                      widthinput @error('addon_purchase_price') is-invalid @enderror"
                                                     placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED"
                                                     value="{{ old('supplierAndPrice[1][addon_purchase_price_in_aed]') }}"  autocomplete="addon_purchase_price"
@@ -45,8 +45,8 @@
                                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                             <div class="input-group">
                                             <input  name="supplierAndPrice[1][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_1"
-                                                    type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
-                                                    placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED"
+                                                    type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror
+                                                    purchase_price_USD" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED"
                                                     value="{{ old('supplierAndPrice[1][addon_purchase_price_in_usd]') }}"  autocomplete="addon_purchase_price_in_usd"
                                                     autofocus onkeyup="calculateAED(1)">
                                                     <div class="input-group-append">
@@ -81,6 +81,7 @@
 <script type="text/javascript">
     $(document).ready(function ()
     {
+
         // alert(currentAddonType);
         $("#suppliers1").select2
         ({
@@ -245,7 +246,6 @@
                             text: value.supplier
                         });
                     });
-                    console.log(brandDropdownData);
                     $('#suppliers'+index).select2
                     ({
                         placeholder:"Choose Supplier....     Or     Type Here To Search....",

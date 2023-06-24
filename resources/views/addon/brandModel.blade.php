@@ -9,7 +9,7 @@
         font-size:11px;
     }
 </style>
-<div class="card">
+<div class="card" id="branModaDiv">
     <div class="card-header">
         <h4 class="card-title">Addon Brand and Model Lines</h4>
     </div>

@@ -6,7 +6,7 @@
                 <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrandDisp(1,1) name="brand[1][brand_id]" id="selectBrandMo1" multiple="true" style="width: 100%;">
-                        <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
+                        <option id="allbrandsMo" class="allbrands" value="allbrands">ALL BRANDS</option>
                         @foreach($brands as $brand)
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
@@ -85,13 +85,11 @@
         $("#selectModelLineNum1Des1").select2({
             maximumSelectionLength: 1,
         });
-        $("#selectBrand1").attr('disabled','disabled'); 
-        $("#showaddtrim").attr('disabled','disabled'); 
         $("#selectModelNumberDiscri1Des1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
         $("#selectModelNumberDiscri1Des1").select2();  
         $("#addDis").on("click", function ()
         {
-            $('.allbrands').prop('disabled',true);
+            $('.allbrandsMo').prop('disabled',true);
             var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1; 
             $(".brandMoDescrip").append(`  
             </br>         
@@ -100,7 +98,6 @@
                 <div class="col-xxl-5 col-lg-5 col-md-12">
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrandDisp(${index},1) name="brand[${index}][brand_id]" id="selectBrandMo${index}" multiple="true" style="width: 100%;">
-                        <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
                         @foreach($brands as $brand)
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
@@ -183,17 +180,53 @@
             });
         }); 
     });
+    function addDiscr(supplier)
+    {
+        alert('hiig');
+        var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1; 
+        $(".MoDes"+supplier).append(`
+            <div class="row MoDesApndHere${supplier}">
+            <div class="col-xxl-1 col-lg-1 col-md-12">
+                    </div>
+                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showDivdropDr${supplier}Des${index}">
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>        
+                        <select class="compare-tag1" name=brand[${supplier}][model][${index}][model_id]" onchange=selectModelLineDescipt(${supplier},${index}) id="selectModelLineNum${supplier}Des${index}" multiple="true" style="width: 100%;">
+                            @foreach($modelLines as $modelLine)
+                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
+                            @endforeach
+                        </select>      
+                        @error('is_primary_payment_method')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>                                        
+                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                        <select class="compare-tag1" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}" multiple="true" style="width: 100%;">
+                            @foreach($modelLines as $modelLine)
+                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
+                            @endforeach
+                        </select>      
+                        @error('is_primary_payment_method')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    </div>
+            </div>
+            `); 
+        $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+supplier+":not(:first)").prop("disabled", false); $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+index).first().prop("disabled", true); 
+        selectBrandDisp(supplier, index);
+        $("#selectModelNumberDiscri"+supplier+"Des"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
+        $("#selectModelNumberDiscri"+supplier+"Des"+index).select2(); 
+    }
+    
     function selectModelLineDescipt(id,row)
     {
         ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
-        // if(currentAddonType == 'SP' && ifModelLineExist != '')
-        // {
-            showModelNumberDropdown(id,row);
-        // }
-        // else
-        // {
-        //     hideModelNumberDropdown(id,row);
-        // }
+        showModelNumberDropdown(id,row);
     }
     function selectBrandDisp(id,row)
     {   
@@ -229,11 +262,6 @@
                 hideRelatedModalDis(brandId,row);
             }
         }
-        // globalThis.selectedBrandsDisArr[i] = 2;
-        // var value =$('#selectBrand'+j).val();
-        // var value =$('#'+id).val();
-        //     var brandId = $('#cityname1 [value="' + value + '"]').data('value');
-        //     globalThis.selectedBrandsDisArr .push(brandId);
     }
     function showRelatedModalDis(id,value,row,currentAddonType)
     { 
@@ -248,8 +276,6 @@
             dataType: "json",
             success:function(data) 
             {
-                console.log(data);
-                console.log("#selectModelLineNum"+id+"Des"+row);
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
                 $.each(data,function(key,value)
@@ -260,39 +286,15 @@
                         text: value.model_line
                     });
                 });
-                // if(currentAddonType == 'SP')
-                // {
-                    $("#selectModelLineNum"+id+"Des"+row).select2
-                    ({
-                        placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                        allowClear: true,
-                        data: BrandModelLine,
-                        maximumSelectionLength: 1,
-                    });
-                // }
-                // else
-                // {
-                //     $("#selectModelLineNum"+value+"Des"+row).select2
-                //     ({
-                //         placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                //         allowClear: true,
-                //         data: BrandModelLine
-                //     });
-                // }   
+                $("#selectModelLineNum"+id+"Des"+row).select2
+                ({
+                    placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                    allowClear: true,
+                    data: BrandModelLine,
+                    maximumSelectionLength: 1,
+                });
             }
         });
-    }
-    function hideRelatedModalDis(id,row)
-    {
-        let showDivdropDr = document.getElementById('showDivdropDr'+row);
-        showDivdropDr.hidden = true
-        let showaddtrim = document.getElementById('showaddtrim');
-        showaddtrim.hidden = true
-    }
-    function hideModelNumberDropdown(id,row)
-    {
-        let showPartNumber = document.getElementById('showModelNumberdrop'+row);
-        showPartNumber.hidden = true  
     }
     function showModelNumberDropdown(id,row)
     {
@@ -336,51 +338,16 @@
             }
         });
     }
-    function addDiscr(supplier)
+    function hideRelatedModalDis(id,row)
     {
-        alert('hiig');
-        var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1; 
-        $(".MoDes"+supplier).append(`
-            <div class="row MoDesApndHere${supplier}">
-            <div class="col-xxl-1 col-lg-1 col-md-12">
-                    </div>
-                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showDivdropDr${supplier}Des${index}">
-                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>        
-                        <select class="compare-tag1" name=brand[${supplier}][model][${index}][model_id]" onchange=selectModelLineDescipt(${supplier},${index}) id="selectModelLineNum${supplier}Des${index}" multiple="true" style="width: 100%;">
-                            @foreach($modelLines as $modelLine)
-                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                            @endforeach
-                        </select>      
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>                                        
-                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
-                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                        <select class="compare-tag1" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}" multiple="true" style="width: 100%;">
-                            @foreach($modelLines as $modelLine)
-                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                            @endforeach
-                        </select>      
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    </div>
-            </div>
-            `); 
-        $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+supplier+":not(:first)").prop("disabled", false); $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+index).first().prop("disabled", true); 
-        selectBrandDisp(supplier, index);
-        // $("#selectModelLineNum"+supplier+"Des"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-        // $("#selectModelLineNum"+supplier+"Des"+index).select2
-        // ({
-        //     maximumSelectionLength: 1,
-        // });  
-        $("#selectModelNumberDiscri"+supplier+"Des"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-        $("#selectModelNumberDiscri"+supplier+"Des"+index).select2(); 
+        let showDivdropDr = document.getElementById('showDivdropDr'+row);
+        showDivdropDr.hidden = true
+        let showaddtrim = document.getElementById('showaddtrim');
+        showaddtrim.hidden = true
+    }
+    function hideModelNumberDropdown(id,row)
+    {
+        let showPartNumber = document.getElementById('showModelNumberdrop'+row);
+        showPartNumber.hidden = true  
     }
 </script>

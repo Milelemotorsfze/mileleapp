@@ -74,7 +74,7 @@
         color: red;
         font-size:11px;
     }
-    .btn_round 
+    .btn_round
     {
         width: 30px;
         height: 30px;
@@ -90,13 +90,13 @@
         border-radius:5px;
         cursor: pointer;
     }
-    .btn_round:hover 
+    .btn_round:hover
     {
         color: #fff;
         background: #fd625e;
         border: 1px solid #fd625e;
     }
-    .paragraph-class 
+    .paragraph-class
     {
         margin-top: .25rem;
         font-size: 80%;
@@ -135,9 +135,6 @@
             </div>
         @endif
         <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.store') }}">
-        <!-- {{ route('addon.store') }} -->
-        <!-- method="POST" enctype="multipart/form-data" action="" -->
-        <!--  action="{{ route('addon.store') }}" -->
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -160,7 +157,7 @@
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
-                            
+
                             <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -212,8 +209,8 @@
                         <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
+                                                    </div>
+                                                </div>
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -228,8 +225,8 @@
                         <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
+                                                    </div>
+                                                </div>
                             @error('selling_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -244,13 +241,13 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                         
+
 
                         <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}"  autocomplete="lead_time">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>  
-                                                </div> 
+                                                    </div>
+                                                </div>
                             @error('lead_time')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -298,8 +295,8 @@
                         <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>  
-                                                </div> 
+                                                    </div>
+                                                </div>
                             @error('fixing_charge_amount')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -456,13 +453,33 @@
         var fixingCharge = 'yes';
         $(document).ready(function ()
         {
+            $("#addon_type").change(function () {
+                let url = '{{ url('supplier-change-addon-type') }}';
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        addonType: addonType,
+                    },
+                    success: function (data) {
+                        $('#suppliers1').empty();
+                        jQuery.each(data, function (key, value) {
+                            $('#suppliers1').append('<option value="' + value.id + '">' + value.supplier + '</option>');
+                        });
+                    }
+                });
+            })
+
             $.ajaxSetup
             ({
-                headers: 
+                headers:
                 {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+            $('#kitSupplier').hide();
+            $('#branModaDiv').hide();
             $('#blah').css('visibility', 'hidden');
             $("#addon_id").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
             $("#addon_id").select2({
@@ -532,7 +549,7 @@
                         {
                             $msg = "";
                             removeAddonTypeError($msg);
-                            removeAddonNameError($msg);        
+                            removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
                             $("#selectBrand1").removeAttr('disabled');
@@ -545,7 +562,7 @@
                     $('#addnewAddonButton').show();
                 }
             });
-          
+
 
             // $('#submit').click(function()
             // {
@@ -665,7 +682,7 @@
             //     $('.modal').removeClass('modalshow');
             // });
         });
-        $('form').on('submit', function (e) 
+        $('form').on('submit', function (e)
         {
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
@@ -872,7 +889,7 @@
             // document.getElementById("supplierError").textContent="";
             // document.getElementById("supplier_type").classList.remove("is-invalid");
             // document.getElementById("supplierError").classList.remove("paragraph-class");
-        } 
+        }
         function showBrandError($msg)
         {
             document.getElementById("brandError").textContent=$msg;
@@ -1092,7 +1109,7 @@
             $('#showImageModal').removeClass('modalhide');
             modalImg.src = img.src;
         }
-       
+
 
 
             //         function changeAddon(i)
@@ -1120,8 +1137,7 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
-                $("#selectBrand1").removeAttr('disabled');
-                $("#selectBrandMo1").removeAttr('disabled'); 
+                $("#selectBrandMo1").removeAttr('disabled');
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
                     maximumSelectionLength: 1,
@@ -1159,7 +1175,7 @@
                         showPartNumber.hidden = false
                         let showPartNumberBr = document.getElementById('partNumberDivBr');
                         showPartNumberBr.hidden = false
-                    }  
+                    }
                 }
                 else
                 {
@@ -1179,12 +1195,16 @@
                 $("#purchase_price").val('');
                 if(value == 'K')
                 {
+                    $('#kitSupplier').show();
+                    $('#branModaDiv').show();
                     hidenotKitSupplier();
                     showkitSupplier();
                     setLeastPurchasePriceAED();
                 }
                 else
                 {
+                    $('#kitSupplier').show();
+                    $('#branModaDiv').show();
                     hidekitSupplier();
                     shownotKitSupplier();
                     setLeastAEDPrice();
@@ -1201,6 +1221,7 @@
                     dataType : 'json',
                     success: function(data)
                     {
+                        // console.log(data.suppliers);
                         $('#addon_type').val(currentAddonType);
                         $('#addon_code').val(data.newAddonCode);
                         $("#addon_id").html("");
@@ -1219,18 +1240,43 @@
                             });
                             $('#addon_id').select2
                             ({
-                                placeholder: 'Select value',
+                                placeholder: 'Choose Addon ....     Or     Type Here To Search....',
                                 allowClear: true,
                                 data: AddonDropdownData,
                                 maximumSelectionLength: 1,
                             });
                         }
+
+                        $("#suppliers1").html("");
+                        myarray1 = data.suppliers;
+                        var size1= myarray1.length;
+                        if(size1 >= 1)
+                        {
+                            let SupplierDropdownData   = [];
+                            $.each(data.suppliers,function(key,value)
+                            {
+                                SupplierDropdownData.push
+                                ({
+                                    id: value.id,
+                                    text: value.supplier
+                                });
+                            });
+                            $('#suppliers1').select2
+                            ({
+                                placeholder: 'Choose Supplier ....     Or     Type Here To Search....',
+                                allowClear: true,
+                                data: SupplierDropdownData,
+                                // maximumSelectionLength: 1,
+                            });
+                        }
+
                     }
                 });
             }
             else
             {
-                $("#selectBrand1").attr('disabled','disabled');
+                $('#kitSupplier').hide();
+                $('#branModaDiv').hide();
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
