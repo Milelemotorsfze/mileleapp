@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        .widthinput
+        {
+            height:32px!important;
+        }
+    </style>
     <div class="card-header">
         <h4 class="card-title">Add New Vehicle Picture</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -37,7 +43,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> VIN</label>
-                                    <select class="form-control vehicles"  multiple="true"  id="vehicles-1" data-index="1" autofocus name="vins[]" >
+                                    <select class="form-control widthinput vehicles" multiple="true" required  id="vehicles-1" data-index="1" autofocus name="vins[]" >
                                         <option></option>
                                         @foreach($vins as $vin)
                                             <option value="{{ $vin->id }}">{{ $vin->vin }}</option>
@@ -48,32 +54,32 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Detail</label>
-                                    <input type="text" value="" class="form-control" id="variant-detail-1" readonly placeholder="Vehicle Details">
+                                    <input type="text" class="form-control widthinput" id="variant-detail-1" readonly placeholder="Vehicle Details">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">GRN</label>
-                                    <input type="text" value="{{ old('GRN_link') }}" name="GRN_link[]" class="form-control mygroup" placeholder="GRN Link">
+                                    <input type="url"  name="GRN_link[]" class="form-control widthinput mygroup-1" placeholder="GRN Link">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">GDN</label>
-                                    <input type="text" value="{{ old('GDN_link') }}" name="GDN_link[]" class="form-control mygroup" placeholder="GDN Link">
+                                    <input type="url"  name="GDN_link[]" class="form-control widthinput mygroup-1" placeholder="GDN Link">
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Modification Link</label>
-                                    <input type="text" value="{{ old('modification_link') }}" name="modification_link[]" class="form-control mygroup"
+                                    <input type="url" name="modification_link[]" class="form-control widthinput mygroup-1"
                                            placeholder="Modification Link">
                                 </div>
                             </div>
                         </div>
                     </div>
                         <div class="col-xxl-12 col-lg-12 col-md-12 col-md-12">
-                            <a onclick="clickAdd()" id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit mt-2">
+                            <a onclick="clickAdd()" style="float: right;" class="btn btn-sm btn-info  mt-2">
                                 <i class="fa fa-plus" aria-hidden="true"></i> Add
                             </a>
                         </div>
@@ -97,6 +103,28 @@
             allowClear: true
 
         })
+        // $("#form-create").validate({
+        //     rules: {
+        //         vins: {
+        //             required: true,
+        //         },
+        //         'modification_link[]':{
+        //             url:true,
+        //             require_from_group: [1, '.mygroup'+2]
+        //         },
+        //         GDN_link:{
+        //             url:true,
+        //             require_from_group: [1, '.mygroup'+2]
+        //         },
+        //         GRN_link:{
+        //             url:true,
+        //             require_from_group: [1, '.mygroup'+2]
+        //         },
+        //         groups: {
+        //             mygroup: "GDN_link GRN_link modification_link"
+        //         },
+        //     }
+        // });
         // $('#vehicles-1').on('change',function(){
             function showVariantDetail(index) {
                 $('#vin-error').remove();
@@ -164,48 +192,27 @@
                 var index = +i + +1;
                 $(this).attr('id','row-'+ index);
                 $(this).find('select').attr('data-index', index);
-                $(this).find('select').attr('id','vehicles'+ index);
+                $(this).find('select').attr('id','vehicles-'+ index);
                 $(this).find('.variant-detail').attr('id','variant-detail-'+index);
+                $(this).find('.select').attr('data-select2-id','select2-data-vehicles-'+index);
+
                 $(this).find('button').attr('data-index', index);
                 $(this).find('button').attr('id','remove-'+ index);
                 $('#vehicles-'+index).select2
                 ({
-                    placeholder:"Choose Vehicle....     Or     Type Here To Search....",
-                    allowClear: true,
-                    minimumResultsForSearch: -1,
+                    placeholder: 'Choose Vehicles',
+                    maximumSelectionLength:1,
+                    allowClear: true
                 });
             });
         })
 
-        $("#form-create").validate({
-            ignore: [],
-            rules: {
-                vin: {
-                    required: true,
-                },
-                modification_link:{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                GDN_link:{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                GRN_link:{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                groups: {
-                    mygroup: "GDN_link GRN_link modification_link"
-                },
-            }
-        });
+
         var index = 1;
         $('#indexValue').val(index);
         function clickAdd()
         {
-            var indexValue = $('#indexValue').val();
-            var index = +indexValue + +1;
+            var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
             $('#indexValue').val(index);
             var selectedVehicles = [];
@@ -237,7 +244,7 @@
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> VIN</label>
-                                    <select class="form-control vehicles" multiple="true" id="vehicles-${index}"  data-index="${index}" autofocus name="vins[]" id="vin">
+                                    <select class="form-control vehicles" required multiple="true" id="vehicles-${index}"  data-index="${index}" autofocus name="vins[]" id="vin">
                                     <option></option>
                                     </select>
                             </div>
@@ -245,25 +252,25 @@
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Variant Detail</label>
-                                <input type="text" value="" class="form-control variant-detail" id="variant-detail-${index}" readonly placeholder="Vehicle Details">
+                                <input type="text" value="" class="form-control widthinput variant-detail" id="variant-detail-${index}" readonly placeholder="Vehicle Details">
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">GRN</label>
-                                <input type="text" value="{{ old('GRN_link') }}" name="GRN_link[]" class="form-control mygroup" placeholder="GRN Link">
+                                <input type="url" name="GRN_link[]" class="form-control widthinput mygroup-${index}" placeholder="GRN Link">
                                 </div>
                             </div>
                             <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">GDN</label>
-                                    <input type="text" value="{{ old('GDN_link') }}" name="GDN_link[]" class="form-control mygroup" placeholder="GDN Link">
+                                    <input type="url" name="GDN_link[]" class="form-control widthinput mygroup-${index}" placeholder="GDN Link">
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Modification Link</label>
-                                    <input type="text" value="{{ old('modification_link') }}" name="modification_link[]" class="form-control mygroup"
+                                    <input type="url" name="modification_link[]" widthinput class="form-control mygroup-${index}"
                                            placeholder="Modification Link">
                                 </div>
                             </div>
