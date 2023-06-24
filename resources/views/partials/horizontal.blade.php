@@ -4,11 +4,11 @@
     </button>
     <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
     <div class="cart-icon-containerss">
-        @php
-            $selectedrole = Auth::user()->selectedRole;
-            $selected = DB::table('roles')->where('id', $selectedrole)->first();
-            $roleselected = $selected ? $selected->name : null;
-        @endphp
+    @php
+    $selectedrole = Auth::user()->selectedRole;
+    $selected = DB::table('roles')->where('id', $selectedrole)->first();
+    $roleselected = $selected ? $selected->name : null;
+@endphp
 <button type="button" class="btn btn-success">{{ $roleselected }}</button>
 </div>
 <!-- <div class="cart-icon-container">

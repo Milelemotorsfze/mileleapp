@@ -136,10 +136,10 @@ input[type=number]::-webkit-outer-spin-button {
                 <label for="brandInput" class="form-label">Variants:</label>
                 <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id">
                 <datalist id="variantslist">
-    @foreach ($variants as $variant)
-    <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
-    @endforeach
-</datalist>
+                @foreach ($variants as $variant)
+                <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>
+                @endforeach
+                </datalist>
                 </div>
                 <div class="col-lg-1 col-md-6">
         <label for="QTY" class="form-label">Brand:</label>
@@ -300,5 +300,27 @@ for (var id in intColours) {
         });
     });
 });
+</script>
+<script>
+  var input = document.getElementById('variants_id');
+  var dataList = document.getElementById('variantslist');
+  input.addEventListener('input', function() {
+    var inputValue = input.value;
+    var options = dataList.getElementsByTagName('option');
+    var matchFound = false;
+    for (var i = 0; i < options.length; i++) {
+      var option = options[i];
+      
+      if (inputValue === option.value) {
+        matchFound = true;
+        break;
+      }
+    }
+    if (!matchFound) {
+      input.setCustomValidity("Please select a value from the list.");
+    } else {
+      input.setCustomValidity('');
+    }
+  });
 </script>
 @endpush

@@ -101,10 +101,11 @@
                     <th class="nowrap-td">Aging</th>
                     @endif
                     @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '8'||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
-                    <th class="nowrap-td">SO</th>
-                    <th class="nowrap-td">SO Date</th>
+                    <th class="nowrap-td">SO Number</th>
                     <th class="nowrap-td">Sales Person</th>
-                    <th class="nowrap-td">Booking Status</th>
+                    <th class="nowrap-td">Reservation Start</th>
+                    <th class="nowrap-td">Reservation End</th>
+                    <th class="nowrap-td">Sales Remarks</th>
                     @endif
                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
                     <th class="nowrap-td">GDN</th>
@@ -152,10 +153,10 @@
                     <th class="nowrap-td">Import Document Type</th>
                     <th class="nowrap-td">Document Ownership</th>
                     <th class="nowrap-td">Documents With</th>
-                    <th class="nowrap-td">DUCAMZ IN/OUT</th>
-                    <th class="nowrap-td">BL</th>
+                    <th class="nowrap-td">BL Status</th>
                     @endif
                     @endcan
+                    <th class="nowrap-td">Pictures</th>
                     <th class="nowrap-td">Changes Log</th>
                 </tr>
                 </thead>
@@ -172,7 +173,6 @@
                      $gdn_number = "";
                      $aging = "";
                      $salesname = "";
-                     $booking_name = "";
                      $conversions = "";
                      $varaints_name = "";
                      $varaints_detail = "";
@@ -190,7 +190,7 @@
                      $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;
                      $ex_colours = $exColour ? $exColour->name : null;
                      $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;
-                     $int_colours = $exColour ? $intColour->name : null;
+                     $int_colours = $intColour ? $intColour->name : null;
                      $variants = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
                      $name = $variants->name;
                      $grn = $vehicles->grn_id ? DB::table('grn')->where('id', $vehicles->grn_id)->first() : null;
@@ -200,9 +200,7 @@
                      $gdn_date = $gdn ? $gdn->date : null;
                      $gdn_number = $gdn ? $gdn->gdn_number : null;
                      $so = $vehicles->so_id ? DB::table('so')->where('id', $vehicles->so_id)->first() : null;
-                     $so_date = $so ? $so->so_date : null;
                      $so_number = $so ? $so->so_number : null;
-                     $payment_percentage = $so ? $so->payment_percentage : null;
                      $sales_person_id = $so ? $so->sales_person_id : null;
                     $sales_person = $sales_person_id ? DB::table('users')->where('id', $sales_person_id)->first() : null;
                     $salesname = $sales_person ? $sales_person->name : null;
@@ -233,8 +231,7 @@
                                 $import_type = $documents ? $documents->import_type : null;
                     $owership = $documents ? $documents->owership : null;
                     $document_with = $documents ? $documents->document_with : null;
-                    $bl = $vehicles->bl_id ? DB::table('bl')->where('id', $vehicles->bl_id)->first() : null;
-                        $bl_number = $bl ? $bl->bl_number : null;
+                    $bl_status = $documents ? $documents->bl_status : null;
                      @endphp
                      @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
                      <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
@@ -257,19 +254,15 @@
                     @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
                      @if ($so_number)
                      <td class="nowrap-td so_number">{{ $so_number }}</td>
-                     @else
-                     <td class="nowrap-td">-</td>
-                     @endif
-                     @if ($so_date)
-                     <td class="nowrap-td">{{ date('d-m-Y', strtotime($so_date)) }}</td>
-                     <input type="hidden" class="so_date" value="{{ $so_date }}">
-                     <input type="hidden" class="payment_percentage" value="{{ $payment_percentage }}">
+                     <input type="hidden" class="payment_percentage" value="{{ $vehicles->payment_percentage }}">
                      @else
                      <td class="nowrap-td">-</td>
                      @endif
                      <td class="nowrap-td">{{ $salesname }}</td>
                      <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
-                     <td class="nowrap-td">{{ $booking_name }}</td>
+                     <td class="nowrap-td reservation_start_date">{{ $vehicles->reservation_start_date }}</td>
+                     <td class="nowrap-td reservation_end_date">{{ $vehicles->reservation_end_date }}</td>
+                     <td class="nowrap-td">{{ $vehicles->remarks }}</td>
                      @endif
                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
                      @if ($gdn_number)
@@ -310,7 +303,7 @@
                         <input type="hidden" class="IntColour" value="{{ $vehicles->int_colour }}">
                         </td>
                         <td class="nowrap-td Upholestry">{{ $varaints_upholestry }}</td>
-                        @if ($gdn_date)
+                        @if ($vehicles->ppmmyyy)
                         <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->ppmmyyy)) }}
                         <input type="hidden" class="Ppmmyy" value="{{ $vehicles->ppmmyyy }}">
                         </td>
@@ -335,11 +328,11 @@
                         <td class="nowrap-td import_type">{{ $import_type }}</td>
                         <td class="nowrap-td owership">{{ $owership }}</td>
                         <td class="nowrap-td document_with">{{ $document_with }}</td>
-                        <td class="nowrap-td">{{ $vehicles->documzinout}}</td>
-                        <th class="nowrap-td">{{ $bl_number }}</td>
+                        <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
                         @endcan
-                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('purchasing-order.viewdetails', $vehicles->id) }}"><i class="fa fa-car" aria-hidden="true"></i> View Log</a></td>
+                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"> View Pic</a></td>
+                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Log</a></td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -435,19 +428,18 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Vehicle Detail</h5>
+        <h5 class="modal-title">Edit Logistics Detail</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-    <form action="{{ route('vehicles.updateso')}}" method="POST">
+    <form action="{{ route('vehicles.updatelogistics')}}" method="POST">
     @csrf
     <div class="row">
       <div class="col-md-4">
   <label for="import_document">Import Document Type</label>
         <select name="import_type" id="import_type" class="form-control" placeholder="Import Document Type">
-        <option value="">Import Docuemnt</option>
         <option value="Belgium Docs">Belgium Docs</option>
         <option value="BOE + VCC + Exit">BOE + VCC + Exit</option>
         <option value="Cross Trade">Cross Trade</option>
@@ -464,7 +456,6 @@
       <div class="col-md-4">
         <label for="gdn_date">Document Ownership</label>
         <select name="owership" id="owership" class="form-control" placeholder="Docuemnt Ownership">
-        <option value="">Document Ownership</option>
         <option value="Abdul Azeem">Abdul Azeem</option>
         <option value="Barwil Supplier">Barwil Supplier</option>
         <option value="Belgium Warehouse">Belgium Warehouse</option>
@@ -484,12 +475,18 @@
       <div class="col-md-4">
         <label for="gdn_date">Document With</label>
         <select name="document_with" id="document_with" class="form-control" placeholder="Docuemnt With">
-        <option value="">Document With</option>
         <option value="Accounts">Accounts</option>
         <option value="Finance Department">Finance Department</option>
         <option value="Import Department">Import Department</option>
         <option value="Not Applicable">Not Applicable</option>
         <option value="Supplier">Supplier</option>
+    </select>
+      </div>
+      <div class="col-md-4">
+        <label for="bl_status">BL Status</label>
+        <select name="bl_status" id="bl_status" class="form-control" placeholder="BL Status">
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
     </select>
       </div>
 </div>
@@ -520,12 +517,18 @@
     <div class="row">
       <div class="col-md-4">
   <label for="so_number">SO Number</label>
-    <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">    
+    <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">
+    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">    
+</div>
+@can('edit-reservation')
+@if (Auth::user()->selectedRole === '8')
+<div class="col-md-4">
+  <label for="so_number">Reservation Start Date</label>
+    <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">    
 </div>
 <div class="col-md-4">
-  <label for="so_number">SO Date</label>
-    <input type="date" class="form-control" id="so_date" name="so_date" value="{{ $so_date }}">    
-    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
+  <label for="so_number">Reservation Ending Date</label>
+    <input type="date" class="form-control" id="reservation_end_date" name="reservation_end_date" value="{{ $vehicles->reservation_end_date }}">    
 </div>
 <div class="col-md-4">
   <label for="gdn_date">Sales Person</label>
@@ -536,6 +539,8 @@
     @endforeach
   </select>
 </div>
+@endif
+@endcan
       <div class="col-md-4">
         <label for="gdn_date">Payment Percentage</label>
         <select name="payment_percentage" id="payment_percentage" class="form-control">
@@ -608,9 +613,11 @@
   var import_type = row.find('.import_type').text();
   var owership = row.find('.owership').text();
   var document_with = row.find('.document_with').text();
+  var bl_status = row.find('.bl_status').text();
   $('#import_type').val(import_type);
   $('#owership').val(owership);
   $('#document_with').val(document_with);
+  $('#bl_status').val(bl_status);
   $('#vehicle_id').val(vehicleId);
   $('#editModal').modal('show');
 }
@@ -633,12 +640,14 @@
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
   var so_number = row.find('.so_number').text();
-  var so_date = row.find('.so_date').val();
+  var reservation_start_date = row.find('.reservation_start_date').text();
+  var reservation_end_date = row.find('.reservation_end_date').text();
   var sales_person = row.find('.sales_person').val();
   var payment_percentage = row.find('.payment_percentage').val();
   console.log(sales_person);
   $('#so_number').val(so_number);
-  $('#so_date').val(so_date);
+  $('#reservation_start_date').val(reservation_start_date);
+  $('#reservation_end_date').val(reservation_end_date);
   $('#sales_person').val(sales_person);
   $('#payment_percentage').val(payment_percentage);
   $('#vehicle_id').val(vehicleId);

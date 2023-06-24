@@ -13,6 +13,7 @@ class Document extends Model
         'import_type',
         'owership',
         'document_with',
+        'bl_status',
     ];
     public $timestamps = false;
 }

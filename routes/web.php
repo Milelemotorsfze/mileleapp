@@ -272,4 +272,5 @@ Route::get('/d', function () {
     Route::resource('colourcode', ColorCodesController::class);
 
     Route::resource('warehouse', WarehouseController::class);
+    Route::post('/vehicles/updatelogistics', [VehiclesController::class, 'updatelogistics'])->name('vehicles.updatelogistics');
 });
