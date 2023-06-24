@@ -37,6 +37,8 @@ use App\Http\Controllers\MovementController;
 use App\Http\Controllers\VehiclesController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\HorizontalController;
+use App\Http\Controllers\ColorCodesController;
+use App\Http\Controllers\WarehouseController;
 
 
 /*
@@ -263,5 +265,7 @@ Route::get('/d', function () {
     Route::get('horizontal-menu', [HorizontalController::class, 'showMenu'])->name('showHorizontalMenu');
     Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');
     Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
+    Route::resource('colourcode', ColorCodesController::class);
 
+    Route::resource('warehouse', WarehouseController::class);
 });

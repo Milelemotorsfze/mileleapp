@@ -2,17 +2,19 @@
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
     </button>
-<div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-@can('sales-view')
-<div class="cart-icon-container">
-  <a href="{{route('quotation.create')}}"><i class="fa fa-car fa-2x" aria-hidden="true"></i></a>
-  <span class="cart-icon-number"></span>
+    <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
+    <div class="cart-icon-containerss">
+    @php
+    $selectedrole = Auth::user()->selectedRole;
+    $selected = DB::table('roles')->where('id', $selectedrole )->first();
+    $roleselected = $selected->name;
+    @endphp
+<button type="button" class="btn btn-success">{{ $roleselected }}</button>
 </div>
-@endcan
-<div class="cart-icon-container">
+<!-- <div class="cart-icon-container">
   <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
-</div>
+</div> -->
         <button type="button" class="btn header-item bg-soft-light border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="height: 55px;">
             <img class="rounded-circle header-profile-user" src="{{asset ('images/users/avatar-1.jpg')}}" alt="Header Avatar" style="float: left;">
             <span class="d-none d-xl-inline-block ms-1 fw-medium" style="line-height: 35px;">
@@ -365,7 +367,6 @@
                         </li>
                         @endif
                     @endcan
-                    @can('user-create')
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -373,52 +374,32 @@
                             <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Models </span>
-                                    <div class="arrow-down"></div>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="" class="dropdown-item" data-key="t-login">Add New Models </a>
-                                    <a href="" class="dropdown-item" data-key="t-login">Model Info </a>
-                                </div>
-                            </div>
-                            <div class="dropdown">
+                        <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Variants </span>
                                 </a>
                             </div>
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Colours </span>
-                                    <div class="arrow-down"></div>
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Colours </span>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Colours </a>
-                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Colours Info </a>
-                                </div>
                             </div>
-                            <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none"  href="#" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Garages </span>
-                                    <div class="arrow-down"></div>
+                            <!-- <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Garages </span>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewsuppliers" class="dropdown-item" data-key="t-login">Add New Garages </a>
-                                    <a href="/suppliermapping" class="dropdown-item" data-key="t-login">Garages Info </a>
-                                </div>
-                            </div>
+                            </div> -->
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('warehouse.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Warehouse </span>
-                                    <div class="arrow-down"></div>
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                    <a href="/addnewcustomers" class="dropdown-item" data-key="t-login">Add New Warehouse </a>
-                                    <a href="/customerinfo" class="dropdown-item" data-key="t-login">Warehouse Info </a>
-                                </div>
                             </div>
                             <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Vendors </span>
+                                </a>
+                            </div>
+                            <!-- <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Supplier </span>
                                     <div class="arrow-down"></div>
@@ -430,10 +411,9 @@
 {{--                                       <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>--}}
 {{--                                    @endcan--}}
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </li>
-                    @endcan
                     @can('HR-view')
                     @if (Auth::user()->selectedRole === '19' || Auth::user()->selectedRole === '20')
                     <li class="nav-item dropdown">

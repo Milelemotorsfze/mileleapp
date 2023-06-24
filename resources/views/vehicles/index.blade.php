@@ -66,8 +66,8 @@
                 <thead class="bg-soft-secondary">
                 <tr>
                 @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
-                    <th class="nowrap-td">PO Number</th>
-                    <th class="nowrap-td">PO Date</th>
+                <th class="nowrap-td">PO Date</th>    
+                <th class="nowrap-td">PO Number</th>
                     @endif
                     <th class="nowrap-td">GRN</th>
                     <th class="nowrap-td">GRN Date</th>
@@ -76,9 +76,10 @@
                     @endif
                     @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '8'||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
                     <th class="nowrap-td">SO</th>
-                    <th class="nowrap-td">SO Date</th>
+                    <th class="nowrap-td">Reservation Date</th>
                     <th class="nowrap-td">Sales Person</th>
-                    <th class="nowrap-td">Booking Status</th>
+                    <th class="nowrap-td">Reservation Status</th>
+                    <th class="nowrap-td">Sales Remarks</th>
                     @endif
                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
                     <th class="nowrap-td">GDN</th>
@@ -243,6 +244,7 @@
                      @endif
                      <td class="nowrap-td">{{ $salesname }}</td>
                      <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
+                     <td class="nowrap-td">{{ $booking_name }}</td>
                      <td class="nowrap-td">{{ $booking_name }}</td>
                      @endif
                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
@@ -497,8 +499,9 @@
   <label for="so_number">SO Number</label>
     <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">    
 </div>
+@can('edit-reservation')
 <div class="col-md-4">
-  <label for="so_number">SO Date</label>
+  <label for="so_number">Reservation Date</label>
     <input type="date" class="form-control" id="so_date" name="so_date" value="{{ $so_date }}">    
     <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
 </div>
@@ -511,6 +514,7 @@
     @endforeach
   </select>
 </div>
+@endcan
       <div class="col-md-4">
         <label for="gdn_date">Payment Percentage</label>
         <select name="payment_percentage" id="payment_percentage" class="form-control">

@@ -12,6 +12,9 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\ModelHasRoles;
 use App\Models\So;
+use App\Models\Vehicleslog;
+use App\Models\Solog;
+use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 
 
@@ -62,18 +65,10 @@ class VehiclesController extends Controller
     {
         //
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //
@@ -202,7 +197,6 @@ class VehiclesController extends Controller
         }
         return response()->json(['message' => 'Vehicle data updated successfully']);
     }
-
     public function fatchvariantdetails(Request $request)
 {
     $variantName = $request->input('value');
@@ -230,6 +224,7 @@ class VehiclesController extends Controller
     {
         $id = $request->input('vehicle_id');
         $vehicle = Vehicles::find($id);
+        $oldValues = $vehicle->toArray();
         $variants_name = $request->input('variants_name');
         $variants_id = Varaint::where('name', $variants_name)->value('id');
         $vehicle->varaints_id = $variants_id;
@@ -240,7 +235,35 @@ class VehiclesController extends Controller
         $vehicle->territory = $request->input('territory');
         $vehicle->ppmmyyy = $request->input('ppmmyy');
         $vehicle->remarks = $request->input('remarks');
-        $vehicle->save();
+        $changes = [];
+        foreach ($oldValues as $field => $oldValue) {
+            if ($field !== 'created_at' && $field !== 'updated_at') {
+                $newValue = $vehicle->$field;
+                if ($oldValue != $newValue) {
+                    $changes[$field] = [
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                    ];
+                }
+            }
+        }
+        if (!empty($changes)) {
+            $vehicle->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            foreach ($changes as $field => $change) {
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update QC Values';
+            $vehicleslog->vehicles_id = $id;
+            $vehicleslog->field = $field;
+            $vehicleslog->old_value = $change['old_value'];
+            $vehicleslog->new_value = $change['new_value'];
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->save();
+            }
+        }
         return redirect()->back()->with('success', 'Vehicle details updated successfully.');
     }
     public function updateso(Request $request)
@@ -248,34 +271,112 @@ class VehiclesController extends Controller
     $vehicleId = $request->input('vehicle_id');
     $vehicle = Vehicles::find($vehicleId);
     $soId = $vehicle->so_id;
-    if ($soId) {
+    if ($soId) 
+	{
         $so = So::find($soId);
+        $oldValues = $so->toArray();
         $so->so_number = $request->input('so_number');
         $so->so_date = $request->input('so_date');
         $so->sales_person_id = $request->input('sales_person');
         $so->payment_percentage = $request->input('payment_percentage');
-        $so->save();
-    } else {
-        $so = new So();
-        $so->so_number = $request->input('so_number');
-        $so->so_date = $request->input('so_date');
-        $so->sales_person_id = $request->input('sales_person');
-        $so->payment_percentage = $request->input('payment_percentage');
-        $so->save();
-        $vehicle->so_id = $so->id;
+        $changes = [];
+        foreach ($oldValues as $field => $oldValue) {
+            if ($field !== 'created_at' && $field !== 'updated_at') {
+                $newValue = $so->$field;
+                if ($oldValue != $newValue) {
+                    $changes[$field] = [
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                    ];
+                }
+            }
+        }
+        if (!empty($changes)) {
+            $so->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            foreach ($changes as $field => $change) {
+            $solog = new Solog();
+            $solog->time = $currentDateTime->toTimeString();
+            $solog->date = $currentDateTime->toDateString();
+            $solog->status = 'Update Sales Values';
+            $solog->so_id = $soId;
+            $solog->field = $field;
+            $solog->old_value = $change['old_value'];
+            $solog->new_value = $change['new_value'];
+            $solog->created_by = auth()->user()->id;
+            $solog->save();
+            }
+        }
+    } 
+	else 
+	{
+        $existingSo = So::where('so_number', $request->input('so_number'))->first();
+        if ($existingSo) 
+		{
+            $oldValues = $existingSo->toArray();
+			$existingSo->so_date = $request->input('so_date');
+			$existingSo->sales_person_id = $request->input('sales_person');
+			$existingSo->payment_percentage = $request->input('payment_percentage');
+			$changes = [];
+			foreach ($oldValues as $field => $oldValue) {
+				if ($field !== 'created_at' && $field !== 'updated_at') {
+					$newValue = $existingSo->$field;
+					if ($oldValue != $newValue) {
+						$changes[$field] = [
+							'old_value' => $oldValue,
+							'new_value' => $newValue,
+						];
+					}
+				}
+			}
+			if (!empty($changes)) {
+				$existingSo->save();
+				$soID = $existingSo->id;
+				$dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+				$currentDateTime = Carbon::now($dubaiTimeZone);
+				foreach ($changes as $field => $change) {
+				$solog = new Solog();
+				$solog->time = $currentDateTime->toTimeString();
+				$solog->date = $currentDateTime->toDateString();
+				$solog->status = 'Update Sales Values';
+				$solog->so_id = $soID;
+				$solog->field = $field;
+				$solog->old_value = $change['old_value'];
+				$solog->new_value = $change['new_value'];
+				$solog->created_by = auth()->user()->id;
+				$solog->save();
+				}
+			}
+		} 
+	else 
+	{
+		$so = new So();
+		$so->so_number = $request->input('so_number');
+		$so->so_date = $request->input('so_date');
+		$so->sales_person_id = $request->input('sales_person');
+		$so->payment_percentage = $request->input('payment_percentage');
+		$so->save();
+		$soID = $so->id;
+		$colorlog = new Solog();
+        $colorlog->time = $currentDateTime->toTimeString();
+        $colorlog->date = $currentDateTime->toDateString();
+        $colorlog->status = 'New Created';
+        $colorlog->so_id = $soID;
+        $colorlog->created_by = auth()->user()->id;
+        $colorlog->save();
+        }
+        $vehicle->so_id = $soID;
         $vehicle->save();
     }
-    return redirect()->back()->with('success', 'Vehicle details updated successfully.');
+    return redirect()->back()->with('success', 'Sales details updated successfully.');
     }
     public function deletes($id)
     {
-    $vehicle = Vehicles::find($id); // Assuming you have a "Vehicle" model
-    
+    $vehicle = Vehicles::find($id); 
     if ($vehicle->grn_id === null) {
         $vehicle->status = 'cancel';
         $vehicle->save();
-        // You can also use $vehicle->update(['status' => 'cancel']);
-        
         return redirect()->back()->with('success', 'Vehicle status updated to "cancel" successfully.');
     } else {
         return redirect()->back()->with('error', 'Vehicle has already been delivered and cannot be canceled.');

@@ -1,0 +1,60 @@
+@extends('layouts.table')
+@section('content')
+    <div class="card-header">
+        <h4 class="card-title">
+            Master Warehouse Info
+        </h4>
+        @can('variants-create')
+            <a  class="btn btn-sm btn-info float-end" href="{{ route('warehouse.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @endcan
+    </div>
+    <div class="card-body">
+        @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br>
+                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
+        <div class="table-responsive">
+            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+                <thead class="bg-soft-secondary">
+                <tr>
+                    <th>Name</th>
+                    <th>Created By</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($warehouselist as $key => $warehouselist)
+                    <tr data-id="1">
+                        <td>{{ $warehouselist->name ?? ''}}</td>
+                        <td>
+                        @php
+                        $names = DB::table('users')->where('id', $warehouselist->created_by )->first();
+                        $created_bys = $names->name;
+                        @endphp
+                        {{ $created_bys ?? '' }}</td>
+                        <td>
+                            @can('variants-edit')
+                                <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
+                                </a>
+                            @endcan
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endsection

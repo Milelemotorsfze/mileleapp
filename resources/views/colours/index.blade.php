@@ -2,10 +2,10 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-            Variants Info
+            Master Colours Info
         </h4>
         @can('variants-create')
-            <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+            <a  class="btn btn-sm btn-info float-end" href="{{ route('colourcode.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
         @endcan
     </div>
     <div class="card-body">
@@ -30,44 +30,49 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
+                    <th>Code</th>
                     <th>Name</th>
-                    <th>Brand</th>
-                    <th>Model Line</th>
-                    <th>Steering</th>
-                    <th>Fuel Type</th>
-                    <th>Gear Box</th>
-                    <th>MY</th>
-                    <th>Seat</th>
-                    <th>Upholstery</th>
-                    <th>Engine Capacity</th>
-                    <th>Detail</th>
+                    <th>Belong To</th>
+                    <th>Parent Colour</th>
+                    <th>Status</th>
+                    <th>Created By</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($variants as $key => $variant)
+                @foreach ($colorcodes as $key => $colorcodes)
                     <tr data-id="1">
-                        <td>{{ $variant->name }}</td>
-                        <td>{{ $variant->brand->brand_name ?? ''}}</td>
-                        <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
-                        <td>{{ $variant->steering ?? '' }}</td>
-                        <td>{{ $variant->fuel_type ?? '' }}</td>
-                        <td>{{ $variant->gearbox ?? '' }}</td>
-                        <td>{{ $variant->my ?? '' }}</td>
-                        <td>{{ $variant->seat ?? '' }}</td>
-                        <td>{{ $variant->upholestry ?? '' }}</td>
-                        <td>{{ $variant->engine ?? '' }}</td>
-                        <td>{{ $variant->detail ?? '' }}</td>
+                        <td>{{ $colorcodes->code ?? ''}}</td>
+                        <td>{{ $colorcodes->name ?? ''}}</td>
+                        <td>
+                        @if ($colorcodes->belong_to == 'ex')
+                            Exterior
+                        @elseif ($colorcodes->belong_to == 'int')
+                            Interior
+                        @else
+                            {{ $colorcodes->belong_to ?? '' }}
+                        @endif
+                        </td>
+                        <td>{{ $colorcodes->parent ?? '' }}</td>
+                        <td>@if ($colorcodes->status == 'Active')
+                            <button class="btn btn-success">Active</button>
+                        @elseif ($colorcodes->status == 'De-Active')
+                            <button class="btn btn-danger">De-Active</button>
+                        @else
+                            {{ $colorcodes->status ?? '' }}
+                        @endif
+                        </td>
+                        <td>
+                        @php
+                        $names = DB::table('users')->where('id', $colorcodes->created_by )->first();
+                        $created_bys = $names->name;
+                        @endphp
+                        {{ $created_bys ?? '' }}</td>
                         <td>
                             @can('variants-edit')
-                                <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
+                                <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                             @endcan
-                            <!-- @can('variants-delete')
-                                @if($variant->is_deletable == true)
-                                <a data-placement="top" id="{{ $variant->id }}" href="{{ route('variants.destroy',$variant->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </a>
-                                @endif
-                            @endcan -->
                         </td>
                     </tr>
                 @endforeach

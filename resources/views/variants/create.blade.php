@@ -1,6 +1,5 @@
 @extends('layouts.main')
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
     <div class="card-header">
         <h4 class="card-title">Add New Variant</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -31,73 +30,111 @@
         <form id="form-create" action="{{ route('variants.store') }}" method="POST">
             @csrf
                 <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Name</label>
                             <input type="text" value="{{ old('name') }}" name="name" class="form-control " placeholder="Name">
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label"> Brand</label>
+                            <label for="choices-single-default" class="form-label">Brand</label>
                             <select class="form-control" autofocus name="brands_id" id="brand">
-                                <option></option>
                                 @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->brand_name }}</option>
+                                    <option value="{{ $brand->id }}" {{ old('brands_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->brand_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Model</label>
+                            <label for="choices-single-default" class="form-label">Model Line</label>
                             <select class="form-control" autofocus name="master_model_lines_id" id="model">
-                                <option></option>
                                 @foreach($masterModelLines as $masterModelLine)
-                                    <option value="{{ $masterModelLine->id }}">{{ $masterModelLine->model_line }}</option>
+                                    <option value="{{ $masterModelLine->id }}" {{ old('master_model_lines_id') == $masterModelLine->id ? 'selected' : '' }}>
+                                        {{ $masterModelLine->model_line }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Steering</label>
+                            <select class="form-control" autofocus name="steering" id="model">
+                                <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
+                                <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Fuel Type</label>
-                            <input type="text" value="{{ old('fuel_type') }}" name="fuel_type" class="form-control " placeholder="Fuel Type">
+                            <select class="form-control" autofocus name="fuel_type" id="model">
+                                <option value="Diesel" {{ old('fuel_type') == 'Diesel' ? 'selected' : '' }}>Diesel</option>
+                                <option value="EV" {{ old('fuel_type') == 'EV' ? 'selected' : '' }}>EV</option>
+                                <option value="Gasoline" {{ old('fuel_type') == 'Gasoline' ? 'selected' : '' }}>Gasoline</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Gear Box</label>
-                            <input type="text" value="{{ old('gearbox') }}" name="gearbox" class="form-control "
-                                   placeholder="Gear Box">
+                            <select class="form-control" autofocus name="gearbox" id="model">
+                                <option value="Auto" {{ old('gearbox') == 'Auto' ? 'selected' : '' }}>Auto</option>
+                                <option value="Manual" {{ old('gearbox') == 'Manual' ? 'selected' : '' }}>Manual</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">My</label>
-                            <input type="text" value="{{ old('my') }}" name="my" class="form-control "
-                                   placeholder="My">
+                            <label for="choices-single-default" class="form-label">MY</label>
+                            @php
+                            $currentYear = date("Y");
+                            $years = range($currentYear + 10, $currentYear - 10);
+                            $years = array_reverse($years);
+                            @endphp
+                            <select name="my" class="form-control">
+                                @foreach ($years as $year)
+                                    <option value="{{ $year }}" {{ old('my') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Seat</label>
+                            <select name="seat" class="form-control">
+                                @for($i = 1; $i <= 50; $i++)
+                                    <option value="{{ $i }}" {{ old('seat') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Upholstery</label>
+                            <select class="form-control" autofocus name="upholestry" id="model">
+                                <option value="Fabric" {{ old('upholestry') == 'Fabric' ? 'selected' : '' }}>Fabric</option>
+                                <option value="Leather" {{ old('upholestry') == 'Leather' ? 'selected' : '' }}>Leather</option>
+                                <option value="Fabric + Leather" {{ old('upholestry') == 'Fabric + Leather' ? 'selected' : '' }}>Fabric + Leather</option>
+                                <option value="Fabric / Leather" {{ old('upholestry') == 'Fabric / Leather' ? 'selected' : '' }}>Fabric / Leather</option>
+                                <option value="Vinyl" {{ old('upholestry') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Engine Capacity</label>
+                            <input type="text" value="{{ old('engine_capacity') }}" name="engine" class="form-control "placeholder="Engine Capacity" required>
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Detail</label>
-                            <input type="text" value="{{ old('detail') }}" name="detail" class="form-control "
-                                   placeholder="Detail">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Seat</label>
-                            <input type="text" value="{{ old('seat') }}" name="seat" class="form-control "
-                                   placeholder="Seat">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Upholestry</label>
-                            <input type="text" value="{{ old('upholestry') }}" name="upholestry" class="form-control "
-                                   placeholder="Upholestry">
+                            <input type="text" value="{{ old('detail') }}" name="detail" class="form-control "placeholder="Detail" required>
                         </div>
                     </div>
                     <div class="col-12 text-center">
@@ -107,11 +144,6 @@
         </form>
     </div>
     </div>
-    @else
-    @php
-        redirect()->route('home')->send();
-    @endphp
-@endif
 @endsection
 @push('scripts')
     <script>
