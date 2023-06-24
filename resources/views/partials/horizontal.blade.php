@@ -4,11 +4,11 @@
     </button>
     <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
     <div class="cart-icon-containerss">
-    @php
-    $selectedrole = Auth::user()->selectedRole;
-    $selected = DB::table('roles')->where('id', $selectedrole )->first();
-    $roleselected = $selected->name;
-    @endphp
+        @php
+            $selectedrole = Auth::user()->selectedRole;
+            $selected = DB::table('roles')->where('id', $selectedrole)->first();
+            $roleselected = $selected ? $selected->name : null;
+        @endphp
 <button type="button" class="btn btn-success">{{ $roleselected }}</button>
 </div>
 <!-- <div class="cart-icon-container">
@@ -229,8 +229,8 @@
                         </li>
                         @endif
                     @endcan
-                    
-                   
+
+
                     @can('Calls-view')
                     @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
                     <li class="nav-item dropdown">
@@ -301,12 +301,12 @@
                     </li>
                     @endif
                     @endcan
-                    <!-- <li class="nav-item dropdown">
+                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Vehicle Pictures</span>
                         </a>
-                    </li> -->
+                    </li>
                     @can('demand-create')
                     @if (Auth::user()->selectedRole === '17' || Auth::user()->selectedRole === '18')
                         <li class="nav-item dropdown">
@@ -397,6 +397,11 @@
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Vendors </span>
+                                </a>
+                            </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Variant Prices </span>
                                 </a>
                             </div>
                             <!-- <div class="dropdown">

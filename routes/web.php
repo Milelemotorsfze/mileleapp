@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
+use App\Http\Controllers\VariantPriceController;
 use App\Http\Controllers\WarrantyBrandsController;
 use App\Http\Controllers\WarrantyPriceHistoriesController;
 use Illuminate\Support\Facades\Auth;
@@ -215,9 +216,12 @@ Route::get('/d', function () {
     // vehicle pictures
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
+     Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
+
 
      // Variants
     Route::resource('variants', VariantController::class);
+    Route::resource('variant-prices', VariantPriceController::class);
 
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');

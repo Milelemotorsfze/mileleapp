@@ -730,7 +730,7 @@
                             addonDropdownData.push
                             ({
                                 id: value.id,
-                                text: value.name
+                                text: value.addon_code +'- ('+value.addon_name.name +')'
                             });
                         });
                         $('#addon_'+index).html("");

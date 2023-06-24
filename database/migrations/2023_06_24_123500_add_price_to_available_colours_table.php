@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('selected_role')->nullable();
+        Schema::table('available_colour', function (Blueprint $table) {
+            $table->decimal('price')->after('ext_colour')->nullable();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('selected_role');
+        Schema::table('available_colour', function (Blueprint $table) {
+            $table->dropColumn('price');
         });
     }
 };

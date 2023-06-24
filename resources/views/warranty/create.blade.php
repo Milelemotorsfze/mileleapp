@@ -12,10 +12,7 @@
     {
         border-color: #495057!important;
     }
-    .widthinput
-    {
-        height:32px!important;
-    }
+
     .paragraph-class
     {
         color: red;

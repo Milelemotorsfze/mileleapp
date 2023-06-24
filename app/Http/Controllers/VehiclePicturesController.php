@@ -34,16 +34,20 @@ class VehiclePicturesController extends Controller
      */
     public function store(Request $request)
     {
+//        return $request->all();
         $this->validate($request, [
-            'vin' => 'required',
+            'vins' => 'required',
         ]);
 
-        $vehiclePicture = new VehiclePicture();
-        $vehiclePicture->vehicle_id  = $request->input('vin');
-        $vehiclePicture->GDN_link = $request->input('GDN_link');
-        $vehiclePicture->GRN_link = $request->input('GRN_link');
-        $vehiclePicture->modification_link = $request->input('modification_link');
-        $vehiclePicture->save();
+        $vins = $request->vins;
+        foreach ($request->vins as $key => $vin) {
+            $vehiclePicture = new VehiclePicture();
+            $vehiclePicture->vehicle_id  = $vin;
+            $vehiclePicture->GDN_link = $request->GDN_link[$key];
+            $vehiclePicture->GRN_link = $request->GRN_link[$key];
+            $vehiclePicture->modification_link = $request->modification_link[$key];
+            $vehiclePicture->save();
+        }
 
         return redirect()->route('vehicle-pictures.index')->with('success','Vehicle picture added successfully.');
 
@@ -106,10 +110,23 @@ class VehiclePicturesController extends Controller
     }
     public function getVariantDetail(Request $request)
     {
-        $vehicle = Vehicles::find($request->id);
-        $data = $vehicle->variant->detail;
+        $vehicle = Vehicles::where('id', $request->id)->first();
+        $variant = Varaint::find($vehicle->varaints_id);
+        $data = $variant->detail;
 
-        return response(['data'=> $data, true]);
+        return response($data);
+    }
+    public function getVinForVehicle(Request $request) {
 
+        $vehicleIds = VehiclePicture::pluck('vehicle_id');
+        $data = Vehicles::select('id','vin')
+                ->whereNotIn('id', $vehicleIds);
+
+        if(!empty($request->filteredArray))
+        {
+          $data = $data->whereNotIn('id',$request->filteredArray);
+        }
+        $data = $data->get();
+        return response()->json($data);
     }
 }
