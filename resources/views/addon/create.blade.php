@@ -1201,6 +1201,7 @@
                     hidenotKitSupplier();
                     showkitSupplier();
                     setLeastPurchasePriceAED();
+                    addItemForSupplier();
                 }
                 else
                 {
