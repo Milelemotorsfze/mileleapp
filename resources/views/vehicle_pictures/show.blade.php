@@ -24,19 +24,19 @@
         </div>
         <div class="row">
             <div class="col-lg-2 col-md-3 col-sm-12">
-            <label for="choices-single-default" class="form-label"> GRN</label>
+            <label for="choices-single-default" class="form-label"> GRN Link</label>
             </div>
             <div class="col-lg-6 col-md-9 col-sm-12">
-            <span >{{$vehiclePicture->GRN_link}}</span>
+            <span > <a href="{{$vehiclePicture->GRN_link }}" target="_blank">{{ $vehiclePicture->GRN_link }}</a></span>
 
             </div>
         </div>
         <div class="row">
             <div class="col-lg-2 col-md-3 col-sm-12">
-                <label for="choices-single-default" class="form-label">GDN</label>
+                <label for="choices-single-default" class="form-label">GDN Link</label>
             </div>
             <div class="col-lg-6 col-md-9 col-sm-12">
-                <span>{{ $vehiclePicture->GDN_link }}</span>
+                <span><a href="{{$vehiclePicture->GDN_link}} " target="_blank"> {{ $vehiclePicture->GDN_link }} </a></span>
             </div>
         </div>
         <div class="row">
@@ -44,7 +44,7 @@
                 <label for="choices-single-default" class="form-label"> Modification Link</label>
             </div>
             <div class="col-lg-6 col-md-9 col-sm-12">
-                <span>{{$vehiclePicture->modification_link}}</span>
+                <span><a href="{{ $vehiclePicture->modification_link }}" target="_blank">{{$vehiclePicture->modification_link}}</a></span>
             </div>
         </div>
     </div>
