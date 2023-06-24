@@ -175,6 +175,7 @@
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="row mt-2">
+                                                                    @if($currentPrice)
                                                                     <div class="col-lg-3 col-md-12 col-sm-12">
                                                                         <label class="form-label font-size-13 text-center">Current Price</label>
                                                                     </div>
@@ -188,6 +189,7 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                    @endif
                                                                 </div>
                                                                 <div class="row mt-2">
                                                                     <div class="col-lg-3 col-md-12 col-sm-12">
@@ -230,18 +232,20 @@
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="row mt-2">
-                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                        <label class="form-label font-size-13 text-center">Current Price</label>
-                                                                    </div>
-                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                               <div class="input-group">
-                                                                               <input type="text" value="{{$currentPrice->selling_price}}"
-                                                                               class="form-control" readonly >
-                                                                            <div class="input-group-append">
-                                                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                    @if($currentPrice)
+                                                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                            <label class="form-label font-size-13 text-center">Current Price</label>
+                                                                        </div>
+                                                                        <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                                <div class="input-group">
+                                                                                <input type="text" value="{{$currentPrice->selling_price}}"
+                                                                                class="form-control" readonly >
+                                                                                <div class="input-group-append">
+                                                                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                                                </div>
                                                                             </div>
                                                                         </div>
-                                                                    </div>
+                                                                    @endif
                                                                 </div>
                                                                 <div class="row mt-2">
                                                                     <div class="col-lg-3 col-md-12 col-sm-12">

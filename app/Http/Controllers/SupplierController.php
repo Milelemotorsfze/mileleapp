@@ -36,6 +36,13 @@ class SupplierController extends Controller
             ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
+        $inactiveSuppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')
+            ->whereHas('supplierTypes', function ($query){
+                $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', 'inactive')
+            ->get();
+
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list')) {
              $suppliers = Supplier::with('supplierTypes')
                  ->whereHas('supplierTypes', function ($query){
@@ -44,7 +51,7 @@ class SupplierController extends Controller
                  ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
                  ->get();
          }
-        return view('suppliers.index',compact('suppliers'));
+        return view('suppliers.index',compact('suppliers','inactiveSuppliers'));
     }
 
     /**
@@ -178,33 +185,41 @@ class SupplierController extends Controller
         $addons = AddonDetails::whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes'));
     }
-    public function delete($id)
+    public function destroy($id)
     {
+        $supplier = Supplier::findOrFail($id);
         DB::beginTransaction();
-
         SupplierType::where('supplier_id', $id)->delete();
-        Supplier::find($id)->delete();
-
+            $supplier->delete();
         DB::commit();
-        return redirect()->route('suppliers.index')
-                        ->with('success','Suppliers deleted successfully');
+        return response(true);
     }
-    public function makeActive($id)
+    // public function makeActive($id)
+    // {
+    //    $user = Supplier::find($id);
+    //    $user->status = 'active';
+    //    $user->update();
+    //    return redirect()->route('suppliers.index')
+    //                    ->with('success','Supplier updated successfully');
+    // }
+    public function updateStatus(Request $request)
     {
-       $user = Supplier::find($id);
-       $user->status = 'active';
-       $user->update();
-       return redirect()->route('suppliers.index')
-                       ->with('success','Supplier updated successfully');
+        $supplier = Supplier::find($request->id);
+        $supplier->status = $request->status;
+
+        $supplier->save();
+        // return response($supplier, 200);
+        return response(true);
     }
-    public function updateStatus($id)
-    {
-        $user = Supplier::find($id);
-        $user->status = 'inactive';
-        $user->update();
-        return redirect()->route('suppliers.index')
-                        ->with('success','Supplier updated successfully');
-    }
+    // public function statusChange(Request $request)
+    // {
+    //     $supplier = Supplier::find($request->id);
+    //     $supplier->status = $request->status;
+
+    //     $supplier->save();
+    //     // return response($supplier, 200);
+    //     return response(true);
+    // }
     public function supplierAddonExcelValidation(Request $request)
     {
         if($request->file)

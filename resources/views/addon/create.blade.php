@@ -135,9 +135,6 @@
             </div>
         @endif
         <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.store') }}">
-        <!-- {{ route('addon.store') }} -->
-        <!-- method="POST" enctype="multipart/form-data" action="" -->
-        <!--  action="{{ route('addon.store') }}" -->
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -1141,7 +1138,6 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
-                $("#selectBrand1").removeAttr('disabled');
                 $("#selectBrandMo1").removeAttr('disabled');
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
@@ -1226,6 +1222,7 @@
                     dataType : 'json',
                     success: function(data)
                     {
+                        // console.log(data.suppliers);
                         $('#addon_type').val(currentAddonType);
                         $('#addon_code').val(data.newAddonCode);
                         $("#addon_id").html("");
@@ -1244,12 +1241,36 @@
                             });
                             $('#addon_id').select2
                             ({
-                                placeholder: 'Select value',
+                                placeholder: 'Choose Addon ....     Or     Type Here To Search....',
                                 allowClear: true,
                                 data: AddonDropdownData,
                                 maximumSelectionLength: 1,
                             });
                         }
+
+                        $("#suppliers1").html("");
+                        myarray1 = data.suppliers;
+                        var size1= myarray1.length;
+                        if(size1 >= 1)
+                        {
+                            let SupplierDropdownData   = [];
+                            $.each(data.suppliers,function(key,value)
+                            {
+                                SupplierDropdownData.push
+                                ({
+                                    id: value.id,
+                                    text: value.supplier
+                                });
+                            });
+                            $('#suppliers1').select2
+                            ({
+                                placeholder: 'Choose Supplier ....     Or     Type Here To Search....',
+                                allowClear: true,
+                                data: SupplierDropdownData,
+                                // maximumSelectionLength: 1,
+                            });
+                        }
+
                     }
                 });
             }
@@ -1257,7 +1278,6 @@
             {
                 $('#kitSupplier').hide();
                 $('#branModaDiv').hide();
-                $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);

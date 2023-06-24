@@ -54,4 +54,8 @@ class AddonDetails extends Model
     {
         return $this->hasOne(AddonSellingPrice::class,'addon_details_id','id')->where('status','active')->latest('updated_at');
     }
+    public function PendingSellingPrice()
+    {
+        return $this->hasOne(AddonSellingPrice::class,'addon_details_id','id')->where('status','pending')->latest('updated_at');
+    }
 }

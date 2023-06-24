@@ -552,7 +552,6 @@
                             removeAddonNameError($msg);        
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
-                            $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
                     });
@@ -1119,7 +1118,6 @@
             currentAddonType = value;
             if(currentAddonType != '')
             {
-                $("#selectBrand1").removeAttr('disabled');
                 $("#selectBrandMo1").removeAttr('disabled'); 
                 $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $("#selectBrand1").select2({
@@ -1252,7 +1250,6 @@
             }
             else
             {
-                // $("#selectBrand1").attr('disabled','disabled');
                 $('#addon_code').val('');
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
