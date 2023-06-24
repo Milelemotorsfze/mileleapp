@@ -399,6 +399,11 @@
                                     <span data-key="t-utility">Vendors </span>
                                 </a>
                             </div>
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Variant Prices </span>
+                                </a>
+                            </div>
                             <!-- <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Supplier </span>

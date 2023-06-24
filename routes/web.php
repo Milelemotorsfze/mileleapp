@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
+use App\Http\Controllers\VariantPriceController;
 use App\Http\Controllers\WarrantyBrandsController;
 use App\Http\Controllers\WarrantyPriceHistoriesController;
 use Illuminate\Support\Facades\Auth;
@@ -220,6 +221,7 @@ Route::get('/d', function () {
 
      // Variants
     Route::resource('variants', VariantController::class);
+    Route::resource('variant-prices', VariantPriceController::class);
 
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
     // Route::get('/fetch-addon-data/{id}/{quotationId}/{VehiclesId}', [AddonController::class, 'fetchAddonData'])->name('fetch-addon-data');
