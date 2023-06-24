@@ -215,6 +215,8 @@ Route::get('/d', function () {
     // vehicle pictures
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
+     Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
+
 
      // Variants
     Route::resource('variants', VariantController::class);
