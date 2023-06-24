@@ -229,8 +229,8 @@
                         </li>
                         @endif
                     @endcan
-                    
-                   
+
+
                     @can('Calls-view')
                     @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
                     <li class="nav-item dropdown">
@@ -301,12 +301,12 @@
                     </li>
                     @endif
                     @endcan
-                    <!-- <li class="nav-item dropdown">
+                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Vehicle Pictures</span>
                         </a>
-                    </li> -->
+                    </li>
                     @can('demand-create')
                     @if (Auth::user()->selectedRole === '17' || Auth::user()->selectedRole === '18')
                         <li class="nav-item dropdown">

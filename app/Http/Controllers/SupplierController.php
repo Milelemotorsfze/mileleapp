@@ -1131,7 +1131,8 @@ class SupplierController extends Controller
 
     public function getAddonForSupplier(Request $request){
 
-        $data = Addon::select('id','name');
+        $data = AddonDetails::select('id','addon_code','addon_id')->with('AddonName');
+//        $data = Addon::select('id','name');
 
         if($request->filteredArray)
         {
