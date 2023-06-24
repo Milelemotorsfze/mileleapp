@@ -67,7 +67,7 @@
                     <form action="{{ route('calls.storenewvarinats') }}" method="post" enctype="multipart/form-data"> 
                     @csrf
                     <div class="row"> 
-					<div class="col-lg-4 col-md-6">
+					          <div class="col-lg-4 col-md-6">
                     <span class="error">*</span>
                     <label for="basicpill-firstname-input" class="form-label">Variant Name : </label>
                     <input type="text" class="form-control" id="basicpill-firstname-input" name="name">

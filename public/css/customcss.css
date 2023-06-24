@@ -44,6 +44,11 @@
   top: 10px;
   right: 10px;
 }
+.cart-icon-containerss {
+  position: relative;
+  display: inline-block;
+  right: 10px;
+}
   .plus-circle-link {
     font-size: 20px;
     color: white;

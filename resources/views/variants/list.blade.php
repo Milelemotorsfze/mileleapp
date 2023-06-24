@@ -1,9 +1,8 @@
 @extends('layouts.table')
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
     <div class="card-header">
         <h4 class="card-title">
-            Variants
+            Variants Info
         </h4>
         @can('variants-create')
             <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
@@ -28,44 +27,47 @@
             </div>
         @endif
         <div class="table-responsive">
-            <table id="supplier-pictures-table" class="table table-striped table-editable table-edits table">
+            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                    <th>S.NO</th>
                     <th>Name</th>
                     <th>Brand</th>
                     <th>Model Line</th>
-                    <th>My</th>
+                    <th>Steering</th>
+                    <th>Fuel Type</th>
+                    <th>Gear Box</th>
+                    <th>MY</th>
+                    <th>Seat</th>
+                    <th>Upholstery</th>
+                    <th>Engine Capacity</th>
+                    <th>Detail</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
-                <div hidden>{{$i=0;}}
-                </div>
                 @foreach ($variants as $key => $variant)
                     <tr data-id="1">
-                        <td>{{ ++$i }}</td>
                         <td>{{ $variant->name }}</td>
                         <td>{{ $variant->brand->brand_name ?? ''}}</td>
                         <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
-                        <td>{{ $variant->my }}</td>
+                        <td>{{ $variant->steering ?? '' }}</td>
+                        <td>{{ $variant->fuel_type ?? '' }}</td>
+                        <td>{{ $variant->gearbox ?? '' }}</td>
+                        <td>{{ $variant->my ?? '' }}</td>
+                        <td>{{ $variant->seat ?? '' }}</td>
+                        <td>{{ $variant->upholestry ?? '' }}</td>
+                        <td>{{ $variant->engine ?? '' }}</td>
+                        <td>{{ $variant->detail ?? '' }}</td>
                         <td>
-                            @can('variants-show')
-                                <a href="{{ route('variants.show', $variant->id) }}">
-                                    <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
-                                </a>
-                            @endcan
                             @can('variants-edit')
-                                <a href="{{ route('variants.edit', $variant->id) }}">
-                                    <button type="button" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> </button>
+                                <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                             @endcan
-                            @can('variants-delete')
+                            <!-- @can('variants-delete')
                                 @if($variant->is_deletable == true)
-                                <button type="button" data-id="{{ $variant->id }}" data-url="{{ route('variants.destroy',$variant->id) }}"
-                                        class="btn btn-danger btn-delete btn-sm"><i class="fa fa-trash"></i> </button>
+                                <a data-placement="top" id="{{ $variant->id }}" href="{{ route('variants.destroy',$variant->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </a>
                                 @endif
-                            @endcan
+                            @endcan -->
                         </td>
                     </tr>
                 @endforeach
@@ -97,11 +99,6 @@
             }).set({title:"Delete Item"})
         });
     </script>
-    @else
-    @php
-        redirect()->route('home')->send();
-    @endphp
-@endif
 @endsection
 
 

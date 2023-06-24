@@ -131,6 +131,7 @@ class PermissionTableSeeder extends Seeder
             ['9','Full Edit stock','stock-full-edit', 'To Edit the whole stock details'],
             ['9','SO View','view-so', 'To View The SO Details'],
             ['9','Edit & Create SO','edit-so', 'To Create and Edit the SO'],
+            ['9','Edit Reservation','edit-reservation', 'To Edit Reservation and Select Sales Person'],
             ['9','GRN View','grn-view', 'To View the GRN Details'],
             ['9','GRN Edit','grn-edit', 'To Create,Edit the GRN Details'],
             ['9','GDN View','gdn-view', 'To View the GDN Details'],
