@@ -5,6 +5,12 @@
             min-height: 300px;
             max-height: 500px;
         }
+        .iti{
+            width: 100%;
+        }
+        .iti__selected-flag{
+           height: 36px;
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">Add New Vendor</h4>
@@ -202,15 +208,16 @@
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label ">Phone</label>
-                                <input type="number" class="form-control mygroup @error('phone') is-invalid @enderror"
+                                <label for="choices-single-default" class="form-label">Phone</label>
+                                <input type="tel" id="phone" class="form-control mygroup @error('phone') is-invalid @enderror"
                                        name="phone" placeholder="Phone">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Mobile </label>
-                                <input id="mobile" type="number" class=" form-control @error('mobile') is-invalid @enderror"
+                                <input id="mobile" type="tel"
+                                 class="mygroup form-control @error('mobile') is-invalid @enderror"
                                        name="mobile" placeholder="Enter Mobile Number"
                                       autofocus >
 {{--                                <input type="number" class="form-control mygroup @error('mobile') is-invalid @enderror" id="mobile"--}}
@@ -226,7 +233,8 @@
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Alternate Contact Number</label>
-                                <input type="number" class="form-control" name="alternate_contact_number" placeholder="Alternate Contact Number">
+                                <input type="tel" class="form-control" name="alternate_contact_number"
+                                       id="alternate-contact-number" placeholder="Alternate Contact Number">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
@@ -323,15 +331,30 @@
 
 @endsection
 @push('scripts')
-{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>--}}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     <script>
-        // var contact_number = window.intlTelInput(document.querySelector("#mobile"),
-        //     {
-        //         separateDialCode: true,
-        //         preferredCountries:["ae"],
-        //         hiddenInput: "full",
-        //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-            // });
+        var Mobile = window.intlTelInput(document.querySelector("#mobile"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "mobile",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var Phone = window.intlTelInput(document.querySelector("#phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "phone",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var AlternateContactNumber = window.intlTelInput(document.querySelector("#alternate-contact-number"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "alternate_contact_number",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
         const file1InputLicense = document.querySelector("#passport-upload");
         const file2InputLicense = document.querySelector("#trade-licence-upload");
         const file3InputLicense = document.querySelector("#vat-certificate-upload");
@@ -461,13 +484,25 @@
                     required: true
                 },
                 email:{
-                    require_from_group: [1, '.mygroup']
+                    require_from_group: [1, '.mygroup'],
+                    email: true
                 },
                 phone:{
-                    require_from_group: [1, '.mygroup']
+                    require_from_group: [1, '.mygroup'],
+                    minlength:5,
+                    maxlength:15,
+                    number:true
                 },
                 mobile:{
-                    require_from_group: [1, '.mygroup']
+                    require_from_group: [1, '.mygroup'],
+                    minlength:5,
+                    maxlength:15,
+                    number:true
+                },
+                alternate_contact_number: {
+                    minlength:5,
+                    maxlength:15,
+                    number:true
                 },
                 messages: {
                     passport_copy_file: {

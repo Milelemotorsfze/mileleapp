@@ -33,9 +33,9 @@ class VendorController extends Controller
         $request->validate([
             'vendor_type' => 'required',
             'trade_name_or_individual_name' => 'required',
-            'passport_copy_file' => 'required',
-            'trade_license_file' => 'required',
-            'vat_certificate_file' => 'required',
+//            'passport_copy_file' => 'required',
+//            'trade_license_file' => 'required',
+//            'vat_certificate_file' => 'required',
         ]);
 
         $vendor = new Vendor();

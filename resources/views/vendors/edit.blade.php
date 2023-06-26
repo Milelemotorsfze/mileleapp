@@ -5,6 +5,12 @@
             min-height: 300px;
             max-height: 500px;
         }
+        .iti{
+            width: 100%;
+        }
+        .iti__selected-flag{
+            height: 36px;
+        }
     </style>
     <div class="card-header">
         <h4 class="card-title">Update Vendor</h4>
@@ -185,18 +191,23 @@
                                 <div class="row">
                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                         <div id="file1-preview">
-                                            <iframe src="{{ url('/vendor/passport/'.$vendor->passport_copy_file) }}" ></iframe>
+                                            @if($vendor->passport_copy_file)
+                                                <iframe src="{{ url('/vendor/passport/'.$vendor->passport_copy_file) }}" ></iframe>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                         <div id="file2-preview">
-                                            <iframe src="{{ url('/vendor/trade_license/'.$vendor->trade_license_file) }}" ></iframe>
+                                            @if($vendor->trade_license_file)
+                                                <iframe src="{{ url('/vendor/trade_license/'.$vendor->trade_license_file) }}" ></iframe>
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                         <div id="file3-preview">
-                                            <iframe src="{{ url('/vendor/vat_certificate/'.$vendor->vat_certificate_file) }}" ></iframe>
-
+                                            @if($vendor->vat_certificate_file)
+                                                <iframe src="{{ url('/vendor/vat_certificate/'.$vendor->vat_certificate_file) }}" ></iframe>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -214,35 +225,36 @@
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                <input type="email" id="email" class="form-control mygroup @error('email') is-invalid @enderror"
                                        name="email" placeholder="Email" value="{{ old('email', $vendor->email) }}">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Phone</label>
-                                <input type="number" class="form-control @error('phone') is-invalid @enderror"
-                                       name="phone" placeholder="Phone" value="{{ old('phone', $vendor->phone) }}">
+                                <input type="tel" id="phone" class="form-control mygroup @error('phone') is-invalid @enderror"
+                                       name="phone" placeholder="Phone Number" id="phone" value="{{ old('phone', $vendor->phone) }}">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Mobile </label>
-                                <input type="number" class="form-control @error('mobile') is-invalid @enderror"
-                                       name="mobile" placeholder="Mobile" value="{{ old('mobile', $vendor->mobile) }}">
+                                <input type="tel" id="mobile" class="form-control mygroup @error('mobile') is-invalid @enderror"
+                                       name="mobile" placeholder="Mobile Number" value="{{ $vendor->mobile }}">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Address</label>
-                                <textarea cols="25" rows="5" class="form-control" name="address_details" placeholder="Address Details">{{ old('address_details', $vendor->address_details) }}
+                                <textarea cols="25" rows="5" class="form-control" name="address_details"
+                                          placeholder="Address Details">{{ old('address_details', $vendor->address_details) }}
                                 </textarea>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Alternate Contact Number</label>
-                                <input type="number" class="form-control" name="alternate_contact_number" placeholder="Alternate Contact Number"
+                                <input type="tel" class="form-control" id="alternate-contact-number" name="alternate_contact_number" placeholder="Alternate Contact Number"
                                        value="{{ old('alternate_contact_number', $vendor->alternate_contact_number) }}">
                             </div>
                         </div>
@@ -340,7 +352,30 @@
 
 @endsection
 @push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
     <script>
+        var mobile = window.intlTelInput(document.querySelector("#mobile"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "mobile",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var phone = window.intlTelInput(document.querySelector("#phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "phone",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var alternateNumber = window.intlTelInput(document.querySelector("#alternate-contact-number"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "alternate_contact_number",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
         const file1InputLicense = document.querySelector("#passport-upload");
         const file2InputLicense = document.querySelector("#trade-licence-upload");
         const file3InputLicense = document.querySelector("#vat-certificate-upload");
@@ -473,10 +508,21 @@
                     require_from_group: [1, '.mygroup']
                 },
                 phone:{
-                    require_from_group: [1, '.mygroup']
+                    require_from_group: [1, '.mygroup'],
+                    minlength:5,
+                    maxlength:15,
+                    number:true
                 },
                 mobile:{
-                    require_from_group: [1, '.mygroup']
+                    require_from_group: [1, '.mygroup'],
+                    minlength:5,
+                    maxlength:15,
+                    number:true
+                },
+                alternate_contact_number: {
+                    minlength:5,
+                    maxlength:15,
+                    number:true
                 },
                 messages: {
                     passport_copy_file: {

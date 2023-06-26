@@ -81,8 +81,6 @@
 <script type="text/javascript">
     $(document).ready(function ()
     {
-
-        // alert(currentAddonType);
         $("#suppliers1").select2
         ({
             placeholder:"Choose Suppliers....     Or     Type Here To Search...."
