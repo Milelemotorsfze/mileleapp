@@ -3,7 +3,7 @@
 @if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
     <div class="card-header">
         <h4 class="card-title">
-            Purchasing Orders
+            Purchase Orders
         </h4>
       @can('create-po-details')
       @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')

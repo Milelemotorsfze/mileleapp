@@ -33,6 +33,7 @@
                     <th>Name</th>
                     <th>Brand</th>
                     <th>Model Line</th>
+                    <th>Model Description</th>
                     <th>Steering</th>
                     <th>Fuel Type</th>
                     <th>Gear Box</th>
@@ -50,6 +51,7 @@
                         <td>{{ $variant->name }}</td>
                         <td>{{ $variant->brand->brand_name ?? ''}}</td>
                         <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
+                        <td>{{ $variant->model_detail ?? '' }}</td>
                         <td>{{ $variant->steering ?? '' }}</td>
                         <td>{{ $variant->fuel_type ?? '' }}</td>
                         <td>{{ $variant->gearbox ?? '' }}</td>

@@ -62,7 +62,7 @@ input[type=number]::-webkit-outer-spin-button {
     $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
 @endphp
 <div class="card-header">
-        <h4 class="card-title">Edit Purchasing Order</h4>
+        <h4 class="card-title">Edit Purchase Order</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div> 
@@ -94,8 +94,8 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Supplier : </label>
-            <input type="number" id="po_number" name="po_number" class="form-control" value="{{$purchasingOrder->supplier}}" placeholder="Supplier Name" readonly>
+            <label for="basicpill-firstname-input" class="form-label">Vendor : </label>
+            <input type="number" id="po_number" name="po_number" class="form-control" value="{{$purchasingOrder->supplier}}" placeholder="Vendor Name" readonly>
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
     </div>

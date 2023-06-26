@@ -92,9 +92,9 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Suppliers : </label>
+            <label for="basicpill-firstname-input" class="form-label">Vendors : </label>
             <select class="form-control" autofocus name="suppliers_id" id="supplier">
-                                <option value="" disabled>Select The Supplier</option>
+                                <option value="" disabled>Select The Vendor</option>
                                 @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
                                 @endforeach

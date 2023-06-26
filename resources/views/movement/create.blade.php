@@ -2,7 +2,7 @@
 @section('content')
 @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
 <div class="card-header">
-        <h4 class="card-title">Adding New Movements</h4>
+        <h4 class="card-title">Add New Vehicles Transaction</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>

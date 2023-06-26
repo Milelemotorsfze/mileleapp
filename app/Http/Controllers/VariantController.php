@@ -57,6 +57,7 @@ class VariantController extends Controller
     $variant->my = $request->input('my');
     $variant->detail = $request->input('detail');
     $variant->seat = $request->input('seat');
+    $variant->model_detail = $request->input('model_detail');
     $variant->upholestry = $request->input('upholestry');
     $variant->save();
     $variantId = $variant->id;
@@ -115,6 +116,7 @@ class VariantController extends Controller
             $variant->my = $request->input('my');
             $variant->detail = $request->input('detail');
             $variant->seat = $request->input('seat');
+            $variant->model_detail = $request->input('model_detail');
             $variant->upholestry = $request->input('upholestry');
             $changes = [];
             foreach ($oldValues as $field => $oldValue) {
