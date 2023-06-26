@@ -278,6 +278,11 @@
             {
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
+                BrandModelLine.push 
+                    ({
+                        id: 'allmodellines',
+                        text: 'All Model Lines'
+                    });
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push 
