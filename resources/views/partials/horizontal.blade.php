@@ -2,15 +2,26 @@
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
     </button>
-    <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
+    <div class="dropdown d-inline-block" style="position: absolute; right: 120px; z-index: 500; top: 10px;">
     <div class="cart-icon-containerss">
-    @php
-    $selectedrole = Auth::user()->selectedRole;
-    $selected = DB::table('roles')->where('id', $selectedrole)->first();
-    $roleselected = $selected ? $selected->name : null;
-@endphp
-<button type="button" class="btn btn-success">{{ $roleselected }}</button>
+        @php
+        $selectedrole = Auth::user()->selectedRole;
+        $selected = DB::table('roles')->where('id', $selectedrole)->first();
+        $roleselected = $selected ? $selected->name : null;
+        @endphp
+        <button type="button" class="btn btn-success">{{ $roleselected }}</button>
+    </div>
+    <div class="dropdown-menu">
+        @foreach ($assignedRoles as $role)
+            <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
+                <i class="fa fa-users" aria-hidden="true"></i> {{ $role->name }}
+            </a>
+            <div class="dropdown-divider"></div>
+        @endforeach
+    </div>
 </div>
+    <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
+    
 <!-- <div class="cart-icon-container">
   <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -27,12 +38,6 @@
         <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
     </a>
     <div class="dropdown-divider"></div>
-    @foreach ($assignedRoles as $role)
-        <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
-            <i class="fa fa-users" aria-hidden="true"></i> {{ $role->name }}
-        </a>
-        <div class="dropdown-divider"></div>
-    @endforeach
     @can('user-view')
         <a class="dropdown-item" href="{{ route('users.index') }}">
             <i class="fa fa-users" aria-hidden="true"></i> Users
@@ -161,76 +166,6 @@
                         </div>
                     </li>
                     @endcanany
-                    @can('demand-create')
-                    @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
-                                <i data-feather="file-text"></i>
-                                <span data-key="t-extra-pages">Demand & Planning</span>
-                                <div class="arrow-down"></div>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                @can('demand-planning-supplier-list')
-                                <div class="dropdown">
-                                    <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}"
-                                       id="topnav-auth" role="button" >
-                                        <span data-key="t-authentication">Supplier</span>
-                                    </a>
-                                </div>
-                                @endcan
-                                @can('demand-create')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Demand</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
-                                        </div>
-                                    </div>
-                                @endcan
-                                @can('supplier-inventory-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Supplier Inventory</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
-                                            <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
-                                            <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
-                                        </div>
-                                    </div>
-                                @endcan
-                                @can('LOI-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">LOI</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            @can('LOI-list')
-                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
-                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
-                                            @endcan
-                                        </div>
-                                    </div>
-                                @endcan
-                                @can('PFI-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('pfi.index') }}"
-                                           id="topnav-auth" role="button" >
-                                            <span data-key="t-authentication">PFI</span>
-                                        </a>
-                                    </div>
-                                @endcan
-
-                            </div>
-                        </li>
-                        @endif
-                    @endcan
-
-
                     @can('Calls-view')
                     @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
                     <li class="nav-item dropdown">
@@ -256,7 +191,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
                             <i data-feather="award"></i>
-                            <span data-key="t-extra-pages">Purchasing Order</span>
+                            <span data-key="t-extra-pages">Purchase Order</span>
                         </a>
 					</li>
                     @endif
@@ -301,12 +236,14 @@
                     </li>
                     @endif
                     @endcan
+                    @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
                      <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Vehicle Pictures</span>
                         </a>
                     </li>
+                    @endif
                     @can('demand-create')
                     @if (Auth::user()->selectedRole === '17' || Auth::user()->selectedRole === '18')
                         <li class="nav-item dropdown">
@@ -367,6 +304,7 @@
                         </li>
                         @endif
                     @endcan
+                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -419,6 +357,7 @@
                             </div> -->
                         </div>
                     </li>
+                    @endif
                     @can('HR-view')
                     @if (Auth::user()->selectedRole === '19' || Auth::user()->selectedRole === '20')
                     <li class="nav-item dropdown">

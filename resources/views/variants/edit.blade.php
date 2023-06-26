@@ -67,6 +67,12 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Model Description</label>
+                            <input type="text" value="{{ old('model_detail', $variant->model_detail) }}" name="model_detail" class="form-control "placeholder="Model Description" required>
+                        </div>
+                    </div>
                 <div class="col-lg-2 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Steering</label>

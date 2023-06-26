@@ -7,7 +7,7 @@
         </h4>
         @can('view-po-details')
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movements
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Vehicles Transaction
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <a class="btn btn-sm btn-success float-end" href="{{ route('grnlist.create') }}" text-align: right>
@@ -17,10 +17,10 @@
       <br>
       <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Transtions</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Vehicles Transaction</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">All Movements</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab2">All Vehicle Movements</a>
       </li>
     </ul>
     </div>

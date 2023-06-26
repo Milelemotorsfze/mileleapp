@@ -97,6 +97,7 @@
                     @endif
                     <th class="nowrap-td">GRN</th>
                     <th class="nowrap-td">GRN Date</th>
+                    <th class="nowrap-td">Inspection Date</th>
                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
                     <th class="nowrap-td">Aging</th>
                     @endif
@@ -206,8 +207,6 @@
                     $salesname = $sales_person ? $sales_person->name : null;
                     $booking = $vehicles->booking_id ? DB::table('booking')->where('id', $vehicles->booking_id)->first() : null;
                     $booking_name = $booking ? $booking->name : null;
-                    $conversion = $vehicles->conversion_id ? DB::table('conversion')->where('id', $vehicles->conversion_id)->first() : null;
-                    $conversions = $conversion ? $conversion->id : null;
                     $warehouse = $vehicles->vin ? DB::table('movements')->where('vin', $vehicles->vin)->latest()->first() : null;
                     $warehouses = $warehouse ? DB::table('warehouse')->where('id', $warehouse->to)->value('name') : null;
 
@@ -232,6 +231,7 @@
                     $owership = $documents ? $documents->owership : null;
                     $document_with = $documents ? $documents->document_with : null;
                     $bl_status = $documents ? $documents->bl_status : null;
+                    $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                      @endphp
                      @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
                      <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
@@ -244,12 +244,26 @@
                      @endif
                      @if ($grn_date)
                      <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}
+                     @if (!empty($vehicles->inspection_date))
+                        <td class="nowrap-td inspection">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
+                    @else
+                        <td class="nowrap-td">-</td>
+                    @endif
                      @else
                      <td class="nowrap-td grnDate">-</td>
+                     <td class="nowrap-td">-</td>
                     @endif
                      </td>
                      @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
+                     @if ($grn_date)
+                     @php
+                     $grn_date = \Carbon\Carbon::parse($grn_date);
+                     $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
+                     @endphp
                      <td class="nowrap-td">{{ $aging }}</td>
+                     @else
+                     <td class="nowrap-td">-</td>
+                     @endif
                      @endif
                     @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
                      @if ($so_number)
@@ -262,7 +276,14 @@
                      <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
                      <td class="nowrap-td reservation_start_date">{{ $vehicles->reservation_start_date }}</td>
                      <td class="nowrap-td reservation_end_date">{{ $vehicles->reservation_end_date }}</td>
-                     <td class="nowrap-td">{{ $vehicles->remarks }}</td>
+                     @if($latestRemark)
+                        <td class="nowrap-td" onclick="event.stopPropagation();">
+                            {{ $latestRemark }}
+                            <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
+                        </td>
+                    @else
+                        <td class="nowrap-td">-</td>
+                    @endif
                      @endif
                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
                      @if ($gdn_number)
@@ -277,10 +298,10 @@
                      @endif
                      @endif
                      @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                     <td class="nowrap-td Remarks">{{ $vehicles->remarks }}</td>
+                     <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
                      @endif
                      @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
-                     <td class="nowrap-td">{{ $conversions }}</td>
+                     <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
                      @endif
                      @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
                     @can('vehicles-detail-view')
@@ -331,14 +352,50 @@
                         <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
                         @endcan
-                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"> View Pic</a></td>
-                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Log</a></td>
+                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"> View Pic</a></td>
+                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"></i> View Log</a></td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
         </div>
         </div>
+        @can('warehouse-edit')
+  @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+  <div id="editmodalwarehouse" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Detail</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+    <form action="{{ route('vehicles.updatewarehouse')}}" method="POST">
+    @csrf
+    <div class="row">
+      <div class="col-md-12">
+        <label for="gdn_date">Conversions</label>
+        <input type="text" class="form-control" id="conversion" name="conversion" value="{{ $vehicles->conversions }}">
+        <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
+      </div>
+    </div>
+    <div class="col-md-12">
+        <label for="gdn_date">Remarks</label>
+        <input type="text" class="form-control" id="remarks" name="remarks" value="{{ $vehicles->remarks }}">
+      </div>
+    </div>
+                        <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+    </div>
+  </div>
+</div>
+@endif
+@endcan
   @can('vehicles-detail-edit')
   @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
   <div id="editModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -354,6 +411,11 @@
     <form action="{{ route('vehicles.updatedata')}}" method="POST">
     @csrf
     <div class="row">
+    <div class="col-md-4">
+        <label for="gdn_date">Inspection Date</label>
+        <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
+        <input type="date" class="form-control" id="inspection" name="inspection" value="{{ $vehicles->inspection }}">
+      </div>
       <div class="col-md-4">
   <label for="variants_name">Variant</label>
   <input type="text" class="form-control" id="variants_name" name="variants_name" list="laList" value="{{ $varaints_name }}">
@@ -406,12 +468,6 @@
         <input type="date" class="form-control" id="ppmmyy" name="ppmmyy" value="{{ $vehicles->ppmmyyy }}">
       </div>
     </div>
-    <div class="form-group">
-      <label for="remarks">Remarks</label>
-      <input type="text" class="form-control" id="remarks" name="remarks" value="{{ $vehicles->remarks }}">
-      <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
-    </div>
-</div>
                         <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -557,6 +613,14 @@
                 <option value="100%">100%</option>
     </select>
       </div>
+      @can('edit-reservation')
+@if (Auth::user()->selectedRole === '8')
+      <div class="col-md-12">
+  <label for="sales_remarks">Sales Remarks</label>
+    <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">    
+</div>
+@endif
+@endcan
 </div>
                         <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -579,8 +643,8 @@
   var ExColour = row.find('.ExColour').val();
   var IntColour = row.find('.IntColour').val();
   var Territory = row.find('.Territory').text();
+  var inspection = row.find('.inspection').text();
   var Ppmmyy = row.find('.Ppmmyy').val();
-  var Remarks = row.find('.Remarks').text();
   $('#variants_name').val(variant);
   $('#vin').val(Vin);
   $('#engine').val(Engine);
@@ -588,7 +652,7 @@
   $('#int_colour').val(IntColour);
   $('#territory').val(Territory);
   $('#ppmmyy').val(Ppmmyy);
-  $('#remarks').val(Remarks);
+  $('#inspection').val(inspection);
   $('#vehicle_id').val(vehicleId);
   $('#editModal').modal('show');
 }
@@ -666,6 +730,31 @@
 </script>
 @endif
 @endcan
+@can('warehouse-edit')
+@if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+<script>
+  function openModal(vehicleId) {
+  var row = $('tr[data-id="' + vehicleId + '"]');
+  var remarks = row.find('.remarks').text();
+  var conversion = row.find('.conversion').text();
+  $('#remarks').val(remarks);
+  $('#conversion').val(conversion);
+  $('#vehicle_id').val(vehicleId);
+  $('#editmodalwarehouse').modal('show');
+}
+  function saveChanges() {
+    var grnNumber = $('#grnNumber').val();
+    var grnDate = $('#grnDate').val();
+    $('#editmodalwarehouse').modal('hide');
+  }
+  function cancelChanges() {
+    $('#editmodalwarehouse').modal('hide');
+  }
+  $('#editmodalwarehouse').on('click', '#saveButton', saveChanges);
+  $('#editmodalwarehouse').on('click', '[data-dismiss="modal"]', cancelChanges);
+</script>
+@endif
+@endcan
 <script>
 $(document).ready(function() {
   $('.select2').select2();
@@ -714,6 +803,28 @@ $(document).ready(function() {
         }, 2000);
     </script>
     </div>
+    <script>
+  var input = document.getElementById('variants_name');
+  var dataList = document.getElementById('laList');
+  input.addEventListener('input', function() {
+    var inputValue = input.value;
+    var options = dataList.getElementsByTagName('option');
+    var matchFound = false;
+    for (var i = 0; i < options.length; i++) {
+      var option = options[i];
+      
+      if (inputValue === option.value) {
+        matchFound = true;
+        break;
+      }
+    }
+    if (!matchFound) {
+      input.setCustomValidity("Please select a value from the list.");
+    } else {
+      input.setCustomValidity('');
+    }
+  });
+</script>
     @else
     @php
         redirect()->route('home')->send();

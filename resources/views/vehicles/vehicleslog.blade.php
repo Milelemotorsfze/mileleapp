@@ -7,7 +7,7 @@
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </a>
 @endif
-<b>VIN No: {{$currentId}}</b>
+<b>Vehicles No: {{$currentId}}</b>
 @if ($nextId)
     <a class="btn btn-sm btn-info" href="{{ route('vehicleslog.viewdetails', $nextId) }}">
        <i class="fa fa-arrow-right" aria-hidden="true"></i>

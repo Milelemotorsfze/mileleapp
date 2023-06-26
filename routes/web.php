@@ -279,4 +279,7 @@ Route::get('/d', function () {
     Route::resource('vendors', VendorController::class);
 
     Route::post('/vehicles/updatelogistics', [VehiclesController::class, 'updatelogistics'])->name('vehicles.updatelogistics');
+    Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
+    Route::get('/view-remarks-details/{id}', [VehiclesController::class, 'viewremarks'])->name('vehiclesremarks.viewremarks');
+    Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
 });

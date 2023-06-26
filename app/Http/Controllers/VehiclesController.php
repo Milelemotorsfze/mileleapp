@@ -15,6 +15,8 @@ use App\Models\ModelHasRoles;
 use App\Models\So;
 use App\Models\Vehicleslog;
 use App\Models\Solog;
+use App\Models\Remarks;
+use App\Models\VehiclePicture;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 
@@ -28,11 +30,12 @@ class VehiclesController extends Controller
     public function index()
     {
         $data = Vehicles::where('status', '!=', 'cancel')->get();
+        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();
         $sales_ids = $sales_persons->pluck('model_id');
         $sales = User::whereIn('id', $sales_ids)->get();
-        return view('vehicles.index', compact('data', 'varaint', 'sales'));  
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'));  
     }    
 
     /**
@@ -234,8 +237,8 @@ class VehiclesController extends Controller
         $vehicle->ex_colour = $request->input('ex_colour');
         $vehicle->int_colour = $request->input('int_colour');
         $vehicle->territory = $request->input('territory');
+        $vehicle->inspection_date = $request->input('inspection');
         $vehicle->ppmmyyy = $request->input('ppmmyy');
-        $vehicle->remarks = $request->input('remarks');
         $changes = [];
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
@@ -315,7 +318,6 @@ class VehiclesController extends Controller
             }
         } else {
             $existingSo = So::where('so_number', $request->input('so_number'))->first();
-    
             if ($existingSo) {
                 // Update existing So
                 $oldValues = $existingSo->toArray();
@@ -333,15 +335,12 @@ class VehiclesController extends Controller
                         }
                     }
                 }
-    
                 if (!empty($changes)) {
                     $existingSo->save();
                     $soID = $existingSo->id;
-    
                     // Save changes in Solog
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                     $currentDateTime = Carbon::now($dubaiTimeZone);
-    
                     foreach ($changes as $field => $change) {
                         $solog = new Solog();
                         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -441,6 +440,19 @@ if ($request->has('reservation_start_date')) {
         }
     }
 }
+        if($request->has('remarks')){
+        $remarksdata = new Remarks();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $remarksdata->time = $currentDateTime->toTimeString();
+        $remarksdata->date = $currentDateTime->toDateString();
+        $remarksdata->vehicles_id = $vehicleId;
+        $remarksdata->remarks = $request->input('remarks');
+        $remarksdata->created_by = auth()->user()->id;
+        $remarksdata->department = "Sales";
+        $remarksdata->created_at = $currentDateTime;
+        $remarksdata->save();
+        }
         // Save changes in the vehicles table
         $vehicle->save();
         return redirect()->back()->with('success', 'Sales details updated successfully.');
@@ -470,6 +482,17 @@ if ($request->has('reservation_start_date')) {
                'previousId' => $previousId,
                'nextId' => $nextId
            ], compact('documentsLog', 'soLog', 'vehiclesLog', 'vehiclesLogforso'));
+    }
+    public function  viewremarks($id)
+    {
+        $remarks = Remarks::where('vehicles_id', $id)->get();
+        $previousId = Vehicles::where('id', '<', $id)->max('id');
+        $nextId = Vehicles::where('id', '>', $id)->min('id');
+        return view('vehicles.viewremarks', [
+               'currentId' => $id,
+               'previousId' => $previousId,
+               'nextId' => $nextId
+           ], compact('remarks'));
     }
     public function updatelogistics(Request $request)
     {
@@ -537,5 +560,48 @@ if ($request->has('reservation_start_date')) {
              $vehicle->save();
             }
         return redirect()->back()->with('success', 'Vehicle details updated successfully.');
+    }
+    public function viewpictures($id)
+    {
+    $vehiclePictures = VehiclePicture::where('vehicle_id', $id)->get();
+    return view('vehicle_pictures.show', compact('vehiclePictures'));
+    }
+    public function updatewarehouse(Request $request)
+    {
+        $id = $request->input('vehicle_id');
+        $vehicle = Vehicles::find($id);
+        $oldValues = $vehicle->toArray();
+        $vehicle->remarks = $request->input('remarks');
+        $vehicle->conversion = $request->input('conversion');
+        $changes = [];
+        foreach ($oldValues as $field => $oldValue) {
+            if ($field !== 'created_at' && $field !== 'updated_at') {
+                $newValue = $vehicle->$field;
+                if ($oldValue != $newValue) {
+                    $changes[$field] = [
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                    ];
+                }
+            }
+        }
+        if (!empty($changes)) {
+            $vehicle->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            foreach ($changes as $field => $change) {
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update QC Values';
+            $vehicleslog->vehicles_id = $id;
+            $vehicleslog->field = $field;
+            $vehicleslog->old_value = $change['old_value'];
+            $vehicleslog->new_value = $change['new_value'];
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->save();
+            }
+        }
+        return redirect()->back()->with('success', 'Details updated successfully.');
     }
     }
