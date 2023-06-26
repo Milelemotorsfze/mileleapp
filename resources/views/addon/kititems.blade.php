@@ -81,7 +81,13 @@
 </style>
 @section('content')
     <div class="card-header">
-        <h4 class="card-title"> Kit Details</h4>
+        <h4 class="card-title"> 
+        @if($supplierAddonDetails->addon_type_name == 'K')
+            Kit
+            @else
+            Addon
+            @endif
+             Details</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -143,14 +149,32 @@
                         @endif
                     </span>
                     </div>
+
+
                     @can('addon-selling-price-view')
+                    @if($supplierAddonDetails->SellingPrice!= null OR $supplierAddonDetails->PendingSellingPrice!= null)
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Selling Price :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
-                        <span>{{ $supplierAddonDetails->SellingPrice->selling_price}} AED</span>
-                    </div>
-                    @endcan
+                    <div class="col-lg-2 col-md-9 col-sm-12"> 
+                        @if($supplierAddonDetails->SellingPrice!= null)
+                          @if($supplierAddonDetails->SellingPrice->selling_price != '')
+                            {{$supplierAddonDetails->SellingPrice->selling_price}} AED
+                          @endif
+                          @elseif($supplierAddonDetails->PendingSellingPrice!= null)
+                          @if($supplierAddonDetails->PendingSellingPrice->selling_price != '')
+                            {{$supplierAddonDetails->PendingSellingPrice->selling_price}} AED 
+                            <span style="color:#fd625e; font-size:13px;">( Approval Awaiting )</span>
+                          @endif
+                        @endif
+                      </div>
+                    @endif
+                  @endcan
+
+
+
+
+
                     @if($supplierAddonDetails->LeastPurchasePrices != '')
                     @can('addon-least-purchase-price-view')
                     <div class="col-lg-2 col-md-3 col-sm-12">
@@ -165,30 +189,35 @@
             </div>
             <div class="col-xxl-2 col-lg-2 col-md-2">
                 <div class="row">
-                @if( $supplierAddonDetails->is_all_brands == 'yes')
-                All Brands
-                @elseif($supplierAddonDetails->is_all_brands == 'no')
-                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                    <center>Brand</center>
-                  </div>
-                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                    <center>Model Line</center>
-                  </div>
-                  @foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
-                    <div class="divcolorclass" value="5" hidden>
-                    </div>
-                    <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                      {{$AddonTypes->brands->brand_name}}
-                    </div>                   
-                    <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                    @if($AddonTypes->is_all_model_lines == 'yes')
-                    All Model Lines
-                    @else
-                      {{$AddonTypes->modelLines->model_line}}
+                    @if( $supplierAddonDetails->is_all_brands == 'yes')
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">Brand  :</label>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <span>All Brands</span>
+                        </div>
+                    @elseif($supplierAddonDetails->is_all_brands == 'no')
+                        <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                            <center>Brand</center>
+                        </div>
+                        <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                            <center>Model Line</center>
+                        </div>
+                        @foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
+                            <div class="divcolorclass" value="5" hidden>
+                            </div>
+                            <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                            {{$AddonTypes->brands->brand_name}}
+                            </div>                   
+                            <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                            @if($AddonTypes->is_all_model_lines == 'yes')
+                            All Model Lines
+                            @else
+                            {{$AddonTypes->modelLines->model_line}}
+                            @endif
+                            </div>
+                        @endforeach
                     @endif
-                    </div>
-                  @endforeach
-                @endif
                  </div>
             </div>
             <div class="col-xxl-1 col-lg-1 col-md-1">
@@ -200,7 +229,14 @@
             </div>
         </div>
     </br>
-    <center><h5 class="card-title">Suppliers And Kit Items</h5></center>
+    <center><h5 class="card-title">
+    @if($supplierAddonDetails->addon_type_name == 'K')
+    Suppliers Details And Kit Items
+            @else
+            Suppliers Details And Purchase Prices
+            @endif
+    
+</h5></center>
     </br>
         @foreach($supplierAddonDetails->AddonSuppliers as $AddonSuppliers)
             <div class="card-body" style="border:solid; border-color:#e9e9ef; border-width: 1px; border-radius: .25rem;">

@@ -18,10 +18,6 @@
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1" name="brandModel[1][modelline_id][]" id="selectModelLine1" multiple="true" 
                             style="width: 100%;" required>
-                        <option value="allmodellines">All Model Lines</option>
-                        @foreach($modelLines as $modelLine)
-                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                        @endforeach
                     </select> 
                 </div>
             </div>
@@ -57,10 +53,6 @@
                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                             <select class="compare-tag1" name="brandModel[${index}][modelline_id][]" onchange=selectModelLine(this.id,${index}) id="selectModelLine${index}" 
                                     multiple="true" style="width: 100%;" required>
-                                <option value="allmodellines">All Model Lines</option>
-                                @foreach($modelLines as $modelLine)
-                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
@@ -136,6 +128,11 @@
             {
                 $("#selectModelLine"+row).html("");
                 let BrandModelLine   = [];
+                BrandModelLine.push 
+                    ({
+                        id: 'allmodellines',
+                        text: 'All Model Lines'
+                    });
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push 

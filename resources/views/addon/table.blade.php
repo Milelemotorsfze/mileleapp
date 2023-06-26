@@ -1,145 +1,212 @@
 <style>
-    .modal-content {
-            position:fixed;
-            top: 50%;
-            left: 50%;
-            width:30em;
-            height:18em;
-            margin-top: -9em; /*set to a negative number 1/2 of your height*/
-            margin-left: -15em; /*set to a negative number 1/2 of your width*/
-            border: 2px solid #e3e4f1;
-            background-color: white;
-        }
-        .modal-title {
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-        .modal-paragraph {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .modal-button-class {
-            margin-top: 20px;
-            margin-left: 20px;
-            margin-right: 20px;
-        }
-        .icon-right {
-            z-index: 10;
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
+    .modal-content 
+    {
+        position:fixed;
+        top: 50%;
+        left: 50%;
+        width:30em;
+        height:18em;
+        margin-top: -9em; /*set to a negative number 1/2 of your height*/
+        margin-left: -15em; /*set to a negative number 1/2 of your width*/
+        border: 2px solid #e3e4f1;
+        background-color: white;
+    }
+    .modal-title 
+    {
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+    .modal-paragraph 
+    {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .modal-button-class 
+    {
+        margin-top: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .icon-right 
+    {
+        z-index: 10;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
 </style>
-@if($addons)
-  @if(count($addons) > 0)
-  @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
-  <div class="card-body">
-    <div class="table-responsive" id="addonListTable" hidden>     
-      <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Image</th>
-            <th>Addon Name</th>
-            <th>Addon Code</th>
-            <th>Brand</th>
-            <th>Model Line</th>
-            <th>Lead Time</th>
-            <th>Additional Remarks</th>
-            @can('addon-least-purchase-price-view')
-            <th>Least Purchase Price</th>
-            @endcan
-            @can('addon-selling-price-view')
-            <th>Selling Price(AED)</th>
-            @endcan
-            <th>Payment Condition</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <div hidden>{{$i=0;}}
-          </div>
-        
-          @foreach ($addons as $key => $addon)
-            <tr data-id="1" class="{{ $addon->addon_details_table_id }} tr">
-              <td>{{ ++$i }}</td>
-              <td><img src="{{ asset('addon_image/' . $addon->image) }}" style="width:100%; height:100px;" /></td>
-              <td>{{ $addon->name }}</td>
-              <td>{{ $addon->addon_code }}</td>
-              <td>@if($addon->is_all_brands == 'no'){{ $addon->brand_name }}@elseif($addon->is_all_brands == 'yes'){{'All Brands'}}@endif</td>
-              <td>
-                @if($addon->is_all_brands == 'no')
-                  @if($addon->is_all_model_lines == 'no')
-                    {{$addon->model_line}}
-                  @elseif($addon->is_all_model_lines == 'yes')
-                    {{'All Model Lines'}}
-                  @endif
-                @elseif($addon->is_all_brands == 'yes')
-                {{'All Model Lines'}}
-                @endif
-              </td>
-              <td>{{ $addon->lead_time }}</td>
-              <td>{{ $addon->additional_remarks }}</td>
-              @can('addon-least-purchase-price-view')
-              <td>{{ 'purchase price' }}</td> <!--$addon->purchase_price-->
-              @endcan
-              @can('addon-selling-price-view')
-              <td>Selling Price</td>
-              @endcan
-              <td>{{ $addon->payment_condition }}</td>
-              <td>
-                @can('addon-view')
-                <a class="btn btn-sm btn-success" href="{{ route('addon.view',$addon->addon_details_table_id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
-                @endcan
-                @can('addon-edit')
-                <a class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addon->addon_details_table_id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                @endcan
-                @can('addon-active-inactive')
-                @if( $addon->status == 'active')
-                <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveAddon{{$addon->addon_details_table_id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
-                        <div class="modal modal-class" id="makeInactiveAddon{{$addon->addon_details_table_id}}" >
-                          <div class="modal-content">
-                            <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
-                            <h3 class="modal-title" style="text-align:center;"> Make Inactive Addon </h3>
-                            <div class="dropdown-divider"></div>
-                            <h4 class="modal-paragraph"> Are you sure,</h4>
-                            <h5 class="modal-paragraph"> You want to make inactive ?</h5>
-                            <div class="dropdown-divider"></div>
-                            <div class="row modal-button-class">                                           
-                              <div class="col-xs-6 col-sm-6 col-md-6">
-                                <a href="" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
-                              </div>
-                            </div>                                          
-                          </div>
-                        </div>
-                        @else
-                        <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveAddon{{$addon->addon_details_table_id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
-                            <div class="modal modal-class" id="makeActiveAddon{{$addon->addon_details_table_id}}" >
-                              <div class="modal-content">
-                                <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
-                                <h3 class="modal-title" style="text-align:center;"> Make Active Addon </h3>
-                                <div class="dropdown-divider"></div>
-                                <h4 class="modal-paragraph"> Are you sure,</h4>
-                                <h5 class="modal-paragraph"> You want to make active ?</h5>
-                                <div class="dropdown-divider"></div>
-                                <div class="row modal-button-class">                                           
-                                  <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <a href="" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>        
-                                  </div>
-                                </div>                                          
-                              </div>
-                            </div>
-                        @endif
-                        @endcan
-              </td>
-            </tr>
-          @endforeach
-        
-        </tbody>
-      </table>
-    </div>
-    </div>
-    @endcanany
+@if($addon1)
+    @if(count($addon1) > 0)
+        @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
+            <div class="card-body">
+                <div class="table-responsive" id="addonListTable" hidden>     
+                    <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Image</th>
+                                <th>Addon Name</th>
+                                <th>Addon Type</th>
+                                <th>Addon Code</th>
+                                <th>Brand</th>
+                                <th>Model Line</th>
+                                <!-- <th>Model Description</th> -->
+                                <th>Lead Time</th>
+                                <th>Additional Remarks</th>
+                                @if($content == '')
+                                    @can('supplier-addon-purchase-price-view')
+                                        <th>Purchase Price</th>
+                                    @endcan
+                                @endif
+                                @can('addon-least-purchase-price-view')
+                                    <th>Least Purchase Price</th>
+                                @endcan
+                                @can('addon-selling-price-view')
+                                    <th>Selling Price(AED)</th>
+                                @endcan
+                                <th>Fixing Charge</th>
+                                <th>Part Number</th>
+                                <th>Payment Condition</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <div hidden>{{$i=0;}}</div>
+                            @foreach ($addon1 as $key => $addonsdata)
+                                @if($addonsdata->is_all_brands == 'yes')
+                                    <tr data-id="1" class="{{ $addonsdata->addon_details_table_id }} tr">
+                                        <td>{{ ++$i }}</td>
+                                        <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                        <td>{{$addonsdata->AddonName->name}}</td>
+                                        <td>     
+                                            @if($addonsdata->addon_type_name == 'K')
+                                                <label class="badge badge-soft-success">Kit</label>
+                                            @elseif($addonsdata->addon_type_name == 'P')
+                                                <label class="badge badge-soft-primary">Accessories</label>
+                                            @elseif($addonsdata->addon_type_name == 'SP')
+                                                <label class="badge badge-soft-warning">Spare Parts</label>
+                                            @endif                   
+                                        </td>
+                                        <td>{{$addonsdata->addon_code}}</td>
+                                        <td>All Brands</td>
+                                        <td>All Model Lines</td>
+                                        <td>{{$addonsdata->lead_time}} Days</td>
+                                        <td>{{$addonsdata->additional_remarks}}</td>
+                                        @if($content == '')
+                                            @can('supplier-addon-purchase-price-view')
+                                                <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
+                                            @endcan
+                                        @endif
+                                        @can('addon-least-purchase-price-view')
+                                            <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                        @endcan
+                                        @can('addon-selling-price-view')
+                                            <td>
+                                                @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
+                                                    <label class="badge badge-soft-info">Not Created</label>          
+                                                @elseif($addonsdata->SellingPrice!= null OR $addonsdata->PendingSellingPrice!= null)
+                                                    @if($addonsdata->SellingPrice!= null)
+                                                        @if($addonsdata->SellingPrice->selling_price != '')
+                                                            {{$addonsdata->SellingPrice->selling_price}} AED
+                                                        @endif
+                                                    @elseif($addonsdata->PendingSellingPrice!= null)
+                                                        @if($addonsdata->PendingSellingPrice->selling_price != '')
+                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED 
+                                                            <label class="badge badge-soft-danger">Approval Awaiting</label>
+                                                        @endif
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        @endcan
+                                        <td>
+                                            @if($addonsdata->fixing_charges_included == 'yes')
+                                                <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                            @else
+                                                @if($addonsdata->fixing_charge_amount != '')
+                                                    {{$addonsdata->fixing_charge_amount}} AED
+                                                @endif
+                                            @endif
+                                        </td>
+                                        <td>{{$addonsdata->part_number}}</td>
+                                        <td>{{$addonsdata->payment_condition}}</td>
+                                        <td>
+                                        @include('addon.action.action')
+                                            
+                                        </td>
+                                    </tr>
+                                @else
+                                    @foreach($addonsdata->AddonTypes as $AddonTypes)
+                                        <tr data-id="1" class="{{ $addonsdata->addon_details_table_id }} tr">
+                                            <td>{{ ++$i }}</td>                      
+                                            <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                            <td>{{$addonsdata->AddonName->name}}</td>
+                                            <td>
+                                                @if($addonsdata->addon_type_name == 'K')
+                                                    <label class="badge badge-soft-success">Kit</label>
+                                                @elseif($addonsdata->addon_type_name == 'P')
+                                                    <label class="badge badge-soft-primary">Accessories</label>
+                                                @elseif($addonsdata->addon_type_name == 'SP')
+                                                    <label class="badge badge-soft-warning">Spare Parts</label>
+                                                @endif                       
+                                            </td>
+                                            <td>{{$addonsdata->addon_code}}</td>
+                                            <td> {{$AddonTypes->brands->brand_name}}</td>
+                                            <td>
+                                                @if($AddonTypes->is_all_model_lines == 'yes')
+                                                    All Model Lines
+                                                @else
+                                                    {{$AddonTypes->modelLines->model_line}}
+                                                @endif
+                                            </td>
+                                            <td>{{$addonsdata->lead_time}} Days</td>
+                                            <td>{{$addonsdata->additional_remarks}}</td>
+                                            @if($content == '')
+                                                @can('supplier-addon-purchase-price-view')
+                                                    <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
+                                                @endcan
+                                            @endif
+                                            @can('addon-least-purchase-price-view')
+                                            <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                            @endcan
+                                            @can('addon-selling-price-view')
+                                                <td>
+                                                    @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')    
+                                                        <label class="badge badge-soft-info">Not Created</label>          
+                                                    @elseif($addonsdata->SellingPrice!= null)
+                                                        @if($addonsdata->SellingPrice->selling_price != '')
+                                                            {{$addonsdata->SellingPrice->selling_price}} AED
+                                                        @endif
+                                                    @elseif($addonsdata->PendingSellingPrice!= null)
+                                                        @if($addonsdata->PendingSellingPrice->selling_price != '')
+                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED 
+                                                            <label class="badge badge-soft-danger">Approval Awaiting</label>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            @endcan
+                                            <td>
+                                                @if($addonsdata->fixing_charges_included == 'yes')
+                                                    <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                                @else
+                                                    @if($addonsdata->fixing_charge_amount != '')
+                                                        {{$addonsdata->fixing_charge_amount}} AED
+                                                    @endif
+                                                @endif
+                                            </td>
+                                            <td>{{$addonsdata->part_number}}</td>
+                                            <td>{{$addonsdata->payment_condition}}</td>
+                                            <td>
+                                            @include('addon.action.action')
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                            @endforeach 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endcanany
     @endif
-          @endif
+@endif
