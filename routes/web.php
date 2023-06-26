@@ -3,6 +3,7 @@
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
+use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WarrantyBrandsController;
 use App\Http\Controllers\WarrantyPriceHistoriesController;
 use Illuminate\Support\Facades\Auth;
@@ -272,4 +273,9 @@ Route::get('/d', function () {
     Route::resource('colourcode', ColorCodesController::class);
 
     Route::resource('warehouse', WarehouseController::class);
+
+    // Vendors
+
+    Route::resource('vendors', VendorController::class);
+
 });
