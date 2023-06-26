@@ -278,4 +278,5 @@ Route::get('/d', function () {
 
     Route::resource('vendors', VendorController::class);
 
+    Route::post('/vehicles/updatelogistics', [VehiclesController::class, 'updatelogistics'])->name('vehicles.updatelogistics');
 });

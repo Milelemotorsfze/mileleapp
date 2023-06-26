@@ -44,17 +44,17 @@
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
           <select id="fltr-brand" multiple="true" style="width: 100%;">
-          <option value="yes">All Brands</option>
+          <option id="allBrandsFilter" value="yes">All Brands</option>
             @foreach($brandMatsers as $brandMatser)
-              <option value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
+              <option class="allBrandsFilterClass" value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
             @endforeach
           </select>
         </div>
-        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+        <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12" id="ModelLineDiv">
           <select id="fltr-model-line" multiple="true" style="width: 100%;">
-          <option value="yes">All Model Lines</option>
+          <option id="allMoLiId" value="yes">All Model Lines</option>
           @foreach($modelLineMasters as $modelLineMaster)
-          <option value="{{$modelLineMaster->id}}">{{$modelLineMaster->model_line}}</option>
+          <option class="allMoLiClass" value="{{$modelLineMaster->id}}">{{$modelLineMaster->model_line}}</option>
           @endforeach
           </select>
         </div>
@@ -66,6 +66,7 @@
     @include('addon.table')
  @endcanany
   <script type="text/javascript">
+    var brandMatsers = {!! json_encode($brandMatsers) !!};
     $(document).ready(function ()
     {
       $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
@@ -133,7 +134,43 @@
       var Data = '';
       var AddonIds = $('#fltr-addon-code').val();
       var BrandIds = $('#fltr-brand').val();
+      if (BrandIds === undefined || BrandIds.length == 0) 
+      {
+        $('#allBrandsFilter').prop("disabled", false);
+        $('.allBrandsFilterClass').prop("disabled", false);
+        $('#ModelLineDiv').show();
+      }
+      else
+      {
+        if(BrandIds.includes('yes'))
+        {
+          $('.allBrandsFilterClass').prop("disabled", true);
+          $('#ModelLineDiv').hide();
+        }
+        else
+        {
+          $('#allBrandsFilter').prop("disabled", true);
+        }
+      } 
+
       var ModelLineIds = $('#fltr-model-line').val();
+      if (ModelLineIds === undefined || ModelLineIds.length == 0) 
+      {
+        $('#allMoLiId').prop("disabled", false);
+        $('.allMoLiClass').prop("disabled", false);
+      }
+      else
+      {
+        if(ModelLineIds.includes('yes'))
+        {
+          $('.allMoLiClass').prop("disabled", true);
+        }
+        else
+        {
+          $('#allMoLiId').prop("disabled", true);
+        }
+      }
+
       var Data = $('#data').val();
       $.ajax
       ({

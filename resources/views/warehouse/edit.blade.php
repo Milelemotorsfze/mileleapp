@@ -136,7 +136,7 @@ input[type=number]::-webkit-outer-spin-button {
     $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;
     $ex_colours = $exColour ? $exColour->name : null;
     $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;
-    $int_colours = $exColour ? $intColour->name : null;
+    $int_colours = $intColour ? $intColour->name : null;
     $detail = $variant->detail;
     $brands_id = $variant->brands_id;
     $master_model_lines_id = $variant->master_model_lines_id;
@@ -179,7 +179,7 @@ input[type=number]::-webkit-outer-spin-button {
 </div>
 <div class="col-lg-1 col-md-6">
     <select name="oldint_colour[]" class="form-control" placeholder="Interior Color">
-        <option value="">Exterior Color</option>
+        <option value="">Interior Color</option>
         @foreach ($intColours as $id => $intColour)
             @if ($id == $vehicles->int_colour)
                 <option value="{{ $id }}" selected>{{ $intColour }}</option>
@@ -381,6 +381,28 @@ for (var id in intColours) {
       return false;
     }
   }
+</script>
+<script>
+  var input = document.getElementById('variants_id');
+  var dataList = document.getElementById('variantslist');
+  input.addEventListener('input', function() {
+    var inputValue = input.value;
+    var options = dataList.getElementsByTagName('option');
+    var matchFound = false;
+    for (var i = 0; i < options.length; i++) {
+      var option = options[i];
+      
+      if (inputValue === option.value) {
+        matchFound = true;
+        break;
+      }
+    }
+    if (!matchFound) {
+      input.setCustomValidity("Please select a value from the list.");
+    } else {
+      input.setCustomValidity('');
+    }
+  });
 </script>
 <script>
     setTimeout(function() {
