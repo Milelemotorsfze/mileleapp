@@ -67,12 +67,12 @@
                         <div class="row">
                             <div class="col-md-12 p-0">
                                 <div class="col-md-12 apendNewItemHere1 p-0">
-                                    <div class="row kitItemRowForSupplier1 kititemdelete">
+                                    <div class="row kitItemRowForSupplier1 kititemdelete" id="row-supplier-1-item-1">
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                            <select class="form-control widthinput" name="kitSupplierAndPrice[1][item][1][kit_item_id]"
-                                                    id="kitSupplier1Item1" multiple="true" style="width: 100%;">
+                                            <select class="form-control widthinput KitSupplierItems" name="kitSupplierAndPrice[1][item][1][kit_item_id]"
+                                                    id="kitSupplier1Item1" multiple="true" style="width: 100%;" data-index="1" data-supplier="1">
                                                 @foreach($kitItemDropdown as $kitItemDropdownData)
                                                     <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
                                                 @endforeach
@@ -136,7 +136,7 @@
                                             <span id="Supplier1Kit1TotalPriceUSDError" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                            <button  class="btn_round removeKitItemForSupplier1" onclick=del(this,1) hidden disabled>
+                                            <button  class="btn_round removeKitItemForSupplier1 "  hidden disabled>
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -157,6 +157,7 @@
     </div>
 </div>
 <input type="hidden" id="supplierIndex" value="">
+
 <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -167,6 +168,7 @@
         });
         var index = 1;
         $('#supplierIndex').val(index);
+
         $(document.body).on('select2:select', ".kitSuppliers", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
@@ -198,10 +200,12 @@
             var indexValue = $('#supplierIndex').val();
             for(var i=1;i<=indexValue;i++) {
                 $('#kitSupplierDropdown'+i).append($('<option>', {value: id, text :text}))
+
             }
         }
         $(document.body).on('click', ".removeKitSupplier", function (e) {
             var indexNumber = $(this).attr('data-index');
+            var supplierTotalIndex = $('#supplierIndex').val();
 
             $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
                 var id = (this.value);
@@ -210,6 +214,41 @@
             });
 
             $(this).closest('#row-'+indexNumber).remove();
+
+
+            {{--for(var supplier=1;supplier<=3;supplier++) {--}}
+            {{--    var eachItemTotalIndex =  $(".apendNewItemHere"+supplier).find(".kitItemRowForSupplier"+supplier).length;--}}
+
+            {{--    for(var item=1;item<=3;item++)--}}
+            {{--    {--}}
+            {{--        $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][kit_item_id]');--}}
+            {{--        $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ supplier +'Item'+item);--}}
+            {{--        $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][quantity]');--}}
+            {{--        $(this).find('.quantity').attr('id', 'Supplier'+ supplier +'Kit'+ item +'Quantity');--}}
+            {{--        $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ supplier +','+ item +')');--}}
+
+            {{--        $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][unit_price_in_aed]');--}}
+            {{--        $(this).find('.unit-price-AED').attr('id', 'Supplier'+ supplier +'Kit'+ item +'UnitPriceAED');--}}
+            {{--        $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ supplier +','+ item +')');--}}
+
+            {{--        $(this).find('.total-price-AED').attr('id', 'Supplier'+ supplier +'Kit'+ item +'TotalPriceAED');--}}
+            {{--        $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][total_price_in_aed]');--}}
+            {{--        $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ supplier +','+ item +')');--}}
+            {{--        $(this).find('.total-price-AED').attr('class', 'Supplier'+ supplier +'TotalPriceInAED form-control widthinput @error('addon_purchase_price')--}}
+            {{--            is-invalid @enderror total-price-AED');--}}
+
+            {{--        $(this).find('.unit-price-USD').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][unit_price_in_usd]');--}}
+            {{--        $(this).find('.unit-price-USD').attr('id', 'Supplier'+ supplier +'Kit1UnitPriceUSD');--}}
+            {{--        $(this).find('.unit-price-USD').attr('onkeyup', 'calculateOtherValuesbyUnitPriceUSD('+ supplier +','+ item +')');--}}
+            {{--        $(this).find('.unit-price-USD').attr('class', 'Supplier'+ supplier +'TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')--}}
+            {{--            is-invalid @enderror unit-price-USD');--}}
+
+            {{--        $(this).find('.total-price-USD').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][total_price_in_usd]');--}}
+            {{--        $(this).find('.total-price-USD').attr('id', 'Supplier'+ supplier +'Kit'+ item +'TotalPriceUSD');--}}
+            {{--        $(this).find('.total-price-USD').attr('onkeyup', 'calculateOtherValuesbyTotalPriceUSD('+ supplier +','+ item +')');--}}
+            {{--    }--}}
+
+            {{--}--}}
             $('.addSupplierForKitRow').each(function(i){
                 var index = +i + +1;
                 $(this).attr('id','row-'+ index);
@@ -224,11 +263,13 @@
 
                 $(this).find('#kitItemRow').attr('apendNewItemHere'+index);
                 $(this).find('#kitItemSubRow').attr('kitItemRowForSupplier'+index);
+
                 $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][kit_item_id]');
                 $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ index +'Item1');
                 $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][quantity]');
                 $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit1Quantity');
                 $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',1)');
+
                 $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_aed]');
                 $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit1UnitPriceAED');
                 $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ index +',1)');
@@ -245,12 +286,13 @@
                 $(this).find('.unit-price-USD').attr('class', 'Supplier'+ index +'TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')
                     is-invalid @enderror unit-price-USD');
 
-                $(this).find('.total-price-USD').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][total_price_in_usd]');
-                $(this).find('.total-price-USD').attr('id', 'Supplier'+ index +'Kit1TotalPriceUSD');
-                $(this).find('.total-price-USD').attr('onkeyup', 'calculateOtherValuesbyTotalPriceUSD('+ index +',1)');
-
                 $(this).find('.remove-kit-items').attr('class', 'btn_round removeKitItemForSupplier'+index+' remove-kit-items');
-                $(this).find('.remove-kit-items').attr('onclick', 'del(this,'+ index +')');
+
+                // for(var j=2; j<=4; j++) {
+                //     $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+ j +'][quantity]');
+                //     $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit'+ j +'Quantity');
+                //     $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +','+ j +')');
+                // }
 
 
                 // $(this).find('button').attr('id','remove-'+ index);
@@ -260,7 +302,11 @@
                     allowClear: true,
                     minimumResultsForSearch: -1,
                 });
+
+
             });
+
+
             setLeastPurchasePriceAED();
 
         })
@@ -275,73 +321,129 @@
     function addItemForSupplier(supplier)
     {
         var index = $(".apendNewItemHere"+supplier).find(".kitItemRowForSupplier"+supplier).length + 1;
-        $(".apendNewItemHere"+supplier).append(`
-            <div class="row kitItemRowForSupplier${supplier} kititemdelete">
-                <div class="col-xxl-2 col-lg-6 col-md-12">
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                    <select name="kitSupplierAndPrice[${supplier}][item][${index}][kit_item_id]" id="kitSupplier${supplier}Item${index}" multiple="true" style="width: 100%;">
-                        @foreach($kitItemDropdown as $kitItemDropdownData)
-                            <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
-                        @endforeach
-                    </select>
-                    @error('supplier_id')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
-                </div>
-                <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
-                    <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][quantity]" id="Supplier${supplier}Kit${index}Quantity" type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${supplier},${index})">
-                </div>
-                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
-                    <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
-                    <div class="input-group">
-                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_aed]" id="Supplier${supplier}Kit${index}UnitPriceAED" type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyUniTPriceAED(${supplier},${index})">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                </div>
-                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
-                    <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
-                    <div class="input-group">
-                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_aed]" id="Supplier${supplier}Kit${index}TotalPriceAED" type="number" min="0" step="any" class="Supplier${supplier}TotalPriceInAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="Enter Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${supplier},${index})">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                </div>
-                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
-                    <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
-                    <div class="input-group">
-                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_usd]" id="Supplier${supplier}Kit${index}UnitPriceUSD" type="number" min="0" step="any" class="Supplier${supplier}TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${supplier},${index})">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
-                                                    </div>
-                                                </div>
-                </div>
-                <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: #F8F8F8;">
-                    <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
-                    <div class="input-group">
-                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_usd]" id="Supplier${supplier}Kit${index}TotalPriceUSD" type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyTotalPriceUSD(${supplier},${index})">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
-                                                    </div>
-                                                </div>
-                </div>
-                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                    <button class="btn_round removeKitItemForSupplier${supplier}" onclick=del(this,${supplier}) disabled>
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </div>
-            </div>
-            `);
-        $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+supplier+":not(:first)").prop("disabled", false); $(".apendNewItemHere"+supplier).find(".removeKitItemForSupplier"+index).first().prop("disabled", true);
-        $("#kitSupplier"+supplier+"Item"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-        $("#kitSupplier"+supplier+"Item"+index).select2
-        ({
-            maximumSelectionLength: 1,
+        $('#kitItemIndex').val(index);
+        var selectedAddons = [];
+        for(let i=1; i<index; i++)
+        {
+            var eachSelectedAddon = $('#kitSupplier'+supplier+'Item'+i).val();
+            if(eachSelectedAddon) {
+                selectedAddons.push(eachSelectedAddon);
+            }
+        }
+        $.ajax({
+            url:"{{url('getKitItemsForAddon')}}",
+            type: "POST",
+            data:
+                {
+                    filteredArray: selectedAddons,
+                    _token: '{{csrf_token()}}'
+                },
+            dataType : 'json',
+            success: function(data) {
+                myarray = data;
+                var size = myarray.length;
+                if (size >= 1) {
+                    $(".apendNewItemHere" + supplier).append(`
+                        <div class="row kitItemRowForSupplier${supplier} kititemdelete" id="row-supplier-${supplier}-item-${index}">
+                            <div class="col-xxl-2 col-lg-6 col-md-12">
+                                <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
+                                <select name="kitSupplierAndPrice[${supplier}][item][${index}][kit_item_id]" id="kitSupplier${supplier}Item${index}" multiple="true"
+                                 style="width: 100%;" class="KitSupplierItems" data-index="${index}" data-supplier="${supplier}">
+                                    @foreach($kitItemDropdown as $kitItemDropdownData)
+                                <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
+                                    @endforeach
+                                </select>
+                                @error('supplier_id')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                                </div>
+                                <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                                    <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
+                                    <input name="kitSupplierAndPrice[${supplier}][item][${index}][quantity]" id="Supplier${supplier}Kit${index}Quantity"
+                                     type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantity"
+                                     placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
+                                     onkeyup="calculateOtherValuesbyQuantity(${supplier},${index})">
+                                </div>
+                            <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
+                                <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
+                                <div class="input-group">
+                                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_aed]" id="Supplier${supplier}Kit${index}UnitPriceAED"
+                                    type="number" min="0" step="any" class="form-control widthinput @error('addon_purchase_price') is-invalid @enderror unit-price-AED"
+                                    placeholder="Enter Unit Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus
+                                    onkeyup="calculateOtherValuesbyUniTPriceAED(${supplier},${index})">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
+                                <label for="choices-single-default" class="form-label font-size-13 ">Total Price In AED</label>
+                                <div class="input-group">
+                                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_aed]" id="Supplier${supplier}Kit${index}TotalPriceAED"
+                                    type="number" min="0" step="any" class="Supplier${supplier}TotalPriceInAED total-price-AED form-control widthinput @error('addon_purchase_price')
+                                    is-invalid @enderror" placeholder="Enter Total Price In AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price"
+                                    autofocus onkeyup="calculateOtherValuesbyTotalPriceAED(${supplier},${index})">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
+                                <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
+                                <div class="input-group">
+                                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][unit_price_in_usd]" id="Supplier${supplier}Kit${index}UnitPriceUSD"
+                                     type="number" min="0" step="any" class="Supplier${supplier}TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')
+                                        is-invalid @enderror unit-price-USD" placeholder="Enter Unit Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"
+                                         autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyUnitPriceUSD(${supplier},${index})">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: #F8F8F8;">
+                                <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
+                                <div class="input-group">
+                                    <input  name="kitSupplierAndPrice[${supplier}][item][${index}][total_price_in_usd]" id="Supplier${supplier}Kit${index}TotalPriceUSD"
+                                     type="number" min="0" step="any" class="form-control widthinput total-price-USD @error('addon_purchase_price_in_usd') is-invalid @enderror"
+                                      placeholder="Enter Total Price In USD" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd"
+                                       autofocus onkeyup="calculateOtherValuesbyTotalPriceUSD(${supplier},${index})">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                <button class="btn_round removeKitItemForSupplier${supplier} removeKitItem" data-index="${index}" data-supplier="${supplier}" >
+
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `);
+
+                    let addonDropdownData   = [];
+                    $.each(data,function(key,value)
+                    {
+                        addonDropdownData.push
+                        ({
+
+                            id: value.id,
+                            text: value.addon_code +' ('+value.addon_name.name +')'
+                        });
+                    });
+                    $('#kitSupplier'+supplier+'Item'+index).html("");
+                    $('#kitSupplier'+supplier+'Item'+index).select2
+                    ({
+                        placeholder:"Choose Items....     Or     Type Here To Search....",
+                        allowClear: true,
+                        data: addonDropdownData,
+                        maximumSelectionLength: 1,
+                    });
+                }
+            }
         });
+
     }
 </script>

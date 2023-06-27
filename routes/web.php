@@ -99,7 +99,7 @@ Route::get('/d', function () {
     Route::post('getSupplierForAddon', [AddonController::class, 'getSupplierForAddon'])->name('get-addon-supplier');
     Route::get('supplier-change-addon-type', [AddonController::class, 'getSupplierForAddonType']);
     Route::post('createSellingPrice/{id}', [AddonController::class, 'createSellingPrice'])->name('addon.createSellingPrice');
-
+    Route::post('getKitItemsForAddon', [AddonController::class, 'getKitItemsForAddon']);
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
 
