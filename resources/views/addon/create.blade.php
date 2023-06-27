@@ -453,6 +453,7 @@
         var fixingCharge = 'yes';
         $(document).ready(function ()
         {
+
             $("#addon_type").change(function () {
                 var addonType = $(this).val();
                 let url = '{{ url('supplier-change-addon-type') }}';
@@ -1470,5 +1471,6 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
+
 </script>
 @endsection

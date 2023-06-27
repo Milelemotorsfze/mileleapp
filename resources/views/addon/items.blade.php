@@ -1,4 +1,4 @@
-<div class="row addSupplierForKitRow">
+<div class="row addSupplierForKitRow" id="row-1" >
     <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
         <div id="London" class="tabcontent">
             <div class="row">
@@ -11,7 +11,7 @@
                                         <div class="col-xxl-3 col-lg-6 col-md-12">
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13" >Choose Suppliers</label>
-                                            <select name="kitSupplierAndPrice[1][supplier_id] kitSuppliers"  data-index="1"  id="kitSupplierDropdown1"
+                                            <select name="kitSupplierAndPrice[1][supplier_id]"  class="kitSuppliers" data-index="1"  id="kitSupplierDropdown1"
                                                     multiple="true" style="width: 100%;">
                                                 @foreach($suppliers as $supplier)
                                                     <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>
@@ -71,7 +71,8 @@
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                            <select class="form-control widthinput" name="kitSupplierAndPrice[1][item][1][kit_item_id]" id="kitSupplier1Item1" multiple="true" style="width: 100%;">
+                                            <select class="form-control widthinput" name="kitSupplierAndPrice[1][item][1][kit_item_id]"
+                                                    id="kitSupplier1Item1" multiple="true" style="width: 100%;">
                                                 @foreach($kitItemDropdown as $kitItemDropdownData)
                                                     <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
                                                 @endforeach
@@ -164,7 +165,107 @@
         ({
             maximumSelectionLength: 1,
         });
+        var index = 1;
+        $('#supplierIndex').val(index);
+        $(document.body).on('select2:select', ".kitSuppliers", function (e) {
+            var index = $(this).attr('data-index');
+            var value = e.params.data.id;
+            hideOption(index,value);
+        });
+        $(document.body).on('select2:unselect', ".kitSuppliers", function (e) {
+            var index = $(this).attr('data-index');
+            var data = e.params.data;
+            appendOption(index,data);
+        });
+        function hideOption(index,value) {
+            var indexValue = $('#supplierIndex').val();
+            for (var i = 1; i <= indexValue; i++) {
+                if (i != index) {
+                    var currentId = 'kitSupplierDropdown' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();
+                }
+            }
+        }
+        function appendOption(index,data) {
+            var indexValue = $('#supplierIndex').val();
+            for(var i=1;i<=indexValue;i++) {
+                if(i != index) {
+                    $('#kitSupplierDropdown'+i).append($('<option>', {value: data.id, text : data.text}))
+                }
+            }
+        }
+        function addOption(id,text) {
+            var indexValue = $('#supplierIndex').val();
+            for(var i=1;i<=indexValue;i++) {
+                $('#kitSupplierDropdown'+i).append($('<option>', {value: id, text :text}))
+            }
+        }
+        $(document.body).on('click', ".removeKitSupplier", function (e) {
+            var indexNumber = $(this).attr('data-index');
+
+            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                var id = (this.value);
+                var text = (this.text);
+                addOption(id,text)
+            });
+
+            $(this).closest('#row-'+indexNumber).remove();
+            $('.addSupplierForKitRow').each(function(i){
+                var index = +i + +1;
+                $(this).attr('id','row-'+ index);
+                $(this).find('.kitSuppliers').attr('data-index', index);
+                $(this).find('.kitSuppliers').attr('id','kitSupplierDropdown'+ index);
+                $(this).find('.kitSuppliers').attr('name','kitSupplierAndPrice['+ index +'][supplier_id]');
+                $(this).find('.leastPurchasePriceAED').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_aed]');
+                $(this).find('.leastPurchasePriceAED').attr('id','Supplier'+ index +'TotalPriceAED');
+                $(this).find('.purchase-price-USD').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_usd]');
+                $(this).find('.purchase-price-USD').attr('id','Supplier'+ index +'TotalPriceUSD');
+                $(this).find('.removeKitSupplier').attr('data-index', index);
+
+                $(this).find('#kitItemRow').attr('apendNewItemHere'+index);
+                $(this).find('#kitItemSubRow').attr('kitItemRowForSupplier'+index);
+                $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][kit_item_id]');
+                $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ index +'Item1');
+                $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][quantity]');
+                $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit1Quantity');
+                $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',1)');
+                $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_aed]');
+                $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit1UnitPriceAED');
+                $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ index +',1)');
+
+                $(this).find('.total-price-AED').attr('id', 'Supplier'+ index +'Kit1TotalPriceAED');
+                $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][total_price_in_aed]');
+                $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ index +',1)');
+                $(this).find('.total-price-AED').attr('class', 'Supplier'+ index +'TotalPriceInAED form-control widthinput @error('addon_purchase_price')
+                    is-invalid @enderror total-price-AED');
+
+                $(this).find('.unit-price-USD').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_usd]');
+                $(this).find('.unit-price-USD').attr('id', 'Supplier'+ index +'Kit1UnitPriceUSD');
+                $(this).find('.unit-price-USD').attr('onkeyup', 'calculateOtherValuesbyUnitPriceUSD('+ index +',1)');
+                $(this).find('.unit-price-USD').attr('class', 'Supplier'+ index +'TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')
+                    is-invalid @enderror unit-price-USD');
+
+                $(this).find('.total-price-USD').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][total_price_in_usd]');
+                $(this).find('.total-price-USD').attr('id', 'Supplier'+ index +'Kit1TotalPriceUSD');
+                $(this).find('.total-price-USD').attr('onkeyup', 'calculateOtherValuesbyTotalPriceUSD('+ index +',1)');
+
+                $(this).find('.remove-kit-items').attr('class', 'btn_round removeKitItemForSupplier'+index+' remove-kit-items');
+                $(this).find('.remove-kit-items').attr('onclick', 'del(this,'+ index +')');
+
+
+                // $(this).find('button').attr('id','remove-'+ index);
+                $('#kitSupplierDropdown'+index).select2
+                ({
+                    placeholder:"Choose Suppliers....     Or     Type Here To Search....",
+                    allowClear: true,
+                    minimumResultsForSearch: -1,
+                });
+            });
+            setLeastPurchasePriceAED();
+
+        })
     });
+
     function del(currentRow, supplier)
     {
         currentRow.closest(".kititemdelete").remove();
