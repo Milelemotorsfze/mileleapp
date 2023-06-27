@@ -69,6 +69,8 @@
     var brandMatsers = {!! json_encode($brandMatsers) !!};
     $(document).ready(function ()
     {
+      // table = $('#addonListDataTable').DataTable();
+      // $('#addonListDataTable').DataTable();
       $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
       $("#fltr-addon-code").select2();
       $("#fltr-brand").attr("data-placeholder","Choose Brand....    Or     Type Here To Search....");
@@ -192,23 +194,22 @@
           $.each(result.addonsBox, function (index, value)
           {
             $("#"+value).show();
-            $("."+value).show();
           });
-       
-          // location.reload();
-          // console.log(result);
-          
-          // $.each(globalThis.OldAddons,function(key,value)
-          // {  
-          //   $("#"+value).show();
-          // });
-          // globalThis.OldAddons = [];                     
-          // $.each(result,function(key,value)
-          // {  
-          //   globalThis.OldAddons .push(value);
-          //   $("#"+value).hide();
-          //   // $("#"+value).addClass('hide');
-          // });
+          $.each(result.addonsTable, function (index, value)
+          {
+            if(value.is_all_brands == 'yes')
+            {
+              $("."+value.id+"_allbrands").show();
+            }
+            else
+            {
+              $.each(value.addon_types, function (index, val)
+              {
+                $("."+value.id+"_"+val.brand_id).show();
+              });
+            }
+          });
+          // $('#addonListDataTable').DataTable();
         }
       });
     }
