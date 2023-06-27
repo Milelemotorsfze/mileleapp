@@ -139,11 +139,14 @@
                         </select>
                         <span id="SupplierError" class="invalid-feedback"></span>
                     </div>
-                    <div class="col-xxl-2 col-lg-3 col-md-4" id="ExtendedWarrantyMileageDiv" hidden>
+                    <div class="col-xxl-2 col-lg-3 col-md-4" id="ExtendedWarrantyMileageDiv" @if($isOpenMilage === 'yes') hidden @endif>
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Mileage') }}</label>
                         <div class="input-group">
-                            <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)" value="{{ $premium->extended_warranty_milage }}" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="extended_warranty_milage" id="extended_warranty_milage" onkeyup="validationOnKeyUp(this)"
+                                   value="{{ $premium->extended_warranty_milage }}" type="number" class="form-control widthinput"
+                                   onkeypress="return event.charCode >= 48" min="1" placeholder="Extended Warranty Mileage" aria-label="measurement"
+                                   aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">KM</span>
                             </div>
@@ -258,11 +261,11 @@
 <script type="text/javascript">
     var selectedBrands = [];
     var filteredArray = [];
-    var IsOpenMileage = 'yes';
     var save = 1;
 
     $(document).ready(function ()
     {
+
         $('#supplier_id').select2({
             placeholder:"Choose Supplier",
         });
@@ -638,6 +641,7 @@
     function hideExtendedWarrantyMileage()
     {
         let showExtendedWarrantyMilage = document.getElementById('ExtendedWarrantyMileageDiv');
+        // $('#extended_warranty_milage').val(0);
         showExtendedWarrantyMilage.hidden = true
     }
     function showEligibilityYearsError($msg)
