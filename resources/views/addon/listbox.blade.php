@@ -81,6 +81,20 @@
     background-color: rgba(128,128,128,0.5); /* color */
     display: none; /* making it hidden by default */
   }
+  .testtransform { text-transform: lowercase; }
+
+.testtransform:first-letter {
+  text-transform: uppercase;
+}
+.widthClass
+{
+  width: 165px;
+  margin-left:2px;
+}
+.widthData
+{
+  width: 400px;
+}
 </style>
 @if($addon1)
   @if(count($addon1) > 0)      
@@ -89,66 +103,37 @@
         @foreach($addon1 as $addonsdata)
           <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">  
             <div class="row">
-              <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+              <div class="widthClass labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
                 Addon Name
               </div>
-              <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+              <div class="testtransform widthData labellist databack1 col-xxl-8 col-lg-8 col-md-8">
                 @if($addonsdata->AddonName->name != '')
                   {{$addonsdata->AddonName->name}}
                 @endif
               </div>
               @if($addonsdata->payment_condition)
-                <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                <div class="widthClass labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
                   Payment Condition
                 </div>  
-              <div class="labellist databack2 col-xxl-8 col-lg-8 col-md-8">
+              <div class="testtransform widthData labellist databack1 col-xxl-8 col-lg-8 col-md-8">
                 {{$addonsdata->payment_condition}}
               </div>
               @endif
               @if($addonsdata->additional_remarks)
-                <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                <div class="widthClass labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
               Additional Remarks
               </div>
-              <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+              <div class="testtransform widthData labellist databack1 col-xxl-8 col-lg-8 col-md-8">
                 {{$addonsdata->additional_remarks}}
               </div>
               @endif
-              <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                @if($addonsdata->image)
-                  <img id="{{$addonsdata->id}}" src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:155px;" alt="Addon Image" class="modal-button" 
-                      data-modal-id="showImageModal{{$addonsdata->id}}" />
-                  <div class="modal" id="showImageModal{{$addonsdata->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Addon Image </h5>
-                          <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">X</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <form method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="row modal-row">
-                              <div class="col-xxl-12 col-lg-12 col-md-12">
-                                <center>
-                                  <img id="showImage{{$addonsdata->id}}" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="your image" class="showImage" />
-                                </center>
-                              </div>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>          
-                @endif
-              </div>              
+                          
               <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                 <div class="row" style="padding-right:3px; padding-left:3px;">
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
                     Addon Code
                   </div>
-                  <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                     {{$addonsdata->addon_code}}
                   </div>
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -170,7 +155,7 @@
                           <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                             Purchase Price
                           </div>
-                          <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                          <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                             {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                           </div>
                         @endcan
@@ -194,7 +179,7 @@
                       <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                         Selling Price 
                       </div>
-                      <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">       
+                      <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">       
                         @if($addonsdata->SellingPrice!= null)
                           @if($addonsdata->SellingPrice->selling_price != '')
                             {{$addonsdata->SellingPrice->selling_price}} AED
@@ -203,25 +188,29 @@
                           @if($addonsdata->PendingSellingPrice->selling_price != '')
                             {{$addonsdata->PendingSellingPrice->selling_price}} AED 
                             </br>
-                            <span style="color:#fd625e; font-size:13px;">( Approval Awaiting )</span>
+                            <label class="badge badge-soft-danger">Approval Awaiting</label>
                           @endif
                         @endif
                       </div>
                     @endif
                   @endcan
-                  @if($addonsdata->fixing_charge_amount)
-                    <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                      Fixing Charge
-                    </div>
-                    <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                      {{$addonsdata->fixing_charge_amount}} AED
-                    </div>
-                  @endif
+                  <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                    Fixing Charge
+                  </div>
+                  <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                    @if($addonsdata->fixing_charges_included == 'yes')
+                      <label class="badge badge-soft-success">Fixing Charge Included</label>
+                    @else
+                      @if($addonsdata->fixing_charge_amount != '')
+                        {{$addonsdata->fixing_charge_amount}} AED
+                      @endif
+                    @endif
+                  </div>
                   @if($addonsdata->lead_time)
                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                       Lead Time
                     </div>
-                    <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                    <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                       {{$addonsdata->lead_time}} Days
                     </div>
                   @endif
@@ -235,33 +224,75 @@
                   @endif
                 </div>                     
               </div> 
+              <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
+                @if($addonsdata->image)
+                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                      style="width:100%;max-width:300px">
+                @endif
+              </div> 
               @if($addonsdata->is_all_brands == 'yes')
                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                   Brand
                 </div>
-                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                   All Brands
                 </div>
               @else
-                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                @if($addonsdata->addon_type_name == 'SP')
+                  <div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3">
+                    <center>Brand</center>
+                  </div>
+                  <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                    <center> 
+                        Model Line
+                    </center>
+                  </div>
+                  <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5">
+                    <center> 
+                        Model Description
+                    </center>
+                  </div>
+                @else
+                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                   <center>Brand</center>
                 </div>
                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                  <center>Model Line</center>
+                  <center>
+                      Model Line
+                  </center>
                 </div>
+                @endif
                 @foreach($addonsdata->AddonTypes as $AddonTypes)
                   <div class="divcolorclass" value="5" hidden>
                   </div>
-                  <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                    {{$AddonTypes->brands->brand_name}}
-                  </div>                   
-                  <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                    @if($AddonTypes->is_all_model_lines == 'yes')
-                      All Model Lines
-                    @else
-                      {{$AddonTypes->modelLines->model_line}}
-                    @endif
-                  </div>
+                  @if($addonsdata->addon_type_name == 'SP')
+                    <div class="testtransform divcolor labellist databack1 col-xxl-3 col-lg-3 col-md-3">
+                      {{$AddonTypes->brands->brand_name}}
+                    </div>  
+                    <div class="testtransform divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">          
+                      @if(isset($AddonTypes->modelLines->model_line))
+                        {{$AddonTypes->modelLines->model_line}}                        
+                        @endif                   
+                        @if($AddonTypes->is_all_model_lines == 'yes')
+                          All Model Lines
+                        @endif                   
+                    </div>                 
+                    <div class="testtransform divcolor labellist databack1 col-xxl-5 col-lg-5 col-md-5">
+                        {{$AddonTypes->modelDescription->model_description ?? ''}} 
+                    </div>
+                  @else
+                    <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                      {{$AddonTypes->brands->brand_name}}
+                    </div>                   
+                    <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                        @if(isset($AddonTypes->modelLines->model_line))
+                          {{$AddonTypes->modelLines->model_line}}  
+                        @endif
+                        @if($AddonTypes->is_all_model_lines == 'yes')
+                          All Model Lines
+                        @endif
+                    </div>
+                  @endif 
                 @endforeach
               @endif      
             </div> 
@@ -275,25 +306,9 @@
                   </a>
                   @endcan
                 @endif
-
+                @include('addon.action.addsellingprice')
                 @include('addon.action.action')
-                
-                  
-                  <!-- @can('view-addon-selling-price-history')
-                    <a title="Selling Price History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.sellingPriceHistory',$addonsdata->id) }}">
-                      <i class="fa fa-history" aria-hidden="true"></i> Selling Price History
-                    </a>
-                  @endcan -->
-                  <!-- @can('addon-view')       
-                    <a title="View" class="btn btn-sm btn-success" href="{{ route('addon.view',$addonsdata->id) }}">
-                      <i class="fa fa-eye" aria-hidden="true"></i> View
-                    </a>
-                  @endcan -->
-                  <!-- @can('addon-edit')
-                    <a title="Edit" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
-                      <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                    </a>
-                  @endcan -->
+
                 </div> 
               </div>
             </div>
@@ -305,81 +320,4 @@
       <h6 style="text-align:center; padding-top:10px;">No data found !!</h6>
     @endif
   @endif
-
-        <script type="text/javascript">
-        //    $('.createAddonId').on('click', function()
-        // {
-
-        //     // create new addon and list new addon in addon list
-        //     var value = $('#selling_price').val();
-        //     var id = $('#createNew').val();
-        //     alert(id);
-        //         $.ajax
-        //         ({
-        //             url:"{{url('newSellingPriceRequest')}}",
-        //             type: "POST",
-        //             data:
-        //             {
-        //                 name: value,
-        //                 id: id,
-        //                 _token: '{{csrf_token()}}'
-        //             },
-        //             dataType : 'json',
-        //             success: function(result)
-        //             {
-        //                 $('.overlay').hide();
-        //                 $('.modal').removeClass('modalshow');
-        //                 $('.modal').addClass('modalhide');
-        //                 // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-        //                 // $('#addon_id').val(result.id);
-        //                 // var selectedValues = new Array();
-        //                 // resetSelectedSuppliers(selectedValues);
-        //                 // $('#addnewAddonButton').hide();
-        //                 // $('#new_addon_name').val("");
-        //                 // document.getElementById("newAddonError").textContent='';
-        //                 // $msg = "";
-        //                 // removeAddonNameError($msg);
-        //             }
-        //         });
-            
-        // });
-        // function showImage(ImgId)
-        // {
-        //     var modal = document.getElementById("showImageModal");
-        //     var img = document.getElementById(ImgId);
-        //     var image = document.getElementById("image");
-        //     var modalImg = document.getElementById("showImage");
-        //     var modalImg = document.getElementById("showImage");
-        //     $('.overlay').show();
-        //     $('#showImageModal').addClass('modalshow');
-        //     $('#showImageModal').removeClass('modalhide');
-        //     modalImg.src = img.src;
-        // }
-      //   $('.modal-button').on('click', function()
-      // {
-      //           $('.overlay').show();
-      //       $('#showImageModal').addClass('modalshow');
-      //       $('#showImageModal').removeClass('modalhide');
-      // });
-      //     $('.close').on('click', function()
-      //   {
-      //       $('.modal').addClass('modalhide');
-      //       $('.modal').removeClass('modalshow');
-      //       $('.overlay').hide();
-      //   });
-
-        $('.modal-button').on('click', function()
-      {
-        var modalId = $(this).data('modal-id');
-        $('#' + modalId).addClass('modalshow');
-        $('#' + modalId).removeClass('modalhide');
-
-        $('.overlay').show();
-      });
-      $('.close').on('click', function()
-      {
-        $('.modal').addClass('modalhide');
-        $('.modal').removeClass('modalshow');
-        $('.overlay').hide();
-      });
-        </script>
+  

@@ -30,23 +30,14 @@ class AddonController extends Controller
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
-        $addon1 = AddonDetails::
-        // where('id',20)->with(['AddonTypesGroup' => function($query){
-        //     $query->groupBy('brand_id');
-        //     foreach($query as $queryData) 
-        //     {
-        //         $query->model
-        //     }
-        // }])
-        // ->
-        with('AddonName','AddonTypes.brands','AddonTypes.modelLines','AddonTypes.modelDescription','LeastPurchasePrices','SellingPrice','PendingSellingPrice');
+        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','AddonTypes.modelDescription','LeastPurchasePrices','SellingPrice',
+        'PendingSellingPrice');
         if($data != 'all')
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-        $addon1 = $addon1->orderBy('id', 'DESC')->get();    
+        $addon1 = $addon1->orderBy('id', 'DESC')->get(); 
         return view('addon.index',compact('addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
-        // 'addons',
     }
     /**
      * Show the form for creating a new resource.
@@ -374,13 +365,20 @@ class AddonController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Addon $addon)
+    public function destroy(string $id)
     {
-        //
+        $addonDetails = AddonDetails::findOrFail($id);
+        DB::beginTransaction();
+            AddonTypes::where('addon_details_id', $id)->delete();
+            AddonSellingPrice::where('addon_details_id', $id)->delete();
+            SupplierAddons::where('addon_details_id', $id)->delete();
+            $addonDetails->delete();
+        DB::commit();
+        return response(true);
     }
     public function editAddonDetails($id)
     {
-        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','LeastPurchasePrices')->first();
+        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice','LeastPurchasePrices')->first();
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
@@ -808,7 +806,8 @@ class AddonController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')->first();
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers',
+        'AddonSuppliers.Kit.addon.AddonName')->first();
         // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
         // {
@@ -827,9 +826,12 @@ class AddonController extends Controller
         if($request->status == 'active')
         {
             $oldSellingPrice = AddonSellingPrice::where('addon_details_id',$sellingPrice->addon_details_id)->where('status','active')->first();
-            $oldSellingPrice->status = 'inactive';
-            $oldSellingPrice->updated_by = $authId;
-            $oldSellingPrice->save();
+            if($oldSellingPrice != '')
+            {
+                $oldSellingPrice->status = 'inactive';
+                $oldSellingPrice->updated_by = $authId;
+                $oldSellingPrice->save();
+            }
         }
         $sellingPrice->status = $request->status;
         $sellingPrice->status_updated_by = $authId;
@@ -933,4 +935,13 @@ class AddonController extends Controller
         return redirect()->route('addon.list', $data)
                         ->with('success','Addon created successfully');
     }
+    public function addonStatusChange(Request $request)
+    {
+        $addon = AddonDetails::find($request->id);
+        $addon->status = $request->status;
+
+        $addon->save();
+        return response($addon, 200);
+    }
+
 }

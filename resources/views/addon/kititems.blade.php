@@ -69,15 +69,17 @@
               background-color:#f2f2f2;
               border-color: white;
             }
-              /* #addonListTable{
-            display: none;
-          } */
           #blah
-        {
-            width: 140px;
-            height: 120px;  
-            padding-right:1.25rem;
-        }
+            {
+                width: 250px;
+                height: 250px;  
+                padding-top:0px;
+                margin-top:0px;
+            }
+        .contain
+    {
+    object-fit: contain;
+    }
 </style>
 @section('content')
     <div class="card-header">
@@ -93,54 +95,54 @@
     <div class="card-body">
 
         <div class="row">
-            <div class="col-xxl-9 col-lg-9 col-md-9">
+            <div class="col-xxl-4 col-lg-4 col-md-4">
                 <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Kit Name :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->AddonName->name}}</span>
                     </div>
 
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Kit Code :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->addon_code}}</span>
                     </div>
 
                     @if($supplierAddonDetails->part_number != '')
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Part Number :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->part_number}} </span>
                     </div>
         	        @endif
 
                     @if($supplierAddonDetails->payment_condition != '')
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Payment Condition :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->payment_condition}}</span>
                     </div>
                     @endif
 
                     @if($supplierAddonDetails->additional_remarks != '')
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Additional Remarks :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->additional_remarks}}</span>
                     </div>
                     @endif
 
                    
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Fixing Charge Amount :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>
                         @if($supplierAddonDetails->fixing_charges_included == 'yes')
                         Included
@@ -149,78 +151,109 @@
                         @endif
                     </span>
                     </div>
-
-
                     @can('addon-selling-price-view')
-                    @if($supplierAddonDetails->SellingPrice!= null OR $supplierAddonDetails->PendingSellingPrice!= null)
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> Selling Price :</label>
-                    </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12"> 
-                        @if($supplierAddonDetails->SellingPrice!= null)
-                          @if($supplierAddonDetails->SellingPrice->selling_price != '')
-                            {{$supplierAddonDetails->SellingPrice->selling_price}} AED
-                          @endif
-                          @elseif($supplierAddonDetails->PendingSellingPrice!= null)
-                          @if($supplierAddonDetails->PendingSellingPrice->selling_price != '')
-                            {{$supplierAddonDetails->PendingSellingPrice->selling_price}} AED 
-                            <span style="color:#fd625e; font-size:13px;">( Approval Awaiting )</span>
-                          @endif
+                        @if($supplierAddonDetails->SellingPrice!= null OR $supplierAddonDetails->PendingSellingPrice!= null)
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Selling Price :</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12"> 
+                                @if($supplierAddonDetails->SellingPrice!= null)
+                                    @if($supplierAddonDetails->SellingPrice->selling_price != '')
+                                        {{$supplierAddonDetails->SellingPrice->selling_price}} AED
+                                    @endif
+                                @elseif($supplierAddonDetails->PendingSellingPrice!= null)
+                                    @if($supplierAddonDetails->PendingSellingPrice->selling_price != '')
+                                        {{$supplierAddonDetails->PendingSellingPrice->selling_price}} AED 
+                                        <label class="badge badge-soft-danger">Approval Awaiting</label>
+                                    @endif
+                                @endif
+                            </div>
                         @endif
-                      </div>
-                    @endif
-                  @endcan
-
-
-
-
-
+                    @endcan
                     @if($supplierAddonDetails->LeastPurchasePrices != '')
                     @can('addon-least-purchase-price-view')
-                    <div class="col-lg-2 col-md-3 col-sm-12">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Least Purchase Price :</label>
                     </div>
-                    <div class="col-lg-2 col-md-9 col-sm-12">
+                    <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->LeastPurchasePrices->purchase_price_aed}} AED</span>
                     </div>
                     @endcan
                     @endif
                 </div>
             </div>
-            <div class="col-xxl-2 col-lg-2 col-md-2">
+            <div class="col-xxl-5 col-lg-5 col-md-5">
                 <div class="row">
-                    @if( $supplierAddonDetails->is_all_brands == 'yes')
-                        <div class="col-lg-6 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">Brand  :</label>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-12">
-                            <span>All Brands</span>
-                        </div>
-                    @elseif($supplierAddonDetails->is_all_brands == 'no')
-                        <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                            <center>Brand</center>
-                        </div>
-                        <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
-                            <center>Model Line</center>
-                        </div>
-                        @foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
-                            <div class="divcolorclass" value="5" hidden>
+                    @if($supplierAddonDetails->addon_type_name == 'SP')
+                        @if( $supplierAddonDetails->is_all_brands == 'yes')
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Brand  :</label>
                             </div>
-                            <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                            {{$AddonTypes->brands->brand_name}}
-                            </div>                   
-                            <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
-                            @if($AddonTypes->is_all_model_lines == 'yes')
-                            All Model Lines
-                            @else
-                            {{$AddonTypes->modelLines->model_line}}
-                            @endif
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <span>All Brands</span>
                             </div>
-                        @endforeach
+                        @elseif($supplierAddonDetails->is_all_brands == 'no')
+                            <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                                <center>Brand</center>
+                            </div>
+                            <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                                <center>Model Line</center>
+                            </div>
+                            <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                                <center>Model Description</center>
+                            </div>
+                            @foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
+                                <div class="divcolorclass" value="5" hidden>
+                                </div>
+                                <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
+                                {{$AddonTypes->brands->brand_name}}
+                                </div>                   
+                                <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
+                                @if($AddonTypes->is_all_model_lines == 'yes')
+                                All Model Lines
+                                @else
+                                {{$AddonTypes->modelLines->model_line}}
+                                @endif
+                                </div>
+                                <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
+                                {{$AddonTypes->modelDescription->model_description ?? ''}}
+                                </div>   
+                            @endforeach
+                        @endif
+                    @else
+                        @if( $supplierAddonDetails->is_all_brands == 'yes')
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Brand  :</label>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <span>All Brands</span>
+                            </div>
+                        @elseif($supplierAddonDetails->is_all_brands == 'no')
+                            <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                                <center>Brand</center>
+                            </div>
+                            <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                                <center>Model Line</center>
+                            </div>
+                            @foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
+                                <div class="divcolorclass" value="5" hidden>
+                                </div>
+                                <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                                {{$AddonTypes->brands->brand_name}}
+                                </div>                   
+                                <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
+                                @if($AddonTypes->is_all_model_lines == 'yes')
+                                All Model Lines
+                                @else
+                                {{$AddonTypes->modelLines->model_line}}
+                                @endif
+                                </div>
+                            @endforeach
+                        @endif
                     @endif
                  </div>
             </div>
-            <div class="col-xxl-1 col-lg-1 col-md-1">
+            <div class="col-xxl-3 col-lg-3 col-md-3">
                 <div class="row">
                     <center>
                     <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="your image" class="contain" data-modal-id="showImageModal"/>
@@ -323,7 +356,7 @@
                                             {{$Kit->addon->AddonName->name}}
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                                            <img src="{{ asset('addon_image/' . $Kit->addon->image) }}" style="width:100%; height:125px;" alt="Addon Image"  />
+                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class" style="width:100%; height:125px;" alt="Addon Image"  />
                                         </div>
                                         <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                                             <div class="row" style="padding-right:3px; padding-left:3px;">
@@ -390,6 +423,32 @@
             </br>
         @endforeach
     </div>
+    <div id="myModal" class="modal modalForImage">
+  <span class="closeImage close">&times;</span>
+  <img class="modalContentForImage" id="img01">
+  <div id="caption"></div>
+</div>
+<script type="text/javascript">
+// show image in large view
+    $('.image-click-class').click(function (e) 
+    {
+        alert('hihih');
+        var id =  $(this).attr('id');
+        var src = $(this).attr('src');
+        var modal = document.getElementById("myModal");
+        var img = document.getElementById(id);
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+        modal.style.display = "block";
+        modalImg.src = src;
+        captionText.innerHTML = this.alt;
+      })
+      $('.closeImage').click(function (e) 
+      {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+      })   
+      </script>
 @endsection
 
 

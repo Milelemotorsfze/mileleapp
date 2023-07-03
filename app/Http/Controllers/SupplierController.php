@@ -94,6 +94,10 @@ class SupplierController extends Controller
     {
         $authId = Auth::id();
         $existingSellingprice = AddonSellingPrice::where('id',$request->id)->where('status','active')->latest()->first();
+        if($existingSellingprice == '')
+        {
+            $existingSellingprice = AddonSellingPrice::where('id',$request->id)->where('status','pending')->latest()->first();
+        }
         $input['addon_details_id'] = $existingSellingprice->addon_details_id;
         $input['selling_price'] = $request->selling_price;
         $input['created_by'] = $authId;

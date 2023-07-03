@@ -76,8 +76,9 @@
                             @foreach ($addon1 as $key => $addonsdata)
                                 @if($addonsdata->is_all_brands == 'yes')
                                     <tr data-id="1" class="{{$addonsdata->id}}_allbrands tr" id="{{$addonsdata->id}}_allbrands">
-                                        <td>{{ ++$i }}</td>
-                                        <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                        <td>{{ ++$i }}</td>                                    
+                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                        style="width:100%; height:100px;"></td>
                                         <td>{{$addonsdata->AddonName->name}}</td>
                                         <td>     
                                             @if($addonsdata->addon_type_name == 'K')
@@ -132,15 +133,23 @@
                                         <td>{{$addonsdata->part_number}}</td>
                                         <td>{{$addonsdata->payment_condition}}</td>
                                         <td>
+                                        @include('addon.action.tableAddSellingPrice')
                                         @include('addon.action.action')
                                             
                                         </td>
                                     </tr>
                                 @else
                                     @foreach($addonsdata->AddonTypes as $AddonTypes)
-                                        <tr data-id="1" class="{{$addonsdata->id}}_{{$AddonTypes->brand_id}} tr" id="{{$addonsdata->id}}_{{$AddonTypes->brand_id}}">
-                                            <td>{{ ++$i }}</td>                      
-                                            <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                        <tr data-id="1" class="
+                                            @if($AddonTypes->is_all_model_lines == 'yes') 
+                                                {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_all_model_lines
+                                            @else
+                                                {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}
+                                            @endif
+                                                tr" id="{{$addonsdata->id}}_{{$AddonTypes->brand_id}}">
+                                            <td>{{ ++$i }}</td>    
+                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                            style="width:100%; height:100px;"></td>
                                             <td>{{$addonsdata->AddonName->name}}</td>
                                             <td>
                                                 @if($addonsdata->addon_type_name == 'K')
@@ -199,6 +208,7 @@
                                             <td>{{$addonsdata->part_number}}</td>
                                             <td>{{$addonsdata->payment_condition}}</td>
                                             <td>
+                                            @include('addon.action.modelAddonSellingPrice')
                                             @include('addon.action.action')
                                             </td>
                                         </tr>
