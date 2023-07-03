@@ -20,7 +20,7 @@
     </h4>
     @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create', 'addon-supplier-create']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create','addon-supplier-create']);
     @endphp
     @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>

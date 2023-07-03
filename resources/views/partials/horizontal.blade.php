@@ -18,7 +18,7 @@
     {
         .responsiveButton
         {
-            position: absolute; right: 150px; z-index: 500; top: 10px;
+            position: absolute; right: 161px; z-index: 500; top: 10px;
         }
     }  
 </style>

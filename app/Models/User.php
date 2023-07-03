@@ -36,13 +36,13 @@ class User extends Authenticatable
     public function hasPermissionForSelectedRole($permissionName)
     {
         $selectedRole = $this->selected_role;
-        if(is_array($selectedRole)) {
-            if(count($selectedRole) > 0)
+        if(is_array($permissionName)) {
+            if(count($permissionName) > 0)
             {
                 return DB::table('role_has_permissions')
                     ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
                     ->where('role_has_permissions.role_id', $selectedRole)
-                    ->orWhereIn('permissions.name', $permissionName)
+                    ->whereIn('permissions.name', $permissionName)
                     ->exists();
             }
         }
