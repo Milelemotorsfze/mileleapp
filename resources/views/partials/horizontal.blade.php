@@ -64,7 +64,7 @@
     <div class="dropdown-divider"></div>
     @canany(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create');
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create']);
     @endphp
     @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('users.index') }}">
