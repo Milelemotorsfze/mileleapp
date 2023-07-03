@@ -30,6 +30,10 @@ class AddonDetails extends Model
     {
         return $this->hasMany(AddonTypes::class,'addon_details_id','id');
     }
+    public function AddonTypesGroup()
+    {
+        return $this->hasMany(AddonTypes::class,'addon_details_id','id');
+    }
     public function AddonName()
     {
         return $this->hasOne(Addon::class,'id','addon_id');

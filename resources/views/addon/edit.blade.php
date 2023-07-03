@@ -164,7 +164,8 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ $addonDetails->addon_code }}"  autocomplete="addon_code" autofocus readonly>
+                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code" 
+                            placeholder="Addon Code" value="{{ $addonDetails->addon_code }}"  autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -193,7 +194,8 @@
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
                             @can('master-addon-create')
-                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
+                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" 
+                            class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                             @endcan
                         </div>
                     </div>
@@ -205,7 +207,9 @@
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
 
-                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed }}"  autocomplete="purchase_price" autofocus readonly>
+                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" 
+                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed }}"  
+                        autocomplete="purchase_price" autofocus readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -217,11 +221,21 @@
                             @enderror
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
+                            <label for="selling_price" class="col-form-label text-md-end">
+                                @if(isset($addonDetails->SellingPrice->selling_price))
+                                {{ __('Selling Price') }}
+                                @elseif(isset($addonDetails->PendingSellingPrice->selling_price))
+                                {{ __('Selling Price') }}
+                                <label class="badge badge-soft-danger">Approval Awaiting</label>
+                                @endif
+                            </label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                        <input readonly id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ $addonDetails->SellingPrice->selling_price }}" autocomplete="selling_price">
+                        <input readonly id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror"
+                         name="selling_price" placeholder="Enter Selling Price" value="{{$addonDetails->SellingPrice->selling_price ?? 
+                            $addonDetails->PendingSellingPrice->selling_price ?? ''}}" 
+                                autocomplete="selling_price">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -234,6 +248,10 @@
                         </div>
                     </div>
                     </br>
+
+                   
+
+
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
@@ -242,7 +260,9 @@
                         <div class="input-group">
                          
 
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">
+                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" 
+                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" 
+                        value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">Days</span>
                                                     </div>  
@@ -257,7 +277,9 @@
                             <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ $addonDetails->payment_condition }}"  autocomplete="payment_condition" autofocus>
+                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" 
+                            name="payment_condition" placeholder="Enter Payment Condition" value="{{ $addonDetails->payment_condition }}"  autocomplete="payment_condition" 
+                            autofocus>
                             @error('payment_condition')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -273,9 +295,11 @@
                             <div class="col-xxl-3 col-lg-3 col-md-6" id="">
                                 <fieldset>
                                     <div class="some-class">
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="yes" id="yes" {{"yes" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
+                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" 
+                                        value="yes" id="yes" {{"yes" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
                                         <label for="yes">Yes</label>
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="no" id="no" {{"no" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
+                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" 
+                                        value="no" id="no" {{"no" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
                                         <label for="no">No</label>
                                     </div>
                                 </fieldset>
@@ -291,7 +315,8 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
                         <div class="input-group">
-                        <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
+                        <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" 
+                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>  
@@ -309,7 +334,8 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
-                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
+                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
+                        value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -325,7 +351,8 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
+                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
+                            value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -340,7 +367,9 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ $addonDetails->additional_remarks }}"  autocomplete="additional_remarks" autofocus>{{ $addonDetails->additional_remarks }}</textarea>
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" 
+                            name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ $addonDetails->additional_remarks }}"  
+                            autocomplete="additional_remarks" autofocus>{{ $addonDetails->additional_remarks }}</textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -357,7 +386,8 @@
                     </br>
                     </br>
                     <center>
-                    <img id="blah" src="{{ asset('addon_image/' . $addonDetails->image) }}" alt="your image" class="contain" data-modal-id="showImageModal" onclick="showImage()"/>
+                    <img id="blah" src="{{ asset('addon_image/' . $addonDetails->image) }}" alt="your image" class="contain" data-modal-id="showImageModal" 
+                    onclick="showImage()"/>
                     </center>
                    
                 </div>
@@ -401,7 +431,8 @@
                                         <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
+                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
+                                        placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
@@ -414,7 +445,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i>
+                             Submit</button>
                         </div>
                     </div>
                 </div>

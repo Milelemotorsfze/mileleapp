@@ -56,9 +56,9 @@
                             <td>{{ $vendor->mobile }}</td>
                             <td>
 {{--                                @can('vendors-view')--}}
-                                    <a href="{{ route('vendors.show',$vendor->id) }}">
-                                        <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>
-                                    </a>
+{{--                                    <a href="{{ route('vendors.show',$vendor->id) }}">--}}
+{{--                                        <button type="button" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> </button>--}}
+{{--                                    </a>--}}
 {{--                                @endcan--}}
 {{--                                @can('vendors-edit')--}}
                                     <a href="{{ route('vendors.edit',$vendor->id) }}">

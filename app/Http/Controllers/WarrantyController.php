@@ -50,6 +50,7 @@ class WarrantyController extends Controller
         $authId = Auth::id();
         $input = $request->all();
         $input['created_by'] = $authId;
+        $input['extended_warranty_milage'] =  $input['is_open_milage'] = 'no' ? $input['extended_warranty_milage'] : 0;
         $premium = WarrantyPremiums::create($input);
         if($request->brandPrice)
         {
@@ -127,8 +128,10 @@ class WarrantyController extends Controller
             })
             ->get();
         $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
+        $isOpenMilage = $premium->is_open_milage;
 
-        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands','alreadyAddedBrands'));
+        return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands',
+            'alreadyAddedBrands','isOpenMilage'));
     }
 
     /**
@@ -147,6 +150,7 @@ class WarrantyController extends Controller
             'extended_warranty_period' => 'required',
             'claim_limit_in_aed' => 'required'
         ]);
+
 
         $input = $request->all();
         $input['updated_by'] = Auth::id();

@@ -1,9 +1,9 @@
 @can('add-new-addon-selling-price')
-  @if(!isset($addonsdata->SellingPrice) && !isset($addonsdata->PendingSellingPrice))
-    <button type="button" title="Create Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#create-selling-price-{{$addonsdata->id}}">
+@if(!isset($addonsdata->SellingPrice) && !isset($addonsdata->PendingSellingPrice))
+    <button type="button" title="Create Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}">
       <i class="fa fa-plus"></i> 
     </button>
-    <div class="modal fade" id="create-selling-price-{{$addonsdata->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog ">
         <form id="form-update" action="{{ route('addon.createSellingPrice', $addonsdata->id) }}" method="POST" >
           @csrf
@@ -40,12 +40,12 @@
         </form>
       </div>
     </div>
-  @elseif(isset($addonsdata->SellingPrice))
+    @elseif(isset($addonsdata->SellingPrice))
     <button type="button" title="Add New Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" 
-        data-bs-target="#edit-selling-price-{{$addonsdata->SellingPrice->id}}">
+        data-bs-target="#edit-table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}">
       <i class="fa fa-plus"></i> 
     </button>
-    <div class="modal fade" id="edit-selling-price-{{$addonsdata->SellingPrice->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="edit-table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog ">
         <form id="form-update" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}" method="POST" >
         @csrf
@@ -90,10 +90,10 @@
                       </div>
                     </div>
                     @else
-                    <button title="Add New Selling Price" type="button" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#edit-selling-price-{{$addonsdata->PendingSellingPrice->id}}">
+                    <button title="Add New Selling Price" type="button" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#edit-table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}">
                       <i class="fa fa-plus"></i> 
                     </button>
-                    <div class="modal fade" id="edit-selling-price-{{$addonsdata->PendingSellingPrice->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="edit-table-selling-price-{{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                       <div class="modal-dialog ">
                         <form id="form-update" action="{{ route('addon.newSellingPriceRequest', $addonsdata->PendingSellingPrice->id) }}" method="POST" >
                           @csrf

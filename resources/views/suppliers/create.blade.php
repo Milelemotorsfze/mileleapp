@@ -265,7 +265,8 @@ input {
                             <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person" placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
+                            <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
+                                   placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
                             @error('contact_person')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -283,7 +284,9 @@ input {
                             <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror" name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                            <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
+                                   name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"
+                                   autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                             <!-- @error('contact_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -336,7 +339,9 @@ input {
                             <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"  autocomplete="person_contact_by" autofocus>
+                            <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror"
+                                   name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"
+                                   autocomplete="person_contact_by" autofocus>
                             @error('person_contact_by')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -902,27 +907,7 @@ input {
                 });
             }
         });
-        function resetAddonDropdown()
-        {
-            // var selectedAddons = [];
-            // for (var i = 1; i <= addonDropdownCount; i++)
-            // {
-            //     var eachSelected = [];
-            //     var eachSelected = $('#adoon_'+i).val();
-            //     $.each(eachSelected, function( ind, value )
-            //     {
-            //         selectedAddons.push(value);
 
-            //     });
-            // }
-            // for (var i = 1; i <= addonDropdownCount; i++)
-            // {
-            //     $.each(selectedAddons, function( ind, value )
-            //     {
-            //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
-            //     });
-            // }
-        }
         //===== delete the form fieed row
 
         function secondaryPaymentMethods(changePayment)
@@ -1341,3 +1326,4 @@ input {
         }
     </script>
 @endsection
+// onclick=del(this,${supplier})

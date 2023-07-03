@@ -27,4 +27,12 @@ class AddonTypes extends Model
     {
         return $this->belongsTo(MasterModelLines::class,'model_id','id');
     }
+    public function modelDescription()
+    {
+        return $this->hasOne(MasterModelDescription::class,'id','model_number');
+    }
+    public function AddonModelGroup()
+    {
+        return $this->hasMany(AddonTypes::class,'brand_id','id');
+    }
 }

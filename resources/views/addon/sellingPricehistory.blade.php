@@ -353,7 +353,7 @@
             }else{
                 var message = 'Reject';
             }
-            var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this addon selling price ?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",
@@ -370,7 +370,7 @@
                         }
                     });
                 }
-            }).set({title:"Status Change"})
+            }).set({title: message +" Addon Selling Price"})
         }
     </script>
 @endpush

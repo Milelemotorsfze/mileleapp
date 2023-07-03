@@ -1,11 +1,106 @@
-@extends('layouts.table')
+@extends('layouts.main')
 @section('content')
 <style>
-  .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link
+  /* .nav-fill .nav-item .nav-link, .nav-justified .nav-item .nav-link
   {
     width :20%;
-  }
+  } */
+  .widthinput
+    {
+        height:32px!important;
+    }
   </style>
+  <style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+#myImg {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modalForImage {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 10px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: black; /* Fallback color */
+  background-color: rgba(128,128,128,0.5);/* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modalContentForImage {
+  padding-top: 100px; /* Location of the box */
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  height:auto!important;
+  max-width: 700px!important;
+}
+
+/* Caption of Modal Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation */
+.modalContentForImage, #caption {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  color: black;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .modalContentForImage {
+    width: 100%;
+  }
+}
+</style>
   @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
   <div class="card-header">
     <h4 class="card-title">
@@ -35,7 +130,9 @@
     <form>
       <input type="text", value="{{$data}}" id="data" hidden>
       <div class="row">
+        <h6><center>Addon Filters</center></h6>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+        <label class="col-form-label text-md-end">{{ __('Choose Addon Name') }}</label>
           <select id="fltr-addon-code" multiple="true" style="width: 100%;">
             @foreach($addonMasters as $addonMaster)
               <option value="{{$addonMaster->id}}">{{$addonMaster->name}}</option>
@@ -43,6 +140,7 @@
           </select>
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+        <label class="col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
           <select id="fltr-brand" multiple="true" style="width: 100%;">
           <option id="allBrandsFilter" value="yes">All Brands</option>
             @foreach($brandMatsers as $brandMatser)
@@ -51,6 +149,7 @@
           </select>
         </div>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12" id="ModelLineDiv">
+        <label class="col-form-label text-md-end">{{ __('Choose Model Line') }}</label>
           <select id="fltr-model-line" multiple="true" style="width: 100%;">
           <option id="allMoLiId" value="yes">All Model Lines</option>
           @foreach($modelLineMasters as $modelLineMaster)
@@ -62,8 +161,14 @@
     </form>
   </div>
   
+  <div id="myModal" class="modal modalForImage">
+  <span class="closeImage close">&times;</span>
+  <img class="modalContentForImage" id="img01">
+  <div id="caption"></div>
+</div>
     @include('addon.listbox')
     @include('addon.table')
+
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};
@@ -99,6 +204,24 @@
         $('.modal').removeClass('modalshow');
       });
     });
+    // show image in large view
+    $('.image-click-class').click(function (e) 
+    {
+        var id =  $(this).attr('id');
+        var src = $(this).attr('src');
+        var modal = document.getElementById("myModal");
+        var img = document.getElementById(id);
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+        modal.style.display = "block";
+        modalImg.src = src;
+        captionText.innerHTML = this.alt;
+      })
+      $('.closeImage').click(function (e) 
+      {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+      })   
     function closemodal()
     {
       $('.modal').removeClass('modalshow');
@@ -192,25 +315,31 @@
           $.each(result.addonsBox, function (index, value)
           {
             $("#"+value).show();
-            $("."+value).show();
           });
-       
-          // location.reload();
-          // console.log(result);
-          
-          // $.each(globalThis.OldAddons,function(key,value)
-          // {  
-          //   $("#"+value).show();
-          // });
-          // globalThis.OldAddons = [];                     
-          // $.each(result,function(key,value)
-          // {  
-          //   globalThis.OldAddons .push(value);
-          //   $("#"+value).hide();
-          //   // $("#"+value).addClass('hide');
-          // });
+          $.each(result.addonsTable, function (index, value)
+          {
+            if(value.is_all_brands == 'yes')
+            {
+              $("."+value.id+"_allbrands").show();
+            }
+            else
+            {
+              $.each(value.addon_types, function (index, val)
+              {
+                if(val.is_all_model_lines == 'yes')
+                {
+                  $("."+value.id+"_"+val.brand_id+"_all_model_lines").show();
+                }
+                else
+                {
+                  $("."+value.id+"_"+val.brand_id+"_"+val.model_id).show();
+                }
+              });
+            }
+          });
         }
       });
     }
   </script>
 @endsection
+

@@ -195,6 +195,7 @@ class PermissionTableSeeder extends Seeder
             ['14','Addons Delete','addon-delete', 'To Delete the Addons'],
             ['14','Addons View','addon-view', 'To View the Addons'],
             ['14','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
+            ['14','Delete Addon','addon-delete', 'To Delete the Addons'],
 
             //Addon Purchase Prices
             ['15','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],

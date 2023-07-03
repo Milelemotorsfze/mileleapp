@@ -41,7 +41,7 @@
         @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
             <div class="card-body">
                 <div class="table-responsive" id="addonListTable" hidden>     
-                    <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
+                    <table id="addonListDataTable" class="table table-striped table-editable table-edits table">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -51,7 +51,7 @@
                                 <th>Addon Code</th>
                                 <th>Brand</th>
                                 <th>Model Line</th>
-                                <!-- <th>Model Description</th> -->
+                                <th>Model Description</th>
                                 <th>Lead Time</th>
                                 <th>Additional Remarks</th>
                                 @if($content == '')
@@ -71,13 +71,14 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <div hidden>{{$i=0;}}</div>
+                        <div hidden>{{$i=0;}}</div>
+                        <tbody id="tBodyAddon">                           
                             @foreach ($addon1 as $key => $addonsdata)
                                 @if($addonsdata->is_all_brands == 'yes')
-                                    <tr data-id="1" class="{{ $addonsdata->addon_details_table_id }} tr">
-                                        <td>{{ ++$i }}</td>
-                                        <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                    <tr data-id="1" class="{{$addonsdata->id}}_allbrands tr" id="{{$addonsdata->id}}_allbrands">
+                                        <td>{{ ++$i }}</td>                                    
+                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                        style="width:100%; height:100px;"></td>
                                         <td>{{$addonsdata->AddonName->name}}</td>
                                         <td>     
                                             @if($addonsdata->addon_type_name == 'K')
@@ -91,6 +92,7 @@
                                         <td>{{$addonsdata->addon_code}}</td>
                                         <td>All Brands</td>
                                         <td>All Model Lines</td>
+                                        <td></td>
                                         <td>{{$addonsdata->lead_time}} Days</td>
                                         <td>{{$addonsdata->additional_remarks}}</td>
                                         @if($content == '')
@@ -131,15 +133,23 @@
                                         <td>{{$addonsdata->part_number}}</td>
                                         <td>{{$addonsdata->payment_condition}}</td>
                                         <td>
+                                        @include('addon.action.tableAddSellingPrice')
                                         @include('addon.action.action')
                                             
                                         </td>
                                     </tr>
                                 @else
                                     @foreach($addonsdata->AddonTypes as $AddonTypes)
-                                        <tr data-id="1" class="{{ $addonsdata->addon_details_table_id }} tr">
-                                            <td>{{ ++$i }}</td>                      
-                                            <td><img src="{{ asset('addon_image/' . $addonsdata->image) }}" style="width:100%; height:100px;" /></td>
+                                        <tr data-id="1" class="
+                                            @if($AddonTypes->is_all_model_lines == 'yes') 
+                                                {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_all_model_lines
+                                            @else
+                                                {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}
+                                            @endif
+                                                tr" id="{{$addonsdata->id}}_{{$AddonTypes->brand_id}}">
+                                            <td>{{ ++$i }}</td>    
+                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                            style="width:100%; height:100px;"></td>
                                             <td>{{$addonsdata->AddonName->name}}</td>
                                             <td>
                                                 @if($addonsdata->addon_type_name == 'K')
@@ -159,6 +169,7 @@
                                                     {{$AddonTypes->modelLines->model_line}}
                                                 @endif
                                             </td>
+                                            <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>
                                             <td>{{$addonsdata->lead_time}} Days</td>
                                             <td>{{$addonsdata->additional_remarks}}</td>
                                             @if($content == '')
@@ -197,6 +208,7 @@
                                             <td>{{$addonsdata->part_number}}</td>
                                             <td>{{$addonsdata->payment_condition}}</td>
                                             <td>
+                                            @include('addon.action.modelAddonSellingPrice')
                                             @include('addon.action.action')
                                             </td>
                                         </tr>
