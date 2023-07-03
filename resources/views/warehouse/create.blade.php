@@ -55,7 +55,10 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
-@can('create-po-details')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
+                    @endphp
+                    @if ($hasPermission)
 <div class="card-header">
         <h4 class="card-title">New Purchasing Order</h4>
         <div class="row">
@@ -171,7 +174,7 @@ input[type=number]::-webkit-outer-spin-button {
 {!! Form::close() !!}
 		</br>
     </div>
-    @endcan
+    @endif
     @php
     $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
     $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();

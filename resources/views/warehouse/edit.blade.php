@@ -55,8 +55,10 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
-@can('create-po-details')
-@if (Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-details');
+                    @endphp
+                    @if ($hasPermission)
 @php
     $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
     $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
@@ -190,7 +192,10 @@ input[type=number]::-webkit-outer-spin-button {
     </select>
 </div>
 @endif
-    @if (Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                    @endphp
+                    @if ($hasPermission)
     <div class="col-lg-1 col-md-6">
     <select name="oldpayment[]" class="form-control">
         <option value="Not Paid" {{ $vehicles->payment_status == 'Not Paid' ? 'selected' : '' }}>Not Paid</option>
@@ -202,7 +207,10 @@ input[type=number]::-webkit-outer-spin-button {
         <input type="hidden" name="id[]" value="{{$vehicles->id}}" class="form-control" placeholder="VIN">
 		</div>
     @endif
-    @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
     <div class="col-lg-1 col-md-6">
     <input type="text" name="oldpayment[]" class="form-control" value="{{$vehicles->payment_status}}" readonly>
     </div>
@@ -226,7 +234,10 @@ input[type=number]::-webkit-outer-spin-button {
         <br>
         @endforeach
         </div>
-        @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
         <div class="bar">Add New Vehicles Into Stock</div>
         <div class="row">
             <div class="col-lg-2 col-md-6">
@@ -274,7 +285,6 @@ input[type=number]::-webkit-outer-spin-button {
         redirect()->route('home')->send();
     @endphp
 @endif
-    @endcan
 @endsection
 @push('scripts')
 <style>

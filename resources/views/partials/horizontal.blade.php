@@ -167,7 +167,10 @@
                     </li>
                     @endcanany
                     @can('Calls-view')
-                    @if (Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '3')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('calls.index') }}" id="topnav-more" role="button">
                             <i data-feather="phone-call"></i>
@@ -177,7 +180,10 @@
                     @endif
                     @endcan
                     @can('View-daily-movemnets')
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnets');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('movement.index') }}" id="topnav-more" role="button">
                             <i data-feather="command"></i>
@@ -187,7 +193,10 @@
                     @endif
                     @endcan
                     @can('view-po-details')
-                    @if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('purchasing-order.index') }}" id="topnav-more" role="button">
                             <i data-feather="award"></i>
@@ -197,7 +206,10 @@
                     @endif
                     @endcan
                     @can('stock-full-view')
-                    @if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16'|| Auth::user()->selectedRole === '17'|| Auth::user()->selectedRole === '18'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
@@ -207,7 +219,10 @@
                     @endif
                     @endcan
                     @can('edit-po-details')
-                    @if (Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-details');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
@@ -217,7 +232,10 @@
                     @endif
                     @endcan
                     @can('variants-view')
-                    @if (Auth::user()->selectedRole === '4')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
@@ -227,7 +245,10 @@
                     @endif
                     @endcan
                     @can('sales-view')
-                    @if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle arrow-none" href="{{ route('dailyleads.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
@@ -236,7 +257,10 @@
                     </li>
                     @endif
                     @endcan
-                    @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-picture-view');
+                    @endphp
+                    @if ($hasPermission)
                      <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
@@ -244,8 +268,11 @@
                         </a>
                     </li>
                     @endif
-                    @can('demand-create')
-                    @if (Auth::user()->selectedRole === '17' || Auth::user()->selectedRole === '18')
+                    @can('demand-list')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
+                    @endphp
+                    @if ($hasPermission)
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                 <i data-feather="file-text"></i>
@@ -304,7 +331,10 @@
                         </li>
                         @endif
                     @endcan
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -312,36 +342,61 @@
                             <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
+                        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+                    @endphp
+                    @if ($hasPermission)
                         <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Variants </span>
                                 </a>
                             </div>
+                            @endif
+                            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('colour-edit');
+                    @endphp
+                    @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('colourcode.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Colours </span>
                                 </a>
                             </div>
+                            @endif
                             <!-- <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Garages </span>
                                 </a>
                             </div> -->
+                            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+                    @endphp
+                    @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('warehouse.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Warehouse </span>
                                 </a>
                             </div>
+                            @endif
+                            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-view');
+                    @endphp
+                    @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('vendors.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Vendors </span>
                                 </a>
                             </div>
+                            @endif
+                            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-edit');
+                    @endphp
+                    @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Variant Prices </span>
                                 </a>
                             </div>
+                            @endif
                             <!-- <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Supplier </span>
@@ -359,7 +414,10 @@
                     </li>
                     @endif
                     @can('HR-view')
-                    @if (Auth::user()->selectedRole === '19' || Auth::user()->selectedRole === '20')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('HR-view');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('hiring.index') }}" id="topnav-more" role="button">
                             <i data-feather="file-text"></i>
@@ -370,7 +428,10 @@
                     @endif
                     @endcan
                     @can('Calls-view')
-                    @if (Auth::user()->selectedRole === '4')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('lead_source.index') }}" id="topnav-more" role="button">
                             <i data-feather="server"></i>

@@ -55,17 +55,23 @@
     $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
     $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
 @endphp
-@if (Auth::user()->selectedRole === '2' || Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '11'|| Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16'|| Auth::user()->selectedRole === '17'|| Auth::user()->selectedRole === '18'|| Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
+                    @endphp
+                    @if ($hasPermission)
 <div class="card-header">
         <h4 class="card-title">View Vehicles Details</h4>
     </div>
-    @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
+    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                    @endphp
+                    @if ($hasPermission)
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="pill" href="#tab1">All Vehicles</a>
+      <a class="nav-link active" data-bs-toggle="pill" href="#tab1">All Vehicles</a>
       </li>
       <li class="nav-item">
-      <a class="nav-link active" data-bs-toggle="pill" href="#tab2">Pending Inspection Vehicles</a>
+      <a class="nav-link" data-bs-toggle="pill" href="#tab2">Pending Inspection Vehicles</a>
       </li>
     </ul>
     <div class="tab-content">
@@ -73,77 +79,149 @@
       @endif
     <div class="card-body">
     <div class="table-responsive" >
-            <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-bordered">
+            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
                 <tr>
-                @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
-                <th class="nowrap-td">PO Date</th>    
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
                 <th class="nowrap-td">PO Number</th>
-                    @endif
-                    <th class="nowrap-td">GRN</th>
-                    <th class="nowrap-td">GRN Date</th>
-                    <th class="nowrap-td">Inspection Date</th>
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
-                    <th class="nowrap-td">Aging</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '8'||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
+                <th class="nowrap-td">PO Date</th> 
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">GRN</th>
+                <th class="nowrap-td">GRN Date</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Inspection Date</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Aging</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">SO Number</th>
                     <th class="nowrap-td">Sales Person</th>
+                    @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Reservation Start</th>
                     <th class="nowrap-td">Reservation End</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Sales Remarks</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">GDN</th>
                     <th class="nowrap-td">GDN Date</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Warehouse Remarks</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
-                    <th class="nowrap-td">Conversion</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                    @can('vehicles-detail-view')
-                    <th class="nowrap-td">Variant</th>
-                    <th class="nowrap-td">Variant Detail</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Brand</th>
                     <th class="nowrap-td">Model Line</th>
                     <th class="nowrap-td">Model Description</th>
-                    <th class="nowrap-td">VIN</th>
+                    <th class="nowrap-td">Variant</th>
+                    <th class="nowrap-td">Variant Detail</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">VIN</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Conversion</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Engine</th>
-                    <th class="nowrap-td">MY</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Manufacture Year</th>
                     <th class="nowrap-td">Steering</th>
                     <th class="nowrap-td">Seats</th>
-                    <th class="nowrap-td">Fuel</th>
+                    <th class="nowrap-td">Fuel Type</th>
                     <th class="nowrap-td">Gear</th>
                     <th class="nowrap-td">Ex Colour</th>
                     <th class="nowrap-td">Int Colour</th>
                     <th class="nowrap-td">Upholestry</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">PY MM YYYY</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Allowed Territory</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Warehouse</th>
-                    @endcan
-                    @endif
-                    @can('price-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Warehouse Remarks</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Price</th>
-                    @endif
-                    @endcan
-                    @can('territory-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Territory</th>
-                    @endif
-                    @endcan
-                    @can('document-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Import Document Type</th>
-                    <th class="nowrap-td">Document Ownership</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+                @endphp
+                @if ($hasPermission)
+               <th class="nowrap-td">Import Document Type</th>
+               <th class="nowrap-td">Document Ownership</th>
                     <th class="nowrap-td">Documents With</th>
-                    <th class="nowrap-td">BL Status</th>
-                    @endif
-                    @endcan
-                    <th class="nowrap-td">Pictures View</th>
-                    <th class="nowrap-td">Changes Log</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">BL Number</th>
+                @endif
+                    <th class="nowrap-td" id="pictures" style="vertical-align: middle;">Pictures View</th>
+                    <th class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -218,28 +296,39 @@
                                 $bl_status = $documents ? $documents->bl_status : null;
                                 $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                      @endphp
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
                      <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                      @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($grn_number)
                      <td class="nowrap-td grnNumber">GRN - {{ $grn_number }}</td>
                      @else
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}
-                     @if (!empty($vehicles->inspection_date))
-                        <td class="nowrap-td inspection">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
-                    @else
-                        <td class="nowrap-td">-</td>
-                    @endif
+                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
-                     <td class="nowrap-td">-</td>
                     @endif
-                     </td>
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                    @endphp
+                    @if ($hasPermission)
+                    <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
+                    <input type="hidden" class="inspection" value="{{ $vehicles->inspection_date }}">
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($grn_date)
                      @php
                      $grn_date = \Carbon\Carbon::parse($grn_date);
@@ -250,7 +339,10 @@
                      <td class="nowrap-td">-</td>
                      @endif
                      @endif
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($so_number)
                      <td class="nowrap-td so_number">{{ $so_number }}</td>
                      <input type="hidden" class="payment_percentage" value="{{ $vehicles->payment_percentage }}">
@@ -259,8 +351,18 @@
                      @endif
                      <td class="nowrap-td">{{ $salesname }}</td>
                      <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
+                     @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+                    @endphp
+                    @if ($hasPermission)
                      <td class="nowrap-td reservation_start_date">{{ $vehicles->reservation_start_date }}</td>
                      <td class="nowrap-td reservation_end_date">{{ $vehicles->reservation_end_date }}</td>
+                     @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
+                    @endphp
+                    @if ($hasPermission)
                      @if($latestRemark)
                         <td class="nowrap-td" onclick="event.stopPropagation();">
                             {{ $latestRemark }}
@@ -269,8 +371,11 @@
                     @else
                         <td class="nowrap-td">-</td>
                     @endif
-                     @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($gdn_number)
                      <td class="nowrap-td gdnNumber">GDN - {{ $gdn_number }}</td>
                      @else
@@ -282,22 +387,39 @@
                      <td class="nowrap-td gdnDate">-</td>
                      @endif
                      @endif
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                     <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
-                     @endif
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
-                     <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
-                     @endif
-                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                    @can('vehicles-detail-view')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td">{{ $brand_name }}</td>
+                     <td class="nowrap-td">{{ $model_line }}</td>
+                     <td class="nowrap-td">{{ $vehicles->vin }}</td>
                      <td class="nowrap-td Variant">{{ $varaints_name }}</td>
-                        <td class="nowrap-td">{{ $varaints_detail }}</td>
-                        <td class="nowrap-td">{{ $brand_name }}</td>
-                        <td class="nowrap-td">{{ $model_line }}</td>
-                        <td class="nowrap-td">{{ $vehicles->vin }}</td>
-                        <td class="nowrap-td Vin">{{ $vehicles->vin }}</td>
-                        <td class="nowrap-td Engine">{{ $vehicles->engine }}</td>
-                        <td class="nowrap-td">{{ $varaints_my }}</td>
+                     <td class="nowrap-td">{{ $varaints_detail }}</td>
+                     @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td Vin">{{ $vehicles->vin }}</td>
+                     @endif
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
+                      @endphp
+                      @if ($hasPermission)
+                      <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
+                      @endif
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
+                      @endphp
+                      @if ($hasPermission)
+                     <td class="nowrap-td Engine">{{ $vehicles->engine }}</td>
+                     @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td">{{ $varaints_my }}</td>
                         <td class="nowrap-td">{{ $varaints_steering }}</td>
                         <td class="nowrap-td">{{ $varaints_seat }}</td>
                         <td class="nowrap-td">{{ $varaints_fuel_type }}</td>
@@ -307,6 +429,11 @@
                         <td class="nowrap-td">{{ $int_colours }}</td>
                         <input type="hidden" class="IntColour" value="{{ $vehicles->int_colour }}">
                         <td class="nowrap-td Upholestry">{{ $varaints_upholestry }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
+                        @endphp
+                        @if ($hasPermission)
                         @if ($vehicles->ppmmyyy)
                         <input type="hidden" class="Ppmmyy" value="{{ $vehicles->ppmmyyy }}">
                         <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->ppmmyyy)) }}
@@ -314,27 +441,45 @@
                         @else
                         <td class="nowrap-td Ppmmyy"></td>
                         @endif
-                        <td class="nowrap-td">{{ $warehouses }}</td>
-                        @endcan
-                    @endif
-                    @can('price-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                        <td class="nowrap-td">{{ $vehicles->price }}</td>
                         @endif
-                    @endcan
-                    @can('territory-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td Territory">{{ $vehicles->territory }}</td>
                         @endif
-                    @endcan
-                    @can('document-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+                        @endphp
+                        @if ($hasPermission)
+                        <td class="nowrap-td">{{ $warehouses }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
+                        @endphp
+                        @if ($hasPermission)
+                        <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                        @endphp
+                        @if ($hasPermission)
+                       <td class="nowrap-td">{{ $vehicles->price }}</td>
+                       @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td import_type">{{ $import_type }}</td>
                         <td class="nowrap-td owership">{{ $owership }}</td>
                         <td class="nowrap-td document_with">{{ $document_with }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
-                        @endcan
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehiclespictures.viewpictures', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"> View Pic</a></td>
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"></i> View Log</a></td>
                     </tr>
@@ -343,84 +488,159 @@
             </table>
         </div>
         </div>
-        @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
+        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                        @endphp
+                        @if ($hasPermission)
         </div>
         </div>
   <div class="tab-content">
   <div class="tab-pane fade show" id="tab2">
   <div class="card-body">
     <div class="table-responsive" >
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
-                <thead class="bg-soft-secondary">
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
+            <thead class="bg-soft-secondary">
                 <tr>
-                @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
-                <th class="nowrap-td">PO Date</th>    
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
                 <th class="nowrap-td">PO Number</th>
-                    @endif
-                    <th class="nowrap-td">GRN</th>
-                    <th class="nowrap-td">GRN Date</th>
-                    <th class="nowrap-td">Inspection Date</th>
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
-                    <th class="nowrap-td">Aging</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '8'||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
+                <th class="nowrap-td">PO Date</th> 
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">GRN</th>
+                <th class="nowrap-td">GRN Date</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Inspection Date</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Aging</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">SO Number</th>
                     <th class="nowrap-td">Sales Person</th>
+                    @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Reservation Start</th>
                     <th class="nowrap-td">Reservation End</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Sales Remarks</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">GDN</th>
                     <th class="nowrap-td">GDN Date</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Remarks</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
-                    <th class="nowrap-td">Conversion</th>
-                    @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                    @can('vehicles-detail-view')
-                    <th class="nowrap-td">Variant</th>
-                    <th class="nowrap-td">Variant Detail</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Brand</th>
                     <th class="nowrap-td">Model Line</th>
                     <th class="nowrap-td">Model Description</th>
-                    <th class="nowrap-td">VIN</th>
+                    <th class="nowrap-td">Variant</th>
+                    <th class="nowrap-td">Variant Detail</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">VIN</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Conversion</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Engine</th>
-                    <th class="nowrap-td">MY</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Manufacture Year</th>
                     <th class="nowrap-td">Steering</th>
                     <th class="nowrap-td">Seats</th>
-                    <th class="nowrap-td">Fuel</th>
+                    <th class="nowrap-td">Fuel Type</th>
                     <th class="nowrap-td">Gear</th>
                     <th class="nowrap-td">Ex Colour</th>
                     <th class="nowrap-td">Int Colour</th>
                     <th class="nowrap-td">Upholestry</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">PY MM YYYY</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Allowed Territory</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Warehouse</th>
-                    @endcan
-                    @endif
-                    @can('price-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">Warehouse Remarks</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                @endphp
+                @if ($hasPermission)
                     <th class="nowrap-td">Price</th>
-                    @endif
-                    @endcan
-                    @can('territory-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Territory</th>
-                    @endif
-                    @endcan
-                    @can('document-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                    <th class="nowrap-td">Import Document Type</th>
-                    <th class="nowrap-td">Document Ownership</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+                @endphp
+                @if ($hasPermission)
+               <th class="nowrap-td">Import Document Type</th>
+               <th class="nowrap-td">Document Ownership</th>
                     <th class="nowrap-td">Documents With</th>
-                    <th class="nowrap-td">BL Status</th>
-                    @endif
-                    @endcan
-                    <th class="nowrap-td">Pictures View</th>
-                    <th class="nowrap-td">Changes Log</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
+                @endphp
+                @if ($hasPermission)
+                    <th class="nowrap-td">BL Number</th>
+                @endif
+                    <th class="nowrap-td" id="pictures" style="vertical-align: middle;">Pictures View</th>
+                    <th class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -495,28 +715,39 @@
                                 $bl_status = $documents ? $documents->bl_status : null;
                                 $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                      @endphp
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12'|| Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '8'|| Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
                      <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                      @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($grn_number)
                      <td class="nowrap-td grnNumber">GRN - {{ $grn_number }}</td>
                      @else
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}
-                     @if (!empty($vehicles->inspection_date))
-                        <td class="nowrap-td inspection">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
-                    @else
-                        <td class="nowrap-td">-</td>
-                    @endif
+                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
-                     <td class="nowrap-td">-</td>
                     @endif
-                     </td>
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22')
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                    @endphp
+                    @if ($hasPermission)
+                    <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
+                    <input type="hidden" class="inspection" value="{{ $vehicles->inspection_date }}">
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($grn_date)
                      @php
                      $grn_date = \Carbon\Carbon::parse($grn_date);
@@ -527,7 +758,10 @@
                      <td class="nowrap-td">-</td>
                      @endif
                      @endif
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '15'|| Auth::user()->selectedRole === '16')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($so_number)
                      <td class="nowrap-td so_number">{{ $so_number }}</td>
                      <input type="hidden" class="payment_percentage" value="{{ $vehicles->payment_percentage }}">
@@ -536,18 +770,31 @@
                      @endif
                      <td class="nowrap-td">{{ $salesname }}</td>
                      <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
+                     @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+                    @endphp
+                    @if ($hasPermission)
                      <td class="nowrap-td reservation_start_date">{{ $vehicles->reservation_start_date }}</td>
                      <td class="nowrap-td reservation_end_date">{{ $vehicles->reservation_end_date }}</td>
+                     @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
+                    @endphp
+                    @if ($hasPermission)
                      @if($latestRemark)
                         <td class="nowrap-td" onclick="event.stopPropagation();">
                             {{ $latestRemark }}
-                            <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more">View All</a>
+                            <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                         </td>
                     @else
                         <td class="nowrap-td">-</td>
                     @endif
-                     @endif
-                    @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+                    @endphp
+                    @if ($hasPermission)
                      @if ($gdn_number)
                      <td class="nowrap-td gdnNumber">GDN - {{ $gdn_number }}</td>
                      @else
@@ -559,22 +806,39 @@
                      <td class="nowrap-td gdnDate">-</td>
                      @endif
                      @endif
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7'|| Auth::user()->selectedRole === '8')
-                     <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
-                     @endif
-                     @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
-                     <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
-                     @endif
-                     @if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '9' || Auth::user()->selectedRole === '10'|| Auth::user()->selectedRole === '8' ||Auth::user()->selectedRole === '13'|| Auth::user()->selectedRole === '14' || Auth::user()->selectedRole === '4' || Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6' || Auth::user()->selectedRole === '15' || Auth::user()->selectedRole === '16' || Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                    @can('vehicles-detail-view')
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td">{{ $brand_name }}</td>
+                     <td class="nowrap-td">{{ $model_line }}</td>
+                     <td class="nowrap-td">{{ $vehicles->vin }}</td>
                      <td class="nowrap-td Variant">{{ $varaints_name }}</td>
-                        <td class="nowrap-td">{{ $varaints_detail }}</td>
-                        <td class="nowrap-td">{{ $brand_name }}</td>
-                        <td class="nowrap-td">{{ $model_line }}</td>
-                        <td class="nowrap-td">{{ $vehicles->vin }}</td>
-                        <td class="nowrap-td Vin">{{ $vehicles->vin }}</td>
-                        <td class="nowrap-td Engine">{{ $vehicles->engine }}</td>
-                        <td class="nowrap-td">{{ $varaints_my }}</td>
+                     <td class="nowrap-td">{{ $varaints_detail }}</td>
+                     @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td Vin">{{ $vehicles->vin }}</td>
+                     @endif
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
+                      @endphp
+                      @if ($hasPermission)
+                      <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
+                      @endif
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
+                      @endphp
+                      @if ($hasPermission)
+                     <td class="nowrap-td Engine">{{ $vehicles->engine }}</td>
+                     @endif
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                    @endphp
+                    @if ($hasPermission)
+                     <td class="nowrap-td">{{ $varaints_my }}</td>
                         <td class="nowrap-td">{{ $varaints_steering }}</td>
                         <td class="nowrap-td">{{ $varaints_seat }}</td>
                         <td class="nowrap-td">{{ $varaints_fuel_type }}</td>
@@ -584,6 +848,11 @@
                         <td class="nowrap-td">{{ $int_colours }}</td>
                         <input type="hidden" class="IntColour" value="{{ $vehicles->int_colour }}">
                         <td class="nowrap-td Upholestry">{{ $varaints_upholestry }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
+                        @endphp
+                        @if ($hasPermission)
                         @if ($vehicles->ppmmyyy)
                         <input type="hidden" class="Ppmmyy" value="{{ $vehicles->ppmmyyy }}">
                         <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->ppmmyyy)) }}
@@ -591,27 +860,45 @@
                         @else
                         <td class="nowrap-td Ppmmyy"></td>
                         @endif
-                        <td class="nowrap-td">{{ $warehouses }}</td>
-                        @endcan
-                    @endif
-                    @can('price-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
-                        <td class="nowrap-td">{{ $vehicles->price }}</td>
                         @endif
-                    @endcan
-                    @can('territory-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td Territory">{{ $vehicles->territory }}</td>
                         @endif
-                    @endcan
-                    @can('document-view')
-                    @if (Auth::user()->selectedRole === '21' || Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12' || Auth::user()->selectedRole === '8' || Auth::user()->selectedRole === '22'|| Auth::user()->selectedRole === '7')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+                        @endphp
+                        @if ($hasPermission)
+                        <td class="nowrap-td">{{ $warehouses }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
+                        @endphp
+                        @if ($hasPermission)
+                        <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+                        @endphp
+                        @if ($hasPermission)
+                       <td class="nowrap-td">{{ $vehicles->price }}</td>
+                       @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td import_type">{{ $import_type }}</td>
                         <td class="nowrap-td owership">{{ $owership }}</td>
                         <td class="nowrap-td document_with">{{ $document_with }}</td>
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
+                        @endphp
+                        @if ($hasPermission)
                         <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
-                        @endcan
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehiclespictures.viewpictures', $vehicles->id) }}" onclick="event.stopPropagation();"> View Pic</a></td>
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Log</a></td>
                     </tr>
@@ -623,8 +910,10 @@
         </div>
         </div>
   @endif
-  @can('warehouse-edit')
-  @if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+  @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+                        @endphp
+                        @if ($hasPermission)
   <div id="editmodalwarehouse" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -658,9 +947,10 @@
   </div>
 </div>
 @endif
-@endcan
-  @can('vehicles-detail-edit')
-  @if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                        @endphp
+                        @if ($hasPermission)
   <div id="editModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -677,14 +967,14 @@
     <div class="col-md-4">
         <label for="gdn_date">Inspection Date</label>
         <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
-        <input type="date" class="form-control" id="inspection" name="inspection" value="{{ $vehicles->inspection }}">
+        <input type="date" class="form-control" id="inspection" name="inspection" value="{{ $vehicles->inspection_date }}">
       </div>
     <div class="col-md-4">
   <label for="variants_name">Variant</label>
-  <input type="text" class="form-control" id="variants_name" name="variants_name" list="laList" value="{{ $varaints_name }}">
-  <datalist id="laList">
-    @foreach ($varaint as $varaints)
-      <option value="{{ $varaints->name }}">{{ $varaints->name }}</option>
+  <input type="text" class="form-control" id="variants_name" name="variants_name" list="variantslist" value="{{ $varaints_name }}">
+  <datalist id="variantslist">
+    @foreach ($varaint as $varainters)
+      <option value="{{ $varainters->name }}">{{ $varainters->name }}</option>
     @endforeach
   </datalist>
 </div>
@@ -741,9 +1031,10 @@
   </div>
 </div>
 @endif
-@endcan
-@can('document-edit')
-@if (Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
+                        @endphp
+                        @if ($hasPermission)
   <div id="editModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -820,9 +1111,10 @@
   </div>
 </div>
 @endif
-@endcan
-@can('edit-so')
-@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+                        @endphp
+                        @if ($hasPermission)
   <div id="editModalso" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -841,8 +1133,10 @@
     <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">
     <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">    
 </div>
-@can('edit-reservation')
-@if (Auth::user()->selectedRole === '8')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
+                        @endphp
+                        @if ($hasPermission)
 <div class="col-md-4">
   <label for="so_number">Reservation Start Date</label>
     <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">    
@@ -861,7 +1155,6 @@
   </select>
 </div>
 @endif
-@endcan
       <div class="col-md-4">
         <label for="gdn_date">Payment Percentage</label>
         <select name="payment_percentage" id="payment_percentage" class="form-control">
@@ -878,14 +1171,15 @@
                 <option value="100%">100%</option>
     </select>
       </div>
-      @can('edit-reservation')
-@if (Auth::user()->selectedRole === '8')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
+                        @endphp
+                        @if ($hasPermission)
       <div class="col-md-12">
   <label for="sales_remarks">Sales Remarks</label>
     <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">    
 </div>
 @endif
-@endcan
 </div>
                         <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -896,9 +1190,10 @@
   </div>
 </div>
 @endif
-@endcan
-@can('vehicles-detail-edit')
-@if (Auth::user()->selectedRole === '13' || Auth::user()->selectedRole === '14')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                        @endphp
+                        @if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -908,8 +1203,9 @@
   var ExColour = row.find('.ExColour').val();
   var IntColour = row.find('.IntColour').val();
   var Territory = row.find('.Territory').text();
-  var inspection = row.find('.inspection').text();
+  var inspection = row.find('.inspection').val();
   var Ppmmyy = row.find('.Ppmmyy').val();
+  console.log(inspection);
   $('#variants_name').val(variant);
   $('#vin').val(Vin);
   $('#engine').val(Engine);
@@ -933,9 +1229,10 @@
   $('#editModal').on('click', '[data-dismiss="modal"]', cancelChanges);
 </script>
 @endif
-@endcan
-@can('document-edit')
-@if (Auth::user()->selectedRole === '11' || Auth::user()->selectedRole === '12')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
+                        @endphp
+                        @if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -962,9 +1259,10 @@
   $('#editModal').on('click', '[data-dismiss="modal"]', cancelChanges);
 </script>
 @endif
-@endcan
-@can('edit-so')
-@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+                        @endphp
+                        @if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -987,9 +1285,10 @@
   $('#editModalso').on('click', '[data-dismiss="modal"]', cancelChanges);
 </script>
 @endif
-@endcan
-@can('warehouse-edit')
-@if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+@php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+                        @endphp
+                        @if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -1012,16 +1311,19 @@
   $('#editmodalwarehouse').on('click', '[data-dismiss="modal"]', cancelChanges);
 </script>
 @endif
-@endcan
 <script>
 $(document).ready(function() {
   $('.select2').select2();
-  var dataTable = $('#dtBasicSupplierInventory').DataTable({
+  var dataTable = $('#dtBasicExample2').DataTable({
     ordering: false,
     initComplete: function() {
       this.api().columns().every(function(d) {
         var column = this;
-        var theadname = $("#dtBasicSupplierInventory th").eq([d]).text();
+        var columnId = column.index();
+        var columnName = $(column.header()).attr('id');
+        if (columnName === "pictures" || columnName === "log") {
+          return;
+        }
         var select = $('<select class="form-control my-1"><option value="">All</option></select>')
           .appendTo($(column.header()))
           .on('change', function() {
@@ -1053,7 +1355,13 @@ $(document).ready(function() {
     initComplete: function() {
       this.api().columns().every(function(d) {
         var column = this;
-        var theadname = $("#dtBasicExample1 th").eq([d]).text();
+        var columnId = column.index();
+        var columnName = $(column.header()).attr('id');
+
+        // Exclude the specified column IDs or names from search filtering
+        if (columnName === "pictures" || columnName === "log") {
+          return;
+        }
         var select = $('<select class="form-control my-1"><option value="">All</option></select>')
           .appendTo($(column.header()))
           .on('change', function() {
@@ -1091,10 +1399,9 @@ $(document).ready(function() {
             $('#success-message').fadeOut('slow');
         }, 2000);
     </script>
-    </div>
     <script>
   var input = document.getElementById('variants_name');
-  var dataList = document.getElementById('laList');
+  var dataList = document.getElementById('variantslist');
   input.addEventListener('input', function() {
     var inputValue = input.value;
     var options = dataList.getElementsByTagName('option');
@@ -1114,6 +1421,7 @@ $(document).ready(function() {
     }
   });
 </script>
+    </div>
     @else
     @php
         redirect()->route('home')->send();
