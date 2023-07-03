@@ -152,6 +152,10 @@
                     </span>
                     </div>
                     @can('addon-selling-price-view')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                    @endphp
+                    @if ($hasPermission)
                         @if($supplierAddonDetails->SellingPrice!= null OR $supplierAddonDetails->PendingSellingPrice!= null)
                             <div class="col-lg-6 col-md-6 col-sm-12">
                                 <label for="choices-single-default" class="form-label"> Selling Price :</label>
@@ -169,15 +173,21 @@
                                 @endif
                             </div>
                         @endif
+                    @endif
                     @endcan
                     @if($supplierAddonDetails->LeastPurchasePrices != '')
                     @can('addon-least-purchase-price-view')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                    @endphp
+                    @if ($hasPermission)
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Least Purchase Price :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->LeastPurchasePrices->purchase_price_aed}} AED</span>
                     </div>
+                    @endif
                     @endcan
                     @endif
                 </div>

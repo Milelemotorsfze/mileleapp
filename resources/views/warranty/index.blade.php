@@ -1,13 +1,29 @@
 @extends('layouts.table')
 @section('content')
 @can('warranty-list')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
+@endphp
+@if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">Warranty Info</h4>
     @can('warranty-create')
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create']);
+    @endphp
+    @if ($hasPermission)
+      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right>
+      <i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
+    @endif
     @endcan
       @can('warranty-sales-view')
-      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" href="{{ route('warranty.view') }}" text-align: right><i class="fa fa-table" aria-hidden="true"></i></a>
+      @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-sales-view']);
+      @endphp
+      @if ($hasPermission)
+      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" href="{{ route('warranty.view') }}" text-align: right>
+      <i class="fa fa-table" aria-hidden="true"></i></a>
+      @endif
       @endcan
     </div>
     <div class="card-body">
@@ -65,18 +81,37 @@
               </td>
               <td>
                 @can('warranty-view')
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-view']);
+                @endphp
+                @if ($hasPermission)
                 <a class="btn btn-sm btn-success" href="{{ route('warranty.show',$premium->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                @endif
                 @endcan
                 @can('warranty-edit')
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
+                @endphp
+                @if ($hasPermission)
                 <a class="btn btn-sm btn-info" href="{{ route('warranty.edit',$premium->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                @endif
                 @endcan
                 @can('warranty-delete')
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-delete']);
+                @endphp
+                @if ($hasPermission)
                     <button type="button" class="btn btn-danger btn-sm warranty-delete sm-mt-3"
                             data-id="{{ $premium->id }}" data-url="{{ route('warranty.destroy', $premium->id) }}">
                         <i class="fa fa-trash"></i>
                     </button>
+                @endif
                 @endcan
                 @can('warranty-active-inactive')
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-active-inactive']);
+                @endphp
+                @if ($hasPermission)
                 @if($premium->status == 'active')
                   <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
                           data-id="{{ $premium->id }}" data-status="inactive" >
@@ -84,6 +119,7 @@
                 @elseif($premium->status == 'inactive')
                   <a data-id="{{ $premium->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button" >
                       <i class="fa fa-check" aria-hidden="true"></i></a>
+                @endif
                 @endif
                 @endcan
               </td>
@@ -93,7 +129,7 @@
         </table>
       </div>
     </div>
-
+@endif
 @endcan
 @endsection
 @push('scripts')

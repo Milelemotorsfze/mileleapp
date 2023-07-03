@@ -19,12 +19,17 @@
       Suppliers Info
     </h4>
     @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create', 'addon-supplier-create']);
+    @endphp
+    @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New Supplier
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <div class="clearfix"></div>
       <br>
+    @endif
     @endcanany
     @if (Session::has('error'))
       <div class="alert alert-danger" >
@@ -58,6 +63,10 @@
                   <th>No</th>
                   <th>Name</th>
                     @can('addon-supplier-list')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
+                    @endphp
+                    @if ($hasPermission)
                     <th>Email</th>
                     <th>contact Number</th>
                     <th>Alternative Contact</th>
@@ -66,6 +75,7 @@
                     <th>Supplier Type</th>
                     <th>Primary Payment Method</th>
                     <th>Other Payment Methods</th>
+                    @endif
                     @endcan
                   <th>Status</th>
                   <th>Action</th>
@@ -78,6 +88,10 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $supplier->supplier }}</td>
                       @can('addon-supplier-list')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
+                      @endphp
+                      @if ($hasPermission)
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->contact_number }}</td>
                         <td>{{ $supplier->alternative_contact_number }}</td>
@@ -122,6 +136,7 @@
                             @endforeach
                           @endif
                         </td>
+                      @endif
                       @endcan
                     <td>
                       @if($supplier->status == 'active')
@@ -132,26 +147,50 @@
                     </td>
                     <td>
                       @can('supplier-addon-price')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-price']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
-                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>                              
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>  
+                      @endif                            
                       @endcan
                       @can('addon-supplier-view')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-view']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
                             href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endif
                       @endcan                       
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit', 'addon-supplier-edit']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
                           href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endif
                       @endcanany
                       @can('addon-supplier-delete')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-delete']);
+                      @endphp
+                      @if ($hasPermission)
                         @if($supplier->is_deletable)
                           <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
                             data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
                             <i class="fa fa-trash"></i>
                           </button>
                         @endif
+                      @endif
                       @endcan
                       @can('supplier-active-inactive') 
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-active-inactive']);
+                      @endphp
+                      @if ($hasPermission)
                         @if($supplier->status == 'active')
                           <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
                             data-id="{{ $supplier->id }}" data-status="inactive" >
@@ -161,6 +200,7 @@
                           <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button">
                           <i class="fa fa-check" aria-hidden="true"></i></a>
                         @endif
+                      @endif
                       @endcan                               
                     </td>
                   </tr>
@@ -176,6 +216,10 @@
                   <th>No</th>
                   <th>Name</th>
                     @can('addon-supplier-list')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
+                    @endphp
+                    @if ($hasPermission)
                     <th>Email</th>
                     <th>contact Number</th>
                     <th>Alternative Contact</th>
@@ -184,6 +228,7 @@
                     <th>Supplier Type</th>
                     <th>Primary Payment Method</th>
                     <th>Other Payment Methods</th>
+                    @endif
                     @endcan
                   <th>Status</th>
                   <th>Action</th>
@@ -196,6 +241,10 @@
                     <td>{{ ++$i }}</td>
                     <td>{{ $supplier->supplier }}</td>
                       @can('addon-supplier-list')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
+                      @endphp
+                      @if ($hasPermission)
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->contact_number }}</td>
                         <td>{{ $supplier->alternative_contact_number }}</td>
@@ -240,6 +289,7 @@
                             @endforeach
                           @endif
                         </td>
+                      @endif
                       @endcan
                     <td>
                       @if($supplier->status == 'active')
@@ -250,26 +300,50 @@
                     </td>
                     <td>
                       @can('supplier-addon-price')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-price']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
-                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>                              
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>  
+                      @endif                            
                       @endcan
                       @can('addon-supplier-view')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-view']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
                             href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endif
                       @endcan                       
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit', 'addon-supplier-edit']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
                           href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endif
                       @endcanany
                       @can('addon-supplier-delete')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-delete']);
+                      @endphp
+                      @if ($hasPermission)
                         @if($supplier->is_deletable)
                           <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
                             data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
                             <i class="fa fa-trash"></i>
                           </button>
                         @endif
+                      @endif
                       @endcan
                       @can('supplier-active-inactive') 
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-active-inactive']);
+                      @endphp
+                      @if ($hasPermission)
                         @if($supplier->status == 'active')
                           <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button"
                             data-id="{{ $supplier->id }}" data-status="inactive" >
@@ -279,6 +353,7 @@
                           <a data-id="{{ $supplier->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-primary status-active-button">
                           <i class="fa fa-check" aria-hidden="true"></i></a>
                         @endif
+                      @endif
                       @endcan                               
                     </td>
                   </tr>

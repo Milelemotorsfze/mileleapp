@@ -1,4 +1,8 @@
 @can('add-new-addon-selling-price')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-selling-price']);
+@endphp
+@if ($hasPermission)
 @if(!isset($addonsdata->SellingPrice) && !isset($addonsdata->PendingSellingPrice))
     <button type="button" title="Create Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#table-selling-price-{{$addonsdata->id}}">
       <i class="fa fa-plus"></i> 
@@ -137,5 +141,6 @@
                         </form>
                       </div>
                     </div>
+                  @endif
                   @endif
                 @endcan

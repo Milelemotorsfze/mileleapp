@@ -15,6 +15,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
   @can('supplier-addon-price')
+  @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-price']);
+  @endphp
+  @if ($hasPermission)
     <div class="card-header">
       <h4 class="card-title">
         Supplier Addon prices History
@@ -52,6 +56,7 @@
         </div>  
       </div>
     </div>
+  @endif
   @endcan
   <script type="text/javascript">
     $(document).ready(function ()

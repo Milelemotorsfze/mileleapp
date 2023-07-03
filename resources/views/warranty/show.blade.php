@@ -29,6 +29,10 @@
     </div>
 
     @can('warranty-view')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-view']);
+    @endphp
+    @if ($hasPermission)
         <div class="card-body">
             <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-12">
@@ -109,6 +113,10 @@
             </div>
         </div>
         @can('warranty-brand-list')
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-brand-list']);
+        @endphp
+        @if ($hasPermission)
             <div class="card" style="margin-bottom: 0" >
             <div class="card-header">
                 <h2 class="card-title">Warranty Brands</h2>
@@ -150,32 +158,57 @@
                                 <td>{{ $warrantyBrand->user->name ?? '' }}</td>
                                 <td>
                                     @can('warranty-purchase-price-histories-list')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-purchase-price-histories-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                         <a href="{{ route('warranty-price-histories.index',['id' => $warrantyBrand->id]) }}" class="btn btn-info btn-sm "
                                            title="Purchase Price Histories" >
                                             <i class="fa fa-history"></i>
                                         </a>
+                                    @endif
                                     @endcan
                                     @can('warranty-purchase-price-edit')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-purchase-price-edit']);
+                                    @endphp
+                                    @if ($hasPermission)
                                         <button type="button" title="Update Purchase Price" class="btn btn-info btn-sm " data-bs-toggle="modal"
                                                 data-bs-target="#edit-price-{{$warrantyBrand->id}}">
                                             <i class="fa fa-edit"></i></button>
+                                    @endif
                                     @endcan
                                     @can('warranty-selling-price-histories-list')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-histories-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                     <a href="{{ route('warranty-selling-price-histories.index',['id' => $warrantyBrand->id]) }}" class="btn btn-warning btn-sm "
                                        title="Selling Price Histories">
                                         <i class="fa fa-history"></i>
                                     </a>
+                                    @endif
                                     @endcan
                                     @can('warranty-selling-price-edit')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-edit']);
+                                    @endphp
+                                    @if ($hasPermission)
                                         <button type="button" title="Update Selling Price" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#edit-selling-price-{{$warrantyBrand->id}}">
                                             <i class="fa fa-edit"></i></button>
+                                    @endif
                                     @endcan
 
                                     @can('warranty-brand-delete')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-brand-delete']);
+                                    @endphp
+                                    @if ($hasPermission)
                                         <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ $warrantyBrand->id }}"
                                                 data-url="{{ route('warranty-brands.destroy', $warrantyBrand->id) }}">
                                             <i class="fa fa-trash"></i></button>
+                                    @endif
                                     @endcan
                                 </td>
                                 <div class="modal fade" id="edit-price-{{$warrantyBrand->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -262,7 +295,9 @@
                 </div>
             </div>
         </div>
+        @endif
         @endcan
+    @endif
     @endcan
 @endsection
 @push('scripts')

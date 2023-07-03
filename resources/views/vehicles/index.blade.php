@@ -103,7 +103,7 @@
                 <th class="nowrap-td">Inspection Date</th>
                 @endif
                 @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                $hasPermission = Auth::user()->('aging-view');
                 @endphp
                 @if ($hasPermission)
                 <th class="nowrap-td">Aging</th>

@@ -62,19 +62,29 @@
         <i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile
     </a>
     <div class="dropdown-divider"></div>
-    @can('user-view')
+    @canany(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create');
+    @endphp
+    @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('users.index') }}">
             <i class="fa fa-users" aria-hidden="true"></i> Users
         </a>
         <div class="dropdown-divider"></div>
-    @endcan
+    @endif
+    @endcanany
 
-    @can('role-list')
+    @canany(['role-list', 'role-create'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-list', 'role-create']);
+    @endphp
+    @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('roles.index') }}">
             <i class="fa fa-user-circle" aria-hidden="true"></i> Roles
         </a>
         <div class="dropdown-divider"></div>
-    @endcan
+    @endif
+    @endcanany
 
     <a class="dropdown-item" href="{{ route('logout') }}"
        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -96,6 +106,10 @@
                         </a>
                     </li>
                     @canany(['addon-supplier-create', 'addon-supplier-list'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create','addon-supplier-list']);
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -104,25 +118,36 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
                             @can('addon-supplier-create')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.create') }}" id="topnav-auth" role="button">
                                     <span data-key="t-authentication">Create Supplier</span>
                                 </a>
                             </div>
+                            @endif
                             @endcan
                             @can('addon-supplier-list')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Supplier Info </span>
                                 </a>
                             </div>
+                            @endif
                             @endcan
                         </div>
                     </li>
+                    @endif
                     @endcanany
                     @canany(['warranty-create', 'warranty-list'])
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('warranty-list');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create', 'warranty-list']);
                     @endphp
                     @if ($hasPermission)
                     <li class="nav-item dropdown">
@@ -133,28 +158,38 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
                             @can('warranty-create')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.create') }}" id="topnav-auth" role="button">
                                     <span data-key="t-authentication">Create Warranty</span>
                                 </a>
                             </div>
+                            @endif
                             @endcan
                             @can('warranty-list')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty.index') }}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Warranty Info </span>
                                 </a>
                             </div>
+                            @endif
                             @endcan
                         </div>
                     </li>
                     @endif
                     @endcanany
+                    @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-create');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
                     @endphp
                     @if ($hasPermission)
-                    @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -163,13 +198,22 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
                             @can('addon-create')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.create') }}" id="topnav-auth" role="button">
                                     <span data-key="t-authentication">Create Addons</span>
                                 </a>
                             </div>
+                            @endif
                             @endcan
                             @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                     <span data-key="t-utility">List Addons </span>
@@ -177,24 +221,45 @@
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                     @can('accessories-list')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                     <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
+                                    @endif
                                     @endcan
                                     <!-- <a href="{{route('addon.list','D')}}" class="dropdown-item" data-key="t-login">Documentation</a>
                                     <a href="{{route('addon.list','DP')}}" class="dropdown-item" data-key="t-login">Documentation On Purchase</a>
                                     <a href="{{route('addon.list','E')}}" class="dropdown-item" data-key="t-login">Others</a>
                                     <a href="{{route('addon.list','S')}}" class="dropdown-item" data-key="t-login">Shipping Cost</a> -->
                                     @can('spare-parts-list')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['spare-parts-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                     <a href="{{route('addon.list','SP')}}" class="dropdown-item" data-key="t-login">Spare Parts</a>
+                                    @endif
                                     @endcan
                                     <!-- <a href="{{route('addon.list','W')}}" class="dropdown-item" data-key="t-login">Warranty</a> -->
                                     @can('kit-list')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['kit-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                     <a href="{{route('addon.list','K')}}" class="dropdown-item" data-key="t-login">Kit</a>
+                                    @endif
                                     @endcan
                                     @canany(['accessories-list','spare-parts-list','kit-list'])
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
+                                    @endphp
+                                    @if ($hasPermission)
                                     <a href="{{route('addon.list','all')}}" class="dropdown-item" data-key="t-login">All</a>
+                                    @endif
                                     @endcanany
                                 </div>
                             </div>
+                            @endif
                             @endcanany
                         </div>
                     </li>

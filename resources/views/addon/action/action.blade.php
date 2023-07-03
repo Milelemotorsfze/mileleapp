@@ -1,19 +1,38 @@
 @can('addon-view')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
+@endphp
+@if ($hasPermission)
     <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$addonsdata->id) }}">
         <i class="fa fa-eye" aria-hidden="true"></i>
     </a>
+@endif
 @endcan
 @can('addon-edit')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
+@endphp
+@if ($hasPermission)
     <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
         <i class="fa fa-edit" aria-hidden="true"></i>
     </a>
+@endif
 @endcan
 @can('view-addon-selling-price-history')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-addon-selling-price-history']);
+@endphp
+@if ($hasPermission)
     <a title="Selling Price History" class="btn btn-sm btn-primary modal-button" href="{{ route('suppliers.sellingPriceHistory',$addonsdata->id) }}">
         <i class="fa fa-history" aria-hidden="true"></i>
     </a>
+@endif
 @endcan
 @can('addon-active-inactive')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-active-inactive']);
+@endphp
+@if ($hasPermission)
     @if( $addonsdata->status == 'active')
         <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button" data-id="{{ $addonsdata->id }}" 
                 data-status="inactive" >
@@ -24,11 +43,17 @@
             <i class="fa fa-check" aria-hidden="true"></i>
         </a>                                                 
     @endif
+@endif
 @endcan
 @can('addon-delete')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-delete']);
+@endphp
+@if ($hasPermission)
     <button title="Delete" type="button" class="btn btn-danger btn-sm addon-delete sm-mt-3" data-id="{{ $addonsdata->id }}" data-url="{{ route('addon.destroy', $addonsdata->id) }}">
         <i class="fa fa-trash"></i>
     </button>
+@endif
 @endcan
 <script>
      $('.status-active-button').click(function (e) {
