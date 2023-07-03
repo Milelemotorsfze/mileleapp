@@ -473,6 +473,12 @@
         var totalPriceUSD = totalPriceAED / 3.6725;
         totalPriceUSD = totalPriceUSD.toFixed(4);
         totalPriceUSD = parseFloat(totalPriceUSD);
+        // alert(unitPriceAED);
+        // alert(totalPriceAED);
+        // alert(unitPriceUSD);
+        // alert(totalPriceUSD);
+        // alert(supplier);
+        // alert(kit);
         showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit);
     }
     function calculateRelatedofTotalPriceAED(quantity,totalPriceAED,supplier,kit)

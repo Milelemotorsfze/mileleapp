@@ -1,8 +1,32 @@
+<style>
+    @media only screen and (max-device-width: 280px)
+    {
+        .responsiveButton
+        {
+            position: absolute; left: 50px; z-index: 500; top: 10px;
+        }
+       
+    }
+    @media only screen and (max-device-width: 1280px)
+    {
+        .responsiveButton
+        {
+            position: absolute; right: 50px; z-index: 500; top: 10px;
+        }
+    }
+    @media only screen and (min-device-width: 1280px)
+    {
+        .responsiveButton
+        {
+            position: absolute; right: 150px; z-index: 500; top: 10px;
+        }
+    }  
+</style>
 <div class="topnav" style="overflow: unset;">
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
     </button>
-    <div class="dropdown d-inline-block" style="position: absolute; right: 120px; z-index: 500; top: 10px;">
+    <div class="dropdown d-inline-block responsiveButton">
     <div class="cart-icon-containerss">
         @php
         $selectedrole = Auth::user()->selectedRole;
@@ -97,6 +121,10 @@
                     </li>
                     @endcanany
                     @canany(['warranty-create', 'warranty-list'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('warranty-list');
+                    @endphp
+                    @if ($hasPermission)
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -120,8 +148,13 @@
                             @endcan
                         </div>
                     </li>
+                    @endif
                     @endcanany
-                    @canany(['addon-list', 'addon-create'])
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-create');
+                    @endphp
+                    @if ($hasPermission)
+                    @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
@@ -165,6 +198,7 @@
                             @endcanany
                         </div>
                     </li>
+                    @endif
                     @endcanany
                     @can('Calls-view')
                     @php

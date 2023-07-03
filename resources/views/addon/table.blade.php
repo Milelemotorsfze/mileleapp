@@ -100,9 +100,13 @@
                                                 <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
                                             @endcan
                                         @endif
-                                        @can('addon-least-purchase-price-view')
-                                            <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
-                                        @endcan
+                                        @if($addonsdata->LeastPurchasePrices!= null)
+                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                                @can('addon-least-purchase-price-view')
+                                                    <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                                @endcan
+                                            @endif
+                                        @endif
                                         @can('addon-selling-price-view')
                                             <td>
                                                 @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
