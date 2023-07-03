@@ -20,11 +20,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vehicles', function (Blueprint $table) {
-            $table->dropColumn('conversion'); 
             $table->foreign('conversion_id')
                 ->references('id')
                 ->on('conversions')
                 ->onDelete('cascade');
+                $table->dropColumn('conversion'); 
         });
     }
 };

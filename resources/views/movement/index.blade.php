@@ -9,10 +9,6 @@
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Vehicles Transaction
       </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-success float-end" href="{{ route('grnlist.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> GRN List
-      </a>
       <div class="clearfix"></div>
       <br>
       <ul class="nav nav-pills nav-fill">

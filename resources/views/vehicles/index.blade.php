@@ -149,7 +149,7 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                 @endphp
                 @if ($hasPermission)
-                <th class="nowrap-td">VIN</th>
+                <th class="nowrap-td">VIN Number</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
@@ -1351,43 +1351,48 @@ $(document).ready(function() {
     }
   });
   var dataTable = $('#dtBasicExample1').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api().columns().every(function(d) {
-        var column = this;
-        var columnId = column.index();
-        var columnName = $(column.header()).attr('id');
+  ordering: false,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
 
-        // Exclude the specified column IDs or names from search filtering
-        if (columnName === "pictures" || columnName === "log") {
-          return;
-        }
-        var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-          .appendTo($(column.header()))
-          .on('change', function() {
-            var val = $.fn.dataTable.util.escapeRegex($(this).val());
-            column.search(val ? '^' + val + '$' : '', true, false).draw();
-          });
-        $(column.header()).find('.caret').remove();
-        if ($(column.header()).find('input').length > 0) {
-          $(column.header()).addClass('nowrap-td');
-          var uniqueValues = column.data().toArray().map(function(value) {
-            return $(value).find('input').val();
-          }).filter(function(value, index, self) {
-            return self.indexOf(value) === index;
-          });
+      // Exclude the specified column IDs or names from search filtering
+      if (columnName === "pictures" || columnName === "log") {
+        return;
+      }
 
-          uniqueValues.sort().forEach(function(value) {
-            select.append('<option value="' + value + '">' + value + '</option>');
-          });
-        } else {
-          column.data().unique().sort().each(function(d, j) {
-            select.append('<option value="' + d + '">' + d + '</option>');
-          });
-        }
+      var selectWrapper = $('<div class="select-wrapper"></div>'); // Create a wrapper div
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue' // Customize the appearance of the dropdown
+        });
+
+      var dropdownIcon = $('<span class="dropdown-icon"><i class="fas fa-caret-down"></i></span>')
+        .appendTo(selectWrapper); // Add a dropdown icon to the wrapper div
+
+      dropdownIcon.on('click', function(e) {
+        select.select2('open'); // Open the dropdown on icon click
+        e.stopPropagation(); // Prevent event propagation to avoid closing the dropdown
       });
-    }
-  });
+
+      select.on('change', function() {
+        var selectedValues = $(this).val(); // Get the selected values as an array
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw(); // Use a pipe (|) as the separator for multiple values
+      });
+
+      selectWrapper.appendTo($(column.header())); // Append the wrapper div to the column header
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
+    });
+  }
+});
   $('.dataTables_filter input').on('keyup', function() {
     dataTable.search(this.value).draw();
   });

@@ -83,7 +83,7 @@
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
         <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Supplier : </label>
+            <label for="basicpill-firstname-input" class="form-label">Vendor : </label>
             <input type="number" id="po_number" name="po_number" class="form-control" value="{{$purchasingOrder->supplier}}" placeholder="Supplier Name" readonly>
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
@@ -161,7 +161,7 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                 @endphp
                 @if ($hasPermission)
-                <th class="nowrap-td">VIN</th>
+                <th class="nowrap-td">VIN Number</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('reference')->nullable();
             $table->string('passport_number')->nullable();
             $table->string('nationality')->nullable();
-            $table->string('passport_copy_filr')->nullable();
+            $table->string('passport_copy_file')->nullable();
             $table->string('trade_license_number')->nullable();
             $table->string('trade_license_file')->nullable();
             $table->string('trade_registration_place')->nullable();
