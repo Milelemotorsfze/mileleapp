@@ -944,14 +944,8 @@ class AddonController extends Controller
             if(count($request->filteredArray) > 0)
             {
                 $data = $data->whereNotIn('id', $request->filteredArray);
-                public function addonStatusChange(Request $request)
-    {
-        $addon = AddonDetails::find($request->id);
-        $addon->status = $request->status;
-
-        $addon->save();
-        return response($addon, 200);
-    }
+            
+               
 
 }
         }
@@ -966,4 +960,13 @@ class AddonController extends Controller
         $data = $data->get();
         return response()->json($data);
     }
+    public function addonStatusChange(Request $request)
+{
+    $addon = AddonDetails::find($request->id);
+    $addon->status = $request->status;
+
+    $addon->save();
+    return response($addon, 200);
 }
+}
+
