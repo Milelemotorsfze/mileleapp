@@ -297,10 +297,10 @@
               @endif      
             </div> 
             </br>
-            <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
+            <!-- <div class="row" style="position: absolute; bottom: 3px; right: 5px; ">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12" >
                 @if($addonsdata->addon_type_name == 'K')
-                  @can('view-kit-item-details')
+                  @can('addon-view')
                   <a class="btn btn-sm btn-info" href="{{ route('addon.kitItems',$addonsdata->id) }}">
                     <i class="fa fa-shopping-cart" aria-hidden="true"></i> Items
                   </a>
@@ -311,7 +311,7 @@
 
                 </div> 
               </div>
-            </div>
+            </div> -->
           @endforeach
         </div>
       </div>

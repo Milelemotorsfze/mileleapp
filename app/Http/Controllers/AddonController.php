@@ -938,32 +938,30 @@ class AddonController extends Controller
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $data = AddonDetails::select('id','addon_code','addon_id')
                 ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
-
         if($request->filteredArray)
         {
             if(count($request->filteredArray) > 0)
             {
                 $data = $data->whereNotIn('id', $request->filteredArray);
-                public function addonStatusChange(Request $request)
-    {
-        $addon = AddonDetails::find($request->id);
-        $addon->status = $request->status;
-
-        $addon->save();
-        return response($addon, 200);
-    }
-
-}
+            }
         }
-//        if($request->id) {
-//            $id = $request->id;
-//            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
-//                $query->where('supplier_id', $id);
-//            })->pluck('addon_id');
-//            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
-//        }
-
+            //        if($request->id) {
+            //            $id = $request->id;
+            //            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
+            //                $query->where('supplier_id', $id);
+            //            })->pluck('addon_id');
+            //            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+            //        }
         $data = $data->get();
         return response()->json($data);
     }
+    public function addonStatusChange(Request $request)
+{
+    $addon = AddonDetails::find($request->id);
+    $addon->status = $request->status;
+
+    $addon->save();
+    return response($addon, 200);
 }
+}
+
