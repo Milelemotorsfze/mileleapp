@@ -102,6 +102,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 </style>
   @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
+  @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list']);
+  @endphp
+  @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
       Addon Info
@@ -110,12 +114,17 @@ body {font-family: Arial, Helvetica, sans-serif;}
       <i class="fa fa-plus" aria-hidden="true"></i> New Addon
     </a>
     @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list', 'spare-parts-list', 'kit-list']);
+    @endphp
+    @if ($hasPermission)
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
     </a>  
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a> 
+    @endif
     @endcanany
     <ul class="nav nav-pills nav-fill">
       <!-- <li class="nav-item">
@@ -168,7 +177,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </div>
     @include('addon.listbox')
     @include('addon.table')
-
+@endif
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};

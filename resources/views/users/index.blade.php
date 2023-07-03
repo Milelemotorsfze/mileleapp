@@ -5,6 +5,10 @@
       Users Info
     </h4>
     @can('user-create')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create']);
+    @endphp
+    @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('users.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> New User
       </a>
@@ -14,6 +18,7 @@
       </a>
       <div class="clearfix"></div>
       <br>
+    @endif
     @endcan
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
@@ -29,6 +34,10 @@
   </div>
   <div class="tab-content">
     @can('user-list-active')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active']);
+    @endphp
+    @if ($hasPermission)
       <div class="tab-pane fade show active" id="tab1"> 
         <div class="card-body">
           <div class="table-responsive">
@@ -64,13 +73,30 @@
                     </td>
                     <td>
                       @can('user-view')
-                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-view']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" 
+                        href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('user-edit')
-                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-edit']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" 
+                        href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('user-delete')
-                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleteActiveUser{{$user->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-delete']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" 
+                        data-modal-id="deleteActiveUser{{$user->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="deleteActiveUser{{$user->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -81,14 +107,21 @@
                             <div class="dropdown-divider"></div>
                             <div class="row modal-button-class">                                           
                               <div class="col-xs-6 col-sm-6 col-md-6">
-                                <a href="{{ route('users.delete',$user->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                                <a href="{{ route('users.delete',$user->id) }}" style="float: right;" class="btn btn-sm btn-success ">
+                                <i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                               </div>
                             </div>                                          
                           </div>
                         </div>
+                        @endif
                       @endcan
                       @can('user-make-inactive')
-                        <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" data-modal-id="makeInactiveUser{{$user->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-make-inactive']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary modal-button" 
+                        data-modal-id="makeInactiveUser{{$user->id}}"><i class="fa fa-ban" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="makeInactiveUser{{$user->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -99,11 +132,13 @@
                             <div class="dropdown-divider"></div>
                             <div class="row modal-button-class">                                           
                               <div class="col-xs-6 col-sm-6 col-md-6">
-                                <a href="{{ route('users.updateStatus',$user->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                                <a href="{{ route('users.updateStatus',$user->id) }}" style="float: right;" class="btn btn-sm btn-success ">
+                                <i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
                               </div>
                             </div>                                          
                           </div>
                         </div>
+                      @endif
                       @endcan                              
                     </td>                
                   </tr>
@@ -112,9 +147,14 @@
             </table>
           </div>  
         </div>  
-      </div>  
+      </div> 
+    @endif 
     @endcan
     @can('user-list-inactive')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-inactive']);
+    @endphp
+    @if ($hasPermission)
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
           <div class="table-responsive">
@@ -146,16 +186,39 @@
                     <td><label class="badge badge-soft-danger">{{ $user->status }}</label></td>
                     <td>
                       @can('user-view')
-                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-view']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" 
+                        href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('user-edit')
-                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-edit']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" 
+                        href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('user-delete')
-                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-delete']);
+                      @endphp
+                      @if ($hasPermission)
+                        <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" 
+                        href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
-                      @can('user-make-active')  
-                        <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="makeActiveUser{{$user->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
+                      @can('user-make-active') 
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-make-active']);
+                      @endphp
+                      @if ($hasPermission) 
+                        <a data-toggle="popover" data-trigger="hover" title="Make Active" data-placement="top" class="btn btn-sm btn-primary modal-button" 
+                        data-modal-id="makeActiveUser{{$user->id}}"><i class="fa fa-check" aria-hidden="true"></i></a>
                         <div class="modal modal-class" id="makeActiveUser{{$user->id}}" >
                           <div class="modal-content">
                             <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -170,6 +233,7 @@
                             </div>
                           </div>
                         </div> 
+                      @endif
                       @endcan 
                     </td>                
                   </tr>
@@ -179,8 +243,13 @@
           </div> 
         </div>  
       </div> 
+      @endif
       @endcan
       @can('user-list-deleted')
+      @php
+      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-deleted']);
+      @endphp
+      @if ($hasPermission)
         <div class="tab-pane fade show" id="tab3">
           <div class="card-body">
             <div class="table-responsive">
@@ -212,16 +281,39 @@
                         <td><label class="badge badge-soft-danger">deleted</label></td>
                         <td>
                           @can('user-view')
-                            <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                          @php
+                          $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-view']);
+                          @endphp
+                          @if ($hasPermission)
+                            <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" 
+                            href="{{ route('users.show',$user->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                          @endif
                           @endcan
                           @can('user-edit')
-                            <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                          @php
+                          $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-edit']);
+                          @endphp
+                          @if ($hasPermission)
+                            <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" 
+                            href="{{ route('users.edit',$user->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                          @endif
                           @endcan
                           @can('user-delete')
-                            <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                          @php
+                          $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-delete']);
+                          @endphp
+                          @if ($hasPermission)
+                            <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger" 
+                            href="{{ route('users.destroy',$user->id) }}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                          @endif
                           @endcan
                           @can('user-restore')
-                            <a data-toggle="popover" data-trigger="hover" title="Restore" data-placement="top" class="btn btn-sm btn-primary modal-button" data-modal-id="restoreUser{{$user->id}}"><i class="fa fa-undo" aria-hidden="true"></i></a>
+                          @php
+                          $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-restore']);
+                          @endphp
+                          @if ($hasPermission)
+                            <a data-toggle="popover" data-trigger="hover" title="Restore" data-placement="top" class="btn btn-sm btn-primary modal-button" 
+                            data-modal-id="restoreUser{{$user->id}}"><i class="fa fa-undo" aria-hidden="true"></i></a>
                             <div class="modal modal-class" id="restoreUser{{$user->id}}" >
                               <div class="modal-content">
                                 <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -232,11 +324,13 @@
                                 <div class="dropdown-divider"></div>
                                 <div class="row modal-button-class">                                           
                                   <div class="col-xs-6 col-sm-6 col-md-6">
-                                    <a href="{{ route('users.restore', $user->id) }}" style="float: right;" class="btn btn-sm btn-success "><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>        
+                                    <a href="{{ route('users.restore', $user->id) }}" style="float: right;" class="btn btn-sm btn-success ">
+                                    <i class="fa fa-check" aria-hidden="true"></i> Confirm</a>        
                                   </div>
                                 </div>                                          
                               </div>
                             </div>
+                          @endif
                           @endcan
                         </td>                
                       </tr>
@@ -246,6 +340,7 @@
               </div>
             </div>
           </div>
+        @endif
         @endcan
       </div><!-- end tab-content-->
     </div>

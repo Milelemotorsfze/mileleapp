@@ -8,6 +8,10 @@
 
     </style>
     @can('warranty-sales-view')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-sales-view']);
+    @endphp
+    @if ($hasPermission)
         <div class="card-header">
             <h4 class="card-title">Warranty Info</h4>
         </div>
@@ -85,6 +89,7 @@
                 @endforeach
             </div>
         </div>
+@endif
 @endcan
 @endsection
 @push('scripts')

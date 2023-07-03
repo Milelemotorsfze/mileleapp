@@ -3,10 +3,19 @@
   <div class="card-header">
     <h4 class="card-title">Role Management</h4>
     @can('role-create')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-create']);
+    @endphp
+    @if ($hasPermission)
       <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('roles.create') }}" text-align: right><i class="fa fa-plus" aria-hidden="true"></i> New Role</a>
+    @endif
     @endcan
   </div>
   @can('role-list')
+  @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-list']);
+  @endphp
+  @if ($hasPermission)
     <div class="card-body">
       <div class="table-responsive">
         <table id="dtBasicExample" class="table table-striped table-editable table-edits table">
@@ -24,12 +33,24 @@
                 <td>{{ ++$i }}</td>
                 <td>{{ $role->name }}</td>
                 <td>
-                  <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" href="{{ route('roles.show',$role->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                  <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success" 
+                  href="{{ route('roles.show',$role->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                   @can('role-edit')
-                    <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" href="{{ route('roles.edit',$role->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                  @php
+                  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-edit']);
+                  @endphp
+                  @if ($hasPermission)
+                    <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info" 
+                    href="{{ route('roles.edit',$role->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                  @endif
                   @endcan
                   @can('role-delete')
-                    <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="deleterole{{$role->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
+                  @php
+                  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-delete']);
+                  @endphp
+                  @if ($hasPermission)
+                    <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" 
+                    data-modal-id="deleterole{{$role->id}}"> <i class="fa fa-trash" aria-hidden="true"></i></a>
                     <div class="modal modal-class" id="deleterole{{$role->id}}" >
                       <div class="modal-content">
                         <i class="fa fa-times icon-right" aria-hidden="true" onclick="closemodal()"></i>
@@ -40,11 +61,13 @@
                         <div class="dropdown-divider"></div>
                         <div class="row modal-button-class">                                           
                           <div class="col-xs-6 col-sm-6 col-md-6">
-                            <a href="{{ route('roles.delete',$role->id) }}" style="float: right;" class="btn btn-sm btn-success btn-move-right"><i class="fa fa-check" aria-hidden="true"></i> Confirm</a>
+                            <a href="{{ route('roles.delete',$role->id) }}" style="float: right;" class="btn btn-sm btn-success btn-move-right"><i class="fa fa-check" 
+                            aria-hidden="true"></i> Confirm</a>
                           </div>
                         </div>                                          
                       </div>
                     </div> 
+                  @endif
                   @endcan
                   </td>
               </tr>
@@ -53,6 +76,7 @@
         </table>
       </div>
     </div>
+  @endif
   @endcan
   <script type="text/javascript">
     $(document).ready(function ()

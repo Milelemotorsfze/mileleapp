@@ -4,6 +4,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 @section('content')
 @can('addon-supplier-view')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-view']);
+@endphp
+@if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Supplier Details</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -165,7 +169,8 @@
                 @include('addon.table')
                 @endif
             </div>
-    </div>  
+    </div> 
+    @endif 
     @endcan
     <script type="text/javascript">
         var data = {!! json_encode($supplier) !!};

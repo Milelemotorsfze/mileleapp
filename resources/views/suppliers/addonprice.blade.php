@@ -15,6 +15,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
   @can('supplier-addon-price')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-price']);
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
       <h4 class="card-title">
         Supplier Addon prices Info
@@ -45,9 +49,14 @@
                     <td id="{{$supplierAddon->id}}">{{$supplierAddon->purchase_price_aed}} AED</td>
                     <td>
                       @can('supplier-new-purchase-price')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-new-purchase-price']);
+                      @endphp
+                      @if ($hasPermission)
                         <!-- <a data-toggle="popover" data-trigger="hover" title="Add New Price" data-placement="top" class="btn btn-sm btn-success"
                               href=""><i class="fa fa-plus" aria-hidden="true"></i></a> -->
-                              <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                              <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" 
+                              class="btn btn-sm btn-warning modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i></a>
                               <div class="overlay"></div>
             <div class="modal" id="createNewAddon" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -67,9 +76,11 @@
                                         <label for="name" class="col-form-label text-md-end ">Add New Purchase Price</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <input hidden id="inputId" type="text" class="form-control @error('name') is-invalid @enderror" name="id" value="{{ $supplierAddon->id }}" placeholder="Enter New Purchase Price"  autofocus>
+                                    <input hidden id="inputId" type="text" class="form-control @error('name') is-invalid @enderror" name="id" 
+                                    value="{{ $supplierAddon->id }}" placeholder="Enter New Purchase Price"  autofocus>
                                     <div class="input-group">
-                                    <input id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
+                                    <input id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
+                                    placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                             </div>
@@ -86,20 +97,33 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button> -->
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                            <!-- <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> 
+                            Close</button> -->
+                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i>
+                             Submit</button>
                         </div>
                     </div>
                 </div>
             </div>
+                      @endif
                       @endcan
                       @can('supplier-addon-delete')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-delete']);
+                      @endphp
+                      @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Delete" data-placement="top" class="btn btn-sm btn-danger modal-button" data-modal-id="">
                          <i class="fa fa-trash" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('supplier-addon-purchase-price-history')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-history']);
+                      @endphp
+                      @if ($hasPermission)
                       <a title="View History" class="btn btn-sm btn-info modal-button" href="{{ route('suppliers.purchasepricehistory',$supplierAddon->id) }}">
                          <i class="fa fa-history" aria-hidden="true"></i></a>
+                         @endif
                          @endcan
                     </td>
                   </tr>
@@ -110,6 +134,7 @@
         </div>
       </div>
     </div>
+    @endif
   @endcan
   <script type="text/javascript">
     $(document).ready(function ()

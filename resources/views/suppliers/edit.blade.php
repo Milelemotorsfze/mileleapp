@@ -178,6 +178,10 @@
 </style>
 @section('content')
 @can('addon-supplier-edit')
+@php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-edit']);
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Edit Suppliers</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -510,6 +514,7 @@
     <input type="hidden" value="" id="indexValue">
 
     <div class="overlay"></div>
+    @endif
 @endcan
     <script type="text/javascript">
         var activeTab = '';

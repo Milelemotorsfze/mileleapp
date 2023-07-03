@@ -217,6 +217,10 @@ input {
 </style>
 @section('content')
 @can('addon-supplier-create')
+@php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create']);
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Create Suppliers</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -546,6 +550,7 @@ input {
     </div>
     <input type="hidden" value="" id="indexValue">
     <div class="overlay"></div>
+    @endif
     @endcan
     <!-- <input id="numbers-only" type="text" placeholder="Numbers Only" /> -->
     <script type="text/javascript">

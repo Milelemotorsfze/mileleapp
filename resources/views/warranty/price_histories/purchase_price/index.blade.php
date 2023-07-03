@@ -28,6 +28,10 @@
             @endif
         </div>
         @can('warranty-purchase-price-histories-list')
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-purchase-price-histories-list']);
+        @endphp
+        @if ($hasPermission)
          <div class="card-body">
             <div class="table-responsive">
                 <table id="purchase-price-histories-table" class="table table-striped table-editable table-edits table">
@@ -57,6 +61,7 @@
                 </table>
             </div>
         </div>
+        @endif
     @endcan
 @endsection
 @push('scripts')
