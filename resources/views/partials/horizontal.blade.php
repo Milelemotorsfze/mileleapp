@@ -64,7 +64,7 @@
     <div class="dropdown-divider"></div>
     @canany(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active', 'user-list-inactive', 'user-list-deleted', 'user-create']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-list-active','user-list-inactive','user-list-deleted','user-create']);
     @endphp
     @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('users.index') }}">
@@ -76,7 +76,7 @@
 
     @canany(['role-list', 'role-create'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-list', 'role-create']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['role-list','role-create']);
     @endphp
     @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('roles.index') }}">
@@ -147,7 +147,7 @@
                     @endcanany
                     @canany(['warranty-create', 'warranty-list'])
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create', 'warranty-list']);
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create','warranty-list']);
                     @endphp
                     @if ($hasPermission)
                     <li class="nav-item dropdown">

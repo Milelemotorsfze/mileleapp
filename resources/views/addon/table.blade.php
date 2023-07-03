@@ -40,7 +40,7 @@
     @if(count($addon1) > 0)
         @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
         @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list', 'spare-parts-list', 'kit-list']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
         @endphp
         @if ($hasPermission)
             <div class="card-body">

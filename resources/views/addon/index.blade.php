@@ -103,7 +103,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </style>
   @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
   @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list']);
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
   @endphp
   @if ($hasPermission)
   <div class="card-header">
@@ -115,7 +115,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     </a>
     @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list', 'spare-parts-list', 'kit-list']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
     @endphp
     @if ($hasPermission)
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">

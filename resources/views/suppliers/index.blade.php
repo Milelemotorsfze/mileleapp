@@ -166,7 +166,7 @@
                       @endcan                       
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                       @php
-                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit', 'addon-supplier-edit']);
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit']);
                       @endphp
                       @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
@@ -319,7 +319,7 @@
                       @endcan                       
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                       @php
-                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit', 'addon-supplier-edit']);
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit']);
                       @endphp
                       @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
