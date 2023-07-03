@@ -146,7 +146,7 @@ class PermissionTableSeeder extends Seeder
             ['9','GRN View','grn-view', 'To View the GRN Details'],
             ['9','GRN Edit','grn-edit', 'To Create,Edit the GRN Details'],
             ['9','Inspection View','inspection-view', 'To View the Inspection Details'],
-            ['9','Inspection Edit','inspection-view', 'To Create,Edit the Inspection Details'],
+            ['9','Inspection Edit','inspection-edit', 'To Create,Edit the Inspection Details'],
             ['9','Aging View','aging-view', 'To View the Aging Details'],
             ['9','GDN View','gdn-view', 'To View the GDN Details'],
             ['9','GDN Edit','gdn-edit', 'To Create, Edit the GdN Details'],
@@ -216,7 +216,6 @@ class PermissionTableSeeder extends Seeder
             ['14','Addons Delete','addon-delete', 'To Delete the Addons'],
             ['14','Addons View','addon-view', 'To View the Addons'],
             ['14','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],
-            ['14','Delete Addon','addon-delete', 'To Delete the Addons'],
 
             //Addon Purchase Prices
             ['15','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
@@ -245,7 +244,6 @@ class PermissionTableSeeder extends Seeder
 
             //Kit
             ['20','Kit List','kit-list', 'To View List of Kit'],
-            ['20','View Kit Item Details','view-kit-item-details', 'To View Kit Item Details'],
             ['20','View Addon Kit Item Purchase Price','view-addon-kit-item-purchase-price', 'To View Addon Kit Item Purchase Price'],
 
             ];
