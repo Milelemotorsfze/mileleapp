@@ -440,6 +440,7 @@
                             </div>
                         </div>
                     `);
+
                     let brandDropdownData   = [];
                     $.each(data,function(key,value)
                     {

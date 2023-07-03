@@ -38,6 +38,7 @@ class AddonController extends Controller
         }
         $addon1 = $addon1->orderBy('id', 'DESC')->get(); 
         return view('addon.index',compact('addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
+   
     }
     /**
      * Show the form for creating a new resource.
@@ -628,7 +629,7 @@ class AddonController extends Controller
         }
         if($request->AddonIds)
         {
-            $addonIds = $addonIds->whereIn('addon_id',$request->AddonIds); 
+            $addonIds = $addonIds->whereIn('addon_id',$request->AddonIds);
         }
         if($request->BrandIds)
         {
@@ -639,30 +640,30 @@ class AddonController extends Controller
             else
             {
                 $addonIds = $addonIds->where('is_all_brands','yes');
-                $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request) 
+                $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
                 {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
                     if($request->ModelLineIds)
-                    {                               
+                    {
                         if(in_array('yes',$request->ModelLineIds))
                         {
                             $q = $q->orWhere('is_all_model_lines','yes');
                         }
                         else
                         {
-                            $q->where( function ($query) use ($request) 
+                            $q->where( function ($query) use ($request)
                             {
                                 $query = $query->whereIn('model_id',$request->ModelLineIds);
                             });
-                        }    
+                        }
                     }
                 });
-            } 
+            }
         }
         elseif($request->ModelLineIds)
         {
             $addonIds = $addonIds->where('is_all_brands','yes');
-            $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request) 
+            $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
             {
                 if(!in_array('yes',$request->ModelLineIds))
                 {
@@ -676,15 +677,15 @@ class AddonController extends Controller
         if(count($addonIds) > 0)
         {
             $addonsTableData = AddonDetails::whereIn('id',$addonIds)
-            ->with('AddonTypes', function($q) use($request) 
+            ->with('AddonTypes', function($q) use($request)
             {
                 if($request->BrandIds)
                 {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
                 }
                 if($request->ModelLineIds)
-                {    
-                    $q = $q->whereIn('model_id',$request->ModelLineIds); 
+                {
+                    $q = $q->whereIn('model_id',$request->ModelLineIds);
                 }
                 $q = $q->with('brands','modelLines','modelDescription')->get();
             })
@@ -852,10 +853,8 @@ class AddonController extends Controller
     }
     public function getSupplierForAddon(Request $request)
     {
-        info("test");
         $data = Supplier::select('id','supplier');
 
-        info($request->filteredArray);
         $addonType = $request->addonType;
         if($addonType == 'P'){
             $data = Supplier::with('supplierTypes')
@@ -876,7 +875,6 @@ class AddonController extends Controller
         }
         if($request->filteredArray)
         {
-            info($request->filteredArray);
             if(count($request->filteredArray) > 0)
             {
                 $data = $data->whereNotIn('id', $request->filteredArray);
@@ -895,7 +893,6 @@ class AddonController extends Controller
     }
     public function getSupplierForAddonType(Request $request)
     {
-        info("ok");
         $addonType = $request->addonType;
         if($addonType == 'P'){
             $data = Supplier::with('supplierTypes')
@@ -935,7 +932,19 @@ class AddonController extends Controller
         return redirect()->route('addon.list', $data)
                         ->with('success','Addon created successfully');
     }
-    public function addonStatusChange(Request $request)
+
+    public function getKitItemsForAddon(Request $request)
+    {
+        $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
+        $data = AddonDetails::select('id','addon_code','addon_id')
+                ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
+
+        if($request->filteredArray)
+        {
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id', $request->filteredArray);
+                public function addonStatusChange(Request $request)
     {
         $addon = AddonDetails::find($request->id);
         $addon->status = $request->status;
@@ -944,4 +953,17 @@ class AddonController extends Controller
         return response($addon, 200);
     }
 
+}
+        }
+//        if($request->id) {
+//            $id = $request->id;
+//            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
+//                $query->where('supplier_id', $id);
+//            })->pluck('addon_id');
+//            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+//        }
+
+        $data = $data->get();
+        return response()->json($data);
+    }
 }

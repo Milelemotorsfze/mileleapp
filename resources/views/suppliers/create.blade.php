@@ -907,27 +907,7 @@ input {
                 });
             }
         });
-        function resetAddonDropdown()
-        {
-            // var selectedAddons = [];
-            // for (var i = 1; i <= addonDropdownCount; i++)
-            // {
-            //     var eachSelected = [];
-            //     var eachSelected = $('#adoon_'+i).val();
-            //     $.each(eachSelected, function( ind, value )
-            //     {
-            //         selectedAddons.push(value);
 
-            //     });
-            // }
-            // for (var i = 1; i <= addonDropdownCount; i++)
-            // {
-            //     $.each(selectedAddons, function( ind, value )
-            //     {
-            //         $('.'+value).prop('disabled', !$('.'+value).prop('disabled'));
-            //     });
-            // }
-        }
         //===== delete the form fieed row
 
         function secondaryPaymentMethods(changePayment)
@@ -1346,3 +1326,4 @@ input {
         }
     </script>
 @endsection
+// onclick=del(this,${supplier})
