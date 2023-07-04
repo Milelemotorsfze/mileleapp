@@ -165,7 +165,8 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code" placeholder="Addon Code" value="{{ old('addon_code') }}"  autocomplete="addon_code" autofocus readonly>
+                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code" 
+                            placeholder="Addon Code" value="{{ old('addon_code') }}"  autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -212,7 +213,9 @@
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
 
-                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus readonly>
+                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" 
+                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus 
+                        readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
@@ -228,7 +231,11 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                        <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+                       
+                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                        name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
+                        <!-- <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                        name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price"> -->
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
@@ -249,7 +256,9 @@
                         <div class="input-group">
 
 
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" value="{{ old('lead_time') }}"  autocomplete="lead_time">
+                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" 
+                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" 
+                        value="{{ old('lead_time') }}"  autocomplete="lead_time">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">Days</span>
                                                     </div>
@@ -264,7 +273,9 @@
                             <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}"  autocomplete="payment_condition" autofocus>
+                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" 
+                            name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}"  autocomplete="payment_condition" 
+                            autofocus>
                             @error('payment_condition')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -297,18 +308,17 @@
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                        <div class="input-group">
-                        <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" >
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                            @error('fixing_charge_amount')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="fixingChargeAmountError" class="invalid-feedback"></span>
+                            <div class="input-group">
+                            <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" 
+                            placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">
+                           <!-- onkeyup="validationOnKeyUp(this)" -->
+                            <!-- <input id="fixing_charge_amount" type="number" min="0" step="any" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" 
+                            value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" onkeyup="validationOnKeyUp(this)"> -->
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                            <span id="fixingChargeAmountError1" class="invalid-feedback"></span>
+                        </div>
                         </div>
                         </br>
                         <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
@@ -316,7 +326,8 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
-                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
+                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" 
+                        autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -332,7 +343,8 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
+                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
+                            value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -347,7 +359,9 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" autofocus></textarea>
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" 
+                            name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" 
+                            autofocus></textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -406,7 +420,8 @@
                                         <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
+                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
+                                        placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
@@ -419,7 +434,8 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> Close</button>
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i> Submit</button>
+                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;">
+                            <i class="fa fa-check" aria-hidden="true"></i> Submit</button>
                         </div>
                     </div>
                 </div>
@@ -457,6 +473,7 @@
         var selectedBrands = [];
         var i=1;
         var fixingCharge = 'yes';
+        var sub ='1';
         $(document).ready(function ()
         {
 
@@ -692,37 +709,38 @@
         });
         $('form').on('submit', function (e)
         {
+            sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            var inputBrand = $('#selectBrand1').val();
-            var inputsupplierId = $('#itemArr1').val();
-            var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-            var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+            // var inputBrand = $('#selectBrand1').val();
+            // var inputsupplierId = $('#itemArr1').val();
+            // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
+            // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
             var formInputError = false;
-            if(inputsupplierId == '')
-            {
-                $msg = "Supplier is required";
-                showSupplierError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceAED == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceAEDError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceUSD == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceUSDError($msg);
-                formInputError = true;
-            }
-            if(inputBrand == '')
-            {
-                $msg = "Brand is required";
-                showBrandError($msg);
-                formInputError = true;
-            }
+            // if(inputsupplierId == '')
+            // {
+            //     $msg = "Supplier is required";
+            //     showSupplierError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputPurchasePriceAED == '')
+            // {
+            //     $msg = "Purchase price is required";
+            //     showPurchasePriceAEDError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputPurchasePriceUSD == '')
+            // {
+            //     $msg = "Purchase price is required";
+            //     showPurchasePriceUSDError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputBrand == '')
+            // {
+            //     $msg = "Brand is required";
+            //     showBrandError($msg);
+            //     formInputError = true;
+            // }
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
@@ -857,14 +875,29 @@
                     formInputError = true;
                 }
             }
-            // if(formInputError == true)
-            // {
-            //     e.preventDefault();
-            // }
-            // alert(formInputError);
+            if(formInputError == true)
+            {
+                e.preventDefault();
+            }
         });
         function validationOnKeyUp(clickInput)
         {
+            // if(clickInput.id == 'fixing_charge_amount')
+            // {
+            //     var value = clickInput.value;
+            //     if(value == '')
+            //     {
+            //         if(value.legth != 0)
+            //         {
+            //             $msg = "Fixing Charge Amount is required";
+            //             showFixingChargeAmountError($msg);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         removeFixingChargeAmountError();
+            //     }
+            // }
             if(clickInput.id == 'itemArr1')
             {
                 var value = clickInput.value; alert(value);
@@ -881,6 +914,7 @@
                     removeSupplierTypeError();
                 }
             }
+            
         }
         function showSupplierTypeError($msg)
         {
@@ -1086,15 +1120,15 @@
         }
         function showFixingChargeAmountError($msg)
         {
-            document.getElementById("fixingChargeAmountError").textContent=$msg;
+            document.getElementById("fixingChargeAmountError1").textContent=$msg;
             document.getElementById("fixing_charge_amount").classList.add("is-invalid");
-            document.getElementById("fixingChargeAmountError").classList.add("paragraph-class");
+            document.getElementById("fixingChargeAmountError1").classList.add("paragraph-class");
         }
         function removeFixingChargeAmountError($msg)
         {
-            document.getElementById("fixingChargeAmountError").textContent="";
+            document.getElementById("fixingChargeAmountError1").textContent="";
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
-            document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
+            document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
         }
                         // $("#supplierArray"+index).select2();
 
@@ -1335,6 +1369,19 @@
         {
             $('#part_number').val(partNum.value);
             $('#part_numberRaw').val(partNum.value);
+            var partNumberInput = $('#part_number').val();
+            var partNumberRawInput = $('#part_numberRaw').val();
+            if(partNumberInput == '' && partNumberRawInput == '')
+            {
+                $msg = "Part Number is required";
+                showPartNumberError($msg);
+                formInputError = true;
+            }
+            else
+            {
+                $msg = "";
+                removePartNumberError($msg);
+            }
         }
         function closemodal()
         {
@@ -1477,6 +1524,35 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
-
+        function inputNumberAbs(currentPriceInput) 
+        {
+            
+            var id = currentPriceInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+            if(currentPriceInput.id == 'fixing_charge_amount' && sub == '2')
+            {
+                var value = currentPriceInput.value;
+                if(value == '')
+                {
+                   
+                    if(value.legth != 0)
+                    {
+                        $msg = "Fixing Charge Amount is required";
+                        showFixingChargeAmountError($msg);
+                    }
+                }
+                else
+                {
+                    removeFixingChargeAmountError();
+                }
+            }
+        }
 </script>
 @endsection

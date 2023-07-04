@@ -596,7 +596,13 @@ class AddonController extends Controller
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
+                    if($addonType == 'SP')
+                    {
+                        $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
+                    }
+                   else{
                     $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
+                   }
                     $newAddonCodeNumber =  $lastAddonCodeNumber+1;
                     $data['newAddonCode'] = $addonType.$newAddonCodeNumber;
                 }
@@ -956,12 +962,12 @@ class AddonController extends Controller
         return response()->json($data);
     }
     public function addonStatusChange(Request $request)
-{
-    $addon = AddonDetails::find($request->id);
-    $addon->status = $request->status;
+    {
+        $addon = AddonDetails::find($request->id);
+        $addon->status = $request->status;
 
-    $addon->save();
-    return response($addon, 200);
-}
+        $addon->save();
+        return response($addon, 200);
+    }
 }
 

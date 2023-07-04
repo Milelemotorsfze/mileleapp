@@ -5,7 +5,7 @@
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                    <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1" multiple="true" style="width: 100%;" required>
+                    <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1" multiple="true" style="width: 100%;">
                         <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
                         @foreach($brands as $brand)
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
@@ -17,7 +17,7 @@
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1" name="brandModel[1][modelline_id][]" id="selectModelLine1" multiple="true" 
-                            style="width: 100%;" required>
+                            style="width: 100%;">
                     </select> 
                 </div>
             </div>

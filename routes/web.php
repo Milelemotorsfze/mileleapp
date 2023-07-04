@@ -94,7 +94,7 @@ Route::get('/d', function () {
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
     Route::post('getModelDescriptionDropdown', [AddonController::class, 'getModelDescriptionDropdown'])->name('addon.getModelDescriptionDropdown');
     Route::get('addon/kitItems/{id}', [AddonController::class, 'kitItems'])->name('addon.kitItems');
-    Route::post('addon-selling-price/status-change', [AddonController::class, 'statusChange'])->name('addon.status-change');
+    Route::post('addon-selling-price/status-change', [AddonController::class, 'statusChange'])->name('addon-selling-price.status-change');
     Route::post('update-addon-selling-price/{id}', [AddonController::class, 'updateSellingPrice'])->name('addon.UpdateSellingPrice');
     Route::post('getSupplierForAddon', [AddonController::class, 'getSupplierForAddon'])->name('get-addon-supplier');
     Route::get('supplier-change-addon-type', [AddonController::class, 'getSupplierForAddonType']);

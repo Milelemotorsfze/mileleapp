@@ -237,7 +237,7 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                        <input readonly id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror"
+                        <input readonly id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror"
                          name="selling_price" placeholder="Enter Selling Price" value="{{$addonDetails->SellingPrice->selling_price ?? 
                             $addonDetails->PendingSellingPrice->selling_price ?? ''}}" 
                                 autocomplete="selling_price">
@@ -320,7 +320,7 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
                         <div class="input-group">
-                        <input id="fixing_charge_amount" type="number" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" 
+                        <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" 
                         value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -1477,6 +1477,36 @@
             $('#kitSupplierIdToHideandshow').hide();
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
+        }
+        function inputNumberAbs(currentPriceInput) 
+        {
+            
+            var id = currentPriceInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+            if(currentPriceInput.id == 'fixing_charge_amount')
+            {
+                var value = currentPriceInput.value;
+                if(value == '')
+                {
+                   
+                    if(value.legth != 0)
+                    {
+                        $msg = "Fixing Charge Amount is required";
+                        showFixingChargeAmountError($msg);
+                    }
+                }
+                else
+                {
+                    removeFixingChargeAmountError();
+                }
+            }
         }
 </script>
 @endsection

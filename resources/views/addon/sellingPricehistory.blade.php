@@ -11,6 +11,11 @@
     display: none;
     opacity:0.5;
   }
+  .paragraph-class
+    {
+        color: red;
+        font-size:11px;
+    }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
@@ -97,9 +102,9 @@
                                 href=""><i class="fa fa-edit" aria-hidden="true"></i></a>
                                 <a data-id="{{ $historyData->id }}" data-status="active" title="Edit" data-placement="top" class="btn btn-sm btn-info price-edit-button" >
                       <i class="fa fa-edit" aria-hidden="true"></i></a>
-                                <a data-id="{{ $historyData->id }}" data-status="active" title="Approved" data-placement="top" class="btn btn-sm btn-success status-active-button" >
+                                <a data-id="{{ $historyData->id }}" data-status="active" title="Approved" data-placement="top" class="btn btn-sm btn-success approve" >
                       <i class="fa fa-check" aria-hidden="true"></i></a>
-                                <button title="Rejected" data-placement="top" class="btn btn-sm btn-danger status-inactive-button"
+                                <button title="Rejected" data-placement="top" class="btn btn-sm btn-danger reject"
                           data-id="{{ $historyData->id }}" data-status="rejected" >
                       <i class="fa fa-ban" aria-hidden="true"></i></button>
                     
@@ -150,7 +155,7 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Update Selling Price</h1>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <button type="button" class="btn-close closeUpdateSelling" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body p-3">
                                                         <div class="col-lg-12">
@@ -161,12 +166,13 @@
                                                                     </div>
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="input-group">
-                                                                            <input type="number" min="0" step="any" name="selling_price" class="form-control"
+                                                                            <input id="updateSellingPriceId" oninput="inputNumberAbs(this)" name="selling_price" class="form-control"
                                                                                    placeholder="Enter Selling Price" value="{{$historyData->selling_price}}"
                                                                                     >
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                             </div>
+                                                                            <span id="updateSellingPriceError" class="invalid-feedback"></span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -174,7 +180,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-secondary closeUpdateSelling" data-bs-dismiss="modal">Close</button>
                                                         <button type="submit" class="btn btn-primary ">Submit</button>
                                                     </div>
                                                 </div>
@@ -232,7 +238,7 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                  
-                                                    <button type="button" class="btn btn-primary status-active-button"
+                                                    <button type="button" class="btn btn-primary approve"
                                                             data-id="{{ $historyData->id }}" data-status="active">Approve</button>
                                                 </div>
                                             </div>
@@ -287,7 +293,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                    <button type="button" class="btn btn-primary  status-inactive-button" data-id="{{ $historyData->id }}"
+                                                    <button type="button" class="btn btn-primary  reject" data-id="{{ $historyData->id }}"
                                                             data-status="rejected">Reject</button>
                                                 </div>
                                             </div>
@@ -304,6 +310,7 @@
     @endif
   @endcan
   <script type="text/javascript">
+    var data = {!! json_encode($historyData) !!};
     $(document).ready(function ()
     {
       $('#supplierAddonPrices').DataTable();
@@ -353,13 +360,13 @@
 
 @push('scripts')
     <script>
-        $('.status-active-button').click(function (e) {
+        $('.approve').click(function (e) {
             // alert("ok");
             var status = $(this).attr('data-status');
             var id =  $(this).attr('data-id');
             statusChange(id,status)
         })
-        $('.status-inactive-button').click(function (e) {
+        $('.reject').click(function (e) {
             // alert("ok");
             var status = $(this).attr('data-status');
             var id =  $(this).attr('data-id');
@@ -367,7 +374,7 @@
         })
 
         function statusChange(id,status) {
-            let url = '{{ route('addon.status-change') }}';
+            let url = '{{ route('addon-selling-price.status-change') }}';
             if(status == 'active') {
                 var message = 'Approve';
             }else{
@@ -392,5 +399,66 @@
                 }
             }).set({title: message +" Addon Selling Price"})
         }
+        function inputNumberAbs(currentPriceInput) 
+        { 
+            var id = currentPriceInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+            if(currentPriceInput.id == 'updateSellingPriceId')
+            {
+                var value = currentPriceInput.value;
+                if(value == '')
+                {
+                   
+                    if(value.legth != 0)
+                    {
+                        $msg = "Selling Price is required";
+                        showSellingPriceError($msg);
+                    }
+                }
+                else
+                {
+                    removeSellingPriceError();
+                }
+            }
+        }
+        function showSellingPriceError($msg)
+        {
+            document.getElementById("updateSellingPriceError").textContent=$msg;
+            document.getElementById("updateSellingPriceId").classList.add("is-invalid");
+            document.getElementById("updateSellingPriceError").classList.add("paragraph-class");
+        }
+        function removeSellingPriceError()
+        {
+            document.getElementById("updateSellingPriceError").textContent="";
+            document.getElementById("updateSellingPriceId").classList.remove("is-invalid");
+            document.getElementById("updateSellingPriceError").classList.remove("paragraph-class");
+        }
+        $('form').on('submit', function (e)
+        {
+            var formInputError = false;
+            var inputupdateSellingPriceId = $('#updateSellingPriceId').val();
+            if(inputupdateSellingPriceId == '')
+            {
+                $msg = "Selling Price is required";
+                showSellingPriceError($msg);
+                formInputError = true;
+            }
+            if(formInputError == true)
+            {
+                e.preventDefault();
+            }
+        });
+        $(".closeUpdateSelling").click(function()
+        {
+            removeSellingPriceError();
+            $("#updateSellingPriceId").val(data.selling_price);
+        });
     </script>
 @endpush

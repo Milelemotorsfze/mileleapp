@@ -5,16 +5,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
 @if ($hasPermission)
   @if(!isset($addonsdata->SellingPrice) && !isset($addonsdata->PendingSellingPrice))
     <button type="button" title="Create Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#create-selling-price-{{$addonsdata->id}}">
-      <i class="fa fa-plus"></i> 
+      <i class="fa fa-plus"></i>
     </button>
     <div class="modal fade" id="create-selling-price-{{$addonsdata->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog ">
-        <form id="form-update" action="{{ route('addon.createSellingPrice', $addonsdata->id) }}" method="POST" >
+        <form id="form-update1_{{$addonsdata->id}}" action="{{ route('addon.createSellingPrice', $addonsdata->id) }}" method="POST" >
           @csrf
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="exampleModalLabel">Create Selling Price</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-3">
               <div class="col-lg-12">
@@ -25,8 +25,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12">
                       <div class="input-group">
-                        <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput" name="selling_price" placeholder="Enter Selling Price" 
-                            value="" autocomplete="selling_price">
+                        <input id="selling_price_a_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput" name="selling_price" 
+                        placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                         <div class="input-group-append">
                           <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                         </div>
@@ -37,8 +37,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-              <button type="submit"  class="btn btn-primary btn-sm createAddonId">Submit</button>
+              <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary btn-sm createAddonId">Submit</button>
             </div>
           </div>
         </form>
@@ -47,16 +47,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
   @elseif(isset($addonsdata->SellingPrice))
     <button type="button" title="Add New Selling Price" class="btn btn-success btn-sm " data-bs-toggle="modal" 
         data-bs-target="#edit-selling-price-{{$addonsdata->SellingPrice->id}}">
-      <i class="fa fa-plus"></i> 
+      <i class="fa fa-plus"></i>
     </button>
     <div class="modal fade" id="edit-selling-price-{{$addonsdata->SellingPrice->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog ">
-        <form id="form-update" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}" method="POST" >
+        <form id="form-update2_{{$addonsdata->id}}" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}" method="POST" >
         @csrf
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title fs-5" id="exampleModalLabel">Add New Selling Price</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-3">
               <div class="col-lg-12">
@@ -75,8 +75,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                   <div class="col-lg-8 col-md-12 col-sm-12">
                     <div class="input-group">
                                       <input value="{{$addonsdata->SellingPrice->id}}" name='id' id="createNew" hidden>
-                                      <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
-                                            name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price">
+                                      <input id="selling_price_b_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                                            name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                                       <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                       </div>
@@ -86,7 +86,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                               </div>
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
                               <button type="submit"  class="btn btn-primary btn-sm createAddonId">Submit</button>
                             </div>
                           </div>
@@ -95,16 +95,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                     </div>
                     @else
                     <button title="Add New Selling Price" type="button" class="btn btn-success btn-sm " data-bs-toggle="modal" data-bs-target="#edit-selling-price-{{$addonsdata->PendingSellingPrice->id}}">
-                      <i class="fa fa-plus"></i> 
+                      <i class="fa fa-plus"></i>
                     </button>
                     <div class="modal fade" id="edit-selling-price-{{$addonsdata->PendingSellingPrice->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                       <div class="modal-dialog ">
-                        <form id="form-update" action="{{ route('addon.newSellingPriceRequest', $addonsdata->PendingSellingPrice->id) }}" method="POST" >
+                        <form id="form-update3_{{$addonsdata->id}}" action="{{ route('addon.newSellingPriceRequest', $addonsdata->PendingSellingPrice->id) }}" method="POST" >
                           @csrf
                           <div class="modal-content">
                             <div class="modal-header">
                               <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Selling Price</h1>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              <button type="button" class="btn-close closeSelPrice" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body p-3">
                               <div class="col-lg-12">
@@ -123,8 +123,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                                   <div class="col-lg-8 col-md-12 col-sm-12">
                                     <div class="input-group">
                                     <input value="{{$addonsdata->PendingSellingPrice->id}}" name='id' id="createNew" hidden>
-                                        <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
-                                            name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price">
+                                        <input id="selling_price_c_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                                            name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                                         <div class="input-group-append">
                                           <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                         </div>
@@ -134,7 +134,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                               </div>
                             </div>
                             <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
                               <button type="submit"  class="btn btn-primary btn-sm createAddonId">Submit</button>
                             </div>
                           </div>
@@ -144,3 +144,40 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                   @endif
                   @endif
                 @endcan
+@push('scripts')
+  <script>
+    
+  
+    function inputNumberAbs(currentPriceInput) 
+    { 
+      var id = currentPriceInput.id;
+      var input = document.getElementById(id);
+      var val = input.value;
+      val = val.replace(/^0+|[^\d.]/g, '');
+      if(val.split('.').length>2) 
+      {
+        val =val.replace(/\.+$/,"");
+      }
+      input.value = val;
+      // if(currentPriceInput.id == 'updateSellingPriceId')
+      // {
+      //           var value = currentPriceInput.value;
+      //           if(value == '')
+      //           {
+                   
+      //               if(value.legth != 0)
+      //               {
+      //                   $msg = "Selling Price is required";
+      //                   showSellingPriceError($msg);
+      //               }
+      //           }
+      //           else
+      //           {
+      //               removeSellingPriceError();
+      //           }
+      //       }
+    }
+  
+  
+  </script>
+@endpush
