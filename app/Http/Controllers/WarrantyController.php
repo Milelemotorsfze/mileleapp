@@ -46,11 +46,10 @@ class WarrantyController extends Controller
      */
     public function store(Request $request)
     {
-//         dd($request->all());
         $authId = Auth::id();
         $input = $request->all();
         $input['created_by'] = $authId;
-        $input['extended_warranty_milage'] =  $input['is_open_milage'] = 'no' ? $input['extended_warranty_milage'] : 0;
+        $input['extended_warranty_milage'] =  $input['is_open_milage'] == 'no' ? $input['extended_warranty_milage'] : NULL;
         $premium = WarrantyPremiums::create($input);
         if($request->brandPrice)
         {
