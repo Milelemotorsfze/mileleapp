@@ -96,7 +96,7 @@
                                 @if($addonsdata->is_all_brands == 'yes')
                                     <tr data-id="1" class="{{$addonsdata->id}}_allbrands tr" id="{{$addonsdata->id}}_allbrands">
                                         <td>{{ ++$i }}</td>                                    
-                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
                                         style="width:100%; height:100px;"></td>
                                         <td>{{$addonsdata->AddonName->name}}</td>
                                         <td>     
@@ -186,7 +186,7 @@
                                             @endif
                                                 tr" id="{{$addonsdata->id}}_{{$AddonTypes->brand_id}}">
                                             <td>{{ ++$i }}</td>    
-                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Snow" 
+                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
                                             style="width:100%; height:100px;"></td>
                                             <td>{{$addonsdata->AddonName->name}}</td>
                                             <td>
