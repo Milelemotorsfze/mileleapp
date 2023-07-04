@@ -55,7 +55,7 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label text-muted">Price</label>
-                        <input type="number" class="form-control" name="price"  value="{{ $vehicle->exterior->name ?? '' }}">
+                        <input type="number" class="form-control" name="price"  value="{{ $vehicle->price  }}">
 
                     </div>
                 </div>

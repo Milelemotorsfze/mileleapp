@@ -16,11 +16,23 @@ class AvailableColour extends Model
     ];
     public function variant()
     {
-        return $this->belongsTo(Varaint::class);
+        return $this->belongsTo(Varaint::class,'varaint_id','id');
+    }
+    public function interior()
+    {
+        return $this->belongsTo(ColorCode::class,'int_colour','id');
+    }
+    public function exterior()
+    {
+        return $this->belongsTo(ColorCode::class,'ext_colour','id');
     }
     public function pictures()
     {
     return $this->hasMany(VariantPicture::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
     }
     public function variantPicture()
     {

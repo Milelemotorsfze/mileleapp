@@ -10,7 +10,8 @@ class Vehicles extends Model
     use HasFactory;
     protected $table = 'vehicles';
     public  $appends = [
-        'price'
+        'similar_vehicles_with_price',
+        'similar_vehicles_without_price'
     ];
     public function variant()
     {
@@ -24,14 +25,24 @@ class Vehicles extends Model
     {
         return $this->belongsTo(ColorCode::class,'ex_colour','id');
     }
-    public function getPriceAttribute() {
-        $availableColour = AvailableColour::where('varaint_id', $this->varaints_id)
-            ->where('int_colour', $this->int_colour )
-            ->where('ext_colour', $this->ex_colour)
-            ->first();
-        if($availableColour) {
-            return $availableColour->price;
-        }
-        return 0;
+
+    public function getSimilarVehiclesWithPriceAttribute()
+    {
+        $vehicles = Vehicles::whereNotNull('price')
+            ->where('varaints_id', $this->varaints_id)
+            ->groupBy('int_colour', 'ex_colour')
+            ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
+            ->get();
+
+        return $vehicles;
     }
+        public function getSimilarVehiclesWithoutPriceAttribute() {
+            $vehicles =  Vehicles::whereNull('price')
+                ->where('varaints_id', $this->varaints_id)
+                ->groupBy('int_colour','ex_colour')
+                ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
+                ->get();
+
+            return $vehicles;
+        }
 }

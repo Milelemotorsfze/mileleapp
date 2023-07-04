@@ -65,7 +65,8 @@
             $('#pending-selling-price-histories-table').DataTable();
             $('#approved-selling-price-histories-table').DataTable();
             $('#rejected-selling-price-histories-table').DataTable();
-            $('#Variant-without-price-table').DataTable();
+            $('#variant-without-price-table').DataTable();
+            $('#variant-with-price-table').DataTable();
             $('#rejected-selling-price-histories-table').DataTable();
             $('#vendor-table').DataTable();
 

@@ -12,9 +12,9 @@ class Varaint extends Model
     protected $appends = [
         'is_deletable',
     ];
-    public function availableColors()
+    public function availableColor()
     {
-        return $this->hasMany(AvailableColour::class, 'varaint_id');
+        return $this->hasone(AvailableColour::class, 'varaint_id');
     }
     public function masterModel()
     {
