@@ -28,6 +28,10 @@
         background-color: rgba(128,128,128,0.5); /* color */
         display: none; /* making it hidden by default */
     }
+    .drop-class
+    {
+        padding-top:10px;
+    }
 </style>
 @section('content')
     @can('warranty-create')
@@ -120,7 +124,9 @@
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
                         <div class="input-group">
-                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
+                             class="form-control widthinput" placeholder="Enter Claim Limit" 
+                             aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                             </div>
@@ -130,7 +136,7 @@
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">Supplier</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus onkeyup="validationOnKeyUp(this)" >
+                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus onchange="validationOnKeyUp(this)" >
                             <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
@@ -175,7 +181,8 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)" 
+                                    class="form-control widthinput" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -183,11 +190,11 @@
                                 </div>
                             </div>
                             <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <span class="error">* </span>
+                                <!-- <span class="error">* </span> -->
                                 <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)"
-                                           type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price">
+                                    <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
+                                           class="form-control widthinput" placeholder="Enter Selling Price">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -418,8 +425,8 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" type="number" required class="form-control widthinput purchase-price"
-                                    onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" >
+                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" required class="form-control widthinput purchase-price"
+                                    placeholder="Enter Purchase Price" id="purchase_price${index}" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -427,11 +434,10 @@
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
                              <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput selling-price"
-                                    onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
+                                    <input name="brandPrice[${index}][selling_price]" id="selling_price${index}" oninput="inputNumberAbs(this)" class="form-control widthinput selling-price"
+                                     placeholder="Enter Selling Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -655,6 +661,7 @@
         document.getElementById("SupplierError").textContent=$msg;
         document.getElementById("supplier_id").classList.add("is-invalid");
         document.getElementById("SupplierError").classList.add("paragraph-class");
+        document.getElementById("SupplierError").classList.add("drop-class");
     }
     function removeSupplierError()
     {
@@ -698,6 +705,17 @@
         document.getElementById("purchase_price1").classList.remove("is-invalid");
         document.getElementById("Price1Error").classList.remove("paragraph-class");
     }
-
+    function inputNumberAbs(currentPriceInput) 
+    {
+        var id = currentPriceInput.id;
+        var input = document.getElementById(id);
+        var val = input.value;
+        val = val.replace(/^0+|[^\d.]/g, '');
+        if(val.split('.').length>2) 
+        {
+            val =val.replace(/\.+$/,"");
+        }
+        input.value = val;
+    }
 </script>
 @endsection

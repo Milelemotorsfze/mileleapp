@@ -125,7 +125,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
                         <div class="input-group">
-                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" value="{{ $premium->claim_limit_in_aed }}" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Claim Limit" aria-label="measurement" aria-describedby="basic-addon2">
+                            <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" value="{{ $premium->claim_limit_in_aed }}"
+                            oninput="inputNumberAbs(this)" class="form-control widthinput" placeholder="Enter Claim Limit" aria-label="measurement" 
+                            aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                             </div>
@@ -178,7 +180,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                             <div class="col-xxl-2 col-lg-2 col-md-3">
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input value="{{$warrantyBrand->price}}" readonly type="number" class="form-control widthinput">
+                                    <input value="{{$warrantyBrand->price}}" readonly oninput="inputNumberAbs(this)" class="form-control widthinput">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -188,7 +190,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                             <div class="col-xxl-2 col-lg-2 col-md-3">
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input value="{{$warrantyBrand->selling_price ?? ''}}" readonly type="number" class="form-control widthinput">
+                                    <input value="{{$warrantyBrand->selling_price ?? ''}}" readonly oninput="inputNumberAbs(this)" class="form-control widthinput">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -220,7 +222,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1"  type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1"  oninput="inputNumberAbs(this)" class="form-control widthinput" 
+                                     placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -232,7 +235,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                     <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                     <div class="input-group">
                                         <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)"
-                                               type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price">
+                                               oninput="inputNumberAbs(this)" class="form-control widthinput" 
+                                                placeholder="Enter Selling Price">
                                         <div class="input-group-append">
                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                         </div>
@@ -489,7 +493,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" type="number" class="form-control widthinput purchase-price" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" class="form-control widthinput purchase-price" 
+                                    id="purchase_price${index}" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" >AED</span>
                                     </div>
@@ -500,8 +505,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" type="number" class="form-control widthinput selling-price"
-                                    onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Selling Price" >
+                                    <input name="brandPrice[${index}][selling_price]" oninput="inputNumberAbs(this)" class="form-control widthinput selling-price"
+                                    id="selling_price${index}" placeholder="Enter Selling Price" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" >AED</span>
                                     </div>
@@ -721,7 +726,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         document.getElementById("extended_warranty_milage").classList.remove("is-invalid");
         document.getElementById("ExtendedWarrantyMilageError").classList.remove("paragraph-class");
     }
-
+    function inputNumberAbs(currentPriceInput) 
+    {
+        var id = currentPriceInput.id;
+        var input = document.getElementById(id);
+        var val = input.value;
+        val = val.replace(/^0+|[^\d.]/g, '');
+        if(val.split('.').length>2) 
+        {
+            val =val.replace(/\.+$/,"");
+        }
+        input.value = val;
+    }
 
 </script>
 @endsection
