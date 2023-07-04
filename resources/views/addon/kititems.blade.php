@@ -81,6 +81,97 @@
     object-fit: contain;
     }
 </style>
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+#myImg {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modalForImage {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 10px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: black; /* Fallback color */
+  background-color: rgba(128,128,128,0.5);/* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modalContentForImage {
+  padding-top: 100px; /* Location of the box */
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  height:auto!important;
+  max-width: 700px!important;
+}
+
+/* Caption of Modal Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation */
+.modalContentForImage, #caption {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  color: black;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .modalContentForImage {
+    width: 100%;
+  }
+}
+</style>
 @section('content')
     <div class="card-header">
         <h4 class="card-title"> 
@@ -266,7 +357,7 @@
             <div class="col-xxl-3 col-lg-3 col-md-3">
                 <div class="row">
                     <center>
-                    <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="your image" class="contain" data-modal-id="showImageModal"/>
+                    <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" class="contain image-click-class" data-modal-id="showImageModal"/>
                     </center>
                 </div>
             </div>
@@ -366,7 +457,8 @@
                                             {{$Kit->addon->AddonName->name}}
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class" style="width:100%; height:125px;" alt="Addon Image"  />
+                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class" 
+                                            style="width:100%; height:125px;" alt="Addon Image"  />
                                         </div>
                                         <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                                             <div class="row" style="padding-right:3px; padding-left:3px;">
@@ -442,7 +534,6 @@
 // show image in large view
     $('.image-click-class').click(function (e) 
     {
-        alert('hihih');
         var id =  $(this).attr('id');
         var src = $(this).attr('src');
         var modal = document.getElementById("myModal");
