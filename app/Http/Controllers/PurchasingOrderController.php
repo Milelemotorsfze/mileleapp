@@ -9,6 +9,8 @@ use App\Models\Varaint;
 use App\Models\Supplier;
 use App\Models\Vehicles;
 use App\Models\Movement;
+use App\Models\Vendor;
+use App\Models\PaymentLog;
 use App\Models\User;
 use App\Models\ModelHasRoles;
 
@@ -28,19 +30,13 @@ class PurchasingOrderController extends Controller
      */
     public function create()
 {
-    $suppliers = Supplier::with('supplierTypes')
-        ->whereHas('supplierTypes', function ($query) {
-            $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-        })
-        ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
-        ->get();
-
+    $vendors = Vendor::where('category', 'vehicle-procurment')->get();
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
 
-    return view('warehouse.create', compact('variants', 'suppliers'));
+    return view('warehouse.create', compact('variants', 'vendors'));
 }
 
     /**
@@ -57,11 +53,11 @@ class PurchasingOrderController extends Controller
         }
         $poDate = $request->input('po_date');
         $poNumber = $request->input('po_number');
-        $suppliers_id = $request->input('suppliers_id');
+        $vendors_id = $request->input('vendors_id');
         $purchasingOrder = new PurchasingOrder();
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->po_number = $poNumber;
-        $purchasingOrder->suppliers_id = $suppliers_id;
+        $purchasingOrder->vendors_id = $vendors_id;
         $purchasingOrder->status = "Active";
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
@@ -120,8 +116,8 @@ class PurchasingOrderController extends Controller
         ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
-    $supplierName = Supplier::where('id', $purchasingOrder->suppliers_id)->value('supplier');
-    return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles', 'supplierName'));
+    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+    return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname'));
 }
     /**
      * Update the specified resource in storage.
@@ -141,6 +137,13 @@ class PurchasingOrderController extends Controller
             $vehicle->int_colour = $newint_colours[$index];
             $vehicle->payment_status = $oldpayments[$index];
             $vehicle->save();
+            if ($vehicle->payment_status === 'Paid' && !PaymentLog::where('vehicle_id', $vehicle->id)->exists()) {
+            $paymentLog = new PaymentLog();
+            $paymentLog->vehicle_id = $vehicle->id;
+            $paymentLog->created_by = auth()->user()->id;
+            $paymentLog->date = date('Y-m-d');
+            $paymentLog->save();
+        }
         }
     }
     $purchasingOrderId = $id;
@@ -221,10 +224,10 @@ class PurchasingOrderController extends Controller
     $varaint = Varaint::get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $data = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'cancel')->get();
-    $supplierName = Supplier::where('id', $purchasingOrder->suppliers_id)->value('supplier');
+    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
     $sales_persons = ModelHasRoles::get();
     $sales_ids = $sales_persons->pluck('model_id');
     $sales = User::whereIn('id', $sales_ids)->get();
-    return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'supplierName', 'sales'));
+    return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'vendorsname', 'sales'));
 }
 }

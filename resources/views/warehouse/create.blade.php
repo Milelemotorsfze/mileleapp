@@ -85,21 +85,21 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
-            <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required>
+            <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Number : </label>
-            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" pattern="[0-9]{4,5}" title="Please enter a valid PO number with 4 to 5 digits" required>
+            <input type="text" id="po_number" name="po_number" class="form-control" placeholder="PO Number" pattern="[0-9]{4,5}" title="Please enter a valid PO number with 4 to 5 digits" required autocomplete="off">
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Vendors : </label>
-            <select class="form-control" autofocus name="suppliers_id" id="supplier">
+            <label for="basicpill-firstname-input" class="form-label">Vendors Name: </label>
+            <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                                 <option value="" disabled>Select The Vendor</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                                @foreach($vendors as $vendors)
+                                    <option value="{{ $vendors->id }}">{{ $vendors->trade_name_or_individual_name }}</option>
                                 @endforeach
             </select>
         </div>
@@ -137,7 +137,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="row">
             <div class="col-lg-2 col-md-6">
                 <label for="brandInput" class="form-label">Variants:</label>
-                <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id">
+                <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id" autocomplete="off">
                 <datalist id="variantslist">
                 @foreach ($variants as $variant)
                 <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>

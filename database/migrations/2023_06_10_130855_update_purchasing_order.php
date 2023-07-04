@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::table('purchasing_order', function (Blueprint $table) {
             $table->string('status')->nullable();
-            $table->bigInteger('suppliers_id')->unsigned()->index()->nullable();
-            $table->foreign('suppliers_id')->references('id')->on('suppliers')->onDelete('cascade');
         });
     }
 
@@ -24,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('purchasing_order', function (Blueprint $table) {
-            $table->dropForeign(['suppliers_id']);
             $table->dropColumn('status');
-            $table->dropColumn('suppliers_id');
         });
     }
 };

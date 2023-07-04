@@ -96,8 +96,8 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
-            <label for="basicpill-firstname-input" class="form-label">Vendor : </label>
-            <input type="number" id="po_number" name="po_number" class="form-control" value="{{$purchasingOrder->supplier}}" placeholder="Vendor Name" readonly>
+            <label for="basicpill-firstname-input" class="form-label">Vendor Name : </label>
+            <input type="number" id="vendor_name" name="vendor_name" class="form-control" value="{{$vendorsname}}" placeholder="Vendor Name" readonly>
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
     </div>
@@ -158,7 +158,10 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-4 col-md-6">
         <input type="text" name="olddetail[]" value="{{$detail}}" class="form-control" readonly>
         </div>
-    @if (Auth::user()->selectedRole === '21'|| Auth::user()->selectedRole === '22')
+        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                    @endphp
+                    @if ($hasPermission)
     <div class="col-lg-1 col-md-6">
     <input type="text" name="oldex_colour[]" value="{{$ex_colours}}" class="form-control" readonly>
 </div>
@@ -166,7 +169,10 @@ input[type=number]::-webkit-outer-spin-button {
     <input type="text" name="oldint_colour[]" value="{{$int_colours}}" class="form-control" readonly>
 </div>
     @endif
-    @if (Auth::user()->selectedRole === '9'|| Auth::user()->selectedRole === '10')
+    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    @endphp
+                    @if ($hasPermission)
         <div class="col-lg-1 col-md-6">
     <select name="oldex_colour[]" class="form-control" placeholder="Exterior Color">
         <option value="">Exterior Color</option>
@@ -208,14 +214,14 @@ input[type=number]::-webkit-outer-spin-button {
 		</div>
     @endif
     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-po-details');
                     @endphp
                     @if ($hasPermission)
     <div class="col-lg-1 col-md-6">
     <input type="text" name="oldpayment[]" class="form-control" value="{{$vehicles->payment_status}}" readonly>
     </div>
         <div class="col-lg-1 col-md-6">
-        <input type="text" name="oldvin[]" value="{{$vehicles->vin}}" class="form-control" placeholder="VIN">
+        <input type="text" name="oldvin[]" value="{{$vehicles->vin}}" class="form-control" placeholder="VIN" autocomplete="off">
         <input type="hidden" name="id[]" value="{{$vehicles->id}}" class="form-control" placeholder="VIN">
 		</div>
         <div class="col-lg-1 col-md-6">
@@ -242,7 +248,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="row">
             <div class="col-lg-2 col-md-6">
                 <label for="brandInput" class="form-label">Variants:</label>
-                <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id">
+                <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id" autocomplete="off">
                 <datalist id="variantslist">
         @foreach ($variants as $variant)
         <option value="{{ $variant->name }}" data-value="{{ $variant->id }}" data-detail="{{ $variant->detail }}" data-brands_id="{{ $variant->brand_name }}" data-master_model_lines_id="{{ $variant->model_line }}">{{ $variant->name }}</option>

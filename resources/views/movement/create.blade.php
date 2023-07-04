@@ -39,7 +39,7 @@
         <div class="col-lg-2 col-md-6">
         <span class="error">* </span>
         <label for="basicpill-firstname-input" class="form-label">Date : </label>
-        <input type="Date" id="date" name="date" class="form-control" placeholder="Date" required>
+        <input type="Date" id="date" name="date" class="form-control" placeholder="Date" required max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
         </div>
         <br>

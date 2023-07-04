@@ -41,13 +41,13 @@
             <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Code</label>
-                        <input type="text" value="{{ old('code', $colorcodes->code) }}" name="code" class="form-control " placeholder="Colour Code">
+                        <input type="text" value="{{ old('code', $colorcodes->code) }}" name="code" class="form-control " placeholder="Colour Code" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label">Name</label>
-                        <input type="text" value="{{ old('name', $colorcodes->name) }}" name="name" class="form-control " placeholder="Colour Name" required>
+                        <input type="text" value="{{ old('name', $colorcodes->name) }}" name="name" class="form-control " placeholder="Colour Name" required autocomplete="off">
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12">

@@ -317,7 +317,7 @@
 					</li>
                     @endif
                     @endcan
-                    @can('edit-po-details')
+                    <!-- @can('edit-po-details')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-details');
                     @endphp
@@ -329,7 +329,7 @@
                         </a>
 					</li>
                     @endif
-                    @endcan
+                    @endcan -->
                     @can('variants-view')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
