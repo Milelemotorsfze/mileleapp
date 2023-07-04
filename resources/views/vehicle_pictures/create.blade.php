@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <div class="form_field_outer" >
                         <div class="row form_field_outer_row" id="row-1">
-                            <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> VIN</label>
                                     <select class="form-control widthinput vehicles" multiple="true" required  id="vehicles-1" data-index="1" autofocus name="vins[1]" >
@@ -51,29 +51,16 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Detail</label>
                                     <input type="text" class="form-control widthinput" id="variant-detail-1" readonly placeholder="Vehicle Details">
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">GRN</label>
-                                    <input type="url"  name="GRN_link[1]" class="form-control widthinput mygroup" placeholder="GRN Link">
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">GDN</label>
-                                    <input type="url"  name="GDN_link[1]" class="form-control widthinput mygroup" placeholder="GDN Link">
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Modification Link</label>
-                                    <input type="url" name="modification_link[1]" class="form-control widthinput mygroup"
-                                           placeholder="Modification Link">
+                                    <label for="choices-single-default" class="form-label">Vehicle Picture Link</label>
+                                    <input type="url"  name="vehicle_picture_link[1]" class="form-control widthinput " required placeholder="Vehicle Picture Link">
                                 </div>
                             </div>
                         </div>
@@ -111,21 +98,11 @@
                 'vins[]': {
                     required: true,
                 },
-                'modification_link[]':{
+                'vehicle_picture_link[]':{
                     url:true,
-                    require_from_group: [1, '.mygroup']
+                    required: true
                 },
-                'GDN_link[]':{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                'GRN_link[]':{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                groups: {
-                    mygroup: "GDN_link GRN_link modification_link"
-                }
+
             }
         });
         // $('#vehicles-1').on('change',function(){
@@ -243,7 +220,7 @@
                     // {
                         $(".form_field_outer").append(`
                            <div class="row form_field_outer_row" id="row-${index}">
-                            <div class="col-lg-2 col-md-6 col-sm-12">
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> VIN</label>
                                     <select class="form-control vehicles" required multiple="true" id="vehicles-${index}"
@@ -252,32 +229,20 @@
                                     </select>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Variant Detail</label>
                                 <input type="text" value="" class="form-control widthinput variant-detail" id="variant-detail-${index}"
                             readonly placeholder="Vehicle Details">
                             </div>
                         </div>
-                        <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">GRN</label>
-                                <input type="url" name="GRN_link[${index}]" class="form-control widthinput mygroup" placeholder="GRN Link">
+                                <label for="choices-single-default" class="form-label">Vehicle Picture Link</label>
+                                <input type="url" name="vehicle_picture_link[${index}]" class="form-control widthinput" required placeholder="Vehicle Picture Link">
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">GDN</label>
-                                    <input type="url" name="GDN_link[${index}]" class="form-control widthinput mygroup" placeholder="GDN Link">
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Modification Link</label>
-                                    <input type="url" name="modification_link[${index}]" widthinput class="form-control mygroup"
-                                           placeholder="Modification Link">
-                                </div>
-                            </div>
+
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 " style="margin-top:32px" >
                                 <button type="button" class="btn btn-danger btn-sm removeButton" id="remove-${index}" data-index="${index}" >
                                     <i class="fa fa-trash"></i>

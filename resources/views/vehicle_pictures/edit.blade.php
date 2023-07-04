@@ -51,23 +51,9 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">GRN</label>
-                            <input type="text" value="{{ old('GRN_link', $vehiclePicture->GRN_link) }}" name="GRN_link"
-                                   class="form-control mygroup" placeholder="GRN">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">GDN</label>
-                            <input type="text" value="{{ old('GDN_link', $vehiclePicture->GDN_link) }}" name="GDN_link"
-                                   class="form-control mygroup" placeholder="GDN">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Modification Link</label>
-                            <input type="text" value="{{ old('modification_link', $vehiclePicture->modification_link) }}" name="modification_link"
-                                   class="form-control mygroup" placeholder="Modification Link">
+                            <label for="choices-single-default" class="form-label">Vehicle Picture Link</label>
+                            <input type="text" value="{{ old('vehicle_picture_link', $vehiclePicture->vehicle_picture_link) }}" name="vehicle_picture_link"
+                                   class="form-control " placeholder="Vehicle Picture Link">
                         </div>
                     </div>
                     </br>
@@ -108,20 +94,9 @@
                 vin: {
                     required: true,
                 },
-                modification_link:{
+                vehicle_picture_link:{
                     url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                GDN_link:{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                GRN_link:{
-                    url:true,
-                    require_from_group: [1, '.mygroup']
-                },
-                groups: {
-                    mygroup: "GDN_link GRN_link modification_link"
+                    required:true
                 },
             }
         });

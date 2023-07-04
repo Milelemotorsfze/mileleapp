@@ -39,6 +39,10 @@
 @if($addon1)
     @if(count($addon1) > 0)
         @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
+        @endphp
+        @if ($hasPermission)
             <div class="card-body">
                 <div class="table-responsive" id="addonListTable" hidden>     
                     <table id="addonListDataTable" class="table table-striped table-editable table-edits table">
@@ -56,14 +60,29 @@
                                 <th>Additional Remarks</th>
                                 @if($content == '')
                                     @can('supplier-addon-purchase-price-view')
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                                    @endphp
+                                    @if ($hasPermission)
                                         <th>Purchase Price</th>
+                                    @endif
                                     @endcan
                                 @endif
                                 @can('addon-least-purchase-price-view')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                @endphp
+                                @if ($hasPermission)
                                     <th>Least Purchase Price</th>
+                                @endif
                                 @endcan
                                 @can('addon-selling-price-view')
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                                @endphp
+                                @if ($hasPermission)
                                     <th>Selling Price(AED)</th>
+                                @endif
                                 @endcan
                                 <th>Fixing Charge</th>
                                 <th>Part Number</th>
@@ -97,17 +116,31 @@
                                         <td>{{$addonsdata->additional_remarks}}</td>
                                         @if($content == '')
                                             @can('supplier-addon-purchase-price-view')
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                                            @endphp
+                                            @if ($hasPermission)
                                                 <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
+                                            @endif
                                             @endcan
                                         @endif
                                         @if($addonsdata->LeastPurchasePrices!= null)
                                             @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
                                                 @can('addon-least-purchase-price-view')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                @endphp
+                                                @if ($hasPermission)
                                                     <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                                @endif
                                                 @endcan
                                             @endif
                                         @endif
                                         @can('addon-selling-price-view')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                                        @endphp
+                                        @if ($hasPermission)
                                             <td>
                                                 @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
                                                     <label class="badge badge-soft-info">Not Created</label>          
@@ -124,6 +157,7 @@
                                                     @endif
                                                 @endif
                                             </td>
+                                        @endif
                                         @endcan
                                         <td>
                                             @if($addonsdata->fixing_charges_included == 'yes')
@@ -178,13 +212,27 @@
                                             <td>{{$addonsdata->additional_remarks}}</td>
                                             @if($content == '')
                                                 @can('supplier-addon-purchase-price-view')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                                                @endphp
+                                                @if ($hasPermission)
                                                     <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
+                                                @endif
                                                 @endcan
                                             @endif
                                             @can('addon-least-purchase-price-view')
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                            @endphp
+                                            @if ($hasPermission)
                                             <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                            @endif
                                             @endcan
                                             @can('addon-selling-price-view')
+                                            @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                                            @endphp
+                                            @if ($hasPermission)
                                                 <td>
                                                     @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')    
                                                         <label class="badge badge-soft-info">Not Created</label>          
@@ -199,6 +247,7 @@
                                                         @endif
                                                     @endif
                                                 </td>
+                                            @endif
                                             @endcan
                                             <td>
                                                 @if($addonsdata->fixing_charges_included == 'yes')
@@ -223,6 +272,7 @@
                     </table>
                 </div>
             </div>
+            @endif
         @endcanany
     @endif
 @endif

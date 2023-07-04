@@ -194,8 +194,13 @@
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
                             @can('master-addon-create')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-create']);
+                            @endphp
+                            @if ($hasPermission)
                             <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" 
                             class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
+                            @endif
                             @endcan
                         </div>
                     </div>

@@ -31,6 +31,10 @@
 </style>
 @section('content')
     @can('warranty-create')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create']);
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Create Warranty</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -211,6 +215,7 @@
     </div>
     <input type="hidden" id="indexValue" value="">
     <div class="overlay"></div>
+    @endif
     @endcan
     <script type="text/javascript">
     var selectedBrands = [];

@@ -43,9 +43,7 @@ class VehiclePicturesController extends Controller
         foreach ($request->vins as $key => $vin) {
             $vehiclePicture = new VehiclePicture();
             $vehiclePicture->vehicle_id  = $vin;
-            $vehiclePicture->GDN_link = $request->GDN_link[$key];
-            $vehiclePicture->GRN_link = $request->GRN_link[$key];
-            $vehiclePicture->modification_link = $request->modification_link[$key];
+            $vehiclePicture->vehicle_picture_link = $request->vehicle_picture_link[$key];
             $vehiclePicture->save();
         }
 
@@ -90,9 +88,7 @@ class VehiclePicturesController extends Controller
         ]);
 
         $vehiclePicture->vehicle_id  = $request->input('vin');
-        $vehiclePicture->GDN_link = $request->input('GDN_link');
-        $vehiclePicture->GRN_link = $request->input('GRN_link');
-        $vehiclePicture->modification_link = $request->input('modification_link');
+        $vehiclePicture->vehicle_picture_link = $request->input('vehicle_picture_link');
         $vehiclePicture->save();
 
         return redirect()->route('vehicle-pictures.index')->with('success','Vehicle picture updated successfully.');

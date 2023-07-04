@@ -28,6 +28,10 @@
             @endif
         </div>
         @can('warranty-selling-price-histories-list')
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-histories-list']);
+        @endphp
+        @if ($hasPermission)
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
@@ -69,11 +73,20 @@
                                     <td>{{ $pendingSellingPriceHistory->updated_at }} </td>
                                     <td>
                                         @can('warranty-selling-price-histories-edit')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-histories-edit']);
+                                        @endphp
+                                        @if ($hasPermission)
                                             <button type="button" class="btn btn-primary btn-sm " data-bs-toggle="modal"
                                                     data-bs-target="#edit-selling-price-{{$pendingSellingPriceHistory->id}}">
                                                 <i class="fa fa-edit"></i></button>
+                                        @endif
                                         @endcan
                                         @can('warranty-selling-price-approve')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-approve']);
+                                        @endphp
+                                        @if ($hasPermission)
                                             <button type="button" class="btn btn-success btn-sm"  data-bs-toggle="modal"
                                                     data-bs-target="#approve-selling-price-{{$pendingSellingPriceHistory->id}}">
                                                 Approve
@@ -82,6 +95,7 @@
                                                     data-bs-target="#reject-selling-price-{{$pendingSellingPriceHistory->id}}">
                                                 Reject
                                             </button>
+                                        @endif
                                         @endcan
                                     </td>
                                     <div class="modal fade" id="edit-selling-price-{{$pendingSellingPriceHistory->id}}"  tabindex="-1"
@@ -279,6 +293,7 @@
                 </div>
             </div>
         </div>
+       @endif
        @endcan
 @endsection
 @push('scripts')

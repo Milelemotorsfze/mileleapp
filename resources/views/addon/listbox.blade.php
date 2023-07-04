@@ -152,12 +152,17 @@
                     @if($addonsdata->PurchasePrices!= null)
                       @if($addonsdata->PurchasePrices->purchase_price_aed != '')
                         @can('supplier-addon-purchase-price-view')
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                        @endphp
+                        @if ($hasPermission)
                           <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                             Purchase Price
                           </div>
                           <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                             {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
                           </div>
+                        @endif
                         @endcan
                       @endif
                     @endif
@@ -165,16 +170,25 @@
                   @if($addonsdata->LeastPurchasePrices!= null)
                     @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
                       @can('addon-least-purchase-price-view')
+                      @php
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                      @endphp
+                      @if ($hasPermission)
                         <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                           Least Purchase Price
                         </div>
                         <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                           {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
                         </div>
+                      @endif
                       @endcan
                     @endif
                   @endif
                   @can('addon-selling-price-view')
+                  @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                    @endphp
+                    @if ($hasPermission)
                     @if($addonsdata->SellingPrice!= null OR $addonsdata->PendingSellingPrice!= null)
                       <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                         Selling Price 
@@ -192,6 +206,7 @@
                           @endif
                         @endif
                       </div>
+                    @endif
                     @endif
                   @endcan
                   <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">

@@ -32,9 +32,7 @@
                 <tr>
                     <th>S.NO</th>
                     <th>VIN</th>
-                    <th>GRN link</th>
-                    <th>GDN link</th>
-                    <th>Modified link</th>
+                    <th>Vehicle Picture link</th>
                     <th>Action</th>
                 </tr>
                 </thead>
@@ -45,9 +43,7 @@
                     <tr data-id="1">
                         <td>{{ ++$i }}</td>
                         <td>{{ $vehiclePicture->vehicle->vin ?? '' }}</td>
-                        <td>{{ $vehiclePicture->GRN_link ?? '' }}</td>
-                        <td>{{ $vehiclePicture->GDN_link ?? '' }}</td>
-                        <td>{{ $vehiclePicture->modification_link ?? ''  }}</td>
+                        <td>{{ $vehiclePicture->vehicle_picture_link ?? '' }}</td>
                         <td>
                             @can('vehicles-picture-view')
                             <a href="{{ route('vehicle-pictures.show',$vehiclePicture->id) }}">
