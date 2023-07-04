@@ -345,7 +345,7 @@ $(document).ready(function() {
             var detailCol = $('<div class="col-lg-4 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
-            var paymentCol = $('<div class="col-lg-1 col-md-6"><select name="payment[]" class="form-control"><option value="Not Paid">Not Paid</option><option value="paid">Paid</option></select></div>');
+            var paymentCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="payment[]" value="Not Paid" class="form-control" readonly></div>');
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
 var exColourDropdown = exColourCol.find('select');
@@ -360,7 +360,7 @@ for (var id in intColours) {
         intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
     }
 }
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, vinCol, paymentCol, removeBtn);
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, paymentCol, vinCol, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
         $('#variants_id').val('');
@@ -427,5 +427,107 @@ for (var id in intColours) {
     setTimeout(function() {
         $('#success-message').fadeOut('slow');
     }, 3000);
+</script>
+<script>
+  $(document).ready(function() {
+    function checkDuplicateVIN() {
+      var vinValues = $('input[name="vin[]"]').map(function() {
+        return $(this).val();
+      }).get();
+
+      var duplicates = vinValues.filter(function(value, index, self) {
+        return self.indexOf(value) !== index && value.trim() !== '';
+      });
+
+      if (duplicates.length > 0) {
+        alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
+        return false;
+      }
+
+      var allBlank = vinValues.every(function(value) {
+        return value.trim() === '';
+      });
+
+      if (allBlank) {
+        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+      } else {
+        var formData = $('#purchasing-order').serialize();
+        // Update the AJAX request method to PATCH
+        $.ajax({
+          url: '{{ route('vehicles.check-vin-duplication') }}',
+          method: 'PATCH', // Update the method to PATCH
+          data: formData,
+          success: function(response) {
+            if (response === 'duplicate') {
+              alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
+              return false;
+            } else {
+              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+            }
+          },
+          error: function() {
+            alert('An error occurred while checking for VIN duplication. Please try again.');
+            return false;
+          }
+        });
+      }
+      return false;
+    }
+    $('#purchasing-order').submit(function(event) {
+      event.preventDefault();
+      checkDuplicateVIN();
+    });
+  });
+</script>
+<script>
+  $(document).ready(function() {
+    function checkDuplicateVIN() {
+      var vinValues = $('input[name="oldvin[]"]').map(function() {
+        return $(this).val();
+      }).get();
+
+      var duplicates = vinValues.filter(function(value, index, self) {
+        return self.indexOf(value) !== index && value.trim() !== '';
+      });
+
+      if (duplicates.length > 0) {
+        alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
+        return false;
+      }
+
+      var allBlank = vinValues.every(function(value) {
+        return value.trim() === '';
+      });
+
+      if (allBlank) {
+        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+      } else {
+        var formData = $('#purchasing-order').serialize();
+        // Update the AJAX request method to PATCH
+        $.ajax({
+          url: '{{ route('vehicles.check-vin-duplication') }}',
+          method: 'PATCH', // Update the method to PATCH
+          data: formData,
+          success: function(response) {
+            if (response === 'duplicate') {
+              alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
+              return false;
+            } else {
+              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+            }
+          },
+          error: function() {
+            alert('An error occurred while checking for VIN duplication. Please try again.');
+            return false;
+          }
+        });
+      }
+      return false;
+    }
+    $('#purchasing-order').submit(function(event) {
+      event.preventDefault();
+      checkDuplicateVIN();
+    });
+  });
 </script>
 @endpush

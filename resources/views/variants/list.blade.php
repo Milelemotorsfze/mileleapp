@@ -4,7 +4,7 @@
         <h4 class="card-title">
             Variants Info
         </h4>
-        @can('variants-create')
+        @can('variant-edit')
             <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
         @endcan
     </div>

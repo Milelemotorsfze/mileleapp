@@ -48,6 +48,8 @@
                 <tr>
                     <th>PO Date</th>
                     <th>PO Number</th>
+                    <th>Vendor</th>
+                    <th>Total Vehicles</th>
                     <th>Status</th>
                     <th>Vehicles Details</th>
                     @php
@@ -71,6 +73,18 @@
                     <tr data-id="1">
                         <td>{{ $purchasingOrder->po_date}}</td>
                         <td>{{ $purchasingOrder->po_number }}</td>
+                        <td>
+                            @php
+                            $resultname = DB::table('vendors')->where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+                            @endphp
+                            {{ $resultname }}
+                        </td>
+                        <td>
+                        @php
+                        $vehicleCount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->count();
+                        @endphp
+                        {{ $vehicleCount }}
+                    </td>
                         <td>
                             @if ($purchasingOrder->status == 'Active')
                                 <span class="btn btn-sm btn-info">Active</span>

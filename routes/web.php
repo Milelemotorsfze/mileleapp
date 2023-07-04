@@ -265,6 +265,8 @@ Route::get('/d', function () {
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
     Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    Route::post('/check-vin-duplication', [PurchasingOrderController::class, 'checkDuplication'])->name('vehicles.check-vin-duplication');
+    Route::patch('/check-vin-duplications', [PurchasingOrderController::class, 'checkDuplications'])->name('vehicles.check-vin-duplication');
 
 
     Route::get('horizontal-menu', [HorizontalController::class, 'showMenu'])->name('showHorizontalMenu');

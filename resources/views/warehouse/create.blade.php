@@ -106,6 +106,9 @@ input[type=number]::-webkit-outer-spin-button {
     </div>
     <div id="variantRowsContainer" style="display: none;">
     <div class="bar">Stock Vehicles</div>
+<div class="col-lg-12">
+  <div id="flashMessage"></div>
+</div>
     <div class="row">
         <div class="col-lg-1 col-md-6">
             <label for="brandInput" class="form-label">Variants:</label>
@@ -169,7 +172,7 @@ input[type=number]::-webkit-outer-spin-button {
 <br>
 <br>
     <div class="col-lg-12 col-md-12">
-        <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+        <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" id="submit-button"/>
     </div>
 {!! Form::close() !!}
 		</br>
@@ -324,6 +327,70 @@ for (var id in intColours) {
     } else {
       input.setCustomValidity('');
     }
+  });
+</script>
+<script>
+  $(document).ready(function() {
+    $('#submit-button').click(function(e) {
+      var variantIds = $('input[name="variant_id[]"]').map(function() {
+        return $(this).val();
+      }).get();
+
+      if (variantIds.length === 0) {
+        e.preventDefault();
+        alert('Please select at least one variant');
+      }
+    });
+  });
+</script>
+<script>
+  $(document).ready(function() {
+    function checkDuplicateVIN() {
+      var vinValues = $('input[name="vin[]"]').map(function() {
+        return $(this).val();
+      }).get();
+
+      var duplicates = vinValues.filter(function(value, index, self) {
+        return self.indexOf(value) !== index && value.trim() !== '';
+      });
+
+      if (duplicates.length > 0) {
+        alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
+        return false;
+      }
+      
+      var allBlank = vinValues.every(function(value) {
+        return value.trim() === '';
+      });
+
+      if (allBlank) {
+        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+      } else {
+        var formData = $('#purchasing-order').serialize();
+        $.ajax({
+          url: '{{ route('vehicles.check-vin-duplication') }}',
+          method: 'POST',
+          data: formData,
+          success: function(response) {
+            if (response === 'duplicate') {
+              alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
+              return false;
+            } else {
+              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+            }
+          },
+          error: function() {
+            alert('An error occurred while checking for VIN duplication. Please try again.');
+            return false;
+          }
+        });
+      }
+      return false;
+    }
+    $('#purchasing-order').submit(function(event) {
+      event.preventDefault();
+      checkDuplicateVIN();
+    });
   });
 </script>
 @endpush

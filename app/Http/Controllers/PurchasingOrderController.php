@@ -13,6 +13,7 @@ use App\Models\Vendor;
 use App\Models\PaymentLog;
 use App\Models\User;
 use App\Models\ModelHasRoles;
+use Illuminate\Support\Facades\Validator;
 
 class PurchasingOrderController extends Controller
 {
@@ -230,4 +231,37 @@ class PurchasingOrderController extends Controller
     $sales = User::whereIn('id', $sales_ids)->get();
     return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'vendorsname', 'sales'));
 }
+public function checkDuplication(Request $request)
+    {
+        $vinValues = $request->input('vin');
+        $vinValues = array_filter($vinValues, function ($value) {
+            return trim($value) !== '';
+        });
+        $duplicates = array_unique(array_diff_assoc($vinValues, array_unique($vinValues)));
+        if (!empty($duplicates)) {
+            return response()->json('duplicate');
+        }
+        $existingVins = Vehicles::whereIn('vin', $vinValues)->pluck('vin')->toArray();
+        if (!empty($existingVins)) {
+            return response()->json('duplicate');
+        }
+        return response()->json('unique');
+    } 
+
+    public function checkDuplications(Request $request)
+    {
+        $vinValues = $request->input('vin');
+        $vinValues = array_filter($vinValues, function ($value) {
+            return trim($value) !== '';
+        });
+        $duplicates = array_unique(array_diff_assoc($vinValues, array_unique($vinValues)));
+        if (!empty($duplicates)) {
+            return response()->json('duplicate');
+        }
+        $existingVins = Vehicles::whereIn('vin', $vinValues)->pluck('vin')->toArray();
+        if (!empty($existingVins)) {
+            return response()->json('duplicate');
+        }
+        return response()->json('unique');
+    }
 }
