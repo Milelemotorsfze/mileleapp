@@ -236,7 +236,7 @@
                                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Vehicles</h1>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('variant-prices.update', $vehicleWithPrice->id) }}" method="POST" >
+                                                <form action="{{ route('variant-prices.update', $vehicleWithoutPrice->id) }}" method="POST" >
                                                     @csrf
                                                     @method('PUT')
 
