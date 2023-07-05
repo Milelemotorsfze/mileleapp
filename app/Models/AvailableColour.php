@@ -14,6 +14,8 @@ class AvailableColour extends Model
         'int_colour',
         'ext_colour',
     ];
+
+
     public function variant()
     {
         return $this->belongsTo(Varaint::class,'varaint_id','id');
@@ -42,4 +44,8 @@ class AvailableColour extends Model
     {
         return $this->hasMany(VariantsReel::class);
     }
+    public function VariantOldPrice() {
+        return $this->hasOne(VehiclePriceHistory::class)->latest();
+    }
+
 }

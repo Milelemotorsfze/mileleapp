@@ -68,48 +68,51 @@ class VariantPriceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'price' => 'required'
-        ]);
+//        return $request->all();
+//        $request->validate([
+//            'prices' => 'required'
+//        ]);
 
-        $vehicle = Vehicles::find($id);
-        $vehicles = Vehicles::where('varaints_id', $vehicle->varaints_id)
-                        ->where('int_colour', $vehicle->int_colour)
-                        ->where('ex_colour', $vehicle->ex_colour)
-                        ->get();
+        $prices = $request->prices;
+        $vehicles = $request->vehicle_ids;
 
-        foreach ($vehicles as $vehicle) {
-            $vehicle->price = $request->price;
-            $vehicle->save();
+        foreach ($prices as $key => $price ) {
+            $vehicle = Vehicles::find($vehicles[$key]);
+            if($price != $vehicle->price) {
+                info("new price update".$vehicle->id);
+                $vehicle->price = $price;
+                $vehicle->save();
+
+                $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+                    ->where('int_colour', $vehicle->int_colour)
+                    ->where('ext_colour', $vehicle->ex_colour)
+                    ->first();
+
+                if(empty($available_color)) {
+                    $available_color = new AvailableColour();
+                    $oldPrice = Null;
+                    $status = 'New';
+                }else{
+                    $oldPrice = $available_color->price;
+                    $status = 'Updated';
+                }
+
+                $available_color->varaint_id = $vehicle->varaints_id;
+                $available_color->int_colour = $vehicle->int_colour;
+                $available_color->ext_colour = $vehicle->ex_colour;
+                $available_color->price = $price;
+                $available_color->updated_by = Auth::id();
+                $available_color->save();
+
+                $vehiclePriceHistory = new VehiclePriceHistory();
+                $vehiclePriceHistory->available_colour_id  = $available_color->id;
+                $vehiclePriceHistory->old_price = $oldPrice;
+                $vehiclePriceHistory->new_price = $price;
+                $vehiclePriceHistory->updated_by = Auth::id();
+                $vehiclePriceHistory->status = $status;
+                $vehiclePriceHistory->save();
+            }
         }
-        $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id)
-                                    ->where('int_colour', $vehicle->int_colour)
-                                    ->where('ext_colour', $vehicle->ex_colour)
-                                    ->first();
-
-        if(empty($available_color)) {
-            $available_color = new AvailableColour();
-            $oldPrice = Null;
-            $status = 'New';
-        }else{
-            $oldPrice = $available_color->price;
-            $status = 'Updated';
-        }
-
-        $available_color->varaint_id = $vehicle->varaints_id;
-        $available_color->int_colour = $vehicle->int_colour;
-        $available_color->ext_colour = $vehicle->ex_colour;
-        $available_color->price = $request->price;
-        $available_color->updated_by = Auth::id();
-        $available_color->save();
-
-        $vehiclePriceHistory = new VehiclePriceHistory();
-        $vehiclePriceHistory->available_colour_id  = $available_color->id;
-        $vehiclePriceHistory->old_price = $oldPrice;
-        $vehiclePriceHistory->new_price = $request->price;
-        $vehiclePriceHistory->updated_by = Auth::id();
-        $vehiclePriceHistory->status = $status;
-        $vehiclePriceHistory->save();
 
         return redirect()->route('variant-prices.index')->with('success','Price Updated Successfully.');
 

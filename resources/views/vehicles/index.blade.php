@@ -91,7 +91,7 @@ th.nowrap-td {
       </li>
     </ul>
     <div class="tab-content">
-    <div class="tab-pane fade show active" id="tab1"> 
+    <div class="tab-pane fade show active" id="tab1">
       @endif
     <div class="card-body">
     <div class="table-responsive" >
@@ -103,7 +103,7 @@ th.nowrap-td {
                     @endphp
                     @if ($hasPermission)
                 <th class="nowrap-td">PO Number</th>
-                <th class="nowrap-td">PO Date</th> 
+                <th class="nowrap-td">PO Date</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
@@ -535,7 +535,7 @@ th.nowrap-td {
                     @endphp
                     @if ($hasPermission)
                 <th class="nowrap-td">PO Number</th>
-                <th class="nowrap-td">PO Date</th> 
+                <th class="nowrap-td">PO Date</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
@@ -1173,7 +1173,7 @@ th.nowrap-td {
       <div class="col-md-4">
   <label for="so_number">SO Number</label>
     <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">
-    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">    
+    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
 </div>
 @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
@@ -1181,11 +1181,11 @@ th.nowrap-td {
                         @if ($hasPermission)
 <div class="col-md-4">
   <label for="so_number">Reservation Start Date</label>
-    <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">    
+    <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">
 </div>
 <div class="col-md-4">
   <label for="so_number">Reservation Ending Date</label>
-    <input type="date" class="form-control" id="reservation_end_date" name="reservation_end_date" value="{{ $vehicles->reservation_end_date }}">    
+    <input type="date" class="form-control" id="reservation_end_date" name="reservation_end_date" value="{{ $vehicles->reservation_end_date }}">
 </div>
 <div class="col-md-4">
   <label for="gdn_date">Sales Person</label>
@@ -1219,7 +1219,7 @@ th.nowrap-td {
                         @if ($hasPermission)
       <div class="col-md-12">
   <label for="sales_remarks">Sales Remarks</label>
-    <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">    
+    <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">
 </div>
 @endif
 </div>
@@ -1391,7 +1391,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });
@@ -1433,7 +1433,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });
@@ -1460,7 +1460,7 @@ $(document).ready(function() {
     var matchFound = false;
     for (var i = 0; i < options.length; i++) {
       var option = options[i];
-      
+
       if (inputValue === option.value) {
         matchFound = true;
         break;

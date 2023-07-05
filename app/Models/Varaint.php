@@ -14,7 +14,7 @@ class Varaint extends Model
     ];
     public function availableColor()
     {
-        return $this->hasone(AvailableColour::class, 'varaint_id');
+        return $this->hasOne(AvailableColour::class, 'varaint_id');
     }
     public function masterModel()
     {
