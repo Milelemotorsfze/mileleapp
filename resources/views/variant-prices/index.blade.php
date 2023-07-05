@@ -99,10 +99,10 @@
                                                                                 <label class="form-label"> Price</label>
                                                                             </div>
                                                                             <div class="col-lg-1 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Effective Date</label>
+                                                                                <label class="form-label">Updated By</label>
                                                                             </div>
                                                                             <div class="col-lg-1 col-md-12 col-sm-12">
-                                                                                <label class="form-label">Updated By</label>
+                                                                                <label class="form-label"> Effective Date</label>
                                                                             </div>
                                                                             <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                 <label class="form-label">Previous Price</label>
@@ -122,11 +122,11 @@
                                                                             <div class="row mt-3">
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Brand</label>
-                                                                                    <input type="text" value="{{ $vehicle->variant->brand->brand_name ?? '' }}" readonly class="form-control" >
+                                                                                    <textarea readonly class="form-control" >{{ $vehicle->variant->brand->brand_name ?? '' }}</textarea>
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                    <input type="text" value="{{ $vehicle->variant->name ?? '' }}" readonly class="form-control" >
+                                                                                    <textarea readonly class="form-control" >{{ $vehicle->variant->name }}</textarea>
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">My</label>
@@ -138,7 +138,7 @@
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Exterior</label>
-                                                                                    <input type="text" value="{{ $vehicle->exterior->name ?? ''}}" readonly class="form-control">
+                                                                                    <textarea readonly  class="form-control">{{ $vehicle->exterior->name ?? ''}} </textarea>
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -154,7 +154,7 @@
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Updated By</label>
-                                                                                    <input type="text" value="{{ $vehicle->updated_by }}" readonly class="form-control">
+                                                                                    <textarea type="text" readonly class="form-control">{{ $vehicle->updated_by }}</textarea>
                                                                                 </div>
                                                                                 <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Effective Date</label>
@@ -278,11 +278,11 @@
                                                                         <div class="row mt-3">
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Brand</label>
-                                                                                <input type="text" value="{{ $vehicle->variant->brand->brand_name ?? '' }}" readonly class="form-control" >
+                                                                                <textarea readonly class="form-control" >{{ $vehicle->variant->brand->brand_name ?? '' }} </textarea>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                                <input type="text" value="{{ $vehicle->variant->name ?? '' }}" readonly class="form-control" >
+                                                                                <textarea readonly class="form-control" >{{ $vehicle->variant->name ?? '' }}</textarea>
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">My</label>
@@ -294,7 +294,7 @@
                                                                             </div>
                                                                             <div class="col-lg-2 col-md-12 col-sm-12">
                                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Exterior</label>
-                                                                                <input type="text" value="{{ $vehicle->exterior->name ?? ''}}" readonly class="form-control">
+                                                                                <textarea readonly class="form-control">{{ $vehicle->exterior->name ?? ''}}</textarea>
                                                                             </div>
                                                                             <div class="col-lg-1 col-md-12 col-sm-12">
                                                                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -334,8 +334,6 @@
             </div>
         </div>
 {{--    @endcan--}}
-
-
     <!-- Modal -->
 @endsection
 
