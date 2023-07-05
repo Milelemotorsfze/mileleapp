@@ -1,6 +1,9 @@
 @extends('layouts.main')
 @section('content')
-@if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnets');
+                    @endphp
+                    @if ($hasPermission)
 <div class="card-header">
         <h4 class="card-title">Movements Transtion</h4>
     @if ($previousId)

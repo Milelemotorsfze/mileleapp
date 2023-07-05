@@ -99,7 +99,7 @@ thead th {
         </div>
         <div class="col-lg-2 col-md-6">
             <label for="basicpill-firstname-input" class="form-label">Vendor : </label>
-            <input type="number" id="vendor_name" name="vendor_name" class="form-control" value="{{$vendorsname}}" placeholder="Vendor Name" readonly>
+            <input type="text" id="vendor_name" name="vendor_name" class="form-control" value="{{$vendorsname}}" placeholder="Vendor Name" readonly>
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
     </div>
@@ -124,7 +124,7 @@ thead th {
                 <th class="nowrap-td">GRN Date</th>
                 @endif
                 @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
                 @endphp
                 @if ($hasPermission)
                 <th class="nowrap-td">Inspection Date</th>
@@ -201,7 +201,7 @@ thead th {
                     <th class="nowrap-td">Gear</th>
                     <th class="nowrap-td">Ex Colour</th>
                     <th class="nowrap-td">Int Colour</th>
-                    <th class="nowrap-td">Upholestry</th>
+                    <th class="nowrap-td">Upholstery</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
@@ -328,7 +328,7 @@ thead th {
                     @endphp
                     @if ($hasPermission)
                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
-                     <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
+                     <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
                      @endif
                      @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
@@ -340,16 +340,16 @@ thead th {
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}</td>
+                     <td class="nowrap-td grnDate">{{ date('d-M-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
                     @endif
                     @endif
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
-                    @endphp
-                    @if ($hasPermission)
-                    <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                @endphp
+                @if ($hasPermission)
+                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
                     <input type="hidden" class="inspection" value="{{ $vehicles->inspection_date }}">
                     @endif
                     @php
@@ -422,7 +422,7 @@ thead th {
                      <td class="nowrap-td gdnNumber">-</td>
                      @endif
                      @if ($gdn_date)
-                     <td class="nowrap-td gdnDate">{{ date('d-m-Y', strtotime($gdn_date)) }}</td>
+                     <td class="nowrap-td gdnDate">{{ date('d-M-Y', strtotime($gdn_date)) }}</td>
                      @else
                      <td class="nowrap-td gdnDate">-</td>
                      @endif
@@ -476,7 +476,7 @@ thead th {
                         @if ($hasPermission)
                         @if ($vehicles->ppmmyyy)
                         <input type="hidden" class="Ppmmyy" value="{{ $vehicles->ppmmyyy }}">
-                        <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->ppmmyyy)) }}
+                        <td class="nowrap-td">{{ date('d-M-Y', strtotime($vehicles->ppmmyyy)) }}
                         </td>
                         @else
                         <td class="nowrap-td Ppmmyy"></td>

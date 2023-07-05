@@ -4,7 +4,7 @@
         <h4 class="card-title">
             Master Warehouse Info
         </h4>
-        @can('variants-create')
+        @can('warehouse-edit')
             <a  class="btn btn-sm btn-info float-end" href="{{ route('warehouse.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
         @endcan
     </div>

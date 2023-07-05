@@ -71,7 +71,7 @@
                 </div>
                 @foreach ($data as $purchasingOrder)
                     <tr data-id="1">
-                        <td>{{ $purchasingOrder->po_date}}</td>
+                        <td>{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}</td>
                         <td>{{ $purchasingOrder->po_number }}</td>
                         <td>
                             @php

@@ -477,7 +477,7 @@
                             </div>
                             @endif
                             @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
                     @endphp
                     @if ($hasPermission)
                             <div class="dropdown">

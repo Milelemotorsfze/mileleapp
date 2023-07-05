@@ -76,6 +76,8 @@ class PurchasingOrderController extends Controller
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
         $payment_status = $request->input('payment');
+        $estimated_arrival = $request->input('estimated_arrival');
+        $territory = $request->input('territory');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -86,11 +88,15 @@ class PurchasingOrderController extends Controller
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
         $payment_statu = $payment_status[$key];
+        $estimation_arrival = $estimated_arrival[$key];
+        $territorys = $territory[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;       
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
+        $vehicle->estimation_date = $estimation_arrival;
+        $vehicle->territory = $territorys;
         $vehicle->payment_status = $payment_statu;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
@@ -127,6 +133,8 @@ class PurchasingOrderController extends Controller
 {
     $variantIds = $request->input('id');
     $newVins = $request->input('oldvin');
+    $oldestimated_arrival = $request->input('oldestimated_arrival');
+    $oldterritory = $request->input('oldterritory');
     $newex_colours = $request->input('oldex_colour');
     $newint_colours = $request->input('oldint_colour');
     $oldpayments = $request->input('oldpayment');
@@ -137,6 +145,8 @@ class PurchasingOrderController extends Controller
             $vehicle->ex_colour = $newex_colours[$index];
             $vehicle->int_colour = $newint_colours[$index];
             $vehicle->payment_status = $oldpayments[$index];
+            $vehicle->estimation_date = $oldestimated_arrival[$index];
+            $vehicle->territory = $oldterritory[$index];
             $vehicle->save();
             if ($vehicle->payment_status === 'Paid' && !PaymentLog::where('vehicle_id', $vehicle->id)->exists()) {
             $paymentLog = new PaymentLog();
@@ -162,6 +172,8 @@ class PurchasingOrderController extends Controller
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
         $payment_status = $request->input('payment');
+        $estimated_arrival = $request->input('estimated_arrival');
+        $territory = $request->input('territory');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
         if ($variantName === null && $key === $count - 1) {
@@ -171,6 +183,8 @@ class PurchasingOrderController extends Controller
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
         $payment_statu = $payment_status[$key];
+        $estimated_arrivals = $estimated_arrival[$key];
+        $territorys = $territory[$key];
         $vin = $vins[$key];
         $vehicle = new Vehicles();
         $vehicle->varaints_id = $variantId;
@@ -178,6 +192,8 @@ class PurchasingOrderController extends Controller
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
         $vehicle->payment_status = $payment_statu;
+        $vehicle->estimation_date = $estimated_arrivals;
+        $vehicle->territory = $territorys;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
     }
@@ -231,7 +247,23 @@ class PurchasingOrderController extends Controller
     $sales = User::whereIn('id', $sales_ids)->get();
     return view('warehouse.vehiclesdetails', compact('purchasingOrder', 'varaint', 'data', 'vendorsname', 'sales'));
 }
-public function checkDuplication(Request $request)
+public function checkcreatevins(Request $request)
+    {
+        $vinValues = $request->input('vin');
+        $vinValues = array_filter($vinValues, function ($value) {
+            return trim($value) !== '';
+        });
+        $duplicates = array_unique(array_diff_assoc($vinValues, array_unique($vinValues)));
+        if (!empty($duplicates)) {
+            return response()->json('duplicate');
+        }
+        $existingVins = Vehicles::whereIn('vin', $vinValues)->pluck('vin')->toArray();
+        if (!empty($existingVins)) {
+            return response()->json('duplicate');
+        }
+        return response()->json('unique');
+    } 
+    public function checkeditcreate(Request $request)
     {
         $vinValues = $request->input('vin');
         $vinValues = array_filter($vinValues, function ($value) {
@@ -248,9 +280,9 @@ public function checkDuplication(Request $request)
         return response()->json('unique');
     } 
 
-    public function checkDuplications(Request $request)
+    public function checkeditvins(Request $request)
     {
-        $vinValues = $request->input('vin');
+        $vinValues = $request->input('oldvin');
         $vinValues = array_filter($vinValues, function ($value) {
             return trim($value) !== '';
         });

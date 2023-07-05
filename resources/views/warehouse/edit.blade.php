@@ -97,7 +97,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">Vendor Name : </label>
-            <input type="number" id="vendor_name" name="vendor_name" class="form-control" value="{{$vendorsname}}" placeholder="Vendor Name" readonly>
+            <input type="text" id="vendor_name" name="vendor_name" class="form-control" value="{{$vendorsname}}" placeholder="Vendor Name" readonly>
             <span id="poNumberError" class="error" style="display: none;"></span>
         </div>
     </div>
@@ -113,8 +113,14 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">Model Line:</label>
         </div>
-        <div class="col-lg-4 col-md-6">
+        <div class="col-lg-2 col-md-6">
             <label for="QTY" class="form-label">Variants Detail:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Estimated Arrival:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Territory:</label>
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Exterior Color:</label>
@@ -155,13 +161,19 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
         <input type="text" name="oldmodel_line[]" value="{{$model_line}}" class="form-control" readonly>
         </div>
-        <div class="col-lg-4 col-md-6">
+        <div class="col-lg-2 col-md-6">
         <input type="text" name="olddetail[]" value="{{$detail}}" class="form-control" readonly>
         </div>
         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
                     @endphp
                     @if ($hasPermission)
+                    <div class="col-lg-1 col-md-6">
+    <input type="text" name="oldestimated_arrival[]" value="{{$vehicles->estimation_date}}" class="form-control" readonly>
+</div>
+<div class="col-lg-1 col-md-6">
+    <input type="text" name="oldterritory[]" value="{{$vehicles->territory}}" class="form-control" readonly>
+</div>
     <div class="col-lg-1 col-md-6">
     <input type="text" name="oldex_colour[]" value="{{$ex_colours}}" class="form-control" readonly>
 </div>
@@ -173,6 +185,12 @@ input[type=number]::-webkit-outer-spin-button {
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                     @endphp
                     @if ($hasPermission)
+                    <div class="col-lg-1 col-md-6">
+    <input type="date" name="oldestimated_arrival[]" value="{{$vehicles->estimation_date}}" class="form-control">
+</div>
+<div class="col-lg-1 col-md-6">
+    <input type="text" name="oldterritory[]" value="{{$vehicles->territory}}" class="form-control">
+</div>
         <div class="col-lg-1 col-md-6">
     <select name="oldex_colour[]" class="form-control" placeholder="Exterior Color">
         <option value="">Exterior Color</option>
@@ -342,11 +360,13 @@ $(document).ready(function() {
             var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
             var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
             var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-            var detailCol = $('<div class="col-lg-4 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+            var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
             var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
             var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
             var paymentCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="payment[]" value="Not Paid" class="form-control" readonly></div>');
             var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
+            var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
+            var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
 var exColourDropdown = exColourCol.find('select');
 for (var id in exColours) {
@@ -360,7 +380,7 @@ for (var id in intColours) {
         intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
     }
 }
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, paymentCol, vinCol, removeBtn);
+            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, estimatedCol,  territory, exColourCol, intColourCol, paymentCol, vinCol, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
         $('#variants_id').val('');
@@ -449,20 +469,19 @@ for (var id in intColours) {
       });
 
       if (allBlank) {
-        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+        $('#purchasing-order').unbind('submit').submit();
       } else {
         var formData = $('#purchasing-order').serialize();
-        // Update the AJAX request method to PATCH
         $.ajax({
-          url: '{{ route('vehicles.check-vin-duplication') }}',
-          method: 'PATCH', // Update the method to PATCH
+          url: '{{ route('vehicles.check-edit-create') }}',
+          method: 'PATCH',
           data: formData,
           success: function(response) {
             if (response === 'duplicate') {
               alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
               return false;
             } else {
-              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+              $('#purchasing-order').unbind('submit').submit();
             }
           },
           error: function() {
@@ -500,20 +519,19 @@ for (var id in intColours) {
       });
 
       if (allBlank) {
-        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+        $('#purchasing-order').unbind('submit').submit();
       } else {
         var formData = $('#purchasing-order').serialize();
-        // Update the AJAX request method to PATCH
         $.ajax({
-          url: '{{ route('vehicles.check-vin-duplication') }}',
-          method: 'PATCH', // Update the method to PATCH
+          url: '{{ route('vehicles.check-edit-vins') }}',
+          method: 'PATCH',
           data: formData,
           success: function(response) {
             if (response === 'duplicate') {
               alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
               return false;
             } else {
-              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+              $('#purchasing-order').unbind('submit').submit();
             }
           },
           error: function() {

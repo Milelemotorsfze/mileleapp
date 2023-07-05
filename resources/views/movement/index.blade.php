@@ -1,15 +1,23 @@
 @extends('layouts.table')
 @section('content')
-@if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnets');
+                    @endphp
+                    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">
             Movements Info
         </h4>
-        @can('view-po-details')
+        @can('View-daily-movemnets')
+        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
+                    @endphp
+                    @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Vehicles Transaction
       </a>
       <div class="clearfix"></div>
+      @endif
       <br>
       <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
@@ -21,7 +29,7 @@
     </ul>
     </div>
     @endcan
-    @can('view-po-details')
+    @can('View-daily-movemnets')
     <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
     <div class="card-body">
@@ -73,7 +81,7 @@
         </div>  
       </div> 
       @endcan
-      @can('view-po-details')
+      @can('View-daily-movemnets')
       <div class="tab-content">
       <div class="tab-pane fade show" id="tab2"> 
     <div class="card-body">
@@ -114,7 +122,7 @@
                         $movementdate = DB::table('movements_reference')->where('id', $movements->reference_id)->first();
                         $date = $movementdate ? $movementdate->date : '';
                         @endphp
-                        <td>{{ date('d-m-Y', strtotime($date)) }}</td>
+                        <td>{{ date('d-M-Y', strtotime($date)) }}</td>
                         <td>{{ $movements->vin }}</td>
                         <td>{{ $movements->vin }}</td>
                         @php

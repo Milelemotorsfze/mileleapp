@@ -293,14 +293,11 @@ class VehiclesController extends Controller
                     }
                 }
             }
-    
             if (!empty($changes)) {
                 $so->save();
-    
                 // Save changes in Solog
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
-    
                 foreach ($changes as $field => $change) {
                     $solog = new Solog();
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -471,17 +468,17 @@ if ($request->has('reservation_start_date')) {
     public function viewLogDetails($id)
     {
         $vehicle = Vehicles::find($id);
-        $documentsLog = Documentlog::where('documents_id', $vehicle->documents_id)->get();
-        $soLog = Solog::where('so_id', $vehicle->so_id)->get();
-        $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id)->whereNotIn('field', ['payment_percentage', 'reservation_start_date', 'reservation_end_date'])->get();
-        $vehiclesLogforso = Vehicleslog::where('vehicles_id', $vehicle->id)->whereIn('field', ['payment_percentage', 'reservation_start_date', 'reservation_end_date'])->get();
+        $documentsLog = Documentlog::where('documents_id', $vehicle->documents_id);
+        $soLog = Solog::where('so_id', $vehicle->so_id);
+        $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
+        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('documentsLog', 'soLog', 'vehiclesLog', 'vehiclesLogforso'));
+           ], compact('mergedLogs', 'vehicle'));
     }
     public function  viewremarks($id)
     {

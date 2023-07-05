@@ -15,37 +15,53 @@
 @endif
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> 
     </div>
-    <ul class="nav nav-pills nav-fill">
-      <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Vehicle Changes</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab2">Sales Support Changes</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Document Changes</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">SO</a>
-      </li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
     <div class="card-body">
+    <div class="row">
+    @php
+    $po = DB::table('purchasing_order')->where('id', $vehicle->purchasing_order_id)->first();
+    $po_date = $po->po_date ?: '';
+    $po_number = $po->po_number ?: '';
+    $grn = $vehicle->grn_id ? DB::table('grn')->where('id', $vehicle->grn_id)->first() : null;
+    $grn_date = $grn ? $grn->date : null;
+    $grn_number = $grn ? $grn->grn_number : null;
+    $gdn = $vehicle->gdn_id ? DB::table('gdn')->where('id', $vehicle->gdn_id)->first() : null;
+    $gdn_date = $gdn ? $gdn->date : null;
+    $gdn_number = $gdn ? $gdn->gdn_number : null;
+    use Carbon\Carbon;
+    if($po_date){
+    $po_date = Carbon::createFromFormat('Y-m-d', $po_date)->format('d-M-Y');
+    }
+    if($grn_date){
+    $grn_date = Carbon::createFromFormat('Y-m-d', $grn_date)->format('d-M-Y');
+    }
+    if($gdn_date){
+    $gdn_date = Carbon::createFromFormat('Y-m-d', $gdn_date)->format('d-M-Y');
+    }
+    @endphp
+    <div class="col-1">PO Number: {{$po_number}}</div>
+    <div class="col-2">PO Date: {{$po_date}}</div>
+    <div class="col-1">GRN Number: {{$grn_number}}</div>
+    <div class="col-2">GRN Date: {{$grn_date}}</div>
+    <div class="col-1">GDN Number: {{$gdn_number}}</div>
+    <div class="col-2">GDN Date: {{$gdn_date}}</div>
+    <div class="col-2">VIN: {{$vehicle->vin}}</div>
+</div>
+<hr>
     <div class="table-responsive">
-            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
+            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
             <thead>
             <tr>
                 <th>Date</th>
                 <th>Time</th>
-                <th>Changed By</th>
+                <th>Updated By</th>
+                <th>Role</th>
                 <th>Field</th>
                 <th>Old Value</th>
                 <th>New Value</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($vehiclesLog as $vehiclesLog)
+            @foreach($mergedLogs as $vehiclesLog)
             <tr data-id="1">
                 <td>{{ date('d-m-Y', strtotime($vehiclesLog->date)) }}</td>
                 <td>{{ $vehiclesLog->time }}</td>
@@ -65,120 +81,6 @@
     </table>
 </div>
     </div>
-</div>
-</div>
-<div class="tab-content">
-      <div class="tab-pane fade show" id="tab2"> 
-    <div class="card-body">
-    <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Changed By</th>
-                <th>Field</th>
-                <th>Old Value</th>
-                <th>New Value</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($vehiclesLogforso as $vehiclesLogforso)
-            <tr data-id="1">
-                <td>{{ date('d-m-Y', strtotime($vehiclesLogforso->date)) }}</td>
-                <td>{{ $vehiclesLogforso->time }}</td>
-                <td>
-                    @php
-                    $change_by = DB::table('users')->where('id', $vehiclesLogforso->created_by)->first();
-                    $change_bys = $change_by->name;
-                    @endphp
-                    {{ $change_bys }}
-                </td>
-                <td>{{ $vehiclesLogforso->field }}</td>
-                <td>{{ $vehiclesLogforso->old_value }}</td>
-                <td>{{ $vehiclesLogforso->new_value }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
-<div class="tab-content">
-      <div class="tab-pane fade show" id="tab3"> 
-<div class="card-body">
-    <div class="table-responsive">
-            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Changed By</th>
-                <th>Field</th>
-                <th>Old Value</th>
-                <th>New Value</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($documentsLog as $documentsLog)
-            <tr data-id="1">
-                <td>{{ date('d-m-Y', strtotime($documentsLog->date)) }}</td>
-                <td>{{ $documentsLog->time }}</td>
-                <td>
-                    @php
-                    $change_by = DB::table('users')->where('id', $documentsLog->created_by)->first();
-                    $change_bys = $change_by->name;
-                    @endphp
-                    {{ $change_bys }}
-                </td>
-                <td>{{ $documentsLog->field }}</td>
-                <td>{{ $documentsLog->old_value }}</td>
-                <td>{{ $documentsLog->new_value }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-    </div>
-</div>
-</div>
-<div class="tab-content">
-      <div class="tab-pane fade show" id="tab4"> 
-    <div class="card-body">
-    <div class="table-responsive">
-            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-            <thead>
-            <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Changed By</th>
-                <th>Field</th>
-                <th>Old Value</th>
-                <th>New Value</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach($soLog as $soLog)
-            <tr data-id="1">
-                <td>{{ date('d-m-Y', strtotime($soLog->date)) }}</td>
-                <td>{{ $soLog->time }}</td>
-                <td>
-                    @php
-                    $change_by = DB::table('users')->where('id', $soLog->created_by)->first();
-                    $change_bys = $change_by->name;
-                    @endphp
-                    {{ $change_bys }}
-                </td>
-                <td>{{ $soLog->field }}</td>
-                <td>{{ $soLog->old_value }}</td>
-                <td>{{ $soLog->new_value }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-</div>
-</div>
     @endsection
 @push('scripts')
 @endpush

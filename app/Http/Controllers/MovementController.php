@@ -54,6 +54,7 @@ class MovementController extends Controller
      */
     public function store(Request $request)
     {
+        
         $vin = $request->input('vin');
         $from = $request->input('from');
         $to = $request->input('to');
