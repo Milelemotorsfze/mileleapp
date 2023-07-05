@@ -32,6 +32,10 @@
     {
         padding-top:10px;
     }
+    .widthinput
+    {
+        height:32px!important;
+    }
 </style>
 @section('content')
     @can('warranty-create')
@@ -170,7 +174,8 @@
                             <div class="col-xxl-7 col-lg-7 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control widthinput brands" autofocus>
+                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  
+                                class="form-control widthinput brands" autofocus onchange="validationOnKeyUp(this)">
                                     @foreach($brands as $brand)
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                     @endforeach
@@ -416,7 +421,8 @@
                             <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"  
+                                class="form-control brands" autofocus onchange="validationOnKeyUp(this)">
 
                                 </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
@@ -425,7 +431,8 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" required class="form-control widthinput purchase-price"
+                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" required onkeyup="validationOnKeyUp(this)"
+                                    class="form-control widthinput purchase-price"
                                     placeholder="Enter Purchase Price" id="purchase_price${index}" >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>

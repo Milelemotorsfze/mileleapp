@@ -448,7 +448,7 @@ input {
                                         <div class="row form_field_outer_row" id="row-1">
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                                <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1][addon_id][]" multiple="true" style="width: 100%;"
+                                                <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;"
                                                         onchange="resetAddonDropdown()">
                                                 @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
@@ -467,6 +467,18 @@ input {
                                                     <option value="USD">USD</option>
                                                 </select>
                                             </div>
+                                            <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1">
+                                                <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                                <div class="input-group">
+                                                    <input id="addon_purchase_price_1" oninput="inputNumberAbs(this)" 
+                                                    class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" 
+                                                    name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" 
+                                                    value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                        </div>
+                                                </div>
+                                            </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                 <div class="input-group">
@@ -480,34 +492,7 @@ input {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" hidden>
-                                                <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                                <div class="input-group">
-                                                    <input id="addon_purchase_price_1" oninput="inputNumberAbs(this)" 
-                                                    class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" 
-                                                    name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" 
-                                                    value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                        </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xxl-4 col-lg-6 col-md-6" id="div_price_in_aedOne_1">
-                                                <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED1</label>
-                                                <div class="input-group">
-                                                <input id="addon_purchase_price_1" oninput="inputNumberAbs(this)" 
-                                                class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" 
-                                                name="supplierAddon[1][addon_purchase_price]" placeholder="Enter Addons Purchase Price in AED" 
-                                                value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                                            </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
-                                                    <i class="fas fa-copy"></i>
-                                                </button> -->
                                                 <button class="btn_round remove_node_btn_frm_field" disabled hidden>
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
@@ -584,7 +569,6 @@ input {
 
         $(document).ready(function ()
         {
-
             $('#addon_1').select2({
                 allowClear: true,
                 minimumResultsForSearch: -1,
@@ -649,7 +633,7 @@ input {
                     $(this).find('.purchase_price_in_AED').attr('id','addon_purchase_price_'+ index);
                     $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
                     $(this).find('.purchase_price_in_USD').attr('onkeyup','calculateAED('+ index +')');
-                    $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
+                    // $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
                     $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
                     $(this).find('.addon-purchase-price').attr('id', 'addon_purchase_price_'+ index);
                     $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
@@ -722,7 +706,19 @@ input {
                                         <option value="AED">AED</option>
                                         <option value="USD">USD</option>
                                     </select>
+                                </div> 
+                                <div class="col-xxl-2 col-lg-3 col-md-3 div-purchase_price_in_AED" id="div_price_in_aed_${index}">
+                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
+                                    <div class="input-group">
+                                    <input id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)" class="widthinput
+                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" name="supplierAddon[${index}][addon_purchase_price]"
+                                    placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
                                 </div>
+                                </div>
+                               
                                 <div class="col-xxl-2 col-lg-3 col-md-3 usd-price-div" id="div_price_in_usd_${index}" hidden>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                     <div class="input-group">
@@ -735,30 +731,7 @@ input {
 
                                 </div>
                                 </div>
-                                <div class="col-xxl-2 col-lg-3 col-md-3 div-purchase_price_in_AED" id="div_price_in_aed_${index}" hidden>
-                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                    <div class="input-group">
-                                    <input id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)" class="widthinput
-                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" name="supplierAddon[${index}][addon_purchase_price]"
-                                    placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                </div>
-                                </div>
-                                <div class="col-xxl-4 col-lg-6 col-md-6 addon-purchase-price-div" id="div_price_in_aedOne_${index}">
-                                    <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
-                                    <div class="input-group">
-                                    <input id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
-                                     class="widthinput form-control addon-purchase-price @error('addon_purchase_price') is-invalid @enderror"
-                                     name="supplierAddon[${index}][addon_purchase_price] placeholder="Enter Addons Purchase Price in AED"
-                                      value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-
-                                </div>
-                                </div>
+                               
                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                     <button class="btn_round removeButton" id="remove-${index}" data-index="${index}">
                                         <i class="fas fa-trash-alt"></i>
@@ -966,21 +939,19 @@ input {
             var value = e.value;
             if(value == 'USD')
             {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = true
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
                 currencyUSD.hidden = false
                 let currencyAED = document.getElementById('div_price_in_aed_'+i);
                 currencyAED.hidden = false
+                $("#addon_purchase_price_"+i).attr('disabled','disabled');
+                $("#addon_purchase_price_"+i).val('');
             }
             else
             {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = false
                 let currencyUSD = document.getElementById('div_price_in_usd_'+i);
                 currencyUSD.hidden = true
-                let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = true
+                $("#addon_purchase_price_"+i).removeAttr('disabled');
+                $("#addon_purchase_price_"+i).val('');
             }
         }
         function calculateAED(i)
