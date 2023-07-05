@@ -146,13 +146,17 @@ class SupplierController extends Controller
         $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
         {
-            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice')
+            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','SellingPrice')
             ->with('PurchasePrices', function($q) use($supplier){
-                // dd($supplier->id);
                 $q->where('supplier_id', $supplier->id);
             })
             ->orderBy('id', 'ASC')->get();
-            // dd($addon1);
+            foreach($addon1 as $addon)
+            {
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $addon->LeastPurchasePrices = $price;
+            }
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')
                         ->join('addon_types','addon_types.addon_details_id','addon_details.id')
