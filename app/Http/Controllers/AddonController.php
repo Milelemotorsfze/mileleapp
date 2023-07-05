@@ -30,13 +30,20 @@ class AddonController extends Controller
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
-        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','AddonTypes.modelDescription','LeastPurchasePrices','SellingPrice',
+        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','AddonTypes.modelDescription','SellingPrice',
         'PendingSellingPrice');
+
         if($data != 'all')
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
         $addon1 = $addon1->orderBy('id', 'DESC')->get(); 
+        foreach($addon1 as $addon)
+        {
+            $price = '';
+            $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+            $addon->LeastPurchasePrices = $price;
+        }
         return view('addon.index',compact('addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
    
     }
@@ -379,7 +386,10 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
-        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice','LeastPurchasePrices')->first();
+        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
+        $price = '';
+        $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+        $addonDetails->LeastPurchasePrices = $price;
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
@@ -695,8 +705,14 @@ class AddonController extends Controller
                 }
                 $q = $q->with('brands','modelLines','modelDescription')->get();
             })
-            ->with('AddonName','LeastPurchasePrices','SellingPrice','PendingSellingPrice');
+            ->with('AddonName','SellingPrice','PendingSellingPrice');
             $addonsTableData = $addonsTableData->orderBy('id', 'DESC')->get();
+            foreach($addonsTableData as $addon)
+            {
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $addon->LeastPurchasePrices = $price;
+            }
         }
 
         $data['addonsTable'] = $addonsTableData;
@@ -813,8 +829,13 @@ class AddonController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','LeastPurchasePrices','AddonSuppliers.Suppliers',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
+       
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $supplierAddonDetails->LeastPurchasePrices = $price;
+     
         // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
         // {

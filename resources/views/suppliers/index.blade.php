@@ -179,7 +179,7 @@
                       @endphp
                       @if ($hasPermission)
                         @if($supplier->is_deletable)
-                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
+                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3" title="Delete"
                             data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
                             <i class="fa fa-trash"></i>
                           </button>
@@ -332,7 +332,7 @@
                       @endphp
                       @if ($hasPermission)
                         @if($supplier->is_deletable)
-                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3"
+                          <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3" title="Delete"
                             data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
                             <i class="fa fa-trash"></i>
                           </button>

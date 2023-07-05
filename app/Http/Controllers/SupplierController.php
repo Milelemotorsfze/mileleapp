@@ -74,7 +74,7 @@ class SupplierController extends Controller
     public function addonprice($id)
     {
         $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
-        return view('suppliers.addonprice',compact('supplierAddons'));
+        return view('suppliers.addonprice',compact('supplierAddons','id'));
     }
     public function purchasepricehistory($id)
     {
@@ -82,7 +82,8 @@ class SupplierController extends Controller
         $history = SupplierAddons::where('supplier_id',$currentPrice->supplier_id)->where('addon_details_id',$currentPrice->addon_details_id)
         ->with('supplierAddonDetails.AddonName','CreatedBy')->latest()->get();
         // $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
-        return view('suppliers.pricehistory',compact('history'));
+        $supplierId = $currentPrice->supplier_id;
+        return view('suppliers.pricehistory',compact('history','supplierId'));
     }
     public function sellingPriceHistory($id)
     {
@@ -118,7 +119,7 @@ class SupplierController extends Controller
         // else
         // {
             $input = $request->all();
-            $existibgData = SupplierAddons::where('id',$request->inputId)->where('status','active')->latest('updated_at')->first();
+            $existibgData = SupplierAddons::where('id',$request->id)->where('status','active')->latest('updated_at')->first();
             if($existibgData)
             {
                 $existibgData->updated_by = $authId;
@@ -131,8 +132,8 @@ class SupplierController extends Controller
                 $addons = SupplierAddons::create($input);
                 $addons = SupplierAddons::where('id',$addons->id)->first();
             }
-
-            return response()->json($addons);
+            return redirect()->route('suppliers.addonprice', $request->supplier_id)->with('success','Supplier Addon Price Updated Successfully.');
+            // return response()->json($addons);
         // }
     }
     public function show(Supplier $supplier)
@@ -145,13 +146,17 @@ class SupplierController extends Controller
         $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
         {
-            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','LeastPurchasePrices','SellingPrice')
+            $addon1 = AddonDetails::whereIn('id',$supplierAddonId)->with('AddonName','AddonTypes.brands','AddonTypes.modelLines','SellingPrice')
             ->with('PurchasePrices', function($q) use($supplier){
-                // dd($supplier->id);
                 $q->where('supplier_id', $supplier->id);
             })
             ->orderBy('id', 'ASC')->get();
-            // dd($addon1);
+            foreach($addon1 as $addon)
+            {
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $addon->LeastPurchasePrices = $price;
+            }
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')
                         ->join('addon_types','addon_types.addon_details_id','addon_details.id')

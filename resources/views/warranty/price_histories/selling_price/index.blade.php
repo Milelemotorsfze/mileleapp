@@ -119,9 +119,9 @@
                                                                     </div>
                                                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                                                         <div class="input-group">
-                                                                            <input type="number" name="selling_price" class="form-control"
-                                                                                   placeholder="Enter Selling Price" value="{{$pendingSellingPriceHistory->updated_price}}"
-                                                                                  step="any" min="0">
+                                                                            <input name="selling_price" id="update_selling_price_{{$pendingSellingPriceHistory->id}}"
+                                                                            oninput="inputNumberAbs(this)" class="form-control"
+                                                                                   placeholder="Enter Selling Price" value="{{$pendingSellingPriceHistory->updated_price}}">
                                                                             <div class="input-group-append">
                                                                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                             </div>
@@ -340,5 +340,17 @@
                 }).set({title:"Update Status"})
             }
         })
+        function inputNumberAbs(currentPriceInput) 
+        {
+            var id = currentPriceInput.id;
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+        }
     </script>
 @endpush
