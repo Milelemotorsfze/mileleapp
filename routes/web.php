@@ -38,7 +38,7 @@ use App\Http\Controllers\PurchasingOrderController;
 use App\Http\Controllers\MovementController;
 use App\Http\Controllers\VehiclesController;
 use App\Http\Controllers\WarrantyController;
-use App\Http\Controllers\HorizontalController;
+// use App\Http\Controllers\HorizontalController;
 use App\Http\Controllers\ColorCodesController;
 use App\Http\Controllers\WarehouseController;
 
@@ -265,9 +265,11 @@ Route::get('/d', function () {
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
     Route::post('grnlist/post-file', [MovementController::class, 'grnfilepost'])->name('grnlist.grnfilepost');
+    Route::post('/check-vin-duplication', [PurchasingOrderController::class, 'checkDuplication'])->name('vehicles.check-vin-duplication');
+    Route::patch('/check-vin-duplications', [PurchasingOrderController::class, 'checkDuplications'])->name('vehicles.check-vin-duplication');
 
 
-    Route::get('horizontal-menu', [HorizontalController::class, 'showMenu'])->name('showHorizontalMenu');
+    // Route::get('horizontal-menu', [HorizontalController::class, 'showMenu'])->name('showHorizontalMenu');
     Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');
     Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
     Route::resource('colourcode', ColorCodesController::class);

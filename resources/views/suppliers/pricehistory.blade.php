@@ -23,7 +23,7 @@
       <h4 class="card-title">
         Supplier Addon prices History
       </h4>
-      <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+      <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.addonprice',$supplierId) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
@@ -47,7 +47,7 @@
                     <td >{{$historyData->purchase_price_aed}} AED</td>
                     <td >{{$historyData->status}}</td>
                     <td>{{$historyData->created_at}}</td>  
-                    <td>{{$historyData->CreatedBy->name}}</td> 
+                    <td>{{$historyData->CreatedBy->name ?? ''}}</td> 
                   </tr>
                 @endforeach
               </tbody>

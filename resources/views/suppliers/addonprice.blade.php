@@ -1,16 +1,9 @@
 @extends('layouts.table')
 <style>
-  .overlay
-  {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(128,128,128,0.5);
-    display: none;
-    opacity:0.5;
-  }
+  .widthinput
+    {
+        height:32px!important;
+    }
 </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
@@ -24,6 +17,29 @@
         Supplier Addon prices Info
       </h4>
       <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+      @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if (Session::has('error'))
+            <div class="alert alert-danger" >
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
+            </div>
+        @endif
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
     </div>
     <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1">
@@ -53,58 +69,52 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-new-purchase-price']);
                       @endphp
                       @if ($hasPermission)
-                        <!-- <a data-toggle="popover" data-trigger="hover" title="Add New Price" data-placement="top" class="btn btn-sm btn-success"
-                              href=""><i class="fa fa-plus" aria-hidden="true"></i></a> -->
-                              <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" 
-                              class="btn btn-sm btn-warning modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                              <div class="overlay"></div>
-            <div class="modal" id="createNewAddon" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenteredLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Add New Purchase Price </h5>
-                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
-                                <span aria-hidden="true">X</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="POST" enctype="multipart/form-data">
+                      <button type="button" title="Addon Prices" class="btn btn-warning btn-sm " data-bs-toggle="modal"
+                                                data-bs-target="#purchasePrice-{{$supplierAddon->id}}">
+                                            <i class="fa fa-plus"></i></button>
+                                            <div class="modal fade" id="purchasePrice-{{$supplierAddon->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog ">
+                                <form id="form-update" action="{{ route('addon.createNewSupplierAddonPrice') }}" method="POST" >
                                 @csrf
-                                <div class="row modal-row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <span class="error">* </span>
-                                        <label for="name" class="col-form-label text-md-end ">Add New Purchase Price</label>
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Update Prices</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <input hidden id="inputId" type="text" class="form-control @error('name') is-invalid @enderror" name="id" 
-                                    value="{{ $supplierAddon->id }}" placeholder="Enter New Purchase Price"  autofocus>
-                                    <div class="input-group">
-                                    <input id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
-                                    placeholder="Enter New Purchase Price" value="{{ old('name') }}"  autofocus>
-                            <div class="input-group-append">
-                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                            </div>
-
-                        </div>
-                                        <span id="newAddonError" class="required-class paragraph-class"></span>
-                                        @error('name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
+                                    <div class="modal-body p-3">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                        <div class="row mt-2">
+                                            <div class="col-xxl-12 col-lg-12 col-md-12">
+                                            <span class="error">* </span>
+                                            <label for="name" class="col-form-label text-md-end ">Add New Purchase Price</label>
+                                            </div>
+                                            <div class="col-xxl-12 col-lg-12 col-md-12">
+                                            <input hidden id="inputId" name="id" value="{{ $supplierAddon->id }}">
+                                            <input hidden id="inputSupplierId" name="supplier_id" value="{{ $supplierAddon->supplier_id }}">
+                                            <div class="input-group">
+                                                <input id="new_addon_name_{{$supplierAddon->id}}" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price" 
+                                                value="{{ old('name') }}" autofocus oninput="inputNumberAbs(this)" required>
+                                                <div class="input-group-append">
+                                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                                </div>
+                                            </div>
+                                            <span id="newAddonError" class="required-class paragraph-class"></span>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        </br>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary ">Submit</button>
+                                    </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="closemodal()"><i class="fa fa-times"></i> 
-                            Close</button> -->
-                            <button type="button" class="btn btn-primary btn-sm" id="createAddonId" style="float: right;"><i class="fa fa-check" aria-hidden="true"></i>
-                             Submit</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                </form>
+                            </div>
+                            </div>
+
                       @endif
                       @endcan
                       @can('supplier-addon-delete')
@@ -153,14 +163,14 @@
         $('#' + modalId).addClass('modalshow');
         $('#' + modalId).removeClass('modalhide');
 
-        $('.overlay').show();
+        // $('.overlay').show();
         table.destroy();
       });
       $('.close').on('click', function()
       {
         $('.modal').addClass('modalhide');
         $('.modal').removeClass('modalshow');
-        $('.overlay').hide();
+        // $('.overlay').hide();
         $('#suppliersList').DataTable();
       });
     });
@@ -189,7 +199,7 @@
                     success: function(result)
                     {
                       console.log('#'+inputId);
-                        $('.overlay').hide();
+                        // $('.overlay').hide();
                         $('.modal').removeClass('modalshow');
                         $('.modal').addClass('modalhide');
                         $msg = result.purchase_price_aed + "AED";
@@ -208,6 +218,55 @@
                 });
             }
         });
+
+
+
+
+
+    // $('#createAddonId').on('click', function()
+    //     {
+    //         // create new addon and list new addon in addon list
+    //         var value = $('#new_addon_name').val();
+    //         var inputId = $('#inputId').val();
+    //         if(value == '')
+    //         {
+    //             document.getElementById("newAddonError").textContent='Addon Name is Required';
+    //         }
+    //         else
+    //         {
+    //             $.ajax
+    //             ({
+    //                 url:"{{url('createNewSupplierAddonPrice')}}",
+    //                 type: "POST",
+    //                 data:
+    //                 {
+    //                     name: value,
+    //                     inputId:inputId,
+    //                     _token: '{{csrf_token()}}'
+    //                 },
+    //                 dataType : 'json',
+    //                 success: function(result)
+    //                 {
+    //                   console.log('#'+inputId);
+    //                     // $('.overlay').hide();
+    //                     $('.modal').removeClass('modalshow');
+    //                     $('.modal').addClass('modalhide');
+    //                     $msg = result.purchase_price_aed + "AED";
+    //                     document.getElementById(inputId).textContent=$msg;
+    //                     // $('#'+inputId).val(result.purchase_price_aed);
+    //                     // $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+    //                     // $('#addon_id').val(result.id);
+    //                     // var selectedValues = new Array();
+    //                     // resetSelectedSuppliers(selectedValues);
+    //                     // $('#addnewAddonButton').hide();
+    //                     // $('#new_addon_name').val("");
+    //                     // document.getElementById("newAddonError").textContent='';
+    //                     // $msg = "";
+    //                     // removeAddonNameError($msg);
+    //                 }
+    //             });
+    //         }
+    //     });
     // function closemodal()
     // {
     //   $('.modal').addClass('modalhide');
@@ -224,6 +283,18 @@
 //   $("#modal").css({"display":"block"});
 //   // $('#suppliersList').DataTable().css({"display":"block"});
 // }
+        function inputNumberAbs(currentPriceInput) 
+        {
+            var id = currentPriceInput.id;
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+        }
   </script>
 @endsection
 

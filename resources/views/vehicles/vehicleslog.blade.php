@@ -1,7 +1,7 @@
 @extends('layouts.table')
 @section('content')
 <div class="card-header">
-        <h4 class="card-title">Edit Stock Record Log</h4>
+        <h4 class="card-title">Stock report change log</h4>
         @if ($previousId)
     <a class="btn btn-sm btn-info" href="{{ route('vehicleslog.viewdetails', $previousId) }}">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
