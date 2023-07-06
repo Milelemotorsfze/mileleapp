@@ -78,7 +78,6 @@
                     </div>
                 </div>
             </div>
-
             <form action="{{ route('variant-prices.update', $vehicle->id) }}" method="POST" >
                 @csrf
                 @method('PUT')
@@ -89,7 +88,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Vehicle Price Details</h4>
-                        <button type="button" class="btn btn-sm btn-primary float-end enable-price-filed" >Price Update</button>
+                        <button type="button" class="btn btn-sm btn-success float-end enable-price-filed" >Price Update</button>
                         <button type="submit" class="btn btn-sm btn-primary float-end update-prices" hidden> Update</button>
 
                     </div>

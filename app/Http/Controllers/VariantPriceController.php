@@ -61,10 +61,8 @@ class VariantPriceController extends Controller
         $vehicle = Vehicles::find($id);
 
         $variantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)->pluck('id');
-        $variantPriceHistories = VehiclePriceHistory::whereHas('availableColour', function ($query) {
-            $query->orderBy('varaint_id','DESC');
-        })
-        ->whereIn('available_colour_id', $variantPrices)->get();
+        $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $variantPrices)
+            ->orderBy('id','DESC')->get();
         if($type == 1) {
             $vehicles =  $vehicle->similar_vehicles_with_price;
 
@@ -82,7 +80,6 @@ class VariantPriceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return $request->all();
         $request->validate([
             'prices' => 'required'
         ]);
@@ -128,7 +125,7 @@ class VariantPriceController extends Controller
             }
         }
 
-        return redirect()->route('variant-prices.index')->with('success','Price Updated Successfully.');
+        return redirect()->back()->with('success','Price Updated Successfully.');
 
     }
 

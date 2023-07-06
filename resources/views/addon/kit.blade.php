@@ -358,7 +358,8 @@
 
     });
     $("body").on("click", ".removeKitItemForSupplier", function ()
-    {alert('hig');
+    {
+        alert('hig');
         $(this).closest(".kititemdelete").remove();
         // calculateTotalPriceInAED();
         // calculateTotalPriceInUSD();
