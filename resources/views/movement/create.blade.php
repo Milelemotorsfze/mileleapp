@@ -1,6 +1,9 @@
 @extends('layouts.main')
 @section('content')
-@if (Auth::user()->selectedRole === '5' || Auth::user()->selectedRole === '6')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-daily-movemnets');
+                    @endphp
+                    @if ($hasPermission)
 <div class="card-header">
         <h4 class="card-title">Add New Vehicles Transaction</h4>
         <div class="row">
@@ -46,27 +49,30 @@
         <div id="rows-container">
         <div class="row">
         <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Vin </label>
-            <input type="text" placeholder="Select VIN" name="vin[]" list="vinlist" class="form-control mb-1" id="vin">
-                <datalist id="vinlist">
-                 @foreach ($vehicles as $vin)
-                <option value="{{ $vin }}">{{ $vin }}</option>
-                @endforeach
-            </datalist>
-        </div>
-        <div class="col-lg-1 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">From </label>
-        <select name="from[]" class="form-control mb-1" id="from" readonly>
-        @foreach ($warehouses as $warehouse)
-        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+    <select name="vin[]" class="form-control mb-1" id="vin-input" required>
+        <option value="" selected disabled>Select VIN</option>
+        @foreach ($vehicles as $vin)
+        <option value="{{ $vin }}">{{ $vin }}</option>
         @endforeach
     </select>
 </div>
-<div class="col-lg-1 col-md-6">
-<label for="basicpill-firstname-input" class="form-label">To </label>
-    <select name="to[]" class="form-control mb-1" id="to">
+        <div class="col-lg-1 col-md-6">
+        <label for="basicpill-firstname-input" class="form-label">From </label>
+        <select class="form-control mb-1" id="from" readonly disabled>
         @foreach ($warehouses as $warehouse)
         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+        @endforeach
+        </select>
+        <input type="hidden" name="from[]" class="form-control mb-1" id="from-input">
+        </div>
+<div class="col-lg-1 col-md-6">
+<label for="basicpill-firstname-input" class="form-label">To </label>
+    <select name="to[]" class="form-control mb-1" id="to" required>
+        @foreach ($warehouses as $warehouse)
+        @if ($warehouse->name !== 'Supplier')
+        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+        @endif
         @endforeach
     </select>
 </div>
@@ -107,6 +113,11 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
+        $('#vin-input').select2();
+    });
+</script>
+<script>
+    $(document).ready(function() {
         var row = 1;
         
         $('.add-row-btn').click(function() {
@@ -114,24 +125,27 @@
             var newRow = `
             <div class="row" data-row="${row}">
                 <div class="col-lg-2 col-md-6">
-                    <input type="text" placeholder="Select VIN" name="vin[]" list="vinlist" class="form-control mb-1 vin" id="vin${row}">
-                    <datalist id="vinlist">
+                    <select name="vin[]" class="form-control mb-1 vin" id="vin${row}">
+                        <option value="" selected disabled>Select VIN</option>
                         @foreach ($vehicles as $vin)
                         <option value="{{ $vin }}">{{ $vin }}</option>
-                        @endforeach
-                    </datalist>
-                </div>
-                <div class="col-lg-1 col-md-6">
-                    <select name="from[]" class="form-control mb-1" id="from${row}" readonly>
-                        @foreach ($warehouses as $warehouse)
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <select name="to[]" class="form-control mb-1" id="to${row}">
+                    <select class="form-control mb-1" id="from${row}" readonly disabled>
                         @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" name="from[]" class="form-control mb-1" id="from-input${row}">
+                </div>
+                <div class="col-lg-1 col-md-6">
+                    <select name="to[]" class="form-control mb-1" id="to${row}" required>
+                        @foreach ($warehouses as $warehouse)
+                        @if ($warehouse->name !== 'Supplier')
+                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
@@ -153,16 +167,17 @@
             </div>
             `;
             $('#rows-container').append(newRow);
+            $('#vin' + row).select2();
         });
-        
         $('#rows-container').on('change', '.vin', function() {
             var selectedVin = $(this).val();
             var row = $(this).closest('.row').data('row');
             var brandField = $('#brand' + row);
             var fromField = $('#from' + row);
+            var fromFieldinput = $('#from-input' + row);
             var modelLineField = $('#model-line' + row);
             var variantField = $('#variant' + row);
-            
+            console.log(brandField);
             $.ajax({
                 url: '{{ route('vehicles.vehiclesdetails') }}',
                 method: 'POST',
@@ -173,6 +188,7 @@
                 success: function(response) {
                     variantField.val(response.variant);
                     fromField.val(response.movement);
+                    fromFieldinput.val(response.movement);
                     brandField.val(response.brand);
                     modelLineField.val(response.modelLine);
                 }
@@ -189,7 +205,7 @@
 </script>
 <script>
     $(document).ready(function() {
-        $('#vin').change(function() {
+        $('#vin-input').change(function() {
             var selectedVin = $(this).val();
             $.ajax({
                 url: '{{ route('vehicles.vehiclesdetails') }}',
@@ -203,6 +219,7 @@
                     $('#variant').val(response.variant);
                     $('#brand').val(response.brand);
                     $('#from').val(response.movement);
+                    $('#from-input').val(response.movement);
                     $('#model-line').val(response.modelLine);
                 }
             });

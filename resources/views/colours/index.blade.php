@@ -4,7 +4,7 @@
         <h4 class="card-title">
             Master Colours Info
         </h4>
-        @can('variants-create')
+        @can('colour-edit')
             <a  class="btn btn-sm btn-info float-end" href="{{ route('colourcode.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
         @endcan
     </div>
@@ -69,7 +69,7 @@
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>
-                            @can('variants-edit')
+                            @can('colour-edit')
                                 <a data-placement="top" href="{{ route('colourcode.edit', $colorcodes->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                             @endcan

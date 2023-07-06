@@ -46,14 +46,6 @@ class AddonDetails extends Model
     {
         return $this->hasOne(SupplierAddons::class,'addon_details_id','id')->where('status','active')->latest('updated_at');
     }
-    public function LeastPurchasePrices()
-    {
-        return $this->hasOne(SupplierAddons::class,'addon_details_id','id')->where('status','active')->ofMany('purchase_price_aed', 'min');
-    }
-    // public function LeastPurchasePrices()
-    // {
-    //     return $this->hasOne(SupplierAddons::class,'addon_details_id','id');
-    // }
     public function SellingPrice()
     {
         return $this->hasOne(AddonSellingPrice::class,'addon_details_id','id')->where('status','active')->latest('updated_at');
