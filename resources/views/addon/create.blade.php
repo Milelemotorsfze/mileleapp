@@ -145,6 +145,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
+                            <!-- <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus> -->
                             <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus>
                                 <option value="">Choose Addon Type</option>
                                 <option value="P">Accessories</option>
@@ -1483,9 +1484,77 @@
             }
             setLeastAEDPrice();
         }
+        function disableDropdown()
+        {
+            document.getElementById("addon_type").disabled=true;
+        }
+        function enableDropdown()
+        {
+            var canEnableDropdown = 'no';
+            if(canEnableDropdown == 'no' && currentAddonType == 'SP' || canEnableDropdown == 'no' && currentAddonType == 'P')
+            {
+                var countNotKitSuplr = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
+                for (let i = 1; i <= countNotKitSuplr; i++) 
+                {
+                    if($('#suppliers'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
+                    {
+                        canEnableDropdown = 'yes';
+                        break;
+                    }   
+                }
+            }
+            else if(canEnableDropdown == 'no' && currentAddonType == 'K')
+            {
+                var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
+                for (let i = 1; i <= countKitSuplr; i++) 
+                {
+                    if($('#kitSupplierDropdown'+i).val() == '' && $('#Supplier'+i+'TotalPriceAED').val() == '' && $('#Supplier'+i+'TotalPriceUSD').val() == '')
+                    {
+                        canEnableDropdown = 'yes';
+                        break;
+                    } 
+                    else
+                    {
+                        var countKitSuplrItem = '';
+                        var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
+                        for (let j = 1; j <= countKitSuplrItem; j++)
+                        {
+                            if($('#kitSupplier'+i+'Item'+j).val() == '' && $('Supplier'+i+'Kit'+j+'Quantity').val() == '' 
+                                && $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() == '' 
+                                && $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() == '' )
+                            {
+                                canEnableDropdown = 'yes';
+                                break;
+                            } 
+                        }
+                    } 
+                }
+            }
+            // if(canEnableDropdown == 'no' && currentAddonType == 'P' || canEnableDropdown == 'no' && currentAddonType == 'K')
+            // {
+            //     var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+            //     alert(countBrandModal);
+            //     // for (let i = 1; i <= brandModal; i++) 
+            //     // {
+            //     //     if($('#suppliers'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
+            //     //     {
+            //     //         canEnableDropdown = 'yes';
+            //     //         break;
+            //     //     }   
+            //     // }
+            // }
+            // else if(canEnableDropdown == 'no' && currentAddonType == 'SP')
+            // {
+
+            // }
+            if(canEnableDropdown == 'yes')
+            {
+                $("#addon_type").removeAttr("disabled");
+            }
+        }
         function setLeastAEDPrice()
         {
-            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
+            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value); alert(values);
             if(values != '')
             {
                 var arrayOfNumbers = [];
@@ -1501,6 +1570,12 @@
                     var arrayOfNumbers = arrayOfNumbers.map(Number);
                     const minOfPrice = Math.min(...arrayOfNumbers);
                     $("#purchase_price").val(minOfPrice);
+                    disableDropdown();
+                }
+                else
+                {
+                    $("#purchase_price").val('');
+                    enableDropdown();
                 }
             }
         }

@@ -33,12 +33,14 @@
             var supplier = $(this).attr('data-supplier');
             var value = e.params.data.id;
             KitItemHideOption(index,supplier,value);
+            disableDropdown();
         });
         $(document.body).on('select2:unselect', ".KitSupplierItems", function (e) {
             var index = $(this).attr('data-index');
             var supplier = $(this).attr('data-supplier');
             var data = e.params.data;
             KitItemAppendOption(index,supplier,data);
+            enableDropdown();
         });
         function KitItemHideOption(index,supplier,value) {
             var indexValue = $('#kitItemIndex').val();
@@ -101,6 +103,7 @@
                 $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+supplier+'][item]['+index+'][quantity]');
                 $(this).find('.quantity').attr('id', 'Supplier'+supplier+'Kit'+index+'Quantity');
                 $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+supplier+','+index+')');
+                $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+supplier+','+index+')');
 
                 $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+supplier+'][item]['+index+'][unit_price_in_aed]');
                 $(this).find('.unit-price-AED').attr('id', 'Supplier'+supplier+'Kit'+index+'UnitPriceAED');
@@ -257,7 +260,7 @@
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
                                                                     <input  name="kitSupplierAndPrice[${index}][item][1][quantity]" id="Supplier${index}Kit1Quantity" type="number" value="1" min="1"
                                                                      class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantity" placeholder="Enter Quantity"
-                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)">
+                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)" onchange="calculateOtherValuesbyQuantity(${index},1)" oninput="validity.valid||(value='1');">
                                                                 </div>
                                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
@@ -421,6 +424,14 @@
         {
             calculateRelatedofTotalPriceUSD(quantity,totalPriceUSD,supplier,kit);
         }
+        if(quantity > 1)
+        {
+            disableDropdown();
+        }
+        else
+        {
+            enableDropdown();
+        }
     }
     function showRelatedValues(unitPriceAED,totalPriceAED,unitPriceUSD,totalPriceUSD,supplier,kit)
     {
@@ -530,8 +541,16 @@
         {
             sum += myNums[i];
         }
-        $("#Supplier"+supplier+"TotalPriceAED").val(sum);
-        setLeastPurchasePriceAED();
+        if(sum == '0')
+        {
+            $("#Supplier"+supplier+"TotalPriceAED").val('');
+            setLeastPurchasePriceAED();
+        }
+        else
+        {
+            $("#Supplier"+supplier+"TotalPriceAED").val(sum);
+            setLeastPurchasePriceAED();
+        } 
     }
     function  calculateTotalPriceInUSD(supplier)
     {
@@ -543,7 +562,14 @@
         {
             sum += myNums[i];
         }
-        $("#Supplier"+supplier+"TotalPriceUSD").val(sum);
+        if(sum == '0')
+        {
+            $("#Supplier"+supplier+"TotalPriceUSD").val('');
+        }
+        else
+        {
+            $("#Supplier"+supplier+"TotalPriceUSD").val(sum);
+        }
     }
     function setLeastPurchasePriceAED()
     {
@@ -563,6 +589,12 @@
                 var arrayOfNumbers = arrayOfNumbers.map(Number);
                 const min = Math.min(...arrayOfNumbers);
                 $("#purchase_price").val(min);
+                disableDropdown();
+            }
+            else
+            {
+                $("#purchase_price").val('');
+                enableDropdown();
             }
         }
     }

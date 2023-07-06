@@ -90,7 +90,7 @@
                                             <input  name="kitSupplierAndPrice[1][item][1][quantity]" id="Supplier1Kit1Quantity" 
                                             class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity" 
                                             type="number" value="1" min="1"  autocomplete="addon_purchase_price_in_usd" autofocus 
-                                            onkeyup="calculateOtherValuesbyQuantity(1,1)">
+                                            onkeyup="calculateOtherValuesbyQuantity(1,1)" onchange="calculateOtherValuesbyQuantity(1,1)" oninput="validity.valid||(value='1');">
                                             <!-- {{ old('addon_purchase_price_in_usd') }} -->
                                             <span id="Supplier1Kit1QuantityError" class="invalid-feedback"></span>
                                         </div>
@@ -187,11 +187,13 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
+            disableDropdown();
         });
         $(document.body).on('select2:unselect', ".kitSuppliers", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
+            enableDropdown();
         });
         function hideOption(index,value) {
             var indexValue = $('#supplierIndex').val();
@@ -240,6 +242,8 @@
             {{--        $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][quantity]');--}}
             {{--        $(this).find('.quantity').attr('id', 'Supplier'+ supplier +'Kit'+ item +'Quantity');--}}
             {{--        $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ supplier +','+ item +')');--}}
+            {{--        $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ supplier +','+ item +')');--}}
+
 
             {{--        $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][unit_price_in_aed]');--}}
             {{--        $(this).find('.unit-price-AED').attr('id', 'Supplier'+ supplier +'Kit'+ item +'UnitPriceAED');--}}
@@ -283,6 +287,8 @@
                 $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][quantity]');
                 $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit1Quantity');
                 $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',1)');
+                $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +',1)');
+
 
                 $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_aed]');
                 $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit1UnitPriceAED');
@@ -306,6 +312,8 @@
                     $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][2][quantity]');
                     $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit2Quantity');
                     $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',2)');
+                    $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +',2)');
+
                 // }
 
                 $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][2][unit_price_in_aed]');
@@ -385,7 +393,7 @@
                                     <input name="kitSupplierAndPrice[${supplier}][item][${index}][quantity]" id="Supplier${supplier}Kit${index}Quantity"
                                      type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantity"
                                      placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
-                                     onkeyup="calculateOtherValuesbyQuantity(${supplier},${index})">
+                                     onkeyup="calculateOtherValuesbyQuantity(${supplier},${index})" onchange="calculateOtherValuesbyQuantity(${supplier},${index})" oninput="validity.valid||(value='1');">
                                 </div>
                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                 <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>

@@ -91,11 +91,13 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
+            disableDropdown();
         });
         $(document.body).on('select2:unselect', ".suppliers", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
+            enableDropdown();
         });
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
