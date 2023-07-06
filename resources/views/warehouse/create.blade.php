@@ -54,8 +54,8 @@ input[type=number]::-webkit-outer-spin-button {
 }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-@section('content')
-@php
+                    @section('content')
+                    @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
                     @endphp
                     @if ($hasPermission)
