@@ -56,10 +56,22 @@ class VariantPriceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id, string $type)
     {
         $vehicle = Vehicles::find($id);
-        return view('variant-prices.edit', compact('vehicle'));
+
+        $variantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)->pluck('id');
+        $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $variantPrices)
+            ->orderBy('id','DESC')->get();
+        if($type == 1) {
+            $vehicles =  $vehicle->similar_vehicles_with_price;
+
+        }else{
+            $vehicles =  $vehicle->similar_vehicles_without_price;
+
+       }
+
+        return view('variant-prices.edit', compact('vehicle','variantPriceHistories','vehicles'));
 
     }
 
@@ -68,10 +80,9 @@ class VariantPriceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return $request->all();
-//        $request->validate([
-//            'prices' => 'required'
-//        ]);
+        $request->validate([
+            'prices' => 'required'
+        ]);
 
         $prices = $request->prices;
         $vehicles = $request->vehicle_ids;
@@ -114,7 +125,7 @@ class VariantPriceController extends Controller
             }
         }
 
-        return redirect()->route('variant-prices.index')->with('success','Price Updated Successfully.');
+        return redirect()->back()->with('success','Price Updated Successfully.');
 
     }
 

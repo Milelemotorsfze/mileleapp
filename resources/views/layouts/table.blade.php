@@ -69,7 +69,8 @@
             $('#variant-with-price-table').DataTable();
             $('#rejected-selling-price-histories-table').DataTable();
             $('#vendor-table').DataTable();
-
+            $('#vehicle-with-price-table').DataTable();
+            $('#vehicle-price-histories-table').DataTable();
 
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {

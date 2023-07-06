@@ -99,7 +99,7 @@ class Vehicles extends Model
             $latestPriceHistory = VehiclePriceHistory::where('available_colour_id', $availableColour->id)
                 ->orderBy('id', 'DESC')
                 ->get();
-            if ($latestPriceHistory->count() > 1) {
+            if ($latestPriceHistory->count() > 1 ) {
                 $latestPriceHistory = $latestPriceHistory->skip(1)->first();
                 return Carbon::parse($latestPriceHistory->updated_at)->format('d M Y');
             }

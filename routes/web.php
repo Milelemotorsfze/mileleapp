@@ -221,6 +221,7 @@ Route::get('/d', function () {
 
      // Variants
     Route::resource('variants', VariantController::class);
+    Route::get('variant-prices/{id}/edit/type/{type}', [VariantPriceController::class,'edit'])->name('variant-price.edit');
     Route::resource('variant-prices', VariantPriceController::class);
 
     Route::get('/remove-vehicle/{id}', [QuotationController::class, 'removeVehicle'])->name('quotation.removeVehicle');
