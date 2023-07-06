@@ -182,7 +182,6 @@
     });
     function addDiscr(supplier)
     {
-        alert('hiig');
         var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1; 
         $(".MoDes"+supplier).append(`
             <div class="row MoDesApndHere${supplier}">

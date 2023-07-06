@@ -75,6 +75,7 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
+            disableDropdown();
         });
         function hideOption(index,value) {
             var indexValue = $('#index').val();
@@ -89,6 +90,7 @@
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
+            enableDropdown();
         });
         function appendOption(index,data) {
             var indexValue = $('#index').val();
@@ -137,7 +139,7 @@
                 $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                 $("#selectModelLine"+index).select2();
             })
-
+            enableDropdown();
 
         })
         $("#add").on("click", function ()

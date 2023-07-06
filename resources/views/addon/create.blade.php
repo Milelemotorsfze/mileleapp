@@ -157,6 +157,7 @@
                                 <option value="K">Kit</option>
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
+                            <input id="addon_type_show" type="text" class="form-control" hidden readonly>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
 
                             <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
@@ -1486,7 +1487,9 @@
         }
         function disableDropdown()
         {
-            document.getElementById("addon_type").disabled=true;
+            document.getElementById("addon_type").hidden=true;
+            document.getElementById("addon_type_show").value=currentAddonType;
+            document.getElementById("addon_type_show").hidden=false;
         }
         function enableDropdown()
         {
@@ -1530,26 +1533,49 @@
                     } 
                 }
             }
-            // if(canEnableDropdown == 'no' && currentAddonType == 'P' || canEnableDropdown == 'no' && currentAddonType == 'K')
-            // {
-            //     var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            //     alert(countBrandModal);
-            //     // for (let i = 1; i <= brandModal; i++) 
-            //     // {
-            //     //     if($('#suppliers'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
-            //     //     {
-            //     //         canEnableDropdown = 'yes';
-            //     //         break;
-            //     //     }   
-            //     // }
-            // }
-            // else if(canEnableDropdown == 'no' && currentAddonType == 'SP')
-            // {
-
-            // }
+            if(canEnableDropdown == 'no' && currentAddonType == 'P' || canEnableDropdown == 'no' && currentAddonType == 'K')
+            {
+                var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                for (let i = 1; i <= countBrandModal; i++) 
+                {
+                    if($('#selectBrand'+i).val() == '' && $('#selectModelLine'+i).val() == '')
+                    {
+                        canEnableDropdown = 'yes';
+                        break;
+                    }   
+                }
+            }
+            else if(canEnableDropdown == 'no' && currentAddonType == 'SP')
+            {
+                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                for (let i = 1; i <= countModel; i++) 
+                {
+                    if($('#selectBrandMo'+i).val() == '')
+                    {
+                        canEnableDropdown = 'yes';
+                        break;
+                    } 
+                    else
+                    {
+                        var countModelDesc = '';
+                        var countModelDesc = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                        for (let j = 1; j <= countModelDesc; j++)
+                        {
+                            if($('#selectModelLineNum'+i+'Des'+j).val() == '' && $('selectModelNumberDiscri'+i+'Des'+j).val() == '')
+                            {
+                                canEnableDropdown = 'yes';
+                                break;
+                            } 
+                        }
+                    } 
+                }
+            }
             if(canEnableDropdown == 'yes')
             {
-                $("#addon_type").removeAttr("disabled");
+                document.getElementById("addon_type").hidden=false;
+                document.getElementById("addon_type_show").value='';
+                document.getElementById("addon_type_show").hidden=true;
+                // $("#addon_type").removeAttr("disabled");
             }
         }
         function setLeastAEDPrice()
