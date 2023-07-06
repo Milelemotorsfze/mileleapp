@@ -537,7 +537,17 @@ th.nowrap-td {
                         @if ($hasPermission)
                         <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
-                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehiclespictures.viewpictures', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"> View Pic</a></td>
+                                            @php
+                          $pictures = DB::table('vehicle_pictures')->where('vehicle_id', $vehicles->id)->latest()->first();
+                          $pictures_link = $pictures ? $pictures->vehicle_picture_link : null;
+                      @endphp
+                        <td>
+                        @if ($pictures_link)
+                        <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ $pictures_link }}" onclick="event.stopPropagation();" target="_blank">View Pic</a>
+                            @else
+                            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="" onclick="event.stopPropagation();"> View Pic</a>
+                            @endif
+                          </td>
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"></i> View Log</a></td>
                     </tr>
                 @endforeach

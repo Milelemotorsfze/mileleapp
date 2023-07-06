@@ -4,9 +4,12 @@
         <h4 class="card-title">
             Variants Info
         </h4>
-        @can('variant-edit')
+        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+                    @endphp
+                    @if ($hasPermission)
             <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-        @endcan
+        @endif
     </div>
     <div class="card-body">
         @if (count($errors) > 0)

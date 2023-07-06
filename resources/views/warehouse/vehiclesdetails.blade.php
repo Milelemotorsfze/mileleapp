@@ -117,11 +117,29 @@ thead th {
                 <th class="nowrap-td">PO Date</th> 
                 @endif
                 @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">ETA Timer</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Estimated Arrival</th>
+                @endif
+                @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                 @endphp
                 @if ($hasPermission)
                 <th class="nowrap-td">GRN</th>
                 <th class="nowrap-td">GRN Date</th>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
+                @endphp
+                @if ($hasPermission)
+                <th class="nowrap-td">Stock Status</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
@@ -318,11 +336,11 @@ thead th {
                                 $model_line = $result->model_line;
                                 $documents = $vehicles->documents_id ? DB::table('documents')->where('id', $vehicles->documents_id)->first() : null;
                                 $import_type = $documents ? $documents->import_type : null;
-                    $owership = $documents ? $documents->owership : null;
-                    $document_with = $documents ? $documents->document_with : null;
-                    $bl_status = $documents ? $documents->bl_status : null;
-                    $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
-                     @endphp
+                                $owership = $documents ? $documents->owership : null;
+                                $document_with = $documents ? $documents->document_with : null;
+                                $bl_status = $documents ? $documents->bl_status : null;
+                                $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
+                                @endphp
                      @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                     @endphp
@@ -330,6 +348,18 @@ thead th {
                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                      <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
                      @endif
+                     @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
+                @endphp
+                @if ($hasPermission)
+                <td class="nowrap-td eta">ETA</td>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
+                @endphp
+                @if ($hasPermission)
+                <td class="nowrap-td eta">{{date('d-M-Y', strtotime($vehicles->estimation_date))}}</td>
+                @endif
                      @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                     @endphp
@@ -340,15 +370,28 @@ thead th {
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate">{{ date('d-M-Y', strtotime($grn_date)) }}</td>
+                     <td class="nowrap-td grnDate"> 
+                     {{ date('d-M-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
                     @endif
-                    @endif
                     @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
                 @endphp
                 @if ($hasPermission)
+                <td class="nowrap-td stockstatus">Incoming</td>
+                @if ($grn_number && $so_number =="")
+                <td class="nowrap-td stockstatus">Available</td>
+                @if ($vehicles->reservation_end_date && $vehicles->reservation_end_date->greaterThan(\Carbon\Carbon::now()))
+                  <td class="nowrap-td stockstatus">Booked</td>
+              @endif
+                @endif
+                @endif
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                    @endphp
+                    @if ($hasPermission)
                     <td class="nowrap-td">{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
                     <input type="hidden" class="inspection" value="{{ $vehicles->inspection_date }}">
                     @endif
@@ -431,7 +474,7 @@ thead th {
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                     @endphp
                     @if ($hasPermission)
-                     <td class="nowrap-td">{{ $brand_name }}</td>
+                     <td class="nowrap-td brand">{{ $brand_name }}</td>
                      <td class="nowrap-td">{{ $model_line }}</td>
                      <td class="nowrap-td">{{ $vehicles->vin }}</td>
                      <td class="nowrap-td Variant">{{ $varaints_name }}</td>
@@ -520,7 +563,7 @@ thead th {
                         @if ($hasPermission)
                         <td class="nowrap-td bl_status">{{ $bl_status }}</td>
                        @endif
-                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"> View Pic</a></td>
+                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehiclespictures.viewpictures', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"> View Pic</a></td>
                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"></i> View Log</a></td>
                     </tr>
                 @endforeach
@@ -528,7 +571,7 @@ thead th {
             </table>
         </div>
         </div>
-        @php
+                        @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
                         @endphp
                         @if ($hasPermission)
@@ -579,6 +622,13 @@ thead th {
         </button>
       </div>
       <div class="modal-body">
+      <div class="row">
+    <div class="col-3" id="po">PO Number: {{ $po_number }}</div>
+    <div class="col-3" id="grn" >GRN Number: {{ $grn_number }}</div>
+    <div class="col-3"id="brand" >Brand: {{ $brand_name }}</div>
+    <div class="col-3" id="vin">VIN: {{ $vehicles->vin }}</div>
+</div>
+<hr>
     <form action="{{ route('vehicles.updatedata')}}" method="POST">
     @csrf
     <div class="row">
@@ -596,15 +646,11 @@ thead th {
     @endforeach
   </datalist>
 </div>
-      <div class="col-md-4">
-        <label for="gdn_date">VIN</label>
-        <input type="text" class="form-control" id="vin" name="vin" value="{{ $vehicles->vin }}">
-      </div>
-      <div class="col-md-4">
+      <div class="col-lg-4">
         <label for="gdn_date">Engine</label>
         <input type="text" class="form-control" id="engine" name="engine" value="{{ $vehicles->engine }}">
       </div>
-      <div class="col-md-4">
+      <div class="col-lg-4">
       <label for="gdn_date">Ex Colour</label>
         <select name="ex_colour" id="ex_colour" class="form-control" placeholder="Exterior Color">
         <option value="">Exterior Color</option>
@@ -617,7 +663,7 @@ thead th {
         @endforeach
     </select>
       </div>
-      <div class="col-md-4">
+      <div class="col-lg-4">
       <label for="gdn_date">Interior Color</label>
         <select name="int_colour" id="int_colour" class="form-control" placeholder="Interior Color">
         <option value="">Interior Color</option>
@@ -629,10 +675,6 @@ thead th {
             @endif
         @endforeach
     </select>
-      </div>
-      <div class="col-md-4">
-        <label for="gdn_date">Territory</label>
-        <input type="text" class="form-control" id="territory" name="territory" value="{{ $vehicles->territory }}">
       </div>
       <div class="col-md-4">
         <label for="gdn_date">PP MM YYYY</label>
@@ -809,27 +851,31 @@ thead th {
 </div>
 @endif
 @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
-                        @endphp
-                        @if ($hasPermission)
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+@endphp
+@if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
   var variant = row.find('.Variant').text();
   var Vin = row.find('.Vin').text();
+  var grn = row.find('.grnNumber').text();
+  var brand = row.find('.brand').text();
+  var po = row.find('.PoNumber').text();
   var Engine = row.find('.Engine').text();
   var ExColour = row.find('.ExColour').val();
   var IntColour = row.find('.IntColour').val();
-  var Territory = row.find('.Territory').text();
   var inspection = row.find('.inspection').val();
   var Ppmmyy = row.find('.Ppmmyy').val();
   console.log(inspection);
   $('#variants_name').val(variant);
   $('#vin').val(Vin);
+  $('#po').val(po);
+  $('#brand').val(brand);
+  $('#grn').val(grn);
   $('#engine').val(Engine);
   $('#ex_colour').val(ExColour);
   $('#int_colour').val(IntColour);
-  $('#territory').val(Territory);
   $('#ppmmyy').val(Ppmmyy);
   $('#inspection').val(inspection);
   $('#vehicle_id').val(vehicleId);
@@ -848,9 +894,9 @@ thead th {
 </script>
 @endif
 @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
-                        @endphp
-                        @if ($hasPermission)
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
+@endphp
+@if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -878,9 +924,9 @@ thead th {
 </script>
 @endif
 @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
-                        @endphp
-                        @if ($hasPermission)
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+@endphp
+@if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -904,9 +950,9 @@ thead th {
 </script>
 @endif
 @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
-                        @endphp
-                        @if ($hasPermission)
+$hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+@endphp
+@if ($hasPermission)
 <script>
   function openModal(vehicleId) {
   var row = $('tr[data-id="' + vehicleId + '"]');
@@ -932,85 +978,40 @@ thead th {
 <script>
 $(document).ready(function() {
   $('.select2').select2();
-  var dataTable = $('#dtBasicExample2').DataTable({
+  var dataTable = $('#dtBasicExample1').DataTable({
   ordering: false,
+  pageLength: 10,
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
       var columnId = column.index();
       var columnName = $(column.header()).attr('id');
-
-      // Exclude the specified column IDs or names from search filtering
       if (columnName === "pictures" || columnName === "log") {
         return;
       }
 
-      var selectWrapper = $('<div class="select-wrapper"></div>'); // Create a wrapper div
+      var selectWrapper = $('<div class="select-wrapper"></div>');
       var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
         .appendTo(selectWrapper)
         .select2({
           width: '100%',
-          dropdownCssClass: 'select2-blue' // Customize the appearance of the dropdown
+          dropdownCssClass: 'select2-blue'
         });
 
       var dropdownIcon = $('<span class="dropdown-icon"><i class="fas fa-caret-down"></i></span>')
-        .appendTo(selectWrapper); // Add a dropdown icon to the wrapper div
+        .appendTo(selectWrapper);
 
       dropdownIcon.on('click', function(e) {
-        select.select2('open'); // Open the dropdown on icon click
-        e.stopPropagation(); // Prevent event propagation to avoid closing the dropdown
+        select.select2('open');
+        e.stopPropagation();
       });
 
       select.on('change', function() {
-        var selectedValues = $(this).val(); // Get the selected values as an array
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw(); // Use a pipe (|) as the separator for multiple values
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
       });
 
-      selectWrapper.appendTo($(column.header())); // Append the wrapper div to the column header
-      $(column.header()).addClass('nowrap-td');
-      
-      column.data().unique().sort().each(function(d, j) {
-        select.append('<option value="' + d + '">' + d + '</option>');
-      });
-    });
-  }
-});
-  var dataTable = $('#dtBasicSupplierInventory').DataTable({
-  ordering: false,
-  pageLength: 10, // Set the number of results per page to 50
-  initComplete: function() {
-    this.api().columns().every(function(d) {
-      var column = this;
-      var columnId = column.index();
-      var columnName = $(column.header()).attr('id');
-
-      // Exclude the specified column IDs or names from search filtering
-      if (columnName === "pictures" || columnName === "log") {
-        return;
-      }
-
-      var selectWrapper = $('<div class="select-wrapper"></div>'); // Create a wrapper div
-      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
-        .appendTo(selectWrapper)
-        .select2({
-          width: '100%',
-          dropdownCssClass: 'select2-blue' // Customize the appearance of the dropdown
-        });
-
-      var dropdownIcon = $('<span class="dropdown-icon"><i class="fas fa-caret-down"></i></span>')
-        .appendTo(selectWrapper); // Add a dropdown icon to the wrapper div
-
-      dropdownIcon.on('click', function(e) {
-        select.select2('open'); // Open the dropdown on icon click
-        e.stopPropagation(); // Prevent event propagation to avoid closing the dropdown
-      });
-
-      select.on('change', function() {
-        var selectedValues = $(this).val(); // Get the selected values as an array
-        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw(); // Use a pipe (|) as the separator for multiple values
-      });
-
-      selectWrapper.appendTo($(column.header())); // Append the wrapper div to the column header
+      selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
       
       column.data().unique().sort().each(function(d, j) {

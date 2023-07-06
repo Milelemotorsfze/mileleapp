@@ -442,7 +442,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
                         @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-view');
                     @endphp
                     @if ($hasPermission)
                         <div class="dropdown">
@@ -487,7 +487,7 @@
                             </div>
                             @endif
                             @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-edit');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
                     @endphp
                     @if ($hasPermission)
                             <div class="dropdown">

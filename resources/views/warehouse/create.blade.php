@@ -372,7 +372,7 @@ for (var id in intColours) {
       });
 
       if (allBlank) {
-        $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+        $('#purchasing-order').unbind('submit').submit();
       } else {
         var formData = $('#purchasing-order').serialize();
         $.ajax({
@@ -384,7 +384,7 @@ for (var id in intColours) {
               alert('Duplicate VIN values found in the database. Please ensure all VIN values are unique.');
               return false;
             } else {
-              $('#purchasing-order').unbind('submit').submit(); // Unbind the submit event handler and submit the form
+              $('#purchasing-order').unbind('submit').submit();
             }
           },
           error: function() {
