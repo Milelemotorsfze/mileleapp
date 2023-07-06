@@ -14,7 +14,6 @@ class AvailableColour extends Model
         'int_colour',
         'ext_colour',
     ];
-
     public function variant()
     {
         return $this->belongsTo(Varaint::class,'varaint_id','id');
