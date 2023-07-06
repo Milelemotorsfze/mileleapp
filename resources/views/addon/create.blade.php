@@ -157,7 +157,7 @@
                                 <option value="K">Kit</option>
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
-                            <input id="addon_type_show" type="text" class="form-control" hidden readonly>
+                            <input id="addon_type_show" type="text" class="form-control" hidden readonly onclick=showAlert()>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
 
                             <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
@@ -1488,7 +1488,18 @@
         function disableDropdown()
         {
             document.getElementById("addon_type").hidden=true;
-            document.getElementById("addon_type_show").value=currentAddonType;
+            if(currentAddonType == 'P')
+            {
+                document.getElementById("addon_type_show").value="Accessories";
+            }
+            else if(currentAddonType == 'K')
+            {
+                document.getElementById("addon_type_show").value="Kit";
+            }
+            else if(currentAddonType == 'SP')
+            {
+                document.getElementById("addon_type_show").value="Spare Parts";
+            }
             document.getElementById("addon_type_show").hidden=false;
         }
         function enableDropdown()
@@ -1654,6 +1665,11 @@
                     removeFixingChargeAmountError();
                 }
             }
+        }
+        function showAlert()
+        {
+            var confirm = alertify.confirm('Please remove Addon Brand , Model Lines and  Suppliers, Purchase Price details to enable dropdown',function (e) {
+                   }).set({title:"Remove Brands and Suppliers"})
         }
 </script>
 @endsection
