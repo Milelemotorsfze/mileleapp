@@ -29,54 +29,65 @@
         @endif
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> Variant</label>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label"> Variant:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span>{{ $vehicle->variant->name }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Brand:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span> {{ $vehicle->variant->brand->brand_name ?? '' }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Variant Detail:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span>{{ $vehicle->vehicle->variant->detail ?? '' }}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span>{{ $vehicle->variant->name }}</span>
+                    <div class="col-lg-6 col-md-6 col-sm-6">
+
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Model:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span> {{ $vehicle->variant->master_model_lines->model_line ?? '' }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Model Description:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span> {{ $vehicle->variant->model_detail ?? '' }}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2 col-md-3 col-sm-12">
+                                <label for="choices-single-default" class="form-label">Model Year:</label>
+                            </div>
+                            <div class="col-lg-6 col-md-9 col-sm-12">
+                                <span> {{ $vehicle->variant->my ?? '' }}</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Brand</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span> {{ $vehicle->variant->brand->brand_name ?? '' }}</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Model</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span> {{ $vehicle->variant->master_model_lines->model_line ?? '' }}</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Model Description</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span> {{ $vehicle->variant->model_detail ?? '' }}</span>
-                    </div>
+
                 </div>
 
-                <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Variant Detail</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span>{{ $vehicle->vehicle->variant->detail ?? '' }}</span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Model Year</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span> {{ $vehicle->variant->my ?? '' }}</span>
-                    </div>
-                </div>
+
+
+
             </div>
             <form action="{{ route('variant-prices.update', $vehicle->id) }}" method="POST" >
                 @csrf
@@ -88,8 +99,8 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Vehicle Price Details</h4>
-                        <button type="button" class="btn btn-sm btn-success float-end enable-price-filed" >Price Update</button>
-                        <button type="submit" class="btn btn-sm btn-primary float-end update-prices" hidden> Update</button>
+                        <button type="button" class="btn btn-sm btn-primary float-end enable-price-filed" >Price Update</button>
+                        <button type="submit" class="btn btn-sm btn-success float-end update-prices" hidden> Update</button>
 
                     </div>
                     <div class="card-body">

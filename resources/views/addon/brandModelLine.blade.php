@@ -38,38 +38,35 @@
         });
 
         var index = 1;
-        //
-        // $(document.body).on('select2:select', ".model-lines", function (e) {
-        //     var value = $(this).val();
-        //     var index = $(this).attr('data-index');
-        //     optionDisable(index, value);
-        //
-        // });
-        //  function optionDisable(index, value){
-        //      if(value == 'allmodellines') {
-        //          var currentId = 'selectModelLine'+index;
-        //          alert(currentId)
-        //          $('#' + currentId +' option[value=' + value + ']').not(':selected').attr('disabled', true);
-        //
-        //          // $('currentId option').not(':selected').attr('disabled', true);
-        //      }
-        //  }
-        //
-        // $(document.body).on('select2:unselect', ".model-lines", function (e) {
-        //     // alert("unselect")
-        //     var index = $(this).attr('data-index');
-        //     var data = e.params.data;
-        //     // alert(data);
-        //     optionEnable(index,data);
-        //
-        // });
-        //  function optionEnable(index,data) {
-        //      if(data == 'allmodellines') {
-        //          // alert("yes");
-        //          $('.model-lines').removeAttribute('disabled');
-        //          // $(".model-lines").find(':selected').attr('disabled','disabled');
-        //      }
-        //  }
+        $(document.body).on('select2:select', ".model-lines", function (e) {
+            var value = $(this).val();
+            var index = $(this).attr('data-index');
+            optionDisable(index, value);
+
+        });
+         function optionDisable(index, value){
+             var currentId = 'selectModelLine'+index;
+             if(value == 'allmodellines') {
+                 $('#' + currentId +' option').not(':selected').attr('disabled', true);
+             }else{
+                 $('#' + currentId + ' option[value=allmodellines]').prop('disabled', true)
+             }
+         }
+
+        $(document.body).on('select2:unselect', ".model-lines", function (e) {
+            var index = $(this).attr('data-index');
+            var currentId = 'selectModelLine'+index;
+            var data = e.params.data.id;
+            optionEnable(currentId,data);
+
+        });
+         function optionEnable(currentId,data) {
+             if(data == 'allmodellines') {
+                 $('#' + currentId + ' option').prop('disabled', false);
+             }else {
+                 $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false)
+             }
+         }
 
         $(document.body).on('select2:select', ".brands", function (e) {
             var index = $(this).attr('data-index');

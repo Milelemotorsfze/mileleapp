@@ -157,7 +157,6 @@
                                 <option value="K">Kit</option>
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
-                            <input id="addon_type_show" type="text" class="form-control" hidden readonly>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
 
                             <span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
@@ -167,7 +166,7 @@
                             <label for="addon_code" class="col-form-label text-md-end">{{ __('Addon Code') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code" 
+                            <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code"
                             placeholder="Addon Code" value="{{ old('addon_code') }}"  autocomplete="addon_code" autofocus readonly>
                             @error('addon_code')
                                 <span class="invalid-feedback" role="alert">
@@ -201,7 +200,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-create']);
                             @endphp
                             @if ($hasPermission)
-                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;" 
+                            <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;"
                             class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                             @endif
                         @endcan
@@ -215,8 +214,8 @@
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
 
-                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror" 
-                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus 
+                        <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
+                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus
                         readonly>
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -233,10 +232,10 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-                       
-                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+
+                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror"
                         name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
-                        <!-- <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                        <!-- <input id="selling_price" type="number" min="0" step="any" class="form-control widthinput @error('selling_price') is-invalid @enderror"
                         name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price"> -->
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -258,8 +257,8 @@
                         <div class="input-group">
 
 
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1" 
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time" 
+                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"
+                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
                         value="{{ old('lead_time') }}"  autocomplete="lead_time">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">Days</span>
@@ -275,8 +274,8 @@
                             <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" 
-                            name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}"  autocomplete="payment_condition" 
+                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror"
+                            name="payment_condition" placeholder="Enter Payment Condition" value="{{ old('payment_condition') }}"  autocomplete="payment_condition"
                             autofocus>
                             @error('payment_condition')
                                 <span class="invalid-feedback" role="alert">
@@ -311,10 +310,10 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
                             <div class="input-group">
-                            <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" 
+                            <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"
                             placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">
                            <!-- onkeyup="validationOnKeyUp(this)" -->
-                            <!-- <input id="fixing_charge_amount" type="number" min="0" step="any" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount" 
+                            <!-- <input id="fixing_charge_amount" type="number" min="0" step="any" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"
                             value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount" onkeyup="validationOnKeyUp(this)"> -->
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -328,7 +327,7 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
-                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}" 
+                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" value="{{ old('part_number') }}"
                         autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
@@ -345,7 +344,7 @@
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
+                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number"
                             value="{{ old('part_number') }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
                             @error('part_number')
                                 <span class="invalid-feedback" role="alert">
@@ -361,8 +360,8 @@
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
                         <div class="col-xxl-10 col-lg-6 col-md-12">
-                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror" 
-                            name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks" 
+                            <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror"
+                            name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks"
                             autofocus></textarea>
                             @error('additional_remarks')
                                 <span class="invalid-feedback" role="alert">
@@ -422,7 +421,7 @@
                                         <label for="name" class="col-form-label text-md-end ">Addon Name</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" 
+                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
                                         placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
@@ -902,7 +901,8 @@
             // }
             if(clickInput.id == 'itemArr1')
             {
-                var value = clickInput.value; alert(value);
+                var value = clickInput.value;
+                // alert(value);
                 if(value == '')
                 {
                     if(value.legth != 0)
@@ -916,7 +916,7 @@
                     removeSupplierTypeError();
                 }
             }
-            
+
         }
         function showSupplierTypeError($msg)
         {
@@ -1497,64 +1497,64 @@
             if(canEnableDropdown == 'no' && currentAddonType == 'SP' || canEnableDropdown == 'no' && currentAddonType == 'P')
             {
                 var countNotKitSuplr = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
-                for (let i = 1; i <= countNotKitSuplr; i++) 
+                for (let i = 1; i <= countNotKitSuplr; i++)
                 {
                     if($('#suppliers'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
                     {
                         canEnableDropdown = 'yes';
                         break;
-                    }   
+                    }
                 }
             }
             else if(canEnableDropdown == 'no' && currentAddonType == 'K')
             {
                 var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
-                for (let i = 1; i <= countKitSuplr; i++) 
+                for (let i = 1; i <= countKitSuplr; i++)
                 {
                     if($('#kitSupplierDropdown'+i).val() == '' && $('#Supplier'+i+'TotalPriceAED').val() == '' && $('#Supplier'+i+'TotalPriceUSD').val() == '')
                     {
                         canEnableDropdown = 'yes';
                         break;
-                    } 
+                    }
                     else
                     {
                         var countKitSuplrItem = '';
                         var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
                         for (let j = 1; j <= countKitSuplrItem; j++)
                         {
-                            if($('#kitSupplier'+i+'Item'+j).val() == '' && $('Supplier'+i+'Kit'+j+'Quantity').val() == '' 
-                                && $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() == '' 
+                            if($('#kitSupplier'+i+'Item'+j).val() == '' && $('Supplier'+i+'Kit'+j+'Quantity').val() == ''
+                                && $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() == ''
                                 && $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() == '' )
                             {
                                 canEnableDropdown = 'yes';
                                 break;
-                            } 
+                            }
                         }
-                    } 
+                    }
                 }
             }
             if(canEnableDropdown == 'no' && currentAddonType == 'P' || canEnableDropdown == 'no' && currentAddonType == 'K')
             {
                 var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                for (let i = 1; i <= countBrandModal; i++) 
+                for (let i = 1; i <= countBrandModal; i++)
                 {
                     if($('#selectBrand'+i).val() == '' && $('#selectModelLine'+i).val() == '')
                     {
                         canEnableDropdown = 'yes';
                         break;
-                    }   
+                    }
                 }
             }
             else if(canEnableDropdown == 'no' && currentAddonType == 'SP')
             {
                 var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-                for (let i = 1; i <= countModel; i++) 
+                for (let i = 1; i <= countModel; i++)
                 {
                     if($('#selectBrandMo'+i).val() == '')
                     {
                         canEnableDropdown = 'yes';
                         break;
-                    } 
+                    }
                     else
                     {
                         var countModelDesc = '';
@@ -1565,9 +1565,9 @@
                             {
                                 canEnableDropdown = 'yes';
                                 break;
-                            } 
+                            }
                         }
-                    } 
+                    }
                 }
             }
             if(canEnableDropdown == 'yes')
@@ -1580,7 +1580,8 @@
         }
         function setLeastAEDPrice()
         {
-            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value); alert(values);
+            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
+            // alert(values);
             if(values != '')
             {
                 var arrayOfNumbers = [];
@@ -1625,14 +1626,14 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
-        function inputNumberAbs(currentPriceInput) 
+        function inputNumberAbs(currentPriceInput)
         {
-            
+
             var id = currentPriceInput.id
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2) 
+            if(val.split('.').length>2)
             {
                 val =val.replace(/\.+$/,"");
             }
@@ -1642,7 +1643,7 @@
                 var value = currentPriceInput.value;
                 if(value == '')
                 {
-                   
+
                     if(value.legth != 0)
                     {
                         $msg = "Fixing Charge Amount is required";
