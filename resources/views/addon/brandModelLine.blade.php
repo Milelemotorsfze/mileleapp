@@ -14,7 +14,7 @@
                     </select>
                     <span id="brandError" class=" invalid-feedback"></span>
                 </div>
-                <div class="col-xxl-4 col-lg-6 col-md-12" id="showDivdrop1" hidden>
+                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1" data-index="1" multiple="true"
@@ -38,38 +38,38 @@
         });
 
         var index = 1;
-
-        $(document.body).on('select2:select', ".model-lines", function (e) {
-            var value = $(this).val();
-            var index = $(this).attr('data-index');
-            optionDisable(index, value);
-
-        });
-         function optionDisable(index, value){
-             if(value == 'allmodellines') {
-                 var currentId = 'selectModelLine'+index;
-                 alert(currentId)
-                 $('#' + currentId +' option[value=' + value + ']').not(':selected').attr('disabled', true);
-
-                 // $('currentId option').not(':selected').attr('disabled', true);
-             }
-         }
-
-        $(document.body).on('select2:unselect', ".model-lines", function (e) {
-            // alert("unselect")
-            var index = $(this).attr('data-index');
-            var data = e.params.data;
-            // alert(data);
-            optionEnable(index,data);
-
-        });
-         function optionEnable(index,data) {
-             if(data == 'allmodellines') {
-                 // alert("yes");
-                 $('.model-lines').removeAttribute('disabled');
-                 // $(".model-lines").find(':selected').attr('disabled','disabled');
-             }
-         }
+        //
+        // $(document.body).on('select2:select', ".model-lines", function (e) {
+        //     var value = $(this).val();
+        //     var index = $(this).attr('data-index');
+        //     optionDisable(index, value);
+        //
+        // });
+        //  function optionDisable(index, value){
+        //      if(value == 'allmodellines') {
+        //          var currentId = 'selectModelLine'+index;
+        //          alert(currentId)
+        //          $('#' + currentId +' option[value=' + value + ']').not(':selected').attr('disabled', true);
+        //
+        //          // $('currentId option').not(':selected').attr('disabled', true);
+        //      }
+        //  }
+        //
+        // $(document.body).on('select2:unselect', ".model-lines", function (e) {
+        //     // alert("unselect")
+        //     var index = $(this).attr('data-index');
+        //     var data = e.params.data;
+        //     // alert(data);
+        //     optionEnable(index,data);
+        //
+        // });
+        //  function optionEnable(index,data) {
+        //      if(data == 'allmodellines') {
+        //          // alert("yes");
+        //          $('.model-lines').removeAttribute('disabled');
+        //          // $(".model-lines").find(':selected').attr('disabled','disabled');
+        //      }
+        //  }
 
         $(document.body).on('select2:select', ".brands", function (e) {
             var index = $(this).attr('data-index');
@@ -122,18 +122,23 @@
                 $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+ index +')');
                 $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
                 $(this).find('.brands').attr('id', 'selectBrand'+index);
-                $(this).find('#model-line-div').attr('showDivdrop'+index);
+                $(this).find('.brands').attr('data-index',index);
+                $(this).find('.model-line-div').attr('id','showDivdrop'+index);
                 $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
                 $(this).find('.model-lines').attr('id','selectModelLine'+index);
-                $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+ index +')');
+                $(this).find('.model-lines').attr('data-index',index);
                 $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                $('#selectBrand'+index).select2
+                ({
+                    placeholder:"Choose Brands....     Or     Type Here To Search....",
+                    allowClear: true,
+                    minimumResultsForSearch: -1,
+                });
+                $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+                $("#selectModelLine"+index).select2();
             })
-            $('#selectBrand'+index).select2
-            ({
-                placeholder:"Choose Brands....     Or     Type Here To Search....",
-                allowClear: true,
-                minimumResultsForSearch: -1,
-            });
+
+
         })
         $("#add").on("click", function ()
         {
@@ -177,9 +182,7 @@
                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-                                         onchange=selectModelLine(this.id,${index})
-                                         id="selectModelLine${index}"
-                                                multiple="true" style="width: 100%;" required>
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" required>
                                         </select>
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
@@ -213,7 +216,7 @@
                 }
             });
 
-            $("#selectModelLine"+index).attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
+            $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
             $("#selectModelLine"+index).select2();
         });
     });
@@ -254,7 +257,9 @@
     }
     function showRelatedModal(value,row,currentAddonType)
     {
+        // alert("div");
         let showDivdrop = document.getElementById('showDivdrop'+row);
+
         showDivdrop.hidden = false
         let showaddtrim = document.getElementById('showaddtrim');
         showaddtrim.hidden = false
