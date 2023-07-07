@@ -434,6 +434,7 @@ input {
                     </br>
                 </div>
             </div>
+        <div id="tabId" hidden>
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
                 <h6 class="tablinks" onclick="openCity(event, 'uploadExcel')">Upload Supplier's Addon Excel</h6>
@@ -448,8 +449,7 @@ input {
                                         <div class="row form_field_outer_row" id="row-1">
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                                <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;"
-                                                        onchange="resetAddonDropdown()">
+                                                <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;">
                                                 @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                     @endforeach
@@ -512,9 +512,7 @@ input {
                     </div>
                 </div>
             </div>
-            <input id="activeTab" name="activeTab" hidden>
-            <input id="hiddencontact" name="hiddencontact" value="{{old('hiddencontact')}}" hidden>
-            <input id="hiddencontactCountryCode" name="hiddencontactCountryCode" value="{{old('hiddencontactCountryCode')}}" hidden>
+            
 
             <div id="uploadExcel" class="tabcontent">
                 <div class="row">
@@ -536,6 +534,10 @@ input {
             </div>
             </br>
 
+            <input id="activeTab" name="activeTab" hidden>
+            <input id="hiddencontact" name="hiddencontact" value="{{old('hiddencontact')}}" hidden>
+            <input id="hiddencontactCountryCode" name="hiddencontactCountryCode" value="{{old('hiddencontactCountryCode')}}" hidden>
+        </div>
             <!-- <label class="col-sm-2 control-label">Image</label>
 <div class="col-sm-12">
 <input id="image" type="file" name="image" accept="image/*" onchange="readURL1(this);">
@@ -689,7 +691,7 @@ input {
                             <div class="row form_field_outer_row" id="row-${index}">
                                 <div class="col-xxl-6 col-lg-6 col-md-12">
                                     <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                    <select class="addons"  id="addon_${index}" data-index="${index}" name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;" onchange="resetAddonDropdown()">
+                                    <select class="addons"  id="addon_${index}" data-index="${index}" name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;">
                                     @foreach($addons as $addon)
                                 <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                         @endforeach
@@ -1004,11 +1006,13 @@ input {
                     {
                         $msg = "Supplier Type is required";
                         showSupplierTypeError($msg);
+                        hideDynamic();
                     }
                 }
                 else
                 {
                     removeSupplierTypeError();
+                    showDynamic();
                 }
             }
             if(clickInput.id == 'is_primary_payment_method')
@@ -1321,17 +1325,23 @@ input {
         }
         function inputNumberAbs(currentPriceInput) 
         {
-            // var id = currentPriceInput.id;
-            // var input = document.getElementById(id);
-            // var val = input.value;
-            
-            // alert(val);
-            // val = val.replace(/^0+|[^\d.]/g, '');
-            // if(val.split('.').length>2) 
-            // {
-            //     val =val.replace(/\.+$/,"");
-            // }
-            // input.value = val;
+            var id = currentPriceInput.id;
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d.]/g, '');
+            if(val.split('.').length>2) 
+            {
+                val =val.replace(/\.+$/,"");
+            }
+            input.value = val;
+        }
+        function showDynamic()
+        {
+            document.getElementById("tabId").hidden=false;
+        }
+        function hideDynamic()
+        {
+            document.getElementById("tabId").hidden=true;
         }
     </script>
 @endsection
