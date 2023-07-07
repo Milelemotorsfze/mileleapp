@@ -1668,7 +1668,7 @@
         }
         function showAlert()
         {
-            var confirm = alertify.confirm('Please remove Addon Brand , Model Lines and  Suppliers, Purchase Price details to enable dropdown',function (e) {
+            var confirm = alertify.confirm('You are not able to edit this field while any Supplier is in selection',function (e) {
                    }).set({title:"Remove Brands and Suppliers"})
         }
 </script>
