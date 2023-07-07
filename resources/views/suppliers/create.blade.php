@@ -35,6 +35,23 @@ input {
 ::placeholder {
   color: #422a4c;
 } */
+.spanSub
+{
+    background-color: #e4e4e4;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: inline;
+    margin-left: 5px;
+    margin-top: 5px;
+    padding: 0 10px 0 20px;
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+    white-space: nowrap;
+}
     .error
     {
         color: #FF0000;
@@ -366,23 +383,26 @@ input {
                             <span class="error">* </span>
                             <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>
                         </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput" 
-                        onchange="validationOnKeyUp(this)">
-                        <!-- @error('supplier_types') is-invalid @enderror -->
-                            <option value="">Choose Supplier Type</option>
-                            <option value="accessories">Accessories</option>
-                            <option value="freelancer">Freelancer</option>
-                            <option value="garage">Garage</option>
-                            <option value="spare_parts">Spare Parts</option>
-                            <option value="warranty">Warranty</option>
-                        </select>
-                        @error('supplier_types')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                        <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
+                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput" 
+                                onchange="validationOnKeyUp(this)">
+                                <option value="">Choose Supplier Type</option>
+                                <option value="accessories">Accessories</option>
+                                <option value="freelancer">Freelancer</option>
+                                <option value="garage">Garage</option>
+                                <option value="spare_parts">Spare Parts</option>
+                                <option value="warranty">Warranty</option>
+                            </select>
                             <span id="supplierTypeError" class=" invalid-feedback"></span>
+                        </div>
+                        <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">
+                            <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">
+                                <span id="accessories" class="spanSub" hidden>Accessories</span>
+                                <span id="freelancer" class="spanSub" hidden>Freelancer</span>
+                                <span id="garage" class="spanSub" hidden>Garage</span>
+                                <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>
+                                <span id="warranty" class="spanSub" hidden>Warranty</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -450,9 +470,9 @@ input {
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
                                                 <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;">
-                                                @foreach($addons as $addon)
+                                                    <!-- @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
-                                                    @endforeach
+                                                    @endforeach -->
                                                 </select>
                                                 @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
@@ -585,11 +605,13 @@ input {
                 var index = $(this).attr('data-index');
                 var value = e.params.data.id;
                 hideOption(index,value);
+                dropdownDisable();
             });
             $(document.body).on('select2:unselect', ".addons", function (e) {
                 var index = $(this).attr('data-index');
                 var data = e.params.data;
                 appendOption(index,data);
+                dropdownEnable();
             });
             function hideOption(index,value) {
                 var indexValue = $('#indexValue').val();
@@ -648,6 +670,7 @@ input {
                         minimumResultsForSearch: -1,
                     });
                 });
+                dropdownEnable();
             })
             function addOption(id,text) {
                 var indexValue = $('#indexValue').val();
@@ -671,12 +694,14 @@ input {
                     selectedAddons.push(value);
                 });
             }
+            var selectedAddonTypes = $("#supplier_type").val();
             $.ajax
             ({
                 url:"{{ route('addon.getAddonForSupplier')}}",
                 type: "POST",
                 data:
                     {
+                        selectedAddonTypes: selectedAddonTypes,
                         filteredArray: selectedAddons,
                         _token: '{{csrf_token()}}'
                     },
@@ -955,6 +980,7 @@ input {
                 $("#addon_purchase_price_"+i).removeAttr('disabled');
                 $("#addon_purchase_price_"+i).val('');
             }
+            dropdownEnable();
         }
         function calculateAED(i)
         {
@@ -1012,7 +1038,16 @@ input {
                 else
                 {
                     removeSupplierTypeError();
-                    showDynamic();
+                    SupplierTypesVal = $("#supplier_type").val();
+
+                    if(SupplierTypesVal.includes('accessories') || SupplierTypesVal.includes('spare_parts'))
+                    {
+                        showDynamic();
+                    }
+                    else
+                    {
+                        hideDynamic();
+                    }
                 }
             }
             if(clickInput.id == 'is_primary_payment_method')
@@ -1334,14 +1369,111 @@ input {
                 val =val.replace(/\.+$/,"");
             }
             input.value = val;
+            if(val != '')
+            {
+                dropdownDisable();
+            }
+            else
+            {
+                dropdownEnable();
+            }
         }
         function showDynamic()
         {
+            var selectedAddonTypes = $("#supplier_type").val();
+            $.ajax
+            ({
+                url:"{{ route('addon.getAddonForSupplier')}}",
+                type: "POST",
+                data:
+                    {
+                        selectedAddonTypes: selectedAddonTypes,
+                        _token: '{{csrf_token()}}'
+                    },
+                dataType : 'json',
+                success: function(data)
+                {
+                    myarray = data;
+                    var size= myarray.length;
+                    if(size >= 1)
+                    {
+                        let addonDropdownData   = [];
+                        $.each(data,function(key,value)
+                        {
+                            addonDropdownData.push
+                            ({
+                                id: value.id,
+                                text: value.addon_code +'- ('+value.addon_name.name +')'
+                            });
+                        });
+                        $('#addon_1').html("");
+                        $('#addon_1').select2
+                        ({
+                            placeholder:"Choose Addons....     Or     Type Here To Search....",
+                            allowClear: true,
+                            data: addonDropdownData,
+                            minimumResultsForSearch: -1,
+                        });
+                    }
+                }
+            });
             document.getElementById("tabId").hidden=false;
         }
         function hideDynamic()
         {
             document.getElementById("tabId").hidden=true;
+        }
+        function dropdownDisable()
+        {
+            document.getElementById("mainSelect").hidden=true;
+            document.getElementById("subSelect").hidden=false;
+            var selectedSupType = '';
+            var selectedSupType = $("#supplier_type").val();
+            selectedSupType.forEach((item) => {
+                document.getElementById(item).hidden=false;
+            });
+        }
+        function dropdownEnable()
+        {
+            var canEnableDropdown = 'no';
+            if(canEnableDropdown == 'no')
+            {
+                var countNotKitSuplr = $(".form_field_outer").find(".form_field_outer_row").length;
+                for (let i = 1; i <= countNotKitSuplr; i++) 
+                {
+                    if($('#currency_'+i).val() == 'USD')
+                    {
+                        if($('#addon_'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
+                        {
+                            canEnableDropdown = 'yes';
+                            break;
+                        }   
+                    }
+                    else
+                    {
+                        if($('#addon_'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '')
+                        {
+                            canEnableDropdown = 'yes';
+                            break;
+                        }  
+                    } 
+                }
+            }
+            if(canEnableDropdown == 'yes')
+            {
+                document.getElementById("mainSelect").hidden=false;
+                document.getElementById("subSelect").hidden=true;
+                var selectedSupType = '';
+                var selectedSupType = $("#supplier_type").val();
+                selectedSupType.forEach((item) => {
+                    document.getElementById(item).hidden=true;
+                });
+            }
+        }
+        function showAlert()
+        {
+            var confirm = alertify.confirm('You are not able to edit this field while any Addon is in selection',function (e) {
+                   }).set({title:"Remove Addons And Prices"})
         }
     </script>
 @endsection

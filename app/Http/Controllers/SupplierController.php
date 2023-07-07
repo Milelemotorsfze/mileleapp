@@ -282,6 +282,7 @@ class SupplierController extends Controller
         }
         else
         {
+            $supplierTypeInput = $request->supplier_types;
             if($request->activeTab == 'uploadExcel')
             {
                 if($request->file('file'))
@@ -333,6 +334,28 @@ class SupplierController extends Controller
                                             if($addonId == '')
                                             {
                                                 $addonError = "This addon code is not exising in the system";
+                                            }
+                                            else
+                                            {
+                                                if(count($supplierTypeInput > 0))
+                                                {
+                                                    if(in_array('accessories', $supplierTypeInput) && in_array('spare_parts', $supplierTypeInput))
+                                                    {
+                                                        $typeAddonData = AddonDetails::whereIn('addon_type_name',['P','SP','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                    }
+                                                    elseif(in_array('accessories', $supplierTypeInput))
+                                                    {
+                                                        $typeAddonData = AddonDetails::whereIn('addon_type_name',['P','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                    }
+                                                    elseif(in_array('spare_parts', $supplierTypeInput))
+                                                    {
+                                                        $typeAddonData = AddonDetails::whereIn('addon_type_name',['SP','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                    }
+                                                    if($typeAddonData == '')
+                                                    {
+                                                        $addonError = "This addon code is not match with supplier type";
+                                                    }
+                                                }
                                             }
                                         }
                                         if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
@@ -1138,11 +1161,27 @@ class SupplierController extends Controller
         }
     }
 
-    public function getAddonForSupplier(Request $request){
-
+    public function getAddonForSupplier(Request $request)
+    {
         $data = AddonDetails::select('id','addon_code','addon_id')->with('AddonName');
-//        $data = Addon::select('id','name');
-
+        if($request->selectedAddonTypes)
+        {
+            if(count($request->selectedAddonTypes) > 0)
+            {
+                if(in_array('accessories', $request->selectedAddonTypes) && in_array('spare_parts', $request->selectedAddonTypes))
+                {
+                    $data = $data->whereIn('addon_type_name',['P','SP','K']);
+                }
+                elseif(in_array('accessories', $request->selectedAddonTypes))
+                {
+                    $data = $data->whereIn('addon_type_name',['P','K']);
+                }
+                elseif(in_array('spare_parts', $request->selectedAddonTypes))
+                {
+                    $data = $data->whereIn('addon_type_name',['SP','K']);
+                }
+            }
+        }
         if($request->filteredArray)
         {
             if(count($request->filteredArray) > 0)
