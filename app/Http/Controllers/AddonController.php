@@ -37,7 +37,7 @@ class AddonController extends Controller
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-        $addon1 = $addon1->orderBy('id', 'DESC')->get(); 
+        $addon1 = $addon1->orderBy('id', 'DESC')->get();
         foreach($addon1 as $addon)
         {
             $price = '';
@@ -45,7 +45,7 @@ class AddonController extends Controller
             $addon->LeastPurchasePrices = $price;
         }
         return view('addon.index',compact('addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
-   
+
     }
     /**
      * Show the form for creating a new resource.
@@ -755,9 +755,16 @@ class AddonController extends Controller
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         return view('addon.show',compact('addonDetails','addons','brands','modelLines'));
     }
-    public function brandModels($id)
+    public function brandModels(Request $request, $id)
     {
-        $data = MasterModelLines::where('brand_id',$id)->select('id','model_line')->get();
+        $data = MasterModelLines::where('brand_id',$id)->select('id','model_line');
+        if($request->filteredArray) {
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id', $request->filteredArray);
+            }
+        }
+        $data = $data->get();
         return response()->json($data);
     }
     public function getAddonCodeAndDropdown(Request $request)
@@ -831,11 +838,11 @@ class AddonController extends Controller
         $supplierAddonDetails = [];
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
-       
+
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $supplierAddonDetails->LeastPurchasePrices = $price;
-     
+
         // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
         // {
@@ -989,6 +996,47 @@ class AddonController extends Controller
 
         $addon->save();
         return response($addon, 200);
+    }
+    public function getModelLinesForAddons(Request $request) {
+
+        $data = MasterModelLines::select('id','model_line');
+        info($request->filteredArray);
+        if($request->filteredArray)
+        {
+            if(count($request->filteredArray) > 0)
+            {
+                info($request->filteredArray);
+                $data = $data->whereNotIn('id',$request->filteredArray);
+            }
+        }
+        if($request->id) {
+            $id = $request->id;
+            $alreadyAddedModelLines = AddonTypes::where('brand_id',$id)->pluck('model_id');
+            $data = $data->whereNotIn('id', $alreadyAddedModelLines);
+        }
+        $data = $data->get();
+        info($data);
+        return response()->json($data);
+
+    }
+    public function getBrandForAddons(Request $request) {
+
+        $data = Brand::select('id','brand_name');
+        if($request->filteredArray)
+        {
+            if(count($request->filteredArray) > 0)
+            {
+                $data = $data->whereNotIn('id',$request->filteredArray);
+            }
+        }
+//        if($request->id) {
+//            $id = $request->id;
+//            $alreadyAddedModelLines = AddonTypes::where('brand_id',$id)->pluck('model_id');
+//            $data = $data->whereNotIn('id', $alreadyAddedModelLines);
+//        }
+        $data = $data->get();
+        return response()->json($data);
+
     }
 }
 
