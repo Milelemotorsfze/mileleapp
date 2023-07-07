@@ -107,9 +107,22 @@ class PurchasingOrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PurchasingOrder $purchasingOrder)
+    public function show($id)
     {
-        //
+        $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
+        ->get();
+    $purchasingOrder = PurchasingOrder::findOrFail($id);
+    $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+        $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
+        $nextId = PurchasingOrder::where('id', '>', $id)->min('id');
+        return view('purchase.show', [
+               'currentId' => $id,
+               'previousId' => $previousId,
+               'nextId' => $nextId
+           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname'));
     }
 
     /**

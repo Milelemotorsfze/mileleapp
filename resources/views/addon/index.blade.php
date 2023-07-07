@@ -78,7 +78,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 /* The Close Button */
 .close {
-  position: absolute;
+  position: fixed;
   top: 50px;
   right: 50px;
   color: black;

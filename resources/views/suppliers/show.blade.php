@@ -1,4 +1,95 @@
 @extends('layouts.main')
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+#myImg {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#myImg:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.modalForImage {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 10px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: black; /* Fallback color */
+  background-color: rgba(128,128,128,0.5);/* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modalContentForImage {
+  padding-top: 100px; /* Location of the box */
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  height:auto!important;
+  max-width: 700px!important;
+}
+
+/* Caption of Modal Image */
+#caption {
+  margin: auto;
+  display: block;
+  width: 100%!important;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation */
+.modalContentForImage, #caption {  
+  -webkit-animation-name: zoom;
+  -webkit-animation-duration: 0.6s;
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)} 
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  color: black;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .modalContentForImage {
+    width: 100%;
+  }
+}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
@@ -169,7 +260,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                 @include('addon.table')
                 @endif
             </div>
-    </div> 
+    </div>
+    <div id="myModal" class="modal modalForImage">
+  <span class="closeImage close">&times;</span>
+  <img class="modalContentForImage" id="img01">
+  <div id="caption"></div>
+</div> 
     @endif 
     @endcan
     <script type="text/javascript">
@@ -179,6 +275,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
             // $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
             // $("#adoon").select2();
         });
+         // show image in large view
+    $('.image-click-class').click(function (e) 
+    {
+        var id =  $(this).attr('id');
+        var src = $(this).attr('src');
+        var modal = document.getElementById("myModal");
+        var img = document.getElementById(id);
+        var modalImg = document.getElementById("img01");
+        var captionText = document.getElementById("caption");
+        modal.style.display = "block";
+        modalImg.src = src;
+        captionText.innerHTML = this.alt;
+      })
+      $('.closeImage').click(function (e) 
+      {
+        var modal = document.getElementById("myModal");
+        modal.style.display = "none";
+      })   
         if(data.contact_number != null)
         { 
             var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {

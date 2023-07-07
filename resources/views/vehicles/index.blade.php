@@ -981,15 +981,6 @@ $(document).ready(function() {
           width: '100%',
           dropdownCssClass: 'select2-blue'
         });
-
-      var dropdownIcon = $('<span class="dropdown-icon"><i class="fas fa-caret-down"></i></span>')
-        .appendTo(selectWrapper);
-
-      dropdownIcon.on('click', function(e) {
-        select.select2('open');
-        e.stopPropagation();
-      });
-
       select.on('change', function() {
         var selectedValues = $(this).val();
         column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
