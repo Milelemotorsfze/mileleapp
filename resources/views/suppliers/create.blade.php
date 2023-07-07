@@ -1335,10 +1335,10 @@ input {
             document.getElementById("supplierTypeError").textContent=$msg;
             document.getElementById("supplier_type").classList.add("is-invalid");
             document.getElementById("supplierTypeError").classList.add("paragraph-class");
-            $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
-            $("#supplier_type").select2({
-                containerCssClass : "form-control is-invalid"
-            });
+            // $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+            // $("#supplier_type").select2({
+            //     containerCssClass : "form-control is-invalid"
+            // });
         }
         function removeSupplierTypeError()
         {
