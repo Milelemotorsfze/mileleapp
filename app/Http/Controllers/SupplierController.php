@@ -245,9 +245,29 @@ class SupplierController extends Controller
             array_push($supAddTypesName, 'warranty');
         }
         // end find using Supplier types
-
-        $addons = AddonDetails::whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();  
-        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes','supAddTypesName'));
+        // addon based on supplier type
+        $supTyp = [];
+        if(in_array('accessories', $supplierTypes) && in_array('spare_parts', $supplierTypes))
+        {
+            array_push($supTyp, 'K');
+            array_push($supTyp, 'P');
+            array_push($supTyp, 'SP');
+        }
+        else
+        {
+            if(in_array('accessories', $supplierTypes))
+            {
+                array_push($supTyp, 'K');
+                array_push($supTyp, 'P');
+            }
+            if(in_array('spare_parts', $supplierTypes))
+            {
+                array_push($supTyp, 'K');
+                array_push($supTyp, 'SP');
+            }
+        }
+        $addons = AddonDetails::whereIn('addon_type_name',$supTyp)->whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();  
+        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons'));
     }
     public function destroy($id)
     {
@@ -732,6 +752,7 @@ class SupplierController extends Controller
         }
         else
         {
+            $supplierTypeInput = $request->supplier_types;
             if($request->activeTab == 'uploadExcel')
             {
                 if($request->file('file'))
@@ -790,6 +811,28 @@ class SupplierController extends Controller
                                                 if($supAdd)
                                                 {
                                                     $addonError = "This addon code is already assigned for this supplier";
+                                                }
+                                                else
+                                                {
+                                                    if(count($supplierTypeInput > 0))
+                                                    {
+                                                        if(in_array('accessories', $supplierTypeInput) && in_array('spare_parts', $supplierTypeInput))
+                                                        {
+                                                            $typeAddonData = AddonDetails::whereIn('addon_type_name',['P','SP','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                        }
+                                                        elseif(in_array('accessories', $supplierTypeInput))
+                                                        {
+                                                            $typeAddonData = AddonDetails::whereIn('addon_type_name',['P','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                        }
+                                                        elseif(in_array('spare_parts', $supplierTypeInput))
+                                                        {
+                                                            $typeAddonData = AddonDetails::whereIn('addon_type_name',['SP','K'])->where('addon_code',$rows[$i]['addon_code'])->select('id')->first();
+                                                        }
+                                                        if($typeAddonData == '')
+                                                        {
+                                                            $addonError = "This addon code is not match with supplier type";
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1235,6 +1278,13 @@ class SupplierController extends Controller
                 {
                     $data = $data->whereIn('addon_type_name',['SP','K']);
                 }
+            }
+        }
+        if($request->supplierAddons)
+        {
+            if(count($request->supplierAddons) > 0)
+            {
+                $data = $data->whereNotIn('id',$request->supplierAddons);
             }
         }
         if($request->filteredArray)

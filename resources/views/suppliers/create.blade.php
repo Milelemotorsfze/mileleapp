@@ -683,7 +683,6 @@ input {
         function clickAdd()
         {
             var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
-
             $('#indexValue').val(index);
             var selectedAddons = [];
             for(let i=1; i<index; i++)
@@ -1369,6 +1368,7 @@ input {
                 val =val.replace(/\.+$/,"");
             }
             input.value = val;
+            alert(val);
             if(val != '')
             {
                 dropdownDisable();
@@ -1406,14 +1406,18 @@ input {
                                 text: value.addon_code +'- ('+value.addon_name.name +')'
                             });
                         });
-                        $('#addon_1').html("");
-                        $('#addon_1').select2
-                        ({
-                            placeholder:"Choose Addons....     Or     Type Here To Search....",
-                            allowClear: true,
-                            data: addonDropdownData,
-                            minimumResultsForSearch: -1,
-                        });
+                        var countIndexRow = $(".form_field_outer").find(".form_field_outer_row").length;
+                        for (let i = 1; i <= countIndexRow; i++) 
+                        {
+                            $('#addon_'+i).html("");
+                            $('#addon_'+i).select2
+                            ({
+                                placeholder:"Choose Addons....     Or     Type Here To Search....",
+                                allowClear: true,
+                                data: addonDropdownData,
+                                minimumResultsForSearch: -1,
+                            });
+                        }
                     }
                 }
             });
