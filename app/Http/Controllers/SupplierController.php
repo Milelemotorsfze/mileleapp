@@ -16,6 +16,7 @@ use App\Models\MasterModelLines;
 use App\Models\SupplierAddonTemp;
 use App\Models\SupplierType;
 use App\Models\AddonSellingPrice;
+use App\Models\WarrantyPremiums;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
@@ -177,6 +178,8 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
+        
+        $supplierTypes = [];
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
         {
             $supplier = Supplier::findOrFail($supplier->id);
@@ -191,8 +194,60 @@ class SupplierController extends Controller
         $supplierType = SupplierType::where('supplier_id',$supplier->id)->pluck('supplier_type');
         $supplierTypes = json_decode($supplierType);
         $supplierAddons = SupplierAddons::where('supplier_id',$supplier->id)->pluck('addon_details_id');
-        $addons = AddonDetails::whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();
-        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes'));
+
+        // find using Supplier types
+        $supAddTypesName = [];
+        $supAddTypes = AddonDetails::whereNot('addon_type_name','K')->whereIn('id',$supplierAddons)->select('addon_type_name')->distinct()->get();
+        if(count($supAddTypes) > 0)
+        {
+            foreach($supAddTypes as $supAddType)
+            {
+                if($supAddType->addon_type_name == 'P')
+                {
+                    array_push($supAddTypesName, 'accessories');
+                }
+                elseif($supAddType->addon_type_name == 'SP')
+                {
+                    array_push($supAddTypesName, 'spare_parts');
+                }
+            }
+        }
+        if(!in_array('accessories', $supAddTypesName) && !in_array('spare_parts', $supAddTypesName))
+        {
+            $kitAddTypes = AddonDetails::where('addon_type_name','K')->whereIn('id',$supplierAddons)->select('id')->get();
+            if(count($kitAddTypes) > 0)
+            {
+                foreach($kitAddTypes as $kitAddType)
+                {
+                    $kitSupId = [];
+                    $kitSupId = SupplierAddons::where('supplier_id',$supplier->id)->where('addon_details_id',$kitAddType->id)->pluck('id');
+                    $kitSupAddons = AddonDetails::whereNot('addon_type_name','K')->whereIn('id',$kitSupId)->select('addon_type_name')->distinct()->get();
+                    if(count($kitSupAddons) > 0)
+                    {
+                        foreach($kitSupAddons as $kitSupAddon)
+                        {
+                            if($kitSupAddon->addon_type_name == 'P' && !in_array('accessories', $supAddTypesName))
+                            {
+                                array_push($supAddTypesName, 'accessories');
+                            }
+                            elseif($kitSupAddon->addon_type_name == 'SP' && !in_array('spare_parts', $supAddTypesName))
+                            {
+                                array_push($supAddTypesName, 'spare_parts');
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $warrantySupp = WarrantyPremiums::where('supplier_id',$supplier->id)->get();
+        if(count($warrantySupp) > 0)
+        {
+            array_push($supAddTypesName, 'warranty');
+        }
+        // end find using Supplier types
+
+        $addons = AddonDetails::whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();  
+        return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes','supAddTypesName'));
     }
     public function destroy($id)
     {

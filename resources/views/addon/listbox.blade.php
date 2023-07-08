@@ -242,7 +242,7 @@
               <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                 @if($addonsdata->image)
                       <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
-                      style="width:100%;max-width:300px">
+                      style="width:100%;max-width:300px;max-height:200px;">
                 @endif
               </div> 
               @if($addonsdata->is_all_brands == 'yes')

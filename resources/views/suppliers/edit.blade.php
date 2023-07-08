@@ -320,13 +320,17 @@
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
                         <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control " onchange="validationOnKeyUp(this)">
-                        <!-- @error('supplier_types') is-invalid @enderror -->
                             <option value="">Choose Supplier Type</option>
-                            <option value="accessories" @if(in_array("accessories", $supplierTypes)) selected @endif>Accessories</option>
-                            <option value="freelancer" @if(in_array("freelancer", $supplierTypes)) selected @endif>Freelancer</option>
-                            <option value="garage" @if(in_array("garage", $supplierTypes)) selected @endif>Garage</option>
-                            <option value="spare_parts" @if(in_array("spare_parts", $supplierTypes)) selected @endif>Spare Parts</option>
-                            <option value="warranty" @if(in_array("warranty", $supplierTypes)) selected @endif>Warranty</option>
+                            <option value="accessories" data-select2-id="1" @if(in_array("accessories", $supplierTypes)) selected @endif 
+                                                                            @if(in_array("accessories", $supAddTypesName)) locked="locked" @endif>Accessories</option>
+                            <option value="freelancer" data-select2-id="2" @if(in_array("freelancer", $supplierTypes)) selected @endif
+                                                                            @if(in_array("freelancer", $supAddTypesName)) locked="locked" @endif>Freelancer</option>
+                            <option value="garage" data-select2-id="3" @if(in_array("garage", $supplierTypes)) selected @endif
+                                                                    @if(in_array("garage", $supAddTypesName)) locked="locked" @endif>Garage</option>
+                            <option value="spare_parts" data-select2-id="4" @if(in_array("spare_parts", $supplierTypes)) selected @endif
+                                                                    @if(in_array("spare_parts", $supAddTypesName)) locked="locked" @endif>Spare Parts</option>
+                            <option value="warranty" data-select2-id="5" @if(in_array("warranty", $supplierTypes)) selected @endif
+                                                                    @if(in_array("warranty", $supAddTypesName)) locked="locked" @endif>Warranty</option>
                         </select>
                         @error('supplier_types')
                                 <span class="invalid-feedback" role="alert">
@@ -1260,10 +1264,10 @@
             document.getElementById("supplierTypeError").textContent=$msg;
             document.getElementById("supplier_type").classList.add("is-invalid");
             document.getElementById("supplierTypeError").classList.add("paragraph-class");
-            $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
-            $("#supplier_type").select2({
-                containerCssClass : "form-control is-invalid"
-            });
+            // $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+            // $("#supplier_type").select2({
+            //     containerCssClass : "form-control is-invalid"
+            // });
         }
         function removeSupplierTypeError()
         {
@@ -1284,4 +1288,32 @@
             document.getElementById("emailRequired").classList.add("requiredOne");
         }
     </script>
+     <script>
+       $(function() {
+   $('#supplier_type').select2({
+   	 tags: true,
+     placeholder: 'Select an option',
+     templateSelection : function (tag, container){
+     		// here we are finding option element of tag and
+        // if it has property 'locked' we will add class 'locked-tag' 
+        // to be able to style element in select
+      	var $option = $('#supplier_type option[value="'+tag.id+'"]');
+        if ($option.attr('locked')){
+           $(container).addClass('locked-tag');
+           tag.locked = true; 
+        }
+        return tag.text;
+     },
+   })
+   .on('select2:unselecting', function(e){
+   		// before removing tag we check option element of tag and 
+      // if it has property 'locked' we will create error to prevent all select2 functionality
+       if ($(e.params.args.data.element).attr('locked')) {
+        var confirm = alertify.confirm('You are not able to remove this type',function (e) {
+                   }).set({title:"Not Able to Remove"})
+           e.preventDefault();
+        }
+     });
+});
+</script>
 @endsection
