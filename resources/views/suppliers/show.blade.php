@@ -18,8 +18,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
   padding-top: 10px; /* Location of the box */
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
+  width: 100%!important;
+  height: 100%!important;
   overflow: auto; /* Enable scroll if needed */
   background-color: black; /* Fallback color */
   background-color: rgba(128,128,128,0.5);/* Black w/ opacity */
