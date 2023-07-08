@@ -88,12 +88,12 @@
 }
 .widthClass
 {
-  width: 184px !important;
-  margin-left:2px !important;
+  width: 164px !important;
+  margin-left:3px !important;
 }
 .widthData
 {
-  width: 445px !important;
+  width: 402px !important;
 }
 </style>
 @if($addon1)
