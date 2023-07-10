@@ -47,9 +47,9 @@
                     <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
-                            @foreach($modelLines as $modelLine)
-                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                            @endforeach
+{{--                            @foreach($modelLines as $modelLine)--}}
+{{--                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                            @endforeach--}}
                         </select>
                         @error('is_primary_payment_method')
                             <span class="invalid-feedback" role="alert">
@@ -86,7 +86,7 @@
         $("#selectBrandMo1").select2({
             maximumSelectionLength: 1,
         });
-        $("#selectModelLineNum1Des1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+        $("#selectModelLineNum1Des1").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
         $("#selectModelLineNum1Des1").select2({
             maximumSelectionLength: 1,
         });
@@ -221,62 +221,62 @@
                 });
             });
         })
-        // $(document.body).on('click', ".removeButtonModelItem", function (e) {
-        //     var indexNumber = $(this).attr('data-index');
-        //     var modelIndex = $(this).attr('data-model-index');
-        //
-        //     $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
-        //         var id = (this.value);
-        //         var text = (this.text);
-        //         // addOption(id,text)
-        //     });
-        //
-        //     $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
-        //     $('.MoDes' + indexNumber).each(function(i){
-        //         var modelIndex = +i + +1;
-        //
-        //         //// should loop ////////////
-        //         $(this).attr('class','row MoDesApndHere${supplier}');
-        //         $(this).attr('id','row-spare-part-brand-'+indexNumber  +'-model-'+modelIndex);
-        //         $(this).find('.model-line-item-dropdown').attr('id', 'showDivdropDr'+indexNumber+'Des'+modelIndex);
-        //
-        //         $(this).find('.spare-parts-model-lines').attr('data-index',indexNumber);
-        //         $(this).find('.spare-parts-model-lines').attr('data-model-index',modelIndex);
-        //
-        //         $(this).find('.spare-parts-model-lines').attr('id','selectModelLineNum'+ indexNumber +'Des1'+modelIndex);
-        //
-        //         $(this).find('.spare-parts-model-lines').attr('id','selectModelLineNum'+ indexNumber +'Des1'+modelIndex);
-        //         $(this).find('.spare-parts-model-lines').attr('name','brand['+ indexNumber +'][model]['+modelIndex+'][model_id]');
-        //         $(this).find('.spare-parts-model-lines').attr('onchange','selectModelLineDescipt('+ indexNumber +','+ modelIndex +')');
-        //         $(this).find('.model-description-dropdown').attr('id', 'showModelNumberdrop'+ indexNumber +'Des'+ modelIndex);
-        //
-        //         $(this).find('.model-descriptions').attr('name', 'brand['+ indexNumber +'][model]['+ modelIndex +'][model_number][]');
-        //         $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri'+ indexNumber +'Des'+ modelIndex);
-        //         ////////////// end ////////////////
-        //
-        //         $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
-        //         $(this).find('.removeButtonModelItem').attr('data-model-index',modelIndex);
-        //
-        //
-        //         $('#selectBrandMo'+indexNumber).select2
-        //         ({
-        //             placeholder:"Choose Brands....     Or     Type Here To Search....",
-        //             allowClear: true,
-        //             minimumResultsForSearch: -1,
-        //         });
-        //         $("#selectModelLineNum"+indexNumber+"Des"+modelIndex).select2
-        //         ({
-        //             placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-        //             allowClear: true,
-        //             maximumSelectionLength: 1,
-        //         });
-        //         $("#selectModelNumberDiscri"+indexNumber+"Des"+modelIndex).select2
-        //         ({
-        //             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
-        //             allowClear: true,
-        //         });
-        //     });
-        // })
+        $(document.body).on('click', ".removeButtonModelItem", function (e) {
+            var indexNumber = $(this).attr('data-index');
+            var modelIndex = $(this).attr('data-model-index');
+
+            $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
+                var id = (this.value);
+                var text = (this.text);
+                // addOption(id,text)
+            });
+
+            $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
+            $('.MoDesApndHere'+indexNumber).each(function(i){
+                var modelIndex = +i + +1;
+
+                //// should loop ////////////
+                // $(this).attr('class','row MoDesApndHere'+indexNumber);
+                $(this).attr('id','row-spare-part-brand-'+indexNumber  +'-model-'+modelIndex);
+                $(this).find('.model-line-item-dropdown').attr('id', 'showDivdropDr'+indexNumber+'Des'+modelIndex);
+
+                $(this).find('.spare-parts-model-lines').attr('data-index',indexNumber);
+                $(this).find('.spare-parts-model-lines').attr('data-model-index',modelIndex);
+
+                $(this).find('.spare-parts-model-lines').attr('id','selectModelLineNum'+ indexNumber +'Des'+modelIndex);
+
+                $(this).find('.spare-parts-model-lines').attr('id','selectModelLineNum'+ indexNumber +'Des'+modelIndex);
+                $(this).find('.spare-parts-model-lines').attr('name','brand['+ indexNumber +'][model]['+modelIndex+'][model_id]');
+                $(this).find('.spare-parts-model-lines').attr('onchange','selectModelLineDescipt('+ indexNumber +','+ modelIndex +')');
+                $(this).find('.model-description-dropdown').attr('id', 'showModelNumberdrop'+ indexNumber +'Des'+ modelIndex);
+
+                $(this).find('.model-descriptions').attr('name', 'brand['+ indexNumber +'][model]['+ modelIndex +'][model_number][]');
+                $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri'+ indexNumber +'Des'+ modelIndex);
+                ////////////// end ////////////////
+
+                $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
+                $(this).find('.removeButtonModelItem').attr('data-model-index',modelIndex);
+
+
+                $('#selectBrandMo'+indexNumber).select2
+                ({
+                    placeholder:"Choose Brands....     Or     Type Here To Search....",
+                    allowClear: true,
+                    minimumResultsForSearch: -1,
+                });
+                $("#selectModelLineNum"+indexNumber+"Des"+modelIndex).select2
+                ({
+                    placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                    allowClear: true,
+                    maximumSelectionLength: 1,
+                });
+                $("#selectModelNumberDiscri"+indexNumber+"Des"+modelIndex).select2
+                ({
+                    placeholder: 'Choose Model Description....     Or     Type Here To Search....',
+                    allowClear: true,
+                });
+            });
+        })
 
         //////////////// end //////////////////////
 
@@ -424,13 +424,13 @@
                         </span>
                     @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" >
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">
-                        @foreach($modelLines as $modelLine)
-                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                        @endforeach
+{{--                        @foreach($modelLines as $modelLine)--}}
+{{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                        @endforeach--}}
                     </select>
                     @error('is_primary_payment_method')
                     <span class="invalid-feedback" role="alert">
@@ -439,7 +439,7 @@
                     @enderror
                 </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
-                    <button  class="btn_round removeButtonModelItem" data-index="${supplier}" disabled data-model-index="${index}">
+                    <button  class="btn_round removeButtonModelItem" data-index="${supplier}"  data-model-index="${index}">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -447,7 +447,12 @@
             </div>
          `);
         selectBrandDisp(supplier, index);
-        $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
+        $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
+        ({
+            placeholder: 'Choose Model Description....     Or     Type Here To Search....',
+            allowClear: true,
+        });
+        // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
 
     function selectModelLineDescipt(id,row)
@@ -538,12 +543,13 @@
                     data: BrandModelLine,
                     maximumSelectionLength: 1,
                 });
+
+                $('#showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
             }
         });
     }
     function showModelNumberDropdown(id,row)
     {
-
         let showPartNumber = document.getElementById('showModelNumberdrop'+id+'Des'+row);
         showPartNumber.hidden = false
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
@@ -565,6 +571,7 @@
             dataType : 'json',
             success:function(data)
             {
+                // console.log(data);
                 $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
                 let ModelLineModelDescription   = [];
                 $.each(data.model_description,function(key,value)
@@ -575,9 +582,11 @@
                         text: value.model_description
                     });
                 });
+                console.log(ModelLineModelDescription);
                 $("#selectModelNumberDiscri"+id+"Des"+row).select2
                 ({
-                    placeholder: 'Select value',
+                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+
                     allowClear: true,
                     data: ModelLineModelDescription
                 });
@@ -586,6 +595,8 @@
     }
     function hideRelatedModalDis(id,row)
     {
+        let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
+        showDivdropModelLine.hidden = true
         let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         showDivdropDr.hidden = true
         let showaddtrim = document.getElementById('showaddtrimDis');

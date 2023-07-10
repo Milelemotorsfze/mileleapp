@@ -80,14 +80,12 @@ class VariantPriceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-//        return $request->all();
         $request->validate([
             'prices' => 'required'
         ]);
 
         $prices = $request->prices;
         $vehicles = $request->vehicle_ids;
-
 
         foreach ($prices as $key => $price ) {
             $vehicle = Vehicles::find($vehicles[$key]);
@@ -97,19 +95,16 @@ class VariantPriceController extends Controller
                 ->where('varaints_id',$vehicle->varaints_id)
                 ->get();
             if($price != $vehicle->price) {
-                info("find available colr row");
                 $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id)
                     ->where('int_colour', $vehicle->int_colour)
                     ->where('ext_colour', $vehicle->ex_colour)
                     ->first();
 
                 if(empty($available_color)) {
-                    info("avail => not found create new");
                     $available_color = new AvailableColour();
                     $oldPrice = Null;
                     $status = 'New';
                 }else{
-                    info("available clr => yes");
                     $oldPrice = $available_color->price;
                     $status = 'Updated';
                 }
@@ -132,7 +127,6 @@ class VariantPriceController extends Controller
 
             foreach ($similarVehicles as $vehicle) {
                 if($price != $vehicle->price) {
-                    info("new price update" . $vehicle->id);
                     $vehicle->price = $price;
                     $vehicle->save();
                 }
