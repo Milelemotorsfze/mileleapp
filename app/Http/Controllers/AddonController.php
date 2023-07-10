@@ -289,6 +289,8 @@ class AddonController extends Controller
                             if($supPriInput['purchase_price_aed'] != '')
                             {
                                 $CreateSupAddPri = SupplierAddons::create($supPriInput);
+                                $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+                                $createHistrory = PurchasePriceHistory::create($supPriInput);
                             }
                             if(count($kitSupplierAndPriceData['item']) > 0)
                             {
@@ -332,6 +334,8 @@ class AddonController extends Controller
                                         if($supPriInput['purchase_price_aed'] != '')
                                         {
                                             $CreateSupAddPri = SupplierAddons::create($supPriInput);
+                                            $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+                                            $createHistrory = PurchasePriceHistory::create($supPriInput);
                                         }
                                     }
                                 }
@@ -378,7 +382,12 @@ class AddonController extends Controller
         $addonDetails = AddonDetails::findOrFail($id);
         DB::beginTransaction();
             AddonTypes::where('addon_details_id', $id)->delete();
-            AddonSellingPrice::where('addon_details_id', $id)->delete();
+            AddonSellingPrice::where('addon_details_id', $id)->delete(); 
+            $supplierAddons = SupplierAddons::where('addon_details_id', $id)->get();
+            // foreach($supplierAddons as $supplierAddon)
+            // {
+            //     $supplierAddon
+            // }
             SupplierAddons::where('addon_details_id', $id)->delete();
             $addonDetails->delete();
         DB::commit();
