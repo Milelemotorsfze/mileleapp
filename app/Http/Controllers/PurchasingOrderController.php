@@ -12,8 +12,14 @@ use App\Models\Movement;
 use App\Models\Vendor;
 use App\Models\PaymentLog;
 use App\Models\User;
+use App\Models\Vehicleslog;
+use Carbon\Carbon;
 use App\Models\ModelHasRoles;
 use Illuminate\Support\Facades\Validator;
+use Carbon\CarbonTimeZone;
+use App\Models\Purchasinglog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PurchasingOrderController extends Controller
 {
@@ -59,7 +65,7 @@ class PurchasingOrderController extends Controller
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->po_number = $poNumber;
         $purchasingOrder->vendors_id = $vendors_id;
-        $purchasingOrder->status = "Active";
+        $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->save();
         $purchasingOrderId = $purchasingOrder->id;
         $variantNames = $request->input('variant_id');
@@ -75,7 +81,6 @@ class PurchasingOrderController extends Controller
         $vins = $request->input('vin');
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
-        $payment_status = $request->input('payment');
         $estimated_arrival = $request->input('estimated_arrival');
         $territory = $request->input('territory');
         $count = count($variantNames);
@@ -87,7 +92,6 @@ class PurchasingOrderController extends Controller
         $vin = $vins[$key];
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
-        $payment_statu = $payment_status[$key];
         $estimation_arrival = $estimated_arrival[$key];
         $territorys = $territory[$key];
         $vehicle = new Vehicles();
@@ -97,9 +101,23 @@ class PurchasingOrderController extends Controller
         $vehicle->int_colour = $int_colour;
         $vehicle->estimation_date = $estimation_arrival;
         $vehicle->territory = $territorys;
-        $vehicle->payment_status = $payment_statu;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $purchasinglog = new Purchasinglog();
+        $purchasinglog->time = now()->toTimeString();
+        $purchasinglog->date = now()->toDateString();
+        $purchasinglog->status = 'PO Created';
+        $purchasinglog->purchasing_order_id = $purchasingOrderId;
+        $purchasinglog->variant = $variantId;
+        $purchasinglog->estimation_date = $estimation_arrival;
+        $purchasinglog->territory = $territorys;
+        $purchasinglog->ex_colour = $ex_colour;
+        $purchasinglog->int_colour = $int_colour;
+        $purchasinglog->created_by = auth()->user()->id;
+        $purchasinglog->role = Auth::user()->selectedRole;
+        $purchasinglog->save();
     }
     }
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
@@ -116,15 +134,16 @@ class PurchasingOrderController extends Controller
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+    $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
+    $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
         $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
         $nextId = PurchasingOrder::where('id', '>', $id)->min('id');
         return view('purchase.show', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname'));
+           ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog','purchasinglog'));
     }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -144,32 +163,6 @@ class PurchasingOrderController extends Controller
      */
     public function update(Request $request, $id)
 {
-    $variantIds = $request->input('id');
-    $newVins = $request->input('oldvin');
-    $oldestimated_arrival = $request->input('oldestimated_arrival');
-    $oldterritory = $request->input('oldterritory');
-    $newex_colours = $request->input('oldex_colour');
-    $newint_colours = $request->input('oldint_colour');
-    $oldpayments = $request->input('oldpayment');
-    foreach ($variantIds as $index => $variantId) {
-        $vehicle = Vehicles::find($variantId);
-        if ($vehicle) {
-            $vehicle->vin = $newVins[$index];
-            $vehicle->ex_colour = $newex_colours[$index];
-            $vehicle->int_colour = $newint_colours[$index];
-            $vehicle->payment_status = $oldpayments[$index];
-            $vehicle->estimation_date = $oldestimated_arrival[$index];
-            $vehicle->territory = $oldterritory[$index];
-            $vehicle->save();
-            if ($vehicle->payment_status === 'Paid' && !PaymentLog::where('vehicle_id', $vehicle->id)->exists()) {
-            $paymentLog = new PaymentLog();
-            $paymentLog->vehicle_id = $vehicle->id;
-            $paymentLog->created_by = auth()->user()->id;
-            $paymentLog->date = date('Y-m-d');
-            $paymentLog->save();
-        }
-        }
-    }
     $purchasingOrderId = $id;
     $variantNames = $request->input('variant_id');
     if($variantNames != null)
@@ -184,7 +177,6 @@ class PurchasingOrderController extends Controller
         $vins = $request->input('vin');
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
-        $payment_status = $request->input('payment');
         $estimated_arrival = $request->input('estimated_arrival');
         $territory = $request->input('territory');
         $count = count($variantNames);
@@ -195,7 +187,6 @@ class PurchasingOrderController extends Controller
         $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
         $ex_colour = $ex_colours[$key];
         $int_colour = $int_colours[$key];
-        $payment_statu = $payment_status[$key];
         $estimated_arrivals = $estimated_arrival[$key];
         $territorys = $territory[$key];
         $vin = $vins[$key];
@@ -204,40 +195,38 @@ class PurchasingOrderController extends Controller
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
-        $vehicle->payment_status = $payment_statu;
+        $vehicle->payment_status = "Payment Initiation Requested";
         $vehicle->estimation_date = $estimated_arrivals;
         $vehicle->territory = $territorys;
         $vehicle->purchasing_order_id = $purchasingOrderId;
         $vehicle->save();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $purchasinglog = new Purchasinglog();
+        $purchasinglog->time = now()->toTimeString();
+        $purchasinglog->date = now()->toDateString();
+        $purchasinglog->status = 'Adding New Vehicle';
+        $purchasinglog->purchasing_order_id = $purchasingOrderId;
+        $purchasinglog->variant = $variantId;
+        $purchasinglog->estimation_date = $estimated_arrivals;
+        $purchasinglog->territory = $territorys;
+        $purchasinglog->ex_colour = $ex_colour;
+        $purchasinglog->int_colour = $int_colour;
+        $purchasinglog->created_by = auth()->user()->id;
+        $purchasinglog->role = Auth::user()->selectedRole;
+        $purchasinglog->save();
     }
     }
-    return redirect()->route('purchasing-order.index')->with('success', 'PO Update successfully!');
+    return back()->with('success', 'Add More Vehicles In PO successful!');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function deletes($id)
 {
-    $notPaidCount = Vehicles::where('purchasing_order_id', $id)
-        ->where('payment_status', 'Paid')
-        ->count();
-    
-    if ($notPaidCount > 0) {
-        return back()->with('error', 'Cannot delete. Some vehicles have payment status is "Paid"');
-    } else {
-        // Delete purchasing order items
-        PurchasingOrderItems::where('purchasing_order_id', $id)->delete();
-        
-        // Delete vehicles
-        Vehicles::where('purchasing_order_id', $id)->delete();
-        
-        // Delete purchasing order
-        $purchasingOrder = PurchasingOrder::find($id);
-        $purchasingOrder->delete();
-        
-        return back()->with('success', 'Deletion successful');
-    }
+    PurchasingOrderItems::where('purchasing_order_id', $id)->delete();
+    Vehicles::where('purchasing_order_id', $id)->delete();
+    Purchasinglog::where('purchasing_order_id', $id)->delete(); // Delete related records
+    $purchasingOrder = PurchasingOrder::find($id);
+    $purchasingOrder->delete();
+    return back()->with('success', 'Deletion successful');
 }
     public function checkPONumber(Request $request)
     {
@@ -248,7 +237,6 @@ class PurchasingOrderController extends Controller
         }
         return response()->json(['success' => 'PO number is valid'], 200);
     }
-
     public function viewdetails($id)
 {
     $varaint = Varaint::get();
@@ -308,5 +296,64 @@ public function checkcreatevins(Request $request)
             return response()->json('duplicate');
         }
         return response()->json('unique');
+    }
+    public function updatepurchasingData(Request $request)
+{
+    $updatedData = $request->json()->all();
+
+    foreach ($updatedData as $data) {
+        $vehicleId = $data['id'];
+        $fieldName = $data['name'];
+        $fieldValue = $data['value'];
+        $vehicle = Vehicles::find($vehicleId);
+        if ($vehicle) {
+            $oldValues = $vehicle->getAttributes();
+            $vehicle->setAttribute($fieldName, $fieldValue);
+            $vehicle->save();
+            $changes = [];
+            foreach ($oldValues as $field => $oldValue) {
+                if ($field !== 'created_at' && $field !== 'updated_at') {
+                    $newValue = $vehicle->$field;
+                    if ($oldValue != $newValue) {
+                        $changes[$field] = [
+                            'old_value' => $oldValue,
+                            'new_value' => $newValue,
+                        ];
+                    }
+                }
+            }
+            info($changes);
+            if (!empty($changes)) {
+                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                $currentDateTime = Carbon::now($dubaiTimeZone);
+                foreach ($changes as $field => $change) {
+                    $vehicleslog = new Vehicleslog();
+                    $vehicleslog->time = $currentDateTime->toTimeString();
+                    $vehicleslog->date = $currentDateTime->toDateString();
+                    $vehicleslog->status = 'Update Vehicles On Purchased Order';
+                    $vehicleslog->vehicles_id = $vehicleId;
+                    $vehicleslog->field = $field;
+                    $vehicleslog->old_value = $change['old_value'];
+                    $vehicleslog->new_value = $change['new_value'];
+                    $vehicleslog->created_by = auth()->user()->id;
+                    $vehicleslog->role = Auth::user()->selectedRole;
+                    $vehicleslog->save();
+                }
+            }
+        }
+    }
+    return response()->json(['message' => 'Data updated successfully']);
+}
+public function purchasingupdateStatus(Request $request)
+    {
+        $id = $request->input('orderId');
+        $status = $request->input('status');
+        $purchasingOrder = PurchasingOrder::find($id);
+        if (!$purchasingOrder) {
+            return response()->json(['message' => 'Purchasing order not found'], 404);
+        }
+        $purchasingOrder->status = $status;
+        $purchasingOrder->save();
+        return response()->json(['message' => 'Status updated successfully'], 200);
     }
 }

@@ -115,7 +115,7 @@ th.nowrap-td {
                     <th style="vertical-align: middle; text-align: center;">PO Date</th>
                     <th style="vertical-align: middle; text-align: center;">Vendor Name</th>
                     <th style="vertical-align: middle; text-align: center;">Total Vehicles</th>
-                    <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Vehicles Status</th>
+                    <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -137,26 +137,20 @@ th.nowrap-td {
                         @endphp
                         {{ $vehicleCount }}
                     </td>
-                    <td style="text-align: center;">
-                        <div style="margin-bottom: 5px;">
-  <span class="badge bg-primary">Pending Approval : 10</span>
-</div>
-<div style="margin-bottom: 5px;">
-  <span class="badge bg-secondary">Pending Initiation : 10</span>
-</div>
-<div style="margin-bottom: 5px;">
-  <span class="badge bg-warning text-dark">Payment Initiation : 10</span>
-</div>
-<div style="margin-bottom: 5px;">
-  <span class="badge bg-info text-dark">Payment Released : 05</span>
-</div>
-<div style="margin-bottom: 5px;">
-  <span class="badge bg-success">Payment Debited : 01</span>
-</div>
-<div style="margin-bottom: 5px;">
-  <span class="badge bg-danger">Rejected : 04</span>
-</div>
-                        </td>
+                    <td>
+                    <table id="dtBasicExample20" class="table table-striped table-editable table-edits table table-bordered">
+                    <thead>
+      <th style="width:5px">Status</th>
+      <th style="width:5px">Vehicles Qty</th>
+    </thead>
+    <tbody>
+        <tr>
+        <td>Pending Approval</td>
+        <td>20</td>
+        </tr>
+        </tbody>
+  </table>
+    </td>
                         </tr>
                 @endforeach
                 </tbody>

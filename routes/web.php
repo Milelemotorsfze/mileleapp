@@ -260,7 +260,7 @@ Route::get('/d', function () {
     Route::resource('movement', MovementController::class);
     Route::get('/last-reference/{currentId}', [MovementController::class, 'lastReference'])->name('movement.lastReference');
     Route::post('movemnet/get-vehicles-details', [MovementController::class, 'vehiclesdetails'])->name('vehicles.vehiclesdetails');
-    Route::get('podelete/{id}', [PurchasingOrderController::class, 'deletes'])->name('podelete.deletes');
+    Route::get('purchasing-order/{id}/delete', [PurchasingOrderController::class, 'deletes'])->name('purchasing-order.deletes');
     Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
@@ -272,7 +272,8 @@ Route::get('/d', function () {
     Route::get('users/update-role/{roleId}', [UserController::class, 'updateRole'])->name('users.updateRole');
     Route::get('/view-log-details/{id}', [VehiclesController::class, 'viewLogDetails'])->name('vehicleslog.viewdetails');
     Route::resource('colourcode', ColorCodesController::class);
-
+    Route::post('/update-purchasing-data', [PurchasingOrderController::class, 'updatepurchasingData'])->name('purchasing.updateData');
+    Route::post('/update-purchasing-status', [PurchasingOrderController::class, 'purchasingupdateStatus'])->name('purchasing.updateStatus');
     Route::resource('warehouse', WarehouseController::class);
 
     // Vendors
