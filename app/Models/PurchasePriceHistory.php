@@ -18,4 +18,12 @@ class PurchasePriceHistory extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function SupplierAddon()
+    {
+        return $this->hasOne(SupplierAddons::class,'id','supplier_addon_id');
+    }
+    public function CreatedBy()
+    {
+        return $this->hasOne(User::class,'id','created_by');
+    }
 }

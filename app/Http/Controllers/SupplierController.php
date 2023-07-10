@@ -17,6 +17,7 @@ use App\Models\SupplierAddonTemp;
 use App\Models\SupplierType;
 use App\Models\AddonSellingPrice;
 use App\Models\WarrantyPremiums;
+use App\Models\PurchasePriceHistory;
 use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
@@ -80,8 +81,8 @@ class SupplierController extends Controller
     public function purchasepricehistory($id)
     {
         $currentPrice = SupplierAddons::where('id',$id)->first();
-        $history = SupplierAddons::where('supplier_id',$currentPrice->supplier_id)->where('addon_details_id',$currentPrice->addon_details_id)
-        ->with('supplierAddonDetails.AddonName','CreatedBy')->latest()->get();
+        $history = PurchasePriceHistory::where('supplier_addon_id',$currentPrice->id)
+        ->with('SupplierAddon.supplierAddonDetails.AddonName','CreatedBy')->latest()->get();
         // $supplierAddons = SupplierAddons::where('supplier_id',$id)->where('status','active')->with('supplierAddonDetails.AddonName')->get();
         $supplierId = $currentPrice->supplier_id;
         return view('suppliers.pricehistory',compact('history','supplierId'));
@@ -124,14 +125,19 @@ class SupplierController extends Controller
             if($existibgData)
             {
                 $existibgData->updated_by = $authId;
-                $existibgData->status = 'inactive';
+                $existibgData->purchase_price_aed = $request->name;
                 $existibgData->update();
-                $input['supplier_id'] = $existibgData->supplier_id;
-                $input['addon_details_id'] = $existibgData->addon_details_id;
+                $existingHistory = PurchasePriceHistory::where('supplier_addon_id',$existibgData->id)->where('status','active')->first();
+                if($existingHistory)
+                {
+                    $existingHistory->status = 'inactive';
+                    $existingHistory->update();
+                }
+                $input['supplier_addon_id'] = $existibgData->id;
                 $input['purchase_price_aed'] = $request->name;
                 $input['created_by'] = $authId;
-                $addons = SupplierAddons::create($input);
-                $addons = SupplierAddons::where('id',$addons->id)->first();
+                $addons = PurchasePriceHistory::create($input);
+                // $addons = SupplierAddons::where('id',$addons->id)->first();
             }
             return redirect()->route('suppliers.addonprice', $request->supplier_id)->with('success','Supplier Addon Price Updated Successfully.');
             // return response()->json($addons);
@@ -499,6 +505,8 @@ class SupplierController extends Controller
                                             {
                                                 $supplier_addon['addon_details_id'] = $addon_id;
                                                 $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                                                $supplier_addon['supplier_addon_id'] = $supplierAddon1->id;
+                                                $createHistory = PurchasePriceHistory::create($supplier_addon);
                                             }
                                         }
                                     }
@@ -531,6 +539,8 @@ class SupplierController extends Controller
                                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
                                                             }
                                                             $suppliers = SupplierAddons::create($supAdd);
+                                                            $supAdd['supplier_addon_id'] = $suppliers->id;
+                                                            $createHistory = PurchasePriceHistory::create($supAdd);
                                                         }
                                                     }
                                                     else
@@ -603,6 +613,8 @@ class SupplierController extends Controller
                             {
                                 $supplier_addon['addon_details_id'] = $addon_id;
                                 $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                                $supplier_addon['supplier_addon_id'] = $supplierAddon1->id;
+                                $createHistory = PurchasePriceHistory::create($supplier_addon);
                             }
                         }
                     }
@@ -635,6 +647,8 @@ class SupplierController extends Controller
                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
                                             }
                                             $suppliers = SupplierAddons::create($supAdd);
+                                            $supAdd['supplier_addon_id'] = $suppliers->id;
+                                            $createHistory = PurchasePriceHistory::create($supAdd);
                                         }
                                     }
                                     else
@@ -721,6 +735,8 @@ class SupplierController extends Controller
                                             {
                                                 $supAdd['addon_details_id'] = $addon_code;
                                                 $suppliers = SupplierAddons::create($supAdd);
+                                                $supAdd['supplier_addon_id'] = $suppliers->id;
+                                                $createHistory = PurchasePriceHistory::create($supAdd);
                                                 array_push($addonAlredyExist, $addon_code);
                                             }
                                         }
@@ -938,6 +954,8 @@ class SupplierController extends Controller
                                             {
                                                 $supplier_addon['addon_details_id'] = $addon_id;
                                                 $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                                                $supplier_addon['supplier_addon_id'] = $supplierAddon1->id;
+                                                $createHistory = PurchasePriceHistory::create($supplier_addon);
                                             }
                                         }
                                     }
@@ -970,6 +988,8 @@ class SupplierController extends Controller
                                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
                                                             }
                                                             $suppliers = SupplierAddons::create($supAdd);
+                                                            $supAdd['supplier_addon_id'] = $suppliers->id;
+                                                            $createHistory = PurchasePriceHistory::create($supAdd);
                                                         }
                                                     }
                                                     else
@@ -1078,6 +1098,8 @@ class SupplierController extends Controller
                             {
                                 $supplier_addon['addon_details_id'] = $addon_id;
                                 $supplierAddon1 = SupplierAddons::create($supplier_addon);
+                                $supplier_addon['supplier_addon_id'] = $supplierAddon1->id;
+                                $createHistory = PurchasePriceHistory::create($supplier_addon);
                             }
                         }
                     }
@@ -1110,6 +1132,8 @@ class SupplierController extends Controller
                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
                                             }
                                             $suppliers = SupplierAddons::create($supAdd);
+                                            $supAdd['supplier_addon_id'] = $suppliers->id;
+                                            $createHistory = PurchasePriceHistory::create($supAdd);
                                         }
                                     }
                                     else
@@ -1244,6 +1268,8 @@ class SupplierController extends Controller
                                             {
                                                 $supAdd['addon_details_id'] = $addon_code;
                                                 $suppliers = SupplierAddons::create($supAdd);
+                                                $supAdd['supplier_addon_id'] = $suppliers->id;
+                                                $createHistory = PurchasePriceHistory::create($supAdd);
                                                 array_push($addonAlredyExist, $addon_code);
                                             }
                                         }

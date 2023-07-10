@@ -13,6 +13,7 @@ use App\Models\SupplierAddons;
 use App\Models\MasterModelDescription;
 use App\Models\KitItems;
 use App\Models\AddonSellingPrice;
+use App\Models\PurchasePriceHistory;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -66,6 +67,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
+        
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -384,10 +386,10 @@ class AddonController extends Controller
             AddonTypes::where('addon_details_id', $id)->delete();
             AddonSellingPrice::where('addon_details_id', $id)->delete(); 
             $supplierAddons = SupplierAddons::where('addon_details_id', $id)->get();
-            // foreach($supplierAddons as $supplierAddon)
-            // {
-            //     $supplierAddon
-            // }
+            foreach($supplierAddons as $supplierAddon)
+            {
+                PurchasePriceHistory::where('supplier_addon_id', $supplierAddon->id)->delete(); 
+            }
             SupplierAddons::where('addon_details_id', $id)->delete();
             $addonDetails->delete();
         DB::commit();
@@ -544,6 +546,8 @@ class AddonController extends Controller
                             $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
                             $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
                             $CreateSupAddPri = SupplierAddons::create($supPriInput);
+                            $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+                            $createHistrory = PurchasePriceHistory::create($supPriInput);
                             if(count($kitSupplierAndPriceData['item']) > 0)
                             {
                                 $createkit['created_by'] = $authId;
@@ -584,6 +588,8 @@ class AddonController extends Controller
                                     {
                                         $supPriInput['supplier_id'] = $suppl1;
                                         $CreateSupAddPri = SupplierAddons::create($supPriInput);
+                                        $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+                                        $createHistrory = PurchasePriceHistory::create($supPriInput);
                                     }
                                 }
                             }

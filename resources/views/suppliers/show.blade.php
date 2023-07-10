@@ -1,5 +1,16 @@
 @extends('layouts.main')
 <style>
+    .widthClass
+    {
+        width: 140px !important;
+    }
+      .modal 
+    {
+        width: 100% !important;
+        height: 100% !important;
+        top: 0%!important;
+        left: 0%!important;
+    }
 body {font-family: Arial, Helvetica, sans-serif;}
 
 #myImg {
@@ -256,7 +267,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     </a> 
                 </div>
-                @include('addon.listbox')
+                @include('suppliers.listbox')
                 @include('addon.table')
                 @endif
             </div>

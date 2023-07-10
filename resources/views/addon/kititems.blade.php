@@ -1,5 +1,12 @@
 @extends('layouts.main')
 <style>
+    .modal 
+    {
+        width: 100% !important;
+        height: 100% !important;
+        top: 0%!important;
+        left: 0%!important;
+    }
             /* .related-addon-header
             {
                 background-color:#5156be;

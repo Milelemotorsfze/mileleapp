@@ -279,13 +279,14 @@
                 $(this).find('.purchase-price-USD').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_usd]');
                 $(this).find('.purchase-price-USD').attr('id','Supplier'+ index +'TotalPriceUSD');
                 $(this).find('.removeKitSupplier').attr('data-index', index);
-                $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');
-                $(this).find('.kititemdelete').attr('id','row-supplier-'+ index +'-item-1');
+                $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');       
                 $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
                 $(this).find('#kitItemSubRow').attr('class','row kititemdelete kitItemRowForSupplier'+index);
 
                 $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][kit_item_id]');
                 $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ index +'Item1');
+
+                $(this).find('.kititemdelete').attr('id','row-supplier-'+ index +'-item-1');
 
                 $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][quantity]');
                 $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit1Quantity');
