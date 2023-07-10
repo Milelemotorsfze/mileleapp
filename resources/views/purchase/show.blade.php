@@ -99,7 +99,7 @@
   @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-po-details');
   @endphp
-                            @if ($hasPermission)
+  @if ($hasPermission)
   <button id="rejection-btn" class="btn btn-danger" onclick="deletepo({{ $purchasingOrder->id }})">Delete</button>
   @endif
   @endif
@@ -164,11 +164,20 @@
                     <h4 class="card-title">Vehicle's Details</h4>
                     <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                     @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
                             @if ($hasPermission)
                     <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
                     <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Updated</a>
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                    @endphp
+                    @if ($hasPermission)
+                    @if ($purchasingOrder->status === 'Approved')
+                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
+                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Updated</a>
+                    @endif
                     @endif
                 </div>
                 <div class="card-body">
@@ -185,7 +194,7 @@
                                 <th>Territory</th>
                                 <th>Exterior Color</th>
                                 <th>Interior Color</th>
-                                @php
+                            @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
                             @endphp
                             @if ($hasPermission)
@@ -194,6 +203,7 @@
                                 @endif
                                 @endif
                                 <th>VIN</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -214,7 +224,18 @@
                             $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();
                             $model_line = $master_model_lines_ids->model_line;
                             @endphp 
-                            <td>{{ $vehicles->id }}</td>
+                            <td>{{ $vehicles->id }}
+                            @if($vehicles->status ==="Approved")
+                            <span id="status-badge" class="badge badge-soft-success">{{ $vehicles->status }}</span>
+                            @elseif($vehicles->status ==="New Changes")
+                            <span id="status-badge" class="badge badge-soft-primary">{{ $vehicles->status }}</span>
+                            @elseif($vehicles->status ==="New Vehicles")
+                            <span id="status-badge" class="badge badge-soft-secondary">{{ $vehicles->status }}</span>
+                            @else
+                            <span id="status-badge" class="badge badge-soft-info">{{ $vehicles->status }}</span>
+                            @endif
+                            
+                            </td>
                             <td>{{ ucfirst($name) }}</td>
                             <td>{{ ucfirst(strtolower($brand_names)) }}</td>
                             <td>{{ ucfirst(strtolower($model_line)) }}</td>
@@ -281,6 +302,7 @@
                                 </select>
                             </td>
                             @if ($purchasingOrder->status === 'Approved')
+                            @if ($vehicles->status === 'Request for Payment')
                             <td class="editable-field payment_status" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                     <select name="payment_status[]" class="form-control" disabled>
                                     <option value="" {{ $vehicles->payment_status == '' ? 'selected' : '' }}>Select Payment Status</option>
@@ -292,6 +314,19 @@
                                         <option value="Vendor Confirmed" {{ $vehicles->payment_status == 'Vendor Confirmed' ? 'selected' : '' }}>Vendor Confirmed</option>
                                     </select>
                                 </td>
+                                @else
+                                <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                    <select name="payment_status[]" class="form-control" disabled>
+                                    <option value="" {{ $vehicles->payment_status == '' ? 'selected' : '' }}>Select Payment Status</option>
+                                        <option value="Payment Initiated" {{ $vehicles->payment_status == 'Payment Initiated' ? 'selected' : '' }}>Payment Initiated</option>
+                                        <option value="Payment Release Pending" {{ $vehicles->payment_status == 'Payment Release Pending' ? 'selected' : '' }}>Payment Release Pending</option>
+                                        <option value="Payment Release Rejected" {{ $vehicles->payment_status == 'Payment Release Rejected' ? 'selected' : '' }}>Payment Release Rejected</option>
+                                        <option value="Payment Release Approved" {{ $vehicles->payment_status == 'Payment Release Approved' ? 'selected' : '' }}>Payment Release Approved</option>
+                                        <option value="Amount Debited" {{ $vehicles->payment_status == 'Amount Debited' ? 'selected' : '' }}>Amount Debited</option>
+                                        <option value="Vendor Confirmed" {{ $vehicles->payment_status == 'Vendor Confirmed' ? 'selected' : '' }}>Vendor Confirmed</option>
+                                    </select>
+                                </td>
+                                @endif
                                 @endif
                                 <td>{{ $vehicles->vin }}</td>
                             @endif
@@ -301,6 +336,45 @@
                             @if ($hasPermission)
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             @endif
+                        <td>
+                        @if ($vehicles->status == 'cancel')
+                        <button class="btn btn-sm btn-danger" disabled>
+                        Cancelled
+                        </button>
+                        @else
+                        <div style="display: inline-block;">
+                        {{-- For Management  --}}
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                        @endphp
+                        @if ($hasPermission) 
+
+
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                        @endphp
+                        @if ($hasPermission) 
+                        @if ($purchasingOrder->status === 'Approved')
+                        @if ($vehicles->status === 'Approved')
+                        
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                            Initiate Payment
+                        </a>
+                        @endif
+                        @endif
+                        @endif
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                        @endphp
+                        @if ($hasPermission) 
+                        <a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();">
+                            Cancel
+                        </a>
+                        @endif
+                    </div>
+                        @endif
+                        </td>
                         </tr>
                             @endforeach
                             </tbody>
@@ -340,7 +414,7 @@
                         </table>
                     </div>
                     </div>
-<div class="row">
+            <div class="row">
             <div class="col-lg-2 col-md-6">
                 <label for="brandInput" class="form-label">Variants:</label>
                 <input type="text" placeholder="Select Variants" name="variant_ider[]" list="variantslist" class="form-control mb-1" id="variants_id" autocomplete="off">
@@ -416,6 +490,8 @@
         Territory
     @elseif($vehicleslog->field === "vin")
         VIN
+    @else
+    {{$vehicleslog->field}}
     @endif
 </td>
 @if($vehicleslog->field === "int_colour" || $vehicleslog->field === "ex_colour")
@@ -570,6 +646,7 @@ $colournew = $new_value ? $new_value->name : null;
 
     // Table #dtBasicExample2
     var dataTable2 = $('#dtBasicExample2').DataTable({
+        "order": [[4, "desc"]],
       pageLength: 10,
       initComplete: function() {
         this.api().columns().every(function(d) {
@@ -615,6 +692,7 @@ $colournew = $new_value ? $new_value->name : null;
 
     // Table #dtBasicExample3
     var dataTable3 = $('#dtBasicExample3').DataTable({
+        "order": [[7, "desc"]],
       pageLength: 10,
       initComplete: function() {
         this.api().columns().every(function(d) {
@@ -886,7 +964,7 @@ var exColourDropdown = exColourCol.find('select');
   });
 </script>
 <script>
-    function updateStatus(status, orderId) {
+  function updateStatus(status, orderId) {
   let url = '{{ route('purchasing.updateStatus') }}';
   let data = { status: status, orderId: orderId };
 
@@ -930,4 +1008,24 @@ function deletepo(id) {
     });
 }
     </script>
+    <script>
+  function confirmCancel() {
+    var confirmDialog = confirm("Are you sure you want to cancel this Vehicles?");
+    if (confirmDialog) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
+<script>
+  function confirmPayment() {
+    var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
+    if (confirmDialog) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
 @endsection

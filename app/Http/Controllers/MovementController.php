@@ -38,6 +38,7 @@ class MovementController extends Controller
     {
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
+        ->where('payment_status', '==', 'Payment Completed')
         ->pluck('vin', 'varaints_id');    
     $warehouses = Warehouse::select('id', 'name')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
