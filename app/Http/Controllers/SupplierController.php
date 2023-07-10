@@ -1296,6 +1296,8 @@ class SupplierController extends Controller
         }
         if($request->id) {
             $id = $request->id;
+            // AddonSuppliersUsed
+            // need to check active or not
             $alreadyAddedAddonIds = AddonDetails::whereHas('AddonSuppliers', function ($query) use($id) {
                 $query->where('supplier_id', $id);
             })->pluck('addon_id');

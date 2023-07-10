@@ -386,6 +386,8 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
+        // AddonSuppliersUsed
+        // one addon - multiple suppliers - suppliers cannot repeat
         $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
         $price = '';
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
@@ -747,14 +749,6 @@ class AddonController extends Controller
                 ->get();
         return view('quotation.addone',compact('result', 'quotationId', 'VehiclesId'));
     }
-    public function addonView($id)
-    {
-        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers.Suppliers')->first();
-        $addons = Addon::select('id','name')->get();
-        $brands = Brand::select('id','brand_name')->get();
-        $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
-        return view('addon.show',compact('addonDetails','addons','brands','modelLines'));
-    }
     public function brandModels(Request $request, $id)
     {
         $data = MasterModelLines::where('brand_id',$id)->select('id','model_line');
@@ -836,6 +830,8 @@ class AddonController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
+        // AddonSuppliersUsed
+        // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
 
