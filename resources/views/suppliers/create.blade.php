@@ -879,10 +879,7 @@ input {
                 $.ajax({
                 type:'POST',
                 url: "{{ route('suppliers.store') }}",
-                data: {
-                    formData: formData,
-                    _token: '{{csrf_token()}}'
-                }
+                data: formData,
                 cache:false,
                 contentType: false,
                 processData: false,
