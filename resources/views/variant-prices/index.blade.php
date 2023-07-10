@@ -32,10 +32,10 @@
                                     <th>Brand</th>
                                     <th>Model</th>
                                     <th>Model Description</th>
-                                    <th>Detail</th>
                                     <th>Variant</th>
+                                    <th>Variant Detail</th>
                                     <th>Variant Quantity</th>
-                                    <th>Vehicle Quantity</th>
+                                    <th>Total Vehicle Quantity</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -47,8 +47,8 @@
                                     <td>{{ $vehicleWithPrice->variant->brand->brand_name ?? '' }}</td>
                                     <td>{{ $vehicleWithPrice->variant->master_model_lines->model_line ?? '' }}</td>
                                     <td>{{ $vehicleWithPrice->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithPrice->variant->detail ?? '' }}</td>
                                     <td>{{ $vehicleWithPrice->variant->name }}</td>
+                                   <td>{{ $vehicleWithPrice->variant->detail ?? '' }}</td>
                                     <td>{{ $vehicleWithPrice->similar_vehicles_with_price->count() ?? '' }} </td>
                                     <td>{{ $vehicleWithPrice->total }}</td>
 
@@ -71,10 +71,10 @@
                                 <th>Brand</th>
                                 <th>Model</th>
                                 <th>Model Description</th>
-                                <th>Detail</th>
                                 <th>Variant</th>
+                                <th>Variant Detail</th>
                                 <th>Variant Quantity</th>
-                                <th>Vehicle Quantity</th>
+                                <th>Total Vehicle Quantity</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -86,8 +86,8 @@
                                     <td>{{ $vehicleWithoutPrice->variant->brand->brand_name ?? '' }}</td>
                                     <td>{{ $vehicleWithoutPrice->variant->master_model_lines->model_line ?? '' }}</td>
                                     <td>{{ $vehicleWithoutPrice->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->detail ?? '' }}</td>
                                     <td>{{ $vehicleWithoutPrice->variant->name }}</td>
+                                    <td>{{ $vehicleWithoutPrice->variant->detail ?? '' }}</td>
                                     <td>{{ $vehicleWithoutPrice->similar_vehicles_without_price->count() ?? '' }} </td>
                                     <td>{{ $vehicleWithoutPrice->total }}</td>
 

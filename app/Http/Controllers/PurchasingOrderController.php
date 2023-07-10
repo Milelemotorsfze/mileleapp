@@ -95,7 +95,7 @@ class PurchasingOrderController extends Controller
         $estimation_arrival = $estimated_arrival[$key];
         $territorys = $territory[$key];
         $vehicle = new Vehicles();
-        $vehicle->varaints_id = $variantId;       
+        $vehicle->varaints_id = $variantId;
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
@@ -144,9 +144,7 @@ class PurchasingOrderController extends Controller
                'nextId' => $nextId
            ], compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname', 'vehicleslog','purchasinglog'));
     }
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit($id)
 {
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -227,6 +225,25 @@ class PurchasingOrderController extends Controller
     $purchasingOrder = PurchasingOrder::find($id);
     $purchasingOrder->delete();
     return back()->with('success', 'Deletion successful');
+    $notPaidCount = Vehicles::where('purchasing_order_id', $id)
+        ->where('payment_status', 'Paid')
+        ->count();
+
+    if ($notPaidCount > 0) {
+        return back()->with('error', 'Cannot delete. Some vehicles have payment status is "Paid"');
+    } else {
+        // Delete purchasing order items
+        PurchasingOrderItems::where('purchasing_order_id', $id)->delete();
+
+        // Delete vehicles
+        Vehicles::where('purchasing_order_id', $id)->delete();
+
+        // Delete purchasing order
+        $purchasingOrder = PurchasingOrder::find($id);
+        $purchasingOrder->delete();
+
+        return back()->with('success', 'Deletion successful');
+    }
 }
     public function checkPONumber(Request $request)
     {
@@ -237,6 +254,7 @@ class PurchasingOrderController extends Controller
         }
         return response()->json(['success' => 'PO number is valid'], 200);
     }
+
     public function viewdetails($id)
 {
     $varaint = Varaint::get();
@@ -263,7 +281,7 @@ public function checkcreatevins(Request $request)
             return response()->json('duplicate');
         }
         return response()->json('unique');
-    } 
+    }
     public function checkeditcreate(Request $request)
     {
         $vinValues = $request->input('vin');
@@ -279,7 +297,7 @@ public function checkcreatevins(Request $request)
             return response()->json('duplicate');
         }
         return response()->json('unique');
-    } 
+    }
 
     public function checkeditvins(Request $request)
     {

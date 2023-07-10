@@ -88,7 +88,7 @@ th.nowrap-td {
                     @endphp
                     @if ($hasPermission)
                 <th class="nowrap-td">PO Number</th>
-                <th class="nowrap-td">PO Date</th> 
+                <th class="nowrap-td">PO Date</th>
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
@@ -268,14 +268,20 @@ th.nowrap-td {
                      $varaints_gearbox = "";
                      $varaints_upholestry = "";
                      $po = DB::table('purchasing_order')->where('id', $vehicles->purchasing_order_id)->first();
-                     $po_date = $po->po_date;
+                     if($po) {
+                          $po_date = $po->po_date;
                      $po_number = $po->po_number;
+                     }
+
                      $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $vehicles->ex_colour)->first() : null;
                      $ex_colours = $exColour ? $exColour->name : null;
                      $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $vehicles->int_colour)->first() : null;
                      $int_colours = $intColour ? $intColour->name : null;
                      $variants = DB::table('varaints')->where('id', $vehicles->varaints_id)->first();
+                     if($variants) {
                      $name = $variants->name;
+
+                     }
                      $grn = $vehicles->grn_id ? DB::table('grn')->where('id', $vehicles->grn_id)->first() : null;
                      $grn_date = $grn ? $grn->date : null;
                      $grn_number = $grn ? $grn->grn_number : null;
@@ -298,16 +304,19 @@ th.nowrap-td {
                                 ->where('varaints.id', $vehicles->varaints_id)
                                 ->select('varaints.name', 'varaints.my', 'varaints.detail', 'varaints.upholestry', 'varaints.steering', 'varaints.fuel_type', 'varaints.seat','varaints.gearbox', 'brands.brand_name AS brand_name', 'master_model_lines.model_line')
                                 ->first();
-                                $varaints_name = $result->name;
-                                $varaints_my = $result->my;
-                                $varaints_steering = $result->steering;
-                                $varaints_fuel_type = $result->fuel_type;
-                                $varaints_seat = $result->seat;
-                                $varaints_detail = $result->detail;
-                                $varaints_gearbox = $result->gearbox;
-                                $varaints_upholestry = $result->upholestry;
-                                $brand_name = $result->brand_name;
-                                $model_line = $result->model_line;
+                                 if($result) {
+                                     $varaints_name = $result->name;
+                                    $varaints_my = $result->my;
+                                    $varaints_steering = $result->steering;
+                                    $varaints_fuel_type = $result->fuel_type;
+                                    $varaints_seat = $result->seat;
+                                    $varaints_detail = $result->detail;
+                                    $varaints_gearbox = $result->gearbox;
+                                    $varaints_upholestry = $result->upholestry;
+                                    $brand_name = $result->brand_name;
+                                    $model_line = $result->model_line;
+                                 }
+
                                 $documents = $vehicles->documents_id ? DB::table('documents')->where('id', $vehicles->documents_id)->first() : null;
                                 $import_type = $documents ? $documents->import_type : null;
                                 $owership = $documents ? $documents->owership : null;
@@ -344,7 +353,7 @@ th.nowrap-td {
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate"> 
+                     <td class="nowrap-td grnDate">
                      {{ date('d-M-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
@@ -607,10 +616,10 @@ th.nowrap-td {
       </div>
       <div class="modal-body">
       <div class="row">
-    <div class="col-3" id="po">PO Number: {{ $po_number }}</div>
-    <div class="col-3" id="grn" >GRN Number: {{ $grn_number }}</div>
-    <div class="col-3"id="brand" >Brand: {{ $brand_name }}</div>
-    <div class="col-3" id="vin">VIN: {{ $vehicles->vin }}</div>
+    <div class="col-3" id="po">PO Number: {{ $po_number ?? '' }}</div>
+    <div class="col-3" id="grn" >GRN Number: {{ $grn_number ?? '' }}</div>
+    <div class="col-3"id="brand" >Brand: {{ $brand_name ?? '' }}</div>
+    <div class="col-3" id="vin">VIN: {{ $vehicles->vin  }}</div>
 </div>
 <hr>
     <form action="{{ route('vehicles.updatedata')}}" method="POST">
@@ -775,7 +784,7 @@ th.nowrap-td {
       <div class="col-md-4">
   <label for="so_number">SO Number</label>
     <input type="number" class="form-control" id="so_number" name="so_number" value="{{ $so_number }}">
-    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">    
+    <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
 </div>
 @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
@@ -783,11 +792,11 @@ th.nowrap-td {
                         @if ($hasPermission)
 <div class="col-md-4">
   <label for="so_number">Reservation Start Date</label>
-    <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">    
+    <input type="date" class="form-control" id="reservation_start_date" name="reservation_start_date" value="{{ $vehicles->reservation_start_date }}">
 </div>
 <div class="col-md-4">
   <label for="so_number">Reservation Ending Date</label>
-    <input type="date" class="form-control" id="reservation_end_date" name="reservation_end_date" value="{{ $vehicles->reservation_end_date }}">    
+    <input type="date" class="form-control" id="reservation_end_date" name="reservation_end_date" value="{{ $vehicles->reservation_end_date }}">
 </div>
 <div class="col-md-4">
   <label for="gdn_date">Sales Person</label>
@@ -821,7 +830,7 @@ th.nowrap-td {
                         @if ($hasPermission)
       <div class="col-md-12">
   <label for="sales_remarks">Sales Remarks</label>
-    <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">    
+    <input type="text" class="form-control" id="sales_remarks" name="remarks" value="">
 </div>
 @endif
 </div>
@@ -988,7 +997,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });
@@ -1015,7 +1024,7 @@ $(document).ready(function() {
     var matchFound = false;
     for (var i = 0; i < options.length; i++) {
       var option = options[i];
-      
+
       if (inputValue === option.value) {
         matchFound = true;
         break;

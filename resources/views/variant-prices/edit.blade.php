@@ -2,7 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Edit Price</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a  class="btn btn-sm btn-info float-end" href="{{ route('variant-prices.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -82,12 +82,7 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-
-
-
             </div>
             <form action="{{ route('variant-prices.update', $vehicle->id) }}" method="POST" >
                 @csrf
@@ -110,15 +105,15 @@
                                 <thead class="bg-soft-secondary">
                                 <tr >
                                     <th>S.NO</th>
-                                    <th>Updated Date</th>
                                     <th>Interior</th>
                                     <th>Exterior</th>
-                                    <th>Quantity</th>
+                                    <th>Stock Quantity</th>
+                                    <th>New Price</th>
+                                    <th>Effective Date</th>
                                     @if(request()->type == 1)
                                         <th>Previous Price Dated</th>
                                         <th>Previous Price</th>
                                     @endif
-                                    <th>New Price</th>
                                    @if(request()->type == 1)
                                      <th>Updated By</th>
                                    @endif
@@ -131,16 +126,15 @@
 
                                     <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($vehicle->updated_at)->format('d M Y') }}</td>
-
                                         <td>{{ $vehicle->interior->name ?? ''  }} </td>
                                         <td>{{ $vehicle->exterior->name ?? ''}} </td>
                                         <td>{{ $vehicle->count }}</td>
+                                        <td><input type="number" class="prices" readonly  name="prices[]" min="0" value="{{$vehicle->price}}"> </td>
+                                        <td>{{ \Carbon\Carbon::parse($vehicle->updated_at)->format('d M Y') }}</td>
                                         @if(request()->type == 1)
                                             <td>{{ $vehicle->old_price_dated }}</td>
                                             <td>{{ $vehicle->old_price }}</td>
                                         @endif
-                                        <td><input type="number" class="prices" readonly  name="prices[]" min="0" value="{{$vehicle->price}}"> </td>
                                         @if(request()->type == 1)
                                             <td>{{ $vehicle->updated_by }}</td>
                                         @endif
@@ -164,11 +158,11 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.NO</th>
-                            <th>Updated Date</th>
                             <th>Interior</th>
                             <th>Exterior</th>
-                            <th>Old Price</th>
                             <th>New Price</th>
+                            <th>Old Price</th>
+                            <th>Updated Date</th>
                             <th>Updated By</th>
                         </tr>
                         </thead>
@@ -178,11 +172,11 @@
                         @foreach($variantPriceHistories as $value => $variantPriceHistory)
                             <tr>
                                 <td>{{ ++$i  }}</td>
-                                <td>{{ \Carbon\Carbon::parse($variantPriceHistory->updated_at)->format('d M Y') }}</td>
                                 <td>{{ $variantPriceHistory->availableColour->interior->name ?? ''  }} </td>
                                 <td>{{ $variantPriceHistory->availableColour->exterior->name ?? ''}} </td>
-                                <td>{{ $variantPriceHistory->old_price }}</td>
                                 <td>{{$variantPriceHistory->new_price}} </td>
+                                <td>{{ $variantPriceHistory->old_price }}</td>
+                                <td>{{ \Carbon\Carbon::parse($variantPriceHistory->updated_at)->format('d M Y') }}</td>
                                 <td>{{ $variantPriceHistory->user->name ?? '' }}</td>
                             </tr>
 
