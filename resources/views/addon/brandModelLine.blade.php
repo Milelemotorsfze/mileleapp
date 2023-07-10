@@ -37,7 +37,24 @@
             maximumSelectionLength: 1,
         });
 
+        $(document.body).on('select2:select', "#selectBrand1", function (e) {
+            e.preventDefault();
+            var value = $(this).val();
+
+            if(value == "allbrands") {
+                var count = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                if(count > 1) {
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                        'Please remove those items to edit this field.',function (e) {
+                    }).set({title:"Remove Brands and ModelLines"})
+                    $("#selectBrand1 option:selected").prop("selected", false);
+                    $("#selectBrand1").trigger('change');
+                }
+            }
+        })
+
         var index = 1;
+
         $(document.body).on('select2:select', ".model-lines", function (e) {
             var value = $(this).val();
             var index = $(this).attr('data-index');
@@ -69,13 +86,15 @@
          }
 
         $(document.body).on('select2:select', ".brands", function (e) {
+
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
             disableDropdown();
+
         });
         function hideOption(index,value) {
-            var indexValue = $('#index').val();
+            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != index) {
                     var currentId = 'selectBrand' + i;
@@ -90,7 +109,7 @@
             enableDropdown();
         });
         function appendOption(index,data) {
-            var indexValue = $('#index').val();
+            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
                 if(i != index) {
                     $('#selectBrand'+i).append($('<option>', {value: data.id, text : data.text}))
@@ -98,7 +117,7 @@
             }
         }
         function addOption(id,text) {
-            var indexValue = $('#index').val();
+            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
                 $('#selectBrand'+i).append($('<option>', {value: id, text :text}))
             }
@@ -131,6 +150,7 @@
                 ({
                     placeholder:"Choose Brands....     Or     Type Here To Search....",
                     allowClear: true,
+                    maximumSelectionLength: 1,
                     minimumResultsForSearch: -1,
                 });
                 $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
@@ -141,7 +161,7 @@
         })
         $("#add").on("click", function ()
         {
-            $('#allbrands').prop('disabled',true);
+            // $('#allbrands').prop('disabled',true);
             var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1;
             $('#index').val(index);
             var selectedAddonBrands = [];
