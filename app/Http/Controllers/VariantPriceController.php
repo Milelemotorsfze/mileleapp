@@ -18,15 +18,15 @@ class VariantPriceController extends Controller
     public function index()
     {
 
-        $vehicleWithoutPrices = Vehicles::whereNull('price')
+        $activeStocks = Vehicles::whereNull('gdn_id')
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')->get();
-        $vehicleWithPrices =  Vehicles::whereNotNull('price')
+        $InactiveStocks =  Vehicles::whereNotNull('gdn_id')
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')
                                 ->get();
 
-        return view('variant-prices.index', compact('vehicleWithoutPrices','vehicleWithPrices'));
+        return view('variant-prices.index', compact('activeStocks','InactiveStocks'));
     }
 
     /**
@@ -60,15 +60,18 @@ class VariantPriceController extends Controller
     {
         $vehicle = Vehicles::find($id);
 
-        $variantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)->pluck('id');
-        $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $variantPrices)
-            ->orderBy('id','DESC')->get();
+        $VariantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+            ->pluck('id');
+       // alert($VariantPrices);
+//        $InactiveStockVariantPrices = $VariantPrices->
         if($type == 1) {
-            $vehicles =  $vehicle->similar_vehicles_with_price;
-
+            $vehicles =  $vehicle->similar_vehicles_with_active_stock;
+            $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $VariantPrices)
+                ->orderBy('id','DESC')->get();
         }else{
-            $vehicles =  $vehicle->similar_vehicles_without_price;
-
+            $vehicles =  $vehicle->similar_vehicles_with_inactive_stock;
+            $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $VariantPrices)
+                ->orderBy('id','DESC')->get();
        }
 
         return view('variant-prices.edit', compact('vehicle','variantPriceHistories','vehicles'));

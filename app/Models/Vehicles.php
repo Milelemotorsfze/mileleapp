@@ -11,8 +11,8 @@ class Vehicles extends Model
     use HasFactory;
     protected $table = 'vehicles';
     public  $appends = [
-        'similar_vehicles_with_price',
-        'similar_vehicles_without_price',
+        'similar_vehicles_with_active_stock',
+        'similar_vehicles_with_inactive_stock',
         'old_price',
         'old_price_dated',
         'updated_by',
@@ -31,9 +31,9 @@ class Vehicles extends Model
         return $this->belongsTo(ColorCode::class,'ex_colour','id');
     }
 
-    public function getSimilarVehiclesWithPriceAttribute()
+    public function getSimilarVehiclesWithInactiveStockAttribute()
     {
-        $vehicles = Vehicles::whereNotNull('price')
+        $vehicles = Vehicles::whereNotNull('gdn_id')
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour', 'ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -41,8 +41,8 @@ class Vehicles extends Model
 
         return $vehicles;
     }
-    public function getSimilarVehiclesWithoutPriceAttribute() {
-        $vehicles =  Vehicles::whereNull('price')
+    public function getSimilarVehiclesWithActiveStockAttribute() {
+        $vehicles =  Vehicles::whereNull('gdn_id')
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour','ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -71,22 +71,29 @@ class Vehicles extends Model
     }
     public function getPriceStatusAttribute() {
 
-        $vehicle = Vehicles::find($this->id);
-        $availableColour = AvailableColour::where('varaint_id', $vehicle->varaints_id)
-            ->where('int_colour', $vehicle->int_colour)
-            ->where('ext_colour', $vehicle->ex_colour)
-            ->first();
-        if(!empty($availableColour)) {
-            $latestPriceHistory = VehiclePriceHistory::where('available_colour_id', $availableColour->id)
-                ->orderBy('id','DESC')
-                ->first();
-            if(!empty($latestPriceHistory)) {
-                return $latestPriceHistory->status;
-            }
-            return "";
-        }
-        return "";
+        $similarVehicles = Vehicles::whereNull('gdn_id')
+            ->where('varaints_id', $this->varaints_id)
+            ->groupBy('int_colour','ex_colour')
+            ->pluck('id');
+        $priceStatus = [];
 
+        foreach ($similarVehicles as $similarVehicle) {
+            $vehicle = Vehicles::find($similarVehicle);
+            $availableColour = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+                ->where('int_colour', $vehicle->int_colour)
+                ->where('ext_colour', $vehicle->ex_colour)
+                ->first();
+            if(!empty($availableColour)) {
+                $priceStatus[] = 'true';
+            }else{
+                $priceStatus[] = 'false';
+            }
+        }
+        if (array_unique($priceStatus) === array('true')) {
+            return 'Available';
+        }else{
+            return 'Not Available';
+        }
     }
     public function getOldPriceDatedAttribute() {
 
@@ -101,7 +108,7 @@ class Vehicles extends Model
                 ->get();
             if ($latestPriceHistory->count() > 1 ) {
                 $latestPriceHistory = $latestPriceHistory->skip(1)->first();
-                return Carbon::parse($latestPriceHistory->updated_at)->format('d M Y');
+                return $latestPriceHistory->updated_at;
             }
 
         }

@@ -14,15 +14,15 @@
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#with-price">Price Added Items</a>
+                    <a class="nav-link active" data-bs-toggle="pill" href="#active-stock">Active Stock</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="pill" href="#all">Price Not Added</a>
+                    <a class="nav-link" data-bs-toggle="pill" href="#inactive-stock">Inactive Stock</a>
                 </li>
             </ul>
         </div>
         <div class="tab-content">
-            <div class="tab-pane fade show active" id="with-price">
+            <div class="tab-pane fade show active" id="active-stock">
                 <div class="card-body">
                     <div class="table-responsive" >
                         <table id="variant-with-price-table" class="table table-striped table-editable table-edits table table-condensed">
@@ -34,6 +34,7 @@
                                     <th>Model Description</th>
                                     <th>Variant</th>
                                     <th>Variant Detail</th>
+                                    <th>Price Status</th>
                                     <th>Variant Quantity</th>
                                     <th>Total Vehicle Quantity</th>
                                 </tr>
@@ -41,27 +42,26 @@
                             <tbody>
                             <div hidden>{{$i=0;}}
                             </div>
-                            @foreach ($vehicleWithPrices as $key => $vehicleWithPrice)
-                               <tr  onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $vehicleWithPrice->id, 'type' => '1']) }}'">
+                            @foreach ($activeStocks as $key => $activeStock)
+                               <tr  onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $activeStock->id, 'type' => '1']) }}'">
                                     <td>{{ ++$i }}</td>
-                                    <td>{{ $vehicleWithPrice->variant->brand->brand_name ?? '' }}</td>
-                                    <td>{{ $vehicleWithPrice->variant->master_model_lines->model_line ?? '' }}</td>
-                                    <td>{{ $vehicleWithPrice->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithPrice->variant->name }}</td>
-                                   <td>{{ $vehicleWithPrice->variant->detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithPrice->similar_vehicles_with_price->count() ?? '' }} </td>
-                                    <td>{{ $vehicleWithPrice->total }}</td>
-
+                                    <td>{{ $activeStock->variant->brand->brand_name ?? '' }}</td>
+                                    <td>{{ $activeStock->variant->master_model_lines->model_line ?? '' }}</td>
+                                    <td>{{ $activeStock->variant->model_detail ?? '' }}</td>
+                                    <td>{{ $activeStock->variant->name }}</td>
+                                    <td>{{ $activeStock->variant->detail ?? '' }}</td>
+                                    <td>{{ $activeStock->price_status }}</td>
+                                    <td>{{ $activeStock->similar_vehicles_with_active_stock->count() ?? '' }} </td>
+                                    <td>{{ $activeStock->total }}</td>
                                 </tr>
                                </a>
-
                             @endforeach
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade " id="all">
+            <div class="tab-pane fade " id="inactive-stock">
                 <div class="card-body">
                     <div class="table-responsive" >
                         <table id="variant-without-price-table" class="table table-striped table-editable table-edits table table-condensed">
@@ -70,9 +70,11 @@
                                 <th>S.NO</th>
                                 <th>Brand</th>
                                 <th>Model</th>
+                                <th>Model Year</th>
                                 <th>Model Description</th>
                                 <th>Variant</th>
-                                <th>Variant Detail</th>
+                                <th>Variant Description</th>
+                                <th>Price Status</th>
                                 <th>Variant Quantity</th>
                                 <th>Total Vehicle Quantity</th>
                             </tr>
@@ -80,17 +82,18 @@
                             <tbody>
                             <div hidden>{{$i=0;}}
                             </div>
-                            @foreach ($vehicleWithoutPrices as $key => $vehicleWithoutPrice)
-                                <tr onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $vehicleWithoutPrice->id, 'type' => '2']) }}'">
+                            @foreach ($InactiveStocks as $key => $InactiveStock)
+                                <tr onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $InactiveStock->id, 'type' => '2']) }}'">
                                     <td>{{ ++$i }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->brand->brand_name ?? '' }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->master_model_lines->model_line ?? '' }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->name }}</td>
-                                    <td>{{ $vehicleWithoutPrice->variant->detail ?? '' }}</td>
-                                    <td>{{ $vehicleWithoutPrice->similar_vehicles_without_price->count() ?? '' }} </td>
-                                    <td>{{ $vehicleWithoutPrice->total }}</td>
-
+                                    <td>{{ $InactiveStock->variant->brand->brand_name ?? '' }}</td>
+                                    <td>{{ $InactiveStock->variant->master_model_lines->model_line ?? '' }}</td>
+                                    <td>{{ $InactiveStock->variant->my ?? '' }}</td>
+                                    <td>{{ $InactiveStock->variant->model_detail ?? '' }}</td>
+                                    <td>{{ $InactiveStock->variant->name }}</td>
+                                    <td>{{ $InactiveStock->variant->detail ?? '' }}</td>
+                                    <td>{{ $activeStock->price_status }}</td>
+                                    <td>{{ $InactiveStock->similar_vehicles_with_inactive_stock->count() ?? '' }} </td>
+                                    <td>{{ $InactiveStock->total }}</td>
                                 </tr>
                             @endforeach
                             </tbody>
