@@ -1505,28 +1505,26 @@
         }
         function enableDropdown()
         {
-            var canEnableDropdown = 'no';
-            if(canEnableDropdown == 'no' && currentAddonType == 'SP' || canEnableDropdown == 'no' && currentAddonType == 'P')
+            var canEnableDropdown = 'yes';
+            if(canEnableDropdown == 'yes' && currentAddonType == 'SP' || canEnableDropdown == 'yes' && currentAddonType == 'P')
             {
                 var countNotKitSuplr = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
                 for (let i = 1; i <= countNotKitSuplr; i++)
                 {
-                    if($('#suppliers'+i).val() == '' && $('#addon_purchase_price_'+i).val() == '' && $('#addon_purchase_price_in_usd_'+i).val() == '')
+                    if($('#suppliers'+i).val() != '' || $('#addon_purchase_price_'+i).val() != '' || $('#addon_purchase_price_in_usd_'+i).val() != '')
                     {
-                        canEnableDropdown = 'yes';
-                        break;
+                        canEnableDropdown = 'no';
                     }
                 }
             }
-            else if(canEnableDropdown == 'no' && currentAddonType == 'K')
+            else if(canEnableDropdown == 'yes' && currentAddonType == 'K')
             {
                 var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
                 for (let i = 1; i <= countKitSuplr; i++)
                 {
-                    if($('#kitSupplierDropdown'+i).val() == '' && $('#Supplier'+i+'TotalPriceAED').val() == '' && $('#Supplier'+i+'TotalPriceUSD').val() == '')
+                    if($('#kitSupplierDropdown'+i).val() != '' || $('#Supplier'+i+'TotalPriceAED').val() != '' || $('#Supplier'+i+'TotalPriceUSD').val() != '')
                     {
-                        canEnableDropdown = 'yes';
-                        break;
+                        canEnableDropdown = 'no';
                     }
                     else
                     {
@@ -1534,38 +1532,35 @@
                         var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
                         for (let j = 1; j <= countKitSuplrItem; j++)
                         {
-                            if($('#kitSupplier'+i+'Item'+j).val() == '' && $('Supplier'+i+'Kit'+j+'Quantity').val() == ''
-                                && $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() == ''
-                                && $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() == '' && $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() == '' )
+                            if($('#kitSupplier'+i+'Item'+j).val() != '' || $('Supplier'+i+'Kit'+j+'Quantity').val() != ''
+                                || $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() != ''
+                                || $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() != '' )
                             {
-                                canEnableDropdown = 'yes';
-                                break;
+                                canEnableDropdown = 'no';
                             }
                         }
                     }
                 }
             }
-            if(canEnableDropdown == 'no' && currentAddonType == 'P' || canEnableDropdown == 'no' && currentAddonType == 'K')
+            if(canEnableDropdown == 'yes' && currentAddonType == 'P' || canEnableDropdown == 'yes' && currentAddonType == 'K')
             {
                 var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandModal; i++)
                 {
-                    if($('#selectBrand'+i).val() == '' && $('#selectModelLine'+i).val() == '')
+                    if($('#selectBrand'+i).val() != '' || $('#selectModelLine'+i).val() != '')
                     {
-                        canEnableDropdown = 'yes';
-                        break;
+                        canEnableDropdown = 'no';
                     }
                 }
             }
-            else if(canEnableDropdown == 'no' && currentAddonType == 'SP')
-            {
+            else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
+            { 
                 var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                 for (let i = 1; i <= countModel; i++)
                 {
-                    if($('#selectBrandMo'+i).val() == '')
+                    if($('#selectBrandMo'+i).val() != '')
                     {
-                        canEnableDropdown = 'yes';
-                        break;
+                        canEnableDropdown = 'no';
                     }
                     else
                     {
@@ -1573,10 +1568,9 @@
                         var countModelDesc = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
                         for (let j = 1; j <= countModelDesc; j++)
                         {
-                            if($('#selectModelLineNum'+i+'Des'+j).val() == '' && $('selectModelNumberDiscri'+i+'Des'+j).val() == '')
+                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('selectModelNumberDiscri'+i+'Des'+j).val() != '')
                             {
-                                canEnableDropdown = 'yes';
-                                break;
+                                canEnableDropdown = 'no';
                             }
                         }
                     }
@@ -1587,7 +1581,6 @@
                 document.getElementById("addon_type").hidden=false;
                 document.getElementById("addon_type_show").value='';
                 document.getElementById("addon_type_show").hidden=true;
-                // $("#addon_type").removeAttr("disabled");
             }
         }
         function setLeastAEDPrice()

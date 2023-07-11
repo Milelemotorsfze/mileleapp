@@ -102,6 +102,7 @@ class PurchasingOrderController extends Controller
         $vehicle->estimation_date = $estimation_arrival;
         $vehicle->territory = $territorys;
         $vehicle->purchasing_order_id = $purchasingOrderId;
+        $vehicle->status = "Not Approved";
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -193,10 +194,10 @@ class PurchasingOrderController extends Controller
         $vehicle->vin = $vin;
         $vehicle->ex_colour = $ex_colour;
         $vehicle->int_colour = $int_colour;
-        $vehicle->payment_status = "Payment Initiation Requested";
         $vehicle->estimation_date = $estimated_arrivals;
         $vehicle->territory = $territorys;
         $vehicle->purchasing_order_id = $purchasingOrderId;
+        $vehicle->status = "New Vehicles";
         $vehicle->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -214,16 +215,28 @@ class PurchasingOrderController extends Controller
         $purchasinglog->role = Auth::user()->selectedRole;
         $purchasinglog->save();
     }
+                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                if ($purchasingOrder) {
+                    $purchasingOrder->status = 'Pending Approval';
+                    $purchasingOrder->save();
+                     }
     }
     return back()->with('success', 'Add More Vehicles In PO successful!');
     }
     public function deletes($id)
 {
+    // Delete related records from vehicles_log table
+    $vehicleIds = Vehicles::where('purchasing_order_id', $id)->pluck('id');
+    Vehicleslog::whereIn('vehicles_id', $vehicleIds)->delete();
+
+    // Delete records from other related tables
     PurchasingOrderItems::where('purchasing_order_id', $id)->delete();
     Vehicles::where('purchasing_order_id', $id)->delete();
-    Purchasinglog::where('purchasing_order_id', $id)->delete(); // Delete related records
-    $purchasingOrder = PurchasingOrder::find($id);
-    $purchasingOrder->delete();
+    Purchasinglog::where('purchasing_order_id', $id)->delete();
+
+    // Delete the purchasing order itself
+    PurchasingOrder::where('id', $id)->delete();
+
     return back()->with('success', 'Deletion successful');
     $notPaidCount = Vehicles::where('purchasing_order_id', $id)
         ->where('payment_status', 'Paid')
@@ -245,6 +258,7 @@ class PurchasingOrderController extends Controller
         return back()->with('success', 'Deletion successful');
     }
 }
+
     public function checkPONumber(Request $request)
     {
         $poNumber = $request->input('poNumber');
@@ -342,6 +356,8 @@ public function checkcreatevins(Request $request)
             }
             info($changes);
             if (!empty($changes)) {
+                $vehicle->status = 'New Changes'; // Set the vehicle status
+                $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
                 foreach ($changes as $field => $change) {
@@ -357,8 +373,15 @@ public function checkcreatevins(Request $request)
                     $vehicleslog->role = Auth::user()->selectedRole;
                     $vehicleslog->save();
                 }
+                $purchasingOrderId = $vehicle->purchasing_order_id;
+                $purchasingOrder = PurchasingOrder::find($purchasingOrderId);
+                if ($purchasingOrder) {
+                    $purchasingOrder->status = 'Pending Approval';
+                    $purchasingOrder->save();
+                     }
+
             }
-        }
+        }        
     }
     return response()->json(['message' => 'Data updated successfully']);
 }
@@ -372,6 +395,61 @@ public function purchasingupdateStatus(Request $request)
         }
         $purchasingOrder->status = $status;
         $purchasingOrder->save();
+        $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
+        foreach ($vehicles as $vehicle) {
+            $vehicle->status = 'Approved';
+            $vehicle->save();
+            $ex_colour = $vehicle->ex_colour; 
+            $int_colour = $vehicle->int_colour; 
+            $variantId = $vehicle->	varaints_id;
+            $estimation_arrival = $vehicle->estimation_date;
+            $territorys = $vehicle->territory;
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Approved';
+            $purchasinglog->purchasing_order_id = $id;
+            $purchasinglog->variant = $variantId;
+            $purchasinglog->estimation_date = $estimation_arrival;
+            $purchasinglog->territory = $territorys;
+            $purchasinglog->ex_colour = $ex_colour;
+            $purchasinglog->int_colour = $int_colour;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->save();
+        }
         return response()->json(['message' => 'Status updated successfully'], 200);
+    }
+    public function confirmPayment($id)
+    {
+        $vehicle = Vehicles::find($id);
+        if ($vehicle) {
+            $vehicle->status = 'Request for Payment';
+            $vehicle->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+                $vehicleslog = new Vehicleslog();
+                $vehicleslog->time = $currentDateTime->toTimeString();
+                $vehicleslog->date = $currentDateTime->toDateString();
+                $vehicleslog->status = 'Request for Payment';
+                $vehicleslog->vehicles_id = $id;
+                $vehicleslog->field = "Payment";
+                $vehicleslog->old_value = "Not Paid";
+                $vehicleslog->new_value = "Request for Initiate Payment";
+                $vehicleslog->created_by = auth()->user()->id;
+                $vehicleslog->role = Auth::user()->selectedRole;
+                $vehicleslog->save();
+            return redirect()->back()->with('success', 'Payment confirmed. Vehicle status updated.');
+        }
+        return redirect()->back()->with('error', 'Vehicle not found.');
+    }
+    public function cancel($id)
+    {
+        $vehicle = Vehicles::findOrFail($id);
+        $vehicle->status = 'cancel';
+        $vehicle->save();
+        return redirect()->back()->with('success', 'Vehicle cancellation request submitted successfully.');
     }
 }
