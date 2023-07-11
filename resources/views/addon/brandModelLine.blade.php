@@ -40,15 +40,24 @@
         $(document.body).on('select2:select', "#selectBrand1", function (e) {
             e.preventDefault();
             var value = $(this).val();
-
             if(value == "allbrands") {
                 var count = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+
+                // check each item have data or not?
                 if(count > 1) {
-                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
-                        'Please remove those items to edit this field.',function (e) {
-                    }).set({title:"Remove Brands and ModelLines"})
-                    $("#selectBrand1 option:selected").prop("selected", false);
-                    $("#selectBrand1").trigger('change');
+                    for(let i=2; i<count; i++)
+                    {
+                        var eachBrand = $('#selectBrand'+i).val();
+                        alert(eachBrand);
+                        if(eachBrand != '') {
+                            // if any data then show alert.
+                            var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                                'Please remove those items to edit this field.',function (e) {
+                            }).set({title:"Remove Brands and ModelLines"})
+                            $("#selectBrand1 option:selected").prop("selected", false);
+                            $("#selectBrand1").trigger('change');
+                        }
+                    }
                 }
             }
         })
