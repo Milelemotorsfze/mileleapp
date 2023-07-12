@@ -262,6 +262,7 @@ Route::get('/d', function () {
     Route::post('movemnet/get-vehicles-details', [MovementController::class, 'vehiclesdetails'])->name('vehicles.vehiclesdetails');
     Route::get('purchasing-order/{id}/delete', [PurchasingOrderController::class, 'deletes'])->name('purchasing-order.deletes');
     Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
+    Route::post('/vehicles/updateVehicleDetails', [VehiclesController::class, 'updateVehicleDetails'])->name('vehicles.update-vehicle-details');
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');
@@ -277,6 +278,8 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
     Route::get('/vehicles/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
+    Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
+
     // Vendors
 
     Route::resource('vendors', VendorController::class);

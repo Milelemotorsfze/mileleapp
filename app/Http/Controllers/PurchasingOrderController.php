@@ -38,7 +38,8 @@ class PurchasingOrderController extends Controller
     public function create()
 {
     $vendors = Vendor::where('category', 'vehicle-procurment')->get();
-    $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
+    $variants = Varaint::all();
+    join('brands', 'varaints.brands_id', '=', 'brands.id')
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
         ->get();
@@ -381,7 +382,7 @@ public function checkcreatevins(Request $request)
                      }
 
             }
-        }        
+        }
     }
     return response()->json(['message' => 'Data updated successfully']);
 }
@@ -399,8 +400,8 @@ public function purchasingupdateStatus(Request $request)
         foreach ($vehicles as $vehicle) {
             $vehicle->status = 'Approved';
             $vehicle->save();
-            $ex_colour = $vehicle->ex_colour; 
-            $int_colour = $vehicle->int_colour; 
+            $ex_colour = $vehicle->ex_colour;
+            $int_colour = $vehicle->int_colour;
             $variantId = $vehicle->	varaints_id;
             $estimation_arrival = $vehicle->estimation_date;
             $territorys = $vehicle->territory;
