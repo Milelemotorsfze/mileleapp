@@ -93,7 +93,7 @@
 }
 .widthData
 {
-  width: 402px !important;
+  width: 467px !important;
 }
 </style>
 @if($addon1)

@@ -199,20 +199,23 @@
                                                                 <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                                     <div class="input-group">
-                                                                    <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_aed]" id="Supplier${index}TotalPriceAED" oninput="inputNumberAbs(this)"
+                                                                    <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_aed]" id="Supplier${index}TotalPriceAED" 
+                                                                    oninput="inputNumberAbs(this)"
                                                                     class="leastPurchasePriceAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
-                                                                    placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price"
+                                                                    placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  
+                                                                    autocomplete="addon_purchase_price"
                                                                     autofocus onkeyup="calculateUSD(1)">
                                                                       <div class="input-group-append">
                                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                     </div>
                                                                 </div>
                                                                 </div>
-                                                                <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	 #F8F8F8;">
+                                                                <div class="col-xxl-4 col-lg-3 col-md-3"  style="background-color: 	 #F8F8F8;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                                     <div class="input-group">
                                                                     <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_usd]" id="Supplier${index}TotalPriceUSD"
-                                                                    oninput="inputNumberAbs(this)" class="form-control purchase-price-USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
+                                                                    oninput="inputNumberAbs(this)" class="form-control purchase-price-USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" 
+                                                                    placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
                                                                       autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                                                     <div class="input-group-append">
                                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
@@ -241,7 +244,7 @@
                                                 <div class="row">
                                                     <div class="col-md-12 p-0">
                                                         <div class="col-md-12 apendNewItemHere${index} p-0" id="kitItemRow">
-                                                            <div class="row kitItemRowForSupplier${index} kititemdelete" id="kitItemSubRow">
+                                                            <div class="row kitItemSubRow kitItemRowForSupplier${index} kititemdelete" id="row-supplier-${index}-item-1">
                                                                 <div class="col-xxl-2 col-lg-6 col-md-12">
                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                                                     <select class="form-control widthinput KitSupplierItems"  name="kitSupplierAndPrice[${index}][item][1][kit_item_id]"
@@ -256,11 +259,12 @@
                                                                         </span>
                                                                         @enderror
                                                                     </div>
-                                                                <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                                                                <div class="col-xxl-1 col-lg-3 col-md-3"  >
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
                                                                     <input  name="kitSupplierAndPrice[${index}][item][1][quantity]" id="Supplier${index}Kit1Quantity" type="number" value="1" min="1"
                                                                      class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantity" placeholder="Enter Quantity"
-                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)" onchange="calculateOtherValuesbyQuantity(${index},1)" oninput="validity.valid||(value='1');">
+                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)" 
+                                                                     onchange="calculateOtherValuesbyQuantity(${index},1)" oninput="validity.valid||(value='1');">
                                                                 </div>
                                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In AED</label>
@@ -286,7 +290,7 @@
                                                                     </div>
                                                                 </div>
                                                                 </div>
-                                                                <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
+                                                                <div class="col-xxl-2 col-lg-3 col-md-3"  style="background-color: 	#F8F8F8;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Unit Price In USD</label>
                                                                     <div class="input-group">
                                                                     <input  name="kitSupplierAndPrice[${index}][item][1][unit_price_in_usd]" id="Supplier${index}Kit1UnitPriceUSD" oninput="inputNumberAbs(this)"
@@ -298,7 +302,7 @@
                                                                     </div>
                                                                 </div>
                                                                 </div>
-                                                                <div class="col-xxl-2 col-lg- col-md-3" id="div_price_in_usd_1" style="background-color: 	#F8F8F8;">
+                                                                <div class="col-xxl-2 col-lg- col-md-3" style="background-color: 	#F8F8F8;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Total Price In USD</label>
                                                                     <div class="input-group">
                                                                     <input  name="kitSupplierAndPrice[${index}][item][1][total_price_in_usd]" id="Supplier${index}Kit1TotalPriceUSD" oninput="inputNumberAbs(this)"
