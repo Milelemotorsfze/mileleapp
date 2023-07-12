@@ -101,6 +101,21 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
+            if(value == 'allbrands') {
+                // var
+                // alert("ok");
+                var count = $(".MoDes" + index).find(".MoDesApndHere" + index).length;
+                // check if supplier index count is > 1
+                if (count > 0) {
+                   // check if first model line of addon brand is having data or not
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                        'Please remove those items to edit this field.', function (e) {
+                    }).set({title: "Remove Brands and ModelLines"})
+
+                    // $("#selectBrandMo1 option:selected").prop("selected", false);
+                    // $('#selectBrandMo1').trigger('change');
+                }
+            }
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
@@ -132,6 +147,7 @@
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
         });
+
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
@@ -139,8 +155,10 @@
             modelLineDataAppend(index,modelIndex,data);
         });
 
+
         function modelLineDataHide(index,modelIndex,value) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
+
             for (var i = 1; i <= indexValue; i++) {
                 if (i != modelIndex) {
                     var currentId = 'selectModelLineNum'+ index +'Des' + i;
@@ -424,7 +442,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" >
+                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">
