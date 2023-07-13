@@ -136,13 +136,7 @@ thead th {
                 <th class="nowrap-td">GRN Date</th>
                 @endif
                 @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
-                @endphp
-                @if ($hasPermission)
-                <th class="nowrap-td">Stock Status</th>
-                @endif
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                 @endphp
                 @if ($hasPermission)
                 <th class="nowrap-td">Inspection Date</th>
@@ -346,20 +340,8 @@ thead th {
                     @endphp
                     @if ($hasPermission)
                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
-                     <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
+                     <td class="nowrap-td PoDate">{{ date('d-m-Y', strtotime($po_date)) }}</td>
                      @endif
-                     @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
-                @endphp
-                @if ($hasPermission)
-                <td class="nowrap-td eta">ETA</td>
-                @endif
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
-                @endphp
-                @if ($hasPermission)
-                <td class="nowrap-td eta">{{date('d-M-Y', strtotime($vehicles->estimation_date))}}</td>
-                @endif
                      @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                     @endphp
@@ -370,8 +352,7 @@ thead th {
                      <td class="nowrap-td grnNumber">-</td>
                      @endif
                      @if ($grn_date)
-                     <td class="nowrap-td grnDate"> 
-                     {{ date('d-M-Y', strtotime($grn_date)) }}</td>
+                     <td class="nowrap-td grnDate">{{ date('d-m-Y', strtotime($grn_date)) }}</td>
                      @else
                      <td class="nowrap-td grnDate">-</td>
                     @endif
@@ -389,10 +370,10 @@ thead th {
                 @endif
                     @endif
                     @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                     @endphp
                     @if ($hasPermission)
-                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
+                    <td class="nowrap-td">{{ date('d-m-Y', strtotime($vehicles->inspection_date)) }}</td>
                     <input type="hidden" class="inspection" value="{{ $vehicles->inspection_date }}">
                     @endif
                     @php
