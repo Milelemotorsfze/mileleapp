@@ -262,7 +262,9 @@ Route::get('/d', function () {
     Route::post('movemnet/get-vehicles-details', [MovementController::class, 'vehiclesdetails'])->name('vehicles.vehiclesdetails');
     Route::get('purchasing-order/{id}/delete', [PurchasingOrderController::class, 'deletes'])->name('purchasing-order.deletes');
     Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
-//    Route::post('/vehicles/updateVehicleDetails', [VehiclesController::class, 'updateVehicleDetails'])->name('vehicles.update-vehicle-details');
+
+    Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
+
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');

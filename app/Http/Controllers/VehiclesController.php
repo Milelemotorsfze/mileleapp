@@ -28,7 +28,7 @@ class VehiclesController extends Controller
      */
     public function index()
     {
-        $statuss = "Vendor Confirmed"; 
+        $statuss = "Vendor Confirmed";
         $data = Vehicles::where('status', '!=', 'cancel')->where('payment_status', $statuss)->get();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
@@ -298,58 +298,28 @@ class VehiclesController extends Controller
     }
     public function updateso(Request $request)
     {
-        $vehicleId = $request->input('vehicle_id');
-        $vehicle = Vehicles::find($vehicleId);
-        $soId = $vehicle->so_id;
-        if ($soId) {
-            // Update existing So
-            $so = So::find($soId);
-            $oldValues = $so->toArray();
-            $so->so_number = $request->input('so_number');
+//        return $request->all();
+        info("reached");
+        $vehicles = $request->vehicle_ids;
 
-            $changes = [];
-            foreach ($oldValues as $field => $oldValue) {
-                if ($field !== 'created_at' && $field !== 'updated_at') {
-                    $newValue = $so->$field;
-                    if ($oldValue != $newValue) {
-                        $changes[$field] = [
-                            'old_value' => $oldValue,
-                            'new_value' => $newValue,
-                        ];
-                    }
-                }
-            }
-            if (!empty($changes)) {
-                $so->save();
-                // Save changes in Solog
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-                foreach ($changes as $field => $change) {
-                    $solog = new Solog();
-                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                    $currentDateTime = Carbon::now($dubaiTimeZone);
-                    $solog->time = $currentDateTime->toTimeString();
-                    $solog->date = $currentDateTime->toDateString();
-                    $solog->status = 'Update Sales Values';
-                    $solog->so_id = $soId;
-                    $solog->field = $field;
-                    $solog->old_value = $change['old_value'];
-                    $solog->new_value = $change['new_value'];
-                    $solog->created_by = auth()->user()->id;
-                    $solog->save();
-                }
-            }
-        } else {
-            $existingSo = So::where('so_number', $request->input('so_number'))->first();
-            if ($existingSo) {
+        foreach ($vehicles as $key => $vehicle)
+        {
+            info("vehicle".$vehicle);
+            $vehicle = Vehicles::find($vehicle);
+
+            $soId = $vehicle->so_id;
+            if ($soId)
+            {
+                info("soiD UPDATED");
                 // Update existing So
-                $oldValues = $existingSo->toArray();
-                $existingSo->save();
+                $so = So::find($soId);
+                $oldValues = $so->toArray();
+                $so->so_number = $request->so_numbers[$key];
 
                 $changes = [];
                 foreach ($oldValues as $field => $oldValue) {
                     if ($field !== 'created_at' && $field !== 'updated_at') {
-                        $newValue = $existingSo->$field;
+                        $newValue = $so->$field;
                         if ($oldValue != $newValue) {
                             $changes[$field] = [
                                 'old_value' => $oldValue,
@@ -359,8 +329,7 @@ class VehiclesController extends Controller
                     }
                 }
                 if (!empty($changes)) {
-                    $existingSo->save();
-                    $soID = $existingSo->id;
+                    $so->save();
                     // Save changes in Solog
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                     $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -371,7 +340,7 @@ class VehiclesController extends Controller
                         $solog->time = $currentDateTime->toTimeString();
                         $solog->date = $currentDateTime->toDateString();
                         $solog->status = 'Update Sales Values';
-                        $solog->so_id = $soID;
+                        $solog->so_id = $soId;
                         $solog->field = $field;
                         $solog->old_value = $change['old_value'];
                         $solog->new_value = $change['new_value'];
@@ -379,105 +348,157 @@ class VehiclesController extends Controller
                         $solog->save();
                     }
                 }
-            } else {
-                // Create new So
-                $so = new So();
-                $so->so_number = $request->input('so_number');
-                $so->sales_person_id = $request->has('sales_person') ? $request->input('sales_person') : auth()->user()->id;
-                $so->save();
-                $soID = $so->id;
+            } else
+            {
+                $existingSo = So::where('so_number', $request->so_numbers[$key])->first();
+                info("no so Id existing");
+                if ($existingSo) {
+                    // Update existing So
+                    $oldValues = $existingSo->toArray();
+                    $existingSo->save();
 
-                // Save log in Solog
+                    $changes = [];
+                    foreach ($oldValues as $field => $oldValue) {
+                        if ($field !== 'created_at' && $field !== 'updated_at') {
+                            $newValue = $existingSo->$field;
+                            if ($oldValue != $newValue) {
+                                $changes[$field] = [
+                                    'old_value' => $oldValue,
+                                    'new_value' => $newValue,
+                                ];
+                            }
+                        }
+                    }
+                    if (!empty($changes)) {
+                        $existingSo->save();
+                        $soID = $existingSo->id;
+                        // Save changes in Solog
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        foreach ($changes as $field => $change) {
+                            $solog = new Solog();
+                            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            $currentDateTime = Carbon::now($dubaiTimeZone);
+                            $solog->time = $currentDateTime->toTimeString();
+                            $solog->date = $currentDateTime->toDateString();
+                            $solog->status = 'Update Sales Values';
+                            $solog->so_id = $soID;
+                            $solog->field = $field;
+                            $solog->old_value = $change['old_value'];
+                            $solog->new_value = $change['new_value'];
+                            $solog->created_by = auth()->user()->id;
+                            $solog->save();
+                        }
+                    }
+                } else {
+                    // Create new So
+                    $so = new So();
+                    $so->so_number = $request->so_numbers[$key];
+                    $so->sales_person_id = $request->sales_persons[$key] ? $request->sales_persons[$key] : auth()->user()->id;
+                    $so->save();
+                    $soID = $so->id;
+
+                    // Save log in Solog
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $currentDateTime = Carbon::now($dubaiTimeZone);
+
+                    $colorlog = new Solog();
+                    $colorlog->time = $currentDateTime->toTimeString();
+                    $colorlog->date = $currentDateTime->toDateString();
+                    $colorlog->status = 'New Created';
+                    $colorlog->so_id = $soID;
+                    $colorlog->created_by = auth()->user()->id;
+                    $colorlog->save();
+                }
+            }
+
+            if ($request->reservation_start_dates[$key]) {
+                $newReservationStartDate = $request->reservation_start_dates[$key];
+                $newReservationEndDate = $request->reservation_end_dates[$key];
+
+                $isStartDateChanged = $vehicle->reservation_start_date != $newReservationStartDate;
+                $isEndDateChanged = $vehicle->reservation_end_date != $newReservationEndDate;
+
+                if ($isStartDateChanged || $isEndDateChanged)
+                {
+                    if ($isStartDateChanged)
+                    {
+                        $vehicle->reservation_start_date = $newReservationStartDate;
+
+                        $reservationStartDateLog = new Vehicleslog();
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $reservationStartDateLog->time = $currentDateTime->toTimeString();
+                        $reservationStartDateLog->date = $currentDateTime->toDateString();
+                        $reservationStartDateLog->status = 'Update Vehicle Values';
+                        $reservationStartDateLog->vehicles_id = $vehicle;
+                        $reservationStartDateLog->field = 'reservation_start_date';
+                        $reservationStartDateLog->old_value = $vehicle->getOriginal('reservation_start_date');
+                        $reservationStartDateLog->new_value = $newReservationStartDate;
+                        $reservationStartDateLog->created_by = auth()->user()->id;
+                        $reservationStartDateLog->save();
+                    }
+
+                    if ($isEndDateChanged)
+                    {
+                        $vehicle->reservation_end_date = $newReservationEndDate;
+
+                        $reservationEndDateLog = new Vehicleslog();
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $reservationEndDateLog->time = $currentDateTime->toTimeString();
+                        $reservationEndDateLog->date = $currentDateTime->toDateString();
+                        $reservationEndDateLog->status = 'Update Vehicle Values';
+                        $reservationEndDateLog->vehicles_id = $vehicle;
+                        $reservationEndDateLog->field = 'reservation_end_date';
+                        $reservationEndDateLog->old_value = $vehicle->getOriginal('reservation_end_date');
+                        $reservationEndDateLog->new_value = $newReservationEndDate;
+                        $reservationEndDateLog->created_by = auth()->user()->id;
+                        $reservationEndDateLog->save();
+                    }
+                }
+            }
+
+            if($request->remarks[$key]){
+                info("remarks");
+                $remarksdata = new Remarks();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
-
-                $colorlog = new Solog();
-                $colorlog->time = $currentDateTime->toTimeString();
-                $colorlog->date = $currentDateTime->toDateString();
-                $colorlog->status = 'New Created';
-                $colorlog->so_id = $soID;
-                $colorlog->created_by = auth()->user()->id;
-                $colorlog->save();
+                $remarksdata->time = $currentDateTime->toTimeString();
+                $remarksdata->date = $currentDateTime->toDateString();
+                $remarksdata->vehicles_id = $vehicle;
+                $remarksdata->remarks = $request->remarks[$key];
+                $remarksdata->created_by = auth()->user()->id;
+                $remarksdata->department = "Sales";
+                $remarksdata->created_at = $currentDateTime;
+                $remarksdata->save();
             }
+            // Save changes in the vehicles table
+            $vehicle->save();
+
         }
+        ///  Currenty not updating /////////////
         // Update payment_percentage if changed
-        if ($request->has('payment_percentage')) {
-            $newPaymentPercentage = $request->input('payment_percentage');
-            if ($vehicle->payment_percentage != $newPaymentPercentage) {
-                $vehicle->payment_percentage = $newPaymentPercentage;
-                $paymentPercentageLog = new Vehicleslog();
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-                $paymentPercentageLog->time = $currentDateTime->toTimeString();
-                $paymentPercentageLog->date = $currentDateTime->toDateString();
-                $paymentPercentageLog->status = 'Update Vehicle Values';
-                $paymentPercentageLog->vehicles_id = $vehicleId;
-                $paymentPercentageLog->field = 'payment_percentage';
-                $paymentPercentageLog->old_value = $vehicle->getOriginal('payment_percentage');
-                $paymentPercentageLog->new_value = $newPaymentPercentage;
-                $paymentPercentageLog->created_by = auth()->user()->id;
-                $paymentPercentageLog->save();
-            }
-        }
+//        if ($request->has('payment_percentage')) {
+//            $newPaymentPercentage = $request->input('payment_percentage');
+//            if ($vehicle->payment_percentage != $newPaymentPercentage) {
+//                $vehicle->payment_percentage = $newPaymentPercentage;
+//                $paymentPercentageLog = new Vehicleslog();
+//                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+//                $currentDateTime = Carbon::now($dubaiTimeZone);
+//                $paymentPercentageLog->time = $currentDateTime->toTimeString();
+//                $paymentPercentageLog->date = $currentDateTime->toDateString();
+//                $paymentPercentageLog->status = 'Update Vehicle Values';
+//                $paymentPercentageLog->vehicles_id = $vehicle;
+//                $paymentPercentageLog->field = 'payment_percentage';
+//                $paymentPercentageLog->old_value = $vehicle->getOriginal('payment_percentage');
+//                $paymentPercentageLog->new_value = $newPaymentPercentage;
+//                $paymentPercentageLog->created_by = auth()->user()->id;
+//                $paymentPercentageLog->save();
+//            }
+//        }
             // Update reservation_end_date if changed
-if ($request->has('reservation_start_date')) {
-    $newReservationStartDate = $request->input('reservation_start_date');
-    $newReservationEndDate = $request->input('reservation_end_date');
 
-    $isStartDateChanged = $vehicle->reservation_start_date != $newReservationStartDate;
-    $isEndDateChanged = $vehicle->reservation_end_date != $newReservationEndDate;
-
-    if ($isStartDateChanged || $isEndDateChanged) {
-        if ($isStartDateChanged) {
-            $vehicle->reservation_start_date = $newReservationStartDate;
-
-            $reservationStartDateLog = new Vehicleslog();
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-            $reservationStartDateLog->time = $currentDateTime->toTimeString();
-            $reservationStartDateLog->date = $currentDateTime->toDateString();
-            $reservationStartDateLog->status = 'Update Vehicle Values';
-            $reservationStartDateLog->vehicles_id = $vehicleId;
-            $reservationStartDateLog->field = 'reservation_start_date';
-            $reservationStartDateLog->old_value = $vehicle->getOriginal('reservation_start_date');
-            $reservationStartDateLog->new_value = $newReservationStartDate;
-            $reservationStartDateLog->created_by = auth()->user()->id;
-            $reservationStartDateLog->save();
-        }
-
-        if ($isEndDateChanged) {
-            $vehicle->reservation_end_date = $newReservationEndDate;
-
-            $reservationEndDateLog = new Vehicleslog();
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-            $reservationEndDateLog->time = $currentDateTime->toTimeString();
-            $reservationEndDateLog->date = $currentDateTime->toDateString();
-            $reservationEndDateLog->status = 'Update Vehicle Values';
-            $reservationEndDateLog->vehicles_id = $vehicleId;
-            $reservationEndDateLog->field = 'reservation_end_date';
-            $reservationEndDateLog->old_value = $vehicle->getOriginal('reservation_end_date');
-            $reservationEndDateLog->new_value = $newReservationEndDate;
-            $reservationEndDateLog->created_by = auth()->user()->id;
-            $reservationEndDateLog->save();
-        }
-    }
-}
-        if($request->has('remarks')){
-        $remarksdata = new Remarks();
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-        $remarksdata->time = $currentDateTime->toTimeString();
-        $remarksdata->date = $currentDateTime->toDateString();
-        $remarksdata->vehicles_id = $vehicleId;
-        $remarksdata->remarks = $request->input('remarks');
-        $remarksdata->created_by = auth()->user()->id;
-        $remarksdata->department = "Sales";
-        $remarksdata->created_at = $currentDateTime;
-        $remarksdata->save();
-        }
-        // Save changes in the vehicles table
-        $vehicle->save();
         return redirect()->back()->with('success', 'Sales details updated successfully.');
     }
     public function deletes($id)
@@ -599,40 +620,43 @@ if ($request->has('reservation_start_date')) {
     }
     public function updatewarehouse(Request $request)
     {
-        $id = $request->input('vehicle_id');
-        $vehicle = Vehicles::find($id);
-        $oldValues = $vehicle->toArray();
-        $vehicle->remarks = $request->input('remarks');
-        $vehicle->conversion = $request->input('conversion');
-        $changes = [];
-        foreach ($oldValues as $field => $oldValue) {
-            if ($field !== 'created_at' && $field !== 'updated_at') {
-                $newValue = $vehicle->$field;
-                if ($oldValue != $newValue) {
-                    $changes[$field] = [
-                        'old_value' => $oldValue,
-                        'new_value' => $newValue,
-                    ];
+        $vehicles = $request->vehicle_ids;
+        foreach ($vehicles as $key => $vehicleId) {
+            $vehicle = Vehicles::find($vehicleId);
+            $oldValues = $vehicle->toArray();
+            $vehicle->remarks = $request->warehouse_remarks[$key];
+            $vehicle->conversion = $request->conversions[$key];
+            $changes = [];
+            foreach ($oldValues as $field => $oldValue) {
+                if ($field !== 'created_at' && $field !== 'updated_at') {
+                    $newValue = $vehicle->$field;
+                    if ($oldValue != $newValue) {
+                        $changes[$field] = [
+                            'old_value' => $oldValue,
+                            'new_value' => $newValue,
+                        ];
+                    }
+                }
+            }
+            if (!empty($changes)) {
+                $vehicle->save();
+                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                $currentDateTime = Carbon::now($dubaiTimeZone);
+                foreach ($changes as $field => $change) {
+                    $vehicleslog = new Vehicleslog();
+                    $vehicleslog->time = $currentDateTime->toTimeString();
+                    $vehicleslog->date = $currentDateTime->toDateString();
+                    $vehicleslog->status = 'Update QC Values';
+                    $vehicleslog->vehicles_id = $vehicleId;
+                    $vehicleslog->field = $field;
+                    $vehicleslog->old_value = $change['old_value'];
+                    $vehicleslog->new_value = $change['new_value'];
+                    $vehicleslog->created_by = auth()->user()->id;
+                    $vehicleslog->save();
                 }
             }
         }
-        if (!empty($changes)) {
-            $vehicle->save();
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-            foreach ($changes as $field => $change) {
-            $vehicleslog = new Vehicleslog();
-            $vehicleslog->time = $currentDateTime->toTimeString();
-            $vehicleslog->date = $currentDateTime->toDateString();
-            $vehicleslog->status = 'Update QC Values';
-            $vehicleslog->vehicles_id = $id;
-            $vehicleslog->field = $field;
-            $vehicleslog->old_value = $change['old_value'];
-            $vehicleslog->new_value = $change['new_value'];
-            $vehicleslog->created_by = auth()->user()->id;
-            $vehicleslog->save();
-            }
-        }
+
         return redirect()->back()->with('success', 'Details updated successfully.');
     }
     }

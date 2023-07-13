@@ -91,8 +91,10 @@ class Vehicles extends Model
         }
         if (array_unique($priceStatus) === array('true')) {
             return 'Available';
+//            return 0;
         }else{
             return 'Not Available';
+//            return 1;
         }
     }
     public function getOldPriceDatedAttribute() {
@@ -108,7 +110,7 @@ class Vehicles extends Model
                 ->get();
             if ($latestPriceHistory->count() > 1 ) {
                 $latestPriceHistory = $latestPriceHistory->skip(1)->first();
-                return $latestPriceHistory->updated_at;
+                return Carbon::parse($latestPriceHistory->updated_at)->format('DD-MON-YYYY HH24.MI.SS');
             }
 
         }
@@ -136,7 +138,8 @@ class Vehicles extends Model
             ->first();
         if(!empty($availableColour)) {
             $updatedAt = $availableColour->updated_at;
-            return $updatedAt;
+            return Carbon::parse($updatedAt)->format('DD-MON-YYYY HH24.MI.SS');
+            return  ;
         }
         return " ";
     }

@@ -82,13 +82,36 @@ th.nowrap-td {
             @if ($hasPermission)
                 <div class="card-header">
                     <h4 class="card-title">View Vehicles Details</h4>
-                {{--    @php--}}
-                {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');--}}
-                {{--    @endphp--}}
-                {{--    @if ($hasPermission)--}}
+                    @if (count($errors) > 0)
+                        <div class="alert alert-danger">
+                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if (Session::has('error'))
+                        <div class="alert alert-danger" >
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                            {{ Session::get('error') }}
+                        </div>
+                    @endif
+                    @if (Session::has('success'))
+                        <div class="alert alert-success" id="success-alert">
+                            <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
+                         'vehicles-detail-edit','enginee-edit','document-edit','bl-edit','edit-so','edit-reservation']);
+                    @endphp
+                    @if ($hasPermission)
                         <button type="button" class="btn btn-sm btn-primary float-end edit-vehicle">Edit</button>
                         <button type="button" class="btn btn-sm btn-success float-end update-vehicle-details" hidden >Update</button>
-                {{--    @endif--}}
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="table-responsive" >
@@ -425,34 +448,48 @@ th.nowrap-td {
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
                                         @endphp
                                         @if ($hasPermission)
-                                         @if ($so_number)
-                                         <td class="nowrap-td so_number">{{ $so_number }}</td>
-                                         <input type="hidden" class="payment_percentage" value="{{ $vehicles->payment_percentage }}">
-                                         @else
-                                         <td class="nowrap-td">-</td>
-                                         @endif
-                                         <td class="nowrap-td">{{ $salesname }}</td>
-                                         <input type="hidden" class="sales_person" value="{{ $sales_person_id }}">
+                                         <td class="nowrap-td so_number">
+                                             <input type="text" class="form-control so-number" name="so_numbers[]" value="{{ $so_number }}" readonly>
+
+                                         </td>
+                                        <td class="nowrap-td">
+                                            <select name="sales_persons[]" disabled  class="form-control sales-person" >
+                                                <option value="">Sales Person</option>
+                                                @foreach ($sales as $sale)
+                                                    <option value="{{ $sale->id }}" {{ $salesname == $sale->name ? 'selected' : '' }}>{{ $sale->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
                                          @endif
                                          @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                         @endphp
                                         @if ($hasPermission)
-                                         <td class="nowrap-td reservation_start_date">{{ $vehicles->reservation_start_date }}</td>
-                                         <td class="nowrap-td reservation_end_date">{{ $vehicles->reservation_end_date }}</td>
+                                         <td class="nowrap-td reservation_start_date">
+                                             <input type="date" class="form-control reservation-start-date" readonly  name="reservation_start_dates[]"
+                                                    value="{{ $vehicles->reservation_start_date }}">
+                                         </td>
+                                         <td class="nowrap-td reservation_end_date">
+                                             <input type="date" class="form-control reservation-end-date" readonly  name="reservation_end_dates[]"
+                                                    value="{{ $vehicles->reservation_end_date }}">
+                                         </td>
                                          @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
                                         @endphp
                                         @if ($hasPermission)
-                                         @if($latestRemark)
+{{--                                         @if($latestRemark)--}}
                                             <td class="nowrap-td" onclick="event.stopPropagation();">
-                                                {{ $latestRemark }}
-                                                <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
+                                                <input type="text" class="form-control sales-remark" id="sales_remarks" readonly name="remarks[]" value="{{$latestRemark}}">
+
+{{--                                                {{ $latestRemark }}--}}
+                                                @if($latestRemark)
+                                                    <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
+                                                @endif
                                             </td>
-                                        @else
-                                            <td class="nowrap-td">-</td>
-                                        @endif
+{{--                                        @else--}}
+{{--                                            <td class="nowrap-td">-</td>--}}
+{{--                                        @endif--}}
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
@@ -513,7 +550,10 @@ th.nowrap-td {
                                           $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
                                           @endphp
                                           @if ($hasPermission)
-                                          <td class="nowrap-td conversion">{{ $vehicles->conversion }}</td>
+                                          <td class="nowrap-td conversion">
+                                              <input type="text" class="form-control conversion" readonly name="conversions[]" value="{{ $vehicles->conversion }}">
+{{--                                              {{ $vehicles->conversion }}--}}
+                                          </td>
                                           @endif
                                           @php
                                           $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
@@ -595,7 +635,10 @@ th.nowrap-td {
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
                                             @endphp
                                             @if ($hasPermission)
-                                            <td class="nowrap-td remarks">{{ $vehicles->remarks }}</td>
+                                            <td class="nowrap-td remarks">
+                                                <input type="text" class="form-control warehouse-remarks" readonly name="warehouse_remarks[]"  value="{{ $vehicles->remarks }}" >
+                                                {{ $vehicles->remarks }}
+                                            </td>
                                             @endif
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
@@ -702,20 +745,34 @@ th.nowrap-td {
            //Logistic
            $hasPermissionDocumentEdit = Auth::user()->hasPermissionForSelectedRole('document-edit');
            $hasPermissionBLEdit = Auth::user()->hasPermissionForSelectedRole('bl-edit');
+           // Sales
+           $hasPermissionSoEdit = Auth::user()->hasPermissionForSelectedRole('edit-so');
+           $hasPermissionReservationEdit = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
+           // Warehouse
+           $hasPermissionWarehouseEdit = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+           $hasPermissionConversionEdit = Auth::user()->hasPermissionForSelectedRole('conversion-edit');
 
          @endphp
 
         $(".update-vehicle-details").click(function(e){
             e.preventDefault();
             let Qc_url = '{{ route('vehicles.updatedata') }}';
-            let logistic_url = '{{ route('vehicles.updatelogistics') }}'
-            @if($hasPermissionDocumentEdit)
+            let logistic_url = '{{ route('vehicles.updatelogistics') }}';
+            let sales_url = '{{ route('vehicles.updateso') }}';
+            let warehouse_url = '{{ route('vehicles.updatewarehouse') }}';
+
+            @if($hasPermissionDocumentEdit || $hasPermissionBLEdit)
                 $('#form-update').attr('action', logistic_url).submit();
             @endif
-            @if($hasPermissionVehicleDetailEdit)
+            @if($hasPermissionVehicleDetailEdit || $hasPermissionInspectionEdit || $hasPermissionEngineEdit)
             $('#form-update').attr('action', Qc_url).submit();
             @endif
-            $("#form-update").submit(); // Submit the form
+            @if($hasPermissionSoEdit || $hasPermissionReservationEdit )
+            $('#form-update').attr('action', sales_url).submit();
+            @endif
+            @if($hasPermissionWarehouseEdit || $hasPermissionConversionEdit )
+            $('#form-update').attr('action', warehouse_url).submit();
+            @endif
         });
         $('.variant').change(function () {
             var Id = $(this).val();
@@ -749,13 +806,13 @@ th.nowrap-td {
            $('.edit-vehicle').hide();
            $('.update-vehicle-details').attr('hidden',false);
           @if($hasPermissionInspectionEdit)
-           $('.inspection-date').attr('readonly',false);
+                $('.inspection-date').attr('readonly',false);
           @endif
           @if($hasPermissionVehicleDetailEdit)
-            $('.variant').attr('disabled',false);
-            $('.exterior_colour').attr('readonly',false);
-            $('.interior_colour').attr('readonly',false);
-           $('.py-mm-yyyy').attr('readonly',false);
+             $('.variant').attr('disabled',false);
+             $('.exterior_colour').attr('readonly',false);
+             $('.interior_colour').attr('readonly',false);
+             $('.py-mm-yyyy').attr('readonly',false);
 
           @endif
           @if($hasPermissionEngineEdit)
@@ -768,9 +825,24 @@ th.nowrap-td {
             $('.document-with').attr('disabled',false);
           @endif
            @if($hasPermissionBLEdit)
-           $('.bl-number').attr('readonly',false);
+              $('.bl-number').attr('readonly',false);
+           @endif
+           @if($hasPermissionSoEdit)
+              $('.so-number').attr('readonly',false);
            @endif
 
+           @if($hasPermissionReservationEdit)
+               $('.reservation-start-date').attr('readonly',false);
+               $('.reservation-end-date').attr('readonly',false);
+               $('.sales-remark').attr('readonly',false);
+               $('.sales-person').attr('disabled',false);
+           @endif
+           @if($hasPermissionWarehouseEdit)
+                $('.warehouse-remarks').attr('readonly',false);
+           @endif
+           @if($hasPermissionConversionEdit)
+              $('.conversion').attr('readonly',false);
+           @endif
        })
    </script>
    {{--@endif--}}
