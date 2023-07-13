@@ -36,8 +36,10 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
-@can('Calls-modified')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+  @if ($hasPermission)
 <div class="card-header">
         <h4 class="card-title">Bulk Calls & Messages</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('calls.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -123,7 +125,6 @@
                     </form>
 		</br>
     </div>
-    @endcan
     @else
     @php
         redirect()->route('home')->send();

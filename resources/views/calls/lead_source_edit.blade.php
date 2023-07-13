@@ -23,8 +23,10 @@
 }
     </style>
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
-@can('Calls-modified')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+  @if ($hasPermission)
 <div class="card-header">
 @if (session('error'))
     <div class="alert alert-danger">
@@ -64,7 +66,6 @@
                     </form>
 		</br>
     </div>
-    @endcan
     @else
     @php
         redirect()->route('home')->send();
