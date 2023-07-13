@@ -34,6 +34,7 @@ class PermissionTableSeeder extends Seeder
             ['18','Accessories'],
             ['19','Spare Parts'],
             ['20','Kit'],
+            ['21', 'User Login Activity']
             ];
         foreach ($modules as $key => $value):
         $module[] = [
@@ -247,6 +248,8 @@ class PermissionTableSeeder extends Seeder
             //Kit
             ['20','Kit List','kit-list', 'To View List of Kit'],
             ['20','View Addon Kit Item Purchase Price','view-addon-kit-item-purchase-price', 'To View Addon Kit Item Purchase Price'],
+
+            ['21','View Login Activity','view-log-activity','To View Login Activity']
 
             ];
         foreach ($Permissions as $key => $value):

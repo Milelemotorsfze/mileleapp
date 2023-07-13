@@ -268,8 +268,8 @@
             {{--}--}}
             $('.addSupplierForKitRow').each(function(i){
                 var index = +i + +1;
-
                 $(this).attr('id','row-'+ index);
+                $(this).find('#row-'+ index).attr('class','row addSupplierForKitRow');
 
                 $(this).find('.kitSuppliers').attr('name','kitSupplierAndPrice['+ index +'][supplier_id]');
                 $(this).find('.kitSuppliers').attr('id','kitSupplierDropdown'+ index);
@@ -283,14 +283,13 @@
 
                 $(this).find('.removeKitSupplier').attr('data-index', index);
 
-                $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
+                // $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
 
                 $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');       
            
-
                 var oldIndex = '';
                 oldIndex = index+1;
-                itemcount = $(".apendNewItemHere"+index).find(".kitItemRowForSupplier"+oldIndex).length;
+                itemcount = $(".apendNewItemHere"+oldIndex).find(".kitItemRowForSupplier"+oldIndex).length;
                 for (var i = 1; i <= itemcount; i++) {
                     $(this).find('#row-supplier-'+oldIndex+'-item-'+i).attr('id','row-supplier-'+index+'-item-'+i);
 
@@ -330,9 +329,12 @@
                         is-invalid @enderror');                      
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('id', 'Supplier'+ index +'Kit'+i+'TotalPriceUSD');
 
-                    $(this).find('#removeKitItemForSupplier'+oldIndex).attr('onclick', 'del('+index+','+i+')');
-                    $(this).find('#removeKitItemForSupplier'+oldIndex).attr('id', '#removeKitItemForSupplier'+index);
+                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('data-index', index);
+                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('data-index', i);
+                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('class', 'btn_round removeKitItemForSupplier'+index+' removeKitItem');
+            
                 }
+                $(this).find('.apendNewItemHere'+oldIndex).attr('class','apendNewItemHere'+index);
                 $(this).find('.kitItemRowForSupplier'+oldIndex).attr('class','row kititemdelete kitItemRowForSupplier'+index);
                 $('#kitSupplierDropdown'+index).select2
                 ({
@@ -341,6 +343,101 @@
                     minimumResultsForSearch: -1,
                 });
             });
+//             $('.addSupplierForKitRow1').each(function(i){
+
+// var index = +i + +1;
+
+// $(this).attr('id','row-'+ index);
+// $(this).find('.kitSuppliers').attr('data-index', index);
+// $(this).find('.kitSuppliers').attr('id','kitSupplierDropdown'+ index);
+// $(this).find('.kitSuppliers').attr('name','kitSupplierAndPrice['+ index +'][supplier_id]');
+// $(this).find('.leastPurchasePriceAED').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_aed]');
+// $(this).find('.leastPurchasePriceAED').attr('id','Supplier'+ index +'TotalPriceAED');
+// $(this).find('.purchase-price-USD').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_usd]');
+// $(this).find('.purchase-price-USD').attr('id','Supplier'+ index +'TotalPriceUSD');
+// $(this).find('.removeKitSupplier').attr('data-index', index);
+// $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');       
+// $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
+// $(this).find('#kitItemSubRow').attr('class','row kititemdelete kitItemRowForSupplier'+index);
+
+// $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][kit_item_id]');
+// $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ index +'Item1');
+
+// $(this).find('.kititemdelete').attr('id','row-supplier-'+ index +'-item-1');
+
+// $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][quantity]');
+// $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit1Quantity');
+// $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',1)');
+// $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +',1)');
+
+
+// $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_aed]');
+// $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit1UnitPriceAED');
+// $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ index +',1)');
+
+// $(this).find('.total-price-AED').attr('id', 'Supplier'+ index +'Kit1TotalPriceAED');
+// $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][total_price_in_aed]');
+// $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ index +',1)');
+// $(this).find('.total-price-AED').attr('class', 'Supplier'+ index +'TotalPriceInAED form-control widthinput @error('addon_purchase_price')
+//     is-invalid @enderror total-price-AED');
+
+// $(this).find('.unit-price-USD').attr('name', 'kitSupplierAndPrice['+ index +'][item][1][unit_price_in_usd]');
+// $(this).find('.unit-price-USD').attr('id', 'Supplier'+ index +'Kit1UnitPriceUSD');
+// $(this).find('.unit-price-USD').attr('onkeyup', 'calculateOtherValuesbyUnitPriceUSD('+ index +',1)');
+// $(this).find('.unit-price-USD').attr('class', 'Supplier'+ index +'TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')
+//     is-invalid @enderror unit-price-USD');
+
+// $(this).find('.remove-kit-items').attr('class', 'btn_round removeKitItemForSupplier'+index+' remove-kit-items');
+// // for(var j=2; j<=4; j++) {
+//     $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item][2][quantity]');
+//     $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit2Quantity');
+//     $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +',2)');
+//     $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +',2)');
+
+// // }
+
+// // $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][2][unit_price_in_aed]');
+// // $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit2UnitPriceAED');
+// // $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ index +',2)');
+// //
+// // $(this).find('.total-price-AED').attr('id', 'Supplier'+ index +'Kit2TotalPriceAED');
+// // $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item][2][total_price_in_aed]');
+// // $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ index +',2)');
+
+// // $(this).find('button').attr('id','remove-'+ index);
+// $('#kitSupplierDropdown'+index).select2
+// ({
+//     placeholder:"Choose Suppliers....     Or     Type Here To Search....",
+//     allowClear: true,
+//     minimumResultsForSearch: -1,
+// });
+
+
+// $('.kitItemRowForSupplier'+index).each(function(j){
+//     // var count = 6;
+//     // alert("kitIndex");
+//     // alert(index);
+//     // alert("ok");
+
+//     // var j = +j + +1;
+//     // alert(j);
+//     // alert(index);
+//     // $(this).find('.quantity').attr('name','test'+kitIndex);
+//     // $(this).find('.quantity').attr('name','testfrom'+j);
+//     $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+j+'][quantity]');
+//     $(this).find('.quantity').attr('id', 'Supplier'+ index +'Kit'+j+'Quantity');
+//     $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +','+j+')');
+
+//     $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+j+'][unit_price_in_aed]');
+//     $(this).find('.unit-price-AED').attr('id', 'Supplier'+ index +'Kit'+j+'UnitPriceAED');
+//     $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ index +','+j+')');
+
+//     $(this).find('.total-price-AED').attr('id', 'Supplier'+ index +'Kit'+j+'TotalPriceAED');
+//     $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+j+'][total_price_in_aed]');
+//     $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ index +','+j+')');
+
+// })
+// });
             setLeastPurchasePriceAED();
         })
     });

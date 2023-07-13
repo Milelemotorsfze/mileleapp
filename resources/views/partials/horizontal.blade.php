@@ -85,7 +85,17 @@
         <div class="dropdown-divider"></div>
     @endif
     @endcanany
-
+    @canany(['view-log-activity'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-log-activity']);
+    @endphp
+    @if ($hasPermission)
+        <a class="dropdown-item" href="{{ route('listUsers') }}">
+            <i class="fa fa-user-circle" aria-hidden="true"></i> Login Activity
+        </a>
+        <div class="dropdown-divider"></div>
+    @endif
+    @endcanany
     <a class="dropdown-item" href="{{ route('logout') }}"
        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
         <i class="mdi mdi-logout font-size-16 align-middle me-1"></i>Logout

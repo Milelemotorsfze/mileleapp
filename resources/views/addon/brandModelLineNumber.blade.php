@@ -195,66 +195,70 @@
             $('.brandMoDescripApendHere').each(function(i){
                 var index = +i + +1;
                 $(this).attr('id','row-addon-brand-'+ index);
+
                 $(this).find('.brandRows').attr('data-index', index);
                 $(this).find('.brandRows').attr('id','selectBrandMo'+ index);
                 $(this).find('.brandRows').attr('name','brand['+ index +'][brand_id]');
-
-                //// should loop ////////////
                 $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +',1)');
-                $(this).find('.spare-parts-model-lines').attr('data-index', index);
-                $(this).find('.spare-parts-model-lines').attr('id','selectModelLineNum'+ index +'Des1');
-                $(this).find('.spare-parts-model-lines').attr('name','brand['+ index +'][model][1][model_id]');
-                $(this).find('.spare-parts-model-lines').attr('onchange','selectModelLineDescipt('+ index +',1)');
-                $(this).find('.model-description-dropdown').attr('id', 'showModelNumberdrop'+ index +'Des1');
-                $(this).find('.model-descriptions').attr('name', 'brand['+ index +'][model][1][model_number][]');
-                $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri'+ index +'Des1');
-                $(this).find('.model-line-dropdown').attr('id','showDivdropDr'+ index +'Des1');
-                ////////////// end ////////////////
-
-                $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
-                $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
-                $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
-
-                $(this).find('#model-line-first-row').attr('class','MoDes'+ index);
-                $(this).find('#model-line-div').attr('class','row MoDesApndHere'+ index);
-                $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
-
-
                 $('#selectBrandMo'+index).select2
                 ({
                     placeholder:"Choose Brands....     Or     Type Here To Search....",
                     allowClear: true,
                     minimumResultsForSearch: -1,
                 });
-                $("#selectModelLineNum"+index+"Des1").select2
-                ({
-                    placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                    allowClear: true,
-                    maximumSelectionLength: 1,
-                });
-                $("#selectModelNumberDiscri"+index+"Des1").select2
-                ({
-                    placeholder: 'Choose Model Description....     Or     Type Here To Search....',
-                    allowClear: true,
-                });
+
+                $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
+                $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
+                $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
+                $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
+                
+                var oldIndex = '';
+                oldIndex = index+1;
+                itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
+                for (var i = 1; i <= itemcount; i++) 
+                {
+                    $(this).find('#row-spare-part-brand-'+oldIndex+'-model-'+i).attr('id', 'row-spare-part-brand-'+index+'-model-'+i);
+                    $(this).find('#showDivdropDr'+ oldIndex +'Des'+i).attr('id','showDivdropDr'+ index +'Des'+i);
+                    $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('data-index', index);
+                    $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('name','brand['+ index +'][model]['+i+'][model_id]');
+                    $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('onchange','selectModelLineDescipt('+ index +','+i+')');
+                    $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('class','compare-tag1 spare-parts-model-lines');
+                    $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('id','selectModelLineNum'+ index +'Des'+i);
+                     $("#selectModelLineNum"+index+"Des"+i).select2
+                    ({
+                        placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                        allowClear: true,
+                        maximumSelectionLength: 1,
+                    });
+                    
+                    $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
+                    $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
+                    $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);                   
+                    $("#selectModelNumberDiscri"+index+"Des"+i).select2
+                    ({
+                        placeholder: 'Choose Model Description....     Or     Type Here To Search....',
+                        allowClear: true,
+                    });
+
+                }
+                $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
+                $(this).find(".MoDesApndHere"+oldIndex).attr('class', "row MoDesApndHere"+index);
+                $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
             });
         })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {
             var indexNumber = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
-
             $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
                 var id = (this.value);
                 var text = (this.text);
                 // addOption(id,text)
             });
-
             $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
             $('.MoDesApndHere'+indexNumber).each(function(i){
                 var modelIndex = +i + +1;
 
                 //// should loop ////////////
-                // $(this).attr('class','row MoDesApndHere'+indexNumber);
                 $(this).attr('id','row-spare-part-brand-'+indexNumber  +'-model-'+modelIndex);
                 $(this).find('.model-line-item-dropdown').attr('id', 'showDivdropDr'+indexNumber+'Des'+modelIndex);
 
@@ -356,7 +360,7 @@
                                     </div>
                                 </div>
                                     <div class="MoDes${index}" id="model-line-first-row">
-                                        <div class="row MoDesApndHere${index}" id="model-line-div" >
+                                        <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >
                                             <div class="col-xxl-1 col-lg-1 col-md-12">
                                             </div>
                                             <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
