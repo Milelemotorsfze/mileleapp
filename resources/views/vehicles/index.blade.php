@@ -74,7 +74,7 @@ th.nowrap-td {
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         @endphp
-        <form id="form-update" action="{{ route('vehicles.update-vehicle-details') }}" method="POST" >
+        <form id="form-update" method="POST" >
             @csrf
             @foreach($data as $value => $vehicle)
                 <input type="hidden" value="{{ $vehicle->id }}" name="vehicle_ids[]">
@@ -334,7 +334,7 @@ th.nowrap-td {
                                                     $import_type = $documents ? $documents->import_type : null;
                                                     $owership = $documents ? $documents->owership : null;
                                                     $document_with = $documents ? $documents->document_with : null;
-                                                    $bl_status = $documents ? $documents->bl_status : null;
+                                                    $bl_number = $documents ? $documents->bl_number : null;
                                                     $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                                                     @endphp
                                          @php
@@ -607,17 +607,65 @@ th.nowrap-td {
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
                                             @endphp
                                             @if ($hasPermission)
-                                            <td class="nowrap-td import_type">{{ $import_type }}</td>
-                                            <td class="nowrap-td owership">{{ $owership }}</td>
-                                            <td class="nowrap-td document_with">{{ $document_with }}</td>
+                                            <td class="nowrap-td import_type">
+                                                <select name="import_types[]" id="import_type" disabled class="form-control import-type">
+                                                    <option value=""></option>
+                                                    <option value="Belgium Docs" {{ $import_type == 'Belgium Docs' ? 'selected' : ''}}>Belgium Docs</option>
+                                                    <option value="BOE + VCC + Exit" {{ $import_type == 'BOE + VCC + Exit' ? 'selected' : ''}}>BOE + VCC + Exit</option>
+                                                    <option value="Cross Trade" {{ $import_type == 'Cross Trade' ? 'selected' : ''}}>Cross Trade</option>
+                                                    <option value="Dubai Trade" {{ $import_type == 'Dubai Trade' ? 'selected' : ''}}>Dubai Trade</option>
+                                                    <option value="Incoming" {{ $import_type == 'Incoming' ? 'selected' : ''}}>Incoming</option>
+                                                    <option value="No Records" {{ $import_type == 'No Records' ? 'selected' : ''}}>No Records</option>
+                                                    <option value="RTA Possession" {{ $import_type == 'RTA Possession' ? 'selected' : ''}}>RTA Possession</option>
+                                                    <option value="RTA Registration" {{ $import_type == 'RTA Registration' ? 'selected' : ''}}>RTA Registration</option>
+                                                    <option value="Supplier Docs" {{ $import_type == 'Supplier Docs' ? 'selected' : ''}}>Supplier Docs</option>
+                                                    <option value="VCC" {{ $import_type == 'VCC' ? 'selected' : ''}}>VCC</option>
+                                                    <option value="Zimbabwe" {{ $import_type == 'Zimbabwe' ? 'selected' : ''}}>Zimbabwe</option>
+                                                </select>
+{{--                                                {{ $import_type }}--}}
+                                            </td>
+                                            <td class="nowrap-td owership">
+                                                <select name="owerships[]" id="owership" class="form-control ownership" disabled>
+                                                    <option value=""></option>
+                                                    <option value="Abdul Azeem" {{ $owership == 'Abdul Azeem' ? 'selected' : ''  }}>Abdul Azeem</option>
+                                                    <option value="Barwil Supplier" {{ $owership == 'Barwil Supplier' ? 'selected' : ''  }}>Barwil Supplier</option>
+                                                    <option value="Belgium Warehouse" {{ $owership == 'Belgium Warehouse' ? 'selected' : ''  }}>Belgium Warehouse</option>
+                                                    <option value="Faisal Raiz" {{ $owership == 'Faisal Raiz' ? 'selected' : ''  }}>Faisal Raiz</option>
+                                                    <option value="Feroz Riaz" {{ $owership == 'Feroz Riaz' ? 'selected' : ''  }}>Feroz Riaz</option>
+                                                    <option value="Globelink Supplier" {{ $owership == 'Globelink Supplier' ? 'selected' : ''  }}>Globelink Supplier</option>
+                                                    <option value="Incoming" {{ $owership == 'Incoming' ? 'selected' : ''  }}>Incoming</option>
+                                                    <option value="Milele" {{ $owership == 'Milele' ? 'selected' : ''  }}>Milele</option>
+                                                    <option value="Milele Car Trading LLC" {{ $owership == 'Milele Car Trading LLC' ? 'selected' : ''  }}>Milele Car Trading LLC</option>
+                                                    <option value="Milele Motors FZE" {{ $owership == 'Milele Motors FZE' ? 'selected' : ''  }}>Milele Motors FZE</option>
+                                                    <option value="Oneworld Limousine" {{ $owership == 'Oneworld Limousine' ? 'selected' : ''  }}>Oneworld Limousine</option>
+                                                    <option value="Supplier" {{ $owership == 'Supplier' ? 'selected' : ''  }}>Supplier</option>
+                                                    <option value="Trans Car FZE" {{ $owership == 'Trans Car FZE' ? 'selected' : ''  }}>Trans Car FZE</option>
+                                                    <option value="Zimbabwe Docs" {{ $owership == 'Zimbabwe Docs' ? 'selected' : ''  }}>Zimbabwe Docs</option>
+                                                </select>
+{{--                                                {{ $owership }}--}}
+                                            </td>
+                                            <td class="nowrap-td document_with">
+                                                <select name="documents_with[]" id="document_with" disabled class="form-control document-with">
+                                                    <option value=""></option>
+                                                    <option value="Accounts" {{ $document_with == 'Accounts' ? 'selected' : ''  }}>Accounts</option>
+                                                    <option value="Finance Department" {{ $document_with == 'Finance Department' ? 'selected' : ''  }}>Finance Department</option>
+                                                    <option value="Import Department" {{ $document_with == 'Import Department' ? 'selected' : ''  }}>Import Department</option>
+                                                    <option value="Not Applicable" {{ $document_with == 'Not Applicable' ? 'selected' : ''  }}>Not Applicable</option>
+                                                    <option value="Supplier" {{ $document_with == 'Supplier' ? 'selected' : ''  }}>Supplier</option>
+                                                </select>
+{{--                                                {{ $document_with }}--}}
+                                            </td>
                                             @endif
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
                                             @endphp
                                             @if ($hasPermission)
-                                            <td class="nowrap-td bl_status">{{ $bl_status }}</td>
+                                            <td class="nowrap-td bl_number">
+                                                <input type="number" class="form-control bl-number" value="{{$bl_number}}" min="0" name="bl_numbers[]"
+                                                       readonly>
+                                            </td>
                                            @endif
-                                                                @php
+                                           @php
                                               $pictures = DB::table('vehicle_pictures')->where('vehicle_id', $vehicles->id)->latest()->first();
                                               $pictures_link = $pictures ? $pictures->vehicle_picture_link : null;
                                           @endphp
@@ -645,17 +693,30 @@ th.nowrap-td {
 {{--@endphp--}}
 {{--@if ($hasPermission)--}}
 <script>
-    $(".update-vehicle-details").click(function(){
-        $("#form-update").submit(); // Submit the form
-    });
+
         @php
-        // QC
+            // QC
            $hasPermissionInspectionEdit = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
-           $hasPermissionVehicleVariant = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+           $hasPermissionVehicleDetailEdit = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
            $hasPermissionEngineEdit = Auth::user()->hasPermissionForSelectedRole('enginee-edit');
-           $hasPermissionPP_MM_YYEdit = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
+           //Logistic
+           $hasPermissionDocumentEdit = Auth::user()->hasPermissionForSelectedRole('document-edit');
+           $hasPermissionBLEdit = Auth::user()->hasPermissionForSelectedRole('bl-edit');
 
          @endphp
+
+        $(".update-vehicle-details").click(function(e){
+            e.preventDefault();
+            let Qc_url = '{{ route('vehicles.updatedata') }}';
+            let logistic_url = '{{ route('vehicles.updatelogistics') }}'
+            @if($hasPermissionDocumentEdit)
+                $('#form-update').attr('action', logistic_url).submit();
+            @endif
+            @if($hasPermissionVehicleDetailEdit)
+            $('#form-update').attr('action', Qc_url).submit();
+            @endif
+            $("#form-update").submit(); // Submit the form
+        });
         $('.variant').change(function () {
             var Id = $(this).val();
             var vehicleId = $(this).attr('data-vehicle-id');
@@ -669,12 +730,10 @@ th.nowrap-td {
                     variant_id: Id,
                 },
                 success:function (data) {
-                    console.log(data);
                     $('#brand-'+vehicleId).text(data.brand);
                     $('#model-line-'+vehicleId).text(data.model_line);
                     $('#model-description-'+vehicleId).text(data.model_detail);
                     $('#variant-detail-'+vehicleId).text(data.detail);
-
                     $('#my-'+vehicleId).text(data.my);
                     $('#seat-'+vehicleId).text(data.seat);
                     $('#steering-'+vehicleId).text(data.steering);
@@ -692,19 +751,25 @@ th.nowrap-td {
           @if($hasPermissionInspectionEdit)
            $('.inspection-date').attr('readonly',false);
           @endif
-          @if($hasPermissionVehicleVariant)
+          @if($hasPermissionVehicleDetailEdit)
             $('.variant').attr('disabled',false);
             $('.exterior_colour').attr('readonly',false);
             $('.interior_colour').attr('readonly',false);
+           $('.py-mm-yyyy').attr('readonly',false);
+
           @endif
-         @if($hasPermissionEngineEdit)
-          $('.engine').attr('readonly',false);
-         @endif
+          @if($hasPermissionEngineEdit)
+             $('.engine').attr('readonly',false);
+          @endif
 
-        @if($hasPermissionPP_MM_YYEdit)
-         $('.py-mm-yyyy').attr('readonly',false);
-
-        @endif
+          @if($hasPermissionDocumentEdit)
+            $('.import-type').attr('disabled',false);
+            $('.ownership').attr('disabled',false);
+            $('.document-with').attr('disabled',false);
+          @endif
+           @if($hasPermissionBLEdit)
+           $('.bl-number').attr('readonly',false);
+           @endif
 
        })
    </script>

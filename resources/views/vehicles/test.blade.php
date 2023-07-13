@@ -720,56 +720,56 @@
                                     {{--    <div class="row">--}}
                                     {{--      <div class="col-md-4">--}}
                                     {{--  <label for="import_document">Import Document Type</label>--}}
-                                    {{--  <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">--}}
-                                    {{--        <select name="import_type" id="import_type" class="form-control" placeholder="Import Document Type">--}}
-                                    {{--        <option value="Belgium Docs">Belgium Docs</option>--}}
-                                    {{--        <option value="BOE + VCC + Exit">BOE + VCC + Exit</option>--}}
-                                    {{--        <option value="Cross Trade">Cross Trade</option>--}}
-                                    {{--        <option value="Dubai Trade">Dubai Trade</option>--}}
-                                    {{--        <option value="Incoming">Incoming</option>--}}
-                                    {{--        <option value="No Records">No Records</option>--}}
-                                    {{--        <option value="RTA Possession">RTA Possession</option>--}}
-                                    {{--        <option value="RTA Registration">RTA Registration</option>--}}
-                                    {{--        <option value="Supplier Docs">Supplier Docs</option>--}}
-                                    {{--        <option value="VCC">VCC</option>--}}
-                                    {{--        <option value="Zimbabwe">Zimbabwe</option>--}}
-                                    {{--    </select>--}}
+                                      <input type="hidden" class="form-control" id="vehicle_id" name="vehicle_id" value="{{ $vehicles->id }}">
+                                            <select name="import_type" id="import_type" class="form-control" placeholder="Import Document Type">
+                                            <option value="Belgium Docs">Belgium Docs</option>
+                                            <option value="BOE + VCC + Exit">BOE + VCC + Exit</option>
+                                            <option value="Cross Trade">Cross Trade</option>
+                                            <option value="Dubai Trade">Dubai Trade</option>
+                                            <option value="Incoming">Incoming</option>
+                                            <option value="No Records">No Records</option>
+                                            <option value="RTA Possession">RTA Possession</option>
+                                            <option value="RTA Registration">RTA Registration</option>
+                                            <option value="Supplier Docs">Supplier Docs</option>
+                                            <option value="VCC">VCC</option>
+                                            <option value="Zimbabwe">Zimbabwe</option>
+                                        </select>
                                     {{--</div>--}}
                                     {{--      <div class="col-md-4">--}}
                                     {{--        <label for="gdn_date">Document Ownership</label>--}}
-                                    {{--        <select name="owership" id="owership" class="form-control" placeholder="Docuemnt Ownership">--}}
-                                    {{--        <option value="Abdul Azeem">Abdul Azeem</option>--}}
-                                    {{--        <option value="Barwil Supplier">Barwil Supplier</option>--}}
-                                    {{--        <option value="Belgium Warehouse">Belgium Warehouse</option>--}}
-                                    {{--        <option value="Faisal Raiz">Faisal Raiz</option>--}}
-                                    {{--        <option value="Feroz Riaz">Feroz Riaz</option>--}}
-                                    {{--        <option value="Globelink Supplier">Globelink Supplier</option>--}}
-                                    {{--        <option value="Incoming">Incoming</option>--}}
-                                    {{--        <option value="Milele">Milele</option>--}}
-                                    {{--        <option value="Milele Car Trading LLC">Milele Car Trading LLC</option>--}}
-                                    {{--        <option value="Milele Motors FZE">Milele Motors FZE</option>--}}
-                                    {{--        <option value="Oneworld Limousine">Oneworld Limousine</option>--}}
-                                    {{--        <option value="Supplier">Supplier</option>--}}
-                                    {{--        <option value="Trans Car FZE">Trans Car FZE</option>--}}
-                                    {{--        <option value="Zimbabwe Docs">Zimbabwe Docs</option>--}}
-                                    {{--    </select>--}}
+                                            <select name="owership" id="owership" class="form-control" placeholder="Docuemnt Ownership">
+                                            <option value="Abdul Azeem">Abdul Azeem</option>
+                                            <option value="Barwil Supplier">Barwil Supplier</option>
+                                            <option value="Belgium Warehouse">Belgium Warehouse</option>
+                                            <option value="Faisal Raiz">Faisal Raiz</option>
+                                            <option value="Feroz Riaz">Feroz Riaz</option>
+                                            <option value="Globelink Supplier">Globelink Supplier</option>
+                                            <option value="Incoming">Incoming</option>
+                                            <option value="Milele">Milele</option>
+                                            <option value="Milele Car Trading LLC">Milele Car Trading LLC</option>
+                                            <option value="Milele Motors FZE">Milele Motors FZE</option>
+                                            <option value="Oneworld Limousine">Oneworld Limousine</option>
+                                            <option value="Supplier">Supplier</option>
+                                            <option value="Trans Car FZE">Trans Car FZE</option>
+                                            <option value="Zimbabwe Docs">Zimbabwe Docs</option>
+                                        </select>
                                     {{--      </div>--}}
                                     {{--      <div class="col-md-4">--}}
                                     {{--        <label for="gdn_date">Document With</label>--}}
-                                    {{--        <select name="document_with" id="document_with" class="form-control" placeholder="Docuemnt With">--}}
-                                    {{--        <option value="Accounts">Accounts</option>--}}
-                                    {{--        <option value="Finance Department">Finance Department</option>--}}
-                                    {{--        <option value="Import Department">Import Department</option>--}}
-                                    {{--        <option value="Not Applicable">Not Applicable</option>--}}
-                                    {{--        <option value="Supplier">Supplier</option>--}}
-                                    {{--    </select>--}}
+                                            <select name="document_with" id="document_with" class="form-control" placeholder="Docuemnt With">
+                                            <option value="Accounts">Accounts</option>
+                                            <option value="Finance Department">Finance Department</option>
+                                            <option value="Import Department">Import Department</option>
+                                            <option value="Not Applicable">Not Applicable</option>
+                                            <option value="Supplier">Supplier</option>
+                                        </select>
                                     {{--      </div>--}}
                                     {{--      <div class="col-md-4">--}}
                                     {{--        <label for="gdn_date">BL Status</label>--}}
-                                    {{--        <select name="bl_status" id="bl_status" class="form-control" placeholder="BL Status">--}}
-                                    {{--        <option value="Yes">Yes</option>--}}
-                                    {{--        <option value="No">No</option>--}}
-                                    {{--    </select>--}}
+                                            <select name="bl_status" id="bl_status" class="form-control" placeholder="BL Status">
+                                            <option value="Yes">Yes</option>
+                                            <option value="No">No</option>
+                                        </select>
                                     {{--      </div>--}}
                                     {{--</div>--}}
                                     {{--        <div class="modal-footer">--}}
@@ -779,6 +779,7 @@
                                     {{--</form>--}}
                                 </div>
                             </div>
+                        </div>
                         </div>
                         @endif
                         @php

@@ -21,8 +21,6 @@ use App\Models\VehiclePicture;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 
-
-
 class VehiclesController extends Controller
 {
     /**
@@ -82,118 +80,6 @@ class VehiclesController extends Controller
     public function destroy(string $id)
     {
         //
-    }
-    public function updateVehicleDetails(Request $request) {
-//        return $request->pymmyyyy;
-        $vehicles = $request->vehicle_ids;
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-
-        foreach ($vehicles as $key => $vehicle) {
-            $vehicle = Vehicles::find($vehicle);
-            $oldInspectionDate = $vehicle->inspection_date;
-            $newInspectionDate = $request->inspection_dates[$key];
-            if($oldInspectionDate != $newInspectionDate)
-            {
-                $vehicle->inspection_date = $newInspectionDate;
-
-//                $vehicleslog = new Vehicleslog();
-//                $vehicleslog->time = $currentDateTime->toTimeString();
-//                $vehicleslog->date = $currentDateTime->toDateString();
-//                // MAKE DYNAMIC WITH AUTH USER ROLE
-//                $vehicleslog->status = 'Update QC Values';
-//                $vehicleslog->vehicles_id = $vehicle;
-//                $vehicleslog->field = 'Inspection Date';
-//                $vehicleslog->old_value = $oldInspectionDate;
-//                $vehicleslog->new_value = $newInspectionDate;
-//                $vehicleslog->created_by = auth()->user()->id;
-//                $vehicleslog->save();
-            }
-            $oldVariantId = $vehicle->varaints_id;
-            $newVariantId = $request->variants_ids[$key];
-            if($oldVariantId != $newVariantId)
-            {
-                $vehicle->varaints_id = $newVariantId;
-
-//                $vehicleslog = new Vehicleslog();
-//                $vehicleslog->time = $currentDateTime->toTimeString();
-//                $vehicleslog->date = $currentDateTime->toDateString();
-//                // MAKE DYNAMIC WITH AUTH USER ROLE
-//                $vehicleslog->status = 'Update QC Values';
-//                $vehicleslog->vehicles_id = $vehicle;
-//                $vehicleslog->field = 'Variant';
-//                $vehicleslog->old_value = $oldVariantId;
-//                $vehicleslog->new_value = $newVariantId;
-//                $vehicleslog->created_by = auth()->user()->id;
-//                $vehicleslog->save();
-            }
-            $oldEngine = $vehicle->engine;
-            $newEngine = $request->engines[$key];
-            if($oldEngine != $newEngine) {
-                $vehicle->engine = $newEngine;
-            }
-            $oldExColour = $vehicle->ex_colour;
-            $newExColour = $request->exterior_colours[$key];
-            if($oldExColour != $newExColour)
-            {
-                $vehicle->ex_colour = $newExColour;
-//
-//                $vehicleslog = new Vehicleslog();
-//                $vehicleslog->time = $currentDateTime->toTimeString();
-//                $vehicleslog->date = $currentDateTime->toDateString();
-//                // MAKE DYNAMIC WITH AUTH USER ROLE
-//                $vehicleslog->status = 'Update QC Values';
-//                $vehicleslog->vehicles_id = $vehicle;
-//                $vehicleslog->field = 'Exterior Colour';
-//                $vehicleslog->old_value = $oldExColour;
-//                $vehicleslog->new_value = $newExColour;
-//                $vehicleslog->created_by = auth()->user()->id;
-//                $vehicleslog->save();
-            }
-
-            $oldIntColour = $vehicle->int_colour;
-            $newIntColour = $request->interior_colours[$key];
-
-            if($oldIntColour != $newIntColour)
-            {
-                $vehicle->int_colour = $newIntColour;
-
-//                $vehicleslog = new Vehicleslog();
-//                $vehicleslog->time = $currentDateTime->toTimeString();
-//                $vehicleslog->date = $currentDateTime->toDateString();
-//                // MAKE DYNAMIC WITH AUTH USER ROLE
-//                $vehicleslog->status = 'Update QC Values';
-//                $vehicleslog->vehicles_id = $vehicle;
-//                $vehicleslog->field = 'Exterior Colour';
-//                $vehicleslog->old_value = $oldIntColour;
-//                $vehicleslog->new_value = $newIntColour;
-//                $vehicleslog->created_by = auth()->user()->id;
-//                $vehicleslog->save();
-
-            }
-            $oldppmmyyy = $vehicle->ppmmyyy;
-            $newppmmyyy = $request->pymmyyyy[$key];
-
-            if($oldppmmyyy != $newppmmyyy)
-            {
-                $vehicle->ppmmyyy = $newppmmyyy;
-
-//                $vehicleslog = new Vehicleslog();
-//                $vehicleslog->time = $currentDateTime->toTimeString();
-//                $vehicleslog->date = $currentDateTime->toDateString();
-//                // MAKE DYNAMIC WITH AUTH USER ROLE
-//                $vehicleslog->status = 'Update QC Values';
-//                $vehicleslog->vehicles_id = $vehicle;
-//                $vehicleslog->field = 'Exterior Colour';
-//                $vehicleslog->old_value = $oldppmmyyy;
-//                $vehicleslog->new_value = $newppmmyyy;
-//                $vehicleslog->created_by = auth()->user()->id;
-//                $vehicleslog->save();
-            }
-            $vehicle->save();
-        }
-
-        return redirect()->back()->with('success','Vehicle details are updated successfully.');
     }
     public function getVehicleDetails(Request $request) {
         $variant = Varaint::find($request->variant_id);
@@ -361,48 +247,54 @@ class VehiclesController extends Controller
     }
     public function updatedata(Request $request)
     {
-        $id = $request->input('vehicle_id');
-        $vehicle = Vehicles::find($id);
-        $oldValues = $vehicle->toArray();
-        $variants_name = $request->input('variants_name');
-        $variants_id = Varaint::where('name', $variants_name)->value('id');
-        $vehicle->varaints_id = $variants_id;
-        $vehicle->vin = $request->input('vin');
-        $vehicle->engine = $request->input('engine');
-        $vehicle->ex_colour = $request->input('ex_colour');
-        $vehicle->int_colour = $request->input('int_colour');
-        $vehicle->territory = $request->input('territory');
-        $vehicle->inspection_date = $request->input('inspection');
-        $vehicle->ppmmyyy = $request->input('ppmmyy');
-        $changes = [];
-        foreach ($oldValues as $field => $oldValue) {
-            if ($field !== 'created_at' && $field !== 'updated_at') {
-                $newValue = $vehicle->$field;
-                if ($oldValue != $newValue) {
-                    $changes[$field] = [
-                        'old_value' => $oldValue,
-                        'new_value' => $newValue,
-                    ];
-                }
-            }
-        }
-        if (!empty($changes)) {
+        $vehicles = $request->vehicle_ids;
+
+        foreach ($vehicles as $key => $vehicle)
+        {
+            $vehicle = Vehicles::find($vehicle);
+            $id = $vehicle;
+            $oldValues = $vehicle->toArray();
+            $vehicle->varaints_id = $request->variants_ids[$key];
+            $vehicle->vin = $request->input('vin');
+            $vehicle->engine = $request->engines[$key];
+            $vehicle->ex_colour = $request->exterior_colours[$key];
+            $vehicle->int_colour = $request->interior_colours[$key];
+            $vehicle->territory = $request->input('territory');
+            $vehicle->inspection_date = $request->inspection_dates[$key];
+            $vehicle->ppmmyyy = $request->pymmyyyy[$key];
             $vehicle->save();
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-            foreach ($changes as $field => $change) {
-            $vehicleslog = new Vehicleslog();
-            $vehicleslog->time = $currentDateTime->toTimeString();
-            $vehicleslog->date = $currentDateTime->toDateString();
-            $vehicleslog->status = 'Update QC Values';
-            $vehicleslog->vehicles_id = $id;
-            $vehicleslog->field = $field;
-            $vehicleslog->old_value = $change['old_value'];
-            $vehicleslog->new_value = $change['new_value'];
-            $vehicleslog->created_by = auth()->user()->id;
-            $vehicleslog->save();
-            }
+//            $changes = [];
+//            foreach ($oldValues as $field => $oldValue) {
+//                if ($field !== 'created_at' && $field !== 'updated_at') {
+//                    $newValue = $vehicle->$field;
+//                    if ($oldValue != $newValue) {
+//                        $changes[$field] = [
+//                            'old_value' => $oldValue,
+//                            'new_value' => $newValue,
+//                        ];
+//                    }
+//                }
+//            }
+//            if (!empty($changes)) {
+//                $vehicle->save();
+//                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+//                $currentDateTime = Carbon::now($dubaiTimeZone);
+//                foreach ($changes as $field => $change) {
+//                    $vehicleslog = new Vehicleslog();
+//                    $vehicleslog->time = $currentDateTime->toTimeString();
+//                    $vehicleslog->date = $currentDateTime->toDateString();
+//                    $vehicleslog->status = 'Update QC Values';
+//                    $vehicleslog->vehicles_id = $id;
+//                    $vehicleslog->field = $field;
+//                    $vehicleslog->old_value = $change['old_value'];
+//                    $vehicleslog->new_value = $change['new_value'];
+//                    $vehicleslog->created_by = auth()->user()->id;
+//                    $vehicleslog->save();
+//                }
+//            }
         }
+
+
         return redirect()->back()->with('success', 'Vehicle details updated successfully.');
     }
     public function updateso(Request $request)
@@ -628,69 +520,77 @@ if ($request->has('reservation_start_date')) {
     }
     public function updatelogistics(Request $request)
     {
-         $vehicleId = $request->input('vehicle_id');
-        $vehicle = Vehicles::find($vehicleId);
-        $documents_id = $vehicle->documents_id;
-		if ($documents_id) {
-            $documents = Document::find($documents_id);
-            $oldValues = $documents->toArray();
-            $documents->import_type = $request->input('import_type');
-			$documents->owership = $request->input('owership');
-			$documents->document_with = $request->input('document_with');
-			$documents->bl_status = $request->input('bl_status');
-            $changes = [];
-            foreach ($oldValues as $field => $oldValue) {
-                if ($field !== 'created_at' && $field !== 'updated_at') {
-                    $newValue = $documents->$field;
-                    if ($oldValue != $newValue) {
-                        $changes[$field] = [
-                            'old_value' => $oldValue,
-                            'new_value' => $newValue,
-                        ];
+        $vehicles = $request->vehicle_ids;
+        foreach ($vehicles as $key => $vehicle) {
+            $vehicle = Vehicles::find($vehicle);
+            $documents_id = $vehicle->documents_id;
+            if ($documents_id) {
+                $documents = Document::find($documents_id);
+                $oldValues = $documents->toArray();
+                $documents->import_type = $request->import_types[$key];
+                $documents->owership = $request->owerships[$key];
+                $documents->document_with = $request->documents_with[$key];
+                $documents->bl_number = $request->bl_numbers[$key];
+                $changes = [];
+                foreach ($oldValues as $field => $oldValue) {
+                    if ($field !== 'created_at' && $field !== 'updated_at') {
+                        $newValue = $documents->$field;
+                        if ($oldValue != $newValue) {
+                            $changes[$field] = [
+                                'old_value' => $oldValue,
+                                'new_value' => $newValue,
+                            ];
+                        }
+                    }
+                }
+                if (!empty($changes)) {
+                    $documents->save();
+                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                    foreach ($changes as $field => $change) {
+                        $documentlog = new Documentlog();
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $documentlog->time = $currentDateTime->toTimeString();
+                        $documentlog->date = $currentDateTime->toDateString();
+                        $documentlog->status = 'Update Document Values';
+                        $documentlog->documents_id = $documents_id;
+                        $documentlog->field = $field;
+                        $documentlog->old_value = $change['old_value'];
+                        $documentlog->new_value = $change['new_value'];
+                        $documentlog->created_by = auth()->user()->id;
+                        $documentlog->save();
                     }
                 }
             }
-            if (!empty($changes)) {
-                $documents->save();
-                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                $currentDateTime = Carbon::now($dubaiTimeZone);
-                foreach ($changes as $field => $change) {
-                    $documentlog = new Documentlog();
+            else {
+                if(!empty($request->import_types[$key]) || !empty($request->owerships[$key]) ||
+                    !empty($request->documents_with[$key]) || !empty($request->bl_numbers[$key]))
+                {
+                    $documents = new Document();
+                    $documents->import_type = $request->import_types[$key];
+                    $documents->owership = $request->owerships[$key];
+                    $documents->document_with = $request->documents_with[$key];
+                    $documents->bl_number = $request->bl_numbers[$key];
+                    $documents->save();
+                    $documents_id = $documents->id;
                     $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                     $currentDateTime = Carbon::now($dubaiTimeZone);
+                    $documentlog = new Documentlog();
                     $documentlog->time = $currentDateTime->toTimeString();
                     $documentlog->date = $currentDateTime->toDateString();
-                    $documentlog->status = 'Update Document Values';
+                    $documentlog->status = 'New Created';
                     $documentlog->documents_id = $documents_id;
-                    $documentlog->field = $field;
-                    $documentlog->old_value = $change['old_value'];
-                    $documentlog->new_value = $change['new_value'];
                     $documentlog->created_by = auth()->user()->id;
                     $documentlog->save();
+                    $vehicle->documents_id = $documents_id;
+                    $vehicle->save();
                 }
+
             }
         }
-		else {
-            $documents = new Document();
-            $documents->import_type = $request->input('import_type');
-			$documents->owership = $request->input('owership');
-			$documents->document_with = $request->input('document_with');
-			$documents->document_with = $request->input('document_with');
-			$documents->bl_status = $request->input('bl_status');
-            $documents->save();
-            $documents_id = $documents->id;
-            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-            $currentDateTime = Carbon::now($dubaiTimeZone);
-               $documentlog = new Documentlog();
-                $documentlog->time = $currentDateTime->toTimeString();
-                $documentlog->date = $currentDateTime->toDateString();
-                $documentlog->status = 'New Created';
-                $documentlog->documents_id = $documents_id;
-                $documentlog->created_by = auth()->user()->id;
-                $documentlog->save();
-             $vehicle->documents_id = $documents_id;
-             $vehicle->save();
-            }
+//         $vehicleId = $request->input('vehicle_id');
+
         return redirect()->back()->with('success', 'Vehicle details updated successfully.');
     }
     public function viewpictures($id)
