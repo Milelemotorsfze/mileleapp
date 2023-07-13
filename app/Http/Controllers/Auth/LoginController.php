@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\LogActivity;
 use Session;
 
 class LoginController extends Controller
@@ -39,6 +40,10 @@ public function login(Request $request){
             
             if(Auth::user()->status == 'active') 
             {
+                $activity['ip'] = $request->ip();
+                $activity['user_id'] = Auth::id();
+                $activity['status'] = 'success';
+                LogActivity::create($activity);
                 return redirect()->route('home');
             }
 else{

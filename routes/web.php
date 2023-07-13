@@ -40,6 +40,7 @@ use App\Http\Controllers\VehiclesController;
 use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\ColorCodesController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\LoginActivityController;
 
 
 /*
@@ -309,4 +310,6 @@ Route::get('/d', function () {
     Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
     Route::get('/view-remarks-details/{id}', [VehiclesController::class, 'viewremarks'])->name('vehiclesremarks.viewremarks');
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
+
+    Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
 });

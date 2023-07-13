@@ -360,7 +360,7 @@ class PurchasingOrderController extends Controller
 }
 public function checkcreatevins(Request $request)
     {
-        $vinValues = $request->input('vin');
+        $vinValues = $request->input('oldvin');
         $vinValues = array_filter($vinValues, function ($value) {
             return trim($value) !== '';
         });
