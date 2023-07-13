@@ -123,6 +123,12 @@ input[type=number]::-webkit-outer-spin-button {
             <label for="QTY" class="form-label">Variants Detail:</label>
         </div>
         <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Estimated Arrival:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+            <label for="exColour" class="form-label">Territory:</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Exterior Color:</label>
         </div>
         <div class="col-lg-1 col-md-6">
@@ -169,7 +175,7 @@ input[type=number]::-webkit-outer-spin-button {
     </div>
                 <div class="col-lg-1 col-md-6 upernac">
                     <div class="btn btn-primary add-row-btn">
-                        <i class="fas fa-plus"></i> Add More
+                        <i class="fas fa-plus"></i> Add Vehicles
                     </div>
                 </div>
             </div>

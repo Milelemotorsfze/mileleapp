@@ -46,36 +46,6 @@
     <div class="col-2">GDN Date: {{$gdn_date}}</div>
     <div class="col-2">VIN: {{$vehicle->vin}}</div>
 </div>
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title">Edit Vehicle Detail</h4>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-lg-3 col-md-4 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-16">Brand</label>
-                            <input type="text" class="form-control" id="basicpill-firstname-input"
-                                   value="" name="date">
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-16 text-muted">Model Line</label>
-                            <input type="text" class="form-control" id="basicpill-firstname-input"
-                                   value="" name="date">
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-16 text-muted">Variant</label>
-                            <input type="text" class="form-control" id="basicpill-firstname-input"
-                                   value="" name="date">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 <hr>
     <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
