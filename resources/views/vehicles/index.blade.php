@@ -74,7 +74,7 @@ th.nowrap-td {
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         @endphp
-        <form action="{{ route('vehicles.update-vehicle-details') }}" method="POST" >
+        <form id="form-update" action="{{ route('vehicles.update-vehicle-details') }}" method="POST" >
             @csrf
             @foreach($data as $value => $vehicle)
                 <input type="hidden" value="{{ $vehicle->id }}" name="vehicle_ids[]">
@@ -87,7 +87,7 @@ th.nowrap-td {
                 {{--    @endphp--}}
                 {{--    @if ($hasPermission)--}}
                         <button type="button" class="btn btn-sm btn-primary float-end edit-vehicle">Edit</button>
-                        <button type="submit" class="btn btn-sm btn-success float-end update-vehicle-details" hidden >Update</button>
+                        <button type="button" class="btn btn-sm btn-success float-end update-vehicle-details" hidden >Update</button>
                 {{--    @endif--}}
                 </div>
                 <div class="card-body">
@@ -482,18 +482,26 @@ th.nowrap-td {
                                                {{$vehicles->variant->master_model_lines->model_line ?? ''}}
                                            </span>
                                          </td>
-                                         <td class="nowrap-td">{{ $vehicles->vin }}</td>
+                                         <td class="nowrap-td">
+                                             <span id="model-description-{{$vehicles->id}}">
+                                                 {{ $vehicles->variant->model_detail ?? '' }}
+                                             </span>
+                                         </td>
                                          <td class="nowrap-td Variant">
                                              <select class="form-control variant" data-vehicle-id="{{$vehicles->id}}" id="variant-{{$vehicles->id}}"
-                                                     data-brand="{{$vehicles->variant->brand->brand_name ?? '' }}" data-model-line="{{ $vehicles->variant->master_model_lines->model_line ?? '' }}"
-
                                                      name="variants_ids[]" disabled  >
                                                 @foreach($varaint as $variantItem)
-                                                     <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}> {{ $variantItem->name }}</option>
+                                                     <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                                                         {{ $variantItem->name }}</option>
                                                 @endforeach
                                              </select>
                                          </td>
-                                         <td class="nowrap-td">{{ $varaints_detail }}</td>
+                                         <td class="nowrap-td">
+                                             <span id="variant-detail-{{ $vehicles->id }}">
+{{--                                                 {{ $varaints_detail }}--}}
+                                                 {{ $vehicles->detail ?? '' }}
+                                             </span>
+                                         </td>
                                          @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
@@ -519,11 +527,21 @@ th.nowrap-td {
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                         @endphp
                                         @if ($hasPermission)
-                                         <td class="nowrap-td">{{ $varaints_my }}</td>
-                                            <td class="nowrap-td">{{ $varaints_steering }}</td>
-                                            <td class="nowrap-td">{{ $varaints_seat }}</td>
-                                            <td class="nowrap-td">{{ $varaints_fuel_type }}</td>
-                                            <td class="nowrap-td">{{ $varaints_gearbox }}</td>
+                                             <td class="nowrap-td">
+                                                 <span id="my-{{ $vehicles->id }}"> {{ $vehicles->variant->my }}</span>
+                                             </td>
+                                            <td class="nowrap-td">
+                                                <span id="steering-{{ $vehicles->id }}"> {{ $vehicles->variant->steering }}</span>
+                                            </td>
+                                            <td class="nowrap-td">
+                                                <span id="seat-{{ $vehicles->id }}"> {{ $vehicles->variant->seat }}</span>
+                                            </td>
+                                            <td class="nowrap-td">
+                                                <span id="fuel-type-{{ $vehicles->id }}"> {{ $vehicles->variant->fuel_type }}</span>
+                                            </td>
+                                            <td class="nowrap-td">
+                                                <span id="gearbox-{{ $vehicles->id }}"> {{ $vehicles->variant->gearbox }}</span>
+                                            </td>
                                             <td class="nowrap-td">
                                                 <select class="form-control exterior_colour " name="exterior_colours[]" readonly  >
                                                     @foreach($exteriorColours as $exColour)
@@ -543,7 +561,9 @@ th.nowrap-td {
                                                 </select>
                                             </td>
 {{--                                            <input type="hidden" class="IntColour" value="{{ $vehicles->int_colour }}">--}}
-                                            <td class="nowrap-td Upholestry">{{ $varaints_upholestry }}</td>
+                                            <td class="nowrap-td Upholestry">
+                                              <span id="upholestry-{{ $vehicles->id }}"> </span>  {{ $vehicles->variant->upholestry ?? '' }}
+                                            </td>
                                             @endif
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
@@ -625,6 +645,9 @@ th.nowrap-td {
 {{--@endphp--}}
 {{--@if ($hasPermission)--}}
 <script>
+    $(".update-vehicle-details").click(function(){
+        $("#form-update").submit(); // Submit the form
+    });
         @php
         // QC
            $hasPermissionInspectionEdit = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
@@ -632,14 +655,10 @@ th.nowrap-td {
            $hasPermissionEngineEdit = Auth::user()->hasPermissionForSelectedRole('enginee-edit');
            $hasPermissionPP_MM_YYEdit = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
 
-
          @endphp
         $('.variant').change(function () {
             var Id = $(this).val();
             var vehicleId = $(this).attr('data-vehicle-id');
-            var brand = $(this).attr('data-brand');
-            var modelLine = $(this).attr('data-model-line');
-
             var url = '{{ route('vehicles.getVehicleDetails') }}';
 
             $.ajax({
@@ -651,8 +670,17 @@ th.nowrap-td {
                 },
                 success:function (data) {
                     console.log(data);
-                    $('#brand-'+vehicleId).html(data.brand);
+                    $('#brand-'+vehicleId).text(data.brand);
                     $('#model-line-'+vehicleId).text(data.model_line);
+                    $('#model-description-'+vehicleId).text(data.model_detail);
+                    $('#variant-detail-'+vehicleId).text(data.detail);
+
+                    $('#my-'+vehicleId).text(data.my);
+                    $('#seat-'+vehicleId).text(data.seat);
+                    $('#steering-'+vehicleId).text(data.steering);
+                    $('#fuel-type-'+vehicleId).text(data.fuel_type);
+                    $('#gearbox-'+vehicleId).text(data.gearbox);
+                    $('#upholestry-'+vehicleId).text(data.upholestry);
                 }
             });
         })

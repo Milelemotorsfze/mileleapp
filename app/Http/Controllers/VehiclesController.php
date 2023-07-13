@@ -128,7 +128,7 @@ class VehiclesController extends Controller
 //                $vehicleslog->save();
             }
             $oldEngine = $vehicle->engine;
-            $newEngine = $request->engins[$key];
+            $newEngine = $request->engines[$key];
             if($oldEngine != $newEngine) {
                 $vehicle->engine = $newEngine;
             }
@@ -199,7 +199,15 @@ class VehiclesController extends Controller
         $variant = Varaint::find($request->variant_id);
         $brand = $variant->brand->brand_name ?? '';
         $data['brand'] = $brand;
-        $data['model_line'] = "hsdgfdf";
+        $data['model_line'] = $variant->master_model_lines->model_line ?? '';
+        $data['my'] = $variant->my ?? '';
+        $data['model_detail'] = $variant->model_detail ?? '';
+        $data['seat'] = $variant->seat ?? '';
+        $data['fuel_type'] = $variant->fuel_type ?? '';
+        $data['gearbox'] = $variant->gearbox ?? '';
+        $data['steering'] = $variant->steering ?? '';
+        $data['upholestry'] = $variant->upholestry ?? '';
+        $data['detail'] = $variant->detail ?? '';
 
         return $data;
 
