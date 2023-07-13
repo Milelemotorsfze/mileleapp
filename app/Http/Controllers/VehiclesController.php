@@ -30,9 +30,8 @@ class VehiclesController extends Controller
      */
     public function index()
     {
-        $data = Vehicles::where('status', '!=', 'cancel')
-            ->where('payment_status', '==', 'Payment Completed')
-            ->get();
+        $statuss = "Vendor Confirmed"; 
+        $data = Vehicles::where('status', '!=', 'cancel')->where('payment_status', $statuss)->get();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();

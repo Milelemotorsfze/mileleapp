@@ -30,8 +30,10 @@ input[type=number]::-webkit-outer-spin-button {
     </style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
-@can('Calls-modified')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+@if ($hasPermission)
 @if ($errors->has('start_date') || $errors->has('end_date'))
     <div id="error-message" class="alert alert-danger">
         Please Enter the Correct Dates.
@@ -147,7 +149,6 @@ input[type=number]::-webkit-outer-spin-button {
             </table>
         </div>
     </div>
-    @endcan
     <script>
     $(document).ready(function() {
     $('#one-day-activity-checkbox').change(function() {

@@ -41,8 +41,10 @@
 }
     </style>
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
-@can('Calls-modified')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+  @if ($hasPermission)
 @if ($errors->has('source_name'))
             <div id="error-message" class="alert alert-danger">
                 {{ $errors->first('source_name') }}
@@ -97,7 +99,6 @@
             $('#success-message').fadeOut('slow');
         }, 2000);
     </script>
-@endcan
 @else
     @php
         redirect()->route('home')->send();

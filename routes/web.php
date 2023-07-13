@@ -278,8 +278,27 @@ Route::get('/d', function () {
     Route::resource('warehouse', WarehouseController::class);
     Route::get('vehicles/payment-confirm/{id}', [PurchasingOrderController::class, 'confirmPayment'])->name('vehicles.paymentconfirm');
     Route::get('/vehicles/cancel/{id}', [PurchasingOrderController::class, 'cancel'])->name('vehicles.cancel');
-    Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
+    Route::get('/vehicles/rejecteds/{id}', [PurchasingOrderController::class, 'rejecteds'])->name('vehicles.rejecteds');
+    Route::get('/vehicles/unrejecteds/{id}', [PurchasingOrderController::class, 'unrejecteds'])->name('vehicles.unrejecteds');
+    Route::get('/vehicles/deletevehicles/{id}', [PurchasingOrderController::class, 'deletevehicles'])->name('vehicles.deletevehicles');
+    Route::get('vehicles/paymentintconfirm/{id}', [PurchasingOrderController::class, 'paymentintconfirm'])->name('vehicles.paymentintconfirm');
+    Route::get('vehicles/paymentreleaserejected/{id}', [PurchasingOrderController::class, 'paymentreleaserejected'])->name('vehicles.paymentreleaserejected');
+    Route::get('vehicles/paymentreleaseconfirm/{id}', [PurchasingOrderController::class, 'paymentreleaseconfirm'])->name('vehicles.paymentreleaseconfirm');
+    Route::get('vehicles/paymentrelconfirm/{id}', [PurchasingOrderController::class, 'paymentrelconfirm'])->name('vehicles.paymentrelconfirm');
+    Route::get('vehicles/paymentreleasesconfirm/{id}', [PurchasingOrderController::class, 'paymentreleasesconfirm'])->name('vehicles.paymentreleasesconfirm');
+    Route::get('vehicles/paymentreleasesrejected/{id}', [PurchasingOrderController::class, 'paymentreleasesrejected'])->name('vehicles.paymentreleasesrejected');
+    Route::get('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
+    Route::post('/update-purchasing-allstatus', [PurchasingOrderController::class, 'purchasingallupdateStatus'])->name('purchasing.updateallStatus');
+    Route::get('vehicles/paymentrelconfirmvendors/{id}', [PurchasingOrderController::class, 'paymentrelconfirmvendors'])->name('vehicles.paymentrelconfirmvendors');
 
+    Route::get('/purcahsing-order-filter/{status}', [PurchasingOrderController::class, 'filter'])->name('purchasing.filter');
+    Route::get('/purcahsing-order-filterpayment/{status}', [PurchasingOrderController::class, 'filterpayment'])->name('purchasing.filterpayment');
+    Route::get('/purcahsing-order-filterpaymentrel/{status}', [PurchasingOrderController::class, 'filterpaymentrel'])->name('purchasing.filterpaymentrel');
+    Route::get('/purcahsing-order-filterintentreq/{status}', [PurchasingOrderController::class, 'filterintentreq'])->name('purchasing.filterintentreq');
+    Route::get('/purcahsing-order-filterpendingrelease/{status}', [PurchasingOrderController::class, 'filterpendingrelease'])->name('purchasing.filterpendingrelease');
+    Route::get('/purcahsing-order-filterpendingdebits/{status}', [PurchasingOrderController::class, 'filterpendingdebits'])->name('purchasing.filterpendingdebits');
+    Route::get('/purcahsing-order-filterpendingfellow/{status}', [PurchasingOrderController::class, 'filterpendingfellow'])->name('purchasing.filterpendingfellow');
+    Route::post('/update-purchasing-allstatusrel', [PurchasingOrderController::class, 'purchasingallupdateStatusrel'])->name('purchasing.updateallStatusrel');
     // Vendors
 
     Route::resource('vendors', VendorController::class);

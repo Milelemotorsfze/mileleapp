@@ -1,6 +1,9 @@
 @extends('layouts.table')
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+  @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
      Repeated Customers Info

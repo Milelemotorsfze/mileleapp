@@ -169,7 +169,7 @@ input[type=number]::-webkit-outer-spin-button {
     </div>
                 <div class="col-lg-1 col-md-6 upernac">
                     <div class="btn btn-primary add-row-btn">
-                        <i class="fas fa-plus"></i> Add More
+                        <i class="fas fa-plus"></i> Add Vehicles
                     </div>
                 </div>
             </div>

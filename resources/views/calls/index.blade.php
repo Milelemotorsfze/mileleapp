@@ -1,12 +1,18 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+  @endphp
+  @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
      Calls & Messages Info
     </h4>
-    @can('Calls-modified')
+    @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  @endphp
+  @if ($hasPermission)
     <a class="btn btn-sm btn-success float-end" href="{{ route('calls.createbulk') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Uploading Bulk CSV File
       </a>
@@ -16,7 +22,7 @@
       </a>
       <div class="clearfix"></div>
 <br>
-    @endcan
+    @endif
     @can('Calls-view')
     <ul class="nav nav-pills nav-fill">
       <li class="nav-item">

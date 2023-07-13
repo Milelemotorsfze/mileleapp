@@ -94,8 +94,12 @@
 <br>
 <br>
   <div class="row">
-  <div class="col-lg-2 col-md-3 col-sm-12">
+  <div class="col-lg-1 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>PO Status</strong></label>
+</div>
+  <div class="col-lg-3 col-md-3 col-sm-12">
   @if ($purchasingOrder->status === 'Pending Approval')
+  <span id="status-badge" class="badge badge-soft-info float-middle badge-large">Not Approved</span>
   @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('delete-po-details');
   @endphp
@@ -118,6 +122,35 @@
   @endif
   @endif
 </div>
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+  @endphp
+  @if ($hasPermission)
+  @if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Payment Initiation Request</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="updateallStatus('Approved', {{ $purchasingOrder->id }})">Approve All</button>
+  <button id="rejection-btn" class="btn btn-danger" onclick="updateallStatus('Rejected', {{ $purchasingOrder->id }})">Reject All</button>
+</div>
+@endif
+@endif
+@if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Requested'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Payment Release Request</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="updateallStatusrel('Approved', {{ $purchasingOrder->id }})">Approve All</button>
+  <button id="rejection-btn" class="btn btn-danger" onclick="updateallStatusrel('Rejected', {{ $purchasingOrder->id }})">Reject All</button>
+</div>
+@endif
+@endif
+  @endif
 </div>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12">
@@ -127,34 +160,93 @@
             <th style="font-size: 12px;">Qty</th>
             </thead>
             <tbody>
-                <tr>
-                    <td style="font-size: 12px;">Payment Release Pending</td>
-                    <td style="font-size: 12px;"></td>
+            @php
+                    $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
+                    $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->count();
+                    $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->count();
+                    $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->count();
+                    $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->count();
+                    $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
+                    $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->count();
+                    $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
+                    $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Rejected')->count();
+                    $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Approved')->count();
+                    $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Requested')->count();
+                    $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->count();
+                    $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->count();
+                    $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->count();
+                    $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
+                    @endphp
+                    <tr>
+                    <td style="font-size: 12px;">Vehicles Not Approved</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Release Rejected</td>
-                    <td style="font-size: 12px;"></td>
+                    <td style="font-size: 12px;">Vehicles Rejected</td>
+                    <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Release Approved</td>
-                    <td style="font-size: 12px;"></td>
+                    <td style="font-size: 12px;">Vehicles Payment Requested</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
+                </tr>
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                @endphp
+                @if ($hasPermission)
+                <tr>
+                    <td style="font-size: 12px;">Payment Initiated</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountpaymentreq }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Amount Debited</td>
-                    <td style="font-size: 12px;"></td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px;">Vendor Acknowledged</td>
-                    <td style="font-size: 12px;"></td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px;">Vendor Confirmed</td>
-                    <td style="font-size: 12px;"></td>
+                    <td style="font-size: 12px;">Payment Rejected</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountpaymentrej }}</td>
                 </tr>
                 <tr>
                     <td style="font-size: 12px;">Payment Completed</td>
-                    <td style="font-size: 12px;"></td>
+                    <td style="font-size: 12px;">{{ $vehiclescountpaymentcom }}</td>
                 </tr>
+                <tr>
+                    <td style="font-size: 12px;">Incoming Stock</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountpaymentincom }}</td>
+                </tr>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                @endphp
+                @if ($hasPermission)
+                <tr>
+                    <td style="font-size: 12px;">Payment Initiated</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Initiate Approved</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailapp }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Initiate Rejected</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailreq }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Release Requested</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Release Approved</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailrelapp }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Release Rejected</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Payment Debited</td>
+                    <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
+                </tr>
+                <tr>
+                    <td style="font-size: 12px;">Vendor Confirmed</td>
+                    <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div>
@@ -168,16 +260,7 @@
                             @endphp
                             @if ($hasPermission)
                     <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Updated</a>
-                    @endif
-                    @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
-                    @endphp
-                    @if ($hasPermission)
-                    @if ($purchasingOrder->status === 'Approved')
-                    <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Updated</a>
-                    @endif
+                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
                     @endif
                 </div>
                 <div class="card-body">
@@ -186,15 +269,17 @@
                 <thead class="bg-soft-secondary">
                             <tr >
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
-                                <th>Variants</th>
+                                <th>Variant</th>
                                 <th>Brand</th>
                                 <th>Model Line</th>
                                 <th>Variants Detail</th>
-                                <th>Estimated Arrival</th>
+                                <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th>Territory</th>
-                                <th>Exterior Color</th>
-                                <th>Interior Color</th>
-                            @php
+                                <th  style="vertical-align: middle;" id="int_color">Exterior Color</th>
+                                <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
+                                <th>VIN Number</th>
+                                <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
+                                @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
                             @endphp
                             @if ($hasPermission)
@@ -202,8 +287,7 @@
                                 <th>Payment Status</th>
                                 @endif
                                 @endif
-                                <th>VIN</th>
-                                <th>Action</th>
+                                <th id="action" style="vertical-align: middle;">Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -224,18 +308,7 @@
                             $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();
                             $model_line = $master_model_lines_ids->model_line;
                             @endphp 
-                            <td>{{ $vehicles->id }}
-                            @if($vehicles->status ==="Approved")
-                            <span id="status-badge" class="badge badge-soft-success">{{ $vehicles->status }}</span>
-                            @elseif($vehicles->status ==="New Changes")
-                            <span id="status-badge" class="badge badge-soft-primary">{{ $vehicles->status }}</span>
-                            @elseif($vehicles->status ==="New Vehicles")
-                            <span id="status-badge" class="badge badge-soft-secondary">{{ $vehicles->status }}</span>
-                            @else
-                            <span id="status-badge" class="badge badge-soft-info">{{ $vehicles->status }}</span>
-                            @endif
-                            
-                            </td>
+                            <td>{{ $vehicles->id }}</td>
                             <td>{{ ucfirst($name) }}</td>
                             <td>{{ ucfirst(strtolower($brand_names)) }}</td>
                             <td>{{ ucfirst(strtolower($model_line)) }}</td>
@@ -244,6 +317,7 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
                             @if ($hasPermission)
+							@if ($vehicles->status != 'cancel')
                             <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
@@ -270,7 +344,35 @@
                                     @endforeach
                                 </select>
                             </td>
+							@else
+							<td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
+                                    <option value="">Exterior Color</option>
+                                    @foreach ($exColours as $id => $exColour)
+                                        @if ($id == $vehicles->ex_colour)
+                                            <option value="{{ $id }}" selected>{{ $exColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $exColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                <select name="int_colour[]" class="form-control" placeholder="Interior Color" disabled>
+                                    <option value="">Interior Color</option>
+                                    @foreach ($intColours as $id => $intColour)
+                                        @if ($id == $vehicles->int_colour)
+                                            <option value="{{ $id }}" selected>{{ $intColour }}</option>
+                                        @else
+                                            <option value="{{ $id }}">{{ $intColour }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </td>
                             @endif
+							@endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
                             @endphp
@@ -301,33 +403,7 @@
                                     @endforeach
                                 </select>
                             </td>
-                            @if ($purchasingOrder->status === 'Approved')
-                            @if ($vehicles->status === 'Request for Payment')
-                            <td class="editable-field payment_status" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                    <select name="payment_status[]" class="form-control" disabled>
-                                    <option value="" {{ $vehicles->payment_status == '' ? 'selected' : '' }}>Select Payment Status</option>
-                                        <option value="Payment Initiated" {{ $vehicles->payment_status == 'Payment Initiated' ? 'selected' : '' }}>Payment Initiated</option>
-                                        <option value="Payment Release Pending" {{ $vehicles->payment_status == 'Payment Release Pending' ? 'selected' : '' }}>Payment Release Pending</option>
-                                        <option value="Payment Release Rejected" {{ $vehicles->payment_status == 'Payment Release Rejected' ? 'selected' : '' }}>Payment Release Rejected</option>
-                                        <option value="Payment Release Approved" {{ $vehicles->payment_status == 'Payment Release Approved' ? 'selected' : '' }}>Payment Release Approved</option>
-                                        <option value="Amount Debited" {{ $vehicles->payment_status == 'Amount Debited' ? 'selected' : '' }}>Amount Debited</option>
-                                        <option value="Vendor Confirmed" {{ $vehicles->payment_status == 'Vendor Confirmed' ? 'selected' : '' }}>Vendor Confirmed</option>
-                                    </select>
-                                </td>
-                                @else
-                                <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                    <select name="payment_status[]" class="form-control" disabled>
-                                    <option value="" {{ $vehicles->payment_status == '' ? 'selected' : '' }}>Select Payment Status</option>
-                                        <option value="Payment Initiated" {{ $vehicles->payment_status == 'Payment Initiated' ? 'selected' : '' }}>Payment Initiated</option>
-                                        <option value="Payment Release Pending" {{ $vehicles->payment_status == 'Payment Release Pending' ? 'selected' : '' }}>Payment Release Pending</option>
-                                        <option value="Payment Release Rejected" {{ $vehicles->payment_status == 'Payment Release Rejected' ? 'selected' : '' }}>Payment Release Rejected</option>
-                                        <option value="Payment Release Approved" {{ $vehicles->payment_status == 'Payment Release Approved' ? 'selected' : '' }}>Payment Release Approved</option>
-                                        <option value="Amount Debited" {{ $vehicles->payment_status == 'Amount Debited' ? 'selected' : '' }}>Amount Debited</option>
-                                        <option value="Vendor Confirmed" {{ $vehicles->payment_status == 'Vendor Confirmed' ? 'selected' : '' }}>Vendor Confirmed</option>
-                                    </select>
-                                </td>
-                                @endif
-                                @endif
+                            
                                 <td>{{ $vehicles->vin }}</td>
                             @endif
                             @php
@@ -336,44 +412,153 @@
                             @if ($hasPermission)
                             <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
                             @endif
-                        <td>
-                        @if ($vehicles->status == 'cancel')
-                        <button class="btn btn-sm btn-danger" disabled>
-                        Cancelled
-                        </button>
-                        @else
-                        <div style="display: inline-block;">
+                            <td>
+                            @if($vehicles->status ==="Approved")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="New Changes")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="New Vehicles")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @elseif($vehicles->status ==="Rejected")
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @else
+                            {{ ucfirst(strtolower( $vehicles->status)) }}
+                            @endif
+                            </td>
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                            @endphp
+                            @if ($hasPermission)
+                            @if ($purchasingOrder->status === 'Approved')
+                            <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
+                                @endif
+                                @endif
+                                <td>
+                        <div style="display: flex; gap: 10px;">
                         {{-- For Management  --}}
                         @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
                         @endphp
-                        @if ($hasPermission) 
-
-
-                        @endif
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                        @endphp
-                        @if ($hasPermission) 
-                        @if ($purchasingOrder->status === 'Approved')
-                        @if ($vehicles->status === 'Approved')
-                        
-                        <a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
-                            Initiate Payment
+                        @if ($hasPermission)
+                        @if ($vehicles->payment_status === '')
+                        @if ($vehicles->status != 'Rejected')
+                        <a title="Reject" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.rejecteds', $vehicles->id) }}" onclick="return confirmRejected();"style="white-space: nowrap;">
+                            Reject
+                        </a>
+                        @else
+                        <a title="UnReject" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.unrejecteds', $vehicles->id) }}" onclick="return confirmunRejected();" style="white-space: nowrap;">
+                            Un-Reject
                         </a>
                         @endif
-                        @endif
-                        @endif
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                        @endphp
-                        @if ($hasPermission) 
-                        <a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();">
-                            Cancel
+                        @elseif ($vehicles->payment_status === 'Payment Initiated')
+                        <div style="display: flex; gap: 10px;">
+                        <a title="Payment Initiated Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleaseconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Approved
                         </a>
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleaserejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Reject
+                        </a>
+                        @elseif ($vehicles->payment_status === 'Payment Release Requested')
+                        <div style="display: flex; gap: 10px;">
+                        <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Approved
+                        </a>
+                        <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleasesrejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
+                        Reject
+                        </a>
+                        </div>
                         @endif
-                    </div>
                         @endif
+						{{-- End For Management  --}}
+						{{-- For Initiate Payment Procurement  --}}
+										@php
+										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+										@endphp
+										@if ($hasPermission) 
+										@if ($purchasingOrder->status === 'Approved')
+										@if ($vehicles->status === 'Approved')
+										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Initiate Payment
+										</a>
+										@endif
+										@endif
+										@endif
+							{{-- End For Initiate Payment procurement  --}}
+							{{-- Cancel & Delete for procurement  --}}
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+								@endphp
+								@if ($hasPermission)
+								@if ($purchasingOrder->status === 'Approved')
+								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
+									Cancel
+								</a>
+								@elseif ($vehicles->status === 'Pending Approval')
+								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
+									Delete
+								</a>
+								@endif
+								@endif
+							{{-- End Cancel & Delete For Procurement  --}}
+							{{-- For Initiate Payment Finance  --}}
+										@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->status === 'Request for Payment')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Initiate Payment
+											</a>
+											@endif
+											@endif
+											@endif
+								{{-- End For Initiate Payment Finance  --}}
+								{{-- For Release Request  --}}
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+								@endphp
+								@if ($hasPermission)
+								@if ($purchasingOrder->status === 'Approved')
+								@if ($vehicles->payment_status === 'Payment Initiate Approved')
+								<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+								Payment Release Requested
+								</a>
+								@endif
+								@endif
+								@endif
+								{{-- End For Release Request  --}}
+								{{-- For Amount Debited  --}}
+									@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+									@endphp
+									@if ($hasPermission)
+									@if ($purchasingOrder->status === 'Approved')
+									@if ($vehicles->payment_status === 'Payment Release Approved')
+									<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+									Amount Debited
+									</a>
+									@endif
+									@endif
+									@endif
+									{{-- End For Amount Debited  --}}
+									{{-- For Vendor Confirm  --}}
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Payment Completed')
+                      @if ($vehicles->status != 'Incoming Stock')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Vendor Confirmed
+											</a>
+											@endif
+                      @endif
+											@endif
+											@endif
+											{{-- End For Vendor Confirm  --}}
+                            </div>
                         </td>
                         </tr>
                             @endforeach
@@ -466,8 +651,8 @@
             <tr>
             <th>Ref</th>
                 <th>Field</th>
-                <th>New Value</th>
                 <th>Old Value</th>
+                <th>New Value</th>
                 <th>Updated Date</th>
                 <th>Updated By</th>
                 <th>Role</th>
@@ -690,6 +875,60 @@ $colournew = $new_value ? $new_value->name : null;
       }
     });
 
+        // Table #dtBasicExample2
+        var dataTable2 = $('#dtBasicExample1').DataTable({
+        "order": [[4, "desc"]],
+      pageLength: 10,
+      initComplete: function() {
+        this.api().columns().every(function(d) {
+          var column = this;
+          var columnId = column.index();
+          var columnName = $(column.header()).attr('id');
+          if (columnName === "estimated") {
+            return;
+          }
+          if (columnName === "action") {
+            return;
+          }
+          if (columnName === "int_color") {
+            return;
+          }
+          if (columnName === "ex_color") {
+            return;
+          }
+
+          var selectWrapper = $('<div class="select-wrapper"></div>');
+          var select = $('<select class="form-control my-1" multiple></select>')
+            .appendTo(selectWrapper)
+            .select2({
+              width: '100%',
+              dropdownCssClass: 'select2-blue'
+            });
+          select.on('change', function() {
+            var selectedValues = $(this).val();
+
+            // Check if the blank option is selected
+            if (selectedValues && selectedValues.includes('')) {
+              column.search('^$', true, false); // Filter blank values
+            } else {
+              column.search(selectedValues ? selectedValues.join('|') : '', true, false); // Filter other selected values
+            }
+
+            column.draw();
+          });
+
+          selectWrapper.appendTo($(column.header()));
+          $(column.header()).addClass('nowrap-td');
+
+          column.data().unique().sort().each(function(d, j) {
+            // Add option for blank value
+            var optionValue = d === null ? '' : d;
+            var optionText = d === null ? 'Blank' : d === '' ? 'Null' : d;
+            select.append('<option value="' + optionValue + '">' + optionText + '</option>');
+          });
+        });
+      }
+    });
     // Table #dtBasicExample3
     var dataTable3 = $('#dtBasicExample3').DataTable({
         "order": [[7, "desc"]],
@@ -783,34 +1022,26 @@ editBtn.addEventListener('click', () => {
     }
   });
 });
-// Add event listener to the Update Success button
 updateBtn.addEventListener('click', () => {
-  // Toggle the Update Success and Edit buttons
   updateBtn.style.display = 'none';
   editBtn.style.display = 'block';
-  // Disable editing for all editable fields and change their color back to default
   editableFields.forEach(field => {
     field.contentEditable = false;
     field.classList.remove('editing');
-    // Add the "disabled" attribute to the select elements
     const selectElement = field.querySelector('select');
     if (selectElement) {
       selectElement.setAttribute('disabled', 'disabled');
     }
-    // Remove the input field and restore the original non-editable field content
     const inputField = field.querySelector('input[type="date"]');
     if (inputField) {
       const fieldValue = inputField.value;
       field.innerHTML = fieldValue;
     }
   });
-  // Create an array to hold the updated data
   const updatedData = [];
-  // Iterate over the editable fields and extract the updated values
   editableFields.forEach(field => {
-    const fieldName = field.classList[1]; // Get the second class name as the field name
+    const fieldName = field.classList[1]; 
     const fieldValue = field.innerText.trim();
-  // Handle special case for select elements
   const selectElement = field.querySelector('select');
   if (selectElement) {
     const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -921,14 +1152,14 @@ var exColourDropdown = exColourCol.find('select');
     });
 
     $(document).on('click', '.remove-row-btn', function() {
-    var rowToRemove = $(this).closest('tr'); // Find the closest <tr> element
+    var rowToRemove = $(this).closest('tr');
     var variant = rowToRemove.find('input[name="variant_id[]"]').val();
     var existingOption = $('#variantslist').find('option[value="' + variant + '"]');
     if (existingOption.length === 0) {
         var variantOption = $('<option value="' + variant + '">' + variant + '</option>');
         $('#variantslist').append(variantOption);
     }
-    rowToRemove.remove(); // Remove the specific row
+    rowToRemove.remove();
     $('.row-space').each(function() {
         if ($(this).next().length === 0) {
             $(this).removeClass('row-space');
@@ -985,6 +1216,48 @@ var exColourDropdown = exColourCol.find('select');
       console.error('Error updating status:', error);
     });
 }
+function updateallStatus(status, orderId) {
+  let url = '{{ route('purchasing.updateallStatus') }}';
+  let data = { status: status, orderId: orderId };
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function updateallStatusrel(status, orderId) {
+  let url = '{{ route('purchasing.updateallStatusrel') }}';
+  let data = { status: status, orderId: orderId };
+
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
 function deletepo(id) {
   let url = '{{ route('purchasing-order.deletes', ['id' => ':id']) }}';
   url = url.replace(':id', id);
@@ -1021,6 +1294,26 @@ function deletepo(id) {
 <script>
   function confirmPayment() {
     var confirmDialog = confirm("Are you sure you want to Payment this Vehicles?");
+    if (confirmDialog) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
+<script>
+  function confirmRejected() {
+    var confirmDialog = confirm("Are you sure you want to Reject this Vehicles?");
+    if (confirmDialog) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+</script>
+<script>
+  function confirmunRejected() {
+    var confirmDialog = confirm("Are you sure you want to Un-Reject this Vehicles?");
     if (confirmDialog) {
       return true;
     } else {
