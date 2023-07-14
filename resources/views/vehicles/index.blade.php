@@ -637,7 +637,6 @@ th.nowrap-td {
                                             @if ($hasPermission)
                                             <td class="nowrap-td remarks">
                                                 <input type="text" class="form-control warehouse-remarks" readonly name="warehouse_remarks[]"  value="{{ $vehicles->remarks }}" >
-                                                {{ $vehicles->remarks }}
                                             </td>
                                             @endif
                                             @php
