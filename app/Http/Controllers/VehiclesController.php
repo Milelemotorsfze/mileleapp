@@ -29,7 +29,9 @@ class VehiclesController extends Controller
     public function index()
     {
         $statuss = "Vendor Confirmed";
-        $data = Vehicles::where('status', '!=', 'cancel')->where('payment_status', $statuss)->get();
+        $data = Vehicles::where('status', '!=', 'cancel')
+//            ->where('payment_status', $statuss)
+            ->get();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();
@@ -387,6 +389,26 @@ class VehiclesController extends Controller
 
                     $so->save();
                 }
+                $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
+                $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
+                if($oldSoDate != $newSoDate)
+                {
+                    $solog = new Solog();
+//                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+//                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                    $solog->time = $currentDateTime->toTimeString();
+                    $solog->date = $currentDateTime->toDateString();
+                    $solog->status = 'Update Sales Values';
+                    $solog->so_id = $soId;
+                    $solog->field = 'so_date';
+                    $solog->old_value = $so->so_date;
+                    $solog->new_value = $request->so_dates[$key];
+                    $solog->created_by = auth()->user()->id;
+                    $solog->save();
+                    $so->so_date = $request->so_dates[$key];
+
+                    $so->save();
+                }
 
             } else
             {
@@ -414,12 +436,33 @@ class VehiclesController extends Controller
                         $existingSo->so_number = $request->so_numbers[$key];
                         $so->save();
                     }
+                    $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
+                    $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
+                    if($oldSoDate != $newSoDate)
+                    {
+                        $solog = new Solog();
+//                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+//                    $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $solog->time = $currentDateTime->toTimeString();
+                        $solog->date = $currentDateTime->toDateString();
+                        $solog->status = 'Update Sales Values';
+                        $solog->so_id = $soId;
+                        $solog->field = 'so_date';
+                        $solog->old_value = $so->so_date;
+                        $solog->new_value = $request->so_dates[$key];
+                        $solog->created_by = auth()->user()->id;
+                        $solog->save();
+                        $so->so_date = $request->so_dates[$key];
+
+                        $so->save();
+                    }
                     $existingSo->save();
 
                 } else {
                     // Create new So
                     $so = new So();
                     $so->so_number = $request->so_numbers[$key];
+                    $so->so_date = $request->so_dates[$key];
                     $so->sales_person_id = $request->sales_persons[$key] ? $request->sales_persons[$key] : auth()->user()->id;
                     $so->save();
                     $soID = $so->id;
@@ -552,9 +595,13 @@ class VehiclesController extends Controller
                'nextId' => $nextId
            ], compact('mergedLogs', 'vehicle'));
     }
-    public function  viewremarks($id)
+    public function  viewremarks(Request $request,$id)
     {
-        $remarks = Remarks::where('vehicles_id', $id)->get();
+        $remarks = Remarks::where('vehicles_id', $id)->where('department', 'Sales')->get();
+        if($request->type == 'WareHouse') {
+            $remarks = Remarks::where('vehicles_id', $id)->where('department', 'WareHouse')->get();
+        }
+        // sales
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.viewremarks', [
@@ -693,6 +740,18 @@ class VehiclesController extends Controller
                 $vehicleslog->new_value = $request->warehouse_remarks[$key];
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
+
+                $remarksdata = new Remarks();
+
+                $remarksdata->time = $currentDateTime->toTimeString();
+                $remarksdata->date = $currentDateTime->toDateString();
+                $remarksdata->vehicles_id = $vehicleId;
+                $remarksdata->remarks = $request->warehouse_remarks[$key];
+                $remarksdata->created_by = auth()->user()->id;
+                $remarksdata->department = "WareHouse";
+                $remarksdata->created_at = $currentDateTime;
+                $remarksdata->save();
+
                 $vehicle->remarks = $request->warehouse_remarks[$key];
 
             }
