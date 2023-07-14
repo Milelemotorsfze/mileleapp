@@ -736,91 +736,86 @@ $colournew = $new_value ? $new_value->name : null;
             <th>Estimated Arrival</th>
             <th>Update Date</th>
             <th>Updated By</th>
-            <th>Role</th>
-                                
-                                
+            <th>Role</th>                  
             </tr>
         </thead>
         <tbody>
-@php
-    $previousLog = null;
-    $qty = 0;
-@endphp
-
-@foreach($purchasinglog as $log)
     @php
-        $change_by = DB::table('users')->where('id', $log->created_by)->first();
-        $change_bys = $change_by->name;
-        $selected = DB::table('roles')->where('id', $log->role)->first();
-        $roleselected = $selected ? $selected->name : null;
-        $variant = DB::table('varaints')->where('id', $log->variant)->first();
-        $variant_name = $variant->name;
-        // Check if current row is the same as the previous row
-        $isSameAsPrevious = ($previousLog &&
-            $log->date == $previousLog->date &&
-            strtotime($log->time) - strtotime($previousLog->time) <= 1 &&
-            $log->created_by == $previousLog->created_by &&
-            $log->role == $previousLog->role &&
-            $log->variant == $previousLog->variant &&
-            $log->estimation_date == $previousLog->estimation_date &&
-            $log->territory == $previousLog->territory &&
-            $log->ex_colour == $previousLog->ex_colour &&
-            $log->int_colour == $previousLog->int_colour &&
-            $log->status == $previousLog->status);
+        $previousLog = null;
+        $qty = 0;
+    @endphp
 
-        if (!$isSameAsPrevious) {
-            if ($qty > 0) {
-                // Output the row with the previous quantity count
-                echo '<tr>';
-                echo '<td>'. $previousLog->status .'</td>';
-                echo '<td>'. ucfirst(strtolower($variant_name)) .'</td>';
-                $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
-                $ex_colours = $exColour ? $exColour->name : null;
-                $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
-                $int_colours = $intColour ? $intColour->name : null;
-                echo '<td>'. $ex_colours .'</td>';
-                echo '<td>'. $int_colours .'</td>';
-                echo '<td>'. $qty .'</td>';
-                echo '<td>'. ucfirst(strtolower($previousLog->territory)) .'</td>';
-                echo '<td>'. $previousLog->estimation_date .'</td>';
-                echo '<td>'. date('d-M-Y', strtotime($previousLog->date)) .' '. $previousLog->time .'</td>';
-                echo '<td>'. ucfirst(strtolower($change_bys)) .'</td>';
-                echo '<td>'. $roleselected .'</td>';
-                echo '</tr>';
+    @foreach($purchasinglog as $log)
+        @php
+            $change_by = DB::table('users')->where('id', $log->created_by)->first();
+            $change_bys = $change_by->name;
+            $selected = DB::table('roles')->where('id', $log->role)->first();
+            $roleselected = $selected ? $selected->name : null;
+            $variant = DB::table('varaints')->where('id', $log->variant)->first();
+             $variant_name = $variant->name;
+            // Check if current row is the same as the previous row
+            $isSameAsPrevious = ($previousLog &&
+                $log->date == $previousLog->date &&
+                strtotime($log->time) - strtotime($previousLog->time) <= 1 &&
+                $log->created_by == $previousLog->created_by &&
+                $log->role == $previousLog->role &&
+                $log->variant == $previousLog->variant &&
+                $log->estimation_date == $previousLog->estimation_date &&
+                $log->territory == $previousLog->territory &&
+                $log->ex_colour == $previousLog->ex_colour &&
+                $log->int_colour == $previousLog->int_colour &&
+                $log->status == $previousLog->status);
+            if (!$isSameAsPrevious) {
+                if ($qty > 0) {
+                    // Output the row with the previous quantity count
+                    echo '<tr>';
+                    echo '<td>'. $previousLog->status .'</td>';
+                    echo '<td>'. ucfirst(strtolower($variant_name)) .'</td>';
+                    $exColour = $log->ex_colour ? DB::table('color_codes')->where('id', $log->ex_colour)->first() : null;
+                    $ex_colours = $exColour ? $exColour->name : null;
+                    $intColour = $log->int_colour ? DB::table('color_codes')->where('id', $log->int_colour)->first() : null;
+                    $int_colours = $intColour ? $intColour->name : null;
+                    echo '<td>'. $ex_colours .'</td>';
+                    echo '<td>'. $int_colours .'</td>';
+                    echo '<td>'. $qty .'</td>';
+                    echo '<td>'. ucfirst(strtolower($previousLog->territory)) .'</td>';
+                    echo '<td>'. $previousLog->estimation_date .'</td>';
+                    echo '<td>'. date('d-M-Y', strtotime($previousLog->date)) .' '. $previousLog->time .'</td>';
+                    echo '<td>'. ucfirst(strtolower($change_bys)) .'</td>';
+                    echo '<td>'. $roleselected .'</td>';
+                    echo '</tr>';
+                }
+                // Reset the quantity count and update the previous log
+                $qty = 1;
+                $previousLog = $log;
+            } else {
+                $qty++; // Increment the quantity count
             }
-
-            // Reset the quantity count and update the previous log
-            $qty = 1;
-            $previousLog = $log;
-        } else {
-            $qty++; // Increment the quantity count
-        }
-    @endphp
-@endforeach
-
-{{-- Output the last group if it exists --}}
-@if ($qty > 0)
-    <tr>
-    <td>{{ $previousLog->status }}</td>
-    <td>{{ ucfirst(strtolower($variant_name)) }}</td>
-    @php
-    $exColour = $vehicles->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
-    $ex_colours = $exColour ? $exColour->name : null;
-    $intColour = $vehicles->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
-    $int_colours = $intColour ? $intColour->name : null;
-    @endphp
-    <td>{{ $ex_colours }}</td>
-        <td>{{ $int_colours }}</td>
-        <td>{{ $qty }}</td>
-        <td>{{ ucfirst(strtolower($previousLog->territory)) }}</td>
-        <td>{{ $previousLog->estimation_date }}</td>
-        <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
-        <td>{{ ucfirst(strtolower($change_bys)) }}</td>
-        <td>{{ $roleselected }}</td>   
-    </tr>
-@endif
+        @endphp
+    @endforeach
+    {{-- Output the last group if it exists --}}
+    @if ($qty > 0)
+        <tr>
+            <td>{{ $previousLog->status }}</td>
+            <td>{{ ucfirst(strtolower($variant_name)) }}</td>
+            @php
+            $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
+            $ex_colours = $exColour ? $exColour->name : null;
+            $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
+            $int_colours = $intColour ? $intColour->name : null;
+            @endphp
+            <td>{{ $ex_colours }}</td>
+            <td>{{ $int_colours }}</td>
+            <td>{{ $qty }}</td>
+            <td>{{ ucfirst(strtolower($previousLog->territory)) }}</td>
+            <td>{{ $previousLog->estimation_date }}</td>
+            <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
+            <td>{{ ucfirst(strtolower($change_bys)) }}</td>
+            <td>{{ $roleselected }}</td>   
+        </tr>
+    @endif
 </tbody>
-                                                            </table>
+</table>
 </div>
 </div>
 </div>
