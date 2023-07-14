@@ -282,7 +282,7 @@ class PurchasingOrderController extends Controller
 }
 public function checkcreatevins(Request $request)
     {
-        $vinValues = $request->input('oldvin');
+        $vinValues = $request->input('vin');
         $vinValues = array_filter($vinValues, function ($value) {
             return trim($value) !== '';
         });
@@ -381,7 +381,7 @@ public function checkcreatevins(Request $request)
                      }
 
             }
-        }
+        }        
     }
     return response()->json(['message' => 'Data updated successfully']);
 }
@@ -399,8 +399,8 @@ public function purchasingupdateStatus(Request $request)
         foreach ($vehicles as $vehicle) {
             $vehicle->status = 'Approved';
             $vehicle->save();
-            $ex_colour = $vehicle->ex_colour;
-            $int_colour = $vehicle->int_colour;
+            $ex_colour = $vehicle->ex_colour; 
+            $int_colour = $vehicle->int_colour; 
             $variantId = $vehicle->	varaints_id;
             $estimation_arrival = $vehicle->estimation_date;
             $territorys = $vehicle->territory;
