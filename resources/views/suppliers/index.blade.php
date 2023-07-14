@@ -151,7 +151,7 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-price']);
                       @endphp
                       @if ($hasPermission)
-                        <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
+                        <a data-toggle="popover" data-trigger="hover" title="Addon" data-placement="top" class="btn btn-sm btn-warning"
                           href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>  
                       @endif                            
                       @endcan
