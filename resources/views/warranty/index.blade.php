@@ -34,9 +34,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
               <th>No</th>
               <th>Policy Name</th>
               <th>Vehicle Category</th>
-              <th>Eligibility Years</th>
+              <th>Eligibility Criteria</th>
               <th>Elegibility Mileage</th>
-              <th>Extended Warranty Period</th>
+              <th>Warranty Period</th>
               <th>Extended Warranty Mileage</th>
               <th>Claim Limit</th>
               <th>Status</th>
