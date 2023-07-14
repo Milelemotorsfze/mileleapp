@@ -82,7 +82,8 @@
         $(document.body).on('click', ".removeKitItem", function (e) {
             var indexNumber = $(this).attr('data-index');
             var supplier = $(this).attr('data-supplier');
-
+alert(indexNumber);
+alert(supplier);
             $(this).closest('#row-supplier-'+supplier+'-item-'+indexNumber).find("option:selected").each(function() {
                 var id = (this.value);
                 var text = (this.text);
@@ -315,7 +316,7 @@
                                                                 </div>
                                                                 </div>
                                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                                    <button  class="btn_round removeKitItemForSupplier${index} remove-kit-items" onclick=del(this,${index}) disabled hidden>
+                                                                    <button id="removeSupplier${index}Item1" class="btn_round removeKitItemForSupplier${index} remove-kit-items" onclick=del(this,${index}) disabled hidden>
                                                                         <i class="fas fa-trash-alt"></i>
                                                                     </button>
                                                                 </div>
@@ -325,7 +326,7 @@
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                                        <a id="addSupplier" style="float: right;" class="btn btn-sm btn-primary addItemForSupplier1" onclick="addItemForSupplier(${index})"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a>
+                                                        <a id="addSupplier" style="float: right;" class="btn btn-sm btn-primary addItemForSupplier1" data-supplier="${index}" data-index="1"  onclick="addItemForSupplier(${index})"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a>
                                                     </div>
                                                 </div>
                                             </div>

@@ -149,7 +149,7 @@
                                             <span id="Supplier1Kit1TotalPriceUSDError" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                            <button  class="btn_round removeKitItemForSupplier1 "  hidden disabled>
+                                            <button id="removeSupplier1Item1"  class="btn_round removeKitItemForSupplier1"  hidden data-supplier="1" data-index="1" disabled>
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -329,9 +329,10 @@
                         is-invalid @enderror');                      
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('id', 'Supplier'+ index +'Kit'+i+'TotalPriceUSD');
 
-                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('data-index', index);
-                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('data-index', i);
-                    $(this).find('.removeKitItemForSupplier'+oldIndex).attr('class', 'btn_round removeKitItemForSupplier'+index+' removeKitItem');
+                    $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('data-supplier', index);
+                    $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('data-index', i);
+                    $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('class', 'btn_round removeKitItemForSupplier'+index+' removeKitItem');
+                    $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('id', 'removeSupplier'+index+'Item'+i);
             
                 }
                 $(this).find('.apendNewItemHere'+oldIndex).attr('class','apendNewItemHere'+index);
@@ -545,8 +546,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round removeKitItemForSupplier${supplier} removeKitItem" data-index="${index}" data-supplier="${supplier}" >
-
+                                <button id="removeSupplier${supplier}Item${index}" class="btn_round removeKitItemForSupplier${supplier} removeKitItem" data-index="${index}" data-supplier="${supplier}">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
