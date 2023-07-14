@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\ColorCode;
+use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
@@ -26,12 +27,15 @@ class VehiclesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $statuss = "Vendor Confirmed";
-        $data = Vehicles::where('status', '!=', 'cancel')
+        $data = Vehicles::where('status', '!=', 'cancel');
 //            ->where('payment_status', $statuss)
-            ->get();
+
+        $data = $data->get();
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::groupBy('vehicle_id')->count();
+//        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();
@@ -39,8 +43,9 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
+
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours'));
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovals'));
     }
 
     /**
@@ -82,23 +87,7 @@ class VehiclesController extends Controller
     {
         //
     }
-    public function getVehicleDetails(Request $request) {
-        $variant = Varaint::find($request->variant_id);
-        $brand = $variant->brand->brand_name ?? '';
-        $data['brand'] = $brand;
-        $data['model_line'] = $variant->master_model_lines->model_line ?? '';
-        $data['my'] = $variant->my ?? '';
-        $data['model_detail'] = $variant->model_detail ?? '';
-        $data['seat'] = $variant->seat ?? '';
-        $data['fuel_type'] = $variant->fuel_type ?? '';
-        $data['gearbox'] = $variant->gearbox ?? '';
-        $data['steering'] = $variant->steering ?? '';
-        $data['upholestry'] = $variant->upholestry ?? '';
-        $data['detail'] = $variant->detail ?? '';
 
-        return $data;
-
-    }
     public function updatevehiclesdata(Request $request)
     {
         $vehiclesId = $request->input('vehicles_id');
@@ -318,6 +307,18 @@ class VehiclesController extends Controller
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
 
+                // checking wether it is an update or new add;
+                if(!empty($vehicle->ex_colour))
+                {
+                    $vehicleDetailApproval = new VehicleApprovalRequests();
+                    $vehicleDetailApproval->vehicle_id = $id;
+                    $vehicleDetailApproval->field = 'Exterior Colour';
+                    $vehicleDetailApproval->old_value = $vehicle->ex_colour;
+                    $vehicleDetailApproval->new_value = $request->exterior_colours[$key];
+                    $vehicleDetailApproval->updated_by = auth()->user()->id;
+                    $vehicleDetailApproval->status = 'Pending';
+                    $vehicleDetailApproval->save();
+                }
                 $vehicle->ex_colour = $request->exterior_colours[$key];
 
             }

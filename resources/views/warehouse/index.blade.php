@@ -79,72 +79,72 @@ th.nowrap-td {
                     @if ($hasPermission)
         <div class="col-lg-3 col-md-3 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
-        <thead>
-       <th style="font-size: 12px;">BOD Task</th>
-       <th style="font-size: 12px;">PO QTY</th>
-    </thead>
-    <tbody>
-    <tr onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
-    <td style="font-size: 12px;">
-        <a href="{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}">
-            Pending Purchase Order Approval
-        </a>
-    </td>
-    <td style="font-size: 12px;">
+            <thead>
+               <th style="font-size: 12px;">BOD Task</th>
+               <th style="font-size: 12px;">PO QTY</th>
+            </thead>
+            <tbody>
+                <tr onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
+                    <td style="font-size: 12px;">
+                        <a href="{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}">
+                            Pending Purchase Order Approval
+                        </a>
+                    </td>
+                    <td style="font-size: 12px;">
+            @php
+            $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+            @endphp
+            @if ($pendongpoapproval > 0)
+                {{ $pendongpoapproval }}
+            @else
+                No records found
+            @endif
+        </td>
+                </tr>
+                <tr onclick="window.location='{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}';">
+                    <td style="font-size: 12px;">
+                        <a href="{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}">
+                        Pending Payment Initiation
+                        </a>
+                    </td>
+                    <td style="font-size: 12px;">
+                        @php
+                        $pendingints = DB::table('purchasing_order')
+                    ->where('purchasing_order.status', 'Approved')
+                    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Initiated')
+                    ->count();
+                        @endphp
+                        @if ($pendingints > 0)
+                            {{ $pendingints }}
+                        @else
+                            No records found
+                        @endif
+                    </td>
+                </tr>
+                <tr onclick="window.location='{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}';">
+        <td style="font-size: 12px;">
+            <a href="{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}">
+            Pending Payment Release
+            </a>
+        </td>
+        <td style="font-size: 12px;">
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
-        @endphp
-        @if ($pendongpoapproval > 0)
-            {{ $pendongpoapproval }}
-        @else
-            No records found
-        @endif
-    </td>
-</tr>
-<tr onclick="window.location='{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}';">
-    <td style="font-size: 12px;">
-        <a href="{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}">
-        Pending Payment Initiation
-        </a>
-    </td>
-    <td style="font-size: 12px;">
-        @php
-        $pendingints = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.payment_status', 'Payment Initiated')
-    ->count();
-        @endphp
-        @if ($pendingints > 0)
-            {{ $pendingints }}
-        @else
-            No records found
-        @endif
-    </td>
-</tr>
-<tr onclick="window.location='{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}';">
-    <td style="font-size: 12px;">
-        <a href="{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}">
-        Pending Payment Release
-        </a>
-    </td>
-    <td style="font-size: 12px;">
-    @php
-    $pendingpaymentrelsa = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.payment_status', 'Payment Release Requested')
-    ->count();
-        @endphp
-        @if ($pendingpaymentrelsa > 0)
-            {{ $pendingpaymentrelsa }}
-        @else
-            No records found
-        @endif
-    </td>
-</tr>
-</tbody>
-  </table>
+        $pendingpaymentrelsa = DB::table('purchasing_order')
+        ->where('purchasing_order.status', 'Approved')
+        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+        ->where('vehicles.payment_status', 'Payment Release Requested')
+        ->count();
+            @endphp
+            @if ($pendingpaymentrelsa > 0)
+                {{ $pendingpaymentrelsa }}
+            @else
+                No records found
+            @endif
+        </td>
+    </tr>
+            </tbody>
+        </table>
 </div>
 @endif
 @php
@@ -274,7 +274,7 @@ th.nowrap-td {
       <br>
       </div>
       @endif
-    
+
 </div>
 </div>
     <div class="card-body">
@@ -395,8 +395,8 @@ th.nowrap-td {
         <td style="font-size: 12px;">Payment Debit</td>
         <td style="font-size: 12px;">{{$vehiclescountintitailrelapp}}</td>
         <td colspan="2" style="font-size: 12px;">{{$vehiclescountintitailpaycomp}}</td>
-        </tr> 
-        @endif    
+        </tr>
+        @endif
         <tr>
         <td style="font-size: 12px;">Incoming Stock</td>
         <td colspan="3" style="font-size: 12px;">{{$vendorpaymentconfirm}}</td>
@@ -438,7 +438,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });

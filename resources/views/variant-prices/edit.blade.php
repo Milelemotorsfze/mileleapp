@@ -32,52 +32,52 @@
                     <div class="row">
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="row">
-                                <div class="col-lg-2 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Brand:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Brand:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->brand->brand_name ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-2 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label"> Variant:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold"> Variant:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span>{{ $vehicle->variant->name }}</span>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Variant Detail:</label>
+                                    <label for="choices-single-default" class="form-label fw-bold">Variant Detail:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span>{{ $vehicle->variant->detail ?? '' }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Model Year:</label>
+                                <div class="col-lg-5 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Model Year:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-7 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->my ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-2 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Model:</label>
+                                <div class="col-lg-5 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Model:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-7 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->master_model_lines->model_line ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-4 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Model Description:</label>
+                                <div class="col-lg-5 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Model Description:</label>
                                 </div>
-                                <div class="col-lg-8 col-md-9 col-sm-12">
+                                <div class="col-lg-7 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->model_detail ?? '' }}</span>
                                 </div>
                             </div>
@@ -85,26 +85,26 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Steering:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Steering:</label>
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->steering ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Fuel Type:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Fuel Type:</label>
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->fuel_type ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Transmission:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Transmission:</label>
                                 </div>
-                                <div class="col-lg-9 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->transmission ?? '' }}</span>
                                 </div>
                             </div>
@@ -113,7 +113,7 @@
                         <div class="col-lg-3 col-md-6 col-sm-6">
                             <div class="row">
                                 <div class="col-lg-4 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Engine Capacity:</label>
+                                    <label for="choices-single-default" class="form-label fw-bold">Engine Capacity:</label>
                                 </div>
                                 <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->engine ?? '' }}</span>
@@ -121,17 +121,17 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-4 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Seating Capacity:</label>
+                                    <label for="choices-single-default" class="form-label fw-bold">Seating Capacity:</label>
                                 </div>
                                 <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->seat ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <label for="choices-single-default" class="form-label">Upholstery:</label>
+                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                    <label for="choices-single-default" class="form-label fw-bold">Upholstery:</label>
                                 </div>
-                                <div class="col-lg-6 col-md-9 col-sm-12">
+                                <div class="col-lg-8 col-md-9 col-sm-12">
                                     <span> {{ $vehicle->variant->upholestry ?? '' }}</span>
                                 </div>
                             </div>

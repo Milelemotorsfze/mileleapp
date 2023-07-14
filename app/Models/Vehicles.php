@@ -30,7 +30,10 @@ class Vehicles extends Model
     {
         return $this->belongsTo(ColorCode::class,'ex_colour','id');
     }
-
+    public function vehicleDetailApprovalRequests()
+    {
+        return $this->hasMany(VehicleApprovalRequests::class,'vehicle_id','id');
+    }
     public function getSimilarVehiclesWithInactiveStockAttribute()
     {
         $vehicles = Vehicles::whereNotNull('gdn_id')
