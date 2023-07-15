@@ -25,7 +25,7 @@
                                 <h4 class="text-black-50 " >{{$warrantyBrand->premium->PolicyName->name}}</h4>
                                 <p>Claim Limit : {{ $warrantyBrand->premium->claim_limit_in_aed }} AED</p>
                                 <p class=" mb-2">Premium : @if($warrantyBrand->selling_price) {{ $warrantyBrand->selling_price }} AED @else Not Available @endif</p>
-                                <p>Extended Warranty Period : {{$warrantyBrand->premium->extended_warranty_period}} Months</p>
+                                <p>Warranty Period : {{$warrantyBrand->premium->extended_warranty_period}} Months</p>
                                 <p>Eligibility : {{ $warrantyBrand->premium->eligibility_year }} Year / {{ $warrantyBrand->premium->eligibility_milage }} KM </p>
                                 <p>Extended KM : @if($warrantyBrand->premium->is_open_milage == true) Open Milage @endif  {{ $warrantyBrand->premium->extended_warranty_milage }} </p>
                                 <p>Vehicle Category :

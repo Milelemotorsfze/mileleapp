@@ -77,12 +77,19 @@
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
-                        <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Years') }}</label>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Eligibility Criteria') }}</label>
                         <div class="input-group">
-                            <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" step="any" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
+                        <select name="eligibility_year" id="eligibility_year" class="form-control widthinput" autofocus>
+                                <option value="1">1 Year</option>
+                                <option value="2">2 Years</option>
+                                <option value="3">3 Years</option>
+                                <option value="4">4 Years</option>
+                                <option value="5">5 Years</option>
+                        </select>
+                            <!-- <input name="eligibility_year" id="eligibility_year" onkeyup="validationOnKeyUp(this)" type="number" step="any" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Eligibility Years" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">Years</span>
-                            </div>
+                            </div> -->
                             <span id="EligibilityYearsError" class="invalid-feedback"></span>
                         </div>
                     </div>
@@ -115,7 +122,7 @@
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
-                        <label for="supplier" class="col-form-label text-md-end">{{ __('Extended Warranty Period') }}</label>
+                        <label for="supplier" class="col-form-label text-md-end">{{ __('Warranty Period') }}</label>
                         <div class="input-group">
                             <input name="extended_warranty_period" id="extended_warranty_period" onkeyup="validationOnKeyUp(this)" type="number" class="form-control widthinput" onkeypress="return event.charCode >= 48" min="1" placeholder="Enter Extended Warranty Period" aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">

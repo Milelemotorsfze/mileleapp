@@ -1,9 +1,9 @@
 @extends('layouts.main')
 <style>
-    .widthClass
+    /* .widthClass
     {
         width: 140px !important;
-    }
+    } */
       .modal 
     {
         width: 100% !important;
@@ -267,7 +267,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                     <i class="fa fa-th-large" aria-hidden="true"></i>
                     </a> 
                 </div>
-                @include('suppliers.listbox')
+                @include('addon.listbox')
                 @include('addon.table')
                 @endif
             </div>
