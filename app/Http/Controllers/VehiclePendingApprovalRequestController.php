@@ -26,6 +26,7 @@ class VehiclePendingApprovalRequestController extends Controller
             ->where('status', '!=', 'cancel')
 //            ->where('payment_status', $statuss)
             ->get();
+        return $vehicles;
 //        $data = $data->get();
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::groupBy('vehicle_id')->count();
 //        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();

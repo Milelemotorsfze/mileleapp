@@ -93,9 +93,11 @@
                                 <th style="font-size: 12px;">Vehicle QTY</th>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr >
+{{--                                    <button ></button>--}}
                                     <td style="font-size: 12px;">Pending Vehicle Details</td>
                                     <td style="font-size: 12px;">{{$pendingVehicleDetailForApprovals}}</td>
+
                                 </tr>
                             </tbody>
                         </table>
@@ -599,6 +601,7 @@
                                                 </td>
                                                 <td class="nowrap-td">
                                                     <select class="form-control exterior_colour " name="exterior_colours[]" readonly  >
+                                                        <option value=""></option>
                                                         @foreach($exteriorColours as $exColour)
                                                             <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
                                                                 {{ $exColour->name }}</option>
@@ -609,6 +612,7 @@
     {{--                                            <input type="hidden" class="ExColour" value="{{ $vehicles->ex_colour }}">--}}
                                                 <td class="nowrap-td">
                                                     <select class="form-control interior_colour " name="interior_colours[]" readonly  >
+                                                        <option value=""></option>
                                                         @foreach($interiorColours as $interiorColour)
                                                             <option value="{{$interiorColour->id}} " {{ $interiorColour->id == $vehicles->int_colour ? 'selected' : "" }}   >
                                                                 {{ $interiorColour->name }}</option>
@@ -747,10 +751,6 @@
                 </form>
             @endif
 
-{{--@php--}}
-{{--    $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');--}}
-{{--@endphp--}}
-{{--@if ($hasPermission)--}}
 <script>
 
         @php

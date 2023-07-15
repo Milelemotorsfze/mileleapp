@@ -198,7 +198,6 @@
                         </div>
                     </div>
                 </div>
-
             </form>
                 <div class="card">
                 <div class="card-header">
@@ -228,7 +227,7 @@
                                 <td>{{ $variantPriceHistory->availableColour->interior->name ?? ''  }} </td>
                                 <td>{{$variantPriceHistory->new_price}} </td>
                                 <td>{{ $variantPriceHistory->old_price }}</td>
-                                <td>{{ $variantPriceHistory->updated_at }}</td>
+                                <td>{{ \Carbon\Carbon::parse($variantPriceHistory->updated_at)->format('d/m/y, H:i:s')  }}</td>
                                 <td>{{ $variantPriceHistory->user->name ?? '' }}</td>
                             </tr>
 

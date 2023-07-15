@@ -113,7 +113,7 @@ class Vehicles extends Model
                 ->get();
             if ($latestPriceHistory->count() > 1 ) {
                 $latestPriceHistory = $latestPriceHistory->skip(1)->first();
-                return Carbon::parse($latestPriceHistory->updated_at)->format('DD-MON-YYYY HH24.MI.SS');
+                return Carbon::parse($latestPriceHistory->updated_at)->format('d/m/y, H:i:s');
             }
 
         }
@@ -141,7 +141,7 @@ class Vehicles extends Model
             ->first();
         if(!empty($availableColour)) {
             $updatedAt = $availableColour->updated_at;
-            return Carbon::parse($updatedAt)->format('DD-MON-YYYY HH24.MI.SS');
+            return Carbon::parse($updatedAt)->format('d/m/Y, H:i:s');
             return  ;
         }
         return " ";

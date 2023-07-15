@@ -3,6 +3,7 @@
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
+use App\Http\Controllers\VehiclePendingApprovalRequestController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\WarrantyBrandsController;
 use App\Http\Controllers\WarrantyPriceHistoriesController;
@@ -267,6 +268,7 @@ Route::get('/d', function () {
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
     Route::get('/vehicles/list/pendingVehicleApprovals', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
+    Route::resource('vehicle-detail-approvals', VehiclePendingApprovalRequestController::class);
 
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
