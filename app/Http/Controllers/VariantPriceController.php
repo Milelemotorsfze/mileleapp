@@ -21,10 +21,12 @@ class VariantPriceController extends Controller
         $activeStocks = Vehicles::whereNull('gdn_id')
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')->get();
+        $activeStocks = $activeStocks->sortBy('price_status');
         $InactiveStocks =  Vehicles::whereNotNull('gdn_id')
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')
                                 ->get();
+        $InactiveStocks = $InactiveStocks->sortBy('price_status');
 
         return view('variant-prices.index', compact('activeStocks','InactiveStocks'));
     }
@@ -62,8 +64,6 @@ class VariantPriceController extends Controller
 
         $VariantPrices = AvailableColour::where('varaint_id', $vehicle->varaints_id)
             ->pluck('id');
-       // alert($VariantPrices);
-//        $InactiveStockVariantPrices = $VariantPrices->
         if($type == 1) {
             $vehicles =  $vehicle->similar_vehicles_with_active_stock;
             $variantPriceHistories = VehiclePriceHistory::whereIn('available_colour_id', $VariantPrices)

@@ -41,6 +41,7 @@ class Vehicles extends Model
             ->groupBy('int_colour', 'ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
             ->get();
+        $vehicles = $vehicles->sortBy('price_status');
 
         return $vehicles;
     }
@@ -50,6 +51,7 @@ class Vehicles extends Model
             ->groupBy('int_colour','ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
             ->get();
+        $vehicles = $vehicles->sortBy('price_status');
 
         return $vehicles;
     }
@@ -93,11 +95,11 @@ class Vehicles extends Model
             }
         }
         if (array_unique($priceStatus) === array('true')) {
-            return 'Available';
-//            return 0;
+//            return 'Available';
+            return 1;
         }else{
-            return 'Not Available';
-//            return 1;
+//            return 'Not Available';
+            return 0;
         }
     }
     public function getOldPriceDatedAttribute() {

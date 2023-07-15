@@ -19,17 +19,13 @@ class VehiclePendingApprovalRequestController extends Controller
     public function index()
     {
         $statuss = "Vendor Confirmed";
-        $vehicles = Vehicles::with('vehicleDetailApprovalRequests')
-            ->whereHas('vehicleDetailApprovalRequests', function ($query){
-                $query->groupBy('vehicle_id');
-            })
-            ->where('status', '!=', 'cancel')
+        $pendingApprovalVehicleIds =  VehicleApprovalRequests::pluck('vehicle_id');
+        $data = Vehicles::whereIn('id', $pendingApprovalVehicleIds)
+        ->where('status', '!=', 'cancel')
 //            ->where('payment_status', $statuss)
             ->get();
-        return $vehicles;
-//        $data = $data->get();
+
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::groupBy('vehicle_id')->count();
-//        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();
@@ -38,7 +34,7 @@ class VehiclePendingApprovalRequestController extends Controller
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
 
-        return view('vehicles.index', compact('vehicles', 'varaint', 'sales', 'datapending'
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
             ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovals'));
     }
 

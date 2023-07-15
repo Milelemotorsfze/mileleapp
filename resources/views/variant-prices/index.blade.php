@@ -50,7 +50,13 @@
                                     <td>{{ $activeStock->variant->model_detail ?? '' }}</td>
                                     <td>{{ $activeStock->variant->name }}</td>
                                     <td>{{ $activeStock->variant->detail ?? '' }}</td>
-                                    <td>{{ $activeStock->price_status }}</td>
+                                    <td>
+                                        @if($activeStock->price_status == 1)
+                                            Available
+                                        @else
+                                            Not Available
+                                        @endif
+                                        </td>
                                     <td>{{ $activeStock->similar_vehicles_with_active_stock->count() ?? '' }} </td>
                                     <td>{{ $activeStock->total }}</td>
                                 </tr>
@@ -91,7 +97,12 @@
                                     <td>{{ $InactiveStock->variant->model_detail ?? '' }}</td>
                                     <td>{{ $InactiveStock->variant->name }}</td>
                                     <td>{{ $InactiveStock->variant->detail ?? '' }}</td>
-                                    <td>{{ $activeStock->price_status }}</td>
+                                    <td>
+                                        @if($InactiveStock->price_status == 1)
+                                            Available
+                                        @else
+                                            Not Available
+                                        @endif</td>
                                     <td>{{ $InactiveStock->similar_vehicles_with_inactive_stock->count() ?? '' }} </td>
                                     <td>{{ $InactiveStock->total }}</td>
                                 </tr>

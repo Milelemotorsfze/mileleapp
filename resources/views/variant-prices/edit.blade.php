@@ -185,7 +185,13 @@
                                         <td>{{ $vehicle->exterior->name ?? ''}} </td>
                                         <td>{{ $vehicle->interior->name ?? ''  }} </td>
                                         <td>{{ $vehicle->count }}</td>
-                                        <td>{{ $vehicle->price_status }}</td>
+                                        <td>
+                                            @if($vehicle->price_status == 1)
+                                                Available
+                                            @else
+                                                Not Available
+                                            @endif
+                                        </td>
                                         <td><input type="number" class="prices" readonly  name="prices[]" min="0" value="{{$vehicle->price}}"> </td>
                                         <td>{{ $vehicle->updated_at }}</td>
                                         <td>{{ $vehicle->old_price }}</td>
