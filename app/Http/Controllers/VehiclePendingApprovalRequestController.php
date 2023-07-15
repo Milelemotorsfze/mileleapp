@@ -75,7 +75,10 @@ class VehiclePendingApprovalRequestController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $pendingApprovalRequest = VehicleApprovalRequests::find($id);
+        $pendingApprovalRequest->status = $request->status;
+        $pendingApprovalRequest->save();
+
     }
 
     /**

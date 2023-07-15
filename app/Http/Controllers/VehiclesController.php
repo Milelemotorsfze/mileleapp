@@ -257,7 +257,17 @@ class VehiclesController extends Controller
                 $vehicleslog->new_value = $request->inspection_dates[$key];
                 $vehicleslog->created_by = auth()->user()->id;
                 $vehicleslog->save();
-
+                if(!empty($vehicle->ex_colour))
+                {
+                    $vehicleDetailApproval = new VehicleApprovalRequests();
+                    $vehicleDetailApproval->vehicle_id = $id;
+                    $vehicleDetailApproval->field = 'inspection_date';
+                    $vehicleDetailApproval->old_value = $vehicle->inspection_date;
+                    $vehicleDetailApproval->new_value = $request->inspection_dates[$key];
+                    $vehicleDetailApproval->updated_by = auth()->user()->id;
+                    $vehicleDetailApproval->status = 'Pending';
+                    $vehicleDetailApproval->save();
+                }
                 $vehicle->inspection_date = $request->inspection_dates[$key];
 
             }
@@ -312,7 +322,7 @@ class VehiclesController extends Controller
                 {
                     $vehicleDetailApproval = new VehicleApprovalRequests();
                     $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'Exterior Colour';
+                    $vehicleDetailApproval->field = 'ex_colour';
                     $vehicleDetailApproval->old_value = $vehicle->ex_colour;
                     $vehicleDetailApproval->new_value = $request->exterior_colours[$key];
                     $vehicleDetailApproval->updated_by = auth()->user()->id;
@@ -587,14 +597,17 @@ class VehiclesController extends Controller
         $documentsLog = Documentlog::where('documents_id', $vehicle->documents_id);
         $soLog = Solog::where('so_id', $vehicle->so_id);
         $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
-        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
+//        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
+        $mergedLogs = Vehicles::all();
+        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->get();
+
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('mergedLogs', 'vehicle'));
+           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests'));
     }
     public function  viewremarks(Request $request,$id)
     {

@@ -93,11 +93,9 @@
                             <th style="font-size: 12px;">Vehicle QTY</th>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr  onclick="window.location.href = '{{ route('vehicle-detail-approvals.index') }}'">
                                 <td style="font-size: 12px;">
-                                    <a href="{{ route('vehicle-detail-approvals.index') }}">
                                         Pending Vehicle Details
-                                    </a>
                                 </td>
                                 <td style="font-size: 12px;">{{$pendingVehicleDetailForApprovals}}</td>
 
@@ -305,7 +303,7 @@
                             <div hidden>{{$i=0;}}
                             </div>
                                 @foreach ($data as $vehicles)
-                                <tr >
+                                <tr>
                                     @php
                                      $name = "";
                                      $grn_date = "";
