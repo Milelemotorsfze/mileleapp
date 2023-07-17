@@ -67,46 +67,7 @@
 @push('scripts')
     <script type="text/javascript">
         $(document).ready(function () {
-            $('.status-reject-button').click(function (e) {
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
-                updateSellingPrice(id, status)
-            })
-            $('.status-approve-button').click(function (e) {
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
-                updateSellingPrice(id, status)
-            })
-            function updateSellingPrice(id, status) {
-
-                var updated_price = $('#updated-price').val();
-                let url = '{{ route('warranty-brands.update-selling-price') }}';
-                if(status == 'rejected') {
-                    var message = 'Reject';
-                }else{
-                    var message = 'Approve';
-                }
-                var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
-                    if (e) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                id: id,
-                                status: status,
-                                updated_price: updated_price,
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function (data) {
-                                window.location.reload();
-                                alertify.success(status + " Successfully")
-                            }
-                        });
-                    }
-
-                }).set({title:"Update Status"})
-            }
+           
         })
     </script>
 @endpush

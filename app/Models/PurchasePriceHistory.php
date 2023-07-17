@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchasePriceHistory extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = "purchase_price_histories";
     protected $fillable = [
         'supplier_addon_id',
