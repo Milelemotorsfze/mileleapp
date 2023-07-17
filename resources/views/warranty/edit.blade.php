@@ -574,7 +574,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                 {
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-5 col-lg-5 col-md-5">
+                            <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  
