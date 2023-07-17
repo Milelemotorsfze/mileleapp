@@ -194,8 +194,8 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Reservation Start</th>
-                                    <th class="nowrap-td">Reservation End</th>
+                                    <th class="nowrap-td">Reservation Date</th>
+                                    <th class="nowrap-td">Reservation Due Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
@@ -242,12 +242,12 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Manufacture Year</th>
+                                    <th class="nowrap-td">Model Year</th>
                                     <th class="nowrap-td">Steering</th>
                                     <th class="nowrap-td">Seats</th>
                                     <th class="nowrap-td">Fuel Type</th>
-                                    <th class="nowrap-td">Gear</th>
-                                    <th class="nowrap-td" style="min-width:150px">Ex Colour</th>
+                                    <th class="nowrap-td">Transmission</th>
+                                    <th class="nowrap-td" style="min-width:150px">Ext Colour</th>
                                     <th class="nowrap-td" style="min-width:150px">Int Colour</th>
                                     <th class="nowrap-td">Upholstery</th>
                                 @endif
@@ -255,7 +255,7 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">PY MM YYYY</th>
+                                    <th class="nowrap-td">Production Year</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');

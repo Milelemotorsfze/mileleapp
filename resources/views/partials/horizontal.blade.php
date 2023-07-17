@@ -5,7 +5,7 @@
         {
             position: absolute; left: 50px; z-index: 500; top: 10px;
         }
-       
+
     }
     @media only screen and (max-device-width: 1280px)
     {
@@ -20,7 +20,7 @@
         {
             position: absolute; right: 161px; z-index: 500; top: 10px;
         }
-    }  
+    }
 </style>
 <div class="topnav" style="overflow: unset;">
     <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
@@ -45,7 +45,7 @@
     </div>
 </div>
     <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-    
+
 <!-- <div class="cart-icon-container">
   <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -322,7 +322,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('Vehicles.index') }}" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
-                            <span data-key="t-extra-pages">Full Stocks</span>
+                            <span data-key="t-extra-pages"> Stock Report</span>
                         </a>
 					</li>
                     @endif
@@ -502,7 +502,7 @@
                     @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variant-prices.index')}}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Variant Prices </span>
+                                    <span data-key="t-utility">Variant Price </span>
                                 </a>
                             </div>
                             @endif

@@ -143,7 +143,7 @@
 
             </div>
 
-            <form action="{{ route('variant-prices.update', $vehicle->id) }}" method="POST" >
+            <form id="price-update" name="price-update" action="{{ route('variant-prices.update', $vehicle->id) }}" method="POST" >
                 @csrf
                 @method('PUT')
                 @foreach($vehicles as $value => $vehicle)
@@ -155,10 +155,8 @@
                         <h4 class="card-title">Vehicle Price Details</h4>
                         <button type="button" class="btn btn-sm btn-primary float-end enable-price-filed" >Price Update</button>
                         <button type="submit" class="btn btn-sm btn-success float-end update-prices" hidden> Update</button>
-
                     </div>
                     <div class="card-body">
-
                         <div class="table-responsive" >
                             <table id="vehicle-with-price-table" class="table table-striped table-editable table-edits table table-condensed">
                                 <thead class="bg-soft-secondary">
@@ -178,7 +176,7 @@
                                 <tbody>
                                 <div hidden>{{$i=0;}}
                                 </div>
-                                @foreach($vehicles  as  $vehicle)
+                                @foreach($vehicles as $key =>  $vehicle)
 
                                     <tr>
                                         <td>{{ ++$i }}</td>
@@ -192,7 +190,7 @@
                                                 Not Available
                                             @endif
                                         </td>
-                                        <td><input type="number" class="prices" readonly  name="prices[]" min="0" value="{{$vehicle->price}}"> </td>
+                                        <td><input type="number" class="prices w-100" id="price-{{$key+1}}" readonly  name="prices[]" min="0" value="{{$vehicle->price}}"> </td>
                                         <td>{{ $vehicle->updated_at }}</td>
                                         <td>{{ $vehicle->old_price }}</td>
                                         <td>{{ $vehicle->old_price_dated }}</td>
@@ -236,7 +234,6 @@
                                 <td>{{ \Carbon\Carbon::parse($variantPriceHistory->updated_at)->format('d/m/y, H:i:s')  }}</td>
                                 <td>{{ $variantPriceHistory->user->name ?? '' }}</td>
                             </tr>
-
                         @endforeach
                         </tbody>
                     </table>
@@ -253,6 +250,14 @@
             $('.prices').attr('readonly',false);
 
         })
+        $("#price-update").validate({
+            ignore: [],
+            rules: {
+                "prices[]": {
+                    maxlength: 9,
+                },
+            },
+        });
     </script>
 @endpush
 
