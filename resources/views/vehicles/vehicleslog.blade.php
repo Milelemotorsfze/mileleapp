@@ -437,7 +437,7 @@
                         <th>Field</th>
                         <th>Old Value</th>
                         <th>New Value</th>
-                        <th>Action</th>
+                        <th>Status</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -445,18 +445,50 @@
                             <tr>
                                 <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
                                 <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
-                                <td>{{ $pendingVehicleDetailApprovalRequest->field }}</td>
-                                <td>{{ $pendingVehicleDetailApprovalRequest->old_value }}</td>
-                                <td>{{ $pendingVehicleDetailApprovalRequest->new_value }}</td>
                                 <td>
-                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                        Approve
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                        Reject
-                                    </button>
+                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                       Exterior Colour
+                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
+                                        Interior Colour
+                                    @else
+                                        {{ $pendingVehicleDetailApprovalRequest->field }}
+                                    @endif
+
+                                </td>
+                                <td>
+                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                        {{ $pendingVehicleDetailApprovalRequest->old_exterior }}
+                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
+                                        {{ $pendingVehicleDetailApprovalRequest->old_interior }}
+                                    @else
+                                        {{ $pendingVehicleDetailApprovalRequest->old_value }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                        {{ $pendingVehicleDetailApprovalRequest->new_exterior }}
+                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
+                                        {{ $pendingVehicleDetailApprovalRequest->new_interior }}
+                                        {{--                                    @elseif()--}}
+                                    @else
+                                        {{ $pendingVehicleDetailApprovalRequest->new_value }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($pendingVehicleDetailApprovalRequest->status == 'approved')
+                                        Approved
+                                    @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
+                                        Rejected
+                                    @else
+                                        <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                                data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                            Approve
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                            Reject
+                                        </button>
+                                    @endif
                                 </td>
                                 <div class="modal fade" id="approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -537,7 +569,7 @@
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 <button type="button" class="btn btn-primary reject-button" data-id="{{ $pendingVehicleDetailApprovalRequest->id }}"
-                                                        data-status="rejected">Reject</button>
+                                                        data-status="rejected" >Reject</button>
                                             </div>
                                         </div>
                                     </div>
@@ -598,41 +630,41 @@ $(document).ready(function() {
     $('.reject-button').click(function (e) {
         var id = $(this).attr('data-id');
         var status = $(this).attr('data-status');
+
         updateValue(id, status)
     })
     $('.approve-button').click(function (e) {
-        var value = $(this).val();
         var id = $(this).attr('data-id');
         var status = $(this).attr('data-status');
+
         updateValue(id, status)
     })
-    function updateValue(id, status, value) {
-        let url = '{{ route('vehicle-detail-approvals.update') }}';
+    function updateValue(id, status) {
+         let url =  '{{ route('vehicle-detail.update') }}';
         if(status == 'rejected') {
             var message = 'Reject';
         }else{
             var message = 'Approve';
         }
-        var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
-            if (e) {
+        // var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
+        //     if (e) {
                 $.ajax({
                     type: "POST",
                     url: url,
                     dataType: "json",
                     data: {
-                        id: id,
+                        id:id,
                         status: status,
-                        new_value: value,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function (data) {
                         window.location.reload();
-                        alertify.success(status + " Successfully")
+                        alertify.success("Vehicle Detail"+status + " Successfully")
                     }
                 });
-            }
+            // }
 
-        }).set({title:"Update Vehicle Detail!"})
+        // }).set({title:"Update Vehicle Detail!"})
     }
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({

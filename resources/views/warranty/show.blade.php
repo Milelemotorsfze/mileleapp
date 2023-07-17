@@ -267,7 +267,8 @@
                                                                 </div>
                                                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                                                     <div class="input-group">
-                                                                        <input required id="selling_price_{{$warrantyBrand->id}}" oninput="inputNumberAbs(this)" name="selling_price" class="form-control" placeholder="Enter Selling Price">
+                                                                        <input required id="selling_price_{{$warrantyBrand->id}}" oninput="inputNumberAbs(this)"
+                                                                               name="selling_price" class="form-control" placeholder="Enter Selling Price">
                                                                         <div class="input-group-append">
                                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                                         </div>
@@ -325,13 +326,13 @@
                 }).set({title:"Delete Item"})
             });
         })
-        function inputNumberAbs(currentPriceInput) 
+        function inputNumberAbs(currentPriceInput)
         {
             var id = currentPriceInput.id;
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2) 
+            if(val.split('.').length>2)
             {
                 val =val.replace(/\.+$/,"");
             }

@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ColorCode;
 use App\Models\ModelHasRoles;
+use App\Models\Solog;
 use App\Models\User;
 use App\Models\Varaint;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
+use App\Models\Vehicleslog;
+use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class VehiclePendingApprovalRequestController extends Controller
 {
@@ -25,7 +31,10 @@ class VehiclePendingApprovalRequestController extends Controller
 //            ->where('payment_status', $statuss)
             ->get();
 
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::groupBy('vehicle_id')->count();
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
+                                            ->groupBy('vehicle_id')->get();
+        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::get();
         $sales_persons = ModelHasRoles::get();
@@ -35,7 +44,7 @@ class VehiclePendingApprovalRequestController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
 
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-            ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovals'));
+            ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount'));
     }
 
     /**
@@ -73,11 +82,60 @@ class VehiclePendingApprovalRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    public function ApproveOrRejectVehicleDetails(Request $request) {
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+
+        DB::beginTransaction();
+        $pendingApprovalRequest = VehicleApprovalRequests::find($request->id);
+        $pendingApprovalRequest->status = $request->status;
+        if($request->status == 'approved') {
+            $pendingApprovalRequest->approved_by = Auth::id();
+        }
+        $pendingApprovalRequest->save();
+        $field = $pendingApprovalRequest->field;
+        $oldValue = $pendingApprovalRequest->old_value;
+        $newValue = $pendingApprovalRequest->new_value;
+
+        $vehicle = Vehicles::find($pendingApprovalRequest->vehicle_id);
+        $vehicle->$field = $newValue;
+        $vehicle->save();
+        if($field == 'inspection_date' || $field == 'varaints_id' || $field == 'engine' || $field == 'ex_colour'
+            || $field == 'int_colour' || $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date')
+        {
+            $vehicleslog = new Vehicleslog();
+            $vehicleslog->time = $currentDateTime->toTimeString();
+            $vehicleslog->date = $currentDateTime->toDateString();
+            $vehicleslog->status = 'Update QC Values';
+            $vehicleslog->vehicles_id = $vehicle->id;
+            $vehicleslog->field = $field;
+            $vehicleslog->old_value = $oldValue;
+            $vehicleslog->new_value = $newValue;
+            $vehicleslog->created_by = auth()->user()->id;
+            $vehicleslog->save();
+        }
+
+        if($field == 'so_number' || $field->so_date)
+        {
+            $solog = new Solog();
+            $solog->time = $currentDateTime->toTimeString();
+            $solog->date = $currentDateTime->toDateString();
+            $solog->status = 'Update Sales Values';
+            $solog->so_id = $vehicle->so_id;
+            $solog->field = 'so_date';
+            $solog->old_value = $oldValue;
+            $solog->new_value = $newValue;
+            $solog->created_by = auth()->user()->id;
+            $solog->save();
+        }
+
+        DB::commit();
+
+        return response(true);
+    }
     public function update(Request $request, string $id)
     {
-        $pendingApprovalRequest = VehicleApprovalRequests::find($id);
-        $pendingApprovalRequest->status = $request->status;
-        $pendingApprovalRequest->save();
+
 
     }
 

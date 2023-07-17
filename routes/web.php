@@ -269,6 +269,9 @@ Route::get('/d', function () {
 
     Route::get('/vehicles/list/pendingVehicleApprovals', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
     Route::resource('vehicle-detail-approvals', VehiclePendingApprovalRequestController::class);
+     Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class,'ApproveOrRejectVehicleDetails'])
+         ->name('vehicle-detail.update');
+
 
 
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');

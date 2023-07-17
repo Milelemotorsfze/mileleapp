@@ -93,11 +93,11 @@
                             <th style="font-size: 12px;">Vehicle QTY</th>
                         </thead>
                         <tbody>
-                            <tr  onclick="window.location.href = '{{ route('vehicle-detail-approvals.index') }}'">
+                            <tr @if($pendingVehicleDetailForApprovalCount > 0) onclick="window.location.href = '{{ route('vehicle-detail-approvals.index') }}'" @endif>
                                 <td style="font-size: 12px;">
                                         Pending Vehicle Details
                                 </td>
-                                <td style="font-size: 12px;">{{$pendingVehicleDetailForApprovals}}</td>
+                                <td style="font-size: 12px;">{{ $pendingVehicleDetailForApprovalCount }}</td>
 
                             </tr>
                         </tbody>
@@ -138,9 +138,11 @@
                             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
                                <tr>
+                                <th>S.No</th>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
+{{--                                   <th>Id</th>--}}
                                     @if ($hasPermission)
                                 <th class="nowrap-td">PO Number</th>
                                 <th class="nowrap-td">PO Date</th>
@@ -304,6 +306,7 @@
                             </div>
                                 @foreach ($data as $vehicles)
                                 <tr>
+
                                     @php
                                      $name = "";
                                      $grn_date = "";
@@ -389,6 +392,8 @@
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
+                                    <td>{{ ++$i }}</td>
+{{--                                    <td>{{$vehicles->id}}</td>--}}
                                     @if ($hasPermission)
                                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                                      <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
@@ -544,8 +549,8 @@
                                              {{ $vehicles->variant->model_detail ?? '' }}
                                          </span>
                                      </td>
-                                     <td class="nowrap-td Variant">
-                                         <select class="form-control variant" data-vehicle-id="{{$vehicles->id}}" id="variant-{{$vehicles->id}}"
+                                     <td class="nowrap-td Variant ">
+                                         <select class="form-control variant " data-vehicle-id="{{$vehicles->id}}" id="variant-{{$vehicles->id}}"
                                                  name="variants_ids[]" disabled  >
                                             @foreach($varaint as $variantItem)
                                                  <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
@@ -601,7 +606,7 @@
                                             <span id="gearbox-{{ $vehicles->id }}"> {{ $vehicles->variant->gearbox }}</span>
                                         </td>
                                         <td class="nowrap-td">
-                                            <select class="form-control exterior_colour " name="exterior_colours[]" readonly  >
+                                            <select class="form-control exterior_colour " name="exterior_colours[]" disabled  >
                                                 <option value=""></option>
                                                 @foreach($exteriorColours as $exColour)
                                                     <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
@@ -610,7 +615,7 @@
                                             </select>
                                         </td>
                                         <td class="nowrap-td">
-                                            <select class="form-control interior_colour " name="interior_colours[]" readonly  >
+                                            <select class="form-control interior_colour " name="interior_colours[]" disabled  >
                                                 <option value=""></option>
                                                 @foreach($interiorColours as $interiorColour)
                                                     <option value="{{$interiorColour->id}} " {{ $interiorColour->id == $vehicles->int_colour ? 'selected' : "" }}   >
@@ -816,8 +821,8 @@
       @endif
       @if($hasPermissionVehicleDetailEdit)
          $('.variant').attr('disabled',false);
-         $('.exterior_colour').attr('readonly',false);
-         $('.interior_colour').attr('readonly',false);
+         $('.exterior_colour').attr('disabled',false);
+         $('.interior_colour').attr('disabled',false);
          $('.py-mm-yyyy').attr('readonly',false);
 
       @endif
