@@ -127,7 +127,7 @@
   @endphp
   @if ($hasPermission)
   @if ($purchasingOrder->status === 'Approved')
-  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated'))
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated Request'))
 <div class="col-lg-2 col-md-3 col-sm-12">
   <label for="choices-single-default" class="form-label"><strong>Payment Initiation Request</strong></label>
 </div>
@@ -139,18 +139,93 @@
 @endif
 @endif
 @if ($purchasingOrder->status === 'Approved')
-  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Requested'))
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiated'))
 <div class="col-lg-2 col-md-3 col-sm-12">
   <label for="choices-single-default" class="form-label"><strong>Payment Release Request</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
   <button id="approval-btn" class="btn btn-success" onclick="updateallStatusrel('Approved', {{ $purchasingOrder->id }})">Approve All</button>
   <button id="rejection-btn" class="btn btn-danger" onclick="updateallStatusrel('Rejected', {{ $purchasingOrder->id }})">Reject All</button>
 </div>
 @endif
 @endif
   @endif
+  @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+  @endphp
+  @if ($hasPermission)
+  @if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Approved'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Initiation Payment Request</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreq('Approved', {{ $purchasingOrder->id }})">Request for All</button>
+</div>
+@endif
+@endif
+@if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Payment Completed'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Vendor Confirmed</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqpocomp('Approved', {{ $purchasingOrder->id }})">Confirmed All</button>
+</div>
+@endif
+@endif
+@if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Vendor Confirmed'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Incoming Stock</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqpocompin('Approved', {{ $purchasingOrder->id }})">Incoming All</button>
+</div>
+@endif
+@endif
+@endif
+@php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+  @endphp
+  @if ($hasPermission)
+  @if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Initiation Payment Request</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Request for All</button>
+</div>
+@endif
+@endif
+@if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiate Request Approved'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Payment Initiatie</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpay('Approved', {{ $purchasingOrder->id }})">Initiatie for All</button>
+</div>
+@endif
+@endif
+@if ($purchasingOrder->status === 'Approved')
+  @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Release Approved'))
+<div class="col-lg-2 col-md-3 col-sm-12">
+  <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
+</div>
+  <div class="col-lg-2 col-md-3 col-sm-12">
+ 
+  <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp('Approved', {{ $purchasingOrder->id }})">Complete All Payments</button>
+</div>
+@endif
+@endif
+@endif
 </div>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12">
@@ -161,6 +236,7 @@
             </thead>
             <tbody>
             @php
+                    $vehiclesapprovedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
                     $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
                     $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->count();
                     $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Requested')->count();
@@ -168,66 +244,46 @@
                     $vehiclescountpaymentcom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Completed')->count();
                     $vehiclescountpaymentincom = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
                     $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->count();
-                    $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
-                    $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Rejected')->count();
-                    $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Approved')->count();
-                    $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Requested')->count();
+                    $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated Request')->count();
+                    $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Rejected')->count();
+                    $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Request Approved')->count();
+                    $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
                     $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->count();
                     $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->count();
                     $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->count();
-                    $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
+                    $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Vendor Confirmed')->count();
+                    $vendorpaymentincoming = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Incoming Stock')->count();
                     @endphp
                     <tr>
                     <td style="font-size: 12px;">Vehicles Not Approved</td>
                     <td style="font-size: 12px;">{{ $vehiclescountnotapproved }}</td>
                 </tr>
                 <tr>
+                    <td style="font-size: 12px;"> Vehicles Approved</td>
+                    <td style="font-size: 12px;">{{ $vehiclesapprovedcount }}</td>
+                </tr>
+                <tr>
                     <td style="font-size: 12px;">Vehicles Rejected</td>
                     <td style="font-size: 12px;">{{ $vehiclesrejectedcount }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Vehicles Payment Requested</td>
+                    <td style="font-size: 12px;">Payment Requested</td>
                     <td style="font-size: 12px;">{{ $vehiclescountrequestpay }}</td>
                 </tr>
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                @endphp
-                @if ($hasPermission)
                 <tr>
-                    <td style="font-size: 12px;">Payment Initiated</td>
-                    <td style="font-size: 12px;">{{ $vehiclescountpaymentreq }}</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px;">Payment Rejected</td>
-                    <td style="font-size: 12px;">{{ $vehiclescountpaymentrej }}</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px;">Payment Completed</td>
-                    <td style="font-size: 12px;">{{ $vehiclescountpaymentcom }}</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 12px;">Incoming Stock</td>
-                    <td style="font-size: 12px;">{{ $vehiclescountpaymentincom }}</td>
-                </tr>
-                @endif
-                @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
-                @endphp
-                @if ($hasPermission)
-                <tr>
-                    <td style="font-size: 12px;">Payment Initiated</td>
+                    <td style="font-size: 12px;">Payment Request Initiated</td>
                     <td style="font-size: 12px;">{{ $vehiclescountintitail }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Initiate Approved</td>
+                    <td style="font-size: 12px;">Payment Request Approved</td>
                     <td style="font-size: 12px;">{{ $vehiclescountintitailapp }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Initiate Rejected</td>
+                    <td style="font-size: 12px;">Payment Request Rejected</td>
                     <td style="font-size: 12px;">{{ $vehiclescountintitailreq }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Release Requested</td>
+                    <td style="font-size: 12px;">Payment Initiated</td>
                     <td style="font-size: 12px;">{{ $vehiclescountintitailrelreq }}</td>
                 </tr>
                 <tr>
@@ -239,14 +295,17 @@
                     <td style="font-size: 12px;">{{ $vehiclescountintitailrelrej }}</td>
                 </tr>
                 <tr>
-                    <td style="font-size: 12px;">Payment Debited</td>
+                    <td style="font-size: 12px;">Payment Completed - Acknowledged</td>
                     <td style="font-size: 12px;">{{ $vehiclescountintitailpaycomp }}</td>
                 </tr>
                 <tr>
                     <td style="font-size: 12px;">Vendor Confirmed</td>
                     <td style="font-size: 12px;">{{ $vendorpaymentconfirm }}</td>
                 </tr>
-                @endif
+                <tr>
+                    <td style="font-size: 12px;">Incoming Stock</td>
+                    <td style="font-size: 12px;">{{ $vendorpaymentincoming }}</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -372,7 +431,7 @@
                                 </select>
                             </td>
                             @endif
-							@endif
+							              @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
                             @endphp
@@ -450,7 +509,7 @@
                             Un-Reject
                         </a>
                         @endif
-                        @elseif ($vehicles->payment_status === 'Payment Initiated')
+                        @elseif ($vehicles->payment_status === 'Payment Initiated Request')
                         <div style="display: flex; gap: 10px;">
                         <a title="Payment Initiated Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleaseconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
@@ -458,7 +517,7 @@
                         <a title="Payment" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.paymentreleaserejected', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Reject
                         </a>
-                        @elseif ($vehicles->payment_status === 'Payment Release Requested')
+                        @elseif ($vehicles->payment_status === 'Payment Initiated')
                         <div style="display: flex; gap: 10px;">
                         <a title="Payment Release Approved" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentreleasesconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px;">
                         Approved
@@ -469,6 +528,34 @@
                         </div>
                         @endif
                         @endif
+                        {{-- For Incoming Confirm  --}}
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Vendor Confirmed')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmincoming', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Incoming Confirmed
+											</a>
+                      @endif
+											@endif
+											@endif
+											{{-- End For Vendor Confirm  --}}
+                        {{-- For Vendor Confirm  --}}
+											@php
+											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+											@endphp
+											@if ($hasPermission)
+											@if ($purchasingOrder->status === 'Approved')
+											@if ($vehicles->payment_status === 'Payment Completed')
+											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
+											Vendor Confirmed
+											</a>
+                      @endif
+											@endif
+											@endif
+											{{-- End For Vendor Confirm  --}}
 						{{-- End For Management  --}}
 						{{-- For Initiate Payment Procurement  --}}
 										@php
@@ -508,7 +595,7 @@
 											@if ($purchasingOrder->status === 'Approved')
 											@if ($vehicles->status === 'Request for Payment')
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentintconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Initiate Payment
+											Initiate Payment Request
 											</a>
 											@endif
 											@endif
@@ -520,9 +607,9 @@
 								@endphp
 								@if ($hasPermission)
 								@if ($purchasingOrder->status === 'Approved')
-								@if ($vehicles->payment_status === 'Payment Initiate Approved')
+								@if ($vehicles->payment_status === 'Payment Initiate Request Approved')
 								<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-								Payment Release Requested
+								Payment Initiated
 								</a>
 								@endif
 								@endif
@@ -536,28 +623,12 @@
 									@if ($purchasingOrder->status === 'Approved')
 									@if ($vehicles->payment_status === 'Payment Release Approved')
 									<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmdebited', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-									Amount Debited
+									Payment Completed
 									</a>
 									@endif
 									@endif
 									@endif
 									{{-- End For Amount Debited  --}}
-									{{-- For Vendor Confirm  --}}
-											@php
-											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-											@endphp
-											@if ($hasPermission)
-											@if ($purchasingOrder->status === 'Approved')
-											@if ($vehicles->payment_status === 'Payment Completed')
-                      @if ($vehicles->status != 'Incoming Stock')
-											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
-											Vendor Confirmed
-											</a>
-											@endif
-                      @endif
-											@endif
-											@endif
-											{{-- End For Vendor Confirm  --}}
                             </div>
                         </td>
                         </tr>
@@ -747,33 +818,29 @@ $colournew = $new_value ? $new_value->name : null;
 
     @foreach($purchasinglog as $log)
         @php
-            $change_by = DB::table('users')->where('id', $log->created_by)->first();
-            $change_bys = $change_by->name;
-            $selected = DB::table('roles')->where('id', $log->role)->first();
-            $roleselected = $selected ? $selected->name : null;
-            $variant = DB::table('varaints')->where('id', $log->variant)->first();
-             $variant_name = $variant->name;
             // Check if current row is the same as the previous row
             $isSameAsPrevious = ($previousLog &&
-                $log->date == $previousLog->date &&
-                strtotime($log->time) - strtotime($previousLog->time) <= 1 &&
-                $log->created_by == $previousLog->created_by &&
-                $log->role == $previousLog->role &&
-                $log->variant == $previousLog->variant &&
+            $log->created_by== $previousLog->created_by &&
                 $log->estimation_date == $previousLog->estimation_date &&
                 $log->territory == $previousLog->territory &&
                 $log->ex_colour == $previousLog->ex_colour &&
                 $log->int_colour == $previousLog->int_colour &&
-                $log->status == $previousLog->status);
+                $log->variant == $previousLog->variant &&
+                $log->status == $previousLog->status &&
+                $log->role == $previousLog->role);
             if (!$isSameAsPrevious) {
                 if ($qty > 0) {
                     // Output the row with the previous quantity count
                     echo '<tr>';
+                    $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
+                    $change_bys = $change_by->name;
+                    $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
+                    $variant_name = $variant->name;
                     echo '<td>'. $previousLog->status .'</td>';
                     echo '<td>'. ucfirst(strtolower($variant_name)) .'</td>';
-                    $exColour = $log->ex_colour ? DB::table('color_codes')->where('id', $log->ex_colour)->first() : null;
+                    $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
                     $ex_colours = $exColour ? $exColour->name : null;
-                    $intColour = $log->int_colour ? DB::table('color_codes')->where('id', $log->int_colour)->first() : null;
+                    $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
                     $int_colours = $intColour ? $intColour->name : null;
                     echo '<td>'. $ex_colours .'</td>';
                     echo '<td>'. $int_colours .'</td>';
@@ -782,6 +849,8 @@ $colournew = $new_value ? $new_value->name : null;
                     echo '<td>'. $previousLog->estimation_date .'</td>';
                     echo '<td>'. date('d-M-Y', strtotime($previousLog->date)) .' '. $previousLog->time .'</td>';
                     echo '<td>'. ucfirst(strtolower($change_bys)) .'</td>';
+                    $selected = DB::table('roles')->where('id', $previousLog->role)->first();
+                    $roleselected = $selected ? $selected->name : null;
                     echo '<td>'. $roleselected .'</td>';
                     echo '</tr>';
                 }
@@ -794,26 +863,27 @@ $colournew = $new_value ? $new_value->name : null;
         @endphp
     @endforeach
     {{-- Output the last group if it exists --}}
-    @if ($qty > 0)
-        <tr>
-            <td>{{ $previousLog->status }}</td>
-            <td>{{ ucfirst(strtolower($variant_name)) }}</td>
-            @php
-            $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
-            $ex_colours = $exColour ? $exColour->name : null;
-            $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
-            $int_colours = $intColour ? $intColour->name : null;
-            @endphp
-            <td>{{ $ex_colours }}</td>
-            <td>{{ $int_colours }}</td>
-            <td>{{ $qty }}</td>
-            <td>{{ ucfirst(strtolower($previousLog->territory)) }}</td>
-            <td>{{ $previousLog->estimation_date }}</td>
-            <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
-            <td>{{ ucfirst(strtolower($change_bys)) }}</td>
-            <td>{{ $roleselected }}</td>   
-        </tr>
-    @endif
+@if ($qty > 0)
+    <tr>
+        <td>{{ $previousLog->status }}</td>
+        <td>{{ ucfirst(strtolower($variant_name)) }}</td>
+        @php
+        $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
+        $ex_colours = $exColour ? $exColour->name : null;
+        $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
+        $int_colours = $intColour ? $intColour->name : null;
+        @endphp
+        <td>{{ $ex_colours }}</td>
+        <td>{{ $int_colours }}</td>
+        <td>{{ $qty }}</td>
+        <td>{{ ucfirst(strtolower($previousLog->territory)) }}</td>
+        <td>{{ $previousLog->estimation_date }}</td>
+        <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
+        <td>{{ ucfirst(strtolower($change_bys)) }}</td>
+        <td>{{ $roleselected }}</td>   
+    </tr>
+@endif
+
 </tbody>
 </table>
 </div>
@@ -1315,5 +1385,131 @@ function deletepo(id) {
       return false;
     }
   }
+  function allpaymentintreq(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentreqss') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function allpaymentintreqfin(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentreqssfin') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function allpaymentintreqfinpay(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentreqssfinpay') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function allpaymentintreqfinpaycomp(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentreqssfinpaycomp') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function allpaymentintreqpocomp(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentintreqpocomp') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
+function allpaymentintreqpocompin(status, orderId) {
+  let url = '{{ route('purchasing.allpaymentintreqpocompin') }}';
+  let data = { status: status, orderId: orderId };
+console.log(data);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Status update successful');
+      window.location.reload();
+    })
+    .catch(error => {
+      window.location.reload();
+    });
+}
 </script>
 @endsection

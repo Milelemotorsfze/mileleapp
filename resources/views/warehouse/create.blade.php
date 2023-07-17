@@ -85,7 +85,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
             <label for="basicpill-firstname-input" class="form-label">PO Date : </label>
-            <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+            <input type="Date" id="po_date" name="po_date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
         <div class="col-lg-2 col-md-6">
             <span class="error">* </span>
@@ -121,12 +121,6 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
         <div class="col-lg-3 col-md-6">
             <label for="QTY" class="form-label">Variants Detail:</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-            <label for="exColour" class="form-label">Estimated Arrival:</label>
-        </div>
-        <div class="col-lg-1 col-md-6">
-            <label for="exColour" class="form-label">Territory:</label>
         </div>
         <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Exterior Color:</label>

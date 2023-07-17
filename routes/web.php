@@ -298,6 +298,7 @@ Route::get('/d', function () {
     Route::get('vehicles/paymentrelconfirmdebited/{id}', [PurchasingOrderController::class, 'paymentrelconfirmdebited'])->name('vehicles.paymentrelconfirmdebited');
     Route::post('/update-purchasing-allstatus', [PurchasingOrderController::class, 'purchasingallupdateStatus'])->name('purchasing.updateallStatus');
     Route::get('vehicles/paymentrelconfirmvendors/{id}', [PurchasingOrderController::class, 'paymentrelconfirmvendors'])->name('vehicles.paymentrelconfirmvendors');
+    Route::get('vehicles/paymentrelconfirmincoming/{id}', [PurchasingOrderController::class, 'paymentrelconfirmincoming'])->name('vehicles.paymentrelconfirmincoming');
 
     Route::get('/purcahsing-order-filter/{status}', [PurchasingOrderController::class, 'filter'])->name('purchasing.filter');
     Route::get('/purcahsing-order-filterpayment/{status}', [PurchasingOrderController::class, 'filterpayment'])->name('purchasing.filterpayment');
@@ -307,6 +308,14 @@ Route::get('/d', function () {
     Route::get('/purcahsing-order-filterpendingdebits/{status}', [PurchasingOrderController::class, 'filterpendingdebits'])->name('purchasing.filterpendingdebits');
     Route::get('/purcahsing-order-filterpendingfellow/{status}', [PurchasingOrderController::class, 'filterpendingfellow'])->name('purchasing.filterpendingfellow');
     Route::post('/update-purchasing-allstatusrel', [PurchasingOrderController::class, 'purchasingallupdateStatusrel'])->name('purchasing.updateallStatusrel');
+    Route::post('/update-purchasing-allpaymentreqss', [PurchasingOrderController::class, 'allpaymentreqss'])->name('purchasing.allpaymentreqss');
+    Route::post('/update-purchasing-allpaymentreqssfin', [PurchasingOrderController::class, 'allpaymentreqssfin'])->name('purchasing.allpaymentreqssfin');
+    Route::post('/update-purchasing-allpaymentreqssfinpay', [PurchasingOrderController::class, 'allpaymentreqssfinpay'])->name('purchasing.allpaymentreqssfinpay');
+    Route::post('/update-purchasing-allpaymentreqssfinpaycomp', [PurchasingOrderController::class, 'allpaymentreqssfinpaycomp'])->name('purchasing.allpaymentreqssfinpaycomp');
+    Route::post('/update-purchasing-allpaymentintreqpocomp', [PurchasingOrderController::class, 'allpaymentintreqpocomp'])->name('purchasing.allpaymentintreqpocomp');
+    Route::post('/update-purchasing-allpaymentintreqpocompin', [PurchasingOrderController::class, 'allpaymentintreqpocompin'])->name('purchasing.allpaymentintreqpocompin');
+    Route::get('/purcahsing-order-filterapproved/{status}', [PurchasingOrderController::class, 'filterapproved'])->name('purchasing.filterapproved');
+    Route::get('/purcahsing-order-filterincomings/{status}', [PurchasingOrderController::class, 'filterincomings'])->name('purchasing.filterincomings');
     // Vendors
 
     Route::resource('vendors', VendorController::class);
