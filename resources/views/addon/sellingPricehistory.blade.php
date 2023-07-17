@@ -310,7 +310,7 @@
     @endif
   @endcan
   <script type="text/javascript">
-    var data = {!! json_encode($historyData) !!};
+    var data = {!! json_encode($history) !!};
     $(document).ready(function ()
     {
       $('#supplierAddonPrices').DataTable();

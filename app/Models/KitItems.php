@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class KitItems extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'kit_items';
     protected $fillable = [
         'addon_details_id',

@@ -90,7 +90,7 @@ class WarrantyBrandsController extends Controller
            {
                if(!$warrantyBrand->selling_price) {
                    $warrantyBrand->selling_price = $request->selling_price;
-                   $warrantyBrand->is_selling_price_approved = false;
+                   $warrantyBrand->is_selling_price_approved = '0';
                    $warrantyBrand->save();
                }
                $warrantySellingPriceHistory = new WarrantySellingPriceHistory();
@@ -126,9 +126,18 @@ class WarrantyBrandsController extends Controller
         {
            $warrantyBrand = WarrantyBrands::find($warrantyPriceHistory->warranty_brand_id);
            $warrantyBrand->selling_price = $request->updated_price;
-           $warrantyBrand->is_selling_price_Approved = true;
+           $warrantyBrand->is_selling_price_Approved = '1';
            $warrantyBrand->save();
-
+        }
+        elseif($status == 'rejected')
+        {
+            $warrantyBrand = WarrantyBrands::where('id',$warrantyPriceHistory->warranty_brand_id)->whereNot('is_selling_price_Approved','1')->first();
+            if($warrantyBrand)
+            {
+                $warrantyBrand->selling_price = $request->updated_price;
+                $warrantyBrand->is_selling_price_Approved = '2';
+                $warrantyBrand->save();
+            }
         }
         $warrantyPriceHistory->status = $request->status;
         $warrantyPriceHistory->status_updated_by = Auth::id();

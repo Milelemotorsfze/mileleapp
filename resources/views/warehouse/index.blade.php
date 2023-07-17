@@ -70,13 +70,110 @@ th.nowrap-td {
                     @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">
-            Purchase Orders
+            Purchase Orders Summary
         </h4>
         <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-12">
+        <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
+        <thead>
+       <th style="font-size: 12px;">New Purchase Order</th>
+       <th style="font-size: 12px;">Approved Purchase Order</th>
+       <th style="font-size: 12px;">In-Progress Purchase Order</th>
+       <th style="font-size: 12px;">Closed Purchase Order</th>
+    </thead>
+    <tbody>
+        <tr>
+        <td onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
         @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
+        @if ($pendongpoapproval > 0)
+            {{ $pendongpoapproval }}
+        @else
+            0
+        @endif
+    </td>
+    <td onclick="window.location='{{ route('purchasing.filterapproved', ['status' => 'Approved']) }}';">
+        @php
+        $alreadyapproved = DB::table('purchasing_order')                    
+        ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.status', 'Approved');
+            })
+            ->count();
+        @endphp
+        @if ($alreadyapproved > 0)
+            {{ $alreadyapproved }}
+        @else
+            0
+        @endif
+    </td>
+    <td onclick="window.location='{{ route('purchasing.filterapproved', ['status' => 'Approved']) }}';">
+    @php
+    $inProgressPurchasingOrders = DB::table('vehicles')
+        ->where(function ($query) {
+            $query->where('status', 'Request for Payment')
+                ->orWhere(function ($query) {
+                    $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+                          ->where(function ($query) {
+                              $query->whereNotNull('payment_status')
+                                    ->where('payment_status', '<>', '');
+                          });
+                });
+        })
+        ->distinct('purchasing_order_id')
+        ->count('purchasing_order_id');
+    @endphp
+    @if ($inProgressPurchasingOrders > 0)
+        {{ $inProgressPurchasingOrders }}
+    @else
+        0
+    @endif
+</td>
+<td onclick="window.location='{{ route('purchasing.filterincomings', ['status' => 'Approved']) }}';">
+    @php
+    $completedPos = DB::table('purchasing_order')
+        ->whereNotExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('vehicles')
+                ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                ->whereNotIn('payment_status', ['Payment Rejected', 'Payment Release Rejected', 'Payment Initiate Request Rejected', 'Incoming Stock']);
+        })
+        ->where('status', 'Approved')
+        ->count();
+    @endphp
+    @if ($completedPos > 0)
+        {{ $completedPos }}
+    @else
+        0
+    @endif
+</td>
+        </tr>
+    </tbody>
+  </table>
+</div> 
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
                     @endphp
                     @if ($hasPermission)
+      <div class="col-lg-3 col-md-3 col-sm-12">
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('purchasing-order.create') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Purchasing Order
+      </a>
+      <div class="clearfix"></div>
+      <br>
+      </div>
+      @endif
+</div>
+<hr>
+<h4 class="card-title">
+            Pending Task
+        </h4>
+        <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
             <thead>
@@ -130,27 +227,68 @@ th.nowrap-td {
         </td>
         <td style="font-size: 12px;">
         @php
-        $pendingpaymentrelsa = DB::table('purchasing_order')
-        ->where('purchasing_order.status', 'Approved')
-        ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-        ->where('vehicles.payment_status', 'Payment Release Requested')
-        ->count();
-            @endphp
-            @if ($pendingpaymentrelsa > 0)
-                {{ $pendingpaymentrelsa }}
-            @else
-                No records found
-            @endif
-        </td>
-    </tr>
-            </tbody>
-        </table>
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        @endphp
+        @if ($pendongpoapproval > 0)
+            {{ $pendongpoapproval }}
+        @else
+            No records found
+        @endif
+    </td>
+</tr>
+<tr onclick="window.location='{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}">
+        Pending Payment Request
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+        @php
+        $pendingints = DB::table('purchasing_order')
+            ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Initiated Request');
+            })
+            ->count();
+        @endphp
+        @if ($pendingints > 0)
+            {{ $pendingints }}
+        @else
+            No records found
+        @endif
+    </td>
+</tr>
+<tr onclick="window.location='{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}">
+        Pending Payment Release
+        </a>
+    </td>
+    <td style="font-size: 12px;">
+    @php
+    $pendingpaymentrelsa = DB::table('purchasing_order')
+                ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Initiated');
+            })
+            ->count();
+        @endphp
+        @if ($pendingpaymentrelsa > 0)
+            {{ $pendingpaymentrelsa }}
+        @else
+            No records found
+        @endif
+    </td>
+</tr>
+</tbody>
+  </table>
 </div>
-@endif
-@php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
-                    @endphp
-                    @if ($hasPermission)
 <div class="col-lg-3 col-md-3 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
         <thead>
@@ -161,16 +299,20 @@ th.nowrap-td {
     <tr onclick="window.location='{{ route('purchasing.filterintentreq', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterintentreq', ['status' => 'Approved']) }}">
-        Pending Payment Initiation Req
+        Pending Payment Approval Req
         </a>
     </td>
     <td style="font-size: 12px;">
     @php
     $intipending = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.status', 'Request for Payment')
-    ->count();
+                    ->where('purchasing_order.status', 'Approved')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.status', 'Request for Payment');
+            })
+            ->count();
         @endphp
         @if ($intipending > 0)
             {{ $intipending }}
@@ -182,16 +324,20 @@ th.nowrap-td {
 <tr onclick="window.location='{{ route('purchasing.filterpendingrelease', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterpendingrelease', ['status' => 'Approved']) }}">
-        Pending Payment Release Req
+        Pending Payment Initiation Req
         </a>
     </td>
     <td style="font-size: 12px;">
     @php
     $pendingreleasereqs = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.payment_status', 'Payment Initiate Approved')
-    ->count();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Initiate Request Approved');
+            })
+            ->count();
         @endphp
         @if ($pendingreleasereqs > 0)
             {{ $pendingreleasereqs }}
@@ -203,16 +349,20 @@ th.nowrap-td {
 <tr onclick="window.location='{{ route('purchasing.filterpendingdebits', ['status' => 'Approved']) }}';">
     <td style="font-size: 12px;">
         <a href="{{ route('purchasing.filterpendingdebits', ['status' => 'Approved']) }}">
-        Payment Debit Pending
+        Pending Payment Completion 
         </a>
     </td>
     <td style="font-size: 12px;">
     @php
     $pendingdebitaps = DB::table('purchasing_order')
     ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.payment_status', 'Payment Release Approved')
-    ->count();
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicles')
+                    ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+                    ->where('vehicles.payment_status', 'Payment Release Approved');
+            })
+            ->count();
         @endphp
         @if ($pendingdebitaps > 0)
             {{ $pendingdebitaps }}
@@ -224,11 +374,6 @@ th.nowrap-td {
 </tbody>
   </table>
 </div>
-@endif
-@php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-colour-details', 'price-edit']);
-                @endphp
-                @if ($hasPermission)
 <div class="col-lg-3 col-md-3 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
         <thead>
@@ -244,12 +389,19 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
-    $pendingvendorfol = DB::table('purchasing_order')
-    ->where('purchasing_order.status', 'Approved')
-    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-    ->where('vehicles.payment_status', 'Payment Completed')
+$pendingvendorfol = DB::table('purchasing_order')
+    ->where('status', 'Approved')
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('vehicles')
+            ->whereColumn('purchasing_order.id', '=', 'vehicles.purchasing_order_id')
+            ->where(function ($query) {
+                $query->where('payment_status', 'Payment Completed')
+                      ->orWhere('payment_status', 'Vendor Confirmed');
+            });
+    })
     ->count();
-        @endphp
+@endphp
         @if ($pendingvendorfol > 0)
             {{ $pendingvendorfol }}
         @else
@@ -260,21 +412,6 @@ th.nowrap-td {
 </tbody>
   </table>
 </div>
-@endif
-      @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
-                    @endphp
-                    @if ($hasPermission)
-      <div class="col-lg-9 col-md-3 col-sm-12">
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-success float-end" href="{{ route('purchasing-order.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Purchasing Order
-      </a>
-      <div class="clearfix"></div>
-      <br>
-      </div>
-      @endif
-
 </div>
 </div>
     <div class="card-body">
@@ -299,6 +436,9 @@ th.nowrap-td {
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po-details');
                     @endphp
                     @if ($hasPermission)
+<h4 class="card-title">
+            Purchase Order List
+        </h4>
         <div class="table-responsive" >
         <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
@@ -332,71 +472,37 @@ th.nowrap-td {
                     <td>
                     <table id="dtBasicExample20" class="table table-striped table-editable table-edits table table-bordered table-sm">
                     <thead>
-                    <th style="font-size: 12px;">Task</th>
-                    <th style="font-size: 12px;">Pending</th>
-                    <th style="font-size: 12px;">Approved</th>
-                    <th style="font-size: 12px;">Reject</th>
+                    <th style="font-size: 12px;">Status</th>
+                    <th style="font-size: 12px;">Qty</th>
     </thead>
     <tbody>
       @php
-    $vehiclescountnotnapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Not Approved')->orWhere('status', 'New Changes');})->count();
+   
     $vehiclescountnotapproved = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Approved')->count();
-    $vehiclesrejectedcount = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Rejected')->count();
-    $vehiclescountpaymentreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where(function ($query) {$query->where('status', 'Request for Payment')->orWhere('status', 'Payment Requested');})->count();
-    $vehiclescountpaymentrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Payment Rejected')->count();
-    $vehiclescountintitailpaycomp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Completed')->count();
+    $vehiclescountpaymentreq = DB::table('vehicles')
+    ->where('purchasing_order_id', $purchasingOrder->id)
+    ->where(function ($query) {
+        $query->where('status', 'Request for Payment')
+              ->whereNot('status', 'Rejected')
+              ->orWhere(function ($query) {
+                $query->whereNotIn('payment_status', ['Payment Initiate Request Rejected', 'Request Rejected', 'Payment Release Rejected', 'Incoming Stock'])
+                      ->where(function ($query) {
+                          $query->whereNotNull('payment_status')
+                                ->where('payment_status', '<>', '');
+                      });
+            });
+    })
+    ->count();
     $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
-    $vehiclescountrequestpay = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Request for Payment')->count();
-    $vehiclescountintitail = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiated')->count();
-    $vehiclescountintitailreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Rejected')->count();
-    $vehiclescountintitailapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Initiate Approved')->count();
-    $vehiclescountintitailrelreq = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Requested')->count();
-    $vehiclescountintitailrelapp = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Approved')->count();
-    $vehiclescountintitailrelrej = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('payment_status', 'Payment Release Rejected')->count();
     @endphp
     <tr>
-        <td style="font-size: 12px;">Vehicles Status</td>
-        <td style="font-size: 12px;">{{$vehiclescountnotnapproved}}</td>
+        <td style="font-size: 12px;">Approved Vehicles</td>
         <td style="font-size: 12px;">{{$vehiclescountnotapproved}}</td>
-        <td style="font-size: 12px;">{{$vehiclesrejectedcount}}</td>
         </tr>
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-        @endphp
-        @if ($hasPermission)
         <tr>
-        <td style="font-size: 12px;">Payments Request</td>
+        <td style="font-size: 12px;">In Progress</td>
         <td style="font-size: 12px;">{{$vehiclescountpaymentreq}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailpaycomp}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountpaymentrej}}</td>
-        </tr>
-        @endif
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
-        @endphp
-        @if ($hasPermission)
-        <tr>
-        <td style="font-size: 12px;">Payments Request</td>
-        <td colspan="3" style="font-size: 12px;">{{$vehiclescountrequestpay}}</td>
-        </tr>
-        <tr>
-        <td style="font-size: 12px;">Payment Initiation</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitail}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailapp}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailreq}}</td>
-        </tr>
-        <tr>
-        <td style="font-size: 12px;">Payment Release</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailrelreq}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailrelapp}}</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailrelrej}}</td>
-        </tr>
-        <tr>
-        <td style="font-size: 12px;">Payment Debit</td>
-        <td style="font-size: 12px;">{{$vehiclescountintitailrelapp}}</td>
-        <td colspan="2" style="font-size: 12px;">{{$vehiclescountintitailpaycomp}}</td>
-        </tr>
-        @endif
+        </tr>  
         <tr>
         <td style="font-size: 12px;">Incoming Stock</td>
         <td colspan="3" style="font-size: 12px;">{{$vendorpaymentconfirm}}</td>

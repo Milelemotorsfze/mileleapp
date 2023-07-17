@@ -145,14 +145,13 @@
 
                                 <td>
                                     @if($warrantyBrand->selling_price)
-                                        @if($warrantyBrand->is_selling_price_approved == false)
-                                            {{ $warrantyBrand->selling_price }}  (Not Approved)
-                                        @else
+                                        @if($warrantyBrand->is_selling_price_approved == '0')
+                                            {{ $warrantyBrand->selling_price }}   <label class="badge badge-soft-danger">Approval Awaiting</label>
+                                        @elseif($warrantyBrand->is_selling_price_approved == '1')
                                             {{ $warrantyBrand->selling_price }}
+                                            @else
+                                            <label class="badge badge-soft-info">Not Added</label>
                                         @endif
-
-                                    @else
-                                        Selling Price Not Added
                                    @endif
                                 </td>
                                 <td>{{ $warrantyBrand->user->name ?? '' }}</td>

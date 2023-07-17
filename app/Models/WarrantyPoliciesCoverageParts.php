@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class WarrantyPoliciesCoverageParts extends Model
 {
-    use HasFactory;
+    use HasFactory , SoftDeletes;
     protected $table = "warranty_policies_coverage_parts";
     protected $fillable = [
         'policies_id',

@@ -143,7 +143,7 @@
                                         @if ($hasPermission)
                                             <td>
                                                 @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
-                                                    <label class="badge badge-soft-info">Not Created</label>          
+                                                    <label class="badge badge-soft-info">Not Added</label>          
                                                 @elseif($addonsdata->SellingPrice!= null OR $addonsdata->PendingSellingPrice!= null)
                                                     @if($addonsdata->SellingPrice!= null)
                                                         @if($addonsdata->SellingPrice->selling_price != '')
@@ -235,7 +235,7 @@
                                             @if ($hasPermission)
                                                 <td>
                                                     @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')    
-                                                        <label class="badge badge-soft-info">Not Created</label>          
+                                                        <label class="badge badge-soft-info">Not Added</label>          
                                                     @elseif($addonsdata->SellingPrice!= null)
                                                         @if($addonsdata->SellingPrice->selling_price != '')
                                                             {{$addonsdata->SellingPrice->selling_price}} AED

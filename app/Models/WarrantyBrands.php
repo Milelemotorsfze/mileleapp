@@ -27,7 +27,10 @@ class WarrantyBrands extends Model
     {
         return $this->belongsTo(Brand::class);
     }
-
+    public function brandName()
+    {
+        return $this->hasOne(Brand::class,'id','brand_id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class,'created_by');
