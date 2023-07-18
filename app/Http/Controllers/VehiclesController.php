@@ -32,7 +32,6 @@ class VehiclesController extends Controller
         $statuss = "Vendor Confirmed";
         $data = Vehicles::where('status', '!=', 'cancel')
             ->where('payment_status', $statuss);
-
         $data = $data->get();
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();

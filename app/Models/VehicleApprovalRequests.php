@@ -30,6 +30,7 @@ class VehicleApprovalRequests extends Model
             return $exterior->name ?? '';
         }
     }
+
     public function getNewExteriorAttribute()
     {
         if($this->field == 'ex_colour') {

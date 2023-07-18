@@ -453,7 +453,6 @@
                                     @else
                                         {{ $pendingVehicleDetailApprovalRequest->field }}
                                     @endif
-
                                 </td>
                                 <td>
                                     @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')

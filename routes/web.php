@@ -270,9 +270,6 @@ Route::get('/d', function () {
          ->name('vehicle-detail.update');
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
-
-
-
     Route::get('vehiclesde/{id}', [VehiclesController::class, 'deletes'])->name('vehiclesde.deletes');
     Route::get('grnlist/netsuitgrn', [MovementController::class, 'grnlist'])->name('grnlist.create');
     Route::get('grnlist/grnsimplefile', [MovementController::class,'grnsimplefile'])->name('grnlist.grnsimplefile');

@@ -18,6 +18,7 @@ class Vehicles extends Model
         'updated_by',
         'price_status'
     ];
+
     public function variant()
     {
         return $this->belongsTo(Varaint::class,'varaints_id','id');

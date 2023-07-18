@@ -785,6 +785,7 @@
         $('#form-update').attr('action', warehouse_url).submit();
         @endif
     });
+
     $('.variant').change(function () {
         var Id = $(this).val();
         var vehicleId = $(this).attr('data-vehicle-id');
