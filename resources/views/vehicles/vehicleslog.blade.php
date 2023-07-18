@@ -554,6 +554,34 @@
                                         </button>
                                     @endif
                                 </td>
+                                @php
+                                    if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
+                                        $new_value =  $pendingVehicleDetailApprovalRequest->new_exterior ?? '';
+                                       }
+                                      elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
+                                          $new_value = $pendingVehicleDetailApprovalRequest->new_interior ?? '';
+                                      }
+                                      elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
+                                           $new_value =  $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '';
+                                      }
+                                      else {
+                                        $new_value = $pendingVehicleDetailApprovalRequest->new_value ?? '';
+                                      }
+                                @endphp
+                                @php
+                                    if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
+                                        $old_value =  $pendingVehicleDetailApprovalRequest->old_exterior ?? '';
+                                       }
+                                      elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
+                                          $old_value = $pendingVehicleDetailApprovalRequest->old_interior ?? '';
+                                      }
+                                      elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
+                                           $old_value =  $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '';
+                                      }
+                                      else {
+                                        $old_value = $pendingVehicleDetailApprovalRequest->old_value ?? '';
+                                      }
+                                @endphp
                                 <div class="modal fade" id="approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog ">
@@ -571,7 +599,9 @@
                                                                     <label class="form-label font-size-13 text-center">Old Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $pendingVehicleDetailApprovalRequest->old_value }}"
+
+
+                                                                    <input type="text" value="{{  $old_value }}"
                                                                            class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -580,7 +610,8 @@
                                                                     <label class="form-label font-size-13">New Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $pendingVehicleDetailApprovalRequest->new_value }}"
+
+                                                                    <input type="text" value="{{ $new_value }}"
                                                                            id="updated-price"  class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -613,7 +644,7 @@
                                                                     <label class="form-label font-size-13 text-center">Old Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $pendingVehicleDetailApprovalRequest->old_value}}"
+                                                                    <input type="text" value="{{  $old_value}}"
                                                                            class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -622,7 +653,7 @@
                                                                     <label class="form-label font-size-13">New Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $pendingVehicleDetailApprovalRequest->new_value }}"
+                                                                    <input type="text" value="{{ $new_value }}"
                                                                            id="updated-price"  class="form-control" readonly >
                                                                 </div>
                                                             </div>
