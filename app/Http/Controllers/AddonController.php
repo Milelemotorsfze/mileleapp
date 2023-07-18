@@ -409,7 +409,22 @@ class AddonController extends Controller
         $suppliers = Supplier::select('id','supplier')->get();
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
-        return view('addon.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown'));
+        $supplierAddons = SupplierAddons::where([
+                                            ['addon_details_id', '=', $addonDetails->id],
+                                            ['status', '=', 'active'],
+                                        ])->groupBy(['purchase_price_aed','purchase_price_usd'])
+                                        ->select('id','purchase_price_aed','purchase_price_usd','addon_details_id','status')
+                                        ->get();
+        foreach($supplierAddons as $supplierAddon)
+        {
+            $supplierId = [];
+            $supplierId = SupplierAddons::where([
+                                            ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
+                                            ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
+                                        ])->pluck('supplier_id');
+            $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('supplier')->get();                         
+        }
+        return view('addon.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
