@@ -265,12 +265,11 @@ Route::get('/d', function () {
     Route::get('purchasing-order/{id}/delete', [PurchasingOrderController::class, 'deletes'])->name('purchasing-order.deletes');
     Route::post('/vehicles/updateso', [VehiclesController::class, 'updateso'])->name('vehicles.updateso');
 
+    Route::resource('vehicle-detail-approvals', VehiclePendingApprovalRequestController::class);
+    Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class,'ApproveOrRejectVehicleDetails'])
+         ->name('vehicle-detail.update');
     Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 
-    Route::get('/vehicles/list/pendingVehicleApprovals', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
-    Route::resource('vehicle-detail-approvals', VehiclePendingApprovalRequestController::class);
-     Route::post('vehicle-detail/approve', [VehiclePendingApprovalRequestController::class,'ApproveOrRejectVehicleDetails'])
-         ->name('vehicle-detail.update');
 
 
 
@@ -329,5 +328,4 @@ Route::get('/d', function () {
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
 
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
-    Route::get('/vehicles/getVehicleDetails', [VehiclesController::class, 'getVehicleDetails'])->name('vehicles.getVehicleDetails');
 });

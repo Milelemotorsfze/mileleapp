@@ -88,6 +88,23 @@ class VehiclesController extends Controller
     {
         //
     }
+    public function getVehicleDetails(Request $request) {
+        $variant = Varaint::find($request->variant_id);
+        $brand = $variant->brand->brand_name ?? '';
+        $data['brand'] = $brand;
+        $data['model_line'] = $variant->master_model_lines->model_line ?? '';
+        $data['my'] = $variant->my ?? '';
+        $data['model_detail'] = $variant->model_detail ?? '';
+        $data['seat'] = $variant->seat ?? '';
+        $data['fuel_type'] = $variant->fuel_type ?? '';
+        $data['gearbox'] = $variant->gearbox ?? '';
+        $data['steering'] = $variant->steering ?? '';
+        $data['upholestry'] = $variant->upholestry ?? '';
+        $data['detail'] = $variant->detail ?? '';
+
+        return $data;
+
+    }
 
     public function updatevehiclesdata(Request $request)
     {

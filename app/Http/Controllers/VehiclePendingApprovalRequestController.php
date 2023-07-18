@@ -25,9 +25,9 @@ class VehiclePendingApprovalRequestController extends Controller
     public function index()
     {
         $statuss = "Vendor Confirmed";
-        $pendingApprovalVehicleIds =  VehicleApprovalRequests::pluck('vehicle_id');
+        $pendingApprovalVehicleIds =  VehicleApprovalRequests::where('status','Pending')->pluck('vehicle_id');
         $data = Vehicles::whereIn('id', $pendingApprovalVehicleIds)
-        ->where('status', '!=', 'cancel')
+                ->where('status', '!=', 'cancel')
 //            ->where('payment_status', $statuss)
             ->get();
 
