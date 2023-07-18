@@ -328,15 +328,15 @@
                 <thead class="bg-soft-secondary">
                             <tr >
                                 <th id="serno" style="vertical-align: middle;">Ref No:</th>
-                                <th>Variant</th>
                                 <th>Brand</th>
                                 <th>Model Line</th>
+                                <th>Variant</th>
                                 <th>Variants Detail</th>
-                                <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
-                                <th>Territory</th>
                                 <th  style="vertical-align: middle;" id="int_color">Exterior Color</th>
                                 <th  style="vertical-align: middle;" id="ex_color">Interior Color</th>
                                 <th>VIN Number</th>
+                                <th>Territory</th>
+                                <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
@@ -368,17 +368,15 @@
                             $model_line = $master_model_lines_ids->model_line;
                             @endphp 
                             <td>{{ $vehicles->id }}</td>
-                            <td>{{ ucfirst($name) }}</td>
                             <td>{{ ucfirst(strtolower($brand_names)) }}</td>
                             <td>{{ ucfirst(strtolower($model_line)) }}</td>
+                            <td>{{ ucfirst($name) }}</td>
                             <td>{{ ucfirst(strtolower($detail)) }}</td>
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
                             @endphp
                             @if ($hasPermission)
-							@if ($vehicles->status != 'cancel')
-                            <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
-                            <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+							              @if ($vehicles->status != 'cancel')
                             <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
@@ -403,9 +401,10 @@
                                     @endforeach
                                 </select>
                             </td>
-							@else
-							<td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
-                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td class="editable-field territory" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td class="editable-field estimation_date" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
+                            @else
                             <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
@@ -430,14 +429,15 @@
                                     @endforeach
                                 </select>
                             </td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                            <td contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->estimation_date }}</td>
                             @endif
 							              @endif
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
                             @endphp
                             @if ($hasPermission)
-                            <td>{{ $vehicles->estimation_date }}</td>
-                            <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
                             <td>
                                 <select name="ex_colour[]" class="form-control" placeholder="Exterior Color" disabled>
                                     <option value="">Exterior Color</option>
@@ -462,14 +462,9 @@
                                     @endforeach
                                 </select>
                             </td>
-                            
-                                <td>{{ $vehicles->vin }}</td>
-                            @endif
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-                            @endphp
-                            @if ($hasPermission)
-                            <td class="editable-field vin" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->vin }}</td>
+                            <td>{{ $vehicles->vin }}</td>
+                            <td>{{ ucfirst(strtolower($vehicles->territory)) }}</td>
+                                <td>{{ $vehicles->estimation_date }}</td>
                             @endif
                             <td>
                             @if($vehicles->status ==="Approved")
@@ -653,15 +648,15 @@
                     <table id="dtBasicExampledata" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
                             <tr >
-                                <th>Variants</th>
-                                <th>Brand</th>
+                            <th>Brand</th>
                                 <th>Model Line</th>
+                                <th>Variants</th>
                                 <th>Variants Detail</th>
-                                <th>Estimated Arrival</th>
-                                <th>Territory</th>
                                 <th>Exterior Color</th>
                                 <th>Interior Color</th>
                                 <th>VIN</th>
+                                <th>Territory</th>
+                                <th>Estimated Arrival</th>
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -865,14 +860,20 @@ $colournew = $new_value ? $new_value->name : null;
     {{-- Output the last group if it exists --}}
 @if ($qty > 0)
     <tr>
-        <td>{{ $previousLog->status }}</td>
-        <td>{{ ucfirst(strtolower($variant_name)) }}</td>
-        @php
+    @php
+        $change_by = DB::table('users')->where('id', $previousLog->created_by)->first();
+                    $change_bys = $change_by->name;
+                    $variant = DB::table('varaints')->where('id', $previousLog->variant)->first();
+                    $variant_name = $variant->name;
         $exColour = $previousLog->ex_colour ? DB::table('color_codes')->where('id', $previousLog->ex_colour)->first() : null;
         $ex_colours = $exColour ? $exColour->name : null;
         $intColour = $previousLog->int_colour ? DB::table('color_codes')->where('id', $previousLog->int_colour)->first() : null;
         $int_colours = $intColour ? $intColour->name : null;
+        $selected = DB::table('roles')->where('id', $previousLog->role)->first();
+        $roleselected = $selected ? $selected->name : null;
         @endphp
+        <td>{{ $previousLog->status }}</td>
+        <td>{{ ucfirst(strtolower($variant_name)) }}</td>
         <td>{{ $ex_colours }}</td>
         <td>{{ $int_colours }}</td>
         <td>{{ $qty }}</td>
@@ -1208,7 +1209,7 @@ var exColourDropdown = exColourCol.find('select');
                 }
             }
 
-            newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, estimatedCol, territoryCol, exColourCol, intColourCol, vinCol, removeBtnCol);
+            newRow.append(brandCol, masterModelLineCol, variantCol, detailCol, exColourCol, intColourCol, vinCol, territoryCol, estimatedCol, removeBtnCol);
             $('#dtBasicExampledata tbody').append(newRow);
         }
         $('#variants_id').val('');

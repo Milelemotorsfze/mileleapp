@@ -360,7 +360,7 @@ class VehiclesController extends Controller
                 {
                     $vehicleDetailApproval = new VehicleApprovalRequests();
                     $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'ex_colour';
+                    $vehicleDetailApproval->field = 'Exterior Colour';
                     $vehicleDetailApproval->old_value = $vehicle->ex_colour;
                     $vehicleDetailApproval->new_value = $request->exterior_colours[$key];
                     $vehicleDetailApproval->updated_by = auth()->user()->id;
@@ -695,17 +695,14 @@ class VehiclesController extends Controller
         $documentsLog = Documentlog::where('documents_id', $vehicle->documents_id);
         $soLog = Solog::where('so_id', $vehicle->so_id);
         $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
-//        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
-        $mergedLogs = Vehicles::all();
-        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->get();
-
+        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests'));
+           ], compact('mergedLogs', 'vehicle'));
     }
     public function  viewremarks(Request $request,$id)
     {

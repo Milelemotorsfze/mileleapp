@@ -7,6 +7,11 @@
 .table-wrapper {
   position: relative;
 }
+.sticky-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9; /* Change this to match your desired header background color */
+}
 thead th {
   top: 0;
   background-color: rgba(116,120,141,.25)!important;
@@ -440,14 +445,14 @@ $pendingvendorfol = DB::table('purchasing_order')
             Purchase Order List
         </h4>
         <div class="table-responsive" >
-        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
+        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered sticky-table">
                 <thead class="bg-soft-secondary">
                 <tr>
                 <th style="vertical-align: middle; text-align: center;">PO Number</th>
                     <th style="vertical-align: middle; text-align: center;">PO Date</th>
                     <th style="vertical-align: middle; text-align: center;">Vendor Name</th>
                     <th style="vertical-align: middle; text-align: center;">Total Vehicles</th>
-                    <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Status</th>
+                    <th class="nowrap-td" id="statuss" style="vertical-align: middle; text-align: center;">Vehicle Status</th>
                 </tr>
                 </thead>
                 <tbody id="poTableBody">
@@ -496,7 +501,7 @@ $pendingvendorfol = DB::table('purchasing_order')
     $vendorpaymentconfirm = DB::table('vehicles')->where('purchasing_order_id', $purchasingOrder->id)->where('status', 'Incoming Stock')->count();
     @endphp
     <tr>
-        <td style="font-size: 12px;">Approved Vehicles</td>
+        <td style="font-size: 12px;">Remaining Approved Vehicle</td>
         <td style="font-size: 12px;">{{$vehiclescountnotapproved}}</td>
         </tr>
         <tr>
@@ -590,6 +595,16 @@ $(document).ready(function() {
         });
     }
 </script>
+<script>
+const tableContainer = document.querySelector('.table-container');
+const stickyTable = document.querySelector('.sticky-table');
+
+tableContainer.addEventListener('scroll', () => {
+  const tableHeader = stickyTable.querySelector('thead');
+  tableHeader.style.transform = `translateY(${tableContainer.scrollTop}px)`;
+});
+</script>
+
     </div>
     @else
     @php
