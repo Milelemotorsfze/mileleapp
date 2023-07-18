@@ -299,7 +299,7 @@
                                 @if ($hasPermission)
                                     <th class="nowrap-td">BL Number</th>
                                 @endif
-                                    <th class="nowrap-td" id="pictures" style="vertical-align: middle;">Pictures View</th>
+{{--                                    <th class="nowrap-td" id="pictures" style="vertical-align: middle;">Pictures View</th>--}}
                                     <th class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
                                </tr>
                             </thead>
@@ -733,13 +733,13 @@
                                           $pictures = DB::table('vehicle_pictures')->where('vehicle_id', $vehicles->id)->latest()->first();
                                           $pictures_link = $pictures ? $pictures->vehicle_picture_link : null;
                                       @endphp
-                                        <td>
-                                        @if ($pictures_link)
-                                        <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ $pictures_link }}" onclick="event.stopPropagation();" target="_blank">View Pic</a>
-                                            @else
-                                            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="" onclick="event.stopPropagation();"> View Pic</a>
-                                            @endif
-                                          </td>
+{{--                                        <td>--}}
+{{--                                        @if ($pictures_link)--}}
+{{--                                            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ $pictures_link }}" onclick="event.stopPropagation();" target="_blank">View Pic</a>--}}
+{{--                                            @else--}}
+{{--                                            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="" onclick="event.stopPropagation();"> View Pic</a>--}}
+{{--                                        @endif--}}
+{{--                                          </td>--}}
                                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();" target="_blank"></i> View Log</a></td>
                                     </tr>
                                 @endforeach
@@ -769,11 +769,13 @@
     $(".update-vehicle-details").click(function(e){
         e.preventDefault();
         let Qc_url = '{{ route('vehicles.updatedata') }}';
+
         let logistic_url = '{{ route('vehicles.updatelogistics') }}';
         let sales_url = '{{ route('vehicles.updateso') }}';
         let warehouse_url = '{{ route('vehicles.updatewarehouse') }}';
 
         @if($hasPermissionDocumentEdit || $hasPermissionBLEdit)
+
             $('#form-update').attr('action', logistic_url).submit();
         @endif
         @if($hasPermissionVehicleDetailEdit || $hasPermissionInspectionEdit || $hasPermissionEngineEdit)
