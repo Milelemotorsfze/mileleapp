@@ -444,7 +444,8 @@
                                     @endphp
                                     @if ($hasPermission)
                                         <td class="nowrap-td">
-                                            <input type="date" class="form-control inspection-date" readonly name="inspection_dates[]" value="{{ $vehicles->inspection_date }}">
+                                            <input type="date" class="form-control inspection-date" data-id="{{$vehicles->id}}" id="inspection-date-{{$vehicles->id}}"
+                                                   readonly name="inspection_dates[]" value="{{ $vehicles->inspection_date }}">
                                         </td>
 
                                     @endif
@@ -789,6 +790,22 @@
         @endif
     });
 
+
+    // var vehiclesRows = [];
+    // // vehiclesRows.push({
+    // //     Id : [],
+    // //     inspection_date : []
+    // // });
+    // $('.inspection-date').change(function () {
+    //     var id = $(this).attr('data-id');
+    //     alert(id);
+    //     var value = $(this).val();
+    //     alert(value);
+    //     vehiclesRows['id'].push(id);
+    //     // vehiclesRows[0].Id.push(1);
+    //     // vehiclesRows[0].inspection_date.push(45);
+    // })
+    // console.log(vehiclesRows);
     $('.variant').change(function () {
         var Id = $(this).val();
         var vehicleId = $(this).attr('data-vehicle-id');
