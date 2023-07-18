@@ -7,11 +7,6 @@
 .table-wrapper {
   position: relative;
 }
-.sticky-table thead {
-  position: sticky;
-  top: 0;
-  background-color: #f9f9f9; /* Change this to match your desired header background color */
-}
 thead th {
   top: 0;
   background-color: rgba(116,120,141,.25)!important;
@@ -181,56 +176,18 @@ th.nowrap-td {
         <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
-            <thead>
-               <th style="font-size: 12px;">BOD Task</th>
-               <th style="font-size: 12px;">PO QTY</th>
-            </thead>
-            <tbody>
-                <tr onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
-                    <td style="font-size: 12px;">
-                        <a href="{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}">
-                            Pending Purchase Order Approval
-                        </a>
-                    </td>
-                    <td style="font-size: 12px;">
-            @php
-            $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
-            @endphp
-            @if ($pendongpoapproval > 0)
-                {{ $pendongpoapproval }}
-            @else
-                No records found
-            @endif
-        </td>
-                </tr>
-                <tr onclick="window.location='{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}';">
-                    <td style="font-size: 12px;">
-                        <a href="{{ route('purchasing.filterpayment', ['status' => 'Approved']) }}">
-                        Pending Payment Initiation
-                        </a>
-                    </td>
-                    <td style="font-size: 12px;">
-                        @php
-                        $pendingints = DB::table('purchasing_order')
-                    ->where('purchasing_order.status', 'Approved')
-                    ->join('vehicles', 'purchasing_order.id', '=', 'vehicles.purchasing_order_id')
-                    ->where('vehicles.payment_status', 'Payment Initiated')
-                    ->count();
-                        @endphp
-                        @if ($pendingints > 0)
-                            {{ $pendingints }}
-                        @else
-                            No records found
-                        @endif
-                    </td>
-                </tr>
-                <tr onclick="window.location='{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}';">
-        <td style="font-size: 12px;">
-            <a href="{{ route('purchasing.filterpaymentrel', ['status' => 'Approved']) }}">
-            Pending Payment Release
-            </a>
-        </td>
-        <td style="font-size: 12px;">
+        <thead>
+       <th style="font-size: 12px;">BOD Task</th>
+       <th style="font-size: 12px;">PO QTY</th>
+    </thead>
+    <tbody>
+    <tr onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
+    <td style="font-size: 12px;">
+        <a href="{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}">
+            Pending Purchase Order Approval
+        </a>
+    </td>
+    <td style="font-size: 12px;">
         @php
         $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
         @endphp
@@ -445,7 +402,7 @@ $pendingvendorfol = DB::table('purchasing_order')
             Purchase Order List
         </h4>
         <div class="table-responsive" >
-        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered sticky-table">
+        <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                 <thead class="bg-soft-secondary">
                 <tr>
                 <th style="vertical-align: middle; text-align: center;">PO Number</th>
@@ -549,7 +506,7 @@ $(document).ready(function() {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-
+      
       column.data().unique().sort().each(function(d, j) {
         select.append('<option value="' + d + '">' + d + '</option>');
       });
@@ -595,16 +552,6 @@ $(document).ready(function() {
         });
     }
 </script>
-<script>
-const tableContainer = document.querySelector('.table-container');
-const stickyTable = document.querySelector('.sticky-table');
-
-tableContainer.addEventListener('scroll', () => {
-  const tableHeader = stickyTable.querySelector('thead');
-  tableHeader.style.transform = `translateY(${tableContainer.scrollTop}px)`;
-});
-</script>
-
     </div>
     @else
     @php

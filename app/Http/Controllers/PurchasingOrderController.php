@@ -81,7 +81,7 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    
         return view('warehouse.index', compact('data'));
     }
     public function filterpaymentrel($status)
@@ -93,7 +93,7 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    
         return view('warehouse.index', compact('data'));
     }
     public function filterintentreq($status)
@@ -105,7 +105,7 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingrelease($status)
@@ -117,7 +117,7 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingdebits($status)
@@ -129,7 +129,7 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-
+    
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingfellow($status)
@@ -157,11 +157,10 @@ class PurchasingOrderController extends Controller
     public function create()
 {
     $vendors = Vendor::where('category', 'vehicle-procurment')->get();
-    $variants = Varaint::all();
-//    join('brands', 'varaints.brands_id', '=', 'brands.id')
-//        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
-//        ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
-//        ->get();
+    $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
+        ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+        ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
+        ->get();
 
     return view('warehouse.create', compact('variants', 'vendors'));
 }
@@ -502,7 +501,7 @@ public function checkcreatevins(Request $request)
                      }
 
             }
-        }
+        }        
     }
     return response()->json(['message' => 'Data updated successfully']);
 }
@@ -521,8 +520,8 @@ public function purchasingupdateStatus(Request $request)
             if ($vehicle->status == 'New Changes' || $vehicle->status == 'Not Approved') {
             $vehicle->status = 'Approved';
             $vehicle->save();
-            $ex_colour = $vehicle->ex_colour;
-            $int_colour = $vehicle->int_colour;
+            $ex_colour = $vehicle->ex_colour; 
+            $int_colour = $vehicle->int_colour; 
             $variantId = $vehicle->	varaints_id;
             $estimation_arrival = $vehicle->estimation_date;
             $territorys = $vehicle->territory;
@@ -903,7 +902,7 @@ public function purchasingallupdateStatusrel(Request $request)
 {
     $id = $request->input('orderId');
     $status = $request->input('status');
-
+    
     $vehicles = DB::table('vehicles')
         ->where('payment_status', 'Payment Initiated')
         ->where('purchasing_order_id', $id)

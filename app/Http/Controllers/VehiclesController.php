@@ -29,9 +29,8 @@ class VehiclesController extends Controller
      */
     public function index(Request $request)
     {
-        $statuss = "Vendor Confirmed";
-        $data = Vehicles::where('status', '!=', 'cancel')
-            ->where('payment_status', $statuss);
+        $statuss = "Incoming Stock";
+        $data = Vehicles::where('status', $statuss);
         $data = $data->get();
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
@@ -360,7 +359,7 @@ class VehiclesController extends Controller
                 {
                     $vehicleDetailApproval = new VehicleApprovalRequests();
                     $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'Exterior Colour';
+                    $vehicleDetailApproval->field = 'ex_colour';
                     $vehicleDetailApproval->old_value = $vehicle->ex_colour;
                     $vehicleDetailApproval->new_value = $request->exterior_colours[$key];
                     $vehicleDetailApproval->updated_by = auth()->user()->id;
@@ -696,13 +695,16 @@ class VehiclesController extends Controller
         $soLog = Solog::where('so_id', $vehicle->so_id);
         $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
+        // $mergedLogs = Vehicles::all();
+        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->get();
+
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
                'currentId' => $id,
                'previousId' => $previousId,
                'nextId' => $nextId
-           ], compact('mergedLogs', 'vehicle'));
+           ], compact('mergedLogs', 'vehicle','pendingVehicleDetailApprovalRequests'));
     }
     public function  viewremarks(Request $request,$id)
     {
