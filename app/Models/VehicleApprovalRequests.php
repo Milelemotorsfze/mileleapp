@@ -16,6 +16,9 @@ class VehicleApprovalRequests extends Model
         'new_interior'
 
     ];
+    public function vehicle() {
+        return $this->belongsTo(Vehicles::class,'vehicle_id','id');
+    }
     public function updatedBy() {
         return $this->belongsTo(User::class,'updated_by','id');
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\ColorCode;
 use App\Models\ModelHasRoles;
+use App\Models\So;
 use App\Models\Solog;
 use App\Models\User;
 use App\Models\Varaint;
@@ -87,18 +88,14 @@ class VehiclePendingApprovalRequestController extends Controller
 
         DB::beginTransaction();
         $pendingApprovalRequest = VehicleApprovalRequests::find($request->id);
-        $pendingApprovalRequest->status = $request->status;
-        if($request->status == 'approved') {
-            $pendingApprovalRequest->approved_by = Auth::id();
-        }
-        $pendingApprovalRequest->save();
+
         $field = $pendingApprovalRequest->field;
         $oldValue = $pendingApprovalRequest->old_value;
         $newValue = $pendingApprovalRequest->new_value;
 
         $vehicle = Vehicles::find($pendingApprovalRequest->vehicle_id);
-        $vehicle->$field = $newValue;
-        $vehicle->save();
+
+
         if($field == 'inspection_date' || $field == 'varaints_id' || $field == 'engine' || $field == 'ex_colour'
             || $field == 'int_colour' || $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date')
         {
@@ -114,8 +111,14 @@ class VehiclePendingApprovalRequestController extends Controller
             $vehicleslog->save();
         }
 
-        if($field == 'so_number' || $field->so_date)
+
+        if( $field == 'so_date')
         {
+            $existingSo = So::where('so_date', $oldValue)->first();
+            info("existso date");
+            $existingSo->so_date = $newValue;
+            $existingSo->save();
+
             $solog = new Solog();
             $solog->time = $currentDateTime->toTimeString();
             $solog->date = $currentDateTime->toDateString();
@@ -126,8 +129,58 @@ class VehiclePendingApprovalRequestController extends Controller
             $solog->new_value = $newValue;
             $solog->created_by = auth()->user()->id;
             $solog->save();
-        }
+        }else if($field == 'so_number') {
+            $existingSo = So::where('so_number', $newValue)->first();
 
+            if($existingSo) {
+                if($existingSo->so_number != $newValue)
+                {
+                    $solog = new Solog();
+                    $solog->time = $currentDateTime->toTimeString();
+                    $solog->date = $currentDateTime->toDateString();
+                    $solog->status = 'Update Sales Values';
+                    $solog->so_id = $existingSo->id;
+                    $solog->field = 'so_number';
+                    $solog->old_value = $existingSo->so_number;
+                    $solog->new_value = $newValue;
+                    $solog->created_by = auth()->user()->id;
+                    $solog->save();
+
+                    $existingSo->so_number = $newValue;
+                    $existingSo->save();
+                }
+            }else{
+                $so = new So();
+                $so->so_number = $newValue;
+//                $so->so_date = $request->so_dates[$key];
+                $so->sales_person_id = $pendingApprovalRequest->updated_by;
+                $so->save();
+                $soID = $so->id;
+                $vehicle->so_id = $soID;
+
+                // Save log in Solog
+
+                $colorlog = new Solog();
+                $colorlog->time = $currentDateTime->toTimeString();
+                $colorlog->date = $currentDateTime->toDateString();
+                $colorlog->status = 'New Created';
+                $colorlog->so_id = $soID;
+                $colorlog->field = 'so_number';
+                $colorlog->new_value = $so->so_number;
+                $colorlog->created_by = auth()->user()->id;
+                $colorlog->save();
+
+            }
+        }else{
+            $vehicle->$field = $newValue;
+
+        }
+        $vehicle->save();
+        $pendingApprovalRequest->status = $request->status;
+        if($request->status == 'approved') {
+            $pendingApprovalRequest->approved_by = Auth::id();
+        }
+        $pendingApprovalRequest->save();
         DB::commit();
 
         return response(true);

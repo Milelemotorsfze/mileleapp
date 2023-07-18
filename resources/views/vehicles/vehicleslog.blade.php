@@ -446,19 +446,15 @@
                                 <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
                                 <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
                                 <td>
-                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
-                                       Exterior Colour
-                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
-                                        Interior Colour
-                                    @else
-                                        {{ $pendingVehicleDetailApprovalRequest->field }}
-                                    @endif
+                                    {{ str_replace('_', ' ', ucwords( $pendingVehicleDetailApprovalRequest->field))}}
                                 </td>
                                 <td>
                                     @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->old_exterior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->old_interior }}
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
+                                        {{ $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '' }}
                                     @else
                                         {{ $pendingVehicleDetailApprovalRequest->old_value }}
                                     @endif
@@ -466,9 +462,10 @@
                                 <td>
                                     @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->new_exterior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->filed == 'int_colour')
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->new_interior }}
-                                        {{--                                    @elseif()--}}
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
+                                        {{ $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '' }}
                                     @else
                                         {{ $pendingVehicleDetailApprovalRequest->new_value }}
                                     @endif

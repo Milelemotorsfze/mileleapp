@@ -277,7 +277,7 @@ class VehiclesController extends Controller
                 }
 
             }else{
-                if($vehicle->varaints_id != $request->variants_ids[$key]) {
+                if($vehicle->inspection_date != $request->inspection_dates[$key]) {
                     $vehicleslog = new Vehicleslog();
                     $vehicleslog->time = $currentDateTime->toTimeString();
                     $vehicleslog->date = $currentDateTime->toDateString();
@@ -463,6 +463,7 @@ class VehiclesController extends Controller
             $soId = $vehicle->so_id;
             if ($soId)
             {
+                info("soid existing");
                 $so = So::find($soId);
                 if(!empty($so->so_number)) {
                     if($so->so_number != $request->so_numbers[$key])
@@ -499,53 +500,19 @@ class VehiclesController extends Controller
 
                 $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
                 $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
-                if($oldSoDate != $newSoDate)
-                {
-                    $solog = new Solog();
-//                    $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-//                    $currentDateTime = Carbon::now($dubaiTimeZone);
-                    $solog->time = $currentDateTime->toTimeString();
-                    $solog->date = $currentDateTime->toDateString();
-                    $solog->status = 'Update Sales Values';
-                    $solog->so_id = $soId;
-                    $solog->field = 'so_date';
-                    $solog->old_value = $so->so_date;
-                    $solog->new_value = $request->so_dates[$key];
-                    $solog->created_by = auth()->user()->id;
-                    $solog->save();
-                    $so->so_date = $request->so_dates[$key];
-
-                    $so->save();
-                }
-
-            } else
-            {
-//                if($request->so_numbers[$key]) {
-//                    return redirect()->back()->with('error','So Number '.$request->so_numbers[$key].' is already added for another vehicle');
-//
-//                }
-                // so should be unique then so number is updtaing existing so number.
-                $existingSo = So::where('so_number', $request->so_numbers[$key])->first();
-                if ($existingSo) {
-                    // Update existing So
-                    if($existingSo->so_number != $request->so_numbers[$key])
-                    {
-                        $solog = new Solog();
-                        $solog->time = $currentDateTime->toTimeString();
-                        $solog->date = $currentDateTime->toDateString();
-                        $solog->status = 'Update Sales Values';
-                        $solog->so_id = $existingSo->id;
-                        $solog->field = 'so_number';
-                        $solog->old_value = $existingSo->so_number;
-                        $solog->new_value = $request->so_numbers[$key];
-                        $solog->created_by = auth()->user()->id;
-                        $solog->save();
-
-                        $existingSo->so_number = $request->so_numbers[$key];
-                        $so->save();
+                if(!empty($so->so_date)) {
+                    if($oldSoDate != $newSoDate) {
+                        $vehicleDetailApproval = new VehicleApprovalRequests();
+                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                        $vehicleDetailApproval->field = 'so_date';
+                        $vehicleDetailApproval->old_value = $so->so_date;
+                        $vehicleDetailApproval->new_value = $request->so_dates[$key];
+                        $vehicleDetailApproval->updated_by = auth()->user()->id;
+                        $vehicleDetailApproval->status = 'Pending';
+                        $vehicleDetailApproval->save();
                     }
-                    $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
-                    $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
+
+                }else{
                     if($oldSoDate != $newSoDate)
                     {
                         $solog = new Solog();
@@ -564,47 +531,64 @@ class VehiclesController extends Controller
 
                         $so->save();
                     }
-                    $existingSo->save();
-
-                } else {
-                    // Create new So
-                    $so = new So();
-                    $so->so_number = $request->so_numbers[$key];
-                    $so->so_date = $request->so_dates[$key];
-                    $so->sales_person_id = $request->sales_persons[$key] ? $request->sales_persons[$key] : auth()->user()->id;
-                    $so->save();
-                    $soID = $so->id;
-                    $vehicle->so_id = $soID;
-
-                    // Save log in Solog
-
-                    $colorlog = new Solog();
-                    $colorlog->time = $currentDateTime->toTimeString();
-                    $colorlog->date = $currentDateTime->toDateString();
-                    $colorlog->status = 'New Created';
-                    $colorlog->so_id = $soID;
-                    $colorlog->field = 'so_number';
-                    $colorlog->new_value = $so->so_number;
-                    $colorlog->created_by = auth()->user()->id;
-                    $colorlog->save();
                 }
+            }
+            else
+            {
+                // so should be unique then so number is updtaing existing so number.
+                $existingSo = So::where('so_number', $request->so_numbers[$key])->first();
+//                if ($existingSo) {
+//                    // Update existing So
+//                    if($existingSo->so_number != $request->so_numbers[$key])
+//                    {
+                        $vehicleDetailApproval = new VehicleApprovalRequests();
+                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                        $vehicleDetailApproval->field = 'so_number';
+                        $vehicleDetailApproval->old_value = $so->so_number;
+                        $vehicleDetailApproval->new_value = $request->so_numbers[$key];
+                        $vehicleDetailApproval->updated_by = auth()->user()->id;
+                        $vehicleDetailApproval->status = 'Pending';
+                        $vehicleDetailApproval->save();
+//                    }
+                    $oldSoDate = Carbon::parse($so->so_date)->format('d M Y');
+                    $newSoDate = Carbon::parse($request->so_dates[$key])->format('d M Y');
+                    if($oldSoDate != $newSoDate)
+                    {
+                        $vehicleDetailApproval = new VehicleApprovalRequests();
+                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                        $vehicleDetailApproval->field = 'so_date';
+                        $vehicleDetailApproval->old_value = $so->so_date;
+                        $vehicleDetailApproval->new_value = $request->so_dates[$key];
+                        $vehicleDetailApproval->updated_by = auth()->user()->id;
+                        $vehicleDetailApproval->status = 'Pending';
+                        $vehicleDetailApproval->save();
+                    }
+//                    $existingSo->save();
+
+//                }
             }
 
             if ($request->reservation_start_dates[$key]) {
                 $newReservationStartDate = $request->reservation_start_dates[$key];
-                $newReservationEndDate = $request->reservation_end_dates[$key];
-
                 $isStartDateChanged = $vehicle->reservation_start_date != $newReservationStartDate;
-                $isEndDateChanged = $vehicle->reservation_end_date != $newReservationEndDate;
 
-                if ($isStartDateChanged || $isEndDateChanged)
-                {
-                    if ($isStartDateChanged)
-                    {
+                if (!empty($vehicle->reservation_start_date)) {
+                    if ($vehicle->reservation_start_date != $newReservationStartDate) {
+
+                        $vehicleDetailApproval = new VehicleApprovalRequests();
+                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                        $vehicleDetailApproval->field = 'reservation_start_date';
+                        $vehicleDetailApproval->old_value = $vehicle->reservation_start_date;
+                        $vehicleDetailApproval->new_value = $newReservationStartDate;
+                        $vehicleDetailApproval->updated_by = auth()->user()->id;
+                        $vehicleDetailApproval->status = 'Pending';
+                        $vehicleDetailApproval->save();
+                    }
+                }else{
+                    if ($vehicle->reservation_start_date != $newReservationStartDate) {
                         $vehicle->reservation_start_date = $newReservationStartDate;
 
                         $reservationStartDateLog = new Vehicleslog();
-
                         $reservationStartDateLog->time = $currentDateTime->toTimeString();
                         $reservationStartDateLog->date = $currentDateTime->toDateString();
                         $reservationStartDateLog->status = 'Update Vehicle Values';
@@ -614,15 +598,31 @@ class VehiclesController extends Controller
                         $reservationStartDateLog->new_value = $newReservationStartDate;
                         $reservationStartDateLog->created_by = auth()->user()->id;
                         $reservationStartDateLog->save();
+                    }
+                }
+            }
+            if ($request->reservation_end_dates[$key]) {
+                $newReservationEndDate = $request->reservation_end_dates[$key];
+                $isEndDateChanged = $vehicle->reservation_end_date != $newReservationEndDate;
+                if (!empty($vehicle->reservation_end_date))
+                {
+                    if($vehicle->reservation_end_date != $newReservationEndDate) {
+                        $vehicleDetailApproval = new VehicleApprovalRequests();
 
+                        $vehicleDetailApproval->vehicle_id = $vehicle->id;
+                        $vehicleDetailApproval->field = 'reservation_end_date';
+                        $vehicleDetailApproval->old_value = $vehicle->reservation_end_date;
+                        $vehicleDetailApproval->new_value = $newReservationEndDate;
+                        $vehicleDetailApproval->updated_by = auth()->user()->id;
+                        $vehicleDetailApproval->status = 'Pending';
+                        $vehicleDetailApproval->save();
                     }
 
-                    if ($isEndDateChanged)
-                    {
+                }else {
+                    if($vehicle->reservation_end_date != $newReservationEndDate) {
                         $vehicle->reservation_end_date = $newReservationEndDate;
 
                         $reservationEndDateLog = new Vehicleslog();
-
                         $reservationEndDateLog->time = $currentDateTime->toTimeString();
                         $reservationEndDateLog->date = $currentDateTime->toDateString();
                         $reservationEndDateLog->status = 'Update Vehicle Values';
@@ -637,7 +637,7 @@ class VehiclesController extends Controller
             }
 
             if($request->remarks[$key]){
-                info("remarks");
+
                 $remarksdata = new Remarks();
 
                 $remarksdata->time = $currentDateTime->toTimeString();
@@ -648,6 +648,18 @@ class VehiclesController extends Controller
                 $remarksdata->department = "Sales";
                 $remarksdata->created_at = $currentDateTime;
                 $remarksdata->save();
+//                if($soID) {
+//                    $remarklog = new Solog();
+//                    $remarklog->time = $currentDateTime->toTimeString();
+//                    $remarklog->date = $currentDateTime->toDateString();
+//                    $remarklog->status = 'New Created';
+//                    $remarklog->so_id = $soID;
+//                    $remarklog->field = 'remarks';
+//                    $remarklog->new_value = $request->remarks[$key];
+//                    $remarklog->created_by = auth()->user()->id;
+//                    $remarklog->save();
+//                }
+
             }
             // Save changes in the vehicles table
             $vehicle->save();
@@ -675,7 +687,7 @@ class VehiclesController extends Controller
 //        }
             // Update reservation_end_date if changed
 
-        return redirect()->back()->with('success', 'Sales details updated successfully.');
+        return redirect()->back()->with('success', 'Sales details sent for approval successfully.');
     }
     public function deletes($id)
     {
@@ -696,7 +708,7 @@ class VehiclesController extends Controller
         $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
         // $mergedLogs = Vehicles::all();
-        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->get();
+        $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id','DESC')->get();
 
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
