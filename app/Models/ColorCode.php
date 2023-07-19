@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ColorCode extends Model
 {
     use HasFactory;
-    public const INTERIOR = "Interior Color";
-    public const EXTERIOR = "Exterior Color";
+    public const INTERIOR = "int";
+    public const EXTERIOR = "ex";
 
 }
