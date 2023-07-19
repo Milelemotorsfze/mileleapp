@@ -170,14 +170,14 @@ class AddonController extends Controller
                                 $addon_details->update();
                             }
                             else
-                            {                               
+                            {
                                 if(isset($brandData['model']))
                                 {
                                     if(count($brandData['model']) > 0)
                                     {
                                         foreach($brandData['model'] as $brandModelDta)
                                         {
-                                            $createAddType = [];               
+                                            $createAddType = [];
                                             $createAddType['created_by'] = $authId;
                                             $createAddType['addon_details_id'] = $addon_details->id;
                                             $createAddType['brand_id'] = $brandData['brand_id'];
@@ -208,7 +208,7 @@ class AddonController extends Controller
                                 }
                                 else
                                 {
-                                    $createAddType = [];               
+                                    $createAddType = [];
                                     $createAddType['created_by'] = $authId;
                                     $createAddType['addon_details_id'] = $addon_details->id;
                                     $createAddType['brand_id'] = $brandData['brand_id'];
@@ -234,7 +234,7 @@ class AddonController extends Controller
                                 $addon_details->update();
                             }
                             else
-                            { 
+                            {
                                 if(isset($brandModel['modelline_id']))
                                 {
                                     foreach($brandModel['modelline_id'] as $modelline_id)
@@ -255,7 +255,7 @@ class AddonController extends Controller
                                     }
                                 }
                                 else
-                                { 
+                                {
                                     $inputaddontype = [];
                                     $inputaddontype['addon_details_id'] = $addon_details->id;
                                     $inputaddontype['created_by'] = $authId;
@@ -377,11 +377,11 @@ class AddonController extends Controller
         $addonDetails = AddonDetails::findOrFail($id);
         DB::beginTransaction();
             AddonTypes::where('addon_details_id', $id)->delete();
-            AddonSellingPrice::where('addon_details_id', $id)->delete(); 
+            AddonSellingPrice::where('addon_details_id', $id)->delete();
             $supplierAddons = SupplierAddons::where('addon_details_id', $id)->get();
             foreach($supplierAddons as $supplierAddon)
             {
-                PurchasePriceHistory::where('supplier_addon_id', $supplierAddon->id)->delete(); 
+                PurchasePriceHistory::where('supplier_addon_id', $supplierAddon->id)->delete();
             }
             SupplierAddons::where('addon_details_id', $id)->delete();
             $addonDetails->delete();
@@ -410,7 +410,7 @@ class AddonController extends Controller
                                                 ])->select('model_id')->with('modelLines')->get();
             }
         }
-      
+
         dd($existingBrandModel);
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
@@ -447,7 +447,7 @@ class AddonController extends Controller
                                             ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
                                             ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
                                         ])->pluck('supplier_id');
-            $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();                         
+            $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
         return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons'));
     }
@@ -674,7 +674,7 @@ class AddonController extends Controller
                                                 {
                                                     $oldHistry->status = 'inactive';
                                                     $oldHistry->updated_by = Auth::id();
-                                                    $oldHistry->update();                                                  
+                                                    $oldHistry->update();
                                                 }
                                             }
                                         }
@@ -710,7 +710,7 @@ class AddonController extends Controller
                                                 ['status','=','active'],
                                             ])->get();
                     foreach($delete as $del)
-                    {     
+                    {
                         $deletehistory = PurchasePriceHistory::where('supplier_addon_id',$del->id)->get();
                         foreach($deletehistory as $deletehistory1)
                         {

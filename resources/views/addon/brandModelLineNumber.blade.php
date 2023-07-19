@@ -101,23 +101,10 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
-            if(value == 'allbrands') {
-                // var
-                // alert("ok");
-                var count = $(".MoDes" + index).find(".MoDesApndHere" + index).length;
-                // check if supplier index count is > 1
-                if (count > 0) {
-                   // check if first model line of addon brand is having data or not
-                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
-                        'Please remove those items to edit this field.', function (e) {
-                    }).set({title: "Remove Brands and ModelLines"})
 
-                    // $("#selectBrandMo1 option:selected").prop("selected", false);
-                    // $('#selectBrandMo1').trigger('change');
-                }
-            }
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
+            // alert("ok");
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
@@ -211,11 +198,11 @@
                 $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
                 $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
                 $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
-                
+
                 var oldIndex = '';
                 oldIndex = index+1;
                 itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
-                for (var i = 1; i <= itemcount; i++) 
+                for (var i = 1; i <= itemcount; i++)
                 {
                     $(this).find('#row-spare-part-brand-'+oldIndex+'-model-'+i).attr('id', 'row-spare-part-brand-'+index+'-model-'+i);
                     $(this).find('#showDivdropDr'+ oldIndex +'Des'+i).attr('id','showDivdropDr'+ index +'Des'+i);
@@ -230,10 +217,10 @@
                         allowClear: true,
                         maximumSelectionLength: 1,
                     });
-                    
+
                     $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
                     $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
-                    $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);                   
+                    $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);
                     $("#selectModelNumberDiscri"+index+"Des"+i).select2
                     ({
                         placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -308,7 +295,6 @@
             var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
 
             $('#indexValue').val(index);
-
             var selectedBrands = [];
             for(let i=1; i<index; i++)
             {
@@ -381,9 +367,9 @@
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                                 <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
                                                 multiple="true" style="width: 100%;">
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                    @endforeach
+{{--                                                    @foreach($modelLines as $modelLine)--}}
+{{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                                                    @endforeach--}}
                                                     </select>
                                                     @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
@@ -509,6 +495,7 @@
                 }
                 else
                 {
+                    RelatedDataCheck(id,row);
                     hideRelatedModalDis(id,row);
                 }
             }
@@ -516,6 +503,42 @@
             // {
             //     hideRelatedModalDis(id,row);
             // }
+        }
+    }
+    function  RelatedDataCheck() {
+        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+
+        if (brandTotalIndex > 0) {
+            for(let i=1; i<=brandTotalIndex; i++)
+            {
+                var index = $(".MoDes"+brandTotalIndex).find(".MoDesApndHere"+brandTotalIndex).length;
+                for(let j=1; j<=index; j++)
+                {
+                    var eachModelRow = $('#selectModelLineNum'+ i+'Des'+j).val();
+                    var eachModelNumberRow = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+
+                    if(eachModelRow != '' || eachModelNumberRow != '')
+                    {
+                        var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                            'Please remove those items to edit this field.', function (e) {
+                        }).set({title: "Remove Brands and ModelLines"})
+                        $("#selectBrandMo1 option:selected").prop("selected", false);
+                        $("#selectBrandMo1").trigger('change');
+                    }
+                }
+
+                if(i != 1) {
+                    var eachBrand = $('#selectBrandMo'+i).val();
+                    if(eachBrand != '') {
+                        var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                            'Please remove those items to edit this field.', function (e) {
+                        }).set({title: "Remove Brands and ModelLines"})
+                        $("#selectBrandMo1 option:selected").prop("selected", false);
+                        $("#selectBrandMo1").trigger('change');
+                    }
+                }
+
+            }
         }
     }
     function showRelatedModalDis(id,value,row,currentAddonType)
@@ -528,6 +551,7 @@
                 selectedModelLines.push(eachSelectedModelLine);
             }
         }
+
         let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         showDivdropDr.hidden = false
         let showaddtrimDis = document.getElementById('showaddtrimDis');
@@ -567,6 +591,12 @@
                 });
 
                 $('#showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+                $("#selectModelNumberDiscri"+id+"Des"+row).select2
+                ({
+                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                    allowClear: true,
+                    maximumSelectionLength: 1,
+                });
             }
         });
     }
@@ -594,7 +624,7 @@
             success:function(data)
             {
                 // console.log(data);
-                $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+
                 let ModelLineModelDescription   = [];
                 $.each(data.model_description,function(key,value)
                 {
@@ -604,7 +634,7 @@
                         text: value.model_description
                     });
                 });
-                console.log(ModelLineModelDescription);
+                $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
                 $("#selectModelNumberDiscri"+id+"Des"+row).select2
                 ({
                     placeholder: 'Choose Model Number....     Or     Type Here To Search....',
@@ -617,12 +647,16 @@
     }
     function hideRelatedModalDis(id,row)
     {
-        let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropModelLine.hidden = true
-        let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropDr.hidden = true
-        let showaddtrim = document.getElementById('showaddtrimDis');
-        showaddtrim.hidden = true
+        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+        if(brandTotalIndex <=1) {
+            let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
+            showDivdropModelLine.hidden = true
+            let showDivdropDr = document.getElementById('showModelNumberdrop'+id+'Des'+row);
+            showDivdropDr.hidden = true
+            let showaddtrim = document.getElementById('showaddtrimDis');
+            showaddtrim.hidden = true
+        }
+
     }
     function hideModelNumberDropdown(id,row)
     {
