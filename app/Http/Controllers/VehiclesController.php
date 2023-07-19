@@ -350,7 +350,7 @@ class VehiclesController extends Controller
                         }
                     }
                     elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
-                        $department = ($fieldName === 'warehouse-remarks') ? 'Warehouse' : 'Sales';
+                        $department = ($fieldName === 'warehouse-remarks') ? 'warehouse' : 'sales';
                         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                         $currentDateTime = Carbon::now($dubaiTimeZone);
 
@@ -426,7 +426,8 @@ class VehiclesController extends Controller
         }
     }
 
-    return redirect()->back()->with('success', 'Vehicle details updated successfully & Submit for Approval.');
+    $responseData = ['status' => 'success', 'message' => 'Data updated successfully'];
+    return response()->json($responseData);
 }
     public function updateso(Request $request)
     {

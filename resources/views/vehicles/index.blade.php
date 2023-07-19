@@ -79,6 +79,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">View Vehicles Details</h4>
+                <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
                      'vehicles-detail-edit','enginee-edit','document-edit','bl-edit','edit-so','edit-reservation']);
@@ -145,7 +146,6 @@
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
-{{--                                   <th>Id</th>--}}
                                     @if ($hasPermission)
                                 <th class="nowrap-td">PO Number</th>
                                 <th class="nowrap-td">PO Date</th>
@@ -300,7 +300,6 @@
                                 @if ($hasPermission)
                                     <th class="nowrap-td">BL Number</th>
                                 @endif
-                                    <!-- <th class="nowrap-td" id="pictures" style="vertical-align: middle;">Pictures View</th> -->
                                     <th class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
                                </tr>
                             </thead>
@@ -364,7 +363,6 @@
                                     $booking_name = $booking ? $booking->name : null;
                                     $warehouse = $vehicles->vin ? DB::table('movements')->where('vin', $vehicles->vin)->latest()->first() : null;
                                     $warehouses = $warehouse ? DB::table('warehouse')->where('id', $warehouse->to)->value('name') : null;
-
                                      $result = DB::table('varaints')
                                                 ->join('brands', 'varaints.brands_id', '=', 'brands.id')
                                                 ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
@@ -389,13 +387,14 @@
                                                 $owership = $documents ? $documents->owership : null;
                                                 $document_with = $documents ? $documents->document_with : null;
                                                 $bl_number = $documents ? $documents->bl_number : null;
-                                                $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
+                                                $latestRemarksales = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
+                                                $latestRemarkwarehouse = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'warehouse')->orderBy('created_at', 'desc')->value('remarks');
                                                 @endphp
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
                                     <td>{{ $vehicles->id }}</td>
-{{--                                    <td>{{$vehicles->id}}</td>--}}
+                                    {{--<td>{{$vehicles->id}}</td>--}}
                                     @if ($hasPermission)
                                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                                      <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
@@ -444,12 +443,15 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
                                     @endphp
                                     @if ($hasPermission)
-                                        <td class="nowrap-td">
-                                            <input type="date" class="form-control inspection-date" data-id="{{$vehicles->id}}" id="inspection-date-{{$vehicles->id}}"
-                                                   readonly name="inspection_dates[]" value="{{ $vehicles->inspection_date }}">
-                                        </td>
-
-                                    @endif
+									                  @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
+                                    @else
+									                  <td>{{ $vehicles->inspection_date }}</td>	
+									                  @endif
+									                  @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                     @endphp
@@ -480,9 +482,26 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
                                     @endphp
                                     @if ($hasPermission)
+									                  @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+                                    @endphp
+                                    @if ($hasPermission)
                                      <td class="editable-field so_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $so_number }}</td>
                                      <td class="editable-field so_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="so_date">{{ $so_date }}</td>
-                                     <td class="editable-field sales_person_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+									                   @else
+									                   <td>{{ $so_number }}</td>
+                                     <td>{{ $so_date }}</td>
+                                     @endif
+									                   @endif
+                                     @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+                                    @endphp
+                                    @if ($hasPermission)
+									                  @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <td class="editable-field sales_person_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="sales_person_id" class="form-control" placeholder="sales_person_id" disabled>
                                                 <option value=""></option>
                                                 @foreach ($sales as $sale)
@@ -490,25 +509,45 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                     @endif
-                                     @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
-                                    @endphp
-                                    @if ($hasPermission)
                                     <td class="editable-field reservation_start_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_start_dates">
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
                                     {{ $vehicles->reservation_end_date }}</td>
-                                     @endif
-                                    @php
+									                  @else
+                                    <td>
+                                        <select name="sales_person_id" class="form-control" placeholder="sales_person_id" disabled>
+                                                <option value=""></option>
+                                                @foreach ($sales as $sale)
+                                                    <option value="{{ $sale->id }} " {{ $salesname == $sale->name ? 'selected' : '' }}>{{ $sale->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+									                  <td>
+                                    {{ $vehicles->reservation_start_date }}</td>
+                                    <td>
+                                    {{ $vehicles->reservation_end_date }}</td>	
+									                  @endif	
+                                    @endif
+                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
                                     @endphp
                                     @if ($hasPermission)
-                                    <td class="editable-field sales-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$latestRemark}}
-                                            @if($latestRemark)
+										                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <td class="editable-field sales-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$latestRemarkwarehouse}}
+                                            @if($latestRemarkwarehouse)
                                                 <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>
+									                @else 
+									                <td>{{$latestRemarkwarehouse}}
+                                            @if($latestRemarkwarehouse)
+                                                <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
+                                            @endif
+                                    </td>	
+									                  @endif	
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
@@ -527,6 +566,10 @@
                                      @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+                                    @endphp
+                                    @if ($hasPermission)
+										                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
                                      <td class="nowrap-td brand">
@@ -555,30 +598,76 @@
                                              {{ $vehicles->detail ?? '' }}
                                          </span>
                                      </td>
+                                    @else
+                                      <td class="nowrap-td brand">
+                                       <span id="brand-{{$vehicles->id}}">  {{ $vehicles->variant->brand->brand_name ?? ''}} </span>
+                                     </td>
+                                     <td class="nowrap-td">
+                                       <span id="model-line-{{$vehicles->id}}">
+                                           {{$vehicles->variant->master_model_lines->model_line ?? ''}}
+                                       </span>
+                                     </td>
+                                     <td class="nowrap-td">
+                                         <span id="model-description-{{$vehicles->id}}">
+                                             {{ $vehicles->variant->model_detail ?? '' }}
+                                         </span>
+                                     </td>
+                                     <td>
+                                    <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
+                                    @foreach($varaint as $variantItem)
+                                                 <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                                                     {{ $variantItem->name }}</option>
+                                            @endforeach
+                                    </select>
+                                    </td>
+                                     <td class="nowrap-td">
+                                         <span id="variant-detail-{{ $vehicles->id }}">
+                                             {{ $vehicles->detail ?? '' }}
+                                         </span>
+                                     </td>
                                      @endif
+									                    @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                                     @endphp
                                     @if ($hasPermission)
                                      <td class="nowrap-td Vin">{{ $vehicles->vin }}</td>
                                      @endif
-                                      @php
+                                     @php
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
                                       @endphp
                                       @if ($hasPermission)
+										                  @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-edit');
+                                      @endphp
+                                      @if ($hasPermission)
                                       <td class="editable-field conversion" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->conversion }}</td>
+                                      @else
+                                      <td>{{ $vehicles->conversion }}</td>
+                                      @endif
                                       @endif
                                       @php
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
                                       @endphp
                                       @if ($hasPermission)
+										                  @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-edit');
+                                      @endphp
+                                      @if ($hasPermission)
                                       <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
-                                     @endif
+                                     @else
+                                    <td>{{ $vehicles->engine }}</td>	 
+                                    @endif
+                                    @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                     @endphp
                                     @if ($hasPermission)
-                                         <td class="nowrap-td">
+										                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                                    @endphp
+                                    @if ($hasPermission)
+                                         								                                         <td class="nowrap-td">
                                              <span id="my-{{ $vehicles->id }}"> {{ $vehicles->variant->my }}</span>
                                          </td>
                                         <td class="nowrap-td">
@@ -614,13 +703,58 @@
                                         <td class="nowrap-td Upholestry">
                                           <span id="upholestry-{{ $vehicles->id }}"> </span>  {{ $vehicles->variant->upholestry ?? '' }}
                                         </td>
+										                    @else
+										                    <td class="nowrap-td">
+                                             <span id="my-{{ $vehicles->id }}"> {{ $vehicles->variant->my }}</span>
+                                         </td>
+                                        <td class="nowrap-td">
+                                            <span id="steering-{{ $vehicles->id }}"> {{ $vehicles->variant->steering }}</span>
+                                        </td>
+                                        <td class="nowrap-td">
+                                            <span id="seat-{{ $vehicles->id }}"> {{ $vehicles->variant->seat }}</span>
+                                        </td>
+                                        <td class="nowrap-td">
+                                            <span id="fuel-type-{{ $vehicles->id }}"> {{ $vehicles->variant->fuel_type }}</span>
+                                        </td>
+                                        <td class="nowrap-td">
+                                            <span id="gearbox-{{ $vehicles->id }}"> {{ $vehicles->variant->gearbox }}</span>
+                                        </td>
+                                        <td>
+                                        <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
+                                                <option value=""></option>
+                                                @foreach($exteriorColours as $exColour)
+                                                    <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
+                                                        {{ $exColour->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                        <select name="int_colour" class="form-control" placeholder="int_colour" disabled>
+                                                <option value=""></option>
+                                                @foreach($interiorColours as $interiorColour)
+                                                    <option value="{{$interiorColour->id}} " {{ $interiorColour->id == $vehicles->int_colour ? 'selected' : "" }}   >
+                                                        {{ $interiorColour->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="nowrap-td Upholestry">
+                                          <span id="upholestry-{{ $vehicles->id }}"> </span>  {{ $vehicles->variant->upholestry ?? '' }}
+                                        </td>
                                         @endif
+										                    @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
                                         @endphp
                                         @if ($hasPermission)
+										                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                                        @endphp
+                                        @if ($hasPermission)
                                         <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
-                                        @endif
+                                        @else
+                                      <td>{{ $vehicles->ppmmyyy }}</td>
+                                      @endif
+                                      @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
                                         @endphp
@@ -637,11 +771,23 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
                                         @endphp
                                         @if ($hasPermission)
-                                        <td class="editable-field warehouse-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->remarks }}
-                                            @if($vehicles->remarks)
+										                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+                                        @endphp
+                                        @if ($hasPermission)
+												
+                                        <td class="editable-field warehouse-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $latestRemarksales }}
+                                            @if($latestRemarkwarehouse)
                                                 <a href="{{ route('vehiclesremarks.viewremarks', ['id' => $vehicles->id, 'type' => 'WareHouse'] ) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>
+                                        @else
+                                          <td>{{ $latestRemarkwarehouse }}
+                                            @if($latestRemarkwarehouse)
+                                                <a href="{{ route('vehiclesremarks.viewremarks', ['id' => $vehicles->id, 'type' => 'WareHouse'] ) }}" class="read-more" target="_blank">View All</a>
+                                            @endif
+                                        </td>
+										                    @endif
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
@@ -649,8 +795,12 @@
                                         @if ($hasPermission)
                                        <td class="nowrap-td">{{ $vehicles->price }}</td>
                                        @endif
-                                        @php
+                                       @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+                                        @endphp
+                                        @if ($hasPermission)
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
                                         @endphp
                                         @if ($hasPermission)
                                         <td class="editable-field import_type" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
@@ -668,7 +818,7 @@
                                                 <option value="VCC" {{ $import_type == 'VCC' ? 'selected' : ''}}>VCC</option>
                                                 <option value="Zimbabwe" {{ $import_type == 'Zimbabwe' ? 'selected' : ''}}>Zimbabwe</option>
                                             </select>
-{{--                                                {{ $import_type }}--}}
+                                      {{--{{ $import_type }}--}}
                                         </td>
                                         <td class="editable-field owership" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="owership" class="form-control" placeholder="owership" disabled>
@@ -688,7 +838,7 @@
                                                 <option value="Trans Car FZE" {{ $owership == 'Trans Car FZE' ? 'selected' : ''  }}>Trans Car FZE</option>
                                                 <option value="Zimbabwe Docs" {{ $owership == 'Zimbabwe Docs' ? 'selected' : ''  }}>Zimbabwe Docs</option>
                                             </select>
-{{--                                                {{ $owership }}--}}
+                                     {{--{{ $owership }}--}}
                                         </td>
                                         <td class="editable-field document_with" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="document_with" class="form-control" placeholder="document_with" disabled>
@@ -699,27 +849,65 @@
                                                 <option value="Not Applicable" {{ $document_with == 'Not Applicable' ? 'selected' : ''  }}>Not Applicable</option>
                                                 <option value="Supplier" {{ $document_with == 'Supplier' ? 'selected' : ''  }}>Supplier</option>
                                             </select>
-{{--                                                {{ $document_with }}--}}
+                                    {{--{{ $document_with }}--}}
                                         </td>
+                                        @else
+                                        <td>
+                                        <select name="import_type" class="form-control" placeholder="import_type" disabled>
+                                                <option value=""></option>
+                                                <option value="Belgium Docs" {{ $import_type == 'Belgium Docs' ? 'selected' : ''}}>Belgium Docs</option>
+                                                <option value="BOE + VCC + Exit" {{ $import_type == 'BOE + VCC + Exit' ? 'selected' : ''}}>BOE + VCC + Exit</option>
+                                                <option value="Cross Trade" {{ $import_type == 'Cross Trade' ? 'selected' : ''}}>Cross Trade</option>
+                                                <option value="Dubai Trade" {{ $import_type == 'Dubai Trade' ? 'selected' : ''}}>Dubai Trade</option>
+                                                <option value="Incoming" {{ $import_type == 'Incoming' ? 'selected' : ''}}>Incoming</option>
+                                                <option value="No Records" {{ $import_type == 'No Records' ? 'selected' : ''}}>No Records</option>
+                                                <option value="RTA Possession" {{ $import_type == 'RTA Possession' ? 'selected' : ''}}>RTA Possession</option>
+                                                <option value="RTA Registration" {{ $import_type == 'RTA Registration' ? 'selected' : ''}}>RTA Registration</option>
+                                                <option value="Supplier Docs" {{ $import_type == 'Supplier Docs' ? 'selected' : ''}}>Supplier Docs</option>
+                                                <option value="VCC" {{ $import_type == 'VCC' ? 'selected' : ''}}>VCC</option>
+                                                <option value="Zimbabwe" {{ $import_type == 'Zimbabwe' ? 'selected' : ''}}>Zimbabwe</option>
+                                            </select>
+                                      {{--{{ $import_type }}--}}
+                                        </td>
+                                        <td>
+                                        <select name="owership" class="form-control" placeholder="owership" disabled>
+                                                <option value=""></option>
+                                                <option value="Abdul Azeem" {{ $owership == 'Abdul Azeem' ? 'selected' : ''  }}>Abdul Azeem</option>
+                                                <option value="Barwil Supplier" {{ $owership == 'Barwil Supplier' ? 'selected' : ''  }}>Barwil Supplier</option>
+                                                <option value="Belgium Warehouse" {{ $owership == 'Belgium Warehouse' ? 'selected' : ''  }}>Belgium Warehouse</option>
+                                                <option value="Faisal Raiz" {{ $owership == 'Faisal Raiz' ? 'selected' : ''  }}>Faisal Raiz</option>
+                                                <option value="Feroz Riaz" {{ $owership == 'Feroz Riaz' ? 'selected' : ''  }}>Feroz Riaz</option>
+                                                <option value="Globelink Supplier" {{ $owership == 'Globelink Supplier' ? 'selected' : ''  }}>Globelink Supplier</option>
+                                                <option value="Incoming" {{ $owership == 'Incoming' ? 'selected' : ''  }}>Incoming</option>
+                                                <option value="Milele" {{ $owership == 'Milele' ? 'selected' : ''  }}>Milele</option>
+                                                <option value="Milele Car Trading LLC" {{ $owership == 'Milele Car Trading LLC' ? 'selected' : ''  }}>Milele Car Trading LLC</option>
+                                                <option value="Milele Motors FZE" {{ $owership == 'Milele Motors FZE' ? 'selected' : ''  }}>Milele Motors FZE</option>
+                                                <option value="Oneworld Limousine" {{ $owership == 'Oneworld Limousine' ? 'selected' : ''  }}>Oneworld Limousine</option>
+                                                <option value="Supplier" {{ $owership == 'Supplier' ? 'selected' : ''  }}>Supplier</option>
+                                                <option value="Trans Car FZE" {{ $owership == 'Trans Car FZE' ? 'selected' : ''  }}>Trans Car FZE</option>
+                                                <option value="Zimbabwe Docs" {{ $owership == 'Zimbabwe Docs' ? 'selected' : ''  }}>Zimbabwe Docs</option>
+                                            </select>
+                                     {{--{{ $owership }}--}}
+                                        </td>
+                                        <td>
+                                        <select name="document_with" class="form-control" placeholder="document_with" disabled>
+                                                <option value=""></option>
+                                                <option value="Accounts" {{ $document_with == 'Accounts' ? 'selected' : ''  }}>Accounts</option>
+                                                <option value="Finance Department" {{ $document_with == 'Finance Department' ? 'selected' : ''  }}>Finance Department</option>
+                                                <option value="Import Department" {{ $document_with == 'Import Department' ? 'selected' : ''  }}>Import Department</option>
+                                                <option value="Not Applicable" {{ $document_with == 'Not Applicable' ? 'selected' : ''  }}>Not Applicable</option>
+                                                <option value="Supplier" {{ $document_with == 'Supplier' ? 'selected' : ''  }}>Supplier</option>
+                                            </select>
+                                    {{--{{ $document_with }}--}}
+                                        </td>
+                                        @endif
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
                                         @endphp
                                         @if ($hasPermission)
-                                        <td class="nowrap-td bl_number">
                                         <td class="editable-field bl_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$bl_number}}</td>
                                        @endif
-                                       @php
-                                          $pictures = DB::table('vehicle_pictures')->where('vehicle_id', $vehicles->id)->latest()->first();
-                                          $pictures_link = $pictures ? $pictures->vehicle_picture_link : null;
-                                      @endphp
-                                        <!-- <td>
-                                        @if ($pictures_link)
-                                        <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ $pictures_link }}" onclick="event.stopPropagation();" target="_blank">View Pic</a>
-                                            @else
-                                            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary" href="" onclick="event.stopPropagation();"> View Pic</a>
-                                            @endif
-                                          </td> -->
                                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Log</a></td>
                                     </tr>
                                 @endforeach
@@ -762,23 +950,37 @@ console.log(updatedData);
   })
   .then(response => response.json())
   .then(data => {
-    // Handle the response from the controller if needed
-    console.log(data);
+      // Handle the response from the controller if needed
+      console.log(data);
 
-    // Display the flash message on the page
-    const flashMessage = document.getElementById('flash-message');
-    flashMessage.textContent = 'Data updated successfully';
-    flashMessage.style.display = 'block';
+      // Display the success flash message on the page
+      const flashMessage = document.getElementById('flash-message');
+      flashMessage.textContent = 'Update Data Sucessfully Or Submit The Approval Request Successfully';
+      flashMessage.style.display = 'block';
 
-    // Hide the flash message after 5 seconds
-    setTimeout(() => {
-      flashMessage.style.display = 'none';
-    }, 2000);
-  })
-  .catch(error => {
-    // Handle any errors that occur during the request
-    console.error(error);
-  });
+      // Hide the success flash message after 5 seconds
+      setTimeout(() => {
+        flashMessage.style.display = 'none';
+      }, 5000);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000); // 3.5 seconds delay (3500 milliseconds)
+    })
+    .catch(error => {
+      // Display the error flash message on the page
+      const flashMessage = document.getElementById('flash-message');
+      flashMessage.textContent = 'Failed to update data. Please try again later.';
+      flashMessage.style.display = 'block';
+
+      // Hide the error flash message after 5 seconds
+      setTimeout(() => {
+        flashMessage.style.display = 'none';
+      }, 5000);
+
+      // Handle any errors that occur during the request
+      console.error('Error:', error);
+    });
 }
 // Function to handle date fields and convert them to input fields
 function handleDateFields() {
