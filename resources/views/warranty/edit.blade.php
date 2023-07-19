@@ -399,7 +399,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             }).set({title:"Delete Item"})
         });
 
-        var index = 1;
+        var index = lengthExistingBrand;
         $('#indexValue').val(index);
 
         $(document.body).on('select2:select', ".brands", function (e) {
