@@ -14,6 +14,7 @@ use App\Models\MasterModelDescription;
 use App\Models\KitItems;
 use App\Models\AddonSellingPrice;
 use App\Models\PurchasePriceHistory;
+use App\Models\SupplierType;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -67,7 +68,6 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -406,7 +406,25 @@ class AddonController extends Controller
         $addons = Addon::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
-        $suppliers = Supplier::select('id','supplier')->get();
+        $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
+        if($addonDetails->addon_type_name == 'P')
+        {
+            $typeSuppliers = $typeSuppliers->where('supplier_type','accessories');
+        }
+        elseif($addonDetails->addon_type_name == 'SP')
+        {
+            $typeSuppliers = $typeSuppliers->where('supplier_type','spare_parts');
+        }
+        elseif($addonDetails->addon_type_name == 'K')
+        {
+            $typeSuppliers = $typeSuppliers->whereIn('supplier_type',['accessories','spare_parts']);
+        }
+        $typeSuppliers = $typeSuppliers->pluck('supplier_id');
+        $existingSupplierId = SupplierAddons::where([
+                                                ['addon_details_id', '=', $addonDetails->id],
+                                                ['status', '=', 'active'],
+                                            ])->pluck('supplier_id');
+        $suppliers = Supplier::whereNotIn('id',$existingSupplierId)->whereIn('id',$typeSuppliers)->select('id','supplier')->get();
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
         $supplierAddons = SupplierAddons::where([
@@ -422,14 +440,15 @@ class AddonController extends Controller
                                             ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
                                             ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
                                         ])->pluck('supplier_id');
-            $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('supplier')->get();                         
+            $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();                         
         }
-        return view('addon.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons'));
+        return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        $input = $request->all();
-        $addon_details = addon_details::find($id);
+        // dd($request->all());
+        $authId = Auth::id();
+        $addon_details = AddonDetails::find($id);
         if($request->image)
         {
             $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
@@ -439,9 +458,30 @@ class AddonController extends Controller
             $addon_details->image = $fileName;
         }
         $addon_details->addon_id = $request->addon_id;
-        $addon_details->currency = 'AED';
         $addon_details->updated_by = $authId;
-        $addon_details->addon_type_name = $request->addon_type;
+        $addon_details->addon_type_name = $request->addon_type_hiden;
+        $addon_details->addon_code = $request->addon_code;
+        $addon_details->payment_condition = $request->payment_condition;
+        $addon_details->lead_time = $request->lead_time;
+        $addon_details->additional_remarks = $request->additional_remarks;
+        $addon_details->is_all_brands = $request->additional_remarks;
+        $addon_details->fixing_charges_included = $request->fixing_charges_included;
+        if($request->fixing_charges_included == 'no')
+        {
+            $addon_details->fixing_charge_amount = $request->fixing_charge_amount;
+        }
+        else
+        {
+            $addon_details->fixing_charge_amount = NULL;
+        }
+        if($request->addon_type_hiden == 'SP')
+        {
+            $addon_details->part_number = $request->part_number;
+        }
+        else
+        {
+            $addon_details->part_number = NULL;
+        }
         $addon_details->update();
             if($request->addon_type == 'SP')
             {
@@ -584,31 +624,92 @@ class AddonController extends Controller
             }
             else
             {
+                $NotNelete = [];
+                $existingSuppliers = [];
+                $existingSuppliers2 = SupplierAddons::where([
+                                                        ['addon_details_id','=',$id],
+                                                        ['status','=','active'],
+                                                    ])->select('supplier_id')->get();
+                foreach( $existingSuppliers2 as $existingSuppliers1)
+                {
+                    array_push($existingSuppliers,$existingSuppliers1->supplier_id);
+                }
                 if($request->supplierAndPrice)
                 {
                     if(count($request->supplierAndPrice) > 0)
                     {
                         foreach($request->supplierAndPrice as $supplierAndPrice1)
                         {
-                            $supPriInput['addon_details_id'] = $addon_details->id;
-                            $supPriInput['purchase_price_aed'] = $supplierAndPrice1['addon_purchase_price_in_aed'];
-                            $supPriInput['purchase_price_usd'] = $supplierAndPrice1['addon_purchase_price_in_usd'];
-                            $supPriInput['created_by'] = $authId;
-
                             if($supplierAndPrice1['supplier_id'])
                             {
                                 if(count($supplierAndPrice1['supplier_id']) > 0)
                                 {
                                     foreach($supplierAndPrice1['supplier_id'] as $suppl1)
                                     {
-                                        $supPriInput['supplier_id'] = $suppl1;
-                                        $CreateSupAddPri = SupplierAddons::create($supPriInput);
-                                        $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
-                                        $createHistrory = PurchasePriceHistory::create($supPriInput);
+                                        array_push($NotNelete,$suppl1);
+                                        if(in_array($suppl1, $existingSuppliers))
+                                        {
+                                            $update =  SupplierAddons::where('supplier_id',$suppl1)->where('addon_details_id',$id)->first();
+                                            $oldPrice = $update->purchase_price_aed;
+                                            $oldSellingPrice = $update->purchase_price_usd;
+                                            $update->updated_by = Auth::id();
+                                            $update->supplier_id = $suppl1;
+                                            $update->purchase_price_aed =  $supplierAndPrice1['addon_purchase_price_in_aed'];
+                                            $update->purchase_price_usd =  $supplierAndPrice1['addon_purchase_price_in_usd'];
+                                            $update->update();
+                                            if($oldPrice != $update->purchase_price_aed)
+                                            {
+                                                $oldHistry = PurchasePriceHistory::Where([
+                                                    ['supplier_addon_id', '=', $update->id],
+                                                    ['status','=','active'],
+                                                ])->latest()->first();
+                                                if($oldHistry)
+                                                {
+                                                    $oldHistry->status = 'inactive';
+                                                    $oldHistry->updated_by = Auth::id();
+                                                    $oldHistry->update();                                                  
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $supPriInput['addon_details_id'] = $addon_details->id;
+                                            $supPriInput['purchase_price_aed'] = $supplierAndPrice1['addon_purchase_price_in_aed'];
+                                            $supPriInput['purchase_price_usd'] = $supplierAndPrice1['addon_purchase_price_in_usd'];
+                                            $supPriInput['created_by'] = $authId;
+                                            $supPriInput['supplier_id'] = $suppl1;
+                                            $CreateSupAddPri = SupplierAddons::create($supPriInput);
+                                            $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+                                            $createHistrory = PurchasePriceHistory::create($supPriInput);
+                                        }
                                     }
                                 }
                             }
                         }
+                    }
+                    $newExiSuppliers2 = [];
+                    $newExiSuppliers = SupplierAddons::where([
+                                                        ['addon_details_id','=',$id],
+                                                        ['status','=','active'],
+                                                    ])->pluck('id');
+                    foreach($newExiSuppliers as $newExiSuppliers1)
+                    {
+                        array_push($newExiSuppliers2,$newExiSuppliers1);
+                    }
+                    $differenceArray = array_diff($newExiSuppliers2, $NotNelete);
+                    $delete = SupplierAddons::whereIn('supplier_id',$differenceArray)
+                                            ->where([
+                                                ['addon_details_id','=',$id],
+                                                ['status','=','active'],
+                                            ])->get();
+                    foreach($delete as $del)
+                    {     
+                        $deletehistory = PurchasePriceHistory::where('supplier_addon_id',$del->id)->get();
+                        foreach($deletehistory as $deletehistory1)
+                        {
+                            $deletehistory1->delete();
+                        }
+                        $del = $del->delete();
                     }
                 }
             }
