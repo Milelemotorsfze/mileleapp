@@ -21,6 +21,7 @@ use App\Models\Remarks;
 use App\Models\VehiclePicture;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class VehiclesController extends Controller
 {
@@ -30,7 +31,7 @@ class VehiclesController extends Controller
     public function index(Request $request)
     {
         $statuss = "Incoming Stock";
-        $data = Vehicles::where('status', $statuss);
+        $data = Vehicles::where('payment_status', $statuss);
         $data = $data->get();
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
@@ -253,203 +254,180 @@ class VehiclesController extends Controller
     }
     public function updatedata(Request $request)
     {
-        $vehicles = $request->vehicle_ids;
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-
-        foreach ($vehicles as $key => $vehicleId)
-        {
+        $updatedData = $request->json()->all();
+        foreach ($updatedData as $data) {
+            $vehicleId = $data['id'];
+            $fieldName = $data['name'];
+            $fieldValue = $data['value'];
             $vehicle = Vehicles::find($vehicleId);
-            $id = $vehicleId;
-
-            if(!empty($vehicle->inspection_date))
-            {
-                if($vehicle->inspection_date != $request->inspection_dates[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'inspection_date';
-                    $vehicleDetailApproval->old_value = $vehicle->inspection_date;
-                    $vehicleDetailApproval->new_value = $request->inspection_dates[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
+            if ($vehicle) {
+                if (in_array($fieldName, ['so_number', 'so_date', 'sales_person_id'])) {
+                    // Handling 'so_number', 'so_date', and 'sales_person_id' fields
+                    $so_id = $vehicle->so_id;
+                    $so = $so_id ? So::find($so_id) : new So();
+    
+                    $oldValue = $so->$fieldName ?? null;
+                    $newValue = $fieldValue;
+    
+                    // Save changes to the log if the old and new values differ and the field is not sales_person_id
+                    if ($oldValue !== $newValue) {
+                        $soLog = new SoLog();
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $soLog->time = $currentDateTime->toTimeString();
+                        $soLog->date = $currentDateTime->toDateString();
+                        $soLog->status = 'Update SO';
+                        $soLog->so_id = $so_id;
+                        $soLog->field = $fieldName;
+                        $soLog->old_value = $oldValue;
+                        $soLog->new_value = $newValue;
+                        $soLog->created_by = auth()->user()->id;
+                        $soLog->role = Auth::user()->selectedRole;
+                        $soLog->save();
+    
+                        if ($oldValue !== null && $newValue !== null) {
+                            $approvalLog = new VehicleApprovalRequests();
+                            $approvalLog->vehicle_id = $vehicleId;
+                            $approvalLog->status = 'Pending';
+                            $approvalLog->field = $fieldName;
+                            $approvalLog->old_value = $oldValue;
+                            $approvalLog->new_value = $fieldValue;
+                            $approvalLog->updated_by = auth()->user()->id;
+                            $approvalLog->save();
+                        }
+                    }
+                    // Update the field in the 'So' table only if the new value is not null
+                    if ($fieldValue !== null && $oldValue === null) {
+                        $so->$fieldName = $fieldValue;
+                        $so->save();
+                        // Save the 'so_id' back to the 'Vehicles' table if it's a new So record
+                        if (!$so_id) {
+                            $vehicle->so_id = $so->id;
+                            $vehicle->save();
+                        }
+                    }
                 }
-
-            }else{
-                if($vehicle->inspection_date != $request->inspection_dates[$key]) {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'inspection_date';
-                    $vehicleslog->old_value = $vehicle->inspection_date;
-                    $vehicleslog->new_value = $request->inspection_dates[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->inspection_date = $request->inspection_dates[$key];
+                elseif (in_array($fieldName, ['import_type', 'document_with', 'bl_number', 'owership'])) {
+                    $documents_id = $vehicle->documents_id; // Corrected assignment
+                    $document = $documents_id ? Document::find($documents_id) : new Document();
+                    $oldValue = $document->$fieldName ?? null;
+                    $newValue = $fieldValue;
+                    // Save changes to the log if the old and new values differ
+                    if ($oldValue !== $newValue) {
+                                $documentLog = new DocumentLog();
+                                $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                                $currentDateTime = Carbon::now($dubaiTimeZone);
+                                $documentLog->time = $currentDateTime->toTimeString();
+                                $documentLog->date = $currentDateTime->toDateString();
+                                $documentLog->status = 'Update Document';
+                                $documentLog->documents_id = $documents_id;
+                                $documentLog->field = $fieldName;
+                                $documentLog->old_value = $oldValue;
+                                $documentLog->new_value = $newValue;
+                                $documentLog->created_by = auth()->user()->id;
+                                $documentLog->role = Auth::user()->selectedRole;
+                                $documentLog->save();
+                                if ($oldValue !== null && $newValue !== null) {
+                                $approvalLog = new VehicleApprovalRequests();
+                                $approvalLog->vehicle_id = $vehicleId;
+                                $approvalLog->status = 'Pending';
+                                $approvalLog->field = $fieldName;
+                                $approvalLog->old_value = $oldValue;
+                                $approvalLog->new_value = $fieldValue;
+                                $approvalLog->updated_by = auth()->user()->id;
+                                $approvalLog->save();
+                            }
+                            }
+                        // Update the field in the 'So' table only if the new value is not null
+                        if ($fieldValue !== null && $oldValue === null) {
+                            $document->$fieldName = $fieldValue;
+                            $document->save();
+                            // Save the 'so_id' back to the 'Vehicles' table if it's a new So record
+                            if (!$documents_id) {
+                                $vehicle->documents_id = $document->id;
+                                $vehicle->save();
+                            }
+                        }
+                    }
+                    elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
+                        $department = ($fieldName === 'warehouse-remarks') ? 'Warehouse' : 'Sales';
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                    
+                        // Check if the fieldValue is not null before saving the remark
+                        if ($fieldValue !== null) {
+                            $remarks = new Remarks();
+                            $remarks->vehicles_id = $vehicleId;
+                            $remarks->department = $department;
+                            $remarks->date = $currentDateTime->toDateString();
+                            $remarks->time = $currentDateTime->toTimeString();
+                            $remarks->remarks = $fieldValue;
+                            $remarks->created_by = auth()->user()->id;
+                            $remarks->save();
+                            $vehicleslog = new Vehicleslog();
+                            $vehicleslog->time = $currentDateTime->toTimeString();
+                            $vehicleslog->date = $currentDateTime->toDateString();
+                            $vehicleslog->status = 'Adding New Remarks';
+                            $vehicleslog->vehicles_id = $vehicleId;
+                            $vehicleslog->field = $fieldName;
+                            $vehicleslog->old_value = "";
+                            $vehicleslog->new_value = $fieldValue;
+                            $vehicleslog->created_by = auth()->user()->id;
+                            $vehicleslog->save();
+                        }
+                    }                    
+            else {
+                // Update other fields in the 'Vehicles' table (same code as before)
+                $oldValues = $vehicle->getAttributes();
+                $changes = [];
+                foreach ($oldValues as $field => $oldValue) {
+                    if ($field !== 'created_at' && $field !== 'updated_at') {
+                        $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
+                        if ($oldValue != $newValue) {
+                            $changes[$field] = [
+                                'old_value' => $oldValue,
+                                'new_value' => $newValue,
+                            ];
+                        }
+                    }
                 }
+                if (!empty($changes)) {
+                    // Save approval log if the old value is null and the new value is not null
+                    if ($oldValues[$fieldName] === null && $fieldValue !== null) {
+                        // Update the field in the 'Vehicles' table with the new value
+                        $vehicle->$fieldName = $fieldValue;
+                        $vehicle->save();
+                        // Save vehicle log for the specific field
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $vehicleslog = new Vehicleslog();
+                        $vehicleslog->time = $currentDateTime->toTimeString();
+                        $vehicleslog->date = $currentDateTime->toDateString();
+                        $vehicleslog->status = 'Update QC Values';
+                        $vehicleslog->vehicles_id = $vehicleId;
+                        $vehicleslog->field = $fieldName;
+                        $vehicleslog->old_value = $oldValues[$fieldName];
+                        $vehicleslog->new_value = $fieldValue;
+                        $vehicleslog->created_by = auth()->user()->id;
+                        $vehicleslog->save();
+                    } else {
+                        $approvalLog = new VehicleApprovalRequests();
+                        $approvalLog->vehicle_id = $vehicleId;
+                        $approvalLog->status = 'Pending';
+                        $approvalLog->field = $fieldName;
+                        $approvalLog->old_value = $oldValues[$fieldName];
+                        $approvalLog->new_value = $fieldValue;
+                        $approvalLog->updated_by = auth()->user()->id;
+                        $approvalLog->save();
+                    }
+                }
+                
             }
-
-            if(!empty($vehicle->varaints_id)) {
-                if($vehicle->varaints_id != $request->variants_ids[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'varaints_id';
-                    $vehicleDetailApproval->old_value = $vehicle->varaints_id;
-                    $vehicleDetailApproval->new_value = $request->variants_ids[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
-                }
-            }else {
-                if($vehicle->varaints_id != $request->variants_ids[$key]) {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'varaints_id';
-                    $vehicleslog->old_value = $vehicle->varaints_id;
-                    $vehicleslog->new_value = $request->variants_ids[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->varaints_id = $request->variants_ids[$key];
-                }
-            }
-
-            if(!empty($vehicle->engine)) {
-                if($vehicle->engine != $request->engines[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'engine';
-                    $vehicleDetailApproval->old_value = $vehicle->engine;
-                    $vehicleDetailApproval->new_value = $request->engines[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
-                }
-            }else{
-                if($vehicle->engine != $request->engines[$key])
-                {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'engine';
-                    $vehicleslog->old_value = $vehicle->engine;
-                    $vehicleslog->new_value = $request->engines[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->engine = $request->engines[$key];
-                }
-            }
-
-            if(!empty($vehicle->ex_colour))
-            {
-                // if value changes then send for approval
-                if($vehicle->ex_colour != $request->exterior_colours[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'ex_colour';
-                    $vehicleDetailApproval->old_value = $vehicle->ex_colour;
-                    $vehicleDetailApproval->new_value = $request->exterior_colours[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
-                }
-            }else {
-                if($vehicle->ex_colour != $request->exterior_colours[$key])
-                {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'ex_colour';
-                    $vehicleslog->old_value = $vehicle->ex_colour;
-                    $vehicleslog->new_value = $request->exterior_colours[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->ex_colour = $request->exterior_colours[$key];
-                }
-            }
-
-            if(!empty($vehicle->int_colour))
-            {
-                if($vehicle->int_colour != $request->interior_colours[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'int_colour';
-                    $vehicleDetailApproval->old_value = $vehicle->int_colour;
-                    $vehicleDetailApproval->new_value = $request->interior_colours[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
-                }
-            }else {
-                if($vehicle->int_colour != $request->interior_colours[$key])
-                {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'int_colour';
-                    $vehicleslog->old_value = $vehicle->int_colour;
-                    $vehicleslog->new_value = $request->interior_colours[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->int_colour = $request->interior_colours[$key];
-                }
-            }
-
-            if(!empty($vehicle->ppmmyyy))
-            {
-                if($vehicle->ppmmyyy != $request->pymmyyyy[$key])
-                {
-                    $vehicleDetailApproval = new VehicleApprovalRequests();
-                    $vehicleDetailApproval->vehicle_id = $id;
-                    $vehicleDetailApproval->field = 'ppmmyyy';
-                    $vehicleDetailApproval->old_value = $vehicle->ppmmyyy;
-                    $vehicleDetailApproval->new_value = $request->pymmyyyy[$key];
-                    $vehicleDetailApproval->updated_by = auth()->user()->id;
-                    $vehicleDetailApproval->status = 'Pending';
-                    $vehicleDetailApproval->save();
-                }
-            }else {
-                if($vehicle->ppmmyyy != $request->pymmyyyy[$key])
-                {
-                    $vehicleslog = new Vehicleslog();
-                    $vehicleslog->time = $currentDateTime->toTimeString();
-                    $vehicleslog->date = $currentDateTime->toDateString();
-                    $vehicleslog->status = 'Update QC Values';
-                    $vehicleslog->vehicles_id = $id;
-                    $vehicleslog->field = 'ppmmyyy';
-                    $vehicleslog->old_value = $vehicle->ppmmyyy;
-                    $vehicleslog->new_value = $request->pymmyyyy[$key];
-                    $vehicleslog->created_by = auth()->user()->id;
-                    $vehicleslog->save();
-
-                    $vehicle->ppmmyyy = $request->pymmyyyy[$key];
-                }
-            }
-            $vehicle->save();
         }
-
-        return redirect()->back()->with('success', 'Vehicle details are sent for Approval successfully.');
     }
+
+    return redirect()->back()->with('success', 'Vehicle details updated successfully & Submit for Approval.');
+}
     public function updateso(Request $request)
     {
 //        return $request->all();

@@ -18,7 +18,18 @@ class Vehicles extends Model
         'updated_by',
         'price_status'
     ];
-
+    protected $fillable = [
+        'varaints_id',
+        'int_colour',
+        'ex_colour',
+        'engine',
+        'ppmmyyy',
+        'reservation_start_date',
+        'reservation_end_date',
+        'conversion',
+        'inspection_date',
+        
+    ];
     public function variant()
     {
         return $this->belongsTo(Varaint::class,'varaints_id','id');

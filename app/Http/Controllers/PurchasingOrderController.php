@@ -812,6 +812,13 @@ public function paymentrelconfirmdebited($id)
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->role = Auth::user()->selectedRole;
             $vehicleslog->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+                $paymentlogs = new PaymentLog();
+                $paymentlogs->date = $currentDateTime->toDateString();
+                $paymentlogs->vehicle_id = $vehicle->id;
+                $paymentlogs->created_by = auth()->user()->id;
+                $paymentlogs->save();
         return redirect()->back()->with('success', 'Payment Payment Completed confirmed. Vehicle status updated.');
     }
     return redirect()->back()->with('error', 'Vehicle not found.');
@@ -1052,6 +1059,13 @@ public function allpaymentreqssfinpay(Request $request)
                        $vehicleslog->created_by = auth()->user()->id;
                        $vehicleslog->role = Auth::user()->selectedRole;
                        $vehicleslog->save();
+                       $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                       $currentDateTime = Carbon::now($dubaiTimeZone);
+                           $paymentlogs = new PaymentLog();
+                           $paymentlogs->date = $currentDateTime->toDateString();
+                           $paymentlogs->vehicle_id = $vehicle->id;
+                           $paymentlogs->created_by = auth()->user()->id;
+                           $paymentlogs->save();
                    }
                    return redirect()->back()->with('success', 'Payment Status Updated');
               }
