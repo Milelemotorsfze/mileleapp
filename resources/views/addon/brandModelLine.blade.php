@@ -42,13 +42,12 @@
             var value = $(this).val();
             if(value == "allbrands") {
                 var count = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-
                 // check each item have data or not?
                 if(count > 1) {
-                    for(let i=2; i<count; i++)
+                    var isSubRowEmpty = [];
+                    for(let i=2; i<=count; i++)
                     {
                         var eachBrand = $('#selectBrand'+i).val();
-                        alert(eachBrand);
                         if(eachBrand != '') {
                             // if any data then show alert.
                             var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
@@ -56,7 +55,13 @@
                             }).set({title:"Remove Brands and ModelLines"})
                             $("#selectBrand1 option:selected").prop("selected", false);
                             $("#selectBrand1").trigger('change');
+                        }else{
+                            isSubRowEmpty.push(1);
                         }
+                    }
+                    var subRowCount = count - 1;
+                    if(isSubRowEmpty.length == subRowCount ) {
+                        $(".brandModelLineDiscription").find(".dynamic-rows").remove();
                     }
                 }
             }
@@ -196,7 +201,7 @@
                     var size = myarray.length;
                     if (size >= 1) {
                         $(".brandModelLineDiscription").append(`
-                            <div class="row brandModelLineDiscriptionApendHere" id="row-${index}">
+                            <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
                                 <div class="row">
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
