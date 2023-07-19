@@ -230,7 +230,7 @@ class VehiclesController extends Controller
         return response()->json(['message' => 'Vehicle data updated successfully']);
     }
     public function fatchvariantdetails(Request $request)
-{
+  {
     $variantName = $request->input('value');
     $result = DB::table('varaints')
     ->join('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -265,10 +265,10 @@ class VehiclesController extends Controller
                     // Handling 'so_number', 'so_date', and 'sales_person_id' fields
                     $so_id = $vehicle->so_id;
                     $so = $so_id ? So::find($so_id) : new So();
-    
+
                     $oldValue = $so->$fieldName ?? null;
                     $newValue = $fieldValue;
-    
+
                     // Save changes to the log if the old and new values differ and the field is not sales_person_id
                     if ($oldValue !== $newValue) {
                         $soLog = new SoLog();
@@ -284,7 +284,7 @@ class VehiclesController extends Controller
                         $soLog->created_by = auth()->user()->id;
                         $soLog->role = Auth::user()->selectedRole;
                         $soLog->save();
-    
+
                         if ($oldValue !== null && $newValue !== null) {
                             $approvalLog = new VehicleApprovalRequests();
                             $approvalLog->vehicle_id = $vehicleId;
@@ -353,7 +353,7 @@ class VehiclesController extends Controller
                         $department = ($fieldName === 'warehouse-remarks') ? 'Warehouse' : 'Sales';
                         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                         $currentDateTime = Carbon::now($dubaiTimeZone);
-                    
+
                         // Check if the fieldValue is not null before saving the remark
                         if ($fieldValue !== null) {
                             $remarks = new Remarks();
@@ -375,7 +375,7 @@ class VehiclesController extends Controller
                             $vehicleslog->created_by = auth()->user()->id;
                             $vehicleslog->save();
                         }
-                    }                    
+                    }
             else {
                 // Update other fields in the 'Vehicles' table (same code as before)
                 $oldValues = $vehicle->getAttributes();
@@ -421,7 +421,7 @@ class VehiclesController extends Controller
                         $approvalLog->save();
                     }
                 }
-                
+
             }
         }
     }
@@ -681,10 +681,11 @@ class VehiclesController extends Controller
     public function viewLogDetails($id)
     {
         $vehicle = Vehicles::find($id);
-        $documentsLog = Documentlog::where('documents_id', $vehicle->documents_id);
-        $soLog = Solog::where('so_id', $vehicle->so_id);
-        $vehiclesLog = Vehicleslog::where('vehicles_id', $vehicle->id);
-        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('created_at')->get();
+        $documentsLog = Documentlog::with('roleName')->where('documents_id', $vehicle->documents_id);
+        $soLog = Solog::with('roleName')->where('so_id', $vehicle->so_id);
+        $vehiclesLog = Vehicleslog::with('roleName')->where('vehicles_id', $vehicle->id);
+        $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('updated_at')->get();
+//        return $mergedLogs;
         // $mergedLogs = Vehicles::all();
         $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id','DESC')->get();
 
@@ -828,7 +829,7 @@ class VehiclesController extends Controller
 
         foreach ($vehicles as $key => $vehicleId) {
             $vehicle = Vehicles::find($vehicleId);
-            $vehicle->conversion = $request->conversions[$key];
+//            $vehicle->conversion = $request->conversions[$key];
 
             if($vehicle->remarks != $request->warehouse_remarks[$key]) {
                 $vehicleslog = new Vehicleslog();
@@ -857,6 +858,7 @@ class VehiclesController extends Controller
 
             }
             if($vehicle->conversion != $request->conversions[$key]) {
+                info("conversion is changed");
                 $vehicleslog = new Vehicleslog();
                 $vehicleslog->time = $currentDateTime->toTimeString();
                 $vehicleslog->date = $currentDateTime->toDateString();

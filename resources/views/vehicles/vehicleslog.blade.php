@@ -186,7 +186,7 @@
                                           @endphp
                                          {{$numberOfDays}}
                                       @else
-                                        
+
                                       @endif
                                      @endif
             </div>
@@ -526,7 +526,9 @@
                                     @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->old_interior }}
                                     @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '' }}
+                                        {{ $pendingVehicleDetailApprovalRequest->old_variant  }}
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                        {{ $pendingVehicleDetailApprovalRequest->old_sales_person ?? ''  }}
                                     @else
                                         {{ $pendingVehicleDetailApprovalRequest->old_value }}
                                     @endif
@@ -537,7 +539,9 @@
                                     @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
                                         {{ $pendingVehicleDetailApprovalRequest->new_interior }}
                                     @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '' }}
+                                        {{ $pendingVehicleDetailApprovalRequest->new_variant ?? '' }}
+                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                        {{ $pendingVehicleDetailApprovalRequest->new_sales_person ?? ''  }}
                                     @else
                                         {{ $pendingVehicleDetailApprovalRequest->new_value }}
                                     @endif
@@ -566,7 +570,10 @@
                                           $new_value = $pendingVehicleDetailApprovalRequest->new_interior ?? '';
                                       }
                                       elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
-                                           $new_value =  $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '';
+                                           $new_value =  $pendingVehicleDetailApprovalRequest->new_variant ?? '';
+                                      }
+                                    elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
+                                           $old_value =  $pendingVehicleDetailApprovalRequest->new_sales_person ?? '';
                                       }
                                       else {
                                         $new_value = $pendingVehicleDetailApprovalRequest->new_value ?? '';
@@ -580,7 +587,10 @@
                                           $old_value = $pendingVehicleDetailApprovalRequest->old_interior ?? '';
                                       }
                                       elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
-                                           $old_value =  $pendingVehicleDetailApprovalRequest->vehicle->variant->name ?? '';
+                                           $old_value =  $pendingVehicleDetailApprovalRequest->old_variant ?? '';
+                                      }
+                                      elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
+                                           $old_value =  $pendingVehicleDetailApprovalRequest->old_sales_person ?? '';
                                       }
                                       else {
                                         $old_value = $pendingVehicleDetailApprovalRequest->old_value ?? '';
@@ -605,7 +615,7 @@
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
 
 
-                                                                    <input type="text" value="{{  $old_value }}"
+                                                                    <input type="text" value="{{  $old_value ?? ''}}"
                                                                            class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -615,7 +625,7 @@
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
 
-                                                                    <input type="text" value="{{ $new_value }}"
+                                                                    <input type="text" value="{{ $new_value ?? ''}}"
                                                                            id="updated-price"  class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -648,7 +658,7 @@
                                                                     <label class="form-label font-size-13 text-center">Old Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $old_value}}"
+                                                                    <input type="text" value="{{  $old_value ?? ''}}"
                                                                            class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -657,7 +667,7 @@
                                                                     <label class="form-label font-size-13">New Value</label>
                                                                 </div>
                                                                 <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $new_value }}"
+                                                                    <input type="text" value="{{ $new_value ?? ''}}"
                                                                            id="updated-price"  class="form-control" readonly >
                                                                 </div>
                                                             </div>
@@ -700,10 +710,70 @@
                         <tbody>
                         @foreach($mergedLogs as $vehiclesLog)
                             <tr data-id="1">
-                            <td>
-                                {{ $vehiclesLog->field }}</td>
-                            <td>{{ $vehiclesLog->old_value }}</td>
-                                <td>{{ $vehiclesLog->new_value }}</td>
+                                <td>
+                                    @if($vehiclesLog->field == 'ex_colour')
+                                        Exterior Colour
+                                    @elseif($vehiclesLog->field == 'int_colour')
+                                        Interior Colour
+                                    @elseif($vehiclesLog->field == 'varaints_id')
+                                        Variant
+                                    @elseif($vehiclesLog->field == 'sales_person_id')
+                                       Sales Person
+                                    @else
+                                        {{ str_replace('_', ' ', ucwords( $vehiclesLog->field))}}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($vehiclesLog->field == 'ex_colour')
+                                        @php
+                                            $newExterior = \App\Models\ColorCode::find($vehiclesLog->old_value);
+                                        @endphp
+                                        {{ $newExterior->name }}
+                                    @elseif($vehiclesLog->field == 'int_colour')
+                                        @php
+                                            $newInterior = \App\Models\ColorCode::find($vehiclesLog->old_value);
+                                        @endphp
+                                        {{ $newInterior->name }}
+                                    @elseif($vehiclesLog->field == 'varaints_id')
+                                        @php
+                                            $variant = \App\Models\Varaint::find($vehiclesLog->old_value);
+                                        @endphp
+                                        {{ $variant->name ?? '' }}
+                                    @elseif($vehiclesLog->field == 'sales_person_id')
+                                        @php
+                                            $user = \App\Models\User::find($vehiclesLog->old_value);
+                                        @endphp
+                                        {{ $user->name ?? '' }}
+                                    @else
+                                        {{ $vehiclesLog->old_value }}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($vehiclesLog->field == 'ex_colour')
+                                        @php
+                                            $newExterior = \App\Models\ColorCode::find($vehiclesLog->new_value);
+                                        @endphp
+                                        {{ $newExterior->name }}
+                                    @elseif($vehiclesLog->field == 'int_colour')
+                                        @php
+                                            $newInterior = \App\Models\ColorCode::find($vehiclesLog->new_value);
+                                        @endphp
+                                        {{ $newInterior->name }}
+                                    @elseif($vehiclesLog->field == 'varaints_id')
+                                        @php
+                                            $variant = \App\Models\Varaint::find($vehiclesLog->new_value);
+                                        @endphp
+                                        {{ $variant->name ?? '' }}
+                                    @elseif($vehiclesLog->field == 'sales_person_id')
+                                        @php
+                                            $user = \App\Models\User::find($vehiclesLog->new_value);
+                                        @endphp
+                                        {{ $user->name ?? '' }}
+                                    @else
+                                        {{ $vehiclesLog->new_value }}
+                                    @endif
+{{--                                    {{ $vehiclesLog->new_value }}--}}
+                                </td>
                                 <td>{{ date('d-m-Y', strtotime($vehiclesLog->date)) }} {{ $vehiclesLog->time }}</td>
                                 <td>
                                     @php
@@ -714,7 +784,7 @@
                                     @endphp
                                     {{ $change_bys ?? '' }}
                                 </td>
-                                <td>{{ $vehiclesLog->new_value }}</td>
+                                <td>{{ $vehiclesLog->roleName->name ?? ''}}</td>
                             </tr>
                         @endforeach
                         </tbody>

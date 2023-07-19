@@ -9,4 +9,7 @@ class Solog extends Model
 {
     use HasFactory;
     protected $table = 'so_log';
+    public function roleName() {
+        return $this->hasOne(Role::class, 'id','role');
+    }
 }

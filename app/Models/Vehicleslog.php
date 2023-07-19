@@ -9,4 +9,7 @@ class Vehicleslog extends Model
 {
     use HasFactory;
     protected $table = 'vehicles_log';
+    public function roleName() {
+        return $this->hasOne(Role::class, 'id','role');
+    }
 }

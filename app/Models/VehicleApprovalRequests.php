@@ -13,7 +13,11 @@ class VehicleApprovalRequests extends Model
         'old_exterior',
         'new_exterior',
         'old_interior',
-        'new_interior'
+        'new_interior',
+        'old_variant',
+        'new_variant',
+        'old_sales_person',
+        'new_sales_person'
 
     ];
     public function vehicle() {
@@ -40,6 +44,39 @@ class VehicleApprovalRequests extends Model
             $exterior = ColorCode::find($this->new_value);
 
             return $exterior->name ?? '';
+        }
+    }
+    public function getOldSalesPersonAttribute()
+    {
+        if($this->field == 'sales_person_id') {
+            $user = User::find($this->old_value);
+
+            return $user->name ?? '';
+        }
+    }
+
+    public function getNewSalesPersonAttribute()
+    {
+        if($this->field == 'sales_person_id') {
+            $user = User::find($this->new_value);
+
+            return $user->name ?? '';
+        }
+    }
+    public function getOldVariantAttribute()
+    {
+        if($this->field == 'varaints_id') {
+            $variant = Varaint::find($this->old_value);
+
+            return $variant->name ?? '';
+        }
+    }
+    public function getNewVariantAttribute()
+    {
+        if($this->field == 'varaints_id') {
+            $variant = Varaint::find($this->new_value);
+
+            return $variant->name ?? '';
         }
     }
     public function getOldInteriorAttribute()
