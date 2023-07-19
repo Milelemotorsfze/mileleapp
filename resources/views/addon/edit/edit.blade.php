@@ -399,7 +399,7 @@
                    
                 </div>
                
-              
+                @include('addon.edit.brandModel')
                 <div class="card"  id="kitSupplier" >
                     <div class="card-header">
                         <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
