@@ -397,19 +397,22 @@ class AddonController extends Controller
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
         $addonDetails->LeastPurchasePrices = $price;
         $addons = Addon::select('id','name')->get();
-        $brands = Brand::select('id','brand_name')->get();
+        $existingBrandId = [];
         $existingBrandModel = [];
         if($addonDetails->is_all_brands == 'no')
         {
-            $existingBrandModel = AddonTypes::where('addon_details_id',$id)->groupBy('brand_id')->select('brand_id')->with('brands')->get();
+            $existingBrandModel = AddonTypes::where('addon_details_id',$id)->groupBy('brand_id')->with('brands')->get();
             foreach($existingBrandModel as $data)
             {
-                $data->modelLines = AddonTypes::where([
+                array_push($existingBrandId,$data->brand_id);
+                $data->modelLinesData = AddonTypes::where([
                                                     ['addon_details_id','=',$id],
                                                     ['brand_id','=',$data->brand_id]
                                                 ])->select('model_id')->with('modelLines')->get();
             }
         }
+        // dd($existingBrandModel);
+        $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
 
         dd($existingBrandModel);
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
@@ -449,7 +452,7 @@ class AddonController extends Controller
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
-        return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons'));
+        return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons','existingBrandModel'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
