@@ -1,13 +1,16 @@
 <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
     <div class="col-md-12 brandModelLineDiscription p-0">
-        <div class="row brandModelLineDiscriptionApendHere" id="row-1">
+        <!-- <div class="row brandModelLineDiscriptionApendHere" id="row-1">
             <div class="row">
                 <div class="col-xxl-4 col-lg-6 col-md-12">
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
                             data-index="1" class="brands" multiple="true" style="width: 100%;">
-                        <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
+                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+                        @foreach($existingBrandModel as $existingBrand)
+                            <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected>{{$existingBrand->brands->brand_name}}</option>
+                        @endforeach
                         @foreach($brands as $brand)
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
@@ -22,7 +25,41 @@
                     </select>
                 </div>
             </div>
-        </div>
+        </div> -->
+        <div hidden>{{$i=0;}}</div>
+        @foreach($existingBrandModel as $existingBrand)
+            <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+            <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
+                <div class="row">
+                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+                        <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
+                            multiple="true" style="width: 100%;" required>
+                            <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected>{{$existingBrand->brands->brand_name}}</option>
+                            @foreach($brands as $brand)
+                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                            @endforeach
+                        </select>
+                        <span id="brandError" class=" invalid-feedback"></span>
+                    </div>
+                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                       
+                        <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
+                            style="width: 100%;" required>
+                            <option id="allmodellines" class="allmodellines" value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : ''}}>ALL Model Lines</option>
+                           
+                        </select>
+                    </div>
+                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                        <button class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
     <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
         <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
@@ -30,12 +67,21 @@
     <input type="hidden" value="" id="index">
 </div>
 <script type="text/javascript">
+     var existingBrandModel = {!! json_encode($existingBrandModel) !!};
+    var lengthExistingBrands = '';
     $(document).ready(function ()
     {
-        $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-        $("#selectBrand1").select2({
-            maximumSelectionLength: 1,
-        });
+        lengthExistingBrands = existingBrandModel.length;
+        for(let i=1; i<=lengthExistingBrands; i++)
+        {   
+            $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            $("#selectBrand"+i).select2({
+                maximumSelectionLength: 1,
+            });
+            $("#selectModelLine"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            $("#selectModelLine"+i).select2();
+        }
+       
 
         $(document.body).on('select2:select', "#selectBrand1", function (e) {
             e.preventDefault();
