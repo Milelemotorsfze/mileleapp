@@ -457,7 +457,7 @@ class AddonController extends Controller
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        dd($request->all());
+        // dd($request->all());
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
         if($request->image)
@@ -561,18 +561,19 @@ class AddonController extends Controller
                 {
                     if(count($request->brandModel) > 0 )
                     {
-                        $NotNelete = [];
-                        $existingBrands = [];
-                        $existingBrands2 = AddonTypes::where('addon_details_id',$id)->select('id','brand_id','model_id','is_all_model_lines')->get();
-                        foreach( $existingBrands2 as $existingBrands1)
+                        $deleteAddonTypes = [];
+                        $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
+                        if(count($deleteAddonTypes) > 0)
                         {
-                            array_push($existingBrands,$existingBrands1->supplier_id);
+                            foreach($deleteAddonTypes as $deleteAddonType)
+                            {
+                                $deleteAddonType->updated_by = Auth::id();
+                                $deleteAddonType->update();
+                                $deleteAddonType->delete();
+                            }
                         }
                         foreach($request->brandModel as $brandModel)
                         {
-                            $inputaddontype = [];
-                            $inputaddontype['addon_details_id'] = $addon_details->id;
-                            $inputaddontype['created_by'] = $authId;
                             if($brandModel['brand_id'] == 'allbrands')
                             {
                                 $addon_details->is_all_brands = 'yes';
@@ -580,11 +581,17 @@ class AddonController extends Controller
                             }
                             else
                             {
-                                $inputaddontype['brand_id'] = $brandModel['brand_id'];
+                                $addon_details->is_all_brands = 'no';
+                                $addon_details->update();
+                                 // delete exising and create new
                                 if(isset($brandModel['modelline_id']))
                                 {
                                     foreach($brandModel['modelline_id'] as $modelline_id)
                                     {
+                                        $inputaddontype = [];
+                                        $inputaddontype['addon_details_id'] = $addon_details->id;
+                                        $inputaddontype['created_by'] = $authId;
+                                        $inputaddontype['brand_id'] = $brandModel['brand_id'];
                                         if($modelline_id == 'allmodellines')
                                         {
                                             $inputaddontype['is_all_model_lines'] = 'yes';
@@ -598,6 +605,11 @@ class AddonController extends Controller
                                 }
                                 else
                                 {
+                                    $inputaddontype = [];
+                                    $inputaddontype['addon_details_id'] = $addon_details->id;
+                                    $inputaddontype['created_by'] = $authId;
+                                    $inputaddontype['brand_id'] = $brandModel['brand_id'];
+                                    $createAddType['is_all_model_lines'] = 'yes';
                                     $addon_types = AddonTypes::create($inputaddontype);
                                 }
                             }

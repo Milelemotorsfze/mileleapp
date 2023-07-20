@@ -1,35 +1,7 @@
 <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
     <div class="col-md-12 brandModelLineDiscription p-0">
-        <!-- <div class="row brandModelLineDiscriptionApendHere" id="row-1">
-            <div class="row">
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <span class="error">* </span>
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                    <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
-                            data-index="1" class="brands" multiple="true" style="width: 100%;">
-                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                        @foreach($existingBrandModel as $existingBrand)
-                            <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected>{{$existingBrand->brands->brand_name}}</option>
-                        @endforeach
-                        @foreach($brands as $brand)
-                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                        @endforeach
-                    </select>
-                    <span id="brandError" class=" invalid-feedback"></span>
-                </div>
-                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
-                    <span class="error">* </span>
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                    <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1" data-index="1" multiple="true"
-                            style="width: 100%;">
-                    </select>
-                </div>
-            </div>
-        </div> -->
         <div hidden>{{$i=0;}}</div>
         @if($addonDetails->is_all_brands == "yes")
-        @elseif
-        @foreach($existingBrandModel as $existingBrand)
             <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
                 <div class="row">
@@ -38,11 +10,49 @@
                         <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
                             multiple="true" style="width: 100%;" required>
                             <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+                                @foreach($brands as $brand)
+                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                @endforeach
+                        </select>
+                        <span id="brandError" class=" invalid-feedback"></span>
+                    </div> 
+                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}" hidden>
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                        <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
+                            style="width: 100%;" required>
+                        </select>
+                    </div>
+                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                        <button class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @else
+        @foreach($existingBrandModel as $existingBrand)
+            <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+            <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
+                <div class="row">
+                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+                        <!-- <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
+                            multiple="true" style="width: 100%;" required>
+                            <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
+                                @foreach($brands as $brand)
+                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                @endforeach
+                        </select> -->
+                        <select onchange=selectBrand(this.id,{{$i}})  class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
+                            multiple="true" style="width: 100%;" required disabled>
+                            <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                 <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
                                 @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                 @endforeach
                         </select>
+                        <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">
                         <span id="brandError" class=" invalid-feedback"></span>
                     </div> 
                     <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
@@ -65,7 +75,8 @@
                 </div>
             </div>
         @endforeach
-    </div>
+    @endif
+</div>
     <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12">
         <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
     </div>
@@ -395,6 +406,11 @@
         let showPartNumber = document.getElementById('showModelNumberdrop'+row);
         showPartNumber.hidden = true
     }
+    function hideModelNumberDropdown(id,row)
+    {
+        let showPartNumber = document.getElementById('showModelNumberdrop'+row);
+        showPartNumber.hidden = true
+    }
     $(function() {
    $('#selectBrand1').select2({
    	 tags: true,
@@ -415,7 +431,7 @@
    		// before removing tag we check option element of tag and 
       // if it has property 'locked' we will create error to prevent all select2 functionality
        if ($(e.params.args.data.element).attr('locked')) {
-        var confirm = alertify.confirm('You are not able to remove this Brand, delete the row',function (e) {
+        var confirm = alertify.confirm('You are not able to remove this Brand, remove its model lines first then remove brand or delete the row',function (e) {
                    }).set({title:"Not Able to Remove"})
            e.preventDefault();
         }
