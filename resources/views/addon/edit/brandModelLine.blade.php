@@ -42,14 +42,17 @@
                             @endforeach
                         </select>
                         <span id="brandError" class=" invalid-feedback"></span>
-                    </div>
+                    </div> 
                     <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                       
                         <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
                             style="width: 100%;" required>
-                            <option id="allmodellines" class="allmodellines" value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : ''}}>ALL Model Lines</option>
-                           
+                            <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>ALL Model Lines</option>
+                            @foreach($existingBrand->ModalLines as $modelLine)
+                            <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif 
+                                @if($existingBrand->is_all_model_lines == "yes") disabled @endif
+                            >{{ $modelLine->model_line }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
@@ -141,7 +144,12 @@
              if(data == 'allmodellines') {
                  $('#' + currentId + ' option').prop('disabled', false);
              }else {
-                 $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false)
+                $values = '';
+                $values =  $('#'+currentId).val();
+                if($values == '')
+                {
+                    $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false);
+                }
              }
          }
 

@@ -405,10 +405,14 @@ class AddonController extends Controller
             foreach($existingBrandModel as $data)
             {
                 array_push($existingBrandId,$data->brand_id);
-                $data->modelLinesData = AddonTypes::where([
+                $jsonmodelLine = [];
+                $modelLinesData = AddonTypes::where([
                                                     ['addon_details_id','=',$id],
                                                     ['brand_id','=',$data->brand_id]
-                                                ])->select('model_id')->with('modelLines')->get();
+                                                    ])->pluck('model_id');
+                $jsonmodelLine = json_decode($modelLinesData);  
+                $data->modelLinesData = $jsonmodelLine;                             
+                $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
         // dd($existingBrandModel);

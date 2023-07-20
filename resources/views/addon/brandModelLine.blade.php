@@ -95,7 +95,12 @@
              if(data == 'allmodellines') {
                  $('#' + currentId + ' option').prop('disabled', false);
              }else {
-                 $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false)
+                $values = '';
+                $values =  $('#'+currentId).val();
+                if($values == '')
+                {
+                    $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false);
+                }
              }
          }
 
