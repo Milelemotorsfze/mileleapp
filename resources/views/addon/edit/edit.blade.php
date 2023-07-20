@@ -510,7 +510,7 @@
             }
             if(data.addon_type == 'SP')
             {
-                alert('show part number');
+                // alert('show part number');
                 // let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
                 // showFixingChargeAmount.hidden = false
                 // let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
@@ -900,7 +900,7 @@
         {
             if(clickInput.id == 'itemArr1')
             {
-                var value = clickInput.value; alert(value);
+                var value = clickInput.value; 
                 if(value == '')
                 {
                     if(value.legth != 0)

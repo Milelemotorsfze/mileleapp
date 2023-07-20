@@ -1368,7 +1368,7 @@ input {
                 val =val.replace(/\.+$/,"");
             }
             input.value = val;
-            alert(val);
+            // alert(val);
             if(val != '')
             {
                 dropdownDisable();

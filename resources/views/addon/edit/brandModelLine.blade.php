@@ -27,6 +27,8 @@
             </div>
         </div> -->
         <div hidden>{{$i=0;}}</div>
+        @if($addonDetails->is_all_brands == "yes")
+        @elseif
         @foreach($existingBrandModel as $existingBrand)
             <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
@@ -36,10 +38,10 @@
                         <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
                             multiple="true" style="width: 100%;" required>
                             <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected>{{$existingBrand->brands->brand_name}}</option>
-                            @foreach($brands as $brand)
-                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                            @endforeach
+                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
+                                @foreach($brands as $brand)
+                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                @endforeach
                         </select>
                         <span id="brandError" class=" invalid-feedback"></span>
                     </div> 
@@ -64,13 +66,13 @@
             </div>
         @endforeach
     </div>
-    <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
+    <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12">
         <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
     </div>
     <input type="hidden" value="" id="index">
 </div>
 <script type="text/javascript">
-     var existingBrandModel = {!! json_encode($existingBrandModel) !!};
+    var existingBrandModel = {!! json_encode($existingBrandModel) !!};
     var lengthExistingBrands = '';
     $(document).ready(function ()
     {
@@ -393,4 +395,30 @@
         let showPartNumber = document.getElementById('showModelNumberdrop'+row);
         showPartNumber.hidden = true
     }
+    $(function() {
+   $('#selectBrand1').select2({
+   	 tags: true,
+     placeholder: 'Select an option',
+     templateSelection : function (tag, container){
+     		// here we are finding option element of tag and
+        // if it has property 'locked' we will add class 'locked-tag' 
+        // to be able to style element in select
+      	var $option = $('#selectBrand1 option[value="'+tag.id+'"]');
+        if ($option.attr('locked')){
+           $(container).addClass('locked-tag');
+           tag.locked = true; 
+        }
+        return tag.text;
+     },
+   })
+   .on('select2:unselecting', function(e){
+   		// before removing tag we check option element of tag and 
+      // if it has property 'locked' we will create error to prevent all select2 functionality
+       if ($(e.params.args.data.element).attr('locked')) {
+        var confirm = alertify.confirm('You are not able to remove this Brand, delete the row',function (e) {
+                   }).set({title:"Not Able to Remove"})
+           e.preventDefault();
+        }
+     });
+});
 </script>

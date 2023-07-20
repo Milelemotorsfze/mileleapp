@@ -82,8 +82,8 @@
         $(document.body).on('click', ".removeKitItem", function (e) {
             var indexNumber = $(this).attr('data-index');
             var supplier = $(this).attr('data-supplier');
-alert(indexNumber);
-alert(supplier);
+// alert(indexNumber);
+// alert(supplier);
             $(this).closest('#row-supplier-'+supplier+'-item-'+indexNumber).find("option:selected").each(function() {
                 var id = (this.value);
                 var text = (this.text);
@@ -367,7 +367,7 @@ alert(supplier);
     });
     $("body").on("click", ".removeKitItemForSupplier", function ()
     {
-        alert('hig');
+        // alert('hig');
         $(this).closest(".kititemdelete").remove();
         // calculateTotalPriceInAED();
         // calculateTotalPriceInUSD();

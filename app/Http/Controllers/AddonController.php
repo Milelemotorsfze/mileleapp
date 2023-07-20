@@ -415,10 +415,7 @@ class AddonController extends Controller
                 $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
-        // dd($existingBrandModel);
         $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
-
-        // dd($existingBrandModel);
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
         if($addonDetails->addon_type_name == 'P')
@@ -460,7 +457,7 @@ class AddonController extends Controller
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        // dd($request->all());
+        dd($request->all());
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
         if($request->image)
@@ -564,6 +561,13 @@ class AddonController extends Controller
                 {
                     if(count($request->brandModel) > 0 )
                     {
+                        $NotNelete = [];
+                        $existingBrands = [];
+                        $existingBrands2 = AddonTypes::where('addon_details_id',$id)->select('id','brand_id','model_id','is_all_model_lines')->get();
+                        foreach( $existingBrands2 as $existingBrands1)
+                        {
+                            array_push($existingBrands,$existingBrands1->supplier_id);
+                        }
                         foreach($request->brandModel as $brandModel)
                         {
                             $inputaddontype = [];

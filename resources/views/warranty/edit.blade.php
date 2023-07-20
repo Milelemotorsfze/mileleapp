@@ -414,7 +414,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         });
         $(document.body).on('click', ".removeButton", function (e) {
             var indexNumber = $(this).attr('data-index');
-            alert('#row-'+indexNumber);
+            // alert('#row-'+indexNumber);
             $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
                 var id = (this.value);
                 var text = (this.text);
