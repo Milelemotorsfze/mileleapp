@@ -414,7 +414,7 @@ class AddonController extends Controller
         // dd($existingBrandModel);
         $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
 
-        dd($existingBrandModel);
+        // dd($existingBrandModel);
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
         if($addonDetails->addon_type_name == 'P')
