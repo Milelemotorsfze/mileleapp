@@ -75,6 +75,7 @@ input {
         background-color: #fd625e;
         border-radius:5px;
         cursor: pointer;
+        padding-top:7px;
     }
     .btn_round:hover
     {
@@ -227,7 +228,7 @@ input {
     {
         border-color: #495057!important;
     }
-    button:focus
+    a:focus
     {
         border-color: #495057!important;
     }
@@ -513,9 +514,9 @@ input {
                                                 </div>
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                <button class="btn_round removeButton" id="remove-${index}" data-index="${index}">
+                                                <a class="btn_round removeButton" id="remove-1" data-index="1">
                                                     <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -631,46 +632,56 @@ input {
                 }
             }
             $(document.body).on('click', ".removeButton", function (e) {
-                var indexNumber = $(this).attr('data-index');
+                // var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
+                // if(countRow > 1)
+                // {
+                    var indexNumber = $(this).attr('data-index');
 
-                $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                    var id = (this.value);
-                    var text = (this.text);
-                    addOption(id,text)
-                });
-
-                $(this).closest('#row-'+indexNumber).remove();
-                $('.form_field_outer_row').each(function(i){
-                    var index = +i + +1;
-                    $(this).attr('id','row-'+ index);
-                    $(this).attr('data-select2-id','select2-data-row-'+ index);
-                    $(this).find('.addons').attr('data-index', index);
-                    $(this).find('.addons').attr('id','addon_'+ index);
-                    $(this).find('.currency').attr('id','currency_' + index);
-                    $(this).find('.currency').attr('onchange','changeCurrency(' + index + ')');
-                    $(this).find('.usd-price-div').attr('id','div_price_in_usd_' + index);
-                    $(this).find('.currency').attr('name','supplierAddon['+ index +'][currency]');
-                    $(this).find('.addons').attr('name','supplierAddon['+ index +'][addon_id]');
-                    $(this).find('.purchase_price_in_USD').attr('name','supplierAddon['+ index +'][addon_purchase_price_in_usd]');
-                    $(this).find('.purchase_price_in_AED').attr('name','supplierAddon['+ index +'][addon_purchase_price]');
-                    $(this).find('.div-purchase_price_in_AED').attr('id','div_price_in_aed_' + index);
-                    $(this).find('.purchase_price_in_AED').attr('id','addon_purchase_price_'+ index);
-                    $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
-                    $(this).find('.purchase_price_in_USD').attr('onkeyup','calculateAED('+ index +')');
-                    // $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
-                    $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
-                    $(this).find('.addon-purchase-price').attr('id', 'addon_purchase_price_'+ index);
-                    $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
-                    $(this).find('button').attr('data-index', index);
-                    $(this).find('button').attr('id','remove-'+ index);
-                    $('#addon_'+index).select2
-                    ({
-                        placeholder:"Choose Addon....     Or     Type Here To Search....",
-                        allowClear: true,
-                        minimumResultsForSearch: -1,
+                    $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                        var id = (this.value);
+                        var text = (this.text);
+                        addOption(id,text)
                     });
-                });
-                dropdownEnable();
+
+                    $(this).closest('#row-'+indexNumber).remove();
+                    $('.form_field_outer_row').each(function(i){
+                        var index = +i + +1;
+                        $(this).attr('id','row-'+ index);
+                        $(this).attr('data-select2-id','select2-data-row-'+ index);
+                        $(this).find('.addons').attr('data-index', index);
+                        $(this).find('.addons').attr('id','addon_'+ index);
+                        $(this).find('.currency').attr('id','currency_' + index);
+                        $(this).find('.currency').attr('onchange','changeCurrency(' + index + ')');
+                        $(this).find('.usd-price-div').attr('id','div_price_in_usd_' + index);
+                        $(this).find('.currency').attr('name','supplierAddon['+ index +'][currency]');
+                        $(this).find('.addons').attr('name','supplierAddon['+ index +'][addon_id]');
+                        $(this).find('.purchase_price_in_USD').attr('name','supplierAddon['+ index +'][addon_purchase_price_in_usd]');
+                        $(this).find('.purchase_price_in_AED').attr('name','supplierAddon['+ index +'][addon_purchase_price]');
+                        $(this).find('.div-purchase_price_in_AED').attr('id','div_price_in_aed_' + index);
+                        $(this).find('.purchase_price_in_AED').attr('id','addon_purchase_price_'+ index);
+                        $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
+                        $(this).find('.purchase_price_in_USD').attr('onkeyup','calculateAED('+ index +')');
+                        // $(this).find('.addon-purchase-price-div').attr('id','div_price_in_aedOne_'+ index);
+                        $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
+                        $(this).find('.addon-purchase-price').attr('id', 'addon_purchase_price_'+ index);
+                        $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
+                        $(this).find('a').attr('data-index', index);
+                        $(this).find('a').attr('id','remove-'+ index);
+                        $('#addon_'+index).select2
+                        ({
+                            placeholder:"Choose Addon....     Or     Type Here To Search....",
+                            allowClear: true,
+                            minimumResultsForSearch: -1,
+                        });
+                    });
+                    dropdownEnable();
+                // }
+                // else
+                // {
+                //     var confirm = alertify.confirm('You are not able to edit this field because atleast ',function (e) {
+                //    }).set({title:"Not Able To Remove"})
+                // }
+              
             })
             function addOption(id,text) {
                 var indexValue = $('#indexValue').val();
@@ -759,9 +770,9 @@ input {
                                 </div>
                                
                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                    <button class="btn_round removeButton" id="remove-${index}" data-index="${index}">
+                                    <a class="btn_round removeButton" id="remove-${index}" data-index="${index}">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             `);
