@@ -174,7 +174,7 @@ class WarrantyController extends Controller
                 $existingBrands2 = WarrantyBrands::where('warranty_premiums_id',$id)->select('brand_id')->get();
                 foreach( $existingBrands2 as $existingBrands1)
                 {
-                    array_push($existingBrands,$existingBrands1->id);
+                    array_push($existingBrands,$existingBrands1->brand_id);
                 }
                 foreach($request->brandPrice as $brandPrice)
                 {
@@ -197,7 +197,7 @@ class WarrantyController extends Controller
                                     {
                                         $update->selling_price =  $brandPrice['selling_price'];
                                     }
-                                    $update->save();
+                                    $update->update();
 
                                     if($oldPrice != $update->price)
                                     {
@@ -252,7 +252,7 @@ class WarrantyController extends Controller
                 }
             }
             $newExiBrands2 = [];
-            $newExiBrands = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('id');
+            $newExiBrands = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');
             foreach($newExiBrands as $newExiBrands1)
             {
                 array_push($newExiBrands2,$newExiBrands1);

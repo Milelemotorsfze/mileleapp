@@ -433,7 +433,7 @@ class AddonController extends Controller
                 $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
-        // echo($existingBrandModel);
+        // dd($existingBrandModel);
         $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
@@ -477,6 +477,7 @@ class AddonController extends Controller
     public function updateAddonDetails(Request $request, $id)
     {
         // dd($request->all());
+        $request->addon_type = $request->addon_type_hiden;
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
         if($request->image)
@@ -530,8 +531,6 @@ class AddonController extends Controller
                 {
                     if(count($request->brand) > 0)
                     {
-                        $createAddType['created_by'] = $authId;
-                        $createAddType['addon_details_id'] = $addon_details->id;
                         foreach($request->brand as $brandData)
                         {
                             if($brandData['brand_id'] == 'allbrands')
@@ -541,7 +540,8 @@ class AddonController extends Controller
                             }
                             else
                             {
-                                $createAddType['brand_id'] = $brandData['brand_id'];
+                                $addon_details->is_all_brands = 'no';
+                                $addon_details->update();
                                 if(isset($brandData['model']))
                                 {
                                     if(count($brandData['model']) > 0)
@@ -551,23 +551,36 @@ class AddonController extends Controller
                                             if($brandModelDta['model_id'])
                                             {
                                                 if($brandModelDta['model_id'] == 'allmodellines')
-                                                {
+                                                {   
+                                                    $createAddType = [];                                                
+                                                    $createAddType['created_by'] = $authId;
+                                                    $createAddType['addon_details_id'] = $addon_details->id;                                                    
+                                                    $createAddType['brand_id'] = $brandData['brand_id'];
                                                     $createAddType['is_all_model_lines'] = 'yes';
                                                     $creBranModelDes = AddonTypes::create($createAddType);
                                                 }
                                                 else
                                                 {
-                                                    $createAddType['model_id'] = $brandModelDta['model_id'];
                                                     if(isset($brandModelDta['model_number']))
                                                     {
                                                         foreach($brandModelDta['model_number'] as $modelDescr)
-                                                        {
+                                                        {   
+                                                            $createAddType = [];                                                               
+                                                            $createAddType['created_by'] = $authId;
+                                                            $createAddType['addon_details_id'] = $addon_details->id;
+                                                            $createAddType['brand_id'] = $brandData['brand_id'];
+                                                            $createAddType['model_id'] = $brandModelDta['model_id'];
                                                             $createAddType['model_number'] = $modelDescr;
                                                             $creBranModelDes = AddonTypes::create($createAddType);
                                                         }
                                                     }
                                                     else
-                                                    {
+                                                    {    
+                                                        $createAddType = [];                                                          
+                                                        $createAddType['created_by'] = $authId;
+                                                        $createAddType['addon_details_id'] = $addon_details->id;
+                                                        $createAddType['brand_id'] = $brandData['brand_id'];
+                                                        $createAddType['model_id'] = $brandModelDta['model_id'];
                                                         $creBranModelDes = AddonTypes::create($createAddType);
                                                     }
                                                 }
@@ -576,7 +589,11 @@ class AddonController extends Controller
                                     }
                                 }
                                 else
-                                {
+                                {    
+                                    $createAddType = [];                                      
+                                    $createAddType['created_by'] = $authId;
+                                    $createAddType['addon_details_id'] = $addon_details->id;
+                                    $createAddType['brand_id'] = $brandData['brand_id'];
                                     $createAddType['is_all_model_lines'] = 'yes';
                                     $creBranModelDes = AddonTypes::create($createAddType);
                                 }

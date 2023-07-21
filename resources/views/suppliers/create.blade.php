@@ -513,7 +513,7 @@ input {
                                                 </div>
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                <button class="btn_round remove_node_btn_frm_field" disabled hidden>
+                                                <button class="btn_round removeButton" id="remove-${index}" data-index="${index}">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </button>
                                             </div>
