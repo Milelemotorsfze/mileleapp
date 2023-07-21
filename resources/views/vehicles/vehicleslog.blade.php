@@ -487,209 +487,260 @@
 </div>
   <br>
   <br>
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Vehicle Detail Approval Requests</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive" >
-                <table id="dtBasicExample3" class="table table-striped table-editable table table-bordered">
-                    <thead class="bg-soft-secondary">
-                    <tr>
-                        <th>Date & Time</th>
-                        <th>Updated By</th>
-                        <th>Field</th>
-                        <th>Old Value</th>
-                        <th>New Value</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pendingVehicleDetailApprovalRequests as $pendingVehicleDetailApprovalRequest)
-                            <tr>
-                                <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
-                                <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
-                                <td>
-                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
-                                        Exterior Colour
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
-                                        Interior Colour
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
-                                        Variant
-                                    @else
-                                        {{ str_replace('_', ' ', ucwords( $pendingVehicleDetailApprovalRequest->field))}}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
-                                        {{ $pendingVehicleDetailApprovalRequest->old_exterior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
-                                        {{ $pendingVehicleDetailApprovalRequest->old_interior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->old_variant  }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->old_sales_person ?? ''  }}
-                                    @else
-                                        {{ $pendingVehicleDetailApprovalRequest->old_value }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
-                                        {{ $pendingVehicleDetailApprovalRequest->new_exterior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
-                                        {{ $pendingVehicleDetailApprovalRequest->new_interior }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->new_variant ?? '' }}
-                                    @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
-                                        {{ $pendingVehicleDetailApprovalRequest->new_sales_person ?? ''  }}
-                                    @else
-                                        {{ $pendingVehicleDetailApprovalRequest->new_value }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($pendingVehicleDetailApprovalRequest->status == 'approved')
-                                        Approved
-                                    @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
-                                        Rejected
-                                    @else
-                                        <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                            Approve
-                                        </button>
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                            Reject
-                                        </button>
-                                    @endif
-                                </td>
-                                @php
-                                    if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
-                                        $new_value =  $pendingVehicleDetailApprovalRequest->new_exterior ?? '';
-                                       }
-                                      elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
-                                          $new_value = $pendingVehicleDetailApprovalRequest->new_interior ?? '';
-                                      }
-                                      elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
-                                           $new_value =  $pendingVehicleDetailApprovalRequest->new_variant ?? '';
-                                      }
-                                    elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
-                                           $old_value =  $pendingVehicleDetailApprovalRequest->new_sales_person ?? '';
-                                      }
-                                      else {
-                                        $new_value = $pendingVehicleDetailApprovalRequest->new_value ?? '';
-                                      }
-                                @endphp
-                                @php
-                                    if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
-                                        $old_value =  $pendingVehicleDetailApprovalRequest->old_exterior ?? '';
-                                       }
-                                      elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
-                                          $old_value = $pendingVehicleDetailApprovalRequest->old_interior ?? '';
-                                      }
-                                      elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
-                                           $old_value =  $pendingVehicleDetailApprovalRequest->old_variant ?? '';
-                                      }
-                                      elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
-                                           $old_value =  $pendingVehicleDetailApprovalRequest->old_sales_person ?? '';
-                                      }
-                                      else {
-                                        $old_value = $pendingVehicleDetailApprovalRequest->old_value ?? '';
-                                      }
-                                @endphp
-                                <div class="modal fade" id="approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
-                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog ">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Approve</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-3">
-                                                <div class="col-lg-12">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-center">Old Value</label>
-                                                                </div>
-                                                                <div class="col-lg-9 col-md-12 col-sm-12">
-
-
-                                                                    <input type="text" value="{{  $old_value ?? ''}}"
-                                                                           class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13">New Value</label>
-                                                                </div>
-                                                                <div class="col-lg-9 col-md-12 col-sm-12">
-
-                                                                    <input type="text" value="{{ $new_value ?? ''}}"
-                                                                           id="updated-price"  class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary approve-button"
-                                                        data-id="{{ $pendingVehicleDetailApprovalRequest->id }}" data-status="approved">Approve</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal fade" id="reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
-                                     tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog ">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Selling Price Rejection</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-3">
-                                                <div class="col-lg-12">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-center">Old Value</label>
-                                                                </div>
-                                                                <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $old_value ?? ''}}"
-                                                                           class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-3 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13">New Value</label>
-                                                                </div>
-                                                                <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $new_value ?? ''}}"
-                                                                           id="updated-price"  class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary reject-button" data-id="{{ $pendingVehicleDetailApprovalRequest->id }}"
-                                                        data-status="rejected" >Reject</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                </div>
+    @php
+        $hasPermissionVehicleDetailApprove = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-approve');
+        $hasPermissionEngineApprove = Auth::user()->hasPermissionForSelectedRole('engine-approve');
+        $hasPermissionSOApprove = Auth::user()->hasPermissionForSelectedRole('approve-so');
+        $hasPermissionInspectionApprove = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+    @endphp
+         @if($hasPermissionInspectionApprove || $hasPermissionVehicleDetailApprove || $hasPermissionSOApprove || $hasPermissionEngineApprove)
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Vehicle Detail Approval Requests</h4>
             </div>
+            <div class="card-body">
+                <div class="table-responsive" >
+                    <table id="dtBasicExample3" class="table table-striped table-editable table table-bordered">
+                        <thead class="bg-soft-secondary">
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Updated By</th>
+                            <th>Field</th>
+                            <th>Old Value</th>
+                            <th>New Value</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach($pendingVehicleDetailApprovalRequests as $pendingVehicleDetailApprovalRequest)
+
+                                <tr>
+                                    <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
+                                    <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                            Exterior Colour
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
+                                            Interior Colour
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
+                                            Variant
+                                        @else
+                                            {{ str_replace('_', ' ', ucwords( $pendingVehicleDetailApprovalRequest->field))}}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                            {{ $pendingVehicleDetailApprovalRequest->old_exterior ?? ''}}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
+                                            {{ $pendingVehicleDetailApprovalRequest->old_interior ?? ''}}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->old_variant  ?? ''}}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->old_sales_person ?? ''  }}
+                                        @else
+                                            {{ $pendingVehicleDetailApprovalRequest->old_value }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->field == 'ex_colour')
+                                            {{ $pendingVehicleDetailApprovalRequest->new_exterior ?? ''}}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour')
+                                            {{ $pendingVehicleDetailApprovalRequest->new_interior ?? '' }}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->new_variant ?? '' }}
+                                        @elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->new_sales_person ?? ''  }}
+                                        @else
+                                            {{ $pendingVehicleDetailApprovalRequest->new_value ?? ''}}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->status == 'approved')
+                                            Approved
+                                        @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
+                                            Rejected
+                                        @else
+                                            @if($hasPermissionEngineApprove )
+                                                @if($pendingVehicleDetailApprovalRequest->field == 'engine')
+                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Approve
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Reject
+                                                    </button>
+                                                @endif
+                                           @endif
+                                            @if($hasPermissionInspectionApprove )
+                                                @if($pendingVehicleDetailApprovalRequest->field == 'inspection_date' )
+                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Approve
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Reject
+                                                    </button>
+                                                @endif
+                                            @endif
+                                            @if($hasPermissionVehicleDetailApprove)
+                                                @if(in_array($pendingVehicleDetailApprovalRequest->field, ['ex_colour','int_colour','varaints_id','ppmmyyy']))
+                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Approve
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Reject
+                                                    </button>
+                                                @endif
+                                            @endif
+                                            @if($hasPermissionSOApprove)
+                                                @if(in_array($pendingVehicleDetailApprovalRequest->field, ['so_number','so_date','sales_person_id',
+                                                    'reservation_end_date','reservation_start_date']))
+                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Approve
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                                        Reject
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        @endif
+                                    </td>
+                                    @php
+                                        if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
+                                            $new_value =  $pendingVehicleDetailApprovalRequest->new_exterior ?? '';
+                                           }
+                                          elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
+                                              $new_value = $pendingVehicleDetailApprovalRequest->new_interior ?? '';
+                                          }
+                                          elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
+                                               $new_value =  $pendingVehicleDetailApprovalRequest->new_variant ?? '';
+                                          }
+                                        elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
+                                               $old_value =  $pendingVehicleDetailApprovalRequest->new_sales_person ?? '';
+                                          }
+                                          else {
+                                            $new_value = $pendingVehicleDetailApprovalRequest->new_value ?? '';
+                                          }
+                                    @endphp
+                                    @php
+                                        if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
+                                            $old_value =  $pendingVehicleDetailApprovalRequest->old_exterior ?? '';
+                                           }
+                                          elseif($pendingVehicleDetailApprovalRequest->field == 'int_colour') {
+                                              $old_value = $pendingVehicleDetailApprovalRequest->old_interior ?? '';
+                                          }
+                                          elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id') {
+                                               $old_value =  $pendingVehicleDetailApprovalRequest->old_variant ?? '';
+                                          }
+                                          elseif($pendingVehicleDetailApprovalRequest->field == 'sales_person_id') {
+                                               $old_value =  $pendingVehicleDetailApprovalRequest->old_sales_person ?? '';
+                                          }
+                                          else {
+                                            $old_value = $pendingVehicleDetailApprovalRequest->old_value ?? '';
+                                          }
+                                    @endphp
+                                    <div class="modal fade" id="approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
+                                         tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Approve</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-center">Old Value</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+
+
+                                                                        <input type="text" value="{{  $old_value ?? ''}}"
+                                                                               class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13">New Value</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+
+                                                                        <input type="text" value="{{ $new_value ?? ''}}"
+                                                                               id="updated-price"  class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary approve-button"
+                                                            data-id="{{ $pendingVehicleDetailApprovalRequest->id }}" data-status="approved">Approve</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal fade" id="reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}"
+                                         tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog ">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Selling Price Rejection</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-3">
+                                                    <div class="col-lg-12">
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13 text-center">Old Value</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                        <input type="text" value="{{  $old_value ?? ''}}"
+                                                                               class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-2">
+                                                                    <div class="col-lg-3 col-md-12 col-sm-12">
+                                                                        <label class="form-label font-size-13">New Value</label>
+                                                                    </div>
+                                                                    <div class="col-lg-9 col-md-12 col-sm-12">
+                                                                        <input type="text" value="{{ $new_value ?? ''}}"
+                                                                               id="updated-price"  class="form-control" readonly >
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary reject-button" data-id="{{ $pendingVehicleDetailApprovalRequest->id }}"
+                                                            data-status="rejected" >Reject</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
         </div>
+        @endif
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Changes Log Details</h4>
@@ -753,12 +804,12 @@
                                         @php
                                             $newExterior = \App\Models\ColorCode::find($vehiclesLog->new_value);
                                         @endphp
-                                        {{ $newExterior->name }}
+                                        {{ $newExterior->name ?? ''}}
                                     @elseif($vehiclesLog->field == 'int_colour')
                                         @php
                                             $newInterior = \App\Models\ColorCode::find($vehiclesLog->new_value);
                                         @endphp
-                                        {{ $newInterior->name }}
+                                        {{ $newInterior->name ?? ''}}
                                     @elseif($vehiclesLog->field == 'varaints_id')
                                         @php
                                             $variant = \App\Models\Varaint::find($vehiclesLog->new_value);
@@ -770,7 +821,7 @@
                                         @endphp
                                         {{ $user->name ?? '' }}
                                     @else
-                                        {{ $vehiclesLog->new_value }}
+                                        {{ $vehiclesLog->new_value ?? '' }}
                                     @endif
 {{--                                    {{ $vehiclesLog->new_value }}--}}
                                 </td>

@@ -118,7 +118,6 @@ class PermissionTableSeeder extends Seeder
 
             ['8','View Warehouse','warehouse-view', 'To View the Warehouse Module'],
             ['8','Edit Warehouse','warehouse-edit', 'To Edit the warehouse Module'],
-            ['8','Approve Warehouse','warehouse-approve', 'To Approve the warehouse Remark'],
             ['8','View Daily Movements','View-daily-movemnets', 'To View the Daily Movement'],
             ['8','Edit Daily Movements','edit-daily-movemnets', 'To Edit the Daily Movement'],
             ['8','View PO Details','view-po-details', 'To View the PO Details'],
@@ -161,7 +160,6 @@ class PermissionTableSeeder extends Seeder
             ['9','Vehicles Details Approve','vehicles-detail-approve', 'To Approve the Vehicles Details'],
             ['9','Conversion View','conversion-view', 'To View the Vehicles Details'],
             ['9','Conversion Edit','conversion-edit', 'To Edit the Vehicles Details'],
-            ['9','Conversion Edit','conversion-approve', 'To Approve the Conversion field of Vehicles Details'],
             ['9','VIN View','vin-view', 'To View the VIN Details'],
             ['9','VIN Edit','vin-edit', 'To Edit the VIN Details'],
             ['9','Enginee View','enginee-view', 'To View the Enginee Details'],
@@ -176,7 +174,6 @@ class PermissionTableSeeder extends Seeder
             ['9','Colours Add & Edit','colours-edit', 'To Edit the Colour Details'],
             ['9','Documents View','document-view', 'To View the Document Details'],
             ['9','Documents Add & Edit','document-edit', 'To Edit the Document Details'],
-            ['9','Documents Approve','document-approve', 'To Approve the Document Details'],
             ['9','BL View','bl-view', 'To View the BL Details'],
             ['9','BL Add & Edit ','bl-edit', 'To Edit the BL Details'],
             ['9','Price View','price-view', 'To View the Price Details'],

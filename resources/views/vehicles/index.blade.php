@@ -132,7 +132,7 @@
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
-                     'vehicles-detail-edit','enginee-edit','document-edit','bl-edit','edit-so','edit-reservation']);
+                     'vehicles-detail-edit','enginee-edit','document-edit','edit-so','edit-reservation']);
                 @endphp
                 @if ($hasPermission)
                 <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
@@ -621,7 +621,7 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                     @endphp
                                     @if ($hasPermission)
-										                @php
+									@php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
