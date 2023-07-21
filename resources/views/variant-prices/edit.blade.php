@@ -160,10 +160,10 @@
                         <div class="table-responsive" >
                             <table id="vehicle-with-price-table" class="table table-striped table-editable table-edits table table-condensed">
                                 <thead class="bg-soft-secondary">
-                                <tr >
+                                <tr>
                                     <th>S.NO</th>
-                                    <th>Exterior</th>
                                     <th>Interior</th>
+                                    <th>Exterior</th>
                                     <th>Stock Quantity</th>
                                     <th>Price Status</th>
                                     <th>Current Price</th>
@@ -180,8 +180,8 @@
 
                                     <tr>
                                         <td>{{ ++$i }}</td>
-                                        <td>{{ $vehicle->exterior->name ?? ''}} </td>
                                         <td>{{ $vehicle->interior->name ?? ''  }} </td>
+                                        <td>{{ $vehicle->exterior->name ?? ''}} </td>
                                         <td>{{ $vehicle->count }}</td>
                                         <td>
                                             @if($vehicle->price_status == 1)
@@ -213,8 +213,8 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.NO</th>
-                            <th>Exterior</th>
                             <th>Interior</th>
+                            <th>Exterior</th>
                             <th>New Price</th>
                             <th>Old Price</th>
                             <th>Updated Date</th>
@@ -227,8 +227,8 @@
                         @foreach($variantPriceHistories as $value => $variantPriceHistory)
                             <tr>
                                 <td>{{ ++$i  }}</td>
-                                <td>{{ $variantPriceHistory->availableColour->exterior->name ?? ''}} </td>
                                 <td>{{ $variantPriceHistory->availableColour->interior->name ?? ''  }} </td>
+                                <td>{{ $variantPriceHistory->availableColour->exterior->name ?? ''}} </td>
                                 <td>{{$variantPriceHistory->new_price}} </td>
                                 <td>{{ $variantPriceHistory->old_price }}</td>
                                 <td>{{ \Carbon\Carbon::parse($variantPriceHistory->updated_at)->format('d/m/y, H:i:s')  }}</td>
