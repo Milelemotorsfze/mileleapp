@@ -65,15 +65,14 @@
                                     <h6 class="text-center mt-2"> COVERAGES</h6>
                                     @foreach($warrantyBrand->premium->PolicyName->warrantyPolicyCoverageParts as $key => $coveragePart)
                                         @if($key <= 2)
-                                            <span class="list-group-flush" ><i class="fa fa-check"> </i>&nbsp; &nbsp;{{ $coveragePart->warrantyCoveragePart->name }}</span>
+                                            <div class="list-group-flush view-more-{{$warrantyBrand->id}}" ><i class="fa fa-check"> </i>&nbsp;
+                                                &nbsp;{{ $coveragePart->warrantyCoveragePart->name }}</div>
                                         @endif
                                     @endforeach
                                     @if($warrantyBrand->premium->PolicyName->warrantyPolicyCoverageParts->count() > 3)
                                         @foreach($warrantyBrand->premium->PolicyName->warrantyPolicyCoverageParts as $key => $coveragePart)
                                             <div class="collapse" id="collapseCoverage-{{$warrantyBrand->id}}">
-                                                <div class="view-more-{{$warrantyBrand->id}}">
                                                     <span class="list-group-flush" ><i class="fa fa-check"> </i>&nbsp; &nbsp;{{ $coveragePart->warrantyCoveragePart->name }}</span>
-                                                </div>
                                             </div>
                                         @endforeach
                                         <button class="btn btn-primary btn-sm text-white w-50 view-more-button mt-2"
@@ -111,8 +110,8 @@
             var $this = $(this);
             var id = $(this).attr('data-id');
 
-            $this.toggleClass('collapse-button');
-            if($this.hasClass('collapse-button')){
+            $this.toggleClass('view-more-button');
+            if($this.hasClass('view-more-button')){
                 $this.text('View More');
                 $('.view-more-'+id).show();
             } else {
