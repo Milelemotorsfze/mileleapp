@@ -456,13 +456,28 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <td class="nowrap-td eta">ETA</td>
+                                @if($vehicles->estimation_date && $grn_number === null)
+                                @php
+                                                  $savedDate = $$vehicles->estimation_date;
+                                                  $today = now()->format('Y-m-d');
+                                                  $numberOfDayseta = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
+                                                  @endphp
+                                <td class="nowrap-td eta">$numberOfDayseta</td>
+                                @elseif($grn_number)
+                                <td class="nowrap-td eta">Already Arrived</td>
+                                @else
+                                <td class="nowrap-td eta">Incoming</td>
+                                @endif
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
                                 @endphp
                                 @if ($hasPermission)
+                                @if($vehicles->estimation_date)
                                 <td class="nowrap-td eta">{{date('d-M-Y', strtotime($vehicles->estimation_date))}}</td>
+                                @else
+                                <td class="nowrap-td">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </td>
+                                @endif
                                 @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
@@ -483,14 +498,18 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
                                 @endphp
                                 @if ($hasPermission)
+                                @if($grn_number === null)
                                 <td class="nowrap-td stockstatus">Incoming</td>
-                                @if ($gdn_number && $so_number === "")
+                                @elseif($so_number === null && $vehicles->reservation_end_date && $vehicles->reservation_end_date->greaterThan(\Carbon\Carbon::now()))
+                                <td class="nowrap-td stockstatus">Reserved</td>
+                                @elseif($so_number)
+                                <td class="nowrap-td stockstatus">Booked</td>
+                                @elseif ($gdn_number)
+                                <td class="nowrap-td stockstatus">Sold</td>
+                                @else
                                 <td class="nowrap-td stockstatus">Available</td>
-                                @if ($vehicles->reservation_end_date && $vehicles->reservation_end_date->greaterThan(\Carbon\Carbon::now()))
-                                  <td class="nowrap-td stockstatus">Booked</td>
-                              @endif
-                                @endif
-                                @endif
+                                    @endif
+                                    @endif
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
@@ -502,35 +521,48 @@
                                     @if ($hasPermission)
                                     <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
                                     @else
-									<td>{{ $vehicles->inspection_date }}</td>
-									@endif
+									                  <td>{{ $vehicles->inspection_date }}</td>	
 									                  @endif
-                                    @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
-                                    @endphp
-                                    @if ($hasPermission)
-                                     @if ($grn_date)
-                                     @php
-                                     $grn_date = \Carbon\Carbon::parse($grn_date);
-                                     $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
-                                     @endphp
-                                     <td class="nowrap-td">{{ $aging }}</td>
-                                     @else
-                                     @php
-                                          $paymentLog = DB::table('payment_logs')->where('vehicle_id', $vehicles->id)->latest()->first();
+									                  @endif
+                                                                          @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                       @endphp
-                                      @if ($paymentLog)
-                                          @php
-                                              $savedDate = $paymentLog->date;
-                                              $today = now()->format('Y-m-d');
-                                              $numberOfDays = Carbon\Carbon::parse($savedDate)->diffInDays($today);
-                                          @endphp
-                                          <td class="nowrap-td">{{$numberOfDays}}</td>
-                                      @else
-                                          <td class="nowrap-td">-</td>
+
+                                      @if ($hasPermission)
+
+                                          {{-- If $grn_date is set and $gdn_number is null --}}
+                                          @if ($grn_date && $gdn_number === null)
+                                              @php
+                                              $grn_date = \Carbon\Carbon::parse($grn_date);
+                                              $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
+                                              @endphp
+                                              <td class="nowrap-td">{{ $aging }}</td>
+
+                                          {{-- If $gdn_number is set, calculate aging as the difference between $grn_date and $gdn_number --}}
+                                          @elseif ($gdn_number)
+                                              @php
+                                              $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_number);
+                                              @endphp
+                                              <td class="nowrap-td">{{ $aging }}</td>
+
+                                          {{-- If neither $grn_date nor $gdn_number is set, check for payment logs --}}
+                                          @else
+                                              @php
+                                              $paymentLog = DB::table('payment_logs')->where('vehicle_id', $vehicles->id)->latest()->first();
+                                              @endphp
+                                              @if ($paymentLog)
+                                                  @php
+                                                  $savedDate = $paymentLog->date;
+                                                  $today = now()->format('Y-m-d');
+                                                  $numberOfDays = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
+                                                  @endphp
+                                                  <td class="nowrap-td">{{ $numberOfDays }}</td>
+                                              @else
+                                                  <td class="nowrap-td">-</td>
+                                              @endif
+                                          @endif
+
                                       @endif
-                                     @endif
-                                     @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
                                     @endphp
@@ -764,7 +796,7 @@
                                             {{ $vehicles->variant->gearbox }}
                                         </td>
                                         <td>
-                                        <select name="ex_colour" class="form-control select2" placeholder="ex_colour" disabled>
+                                        <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
                                                 <option value=""></option>
                                                 @foreach($exteriorColours as $exColour)
                                                     <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
@@ -809,7 +841,11 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
                                         @endphp
                                         @if ($hasPermission)
+                                        @if ($warehouses === null)
+                                        <td class="nowrap-td">Supplier</td>
+                                        @else
                                         <td class="nowrap-td">{{ $warehouses }}</td>
+                                        @endif
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
