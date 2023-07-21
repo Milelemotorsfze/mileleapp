@@ -85,7 +85,8 @@ th.nowrap-td {
         <tr>
         <td onclick="window.location='{{ route('purchasing.filter', ['status' => 'Pending Approval']) }}';">
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        $userId = auth()->user()->id;
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->count();
         @endphp
         @if ($pendongpoapproval > 0)
             {{ $pendongpoapproval }}
@@ -93,9 +94,11 @@ th.nowrap-td {
             0
         @endif
     </td>
-    <td onclick="window.location='{{ route('purchasing.filterapproved', ['status' => 'Approved']) }}';">
+    <td onclick="window.location='{{ route('purchasing.filterapprovedonly', ['status' => 'Approved']) }}';">
         @php
-        $alreadyapproved = DB::table('purchasing_order')                    
+        $userId = auth()->user()->id;
+        $alreadyapproved = DB::table('purchasing_order')
+        ->where('created_by', $userId)                    
         ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -113,7 +116,14 @@ th.nowrap-td {
     </td>
     <td onclick="window.location='{{ route('purchasing.filterapproved', ['status' => 'Approved']) }}';">
     @php
+    $userId = auth()->user()->id;
     $inProgressPurchasingOrders = DB::table('vehicles')
+        ->whereExists(function ($query) use ($userId) {
+            $query->select(DB::raw(1))
+                ->from('purchasing_order')
+                ->whereColumn('vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+                ->where('purchasing_order.created_by', $userId);
+        })
         ->where(function ($query) {
             $query->where('status', 'Request for Payment')
                 ->orWhere(function ($query) {
@@ -124,9 +134,9 @@ th.nowrap-td {
                           });
                 });
         })
-        ->distinct('purchasing_order_id')
-        ->count('purchasing_order_id');
-    @endphp
+        ->distinct('vehicles.purchasing_order_id')
+        ->count('vehicles.purchasing_order_id');
+@endphp
     @if ($inProgressPurchasingOrders > 0)
         {{ $inProgressPurchasingOrders }}
     @else
@@ -135,7 +145,9 @@ th.nowrap-td {
 </td>
 <td onclick="window.location='{{ route('purchasing.filterincomings', ['status' => 'Approved']) }}';">
     @php
+    $userId = auth()->user()->id;
     $completedPos = DB::table('purchasing_order')
+    ->where('created_by', $userId)
         ->whereNotExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('vehicles')
@@ -189,7 +201,8 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
         @php
-        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->count();
+        $userId = auth()->user()->id;
+        $pendongpoapproval = DB::table('purchasing_order')->where('status', 'Pending Approval')->where('created_by', $userId)->count();
         @endphp
         @if ($pendongpoapproval > 0)
             {{ $pendongpoapproval }}
@@ -206,7 +219,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
         @php
+        $userId = auth()->user()->id;
         $pendingints = DB::table('purchasing_order')
+        ->where('purchasing_order.created_by', $userId)
             ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -231,7 +246,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
+    $userId = auth()->user()->id;
     $pendingpaymentrelsa = DB::table('purchasing_order')
+    ->where('purchasing_order.created_by', $userId)
                 ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -266,7 +283,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
+    $userId = auth()->user()->id;
     $intipending = DB::table('purchasing_order')
+    ->where('purchasing_order.created_by', $userId)
                     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -291,7 +310,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
+    $userId = auth()->user()->id;
     $pendingreleasereqs = DB::table('purchasing_order')
+    ->where('purchasing_order.created_by', $userId)
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -316,7 +337,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
+    $userId = auth()->user()->id;
     $pendingdebitaps = DB::table('purchasing_order')
+    ->where('purchasing_order.created_by', $userId)
     ->where('purchasing_order.status', 'Approved')
             ->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -351,7 +374,9 @@ th.nowrap-td {
     </td>
     <td style="font-size: 12px;">
     @php
+    $userId = auth()->user()->id;
 $pendingvendorfol = DB::table('purchasing_order')
+    ->where('created_by', $userId)
     ->where('status', 'Approved')
     ->whereExists(function ($query) {
         $query->select(DB::raw(1))

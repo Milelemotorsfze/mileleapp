@@ -39,15 +39,20 @@
     }
     .btn_round
     {
-        width: 35px;
-        height: 35px;
+        width: 30px;
+        height: 30px;
         display: inline-block;
-        border-radius: 50%;
+        /* border-radius: 50%; */
         text-align: center;
         line-height: 35px;
         margin-left: 10px;
+        margin-top: 0px;
         border: 1px solid #ccc;
+        color:#fff;
+        background-color: #fd625e;
+        border-radius:5px;
         cursor: pointer;
+        padding-top:7px;
     }
     .btn_round:hover
     {
@@ -473,21 +478,20 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 " style="margin-top: 26px;">
-                                                <!-- <button class="btn_round add_node_btn_frm_field" title="Copy or clone this row">
-                                                    <i class="fas fa-copy"></i>
-                                                </button> -->
-                                                <button class="btn_round remove_node_btn_frm_field" disabled hidden>
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </div>
+                                            
+                                                <div class="form-group col-xxl-1 col-lg-1 col-md-1" style="margin-top: 26px;">
+                                                    <a class="btn_round btn-danger removeButton" id="remove-1" data-index="1">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </a>
+                                                </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-xxl-12 col-lg-12 col-md-12">
-                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn" onclick="clickAdd()"><i class="fa fa-plus" aria-hidden="true"></i> Add</a>
+                                    <a id="add" style="float: right;" class="btn btn-sm btn-info add_new_frm_field_btn" onclick="clickAdd()">
+                                    <i class="fa fa-plus" aria-hidden="true"></i> Add</a>
                                 </div>
                             </div>
                         </div>
@@ -653,8 +657,8 @@
                     $(this).find('.purchase_price_in_USD').attr('id','addon_purchase_price_in_usd_'+ index);
                     $(this).find('.addon-purchase-price').attr('id', 'addon_purchase_price_'+ index);
                     $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
-                    $(this).find('button').attr('data-index', index);
-                    $(this).find('button').attr('id','remove-'+ index);
+                    $(this).find('a').attr('data-index', index);
+                    $(this).find('a').attr('id','remove-'+ index);
                     $('#addon_'+index).select2
                     ({
                         placeholder:"Choose Addon....     Or     Type Here To Search....",
@@ -751,9 +755,9 @@
                                 </div>
                                 </div>
                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1" style="margin-top: 26px;">
-                                    <button class="btn_round btn-danger removeButton" id="remove-${index}" data-index="${index}">
+                                    <a class="btn_round btn-danger removeButton" id="remove-${index}" data-index="${index}">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             `);

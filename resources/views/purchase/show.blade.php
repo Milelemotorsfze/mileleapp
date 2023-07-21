@@ -346,7 +346,7 @@
                                 <th>Payment Status</th>
                                 @endif
                                 @endif
-                                <th id="action" style="vertical-align: middle;">Action</th>
+                                <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -487,8 +487,10 @@
                             <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
                                 @endif
                                 @endif
-                                <td>
-                        <div style="display: flex; gap: 10px;">
+                                <td style ="width:160px;">  
+                                <div class="row">
+        <div class="col-lg-12" style="display: inline-flex;">
+            <div class="col-lg-8">     
                         {{-- For Management  --}}
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
@@ -566,22 +568,6 @@
 										@endif
 										@endif
 							{{-- End For Initiate Payment procurement  --}}
-							{{-- Cancel & Delete for procurement  --}}
-								@php
-								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
-								@endphp
-								@if ($hasPermission)
-								@if ($purchasingOrder->status === 'Approved')
-								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
-									Cancel
-								</a>
-								@elseif ($vehicles->status === 'Pending Approval')
-								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
-									Delete
-								</a>
-								@endif
-								@endif
-							{{-- End Cancel & Delete For Procurement  --}}
 							{{-- For Initiate Payment Finance  --}}
 										@php
 											$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
@@ -624,7 +610,27 @@
 									@endif
 									@endif
 									{{-- End For Amount Debited  --}}
-                            </div>
+									</div>
+                  <div class="col-lg-4">
+								{{-- Cancel & Delete for procurement  --}}
+								@php
+								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
+								@endphp
+								@if ($hasPermission)
+								@if ($purchasingOrder->status === 'Approved')
+								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
+									Cancel
+								</a>
+								@elseif ($vehicles->status === 'Pending Approval')
+								<a title="Delete" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.deletevehicles', $vehicles->id) }}" onclick="return confirmDelete();" style="white-space: nowrap;">
+									Delete
+								</a>
+								@endif
+								@endif
+							{{-- End Cancel & Delete For Procurement  --}}
+              </div>
+              </div>
+							</div>
                         </td>
                         </tr>
                             @endforeach

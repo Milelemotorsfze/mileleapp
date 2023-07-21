@@ -65,7 +65,7 @@
                         </div>
                         @foreach ($movementreference as $movementreference)
                         <tr data-id="1">
-                        <td>{{ date('d-m-Y', strtotime($movementreference->date)) }}</td>
+                        <td>{{ date('d-M-Y', strtotime($movementreference->date)) }} {{ date('H:i:s', strtotime($movementreference->created_at)) }}</td>
                         <td>MOV - {{ $movementreference->id }}</td>
                         @php
                         $created_bys = DB::table('users')->where('id', $movementreference->created_by)->first();
@@ -135,7 +135,7 @@
             $model_detail = '';
         }
     @endphp
-                        <td>{{ date('d-M-Y', strtotime($date)) }}</td>
+                        <td>{{ date('d-M-Y', strtotime($date)) }} {{ date('H:i:s', strtotime($movements->created_at)) }}</td>
                         <td>{{ $movements->vin }}</td>
                         <td>{{ $model_detail }}</td>
                         @php
