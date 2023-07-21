@@ -38,8 +38,9 @@ class MovementController extends Controller
     {
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
-        ->where('payment_status', '==', 'Payment Completed')
-        ->pluck('vin', 'varaints_id');    
+        ->whereNull('gdn_id')
+        ->where('payment_status', '=', 'Incoming Stock')
+        ->pluck('vin');       
     $warehouses = Warehouse::select('id', 'name')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
@@ -59,10 +60,6 @@ class MovementController extends Controller
         $vin = $request->input('vin');
         $from = $request->input('from');
         $to = $request->input('to');
-        foreach ($vin as $index => $value) {
-            if ($from[$index] === $to[$index]) {
-                return back()->withErrors("The 'from' and 'to' values cannot be the same.");
-            } 
         $date = $request->input('date');
         $createdBy = $request->user()->id;
         $movementsReference = new MovementsReference();
@@ -70,6 +67,10 @@ class MovementController extends Controller
         $movementsReference->created_by = $createdBy;
         $movementsReference->save();
         $movementsReferenceId = $movementsReference->id;
+        foreach ($vin as $index => $value) {
+            if ($from[$index] === $to[$index]) {
+                return back()->withErrors("The 'from' and 'to' values cannot be the same.");
+            } 
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
             if ($vehicle && !$vehicle->grn_id) {
                 $grn = new Grn();

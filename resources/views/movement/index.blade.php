@@ -63,7 +63,7 @@
                         <tbody>
                         <div hidden>{{$i=0;}}
                         </div>
-                @foreach ($movementreference as $movementreference)
+                        @foreach ($movementreference as $movementreference)
                         <tr data-id="1">
                         <td>{{ date('d-m-Y', strtotime($movementreference->date)) }}</td>
                         <td>MOV - {{ $movementreference->id }}</td>
@@ -74,7 +74,7 @@
                         <td>{{ $created_by }}</td>
                         <td><a title="Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('movement.show', $movementreference->id) }}"><i class="fa fa-car" aria-hidden="true"></i> View Details</a></td>
                       </tr>
-                @endforeach
+                        @endforeach
                 </tbody>
             </table>
         </div>
@@ -122,9 +122,22 @@
                         $movementdate = DB::table('movements_reference')->where('id', $movements->reference_id)->first();
                         $date = $movementdate ? $movementdate->date : '';
                         @endphp
+                        @php
+        $vehicle = DB::table('vehicles')
+                    ->where('vin', $movements->vin)
+                    ->first();
+        if ($vehicle) {
+            $variant = DB::table('varaints')
+                        ->where('id', $vehicle->varaints_id)
+                        ->first();
+            $model_detail = $variant ? $variant->model_detail : '';
+        } else {
+            $model_detail = '';
+        }
+    @endphp
                         <td>{{ date('d-M-Y', strtotime($date)) }}</td>
                         <td>{{ $movements->vin }}</td>
-                        <td>{{ $movements->vin }}</td>
+                        <td>{{ $model_detail }}</td>
                         @php
                         $locationfrom = DB::table('warehouse')->where('id', $movements->from)->first();
                         $from = $locationfrom ? $locationfrom->name : '';

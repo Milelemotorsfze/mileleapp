@@ -30,24 +30,36 @@ class VehiclesController extends Controller
      */
     public function index(Request $request)
     {
-        $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss);
-        $data = $data->get();
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
+        if ($hasPermission) {
+            $statuss = "Incoming Stock";
+            $data = Vehicles::where('payment_status', $statuss)
+            ->where(function ($query) {
+                // Include vehicles with 'so_id' is null
+                $query->whereNull('so_id')
+                    // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                    ->orWhereHas('So', function ($query) {
+                        $query->where('sales_person_id', Auth::user()->role_id);
+                    });
+            })
+            ->get();
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
-        $varaint = Varaint::get();
+        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
         $sales_persons = ModelHasRoles::get();
         $sales_ids = $sales_persons->pluck('model_id');
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount'));
+        }
+        else{
+            return redirect()->route('home');
+        } 
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -100,9 +112,7 @@ class VehiclesController extends Controller
         $data['steering'] = $variant->steering ?? '';
         $data['upholestry'] = $variant->upholestry ?? '';
         $data['detail'] = $variant->detail ?? '';
-
         return $data;
-
     }
 
     public function updatevehiclesdata(Request $request)

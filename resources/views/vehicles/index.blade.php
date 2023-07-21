@@ -1,6 +1,56 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<style>
+    <style>
+#searchContainer {
+      width: 25%;
+      float: right;
+    }
+
+    #tableSearch {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    /* Custom pagination container styles */
+#paginationContainer {
+  float: right;
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Custom pagination button styles */
+#prevBtn,
+#nextBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+/* Custom page info styles */
+#pageInfo {
+  display: inline-block;
+  padding: 8px;
+  font-size: 14px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0 10px;
+}
+#prevBtn:hover,
+#nextBtn:hover {
+  background-color: #0056b3;
+}
+  .editable-field[contenteditable="true"] {
+    background-color: white !important;
+    border: 1px solid black  !important;
+  }
       .table-responsive {
       overflow: auto;
       max-height: 650px; /* Adjust the max-height to your desired value */
@@ -9,9 +59,9 @@
       position: relative;
     }
     thead th {
-      position: sticky;
+      position: sticky!important;
       top: 0;
-      background-color: rgba(116,120,141,.25)!important;
+      background-color: rgb(194, 196, 204)!important;
       z-index: 1; /* Ensure the table header is on top of other elements */
     }
     #table-responsive {
@@ -78,7 +128,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-header">
-                <h4 class="card-title">View Vehicles Details</h4>
+                <h4 class="card-title">Pending Vehicles Updates</h4>
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
@@ -107,7 +157,10 @@
                         </tbody>
                     </table>
                 </div>
-
+                <div id="searchContainer" class="mb-3">
+      <!-- Add your full-width search bar or input here -->
+      <input type="text" id="tableSearch" placeholder="Search Table">
+    </div>
                 @if (count($errors) > 0)
                     <div class="alert alert-danger">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -193,12 +246,12 @@
                                 @if ($hasPermission)
                                     <th class="nowrap-td">SO Number</th>
                                     <th class="nowrap-td">SO Date</th>
-                                    <th class="nowrap-td">Sales Person</th>
                                     @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                 @endphp
                                 @if ($hasPermission)
+                                <th class="nowrap-td">Sales Person</th>
                                     <th class="nowrap-td">Reservation Date</th>
                                     <th class="nowrap-td">Reservation Due Date</th>
                                 @endif
@@ -206,7 +259,7 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Sales Remarks</th>
+                                    <th id="sales_remarks" style="vertical-align: middle;" class="nowrap-td">Sales Remarks</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
@@ -222,7 +275,7 @@
                                     <th class="nowrap-td">Brand</th>
                                     <th class="nowrap-td">Model Line</th>
                                     <th class="nowrap-td">Model Description</th>
-                                    <th class="nowrap-td">Variant</th>
+                                    <th id="variant" style="vertical-align: middle;" class="nowrap-td">Variant</th>
                                     <th class="nowrap-td">Variant Detail</th>
                                 @endif
                                 @php
@@ -252,8 +305,8 @@
                                     <th class="nowrap-td">Seats</th>
                                     <th class="nowrap-td">Fuel Type</th>
                                     <th class="nowrap-td">Transmission</th>
-                                    <th class="nowrap-td" style="min-width:150px">Ext Colour</th>
-                                    <th class="nowrap-td" style="min-width:150px">Int Colour</th>
+                                    <th class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
+                                    <th class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
                                     <th class="nowrap-td">Upholstery</th>
                                 @endif
                                 @php
@@ -278,7 +331,7 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Warehouse Remarks</th>
+                                    <th id="warehouseremarks" style="vertical-align: middle;" class="nowrap-td">Warehouse Remarks</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
@@ -290,9 +343,9 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
                                 @endphp
                                 @if ($hasPermission)
-                               <th class="nowrap-td">Import Document Type</th>
-                               <th class="nowrap-td">Document Ownership</th>
-                                    <th class="nowrap-td">Documents With</th>
+                               <th id="importdoc" class="nowrap-td" style="vertical-align: middle;">Import Document Type</th>
+                               <th id="ownership" class="nowrap-td" style="vertical-align: middle;">Document Ownership</th>
+                                    <th id="documentwith" class="nowrap-td" style="vertical-align: middle;">Documents With</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
@@ -300,7 +353,7 @@
                                 @if ($hasPermission)
                                     <th class="nowrap-td">BL Number</th>
                                 @endif
-                                    <th class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
+                                    <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
                                </tr>
                             </thead>
                             <tbody>
@@ -418,20 +471,20 @@
                                      @if ($grn_number)
                                      <td class="nowrap-td grnNumber">GRN - {{ $grn_number }}</td>
                                      @else
-                                     <td class="nowrap-td grnNumber">-</td>
+                                     <td class="nowrap-td grnNumber"></td>
                                      @endif
                                      @if ($grn_date)
                                      <td class="nowrap-td grnDate">
                                      {{ date('d-M-Y', strtotime($grn_date)) }}</td>
                                      @else
-                                     <td class="nowrap-td grnDate">-</td>
+                                     <td class="nowrap-td grnDate"></td>
                                     @endif
                                     @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
                                 @endphp
                                 @if ($hasPermission)
                                 <td class="nowrap-td stockstatus">Incoming</td>
-                                @if ($grn_number && $so_number =="")
+                                @if ($gdn_number && $so_number === "")
                                 <td class="nowrap-td stockstatus">Available</td>
                                 @if ($vehicles->reservation_end_date && $vehicles->reservation_end_date->greaterThan(\Carbon\Carbon::now()))
                                   <td class="nowrap-td stockstatus">Booked</td>
@@ -449,8 +502,8 @@
                                     @if ($hasPermission)
                                     <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
                                     @else
-									                  <td>{{ $vehicles->inspection_date }}</td>	
-									                  @endif
+									<td>{{ $vehicles->inspection_date }}</td>	
+									@endif
 									                  @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
@@ -556,12 +609,12 @@
                                      @if ($gdn_number)
                                      <td class="nowrap-td gdnNumber">GDN - {{ $gdn_number }}</td>
                                      @else
-                                     <td class="nowrap-td gdnNumber">-</td>
+                                     <td class="nowrap-td gdnNumber"></td>
                                      @endif
                                          @if ($gdn_date)
                                             <td class="nowrap-td gdnDate">{{ date('d-M-Y', strtotime($gdn_date)) }}</td>
                                             @else
-                                            <td class="nowrap-td gdnDate">-</td>
+                                            <td class="nowrap-td gdnDate"></td>
                                          @endif
                                      @endif
                                      @php
@@ -572,45 +625,38 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
-                                     <td class="nowrap-td brand">
-                                       <span id="brand-{{$vehicles->id}}">  {{ $vehicles->variant->brand->brand_name ?? ''}} </span>
+                                     <td class="nowrap-td brand" id="brand-{{$vehicles->id}}">
+                                        {{ $vehicles->variant->brand->brand_name ?? ''}}
                                      </td>
-                                     <td class="nowrap-td">
-                                       <span id="model-line-{{$vehicles->id}}">
+                                     <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
                                            {{$vehicles->variant->master_model_lines->model_line ?? ''}}
-                                       </span>
                                      </td>
-                                     <td class="nowrap-td">
-                                         <span id="model-description-{{$vehicles->id}}">
+                                     <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
                                              {{ $vehicles->variant->model_detail ?? '' }}
-                                         </span>
                                      </td>
                                      <td class="editable-field varaints_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                    <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
-                                    @foreach($varaint as $variantItem)
-                                                 <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
-                                                     {{ $variantItem->name }}</option>
-                                            @endforeach
-                                    </select>
-                                    </td>
-                                     <td class="nowrap-td">
-                                         <span id="variant-detail-{{ $vehicles->id }}">
+    <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
+        @foreach($varaint as $variantItem)
+            @if ($variantItem->master_model_lines_id == $vehicles->variant->master_model_lines_id)
+                <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                    {{ $variantItem->name }}
+                </option>
+            @endif
+        @endforeach
+    </select>
+</td>
+                                     <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
                                              {{ $vehicles->detail ?? '' }}
-                                         </span>
                                      </td>
                                     @else
-                                      <td class="nowrap-td brand">
-                                       <span id="brand-{{$vehicles->id}}">  {{ $vehicles->variant->brand->brand_name ?? ''}} </span>
+                                      <td class="nowrap-td brand" id="brand-{{$vehicles->id}}">
+                                    {{ $vehicles->variant->brand->brand_name ?? ''}}
                                      </td>
-                                     <td class="nowrap-td">
-                                       <span id="model-line-{{$vehicles->id}}">
+                                     <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
                                            {{$vehicles->variant->master_model_lines->model_line ?? ''}}
-                                       </span>
                                      </td>
-                                     <td class="nowrap-td">
-                                         <span id="model-description-{{$vehicles->id}}">
+                                     <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
                                              {{ $vehicles->variant->model_detail ?? '' }}
-                                         </span>
                                      </td>
                                      <td>
                                     <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
@@ -620,10 +666,8 @@
                                             @endforeach
                                     </select>
                                     </td>
-                                     <td class="nowrap-td">
-                                         <span id="variant-detail-{{ $vehicles->id }}">
+                                     <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
                                              {{ $vehicles->detail ?? '' }}
-                                         </span>
                                      </td>
                                      @endif
 									                    @endif
@@ -667,20 +711,20 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
-                                         								                                         <td class="nowrap-td">
-                                             <span id="my-{{ $vehicles->id }}"> {{ $vehicles->variant->my }}</span>
+                                     <td class="nowrap-td" id="my-{{ $vehicles->id }}">
+                                             {{ $vehicles->variant->my }}
                                          </td>
-                                        <td class="nowrap-td">
-                                            <span id="steering-{{ $vehicles->id }}"> {{ $vehicles->variant->steering }}</span>
+                                        <td class="nowrap-td" id="steering-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->steering }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="seat-{{ $vehicles->id }}"> {{ $vehicles->variant->seat }}</span>
+                                        <td class="nowrap-td" id="seat-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->seat }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="fuel-type-{{ $vehicles->id }}"> {{ $vehicles->variant->fuel_type }}</span>
+                                        <td class="nowrap-td" id="fuel-type-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->fuel_type }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="gearbox-{{ $vehicles->id }}"> {{ $vehicles->variant->gearbox }}</span>
+                                        <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->gearbox }}
                                         </td>
                                         <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
@@ -700,27 +744,27 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="nowrap-td Upholestry">
-                                          <span id="upholestry-{{ $vehicles->id }}"> </span>  {{ $vehicles->variant->upholestry ?? '' }}
+                                        <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
+                                        {{ $vehicles->variant->upholestry ?? '' }}
                                         </td>
 										                    @else
-										                    <td class="nowrap-td">
-                                             <span id="my-{{ $vehicles->id }}"> {{ $vehicles->variant->my }}</span>
+										                    <td class="nowrap-td" id="my-{{ $vehicles->id }}">
+                                        {{ $vehicles->variant->my }}
                                          </td>
-                                        <td class="nowrap-td">
-                                            <span id="steering-{{ $vehicles->id }}"> {{ $vehicles->variant->steering }}</span>
+                                        <td class="nowrap-td" id="steering-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->steering }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="seat-{{ $vehicles->id }}"> {{ $vehicles->variant->seat }}</span>
+                                        <td class="nowrap-td" id="seat-{{ $vehicles->id }}">
+                                        {{ $vehicles->variant->seat }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="fuel-type-{{ $vehicles->id }}"> {{ $vehicles->variant->fuel_type }}</span>
+                                        <td class="nowrap-td" id="fuel-type-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->fuel_type }}
                                         </td>
-                                        <td class="nowrap-td">
-                                            <span id="gearbox-{{ $vehicles->id }}"> {{ $vehicles->variant->gearbox }}</span>
+                                        <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
+                                            {{ $vehicles->variant->gearbox }}
                                         </td>
                                         <td>
-                                        <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
+                                        <select name="ex_colour" class="form-control select2" placeholder="ex_colour" disabled>
                                                 <option value=""></option>
                                                 @foreach($exteriorColours as $exColour)
                                                     <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
@@ -737,8 +781,8 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="nowrap-td Upholestry">
-                                          <span id="upholestry-{{ $vehicles->id }}"> </span>  {{ $vehicles->variant->upholestry ?? '' }}
+                                        <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
+                                        {{ $vehicles->variant->upholestry ?? '' }}
                                         </td>
                                         @endif
 										                    @endif
@@ -750,7 +794,7 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                         @endphp
                                         @if ($hasPermission)
-                                        <td class="editable-field ppmmyyy" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                        <td class="editable-field ppmmyyy" data-is-date="true" data-type="date" contenteditable="false" data-field-name="ppmmyyy" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                                         @else
                                       <td>{{ $vehicles->ppmmyyy }}</td>
                                       @endif
@@ -889,7 +933,7 @@
                                             </select>
                                      {{--{{ $owership }}--}}
                                         </td>
-                                        <td>
+                                        <td class="filterable-column">
                                         <select name="document_with" class="form-control" placeholder="document_with" disabled>
                                                 <option value=""></option>
                                                 <option value="Accounts" {{ $document_with == 'Accounts' ? 'selected' : ''  }}>Accounts</option>
@@ -914,6 +958,12 @@
                             </tbody>
                         </table>
                         </div>
+                        <div id="paginationContainer" class="mt-3">
+      <!-- Custom pagination buttons -->
+      <button id="prevBtn">Previous</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn">Next</button>
+    </div>
                     </div>
             </form>
         @endif
@@ -955,7 +1005,7 @@ console.log(updatedData);
 
       // Display the success flash message on the page
       const flashMessage = document.getElementById('flash-message');
-      flashMessage.textContent = 'Update Data Sucessfully Or Submit The Approval Request Successfully';
+      flashMessage.textContent = 'Record is successfully saved';
       flashMessage.style.display = 'block';
 
       // Hide the success flash message after 5 seconds
@@ -1045,8 +1095,119 @@ updateBtn.addEventListener('click', () => {
 
   updateData(); // Call the function to update the server with the edited data
 });
-
 </script>
+<script>
+  $(document).ready(function() {
+    $('.select2').select2();
 
+    // Table #dtBasicExample2
+    var dataTable = $('#dtBasicExample1').DataTable({
+      "order": [[4, "desc"]],
+      pageLength: 50,
+      initComplete: function() {
+        this.api().columns().every(function(d) {
+          var column = this;
+          var columnId = column.index();
+          var columnName = $(column.header()).attr('id');
+          if (columnName === "sales_remarks") {
+            return;
+          }
+          if (columnName === "int-colour") {
+            return;
+          }
+          if (columnName === "ex-colour") {
+            return;
+          }
+          
+          if (columnName === "importdoc") {
+            return;
+          }
+          if (columnName === "ownership") {
+            return;
+          }
+          if (columnName === "documentwith") {
+            return;
+          }
+          if (columnName === "changelogs") {
+            return;
+          }
+          if (columnName === "variant") {
+            return;
+          }
+          var selectWrapper = $('<div class="select-wrapper"></div>');
+          var select = $('<select class="form-control my-1" multiple></select>')
+            .appendTo(selectWrapper)
+            .select2({
+              width: '100%',
+              dropdownCssClass: 'select2-blue'
+            });
+
+          select.on('change', function() {
+            var selectedValues = $(this).val();
+
+            // Check if the blank option is selected
+            if (selectedValues && selectedValues.includes('')) {
+              column.search('^$', true, false); // Filter blank values
+            } else {
+              column.search(selectedValues ? selectedValues.join('|') : '', true, false); // Filter other selected values
+            }
+
+            column.draw();
+          });
+
+          selectWrapper.appendTo($(column.header()));
+          $(column.header()).addClass('nowrap-td');
+
+          column.data().unique().sort().each(function(d, j) {
+            // Add option for blank value
+            var optionValue = d === null ? '' : d;
+            var optionText = d === null ? 'Blank' : d === '' ? 'Null' : d;
+            select.append('<option value="' + optionValue + '">' + optionText + '</option>');
+          });
+        });
+      }
+    });
+    // Apply search functionality
+    $('#tableSearch').on('keyup', function () {
+        dataTable.search(this.value).draw();
+      });
+      // Hide the default search bar
+      $('#dtBasicExample1_filter').hide();
+      $('#dtBasicExample1_paginate').hide();
+
+// Implement custom pagination
+var currentPage = 0;
+var pageSize = 50; // Set the number of rows per page here
+
+function showPage(page) {
+  dataTable.page(page).draw(false);
+  updatePageInfo();
+}
+
+function updatePageInfo() {
+  var pageInfo = dataTable.page.info();
+  $('#pageInfo').text('Page ' + (currentPage + 1) + ' of ' + pageInfo.pages);
+}
+
+$('#prevBtn').on('click', function (e) {
+  e.preventDefault(); // Prevent default behavior (page reload)
+  if (currentPage > 0) {
+    currentPage--;
+    showPage(currentPage);
+  }
+});
+
+$('#nextBtn').on('click', function (e) {
+  e.preventDefault(); // Prevent default behavior (page reload)
+  if (currentPage < dataTable.page.info().pages - 1) {
+    currentPage++;
+    showPage(currentPage);
+  }
+});
+
+// Initial page info update
+updatePageInfo();
+});
+</script>
    {{--@endif--}}
 @endsection

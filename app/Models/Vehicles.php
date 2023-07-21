@@ -46,6 +46,10 @@ class Vehicles extends Model
     {
         return $this->hasMany(VehicleApprovalRequests::class,'vehicle_id','id');
     }
+    public function so()
+    {
+        return $this->belongsTo(So::class, 'so_id');
+    }
     public function getSimilarVehiclesWithInactiveStockAttribute()
     {
         $vehicles = Vehicles::whereNotNull('gdn_id')

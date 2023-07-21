@@ -42,7 +42,7 @@
         <div class="col-lg-2 col-md-6">
         <span class="error">* </span>
         <label for="basicpill-firstname-input" class="form-label">Date : </label>
-        <input type="Date" id="date" name="date" class="form-control" placeholder="Date" required max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+        <input type="Date" id="date" name="date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
         </div>
         <br>
@@ -104,7 +104,7 @@
         </div>
         </br>
         <div class="col-lg-12 col-md-12">
-        <input type="submit" name="submit" value="Submit" class="btn btn-success btncenter" />
+        <input type="submit" name="submit" value="Submit" onclick="return validateForm();" class="btn btn-success btncenter" />
     </div>
 </form>
 		</br>
@@ -119,7 +119,6 @@
 <script>
     $(document).ready(function() {
         var row = 1;
-        
         $('.add-row-btn').click(function() {
             row++;
             var newRow = `
@@ -225,6 +224,50 @@
             });
         });
     });
+</script>
+<script>
+    // Function to check if VIN is duplicated
+    function isDuplicateVIN(vin) {
+        var vinInputs = document.getElementsByName('vin[]');
+        var count = 0;
+        for (var i = 0; i < vinInputs.length; i++) {
+            if (vinInputs[i].value === vin) {
+                count++;
+            }
+            if (count > 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Function to handle form submission
+    function validateForm() {
+        var vinInputs = document.getElementsByName('vin[]');
+        var uniqueVINs = [];
+
+        for (var i = 0; i < vinInputs.length; i++) {
+            var vin = vinInputs[i].value;
+
+            // Check if VIN is empty or duplicated
+            if (vin === '') {
+                alert('Please select a VIN for all vehicles.');
+                return false;
+            } else if (isDuplicateVIN(vin)) {
+                alert('Duplicate VINs are not allowed. Please select unique VINs.');
+                return false;
+            }
+
+            // Store unique VINs in an array
+            if (!uniqueVINs.includes(vin)) {
+                uniqueVINs.push(vin);
+            }
+        }
+
+        // At this point, all VINs are unique and not empty
+        // You can submit the form or perform any other action here
+        return true;
+    }
 </script>
 @else
     @php
