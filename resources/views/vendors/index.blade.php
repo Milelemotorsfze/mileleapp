@@ -32,13 +32,13 @@
                 <table id="vendor-table" class="table table-striped table-editable table-edits table table-condensed" style="">
                     <thead class="bg-soft-secondary">
                     <tr>
-                        <th>S.NO</th>
+                        <th>Ref.NO</th>
                         <th>Type</th>
                         <th>Trade / Individual Name </th>
                         <th>Category</th>
-                        <th>Nationality</th>
+{{--                        <th>Nationality</th>--}}
                         <th>Email</th>
-                        <th>Mobile</th>
+                        <th>Primary Contact Number</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
@@ -50,8 +50,17 @@
                             <td>{{ ++$i }}</td>
                             <td>{{ $vendor->vendor_type }}</td>
                             <td>{{ $vendor->trade_name_or_individual_name }}</td>
-                            <td>{{ $vendor->category }}</td>
-                            <td>{{ $vendor->nationality  }}</td>
+                            <td>@if($vendor->category == 'vehicle-procurment')
+                                    Vehicle Procurment
+                                @elseif($vendor->category == 'parts-procurment')
+                                    Parts Procurment
+                                @elseif($vendor->category == 'IT')
+                                    IT
+                                @else
+
+                                @endif
+                              </td>
+{{--                            <td>{{ $vendor->nationality  }}</td>--}}
                             <td>{{ $vendor->email }}</td>
                             <td>{{ $vendor->mobile }}</td>
                             <td>
