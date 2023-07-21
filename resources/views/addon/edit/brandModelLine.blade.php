@@ -22,11 +22,13 @@
                             style="width: 100%;" required>
                         </select>
                     </div>
+                    @if($i != 1)
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <button class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
+                    @endif
                 </div>
             </div>
         @else
@@ -67,17 +69,19 @@
                             @endforeach
                         </select>
                     </div>
+                    @if($i != 1)
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <button class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>
+                    @endif
                 </div>
             </div>
         @endforeach
     @endif
 </div>
-    <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12">
+    <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
         <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
     </div>
     <input type="hidden" value="" id="index">
@@ -88,17 +92,29 @@
     $(document).ready(function ()
     {
         lengthExistingBrands = existingBrandModel.length;
-        for(let i=1; i<=lengthExistingBrands; i++)
-        {   
-            $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-            $("#selectBrand"+i).select2({
-                maximumSelectionLength: 1,
-            });
-            $("#selectModelLine"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-            $("#selectModelLine"+i).select2();
+        if(lengthExistingBrands == 0)
+        {
+                $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectBrand1").select2({
+                    maximumSelectionLength: 1,
+                });
+                $("#selectModelLine1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectModelLine1").select2();
         }
-       
-
+        else
+        {
+            let showaddtrim = document.getElementById('showaddtrim');
+            showaddtrim.hidden = false
+            for(let i=1; i<=lengthExistingBrands; i++)
+            {   
+                $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectBrand"+i).select2({
+                    maximumSelectionLength: 1,
+                });
+                $("#selectModelLine"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectModelLine"+i).select2();
+            }
+        }
         $(document.body).on('select2:select', "#selectBrand1", function (e) {
             e.preventDefault();
             var value = $(this).val();

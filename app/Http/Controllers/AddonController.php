@@ -406,6 +406,24 @@ class AddonController extends Controller
             {
                 array_push($existingBrandId,$data->brand_id);
                 $jsonmodelLine = [];
+                $data->ModelLine = AddonTypes::where([
+                    ['addon_details_id','=',$id],
+                    ['brand_id','=',$data->brand_id]
+                    ])->groupBy('model_id')->with('modelLines')->get();
+                    $data->ModelLine->modeldes = [];
+                if($data->is_all_model_lines == 'no')
+                {
+                    foreach($data->ModelLine as $mo)
+                    {
+                        $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
+                        $mo->modeldes = AddonTypes::where([
+                            ['addon_details_id','=',$id],
+                            ['brand_id','=',$mo->brand_id],
+                            ['model_id','=',$mo->model_id],
+                            ])->pluck('model_number');
+                            $mo->modeldes = json_decode($mo->modeldes);  
+                    }
+                }
                 $modelLinesData = AddonTypes::where([
                                                     ['addon_details_id','=',$id],
                                                     ['brand_id','=',$data->brand_id]
@@ -415,6 +433,7 @@ class AddonController extends Controller
                 $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
+        // echo($existingBrandModel);
         $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
@@ -494,6 +513,17 @@ class AddonController extends Controller
             $addon_details->part_number = NULL;
         }
         $addon_details->update();
+        $deleteAddonTypes = [];
+        $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
+        if(count($deleteAddonTypes) > 0)
+        {
+            foreach($deleteAddonTypes as $deleteAddonType)
+            {
+                $deleteAddonType->updated_by = Auth::id();
+                $deleteAddonType->update();
+                $deleteAddonType->delete();
+            }
+        }
             if($request->addon_type == 'SP')
             {
                 if($request->brand)
@@ -561,17 +591,6 @@ class AddonController extends Controller
                 {
                     if(count($request->brandModel) > 0 )
                     {
-                        $deleteAddonTypes = [];
-                        $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
-                        if(count($deleteAddonTypes) > 0)
-                        {
-                            foreach($deleteAddonTypes as $deleteAddonType)
-                            {
-                                $deleteAddonType->updated_by = Auth::id();
-                                $deleteAddonType->update();
-                                $deleteAddonType->delete();
-                            }
-                        }
                         foreach($request->brandModel as $brandModel)
                         {
                             if($brandModel['brand_id'] == 'allbrands')

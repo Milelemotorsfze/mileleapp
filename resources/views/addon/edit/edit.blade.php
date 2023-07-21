@@ -534,7 +534,6 @@
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
-            $('#brandModelNumberId').hide();
             $('.radioFixingCharge').click(function()
             {
                 var addon_type = $("#addon_type").val();
