@@ -58,7 +58,7 @@ class VehiclesController extends Controller
         }
         else{
             return redirect()->route('home');
-        } 
+        }
     }
     /**
      * Show the form for creating a new resource.

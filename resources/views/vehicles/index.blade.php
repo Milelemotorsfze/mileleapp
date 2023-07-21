@@ -502,7 +502,7 @@
                                     @if ($hasPermission)
                                     <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
                                     @else
-									<td>{{ $vehicles->inspection_date }}</td>	
+									<td>{{ $vehicles->inspection_date }}</td>
 									@endif
 									                  @endif
                                     @php
@@ -578,8 +578,8 @@
 									                  <td>
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td>
-                                    {{ $vehicles->reservation_end_date }}</td>	
-									                  @endif	
+                                    {{ $vehicles->reservation_end_date }}</td>
+									                  @endif
                                     @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
@@ -594,13 +594,13 @@
                                                 <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>
-									                @else 
+									                @else
 									                <td>{{$latestRemarkwarehouse}}
                                             @if($latestRemarkwarehouse)
                                                 <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                                             @endif
-                                    </td>	
-									                  @endif	
+                                    </td>
+									                  @endif
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
@@ -635,16 +635,16 @@
                                              {{ $vehicles->variant->model_detail ?? '' }}
                                      </td>
                                      <td class="editable-field varaints_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-    <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
-        @foreach($varaint as $variantItem)
-            @if ($variantItem->master_model_lines_id == $vehicles->variant->master_model_lines_id)
-                <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
-                    {{ $variantItem->name }}
-                </option>
-            @endif
-        @endforeach
-    </select>
-</td>
+                                        <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
+                                            @foreach($varaint as $variantItem)
+                                                @if ($variantItem->master_model_lines_id == $vehicles->variant->master_model_lines_id)
+                                                    <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                                                        {{ $variantItem->name }}
+                                                    </option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </td>
                                      <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
                                              {{ $vehicles->detail ?? '' }}
                                      </td>
@@ -661,9 +661,9 @@
                                      <td>
                                     <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
                                     @foreach($varaint as $variantItem)
-                                                 <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
-                                                     {{ $variantItem->name }}</option>
-                                            @endforeach
+                                         <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                                             {{ $variantItem->name }}</option>
+                                    @endforeach
                                     </select>
                                     </td>
                                      <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
@@ -700,7 +700,7 @@
                                       @if ($hasPermission)
                                       <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
                                      @else
-                                    <td>{{ $vehicles->engine }}</td>	 
+                                    <td>{{ $vehicles->engine }}</td>
                                     @endif
                                     @endif
                                      @php
@@ -819,7 +819,7 @@
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
                                         @endphp
                                         @if ($hasPermission)
-												
+
                                         <td class="editable-field warehouse-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $latestRemarksales }}
                                             @if($latestRemarkwarehouse)
                                                 <a href="{{ route('vehiclesremarks.viewremarks', ['id' => $vehicles->id, 'type' => 'WareHouse'] ) }}" class="read-more" target="_blank">View All</a>
@@ -1118,7 +1118,7 @@ updateBtn.addEventListener('click', () => {
           if (columnName === "ex-colour") {
             return;
           }
-          
+
           if (columnName === "importdoc") {
             return;
           }

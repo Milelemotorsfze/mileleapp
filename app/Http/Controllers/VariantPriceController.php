@@ -93,15 +93,26 @@ class VariantPriceController extends Controller
         foreach ($prices as $key => $price ) {
             $vehicle = Vehicles::find($vehicles[$key]);
 
-            $similarVehicles = Vehicles::where('int_colour',$vehicle->int_colour)
-                ->where('ex_colour', $vehicle->ex_colour)
-                ->where('varaints_id',$vehicle->varaints_id)
-                ->get();
+            $similarVehicles = Vehicles::where('varaints_id',$vehicle->varaints_id);
+            $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id);
+            if($vehicle->int_colour ) {
+                $similarVehicles = $similarVehicles->where('int_colour',$vehicle->int_colour);
+                $available_color = $available_color->where('int_colour', $vehicle->int_colour);
+            }else{
+                $similarVehicles = $similarVehicles->whereNull('int_colour');
+
+            }
+            if($vehicle->ex_colour){
+                $similarVehicles = $similarVehicles->where('ex_colour', $vehicle->ex_colour);
+                $available_color = $available_color->where('ext_colour', $vehicle->ex_colour);
+            }else{
+                $similarVehicles = $similarVehicles->whereNull('ex_colour');
+
+            }
+            $similarVehicles = $similarVehicles->get();
+
             if($price != $vehicle->price) {
-                $available_color = AvailableColour::where('varaint_id', $vehicle->varaints_id)
-                    ->where('int_colour', $vehicle->int_colour)
-                    ->where('ext_colour', $vehicle->ex_colour)
-                    ->first();
+                $available_color = $available_color->first();
 
                 if(empty($available_color)) {
                     $available_color = new AvailableColour();

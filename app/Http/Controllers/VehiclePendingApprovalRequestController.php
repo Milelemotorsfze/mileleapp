@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AvailableColour;
 use App\Models\ColorCode;
 use App\Models\ModelHasRoles;
 use App\Models\So;
@@ -110,12 +111,44 @@ class VehiclePendingApprovalRequestController extends Controller
             $vehicleslog->created_by = auth()->user()->id;
             $vehicleslog->save();
         }
+        if($field == 'ex_colour'){
+            $isPriceAvailable = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+                ->where('int_colour', $vehicle->int_colour)
+                ->where('ext_colour', $pendingApprovalRequest->new_value)
+                ->first();
+            if($isPriceAvailable) {
+                $vehicle->price = $isPriceAvailable->price;
+            }else {
+                $vehicle->price = null;
+            }
+        }
+        if($field == 'int_colour' ){
 
+            $isPriceAvailable = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+                ->where('int_colour', $pendingApprovalRequest->new_value)
+                ->where('ext_colour', $vehicle->ex_colour)
+                ->first();
+            if($isPriceAvailable) {
+                $vehicle->price = $isPriceAvailable->price;
+            }else {
+                $vehicle->price = null;
+            }
+        }
+        if($field == 'varaints_id' ){
+            $isPriceAvailable = AvailableColour::where('varaint_id', $pendingApprovalRequest->new_value)
+                ->where('int_colour', $vehicle->int_colour)
+                ->where('ext_colour', $vehicle->ex_colour)
+                ->first();
+            if($isPriceAvailable) {
+                $vehicle->price = $isPriceAvailable->price;
+            }else {
+                $vehicle->price = null;
+            }
+        }
 
         if( $field == 'so_date')
         {
             $existingSo = So::where('so_date', $oldValue)->first();
-            info("existso date");
             $existingSo->so_date = $newValue;
             $existingSo->save();
 

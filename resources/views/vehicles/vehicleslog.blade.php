@@ -728,12 +728,12 @@
                                         @php
                                             $newExterior = \App\Models\ColorCode::find($vehiclesLog->old_value);
                                         @endphp
-                                        {{ $newExterior->name }}
+                                        {{ $newExterior->name ?? ''}}
                                     @elseif($vehiclesLog->field == 'int_colour')
                                         @php
                                             $newInterior = \App\Models\ColorCode::find($vehiclesLog->old_value);
                                         @endphp
-                                        {{ $newInterior->name }}
+                                        {{ $newInterior->name ?? ''}}
                                     @elseif($vehiclesLog->field == 'varaints_id')
                                         @php
                                             $variant = \App\Models\Varaint::find($vehiclesLog->old_value);
@@ -745,7 +745,7 @@
                                         @endphp
                                         {{ $user->name ?? '' }}
                                     @else
-                                        {{ $vehiclesLog->old_value }}
+                                        {{ $vehiclesLog->old_value ?? ''}}
                                     @endif
                                 </td>
                                 <td>
