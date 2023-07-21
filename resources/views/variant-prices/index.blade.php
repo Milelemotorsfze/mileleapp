@@ -14,10 +14,10 @@
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#active-stock">Active Stock</a>
+                    <a class="nav-link active" data-bs-toggle="pill" href="#active-stock">Active Stock Price</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-bs-toggle="pill" href="#inactive-stock">Inactive Stock</a>
+                    <a class="nav-link" data-bs-toggle="pill" href="#inactive-stock">Inactive Stock Price</a>
                 </li>
             </ul>
         </div>
