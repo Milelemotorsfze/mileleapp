@@ -203,6 +203,7 @@
                             placeholder:"Choose Brands....     Or     Type Here To Search....",
                             allowClear: true,
                             minimumResultsForSearch: -1,
+                            maximumSelectionLength: 1,
                         });
 
                         $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
