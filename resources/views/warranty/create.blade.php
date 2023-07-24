@@ -213,9 +213,9 @@
                                     <span id="SellingPrice1Error" class="invalid-feedback"></span>
                                 </div>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButton" id="remove-1" disabled hidden>
-                                    <i class="fas fa-trash-alt"></i>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
+                                <button type="button" class="btn btn-danger removeButton" id="remove-1" data-index="1" >
+                                    <i class="fa fa-trash"></i>
                                 </button>
                             </div>
                         </div>
@@ -265,32 +265,42 @@
             appendOption(index,data);
         });
         $(document.body).on('click', ".removeButton", function (e) {
-            var indexNumber = $(this).attr('data-index');
+            var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
+                if(countRow > 1)
+                {
+                    var indexNumber = $(this).attr('data-index');
 
-            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-               var id = (this.value);
-               var text = (this.text);
-                addOption(id,text)
-            });
+                    $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = (this.value);
+                    var text = (this.text);
+                        addOption(id,text)
+                    });
 
-            $(this).closest('#row-'+indexNumber).remove();
-            $('.form_field_outer_row').each(function(i){
-               var index = +i + +1;
-                $(this).attr('id','row-'+ index);
-                $(this).find('select').attr('data-index', index);
-                $(this).find('select').attr('id','brands'+ index);
-                $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
-                $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
-                $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
-                $(this).find('button').attr('data-index', index);
-                $(this).find('button').attr('id','remove-'+ index);
-                $('#brands'+index).select2
-                ({
-                    placeholder:"Choose Brands....     Or     Type Here To Search....",
-                    allowClear: true,
-                    minimumResultsForSearch: -1,
-                });
-            });
+                    $(this).closest('#row-'+indexNumber).remove();
+                    $('.form_field_outer_row').each(function(i){
+                    var index = +i + +1;
+                        $(this).attr('id','row-'+ index);
+                        $(this).find('select').attr('data-index', index);
+                        $(this).find('select').attr('id','brands'+ index);
+                        $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
+                        $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
+                        $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
+                        $(this).find('button').attr('data-index', index);
+                        $(this).find('button').attr('id','remove-'+ index);
+                        $('#brands'+index).select2
+                        ({
+                            placeholder:"Choose Brands....     Or     Type Here To Search....",
+                            allowClear: true,
+                            minimumResultsForSearch: -1,
+                        });
+                    });
+                }
+                else
+                {
+                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Price Required',function (e) {
+                   }).set({title:"Can't Remove Brands And Prices"})
+                }
+           
         })
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
