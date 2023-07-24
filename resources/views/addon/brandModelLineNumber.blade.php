@@ -145,8 +145,10 @@
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
-            var data = e.params.data;
-            modelLineDataAppend(index,modelIndex,data);
+            var id = e.params.value;
+            var text = e.params.text;
+
+            modelLineDataAppend(index,modelIndex,id,text);
         });
 
 
@@ -160,12 +162,12 @@
                 }
             }
         }
-        function modelLineDataAppend(index,modelIndex,data) {
+        function modelLineDataAppend(index,modelIndex,id,text) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != modelIndex) {
                     var currentId = 'selectModelLineNum'+ index +'Des' + i;
-                    $('#'+currentId).append($('<option>', {value: data.id, text : data.text}))
+                    $('#'+currentId).append($('<option>', {value: id, text : text}))
                 }
             }
         }
@@ -182,6 +184,10 @@
                 if(countRow > 1)
                 {
                     var indexNumber = $(this).attr('data-index');
+
+                    if(indexNumber == 1) {
+                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+                    }
 
                     $(this).closest('#row-addon-brand-'+indexNumber).find("option:selected").each(function() {
                         var id = (this.value);
@@ -258,12 +264,15 @@
                 var countRow = $(".MoDes"+indexNumber).find(".MoDesApndHere"+indexNumber).length;
                 if(countRow > 1)
                 {
-
                     var modelIndex = $(this).attr('data-model-index');
+                    if(modelIndex == 1) {
+                        $('<option value="allmodellines"> All Model Lines </option>').prependTo('#selectModelLineNum'+indexNumber+'Des2');
+                    }
+
                     $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
                         var id = (this.value);
                         var text = (this.text);
-                        // addOption(id,text)
+                        modelLineDataAppend(indexNumber,modelIndex,id,text)
                     });
                     $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
                     $('.MoDesApndHere'+indexNumber).each(function(i){
