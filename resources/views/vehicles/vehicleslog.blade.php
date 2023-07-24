@@ -115,8 +115,8 @@
     $latestRemark = DB::table('vehicles_remarks')->where('vehicles_id', $vehicle->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
     @endphp
     <div class="bordered-section">
-    <div class="row">
-    <div class="col-sm-3">
+        <div class="row">
+            <div class="col-sm-3">
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
         @endphp
@@ -151,12 +151,12 @@
        </div>
        @endif
     </div>
-    <div class="col-sm-3">
-        <div class="row">
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
-            @endphp
-            @if ($hasPermission)
+            <div class="col-sm-3">
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="row">
                 <div class="col-lg-4 label">
                     <strong>Estimated Arrival:</strong>
                 </div>
@@ -167,13 +167,13 @@
                         {{$vehicle->estimation_date}}
                     @endif
                 </div>
-             @endif
-        </div>
-        <div class="row">
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
-            @endphp
-            @if ($hasPermission)
+            </div>
+         @endif
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="row">
                 <div class="col-lg-4 label">
                     <strong> ETA Timer:</strong>
                 </div>
@@ -188,8 +188,8 @@
                     @else
                      @endif
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
         @endphp
@@ -223,72 +223,71 @@
         </div>
         @endif
     </div>
-
-    <div class="col-sm-3">
-        @php
-            $hasPermissionGrn = Auth::user()->hasPermissionForSelectedRole('grn-view');
-        @endphp
-        @if ($hasPermissionGrn)
-        <div class="row">
-            <div class="col-lg-4 label">
-                <strong>GRN Number:</strong>
-            </div>
-            <div class="col-lg-8 value">
-                {{$grn_number}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-4 label">
-                <strong>GRN Date:</strong>
-            </div>
-            <div class="col-lg-8 value">
-                {{$grn_date}}
-            </div>
-        </div>
-        @endif
-        <div class="row">
+            <div class="col-sm-3">
             @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                $hasPermissionGrn = Auth::user()->hasPermissionForSelectedRole('grn-view');
             @endphp
-            @if ($hasPermission)
+            @if ($hasPermissionGrn)
+            <div class="row">
                 <div class="col-lg-4 label">
-                    <strong>Inspection Date:</strong>
+                    <strong>GRN Number:</strong>
                 </div>
                 <div class="col-lg-8 value">
-                    {{$vehicle->inspection_date}}
+                    {{$grn_number}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 label">
+                    <strong>GRN Date:</strong>
+                </div>
+                <div class="col-lg-8 value">
+                    {{$grn_date}}
+                </div>
+            </div>
+            @endif
+            <div class="row">
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
+                @endphp
+                @if ($hasPermission)
+                    <div class="col-lg-4 label">
+                        <strong>Inspection Date:</strong>
+                    </div>
+                    <div class="col-lg-8 value">
+                        {{$vehicle->inspection_date}}
+                    </div>
+                @endif
+            </div>
+        </div>
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+            @endphp
+            @if ($hasPermission)
+                <div class="col-sm-3">
+                    <div class="row">
+                        <div class="col-lg-4 label">
+                            <strong>GDN Number:</strong>
+                        </div>
+                        <div class="col-lg-8 value">
+                            {{$gdn_number}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 label">
+                            <strong>GDN Date:</strong>
+                        </div>
+                        <div class="col-lg-8 value">
+                            {{$gdn_date}}
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>
     </div>
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
-        @endphp
-        @if ($hasPermission)
-        <div class="col-sm-3">
-            <div class="row">
-                <div class="col-lg-4 label">
-                    <strong>GDN Number:</strong>
-                </div>
-                <div class="col-lg-8 value">
-                    {{$gdn_number}}
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-4 label">
-                    <strong>GDN Date:</strong>
-                </div>
-                <div class="col-lg-8 value">
-                    {{$gdn_date}}</div>
-                </div>
-            </div>
-        </div>
-        @endif
-    </div>
-    </div>
 <br>
-<div class="bordered-section">
-  <div class="row">
-      <div class="col-sm-3">
+    <div class="bordered-section">
+        <div class="row">
+            <div class="col-sm-3">
           @php
               $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
           @endphp
@@ -306,57 +305,57 @@
                         <strong>SO Date:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                    {{$so_date}}
+                        {{$so_date}}
                     </div>
               </div>
           @endif
       </div>
-      @php
-          $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
-      @endphp
-      @if ($hasPermission)
-          <div class="col-sm-3">
-                <div class="row">
-                    <div class="col-lg-4 label">
-                        <strong>Sales Person:</strong>
-                    </div>
-                    <div class="col-lg-8 value">
-                        @if ($salesPersonName)
-                            {{ $salesPersonName }}
-                        @else
-                         @endif
+              @php
+                  $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
+              @endphp
+              @if ($hasPermission)
+                  <div class="col-sm-3">
+                        <div class="row">
+                            <div class="col-lg-4 label">
+                                <strong>Sales Person:</strong>
+                            </div>
+                            <div class="col-lg-8 value">
+                                @if ($salesPersonName)
+                                    {{ $salesPersonName }}
+                                @else
+                                 @endif
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-4 label">
+                                <strong>Reservation Date:</strong>
+                            </div>
+                            <div class="col-lg-8 value">
+                                @if($vehicle->reservation_start_date)
+                                    {{ date('d-M-Y', strtotime($vehicle->reservation_start_date)) }}
+                                @else
+                                    {{$vehicle->reservation_start_date}}
+                              @endif
+                            </div>
+                        </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <div class="row">
+                        <div class="col-lg-4 label">
+                            <strong>Due Date:</strong>
+                         </div>
+                        <div class="col-lg-8 value">
+                            @if($vehicle->reservation_end_date)
+                                {{ date('d-M-Y', strtotime($vehicle->reservation_end_date)) }}
+                            @else
+                                {{$vehicle->reservation_end_date}}
+                           @endif
+                        </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-4 label">
-                        <strong>Reservation Date:</strong>
-                    </div>
-                    <div class="col-lg-8 value">
-                        @if($vehicle->reservation_start_date)
-                            {{ date('d-M-Y', strtotime($vehicle->reservation_start_date)) }}
-                        @else
-                            {{$vehicle->reservation_start_date}}
-                      @endif
-                    </div>
-                </div>
-          </div>
-         <div class="col-sm-3">
-            <div class="row">
-                <div class="col-lg-4 label">
-                    <strong>Due Date:</strong>
-                 </div>
-                <div class="col-lg-8 value">
-                    @if($vehicle->reservation_end_date)
-                        {{ date('d-M-Y', strtotime($vehicle->reservation_end_date)) }}
-                    @else
-                        {{$vehicle->reservation_end_date}}
-                   @endif
-                </div>
-            </div>
+              @endif
         </div>
-         @endif
-      </div>
-  </div>
+    </div>
   <br>
   <div class="bordered-section">
   <div class="row">
@@ -473,115 +472,154 @@
          @endif
     </div>
     <div class="col-sm-3">
-    <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Steering:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$varaints_steering}}</div>
-        </div>
-        <div class="row">
-        <div class="col-lg-4 label">
-        <strong>Fuel Type:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$varaints_fuel_type}}</div>
-        </div>
-        <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Transmission:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$varaints_gearbox}}</div>
-        </div>
-        <div class="row">
-        <div class="col-lg-4 label">
-        <strong>Seats:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$varaints_seat}}</div>
-        </div>
-        <div class="row">
-        <div class="col-lg-4 label">
-        <strong>Price:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$vehicle->price}}</div>
-        </div>
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="row">
+            <div class="col-lg-4 label">
+            <strong> Steering:</strong>
+                 </div>
+            <div class="col-lg-8 value">
+                {{$varaints_steering}}</div>
+            </div>
+            <div class="row">
+            <div class="col-lg-4 label">
+            <strong>Fuel Type:</strong>
+                 </div>
+            <div class="col-lg-8 value">
+                {{$varaints_fuel_type}}</div>
+            </div>
+            <div class="row">
+            <div class="col-lg-4 label">
+            <strong> Transmission:</strong>
+                 </div>
+            <div class="col-lg-8 value">
+                {{$varaints_gearbox}}</div>
+            </div>
+            <div class="row">
+            <div class="col-lg-4 label">
+            <strong>Seats:</strong>
+                 </div>
+            <div class="col-lg-8 value">
+                {{$varaints_seat}}</div>
+            </div>
+        @endif
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="row">
+                <div class="col-lg-4 label">
+                    <strong>Price:</strong>
+                </div>
+                <div class="col-lg-8 value">
+                {{$vehicle->price}}</div>
+            </div>
+        @endif
     </div>
     <div class="col-sm-3">
-    <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Exterior Colour:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$ex_colours}}</div>
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
+        @endphp
+        @if ($hasPermission)
+        <div class="row">
+            <div class="col-lg-4 label">
+                <strong> Exterior Colour:</strong>
+            </div>
+            <div class="col-lg-8 value">
+                {{$ex_colours}}
+            </div>
         </div>
         <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Interior Colour:</strong>
+            <div class="col-lg-4 label">
+                <strong> Interior Colour:</strong>
              </div>
-        <div class="col-lg-8 value">
-            {{$int_colours}}</div>
+            <div class="col-lg-8 value">
+                {{$int_colours}}
+            </div>
         </div>
         <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Upholstery:</strong>
+            <div class="col-lg-4 label">
+                <strong> Upholstery:</strong>
              </div>
-        <div class="col-lg-8 value">
-            {{$varaints_upholestry}}</div>
+            <div class="col-lg-8 value">
+                {{$varaints_upholestry}}
+            </div>
         </div>
+        @endif
       </div>
   </div>
 </div>
   <br>
   <div class="bordered-section">
-<div class="row">
-<div class="col-sm-3">
-<div class="row">
-        <div class="col-lg-4 label">
-        <strong> Warehouse:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$warehouses}}</div>
+     <div class="row">
+        <div class="col-sm-3">
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
+            @endphp
+            @if ($hasPermission)
+                <div class="row">
+                    <div class="col-lg-4 label">
+                        <strong> Warehouse:</strong>
+                    </div>
+                    <div class="col-lg-8 value">
+                        {{$warehouses}}
+                    </div>
+                </div>
+            @endif
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
+            @endphp
+            @if ($hasPermission)
+                <div class="row">
+                    <div class="col-lg-4 label">
+                        <strong> BL Number:</strong>
+                    </div>
+                    <div class="col-lg-8 value">
+                        {{$bl_number}}
+                    </div>
+                </div>
+            @endif
         </div>
-        <div class="row">
-        <div class="col-lg-4 label">
-        <strong> BL Number:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$bl_number}}</div>
-        </div>
-      </div>
-  <div class="col-sm-3">
-  <div class="row">
-        <div class="col-lg-4 label">
-        <strong>Import Doc Type:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$import_type}}</div>
-        </div>
+         @php
+             $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
+         @endphp
+         @if ($hasPermission)
+            <div class="col-sm-3">
+                <div class="row">
+                    <div class="col-lg-4 label">
+                        <strong>Import Doc Type:</strong>
+                         </div>
+                    <div class="col-lg-8 value">
+                        {{$import_type}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="row">
+                    <div class="col-lg-4 label">
+                        <strong> Doc Owership:</strong>
+                    </div>
+                    <div class="col-lg-8 value">
+                        {{$owership}}
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3">
+                <div class="row">
+                    <div class="col-lg-4 label">
+                        <strong> Doc With:</strong>
+                    </div>
+                    <div class="col-lg-8 value">
+                        {{$document_with}}
+                    </div>
+                </div>
+            </div>
+         @endif
+    </div>
   </div>
-  <div class="col-sm-3">
-  <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Doc Owership:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$owership}}</div>
-        </div>
-  </div>
-  <div class="col-sm-3">
-  <div class="row">
-        <div class="col-lg-4 label">
-        <strong> Doc With:</strong>
-             </div>
-        <div class="col-lg-8 value">
-            {{$document_with}}</div>
-        </div>
-  </div>
-</div>
-</div>
+
   <br>
   <br>
     @php
@@ -775,7 +813,6 @@
                                                                         <label class="form-label font-size-13 text-center">Old Value</label>
                                                                     </div>
                                                                     <div class="col-lg-9 col-md-12 col-sm-12">
-
 
                                                                         <input type="text" value="{{  $old_value ?? ''}}"
                                                                                class="form-control" readonly >

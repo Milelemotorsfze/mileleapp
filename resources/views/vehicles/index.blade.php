@@ -521,7 +521,7 @@
                                     @if ($hasPermission)
                                     <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
                                     @else
-									                  <td>{{ $vehicles->inspection_date }}</td>	
+									                  <td>{{ $vehicles->inspection_date }}</td>
 									                  @endif
 									                  @endif
                                                                           @php
@@ -573,11 +573,11 @@
                                     @if ($hasPermission)
                                      <td class="editable-field so_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $so_number }}</td>
                                      <td class="editable-field so_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="so_date">{{ $so_date }}</td>
-									                   @else
-									                   <td>{{ $so_number }}</td>
+									 @else
+									 <td>{{ $so_number }}</td>
                                      <td>{{ $so_date }}</td>
                                      @endif
-									                   @endif
+									 @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                     @endphp
