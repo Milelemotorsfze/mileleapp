@@ -238,12 +238,11 @@
                                 placeholder: 'Choose Model Description....     Or     Type Here To Search....',
                                 allowClear: true,
                             });
+                            $(this).find('#removeModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'removeModelNumberdrop'+ index +'Des'+i);
 
                         }
                         $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
                         $(this).find(".MoDesApndHere"+oldIndex).attr('class', "row MoDesApndHere"+index);
-                        $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
-                        
                     });
                 }
                 else
