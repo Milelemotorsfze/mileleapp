@@ -76,7 +76,7 @@ th.nowrap-td {
         <div class="col-lg-9 col-md-9 col-sm-12">
         <table id="dtBasicExample21" class="table table-striped table-editable table-edits table table-bordered table-sm">
         <thead>
-       <th style="font-size: 12px;">New Purchase Order</th>
+       <th style="font-size: 12px;">Not Approved Purchase Order</th>
        <th style="font-size: 12px;">Approved Purchase Order</th>
        <th style="font-size: 12px;">In-Progress Purchase Order</th>
        <th style="font-size: 12px;">Closed Purchase Order</th>

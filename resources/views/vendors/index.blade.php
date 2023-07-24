@@ -33,8 +33,8 @@
                     <thead class="bg-soft-secondary">
                     <tr>
                         <th>Ref.NO</th>
+                        <th>Individual/ Company Name </th>
                         <th>Type</th>
-                        <th>Trade / Individual Name </th>
                         <th>Category</th>
 {{--                        <th>Nationality</th>--}}
                         <th>Email</th>
@@ -48,8 +48,8 @@
                     @foreach ($vendors as $key => $vendor)
                         <tr>
                             <td>{{ ++$i }}</td>
-                            <td>{{ $vendor->vendor_type }}</td>
                             <td>{{ $vendor->trade_name_or_individual_name }}</td>
+                            <td>{{ $vendor->vendor_type }}</td>
                             <td>@if($vendor->category == 'vehicle-procurment')
                                     Vehicle Procurment
                                 @elseif($vendor->category == 'parts-procurment')
@@ -83,21 +83,3 @@
         </div>
 {{--    @endcan--}}
 @endsection
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

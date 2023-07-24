@@ -99,6 +99,8 @@ class MovementController extends Controller
             $movement->to = $to[$index];
             $movement->reference_id = $movementsReferenceId;
             $movement->save();
+            $vehicle->latest_location = $to[$index];
+            $vehicle->save();
         }
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')

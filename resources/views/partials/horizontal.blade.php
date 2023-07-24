@@ -38,7 +38,7 @@
     <div class="dropdown-menu">
         @foreach ($assignedRoles as $role)
             <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
-                <i class="fa fa-users" aria-hidden="true"></i> {{ $role->name }}
+                <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
             </a>
             <div class="dropdown-divider"></div>
         @endforeach

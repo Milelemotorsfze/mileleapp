@@ -108,7 +108,6 @@ class PurchasingOrderController extends Controller
             ->select('purchasing_order.*')
             ->groupBy('purchasing_order.id')
             ->get();
-    
         return view('warehouse.index', compact('data'));
     }
     public function filterpaymentrel($status)

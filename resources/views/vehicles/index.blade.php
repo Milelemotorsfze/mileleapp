@@ -130,14 +130,12 @@
             <div class="card-header">
                 <h4 class="card-title">Pending Vehicles Updates</h4>
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
+                <div class="row">
                 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
-                     'vehicles-detail-edit','enginee-edit','document-edit','edit-so','edit-reservation']);
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warehouse-edit','conversion-edit',
+                     'document-edit','edit-so','edit-reservation']);
                 @endphp
                 @if ($hasPermission)
-                <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                    <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
-                @endif
                 <div class="col-lg-3 col-md-3 col-sm-12 table-responsive">
                     <table class="table table-striped table-editable table-edits table table-bordered">
                         <thead>
@@ -157,6 +155,81 @@
                         </tbody>
                     </table>
                 </div>
+                @endif
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-striped table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
+      </tr>
+      <tr>
+      @foreach ($warehouses as $warehouses)
+        <th style="font-size: 12px;">{{$warehouses->name}}</th>
+       @endforeach
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;">
+            Pending Inspection
+        </td>
+        @php
+        $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+        @endphp
+        @foreach ($warehousesveh as $warehousesveh)
+        @php
+        $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
+            ->whereNull('inspection_date')
+            ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehicleinspectionpending.pendinginspection', ['warehouse_id' => $warehousesveh->id]) }}'" style="font-size: 12px;">{{ $pendinginspection }}</td>
+        @endforeach
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+            Pending Inspection Approval
+        </td>
+        @foreach ($warehousesveher as $warehousesveher)
+        @php
+        $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
+        $countpendings = DB::table('vehicles')
+        ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
+        ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
+        ->where('vehicles.latest_location', '=', $warehousesveher->id)
+        ->where(function ($query) use ($fieldValues) {
+        $query->whereIn('field', $fieldValues);
+         })
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehicleinspectionapprovals.pendingapprovals', ['warehouse_id' => $warehousesveher->id]) }}'" style="font-size: 12px;">{{ $countpendings }}</td>
+        @endforeach
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+            Incoming Stock
+        </td>
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+@endif
+  </div>
+  @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
+                     'vehicles-detail-edit','enginee-edit','document-edit','edit-so','edit-reservation']);
+                @endphp
+                @if ($hasPermission)
+                <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
+                <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
+                @endif
+                <br>
+                <br>
                 <div id="searchContainer" class="mb-3">
       <!-- Add your full-width search bar or input here -->
       <input type="text" id="tableSearch" placeholder="Search Table">
@@ -353,7 +426,7 @@
                                 @if ($hasPermission)
                                     <th class="nowrap-td">BL Number</th>
                                 @endif
-                                    <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Changes Log</th>
+                                    <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Details</th>
                                </tr>
                             </thead>
                             <tbody>
@@ -464,7 +537,7 @@
                                                   @endphp
                                 <td class="nowrap-td eta">$numberOfDayseta</td>
                                 @elseif($grn_number)
-                                <td class="nowrap-td eta">Already Arrived</td>
+                                <td class="nowrap-td eta">Arrived</td>
                                 @else
                                 <td class="nowrap-td eta">Incoming</td>
                                 @endif
@@ -988,7 +1061,7 @@
                                         @if ($hasPermission)
                                         <td class="editable-field bl_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$bl_number}}</td>
                                        @endif
-                                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Log</a></td>
+                                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Details</a></td>
                                     </tr>
                                 @endforeach
                             </tbody>

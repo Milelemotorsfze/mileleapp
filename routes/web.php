@@ -316,6 +316,9 @@ Route::get('/d', function () {
     Route::get('/purcahsing-order-filterapproved/{status}', [PurchasingOrderController::class, 'filterapproved'])->name('purchasing.filterapproved');
     Route::get('/purcahsing-order-filterapprovedonly/{status}', [PurchasingOrderController::class, 'filterapprovedonly'])->name('purchasing.filterapprovedonly');
     Route::get('/purcahsing-order-filterincomings/{status}', [PurchasingOrderController::class, 'filterincomings'])->name('purchasing.filterincomings');
+    Route::get('/vehicleinspectionapprovals', [VehiclesController::class, 'pendingapprovals'])->name('vehicleinspectionapprovals.pendingapprovals');
+    Route::get('/vehicleinspectionpending', [VehiclesController::class, 'pendinginspection'])->name('vehicleinspectionpending.pendinginspection');
+    Route::get('/vehicleincomingstock', [VehiclesController::class, 'incomingstocks'])->name('vehiclesincoming.stock');
     // Vendors
 
     Route::resource('vendors', VendorController::class);
