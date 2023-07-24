@@ -86,7 +86,6 @@
                                 @endcan
                                 <th>Fixing Charge</th>
                                 <th>Part Number</th>
-                                <th>Payment Condition</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -169,7 +168,6 @@
                                             @endif
                                         </td>
                                         <td>{{$addonsdata->part_number}}</td>
-                                        <td>{{$addonsdata->payment_condition}}</td>
                                         <td>
                                         @include('addon.action.tableAddSellingPrice')
                                         @include('addon.action.action')
@@ -259,7 +257,6 @@
                                                 @endif
                                             </td>
                                             <td>{{$addonsdata->part_number}}</td>
-                                            <td>{{$addonsdata->payment_condition}}</td>
                                             <td>
                                             @include('addon.action.modelAddonSellingPrice')
                                             @include('addon.action.action')
