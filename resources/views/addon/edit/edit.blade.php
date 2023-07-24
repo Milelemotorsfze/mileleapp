@@ -89,6 +89,7 @@
         background-color: #fd625e;
         border-radius:5px;
         cursor: pointer;
+        padding-top:7px;
     }
     .btn_round:hover 
     {
@@ -280,22 +281,6 @@
                                 </span>
                             @enderror
                         </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="payment_condition" class="col-form-label text-md-end">{{ __('Payment Condition') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="payment_condition" type="text" class="form-control widthinput @error('payment_condition') is-invalid @enderror" 
-                            name="payment_condition" placeholder="Enter Payment Condition" value="{{ $addonDetails->payment_condition }}"  autocomplete="payment_condition" 
-                            autofocus>
-                            @error('payment_condition')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    </br>
-                    <div class="row">
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
@@ -316,6 +301,23 @@
                                     </span>
                                 @enderror
                             </div>
+                    </div>
+                    </br>
+                    <div class="row">
+                    <div class="col-xxl-2 col-lg-6 col-md-12" id="partNumberDiv">
+                            <span class="error">* </span>
+                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-6 col-md-12" id="partNumberDivBr">
+                            <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
+                            value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
+                            @error('part_number')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                            <span id="partNumberError" class="invalid-feedback partNumberError"></span>
+                        </div>
                             <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
                             <span class="error">* </span>
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
@@ -335,40 +337,10 @@
                             @enderror
                             <span id="fixingChargeAmountError" class="invalid-feedback"></span>
                         </div>
-                        </br>
-                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="partNumberDiv">
-                            <span class="error">* </span>
-                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="partNumberDivBr">
-                        <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
-                        value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
-                            @error('part_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="partNumberError" class="invalid-feedback partNumberError"></span>
-                        </div>
+                        
+                       
                     </div>
                     </br>
-                    <div class="row" hidden id="rowPartNumber">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <input id="part_numberRaw" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number" 
-                            value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
-                            @error('part_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="partNumberError1" class="invalid-feedback partNumberError"></span>
-                        </div>
-                    </div>
-                    <br hidden id="rowPartNumberBr">
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
@@ -544,31 +516,9 @@
                     showFixingChargeAmount.hidden = true
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
                     showFixingChargeAmountBr.hidden = true
-                    if(addon_type != '' && addon_type == 'SP')
-                    {
-                        let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = false
-                        let showPartNumberBr = document.getElementById('partNumberDivBr');
-                        showPartNumberBr.hidden = false
-                        let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = true
-                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
-                        showrowPartNumberBr.hidden = true
-                    }
                 }
                 else
                 {
-                    if(addon_type != '' && addon_type == 'SP')
-                    {
-                        let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = true
-                        let showPartNumberBr = document.getElementById('partNumberDivBr');
-                        showPartNumberBr.hidden = true
-                        let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = false
-                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
-                        showrowPartNumberBr.hidden = false
-                    }
                     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
                     showFixingChargeAmount.hidden = false
                     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
@@ -604,77 +554,6 @@
                     $('#addnewAddonButton').show();
                 }
             });
-           
-            // $('#submit').click(function()
-            // {
-            //     var value = $('#addon_id').val();
-            //     var a = $('#cityname [value="' + value + '"]').data('value');
-            //     $('#addon_name').val(a);
-            // });
-            // var j=1;
-
-            //    $('#add').click(function()
-            //    {
-            //         $('.allbrands').prop('disabled',true);
-            //        // globalThis.selectedBrands = [];
-            //        // console.log(globalThis.selectedBrands);
-            //        for (let j = 1; j <= i; j++)
-            //        {
-            //             var value =$('#selectBrand'+j).val();
-            //             // globalThis.selectedBrands .push(value);
-            //             $('.'+value).prop('disabled',true);
-            //             // globalThis.selectedBrands = [];
-            //             // globalThis.selectedBrands.push(a);
-            //        }
-            //        //         $.each(data.existingSuppliers,function(key,value)
-            //        //         {
-            //        //             var a = value.supplier_id;
-            //        //             selectedBrands.push(a);
-            //        // // $("#city-dropdown").append('<option value="'+value.id+'">'+value.name+'</option>');
-            //        // });
-            //        // var brandvalue = $('#selectBrand').val();
-
-            //        // var a = $('#cityname [value="' + brandvalue + '"]').data('value');
-            //        // $('#addon_name').val(a);
-            //        var selectBrand = $("#selectBrand1").val();
-            //        i++;
-            //        // onChange="get_data('+i+')"
-            //        var selectBrand = $("#selectModelLine").val();
-            //        // i++;
-            //        var html = '';
-            //        html += '</br>';
-            //        html += '<div id="row'+i+'" class="dynamic-added">';
-            //        html += '<div class="row">';
-            //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-            //        html += '<div class="row">';
-            //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-            //        html += '<select onchange=selectBrand(this.id) name="br[]" id="selectBrand'+i+'" multiple="true" style="width: 100%;">';
-            //        html += '@foreach($brands as $brand)';
-            //        html += '<option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>';
-            //        html += '@endforeach';
-            //        html += '</select>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        html += '<div class="col-xxl-5 col-lg-5 col-md-10">';
-            //        html += '<div class="row">';
-            //        html += '<div class="col-xxl-12 col-lg-12 col-md-12">';
-            //        html += '<input list="" id="addon_name1" type="text" class="form-control widthinput @error('addon_name') is-invalid @enderror" name="model[]" placeholder="Choose Model Line" value=""  autocomplete="addon_name" autofocus>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        html += '<div class="col-xxl-1 col-lg-1 col-md-2">';
-            //        html += '<a id="'+i+'" style="float: right;" class="btn btn-sm btn-danger btn_remove"><i class="fa fa-minus" aria-hidden="true"></i> Remove</a>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        html += '</div>';
-            //        $('#dynamic_field').append(html);
-            //        $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-            //         $("#selectBrand"+i).select2({
-            //             maximumSelectionLength: 1,
-            //         });
-            //    });
-
            $(document).on('click', '.btn_remove', function()
             {
                 var button_id = $(this).attr("id");
@@ -699,29 +578,6 @@
                     $('#' + modalId).removeClass('modalhide');
                 }
             });
-            // $('.modal-button').on('click', function()
-            // {alert('hhh');
-            //     currentAddonType =  $('#addon_type').val();
-            //     if(currentAddonType == '')
-            //     {
-            //         document.getElementById("AddonTypeError").classList.add("paragraph-class");
-            //         document.getElementById("AddonTypeError").textContent="Please select addon type before create new addon";
-            //     }
-            //     else
-            //     {
-            //         $("#addon_id").val('');
-            //         var modalId = $(this).data('modal-id');
-            //         $('#' + modalId).addClass('modalshow');
-            //         $('#' + modalId).removeClass('modalhide');
-            //     }
-            // });
-            // $('.close').on('click', function()
-            // {
-            //     // alert('hii');
-            //     $('.overlay').hide();
-            //     $('.modal').addClass('modalhide');
-            //     $('.modal').removeClass('modalshow');
-            // });
         });
         $('form').on('submit', function (e) 
         {
@@ -1112,15 +968,6 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
         }
-                        // $("#supplierArray"+index).select2();
-
-
-        // $('.close').on('click', function()
-        // {alert('jj');
-        //     $('.modal').addClass('modalhide');
-        //     $('.modal').removeClass('modalshow');
-        // });
-
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
@@ -1133,27 +980,6 @@
             $('#showImageModal').removeClass('modalhide');
             modalImg.src = img.src;
         }
-        
-
-
-            //         function changeAddon(i)
-            //         {
-            //             var eachSelected = [];
-
-            //                 var eachSelected = $('#adoon_'+i).select2().val();
-            //                 // globalThis.selectedSuppliers[i] = [];
-            //                 $.each(eachSelected, function( ind, value ) {
-            //                     // globalThis.selectedSuppliers[i] .push(value);
-            //                     globalThis.selectedSuppliers .push(value);
-            //             //     //
-            //                 // alert( index + ": " + value );
-            // //                 $("#adoon_1").find(':selected').attr('disabled','disabled');
-            // // $("#adoon_1").trigger('change');
-            // // $("#adoon_2").find(':selected').attr('disabled','disabled');
-            // // $("#adoon_2").trigger('change');
-            //                 });
-                    // }
-
         function getAddonCodeAndDropdown()
         {
             var e = document.getElementById("addon_type");
@@ -1174,19 +1000,6 @@
                 $msg = "";
                 removeAddonTypeError($msg);
                 // document.getElementById("addon_type_required").hidden = true;
-                if(currentAddonType == 'SP' && ifModelLineExist != '')
-                {
-                    // alert('ji');
-                    
-                    
-                    // showModelNumberDropdown(id,row);
-                   
-                }
-                else
-                {
-                    // hideModelNumberDropdown(id,row);
-                    
-                }
                 if(value == 'SP' )
                 {
                     $("#brandModelLineId").hide();
@@ -1194,35 +1007,10 @@
                     document.getElementById("brandModelNumberId").hidden = false;
                     $("#showaddtrim").hide();
                     $("#showaddtrimDis").show();
-                    if(fixingCharge == 'no')
-                    {
-                        let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = true
-                        let showPartNumberBr = document.getElementById('partNumberDivBr');
-                        showPartNumberBr.hidden = true
-                        let showrowPartNumber = document.getElementById('rowPartNumber');
-                        showrowPartNumber.hidden = false
-                        let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
-                        showrowPartNumberBr.hidden = false
-                        // let showrowPartNumberBr1 = document.getElementById('brandModelLineClass');
-                        // showrowPartNumberBr1.hidden = true
-                        // let showrowPartNumberBr2 = document.getElementById('brandModelNumberClass');
-                        // showrowPartNumberBr2.hidden = false
-                        
-                    }
-                    else
-                    {
-                        let showPartNumber = document.getElementById('partNumberDiv');
-                        showPartNumber.hidden = false
-                        let showPartNumberBr = document.getElementById('partNumberDivBr');
-                        showPartNumberBr.hidden = false
-                        // let showrowPartNumberBr1 = document.getElementById('brandModelLineClass');
-                        // showrowPartNumberBr1.hidden = false
-                        // let showrowPartNumberBr2 = document.getElementById('brandModelNumberId');
-                        // showrowPartNumberBr2.hidden = true
-                       
-                    }
-                    
+                    let showPartNumber = document.getElementById('partNumberDiv');
+                    showPartNumber.hidden = false
+                    let showPartNumberBr = document.getElementById('partNumberDivBr');
+                    showPartNumberBr.hidden = false
                 }
                 else
                 {
@@ -1230,10 +1018,6 @@
                     showPartNumber.hidden = true
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true
-                    let showrowPartNumber = document.getElementById('rowPartNumber');
-                    showrowPartNumber.hidden = true
-                    let showrowPartNumberBr = document.getElementById('rowPartNumberBr');
-                    showrowPartNumberBr.hidden = true
                     $("#brandModelLineId").show();
                     $("#brandModelNumberId").hide();
                     $("#showaddtrim").show();
