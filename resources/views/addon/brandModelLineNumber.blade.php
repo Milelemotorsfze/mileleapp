@@ -1,6 +1,6 @@
 <div class="col-md-12 p-0 brandModelNumberClass" id="brandModelNumberId" hidden>
     <div class="col-md-12 brandMoDescrip p-0">
-        <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px; border-color:#e6e6ff; border-radius:10px; 
+        <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px; border-color:#e6e6ff; border-radius:10px;
                 margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-1">
             <div class="row">
                 <div class="col-xxl-5 col-lg-5 col-md-12">
@@ -49,7 +49,7 @@
                     </div>
                     <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                        <select class="compare-tag1" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
+                        <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
 {{--                            @foreach($modelLines as $modelLine)--}}
 {{--                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                            @endforeach--}}
@@ -243,13 +243,14 @@
                         }
                         $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
                         $(this).find(".MoDesApndHere"+oldIndex).attr('class', "row MoDesApndHere"+index);
+
                     });
                 }
                 else
                 {
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
                    }).set({title:"Can't Remove Brand And Model Lines"})
-                }            
+                }
         })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {
                 var indexNumber = $(this).attr('data-index');
@@ -257,7 +258,7 @@
                 var countRow = $(".MoDes"+indexNumber).find(".MoDesApndHere"+indexNumber).length;
                 if(countRow > 1)
                 {
-                    
+
                     var modelIndex = $(this).attr('data-model-index');
                     $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
                         var id = (this.value);
@@ -382,9 +383,9 @@
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                 <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
                                                     id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                    @endforeach
+{{--                                                    @foreach($modelLines as $modelLine)--}}
+{{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                                                    @endforeach--}}
                                                     </select>
                                                     @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
@@ -456,9 +457,9 @@
                     <select class="compare-tag1 spare-parts-model-lines" name=brand[${supplier}][model][${index}][model_id]"
                         onchange=selectModelLineDescipt(${supplier},${index})
                         id="selectModelLineNum${supplier}Des${index}" multiple="true" style="width: 100%;" data-index="${supplier}" data-model-index="${index}">
-                        @foreach($modelLines as $modelLine)
-                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                        @endforeach
+{{--                        @foreach($modelLines as $modelLine)--}}
+{{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                        @endforeach--}}
                     </select>
                     @error('is_primary_payment_method')
                     <span class="invalid-feedback" role="alert">
@@ -504,9 +505,11 @@
     }
     function selectBrandDisp(id,row)
     {
+        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+
         for (let a = 1; a <= i; a++)
         {
-            var value =$('#selectBrandMo'+id).val();
+            var value = $('#selectBrandMo'+id).val();
             var currentAddonType = $('#addon_type').val();
             var brandId = value;
             globalThis.selectedBrandsDisArr .push(brandId);
@@ -514,6 +517,11 @@
             {
                 if(brandId != 'allbrands')
                 {
+                    $('.spare-parts-model-lines').attr('disabled', false);
+                    $('.model-descriptions').attr('disabled', false);
+                    for (var j=2;j<=brandTotalIndex;j++) {
+                        $('#selectBrandMo'+j).attr('disabled', false);
+                    }
                     if(currentAddonType == '')
                     {
                         // document.getElementById("addon_type_required").classList.add("paragraph-class");
@@ -530,7 +538,9 @@
                 else
                 {
                     RelatedDataCheck(id,row);
-                    hideRelatedModalDis(id,row);
+                    $('#showaddtrimDis').attr('hidden',true);
+
+                    // hideRelatedModalDis(id,row);
                 }
             }
             // else
@@ -541,15 +551,27 @@
     }
     function  RelatedDataCheck() {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-
+        var brands = [];
+        var modelLines = [];
+        var modelDescriptions = [];
         if (brandTotalIndex > 0) {
             for(let i=1; i<=brandTotalIndex; i++)
             {
-                var index = $(".MoDes"+brandTotalIndex).find(".MoDesApndHere"+brandTotalIndex).length;
+                var eachBrand = $('#selectBrandMo'+i).val();
+                if(eachBrand != '' && eachBrand != 'allbrands') {
+                    brands.push(eachBrand);
+                }
+                var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
                 for(let j=1; j<=index; j++)
                 {
                     var eachModelRow = $('#selectModelLineNum'+ i+'Des'+j).val();
                     var eachModelNumberRow = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                    if(eachModelRow != '' ) {
+                        modelLines.push(eachModelRow);
+                    }
+                    if(eachModelNumberRow != '' ) {
+                        modelDescriptions.push(eachModelNumberRow);
+                    }
 
                     if(eachModelRow != '' || eachModelNumberRow != '')
                     {
@@ -573,6 +595,19 @@
                 }
 
             }
+            var brandCount = brands.length;
+            var ModelLineCount = modelLines.length;
+            var ModelDescriptionCount = modelDescriptions.length;
+
+            if(brandCount == 0 && ModelLineCount == 0 && ModelDescriptionCount == 0) {
+                $('.spare-parts-model-lines').attr('disabled', true);
+                $('.model-descriptions').attr('disabled', true)
+                for(let i=2; i<=brandTotalIndex; i++)
+                {
+                    $('#selectBrandMo'+i).attr('disabled',true)
+                }
+            }
+
         }
     }
     function showRelatedModalDis(id,value,row,currentAddonType)
@@ -587,7 +622,7 @@
         }
 
         let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropDr.hidden = false           
+        showDivdropDr.hidden = false
         let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
         showDel.hidden = false
         let showaddtrimDis = document.getElementById('showaddtrimDis');
@@ -605,11 +640,14 @@
             {
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
-                BrandModelLine.push
+                if(row == 1) {
+                    BrandModelLine.push
                     ({
                         id: 'allmodellines',
                         text: 'All Model Lines'
                     });
+                }
+
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push
@@ -643,54 +681,114 @@
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
         showPartNumber1.hidden = false
 
+
         var e = document.getElementById("addon_type");
         var value = e.value;
         var selectedModelLine = $("#selectModelLineNum"+id+"Des"+row).val();
-        $.ajax
-        ({
-            url:"{{url('getModelDescriptionDropdown')}}",
-            type: "POST",
-            data:
-            {
-                model_line_id: selectedModelLine,
-                addon_type: value,
-                _token: '{{csrf_token()}}'
-            },
-            dataType : 'json',
-            success:function(data)
-            {
-                // console.log(data);
-
-                let ModelLineModelDescription   = [];
-                $.each(data.model_description,function(key,value)
+        if(selectedModelLine == 'allmodellines') {
+            RelatedModelLineCheck(id,row)
+        }else{
+            $('#showModelNumDel'+id).attr('hidden',false);
+            $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
+            $.ajax
+            ({
+                url:"{{url('getModelDescriptionDropdown')}}",
+                type: "POST",
+                data:
+                    {
+                        model_line_id: selectedModelLine,
+                        addon_type: value,
+                        _token: '{{csrf_token()}}'
+                    },
+                dataType : 'json',
+                success:function(data)
                 {
-                    ModelLineModelDescription.push
-                    ({
-                        id: value.id,
-                        text: value.model_description
+                    let ModelLineModelDescription   = [];
+                    $.each(data.model_description,function(key,value)
+                    {
+                        ModelLineModelDescription.push
+                        ({
+                            id: value.id,
+                            text: value.model_description
+                        });
                     });
-                });
-                $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
-                $("#selectModelNumberDiscri"+id+"Des"+row).select2
-                ({
-                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                    $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+                    $("#selectModelNumberDiscri"+id+"Des"+row).select2
+                    ({
+                        placeholder: 'Choose Model Number....     Or     Type Here To Search....',
 
-                    allowClear: true,
-                    data: ModelLineModelDescription
-                });
-            }
-        });
+                        allowClear: true,
+                        data: ModelLineModelDescription
+                    });
+                }
+            });
+        }
+
     }
-    function hideRelatedModalDis(id,row)
-    {
-        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-        if(brandTotalIndex <=1) {
-            let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
-            showDivdropModelLine.hidden = true
-            let showDivdropDr = document.getElementById('showModelNumberdrop'+id+'Des'+row);
-            showDivdropDr.hidden = true
-            let showaddtrim = document.getElementById('showaddtrimDis');
-            showaddtrim.hidden = true
+    // function hideRelatedModalDis(id,row)
+    // {
+    //     // var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+    //     // alert(brandTotalIndex);
+    //     // if(brandTotalIndex <=1) {
+    //
+    //         // let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
+    //         // showDivdropModelLine.hidden = true
+    //         // let showDivdropDr = document.getElementById('showModelNumberdrop'+id+'Des'+row);
+    //         // showDivdropDr.hidden = true
+    //         $('#showaddtrimDis').attr('hidden',true);
+    //         // let showaddtrim = document.getElementById('showaddtrimDis');
+    //         // showaddtrim.hidden = true
+    //     // }
+    //
+    // }
+    function RelatedModelLineCheck(id,row) {
+
+        var index = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+
+        var modelLinesData = [];
+        var modelLineDescriptionData = [];
+
+        for(let j=1; j<=index; j++)
+        {
+            var eachModelLineRow = $('#selectModelLineNum'+ id+'Des'+j).val();
+            var eachModelDescriptionRow = $('#selectModelNumberDiscri'+ id+'Des'+j).val();
+            if(eachModelLineRow != '' && eachModelLineRow != 'allmodellines') {
+                modelLinesData.push(eachModelLineRow);
+            }
+            if(eachModelDescriptionRow != '' ) {
+                modelLineDescriptionData.push(eachModelDescriptionRow);
+            }
+            if(j !=1) {
+                if(eachModelLineRow != '' )
+                {
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items Model Line.' +
+                        'Please remove those items to edit this field.', function (e) {
+                    }).set({title: "Remove Brands and ModelLines"})
+                    $("#selectModelLineNum"+id+"Des1").find("option:selected").prop("selected", false);
+                    $("#selectModelLineNum"+id+"Des1").trigger('change');
+                }
+            }
+            if(eachModelDescriptionRow != '' )
+            {
+                var confirm = alertify.confirm('You are not able to edit this field while any Items Model Line.' +
+                    'Please remove those items to edit this field.', function (e) {
+                }).set({title: "Remove Brands and ModelLines"})
+                $("#selectModelLineNum"+id+"Des1").find("option:selected").prop("selected", false);
+                $("#selectModelLineNum"+id+"Des1").trigger('change');
+            }
+        }
+        var modelLinesDataCount = modelLinesData.length;
+        var modelLineDescriptionDataCount = modelLineDescriptionData.length;
+
+        if(modelLinesDataCount == 0 && modelLineDescriptionDataCount == 0) {
+            $('#showModelNumDel'+id).attr('hidden',true);
+            for(var i=1;i<=index;i++) {
+                $('#showModelNumberdrop'+id+'Des'+i).attr('hidden',true);
+                if(i != 1) {
+                    $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
+                    $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                }
+            }
         }
 
     }
