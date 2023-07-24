@@ -10,6 +10,7 @@ class Vehicles extends Model
 {
     use HasFactory;
     protected $table = 'vehicles';
+    public const VEHICLE_STATUS_INCOMING = 'Incoming Stock';
     public  $appends = [
         'similar_vehicles_with_active_stock',
         'similar_vehicles_with_inactive_stock',
@@ -28,7 +29,7 @@ class Vehicles extends Model
         'reservation_end_date',
         'conversion',
         'inspection_date',
-        
+
     ];
     public function variant()
     {
@@ -53,6 +54,7 @@ class Vehicles extends Model
     public function getSimilarVehiclesWithInactiveStockAttribute()
     {
         $vehicles = Vehicles::whereNotNull('gdn_id')
+            ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour', 'ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -63,6 +65,7 @@ class Vehicles extends Model
     }
     public function getSimilarVehiclesWithActiveStockAttribute() {
         $vehicles =  Vehicles::whereNull('gdn_id')
+            ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour','ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
