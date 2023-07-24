@@ -421,15 +421,15 @@ class AddonController extends Controller
                             ['brand_id','=',$mo->brand_id],
                             ['model_id','=',$mo->model_id],
                             ])->pluck('model_number');
-                            $mo->modeldes = json_decode($mo->modeldes);  
+                            $mo->modeldes = json_decode($mo->modeldes);
                     }
                 }
                 $modelLinesData = AddonTypes::where([
                                                     ['addon_details_id','=',$id],
                                                     ['brand_id','=',$data->brand_id]
                                                     ])->pluck('model_id');
-                $jsonmodelLine = json_decode($modelLinesData);  
-                $data->modelLinesData = $jsonmodelLine;                             
+                $jsonmodelLine = json_decode($modelLinesData);
+                $data->modelLinesData = $jsonmodelLine;
                 $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
@@ -551,10 +551,10 @@ class AddonController extends Controller
                                             if($brandModelDta['model_id'])
                                             {
                                                 if($brandModelDta['model_id'] == 'allmodellines')
-                                                {   
-                                                    $createAddType = [];                                                
+                                                {
+                                                    $createAddType = [];
                                                     $createAddType['created_by'] = $authId;
-                                                    $createAddType['addon_details_id'] = $addon_details->id;                                                    
+                                                    $createAddType['addon_details_id'] = $addon_details->id;
                                                     $createAddType['brand_id'] = $brandData['brand_id'];
                                                     $createAddType['is_all_model_lines'] = 'yes';
                                                     $creBranModelDes = AddonTypes::create($createAddType);
@@ -564,8 +564,8 @@ class AddonController extends Controller
                                                     if(isset($brandModelDta['model_number']))
                                                     {
                                                         foreach($brandModelDta['model_number'] as $modelDescr)
-                                                        {   
-                                                            $createAddType = [];                                                               
+                                                        {
+                                                            $createAddType = [];
                                                             $createAddType['created_by'] = $authId;
                                                             $createAddType['addon_details_id'] = $addon_details->id;
                                                             $createAddType['brand_id'] = $brandData['brand_id'];
@@ -575,8 +575,8 @@ class AddonController extends Controller
                                                         }
                                                     }
                                                     else
-                                                    {    
-                                                        $createAddType = [];                                                          
+                                                    {
+                                                        $createAddType = [];
                                                         $createAddType['created_by'] = $authId;
                                                         $createAddType['addon_details_id'] = $addon_details->id;
                                                         $createAddType['brand_id'] = $brandData['brand_id'];
@@ -589,8 +589,8 @@ class AddonController extends Controller
                                     }
                                 }
                                 else
-                                {    
-                                    $createAddType = [];                                      
+                                {
+                                    $createAddType = [];
                                     $createAddType['created_by'] = $authId;
                                     $createAddType['addon_details_id'] = $addon_details->id;
                                     $createAddType['brand_id'] = $brandData['brand_id'];

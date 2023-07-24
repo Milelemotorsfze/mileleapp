@@ -156,14 +156,6 @@
                   {{$addonsdata->AddonName->name}}
                 @endif
               </div>
-              @if($addonsdata->payment_condition)
-                <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                  Payment Condition
-                </div>  
-              <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
-                {{$addonsdata->payment_condition}}
-              </div>
-              @endif
               @if($addonsdata->additional_remarks)
                 <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
               Additional Remarks

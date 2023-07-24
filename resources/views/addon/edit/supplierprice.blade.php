@@ -52,13 +52,11 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            @if($i != 1)
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                <button class="btn_round removeButton" data-index="{{$i}}" >
+                                                <a class="btn_round removeButton" data-index="{{$i}}" >
                                                     <i class="fas fa-trash-alt"></i>
-                                            </button>
+                                                </a>
                                             </div>
-                                            @endif
                                         </div>
                                     @endforeach
                                 </div>
@@ -137,43 +135,52 @@
                 }
             }
         }
-        $(document.body).on('click', ".removeButton", function (e) {
-            var indexNumber = $(this).attr('data-index');
-
-            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                var id = (this.value);
-                var text = (this.text);
-                addOption(id,text)
-            });
-
-            $(this).closest('#row-'+indexNumber).remove();
-            $('.supplierWithoutKitApendHere').each(function(i){
-                var index = +i + +1;
-                $(this).attr('id','row-'+ index);
-                $(this).attr('data-select2-id','select2-data-row-'+ index);
-                $(this).find('select').attr('data-index', index);
-                $(this).find('select').attr('id','suppliers'+ index);
-                $(this).find('select').attr('name','supplierAndPrice['+ index +'][supplier_id][]');
-                $(this).find('.AED_price').attr('id','div_price_in_aed_'+ index);
-                $(this).find('.purchase_price_AED').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_aed]');
-                $(this).find('.purchase_price_AED').attr('id','addon_purchase_price_'+index);
-                $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
-
-                $(this).find('.USD_price').attr('id','div_price_in_usd_'+ index);
-                $(this).find('.purchase_price_USD').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_usd]');
-                $(this).find('.purchase_price_USD').attr('onkeyup','calculateAED('+ index +')');
-                $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
-                $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
-                $(this).find('button').attr('data-index', index);
-                $('#suppliers'+index).select2
-                ({
-                    placeholder:"Choose Suppliers....     Or     Type Here To Search....",
-                    allowClear: true,
-                    minimumResultsForSearch: -1,
+        $(document.body).on('click', ".removeButton", function (e) 
+        {
+            var countRow = 0;
+            var countRow = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
+            if(countRow > 1)
+            {
+                var indexNumber = $(this).attr('data-index');
+                $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = (this.value);
+                    var text = (this.text);
+                    addOption(id,text)
                 });
-            });
-            setLeastAEDPrice();
 
+                $(this).closest('#row-'+indexNumber).remove();
+                $('.supplierWithoutKitApendHere').each(function(i){
+                    var index = +i + +1;
+                    $(this).attr('id','row-'+ index);
+                    $(this).attr('data-select2-id','select2-data-row-'+ index);
+                    $(this).find('select').attr('data-index', index);
+                    $(this).find('select').attr('id','suppliers'+ index);
+                    $(this).find('select').attr('name','supplierAndPrice['+ index +'][supplier_id][]');
+                    $(this).find('.AED_price').attr('id','div_price_in_aed_'+ index);
+                    $(this).find('.purchase_price_AED').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_aed]');
+                    $(this).find('.purchase_price_AED').attr('id','addon_purchase_price_'+index);
+                    $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
+
+                    $(this).find('.USD_price').attr('id','div_price_in_usd_'+ index);
+                    $(this).find('.purchase_price_USD').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_usd]');
+                    $(this).find('.purchase_price_USD').attr('onkeyup','calculateAED('+ index +')');
+                    $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
+                    $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
+                    $(this).find('a').attr('data-index', index);
+                    $('#suppliers'+index).select2
+                    ({
+                        placeholder:"Choose Suppliers....     Or     Type Here To Search....",
+                        allowClear: true,
+                        minimumResultsForSearch: -1,
+                    });
+                });
+                setLeastAEDPrice();
+            }
+            else
+            {
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Supplier and Price Required',function (e) {
+                }).set({title:"Can't Remove Supplier And Prices"})
+            }
         })
     });
 
@@ -246,9 +253,9 @@
                                 </div>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round removeButton" data-index="${index}" >
+                                <a class="btn_round removeButton" data-index="${index}" >
                                     <i class="fas fa-trash-alt"></i>
-                                </button>
+                                </a>
                             </div>
                         </div>
                     `);

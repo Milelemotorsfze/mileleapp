@@ -117,16 +117,19 @@
     <div class="bordered-section">
         <div class="row">
             <div class="col-sm-3">
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
-        @endphp
-        @if ($hasPermission)
+
             <div class="row">
                 <div class="col-lg-4 label">
                     <strong>PO Number:</strong></strong>
                 </div>
                 <div class="col-lg-8 value">
-                    {{$po_number}}
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
+                        {{$po_number}}
+                    @endif
+
                 </div>
             </div>
             <div class="row">
@@ -134,10 +137,15 @@
                     <strong>PO Date:</strong>
                 </div>
                 <div class="col-lg-8 value">
-                    {{$po_date}}
+                    @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
+                    @endphp
+                    @if ($hasPermission)
+                        {{$po_date}}
+                    @endif
+
                 </div>
             </div>
-        @endif
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
         @endphp
@@ -284,20 +292,23 @@
             @endif
         </div>
     </div>
-<br>
+    <br>
     <div class="bordered-section">
         <div class="row">
             <div class="col-sm-3">
-          @php
-              $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
-          @endphp
-          @if ($hasPermission)
+
               <div class="row">
                   <div class="col-lg-4 label">
                       <strong>SO Number:</strong>
                   </div>
                   <div class="col-lg-8 value">
-                      {{$so_number}}
+                      @php
+                          $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                      @endphp
+                      @if ($hasPermission)
+                        {{$so_number}}
+                      @endif
+
                   </div>
               </div>
               <div class="row">
@@ -305,10 +316,14 @@
                         <strong>SO Date:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                        {{$so_date}}
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
+                        @endphp
+                        @if ($hasPermission)
+                            {{$so_date}}
+                        @endif
                     </div>
               </div>
-          @endif
       </div>
               @php
                   $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
@@ -405,10 +420,12 @@
                 <strong> Production Year:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$vehicle->ppmmyyy}}</div>
+                {{$vehicle->ppmmyyy}}
             </div>
-		</div>
+        </div>
       @endif
+
+		</div>
     <div class="col-sm-3">
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
