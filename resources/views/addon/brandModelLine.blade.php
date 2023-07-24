@@ -21,6 +21,11 @@
                             style="width: 100%;">
                     </select>
                 </div>
+                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                    <a class="btn_round removeButtonbrandModelLineDiscription" data-index="1" >
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -144,38 +149,50 @@
         //===== delete the form fieed row
         $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
             // $("body").on("click", ".", function ()
-        {
-            var indexNumber = $(this).attr('data-index');
-            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                var id = (this.value);
-                var text = (this.text);
-                addOption(id,text)
-            });
-            $(this).closest('#row-'+indexNumber).remove();
+            {
+               var countRow = 0;
+                var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                if(countRow > 1)
+                {
+                    var indexNumber = $(this).attr('data-index');
+                    $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                        var id = (this.value);
+                        var text = (this.text);
+                        addOption(id,text)
+                    });
+                    $(this).closest('#row-'+indexNumber).remove();
 
-            $('.brandModelLineDiscriptionApendHere').each(function(i) {
-                var index = +i + +1;
-                $(this).attr('id','row-'+index);
-                $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+ index +')');
-                $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
-                $(this).find('.brands').attr('id', 'selectBrand'+index);
-                $(this).find('.brands').attr('data-index',index);
-                $(this).find('.model-line-div').attr('id','showDivdrop'+index);
-                $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
-                $(this).find('.model-lines').attr('id','selectModelLine'+index);
-                $(this).find('.model-lines').attr('data-index',index);
-                $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
-                $('#selectBrand'+index).select2
-                ({
-                    placeholder:"Choose Brands....     Or     Type Here To Search....",
-                    allowClear: true,
-                    maximumSelectionLength: 1,
-                    minimumResultsForSearch: -1,
-                });
-                $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-                $("#selectModelLine"+index).select2();
-            })
-            enableDropdown();
+                    $('.brandModelLineDiscriptionApendHere').each(function(i) {
+                        var index = +i + +1;
+                        $(this).attr('id','row-'+index);
+                        $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+ index +')');
+                        $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
+                        $(this).find('.brands').attr('id', 'selectBrand'+index);
+                        $(this).find('.brands').attr('data-index',index);
+                        $(this).find('.model-line-div').attr('id','showDivdrop'+index);
+                        $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
+                        $(this).find('.model-lines').attr('id','selectModelLine'+index);
+                        $(this).find('.model-lines').attr('data-index',index);
+                        $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                        $('#selectBrand'+index).select2
+                        ({
+                            placeholder:"Choose Brands....     Or     Type Here To Search....",
+                            allowClear: true,
+                            maximumSelectionLength: 1,
+                            minimumResultsForSearch: -1,
+                        });
+                        $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+                        $("#selectModelLine"+index).select2();
+                    })
+                    enableDropdown();
+                }
+                else
+                {
+                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
+                   }).set({title:"Can't Remove Brand And Model Lines"})
+                }
+     
+           
 
         })
         $("#add").on("click", function ()
@@ -224,9 +241,9 @@
                                         </select>
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                        <button class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
+                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
                                             <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>

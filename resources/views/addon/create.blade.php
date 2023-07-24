@@ -89,6 +89,7 @@
         background-color: #fd625e;
         border-radius:5px;
         cursor: pointer;
+        padding-top:7px;
     }
     .btn_round:hover
     {

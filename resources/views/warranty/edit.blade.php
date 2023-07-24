@@ -411,6 +411,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             appendOption(index,data);
         });
         $(document.body).on('click', ".removeButton", function (e) {
+            var countRow = 0;
             var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
                 if(countRow > 1)
                 {
