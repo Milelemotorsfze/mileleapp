@@ -86,32 +86,41 @@
         }
     $(document.body).on('click', ".removeMainItem", function (e) 
     {
-        var indexNumber = $(this).attr('data-index');
-        $(this).closest('#item-'+indexNumber).find("option:selected").each(function() 
+        var countRow = 0;
+        var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+        if(countRow > 1)
         {
-            var id = (this.value);
-            var text = (this.text);
-            MainKitItemAddOption(id,text)
-        });
-        $(this).closest('#item-'+indexNumber).remove();
-        $('.kitMainItemRowForSupplier').each(function(i)
-        {
-            var index = +i + +1;
-            $(this).attr('id','item-'+index);
-            $(this).find('.MainItemsClass').attr('data-index', index);
-            $(this).find('.MainItemsClass').attr('id','mainItem'+index);
-            $(this).find('.MainItemsClass').attr('name','mainItem['+index+'][item]');
-            $(this).find('.quantityMainItem').attr('name', 'mainItem['+index+'][quantity]');
-            $(this).find('.quantityMainItem').attr('id', 'mainQuantity'+index);
-            $(this).find('.removeMainItem').attr('data-index', index);
-            alert(index);
-            $('#mainItem'+index).select2
-            ({
-                placeholder:"Choose Items....     Or     Type Here To Search....",
-                allowClear: true,
-                maximumSelectionLength: 1,
+            var indexNumber = $(this).attr('data-index');
+            $(this).closest('#item-'+indexNumber).find("option:selected").each(function() 
+            {
+                var id = (this.value);
+                var text = (this.text);
+                MainKitItemAddOption(id,text)
             });
-        });
+            $(this).closest('#item-'+indexNumber).remove();
+            $('.kitMainItemRowForSupplier').each(function(i)
+            {
+                var index = +i + +1;
+                $(this).attr('id','item-'+index);
+                $(this).find('.MainItemsClass').attr('data-index', index);
+                $(this).find('.MainItemsClass').attr('id','mainItem'+index);
+                $(this).find('.MainItemsClass').attr('name','mainItem['+index+'][item]');
+                $(this).find('.quantityMainItem').attr('name', 'mainItem['+index+'][quantity]');
+                $(this).find('.quantityMainItem').attr('id', 'mainQuantity'+index);
+                $(this).find('.removeMainItem').attr('data-index', index);
+                $('#mainItem'+index).select2
+                ({
+                    placeholder:"Choose Items....     Or     Type Here To Search....",
+                    allowClear: true,
+                    maximumSelectionLength: 1,
+                });
+            });
+        }
+        else
+        {
+            var confirm = alertify.confirm('You are not able to remove this row, Atleast one Kit Item and Quantity Required',function (e) {
+            }).set({title:"Can't Remove Kit Item and Quantity"})
+        }
     })
     function MainKitItemAddOption(id,text) 
     {
