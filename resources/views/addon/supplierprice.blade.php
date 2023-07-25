@@ -1,3 +1,7 @@
+<div class="card-header">
+    <h4 class="card-title">Suppliers And Purchase Price</h4>
+</div>
+</br>
 <div class="row" id="notKitSupplier">
     <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
         <div id="London" class="tabcontent">

@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="MoDes1">
-                <div class="row MoDesApndHere1" >
+                <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
                     <div class="col-xxl-1 col-lg-1 col-md-12">
                     </div>
                     <div class="col-xxl-5 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
@@ -61,10 +61,10 @@
                         @enderror
                     </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
-                        <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="1" hidden id="removeModelNumberdrop1Des1">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </div>
+                            <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="1" hidden id="removeModelNumberdrop1Des1">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
                 </div>
             </div>
             <div class="row">
@@ -694,45 +694,46 @@
         var e = document.getElementById("addon_type");
         var value = e.value;
         var selectedModelLine = $("#selectModelLineNum"+id+"Des"+row).val();
-        if(selectedModelLine == 'allmodellines') {
+        if(selectedModelLine != ''){
+            if(selectedModelLine == 'allmodellines') {
             RelatedModelLineCheck(id,row)
-        }else{
-            $('#showModelNumDel'+id).attr('hidden',false);
-            $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
-            $.ajax
-            ({
-                url:"{{url('getModelDescriptionDropdown')}}",
-                type: "POST",
-                data:
+            }else{
+                $('#showModelNumDel'+id).attr('hidden',false);
+                $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
+                $.ajax
+                ({
+                    url:"{{url('getModelDescriptionDropdown')}}",
+                    type: "POST",
+                    data:
+                        {
+                            model_line_id: selectedModelLine,
+                            addon_type: value,
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success:function(data)
                     {
-                        model_line_id: selectedModelLine,
-                        addon_type: value,
-                        _token: '{{csrf_token()}}'
-                    },
-                dataType : 'json',
-                success:function(data)
-                {
-                    let ModelLineModelDescription   = [];
-                    $.each(data.model_description,function(key,value)
-                    {
-                        ModelLineModelDescription.push
-                        ({
-                            id: value.id,
-                            text: value.model_description
+                        let ModelLineModelDescription   = [];
+                        $.each(data.model_description,function(key,value)
+                        {
+                            ModelLineModelDescription.push
+                            ({
+                                id: value.id,
+                                text: value.model_description
+                            });
                         });
-                    });
-                    $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
-                    $("#selectModelNumberDiscri"+id+"Des"+row).select2
-                    ({
-                        placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                        $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+                        $("#selectModelNumberDiscri"+id+"Des"+row).select2
+                        ({
+                            placeholder: 'Choose Model Number....     Or     Type Here To Search....',
 
-                        allowClear: true,
-                        data: ModelLineModelDescription
-                    });
-                }
-            });
+                            allowClear: true,
+                            data: ModelLineModelDescription
+                        });
+                    }
+                });
         }
-
+        }
     }
     // function hideRelatedModalDis(id,row)
     // {

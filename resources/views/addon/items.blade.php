@@ -170,7 +170,6 @@
     </div>
 </div>
 <input type="hidden" id="supplierIndex" value="">
-
 <script type="text/javascript">
     $(document).ready(function ()
     {
@@ -231,41 +230,7 @@
             $(this).closest('#row-'+indexNumber).remove();
 
 
-            {{--for(var supplier=1;supplier<=3;supplier++) {--}}
-            {{--    var eachItemTotalIndex =  $(".apendNewItemHere"+supplier).find(".kitItemRowForSupplier"+supplier).length;--}}
-
-            {{--    for(var item=1;item<=3;item++)--}}
-            {{--    {--}}
-            {{--        $(this).find('.KitSupplierItems').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][kit_item_id]');--}}
-            {{--        $(this).find('.KitSupplierItems').attr('id', 'kitSupplier'+ supplier +'Item'+item);--}}
-            {{--        $(this).find('.quantity').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][quantity]');--}}
-            {{--        $(this).find('.quantity').attr('id', 'Supplier'+ supplier +'Kit'+ item +'Quantity');--}}
-            {{--        $(this).find('.quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ supplier +','+ item +')');--}}
-            {{--        $(this).find('.quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ supplier +','+ item +')');--}}
-
-
-            {{--        $(this).find('.unit-price-AED').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][unit_price_in_aed]');--}}
-            {{--        $(this).find('.unit-price-AED').attr('id', 'Supplier'+ supplier +'Kit'+ item +'UnitPriceAED');--}}
-            {{--        $(this).find('.unit-price-AED').attr('onkeyup', 'calculateOtherValuesbyUniTPriceAED('+ supplier +','+ item +')');--}}
-
-            {{--        $(this).find('.total-price-AED').attr('id', 'Supplier'+ supplier +'Kit'+ item +'TotalPriceAED');--}}
-            {{--        $(this).find('.total-price-AED').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][total_price_in_aed]');--}}
-            {{--        $(this).find('.total-price-AED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ supplier +','+ item +')');--}}
-            {{--        $(this).find('.total-price-AED').attr('class', 'Supplier'+ supplier +'TotalPriceInAED form-control widthinput @error('addon_purchase_price')--}}
-            {{--            is-invalid @enderror total-price-AED');--}}
-
-            {{--        $(this).find('.unit-price-USD').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][unit_price_in_usd]');--}}
-            {{--        $(this).find('.unit-price-USD').attr('id', 'Supplier'+ supplier +'Kit1UnitPriceUSD');--}}
-            {{--        $(this).find('.unit-price-USD').attr('onkeyup', 'calculateOtherValuesbyUnitPriceUSD('+ supplier +','+ item +')');--}}
-            {{--        $(this).find('.unit-price-USD').attr('class', 'Supplier'+ supplier +'TotalPriceInUSD form-control widthinput @error('addon_purchase_price_in_usd')--}}
-            {{--            is-invalid @enderror unit-price-USD');--}}
-
-            {{--        $(this).find('.total-price-USD').attr('name', 'kitSupplierAndPrice['+ supplier +'][item]['+ item +'][total_price_in_usd]');--}}
-            {{--        $(this).find('.total-price-USD').attr('id', 'Supplier'+ supplier +'Kit'+ item +'TotalPriceUSD');--}}
-            {{--        $(this).find('.total-price-USD').attr('onkeyup', 'calculateOtherValuesbyTotalPriceUSD('+ supplier +','+ item +')');--}}
-            {{--    }--}}
-
-            {{--}--}}
+            
             $('.addSupplierForKitRow').each(function(i){
                 var index = +i + +1;
                 $(this).attr('id','row-'+ index);
