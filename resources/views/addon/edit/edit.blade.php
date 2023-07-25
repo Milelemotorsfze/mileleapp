@@ -154,7 +154,7 @@
                                 <option value="E">Others</option>
                                 <option value="S">Shipping Cost</option> -->
                                 <option value="SP" {{"SP" == $addonDetails->addon_type_name  ? 'selected' : ''}}>Spare Parts</option>
-                                <option value="K" {{"K" == $addonDetails->addon_type_name  ? 'selected' : ''}}>Kit</option>
+                                <!-- <option value="K" {{"K" == $addonDetails->addon_type_name  ? 'selected' : ''}}>Kit</option> -->
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
                             <input id="addon_type_hiden" name="addon_type_hiden" type="text" value="{{$addonDetails->addon_type_name}}" hidden>

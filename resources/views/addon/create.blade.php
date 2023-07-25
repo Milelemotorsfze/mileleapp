@@ -155,7 +155,7 @@
                                 <option value="E">Others</option>
                                 <option value="S">Shipping Cost</option> -->
                                 <option value="SP">Spare Parts</option>
-                                <option value="K">Kit</option>
+                                <!-- <option value="K">Kit</option> -->
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
                             <input id="addon_type_show" type="text" class="form-control" hidden readonly onclick=showAlert()>
