@@ -62,7 +62,7 @@
                             @enderror
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-12">
-                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" data-model-index="1" hidden id="removeModelNumberdrop1Des1">
+                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </div>
@@ -121,7 +121,7 @@
                 @foreach($existingBrand->ModelLine as $ModelLine)
                 <div id="rowDesCount{{$i}}" hidden value="{{$j+1}}">{{$j=$j+1;}}</div>
                 <div class="MoDes{{$i}}" id="model-line-first-row">
-                    <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-{{$j}}" >
+                    <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-{{$j}}">
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                         </div>
                         <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr{{$i}}Des{{$j}}" >
@@ -180,7 +180,7 @@
     </div>
 </div>
 </br>
-<div id="showaddtrimDis" class="col-xxl-12 col-lg-12 col-md-12" style="margin-top:20px;">
+<div id="showaddtrimDis" class="col-xxl-12 col-lg-12 col-md-12" style="margin-top:20px;" hidden>
     <a id="addDis" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
 </div>
 </br>
@@ -189,11 +189,16 @@
 
 <script type="text/javascript">
     var selectedBrandsDisArr = [];
-    // var existingBrandModel = {!! json_encode($existingBrandModel) !!};
-    // var lengthExistingBrands = '';
+    var existingBrandModel = {!! json_encode($existingBrandModel) !!};
+    var lengthExistingBrands = '';
     $(document).ready(function ()
     {
-        // lengthExistingBrands = existingBrandModel.length;  
+        lengthExistingBrands = existingBrandModel.length; 
+        if(lengthExistingBrands > 0)
+        {
+            let showAdTrim = document.getElementById('showaddtrimDis');
+            showAdTrim.hidden = false
+        }
                 $(".brandRows").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
                 $(".brandRows").select2({
                     maximumSelectionLength: 1,
@@ -212,21 +217,7 @@
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
-            if(value == 'allbrands') {
-                // var
-                // alert("ok");
-                var count = $(".MoDes" + index).find(".MoDesApndHere" + index).length;
-                // check if supplier index count is > 1
-                if (count > 0) {
-                   // check if first model line of addon brand is having data or not
-                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
-                        'Please remove those items to edit this field.', function (e) {
-                    }).set({title: "Remove Brands and ModelLines"})
-
-                    // $("#selectBrandMo1 option:selected").prop("selected", false);
-                    // $('#selectBrandMo1').trigger('change');
-                }
-            }
+           
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
@@ -262,8 +253,9 @@
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
-            var data = e.params.data;
-            modelLineDataAppend(index,modelIndex,data);
+            var id = e.params.value;
+            var text = e.params.text;
+            modelLineDataAppend(index,modelIndex,id,text)
         });
 
 
@@ -277,12 +269,12 @@
                 }
             }
         }
-        function modelLineDataAppend(index,modelIndex,data) {
+        function modelLineDataAppend(index,modelIndex,id,text) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != modelIndex) {
                     var currentId = 'selectModelLineNum'+ index +'Des' + i;
-                    $('#'+currentId).append($('<option>', {value: data.id, text : data.text}))
+                    $('#'+currentId).append($('<option>', {value: id, text : text}))
                 }
             }
         }
@@ -300,7 +292,9 @@
             if(countRow > 1)
             {
                 var indexNumber = $(this).attr('data-index');
-
+                if(indexNumber == 1) {
+                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+                    }
                 $(this).closest('#row-addon-brand-'+indexNumber).find("option:selected").each(function() {
                     var id = (this.value);
                     var text = (this.text);
@@ -375,10 +369,13 @@
             if(countRow > 1)
             {
                 var modelIndex = $(this).attr('data-model-index');
+                if(modelIndex == 1) {
+                        $('<option value="allmodellines"> All Model Lines </option>').prependTo('#selectModelLineNum'+indexNumber+'Des2');
+                    }
                 $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
                     var id = (this.value);
                     var text = (this.text);
-                    // addOption(id,text)
+                    modelLineDataAppend(indexNumber,modelIndex,id,text)
                 });
                 $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
                 $('.MoDesApndHere'+indexNumber).each(function(i){
@@ -555,7 +552,6 @@
     function addDiscr(supplier)
     {
         var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1;
-
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
                 <div class="col-xxl-1 col-lg-1 col-md-12">
@@ -590,7 +586,7 @@
                     @enderror
                 </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
-                    <a  class="btn_round removeButtonModelItem" data-index="${supplier}"  data-model-index="${index}">
+                    <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" hidden id="removeModelNumberdrop${supplier}Des${index}">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </div>
@@ -613,6 +609,7 @@
     }
     function selectBrandDisp(id,row)
     {
+        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
         for (let a = 1; a <= i; a++)
         {
             var value =$('#selectBrandMo'+id).val();
@@ -623,6 +620,11 @@
             {
                 if(brandId != 'allbrands')
                 {
+                    $('.spare-parts-model-lines').attr('disabled', false);
+                    $('.model-descriptions').attr('disabled', false);
+                    for (var j=2;j<=brandTotalIndex;j++) {
+                        $('#selectBrandMo'+j).attr('disabled', false);
+                    }
                     if(currentAddonType == '')
                     {
                         // document.getElementById("addon_type_required").classList.add("paragraph-class");
@@ -638,13 +640,76 @@
                 }
                 else
                 {
-                    hideRelatedModalDis(id,row);
+                    RelatedDataCheck(id,row);
+                    $('#showaddtrimDis').attr('hidden',true);
+                    // hideRelatedModalDis(id,row);
                 }
             }
             // else
             // {
             //     hideRelatedModalDis(id,row);
             // }
+        }
+    }
+    function  RelatedDataCheck() {
+        var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+        var brands = [];
+        var modelLines = [];
+        var modelDescriptions = [];
+        if (brandTotalIndex > 0) {
+            for(let i=1; i<=brandTotalIndex; i++)
+            {
+                var eachBrand = $('#selectBrandMo'+i).val();
+                if(eachBrand != '' && eachBrand != 'allbrands') {
+                    brands.push(eachBrand);
+                }
+                var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                for(let j=1; j<=index; j++)
+                {
+                    var eachModelRow = $('#selectModelLineNum'+ i+'Des'+j).val();
+                    var eachModelNumberRow = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                    if(eachModelRow != '' ) {
+                        modelLines.push(eachModelRow);
+                    }
+                    if(eachModelNumberRow != '' ) {
+                        modelDescriptions.push(eachModelNumberRow);
+                    }
+
+                    if(eachModelRow != '' || eachModelNumberRow != '')
+                    {
+                        var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                            'Please remove those items to edit this field.', function (e) {
+                        }).set({title: "Remove Brands and ModelLines"})
+                        $("#selectBrandMo1 option:selected").prop("selected", false);
+                        $("#selectBrandMo1").trigger('change');
+                    }
+                }
+
+                if(i != 1) {
+                    var eachBrand = $('#selectBrandMo'+i).val();
+                    if(eachBrand != '') {
+                        var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
+                            'Please remove those items to edit this field.', function (e) {
+                        }).set({title: "Remove Brands and ModelLines"})
+                        $("#selectBrandMo1 option:selected").prop("selected", false);
+                        $("#selectBrandMo1").trigger('change');
+                    }
+                }
+
+            }
+            var brandCount = brands.length;
+            var ModelLineCount = modelLines.length;
+            var ModelDescriptionCount = modelDescriptions.length;
+
+            if(brandCount == 0 && ModelLineCount == 0 && ModelDescriptionCount == 0) {
+                $('.spare-parts-model-lines').attr('disabled', true);
+                $('.model-descriptions').attr('disabled', true)
+                for(let i=2; i<=brandTotalIndex; i++)
+                {
+                    $('#selectBrandMo'+i).attr('disabled',true)
+                }
+            }
+
         }
     }
     function showRelatedModalDis(id,value,row,currentAddonType)
@@ -676,11 +741,13 @@
             {
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
+                if(row == 1) {
                 BrandModelLine.push
                     ({
                         id: 'allmodellines',
                         text: 'All Model Lines'
                     });
+                }
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push
@@ -708,44 +775,147 @@
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
         showPartNumber1.hidden = false
 
+
         var e = document.getElementById("addon_type");
         var value = e.value;
+        // var selectedModelLine = [];
         var selectedModelLine = $("#selectModelLineNum"+id+"Des"+row).val();
-        $.ajax
-        ({
-            url:"{{url('getModelDescriptionDropdown')}}",
-            type: "POST",
-            data:
-            {
-                model_line_id: selectedModelLine,
-                addon_type: value,
-                _token: '{{csrf_token()}}'
-            },
-            dataType : 'json',
-            success:function(data)
-            {
-                // console.log(data);
-                $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
-                let ModelLineModelDescription   = [];
-                $.each(data.model_description,function(key,value)
-                {
-                    ModelLineModelDescription.push
-                    ({
-                        id: value.id,
-                        text: value.model_description
-                    });
-                });
-                console.log(ModelLineModelDescription);
-                $("#selectModelNumberDiscri"+id+"Des"+row).select2
+        if(selectedModelLine != ''){
+            if(selectedModelLine == 'allmodellines') {
+            RelatedModelLineCheck(id,row)
+            }else{
+                $('#showModelNumDel'+id).attr('hidden',false);
+                $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
+                $.ajax
                 ({
-                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                    url:"{{url('getModelDescriptionDropdown')}}",
+                    type: "POST",
+                    data:
+                        {
+                            model_line_id: selectedModelLine,
+                            addon_type: value,
+                            _token: '{{csrf_token()}}'
+                        },
+                    dataType : 'json',
+                    success:function(data)
+                    {
+                        let ModelLineModelDescription   = [];
+                        $.each(data.model_description,function(key,value)
+                        {
+                            ModelLineModelDescription.push
+                            ({
+                                id: value.id,
+                                text: value.model_description
+                            });
+                        });
+                        $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+                        $("#selectModelNumberDiscri"+id+"Des"+row).select2
+                        ({
+                            placeholder: 'Choose Model Number....     Or     Type Here To Search....',
 
-                    allowClear: true,
-                    data: ModelLineModelDescription
+                            allowClear: true,
+                            data: ModelLineModelDescription
+                        });
+                    }
                 });
             }
-        });
+        }
     }
+    function RelatedModelLineCheck(id,row) 
+    {
+        var index = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+
+        var modelLinesData = [];
+        var modelLineDescriptionData = [];
+
+        for(let j=1; j<=index; j++)
+        {
+            var eachModelLineRow = $('#selectModelLineNum'+ id+'Des'+j).val();
+            var eachModelDescriptionRow = $('#selectModelNumberDiscri'+ id+'Des'+j).val();
+            if(eachModelLineRow != '' && eachModelLineRow != 'allmodellines') {
+                modelLinesData.push(eachModelLineRow);
+            }
+            if(eachModelDescriptionRow != '' ) {
+                modelLineDescriptionData.push(eachModelDescriptionRow);
+            }
+            if(j !=1) {
+                if(eachModelLineRow != '' )
+                {
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items Model Line.' +
+                        'Please remove those items to edit this field.', function (e) {
+                    }).set({title: "Remove Brands and ModelLines"})
+                    $("#selectModelLineNum"+id+"Des1").find("option:selected").prop("selected", false);
+                    $("#selectModelLineNum"+id+"Des1").trigger('change');
+                }
+            }
+            if(eachModelDescriptionRow != '' )
+            {
+                var confirm = alertify.confirm('You are not able to edit this field while any Items Model Line.' +
+                    'Please remove those items to edit this field.', function (e) {
+                }).set({title: "Remove Brands and ModelLines"})
+                $("#selectModelLineNum"+id+"Des1").find("option:selected").prop("selected", false);
+                $("#selectModelLineNum"+id+"Des1").trigger('change');
+            }
+        }
+        var modelLinesDataCount = modelLinesData.length;
+        var modelLineDescriptionDataCount = modelLineDescriptionData.length;
+
+        if(modelLinesDataCount == 0 && modelLineDescriptionDataCount == 0) {
+            $('#showModelNumDel'+id).attr('hidden',true);
+            for(var i=1;i<=index;i++) {
+                $('#showModelNumberdrop'+id+'Des'+i).attr('hidden',true);
+                if(i != 1) {
+                    $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
+                    $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                }
+            }
+        }
+    }
+    // function showModelNumberDropdown1(id,row)
+    // {
+    //     let showPartNumber = document.getElementById('showModelNumberdrop'+id+'Des'+row);
+    //     showPartNumber.hidden = false
+    //     let showPartNumber1 = document.getElementById('showaddtrd'+id);
+    //     showPartNumber1.hidden = false
+
+    //     var e = document.getElementById("addon_type");
+    //     var value = e.value;
+    //     var selectedModelLine = $("#selectModelLineNum"+id+"Des"+row).val();
+    //     $.ajax
+    //     ({
+    //         url:"{{url('getModelDescriptionDropdown')}}",
+    //         type: "POST",
+    //         data:
+    //         {
+    //             model_line_id: selectedModelLine,
+    //             addon_type: value,
+    //             _token: '{{csrf_token()}}'
+    //         },
+    //         dataType : 'json',
+    //         success:function(data)
+    //         {
+    //             // console.log(data);
+    //             $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+    //             let ModelLineModelDescription   = [];
+    //             $.each(data.model_description,function(key,value)
+    //             {
+    //                 ModelLineModelDescription.push
+    //                 ({
+    //                     id: value.id,
+    //                     text: value.model_description
+    //                 });
+    //             });
+    //             console.log(ModelLineModelDescription);
+    //             $("#selectModelNumberDiscri"+id+"Des"+row).select2
+    //             ({
+    //                 placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+
+    //                 allowClear: true,
+    //                 data: ModelLineModelDescription
+    //             });
+    //         }
+    //     });
+    // }
     function hideRelatedModalDis(id,row)
     {
         let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);

@@ -291,20 +291,6 @@
                     </div>
                     </br>
                     <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
-                            <span class="error">* </span>
-                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                            <div class="input-group">
-                                <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"
-                                    placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                </div>
-                                <span id="fixingChargeAmountError1" class="invalid-feedback"></span>
-                            </div>
-                        </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12" id="partNumberDiv" hidden>
                             <span class="error">* </span>
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
@@ -318,6 +304,20 @@
                                 </span>
                             @enderror
                             <span id="partNumberError" class="invalid-feedback partNumberError"></span>
+                        </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
+                            <span class="error">* </span>
+                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
+                            <div class="input-group">
+                                <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"
+                                    placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                </div>
+                                <span id="fixingChargeAmountError1" class="invalid-feedback"></span>
+                            </div>
                         </div>
                     </div>
                     </br>
@@ -350,9 +350,9 @@
                 </div>
                 @include('addon.brandModel')
                 <div class="card"  id="kitSupplier" >
-                    <div class="card-header">
+                    <!-- <div class="card-header">
                         <h4 class="card-title">Addon Suppliers And Purchase Price</h4>
-                    </div>
+                    </div> -->
                     <div id="London" class="tabcontent">
                         <div class="row">
                             <div class="card-body">
@@ -942,20 +942,14 @@
         function showPartNumberError($msg)
         {
             document.getElementById("partNumberError").textContent=$msg;
-            document.getElementById("partNumberError1").textContent=$msg;
             document.getElementById("part_number").classList.add("is-invalid");
-            document.getElementById("part_numberRaw").classList.add("is-invalid");
             document.getElementById("partNumberError").classList.add("paragraph-class");
-            document.getElementById("partNumberError1").classList.add("paragraph-class");
         }
         function removePartNumberError($msg)
         {
             document.getElementById("partNumberError").textContent="";
-            document.getElementById("partNumberError1").textContent="";
             document.getElementById("part_number").classList.remove("is-invalid");
-            document.getElementById("part_numberRaw").classList.remove("is-invalid");
             document.getElementById("partNumberError").classList.remove("paragraph-class");
-            document.getElementById("partNumberError1").classList.remove("paragraph-class");
         }
         function showAddonNameError($msg)
         {
@@ -1171,10 +1165,8 @@
         function setPartNumber(partNum)
         {
             $('#part_number').val(partNum.value);
-            $('#part_numberRaw').val(partNum.value);
             var partNumberInput = $('#part_number').val();
-            var partNumberRawInput = $('#part_numberRaw').val();
-            if(partNumberInput == '' && partNumberRawInput == '')
+            if(partNumberInput == '')
             {
                 $msg = "Part Number is required";
                 showPartNumberError($msg);
