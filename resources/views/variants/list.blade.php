@@ -33,41 +33,51 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                    <th>Name</th>
                     <th>Brand</th>
                     <th>Model Line</th>
                     <th>Model Description</th>
-                    <th>Steering</th>
-                    <th>Fuel Type</th>
-                    <th>Gear Box</th>
-                    <th>MY</th>
-                    <th>Seat</th>
-                    <th>Upholstery</th>
+                    <th>Model Year</th>
+                    <th>Variant</th>
+                    <th>Variant Detail</th>
                     <th>Engine Capacity</th>
-                    <th>Detail</th>
+                    <th>Transmission</th>
+                    <th>Fuel Type</th>
+                    <th>Steering</th>
+                    <th>Seating Capacity</th>
+                    <th>Upholstery</th>                    
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+                    @endphp
+                    @if ($hasPermission)
                     <th>Action</th>
+                    @endif
                 </tr>
                 </thead>
                 <tbody>
                 @foreach ($variants as $key => $variant)
                     <tr data-id="1">
-                        <td>{{ $variant->name }}</td>
                         <td>{{ $variant->brand->brand_name ?? ''}}</td>
                         <td>{{ $variant->master_model_lines->model_line ?? '' }}</td>
                         <td>{{ $variant->model_detail ?? '' }}</td>
-                        <td>{{ $variant->steering ?? '' }}</td>
-                        <td>{{ $variant->fuel_type ?? '' }}</td>
-                        <td>{{ $variant->gearbox ?? '' }}</td>
                         <td>{{ $variant->my ?? '' }}</td>
+                        <td>{{ $variant->name }}</td>
+                        <td>{{ $variant->detail ?? '' }}</td>
+                        <td>{{ $variant->engine ?? '' }}</td>
+                        <td>{{ $variant->gearbox ?? '' }}</td>
+                        <td>{{ $variant->fuel_type ?? '' }}</td>
+                        <td>{{ $variant->steering ?? '' }}</td>
                         <td>{{ $variant->seat ?? '' }}</td>
                         <td>{{ $variant->upholestry ?? '' }}</td>
-                        <td>{{ $variant->engine ?? '' }}</td>
-                        <td>{{ $variant->detail ?? '' }}</td>
+                        
+                        
                         <td>
-                            @can('variants-edit')
+                        @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
+                    @endphp
+                    @if ($hasPermission)
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
-                            @endcan
+                            @endif
                             <!-- @can('variants-delete')
                                 @if($variant->is_deletable == true)
                                 <a data-placement="top" id="{{ $variant->id }}" href="{{ route('variants.destroy',$variant->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </a>

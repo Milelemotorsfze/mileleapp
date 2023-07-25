@@ -40,12 +40,6 @@
             <div class="row">
                 <div class="col-lg-2 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Name</label>
-                        <input type="text" value="{{ old('name', $variant->name) }}" name="name" class="form-control " placeholder="Name">
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-12">
-                    <div class="mb-3">
                         <label for="choices-single-default" class="form-label"> Brand</label>
                         <select class="form-control" autofocus name="brands_id" id="brand">
                             <option></option>
@@ -75,35 +69,7 @@
                     </div>
                 <div class="col-lg-2 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Steering</label>
-                        <select class="form-control" autofocus name="steering" id="model">
-                            <option value="LHD" {{ (old('steering') == 'LHD' || $variant->steering == 'LHD') ? 'selected' : '' }}>LHD</option>
-                            <option value="RHD" {{ (old('steering') == 'RHD' || $variant->steering == 'RHD') ? 'selected' : '' }}>RHD</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Fuel Type</label>
-                        <select class="form-control" autofocus name="fuel_type" id="model">
-                            <option value="Diesel" {{ (old('fuel_type') == 'Diesel' || $variant->fuel_type == 'Diesel') ? 'selected' : '' }}>Diesel</option>
-                            <option value="EV" {{ (old('fuel_type') == 'EV' || $variant->fuel_type == 'EV') ? 'selected' : '' }}>EV</option>
-                            <option value="Gasoline" {{ (old('fuel_type') == 'Gasoline' || $variant->fuel_type == 'Gasoline') ? 'selected' : '' }}>Gasoline</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Gear Box</label>
-                        <select class="form-control" autofocus name="gearbox" id="model">
-                                <option value="Auto" {{ old('gearbox') == 'Auto' || $variant->gearbox == 'Auto' ? 'selected' : '' }}>Auto</option>
-                                <option value="Manual" {{ old('gearbox') == 'Manual' || $variant->gearbox == 'Manual' ? 'selected' : '' }}>Manual</option>
-                            </select>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">My</label>
+                        <label for="choices-single-default" class="form-label">Model Year</label>
                         @php
                             $currentYear = date("Y");
                             $years = range($currentYear + 10, $currentYear - 10);
@@ -118,7 +84,53 @@
                 </div>
                 <div class="col-lg-2 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Seat</label>
+                        <label for="choices-single-default" class="form-label">Variant</label>
+                        <input type="text" value="{{ old('name', $variant->name) }}" name="name" class="form-control " placeholder="Name">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Variant Detail</label>
+                        <input type="text" value="{{ old('detail', $variant->detail) }}" name="detail" class="form-control "placeholder="Detail">
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Engine Capacity</label>
+                            <input type="text" value="{{ old('engine_capacity', $variant->engine) }}" name="engine" class="form-control "placeholder="Engine Capacity" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Transmission</label>
+                        <select class="form-control" autofocus name="gearbox" id="model">
+                                <option value="Auto" {{ old('gearbox') == 'Auto' || $variant->gearbox == 'Auto' ? 'selected' : '' }}>Auto</option>
+                                <option value="Manual" {{ old('gearbox') == 'Manual' || $variant->gearbox == 'Manual' ? 'selected' : '' }}>Manual</option>
+                            </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Fuel Type</label>
+                        <select class="form-control" autofocus name="fuel_type" id="model">
+                            <option value="Diesel" {{ (old('fuel_type') == 'Diesel' || $variant->fuel_type == 'Diesel') ? 'selected' : '' }}>Diesel</option>
+                            <option value="EV" {{ (old('fuel_type') == 'EV' || $variant->fuel_type == 'EV') ? 'selected' : '' }}>EV</option>
+                            <option value="Gasoline" {{ (old('fuel_type') == 'Gasoline' || $variant->fuel_type == 'Gasoline') ? 'selected' : '' }}>Gasoline</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Steering</label>
+                        <select class="form-control" autofocus name="steering" id="model">
+                            <option value="LHD" {{ (old('steering') == 'LHD' || $variant->steering == 'LHD') ? 'selected' : '' }}>LHD</option>
+                            <option value="RHD" {{ (old('steering') == 'RHD' || $variant->steering == 'RHD') ? 'selected' : '' }}>RHD</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">Seating Capacity</label>
                         <select name="seat" class="form-control">
                                 @for($i = 1; $i <= 50; $i++)
                                     <option value="{{ $i }}" {{ old('seat') == $i || $variant->seat == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -136,18 +148,6 @@
                                 <option value="Fabric / Leather" {{ old('upholestry') == 'Fabric / Leather' || $variant->upholestry == 'Fabric / Leather' ? 'selected' : '' }}>Fabric / Leather</option>
                                 <option value="Vinyl" {{ old('upholestry') == 'Vinyl' || $variant->upholestry == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
                             </select>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Engine Capacity</label>
-                            <input type="text" value="{{ old('engine_capacity', $variant->engine) }}" name="engine" class="form-control "placeholder="Engine Capacity" required>
-                        </div>
-                    </div>
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Detail</label>
-                        <input type="text" value="{{ old('detail', $variant->detail) }}" name="detail" class="form-control "placeholder="Detail">
                     </div>
                 </div>
                 <div class="col-12 text-center">

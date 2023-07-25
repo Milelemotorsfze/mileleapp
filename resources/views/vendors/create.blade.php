@@ -73,7 +73,8 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Trade / Individual Name </label>
                                 <input type="text" class="form-control @error('trade_name_or_individual_name') is-invalid @enderror"
-                                       name="trade_name_or_individual_name" placeholder="Trade / Individual Name">
+                                       id="trade_name_or_individual_name" name="trade_name_or_individual_name" placeholder="Trade / Individual Name">
+                                       <span id="poNumberError" class="error" style="display: none;"></span>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
@@ -516,8 +517,52 @@
                     }
                 }
             },
+        submitHandler: function(form) {
+            // This function will be called when the form is submitted and passes validation
+            var trade_name_or_individual_name = $('#trade_name_or_individual_name').val();
+            $.ajax({
+                url: '{{ route('vendorchecking.checkingname') }}',
+                type: 'POST',
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'trade_name_or_individual_name': trade_name_or_individual_name
+                },
+                success: function(response) {
+                    if (response.exists) {
+                        alert("Name Already Existing");
+                    } else {
+                        form.submit();
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                    alert("Name Already Existing");
+                }
+                }
+            });
+        }
         });
-
+    $(document).ready(function() {
+    $('#trade_name_or_individual_name').on('blur', function() {
+        var trade_name_or_individual_name = $(this).val();
+        $.ajax({
+            url: '{{ route('vendorchecking.checkingname') }}',
+            type: 'POST',
+            data: {
+                '_token': '{{ csrf_token() }}',
+                'trade_name_or_individual_name': trade_name_or_individual_name
+            },
+            success: function(response) {
+                $('#trade_name_or_individual_nameError').hide().text('');
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    alert("Name Already Existing");
+                }
+            }
+        });
+    });
+});
     </script>
 @endpush
 

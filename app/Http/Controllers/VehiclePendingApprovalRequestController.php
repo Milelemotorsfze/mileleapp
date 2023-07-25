@@ -43,7 +43,6 @@ class VehiclePendingApprovalRequestController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
             ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount'));
     }

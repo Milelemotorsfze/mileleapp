@@ -602,9 +602,8 @@
                                       @endphp
 
                                       @if ($hasPermission)
-
                                           {{-- If $grn_date is set and $gdn_number is null --}}
-                                          @if ($grn_date && $gdn_number === null)
+                                          @if ($grn_date && $gdn_date === null)
                                               @php
                                               $grn_date = \Carbon\Carbon::parse($grn_date);
                                               $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
@@ -612,9 +611,9 @@
                                               <td class="nowrap-td">{{ $aging }}</td>
 
                                           {{-- If $gdn_number is set, calculate aging as the difference between $grn_date and $gdn_number --}}
-                                          @elseif ($gdn_number)
+                                          @elseif ($gdn_date)
                                               @php
-                                              $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_number);
+                                              $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_date);
                                               @endphp
                                               <td class="nowrap-td">{{ $aging }}</td>
 
@@ -726,7 +725,7 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                     @endphp
                                     @if ($hasPermission)
-									@php
+									                  @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)

@@ -222,7 +222,6 @@
                            <div class="row form_field_outer_row" id="row-${index}">
                             <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label"> VIN</label>
                                     <select class="form-control vehicles" required multiple="true" id="vehicles-${index}"
                                     data-index="${index}" autofocus name="vins[${index}]" id="vin">
                                     <option></option>
@@ -231,19 +230,17 @@
                         </div>
                         <div class="col-lg-3 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Variant Detail</label>
                                 <input type="text" value="" class="form-control widthinput variant-detail" id="variant-detail-${index}"
                             readonly placeholder="Vehicle Details">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-6 col-sm-12">
                             <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Vehicle Picture Link</label>
                                 <input type="url" name="vehicle_picture_link[${index}]" class="form-control widthinput" required placeholder="Vehicle Picture Link">
                                 </div>
                             </div>
 
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 " style="margin-top:32px" >
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 ">
                                 <button type="button" class="btn btn-danger btn-sm removeButton" id="remove-${index}" data-index="${index}" >
                                     <i class="fa fa-trash"></i>
                                 </button>

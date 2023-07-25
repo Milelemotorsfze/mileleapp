@@ -157,7 +157,7 @@
   @if ($purchasingOrder->status === 'Approved')
   @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Approved'))
 <div class="col-lg-2 col-md-3 col-sm-12">
-  <label for="choices-single-default" class="form-label"><strong>Initiation Payment Request</strong></label>
+  <label for="choices-single-default" class="form-label"><strong>Initiate Payment Request</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
  
@@ -195,7 +195,7 @@
   @if ($purchasingOrder->status === 'Approved')
   @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('status', 'Request for Payment'))
 <div class="col-lg-2 col-md-3 col-sm-12">
-  <label for="choices-single-default" class="form-label"><strong>Initiation Payment Request</strong></label>
+  <label for="choices-single-default" class="form-label"><strong>Payment Request Initiation</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
  

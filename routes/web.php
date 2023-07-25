@@ -319,6 +319,7 @@ Route::get('/d', function () {
     Route::get('/vehicleinspectionapprovals', [VehiclesController::class, 'pendingapprovals'])->name('vehicleinspectionapprovals.pendingapprovals');
     Route::get('/vehicleinspectionpending', [VehiclesController::class, 'pendinginspection'])->name('vehicleinspectionpending.pendinginspection');
     Route::get('/vehicleincomingstock', [VehiclesController::class, 'incomingstocks'])->name('vehiclesincoming.stock');
+    Route::post('vendorchecking/check-name', [VendorController::class, 'checkingname'])->name('vendorchecking.checkingname');
     // Vendors
 
     Route::resource('vendors', VendorController::class);

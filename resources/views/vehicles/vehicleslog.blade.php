@@ -38,7 +38,7 @@
             @endif
         </div>
         <div>
-            <center><b>Vehicle Identification Number: EAT4771585245723MB
+            <center><b>Vehicle Identification Number:
                     @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                     @endphp
@@ -55,7 +55,16 @@
             @endif
         </div>
     </div>
+    <br>
+            @php
+            $pictureslink = DB::table('vehicle_pictures')->where('vehicle_id', $vehicle->id)->first();
+            $pictures = $pictureslink->vehicle_picture_link ?? '';
+            @endphp
+            @if($pictures)
+            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$pictures}}" target="_blank">View Pictures</a>
+            @endif
     </div>
+    
     <div class="card-body">
     @php
     $po = DB::table('purchasing_order')->where('id', $vehicle->purchasing_order_id)->first();

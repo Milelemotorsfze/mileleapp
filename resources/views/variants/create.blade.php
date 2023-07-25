@@ -32,12 +32,6 @@
                 <div class="row">
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Name</label>
-                            <input type="text" value="{{ old('name') }}" name="name" class="form-control " placeholder="Name">
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-12">
-                        <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Brand</label>
                             <select class="form-control" autofocus name="brands_id" id="brand">
                                 @foreach($brands as $brand)
@@ -68,10 +62,43 @@
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Steering</label>
-                            <select class="form-control" autofocus name="steering" id="model">
-                                <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
-                                <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
+                            <label for="choices-single-default" class="form-label">Model Year</label>
+                            @php
+                            $currentYear = date("Y");
+                            $years = range($currentYear + 10, $currentYear - 10);
+                            $years = array_reverse($years);
+                            @endphp
+                            <select name="my" class="form-control">
+                                @foreach ($years as $year)
+                                    <option value="{{ $year }}" {{ old('my') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Variant</label>
+                            <input type="text" value="{{ old('name') }}" name="name" class="form-control " placeholder="Name">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label"> Variant Detail</label>
+                            <input type="text" value="{{ old('detail') }}" name="detail" class="form-control "placeholder="Detail" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Engine Capacity</label>
+                            <input type="text" value="{{ old('engine_capacity') }}" name="engine" class="form-control "placeholder="Engine Capacity" required>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Transmission</label>
+                            <select class="form-control" autofocus name="gearbox" id="model">
+                                <option value="Auto" {{ old('gearbox') == 'Auto' ? 'selected' : '' }}>Auto</option>
+                                <option value="Manual" {{ old('gearbox') == 'Manual' ? 'selected' : '' }}>Manual</option>
                             </select>
                         </div>
                     </div>
@@ -87,31 +114,17 @@
                     </div>
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Gear Box</label>
-                            <select class="form-control" autofocus name="gearbox" id="model">
-                                <option value="Auto" {{ old('gearbox') == 'Auto' ? 'selected' : '' }}>Auto</option>
-                                <option value="Manual" {{ old('gearbox') == 'Manual' ? 'selected' : '' }}>Manual</option>
+                            <label for="choices-single-default" class="form-label">Steering</label>
+                            <select class="form-control" autofocus name="steering" id="model">
+                                <option value="LHD" {{ old('steering') == 'LHD' ? 'selected' : '' }}>LHD</option>
+                                <option value="RHD" {{ old('steering') == 'RHD' ? 'selected' : '' }}>RHD</option>
                             </select>
                         </div>
                     </div>
+                    
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">MY</label>
-                            @php
-                            $currentYear = date("Y");
-                            $years = range($currentYear + 10, $currentYear - 10);
-                            $years = array_reverse($years);
-                            @endphp
-                            <select name="my" class="form-control">
-                                @foreach ($years as $year)
-                                    <option value="{{ $year }}" {{ old('my') == $year ? 'selected' : '' }}>{{ $year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Seat</label>
+                            <label for="choices-single-default" class="form-label">Seating Capacity</label>
                             <select name="seat" class="form-control">
                                 @for($i = 1; $i <= 50; $i++)
                                     <option value="{{ $i }}" {{ old('seat') == $i ? 'selected' : '' }}>{{ $i }}</option>
@@ -129,18 +142,6 @@
                                 <option value="Fabric / Leather" {{ old('upholestry') == 'Fabric / Leather' ? 'selected' : '' }}>Fabric / Leather</option>
                                 <option value="Vinyl" {{ old('upholestry') == 'Vinyl' ? 'selected' : '' }}>Vinyl</option>
                             </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Engine Capacity</label>
-                            <input type="text" value="{{ old('engine_capacity') }}" name="engine" class="form-control "placeholder="Engine Capacity" required>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Detail</label>
-                            <input type="text" value="{{ old('detail') }}" name="detail" class="form-control "placeholder="Detail" required>
                         </div>
                     </div>
                     <div class="col-12 text-center">

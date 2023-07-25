@@ -204,4 +204,13 @@ class VendorController extends Controller
     {
         //
     }
+    public function checkingname(Request $request)
+    {
+        $trade_name_or_individual_name = $request->input('trade_name_or_individual_name');
+        $existingtrade_name_or_individual_name = Vendor::where('trade_name_or_individual_name', $trade_name_or_individual_name)->first();
+        if ($existingtrade_name_or_individual_name) {
+            return response()->json(['error' => 'Name already exists'], 422);
+        }
+        return response()->json(['success' => 'Name is valid'], 200);
+    }
 }
