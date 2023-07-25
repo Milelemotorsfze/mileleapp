@@ -3,7 +3,7 @@
         <div hidden>{{$i=0;}}</div>
         @if($addonDetails->is_all_brands == "yes")
             <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
-            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px; 
+            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px;
                     margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-{{$i}}">
                 <div class="row">
                     <div class="col-xxl-5 col-lg-5 col-md-12">
@@ -81,7 +81,7 @@
         @else
         @foreach($existingBrandModel as $existingBrand)
             <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
-            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px; 
+            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px;
                     margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-{{$i}}">
                 <div class="row">
                     <div class="col-xxl-5 col-lg-5 col-md-12">
@@ -193,7 +193,7 @@
     var lengthExistingBrands = '';
     $(document).ready(function ()
     {
-        lengthExistingBrands = existingBrandModel.length; 
+        lengthExistingBrands = existingBrandModel.length;
         if(lengthExistingBrands > 0)
         {
             let showAdTrim = document.getElementById('showaddtrimDis');
@@ -216,8 +216,14 @@
         $(document.body).on('select2:select', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
+
+            var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
+            for(var i = 1;i<=indexValue;i++) {
+                $('#selectModelLineNum'+index+'Des'+i).empty();
+                $('#selectModelNumberDiscri'+index+'Des'+i).empty();
+            }
+
             hideOption(index,value);
-           
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
@@ -253,11 +259,10 @@
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
-            var id = e.params.value;
-            var text = e.params.text;
+            var id = e.params.data.id;
+            var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text)
         });
-
 
         function modelLineDataHide(index,modelIndex,value) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
@@ -285,7 +290,7 @@
                 $('#selectBrandMo'+i).append($('<option>', {value: id, text :text}))
             }
         }
-        $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) 
+        $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e)
         {
             var countRow = 0;
             var countRow =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
@@ -321,11 +326,11 @@
                     $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
                     $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
                     $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
-                    
+
                     var oldIndex = '';
                     oldIndex = index+1;
                     itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
-                    for (var i = 1; i <= itemcount; i++) 
+                    for (var i = 1; i <= itemcount; i++)
                     {
                         $(this).find('#row-spare-part-brand-'+oldIndex+'-model-'+i).attr('id', 'row-spare-part-brand-'+index+'-model-'+i);
                         $(this).find('#showDivdropDr'+ oldIndex +'Des'+i).attr('id','showDivdropDr'+ index +'Des'+i);
@@ -340,10 +345,10 @@
                             allowClear: true,
                             maximumSelectionLength: 1,
                         });
-                        
+
                         $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
                         $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
-                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);                   
+                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);
                         $("#selectModelNumberDiscri"+index+"Des"+i).select2
                         ({
                             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -360,7 +365,7 @@
             {
                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
                 }).set({title:"Can't Remove Brand And Model Lines"})
-            }   
+            }
         })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {
             var indexNumber = $(this).attr('data-index');
@@ -821,7 +826,7 @@
             }
         }
     }
-    function RelatedModelLineCheck(id,row) 
+    function RelatedModelLineCheck(id,row)
     {
         var index = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
 

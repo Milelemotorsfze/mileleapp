@@ -104,12 +104,31 @@
 
         var index = 1;
         $('#indexValue').val(index);
+
+        function sortDropDownListByText() {
+            $("select").each(function() {
+                var selectedValue = $(this).val();
+                // Sort all the options by text. I could easily sort these by val.
+                $(this).html($("option", $(this)).sort(function(a, b) {
+                    return a.text == b.text ? 0 : a.text < b.text ? -1 : 1
+                }));
+
+                $(this).val(selectedValue);
+            });
+        }
+
         $(document.body).on('select2:select', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
+            var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
+            for(var i = 1;i<=indexValue;i++) {
+                $('#selectModelLineNum'+index+'Des'+i).empty();
+                $('#selectModelNumberDiscri'+index+'Des'+i).empty();
+            }
             hideOption(index,value);
 
         });
+
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             // alert("ok");
             var index = $(this).attr('data-index');
@@ -133,6 +152,7 @@
                     $('#selectBrandMo'+i).append($('<option>', {value: data.id, text : data.text}))
                 }
             }
+            // sortDropDownListByText();
         }
 
         $(document.body).on('select2:select', ".spare-parts-model-lines", function (e) {
@@ -145,12 +165,10 @@
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
-            var id = e.params.value;
-            var text = e.params.text;
-
+            var id = e.params.data.id;
+            var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text);
         });
-
 
         function modelLineDataHide(index,modelIndex,value) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
@@ -170,6 +188,7 @@
                     $('#'+currentId).append($('<option>', {value: id, text : text}))
                 }
             }
+            // sortDropDownListByText();
         }
 
         function addOption(id,text) {
@@ -177,6 +196,8 @@
             for(var i=1;i<=indexValue;i++) {
                 $('#selectBrandMo'+i).append($('<option>', {value: id, text :text}))
             }
+            // sortDropDownListByText();
+
         }
         $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) {
             var countRow = 0;
@@ -507,13 +528,8 @@
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
 
-    function selectModelLineDescipt(id,row)
-    {
-        ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
-        showModelNumberDropdown(id,row);
-    }
-    function selectBrandDisp(id,row)
-    {
+
+    function selectBrandDisp(id,row) {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
 
         for (let a = 1; a <= i; a++)
@@ -548,14 +564,9 @@
                 {
                     RelatedDataCheck(id,row);
                     $('#showaddtrimDis').attr('hidden',true);
-
-                    // hideRelatedModalDis(id,row);
                 }
             }
-            // else
-            // {
-            //     hideRelatedModalDis(id,row);
-            // }
+
         }
     }
     function  RelatedDataCheck() {
@@ -665,6 +676,7 @@
                         text: value.model_line
                     });
                 });
+
                 $("#selectModelLineNum"+id+"Des"+row).select2
                 ({
                     placeholder: 'Choose Model Line....     Or     Type Here To Search....',
@@ -682,6 +694,12 @@
                 });
             }
         });
+    }
+    function selectModelLineDescipt(id,row)
+    {
+        ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
+
+        showModelNumberDropdown(id,row);
     }
     function showModelNumberDropdown(id,row)
     {
@@ -735,22 +753,7 @@
         }
         }
     }
-    // function hideRelatedModalDis(id,row)
-    // {
-    //     // var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-    //     // alert(brandTotalIndex);
-    //     // if(brandTotalIndex <=1) {
-    //
-    //         // let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
-    //         // showDivdropModelLine.hidden = true
-    //         // let showDivdropDr = document.getElementById('showModelNumberdrop'+id+'Des'+row);
-    //         // showDivdropDr.hidden = true
-    //         $('#showaddtrimDis').attr('hidden',true);
-    //         // let showaddtrim = document.getElementById('showaddtrimDis');
-    //         // showaddtrim.hidden = true
-    //     // }
-    //
-    // }
+
     function RelatedModelLineCheck(id,row) {
 
         var index = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
@@ -802,9 +805,9 @@
         }
 
     }
-    function hideModelNumberDropdown(id,row)
-    {
-        let showPartNumber = document.getElementById('showModelNumberdrop'+row);
-        showPartNumber.hidden = true
-    }
+    // function hideModelNumberDropdown(id,row)
+    // {
+    //     let showPartNumber = document.getElementById('showModelNumberdrop'+row);
+    //     showPartNumber.hidden = true
+    // }
 </script>
