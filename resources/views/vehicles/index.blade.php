@@ -269,13 +269,13 @@
         })
         ->count();
           @endphp
-          {{$countpreviouseyear}}     
+          {{$countpreviouseyear}}
         </td>
         <td style="font-size: 12px;">
-            Previous Year
+            {{$previousYearSold}}
         </td>
         <td style="font-size: 12px;">
-            Previous Year
+            {{$previousYearBooked}}
         </td>
         <td style="font-size: 12px;">
               @php
@@ -321,26 +321,26 @@
             Previous Month
         </td>
         <td style="font-size: 12px;">
-        @php
-    $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
-    $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+            @php
+            $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+            $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
 
-    $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
-        ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
-            $query->select(DB::raw(1))
-                ->from('grn')
-                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
-        })
-        ->count();
-@endphp
-{{$countLastMonth}}
+            $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+                ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                    $query->select(DB::raw(1))
+                        ->from('grn')
+                        ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                        ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
+                })
+                ->count();
+            @endphp
+        {{$countLastMonth}}
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            {{ $previousMonthSold }}
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            {{ $previousMonthBooked }}
         </td>
         <td style="font-size: 12px;">
             Previous Month
@@ -351,31 +351,31 @@
           Yesterday
         </td>
         <td style="font-size: 12px;">
-        @php
-    $startDateLastDay = \Carbon\Carbon::now()->subDay(1)->startOfDay();
-    $endDateLastDay = \Carbon\Carbon::now()->subDay(1)->endOfDay();
+            @php
+                $startDateLastDay = \Carbon\Carbon::now()->subDay(1)->startOfDay();
+                $endDateLastDay = \Carbon\Carbon::now()->subDay(1)->endOfDay();
 
-    $countLastDay = \Illuminate\Support\Facades\DB::table('vehicles')
-        ->whereExists(function ($query) use ($startDateLastDay, $endDateLastDay) {
-            $query->select(DB::raw(1))
-                ->from('grn')
-                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                ->whereBetween('grn.date', [$startDateLastDay, $endDateLastDay]);
-        })
-        ->count();
-@endphp
+                $countLastDay = \Illuminate\Support\Facades\DB::table('vehicles')
+                    ->whereExists(function ($query) use ($startDateLastDay, $endDateLastDay) {
+                        $query->select(DB::raw(1))
+                            ->from('grn')
+                            ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                            ->whereBetween('grn.date', [$startDateLastDay, $endDateLastDay]);
+                    })
+                    ->count();
+            @endphp
 
-{{$countLastDay}}
+            {{$countLastDay}}
 
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            {{ $yesterdaySold }}
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            {{ $yesterdayBooked }}
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            Yesterday - available
         </td>
       </tr>
     </tbody>

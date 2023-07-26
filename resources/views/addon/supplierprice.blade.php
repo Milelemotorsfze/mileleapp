@@ -85,18 +85,31 @@
 <script type="text/javascript">
     $(document).ready(function ()
     {
+        function sortDropDownListByText() {
+            $("select").each(function() {
+                var selectedValue = $(this).val();
+                // Sort all the options by text. I could easily sort these by val.
+                $(this).html($("option", $(this)).sort(function(a, b) {
+                    return a.text == b.text ? 0 : a.text < b.text ? -1 : 1
+                }));
+
+                $(this).val(selectedValue);
+            });
+        }
         $("#suppliers1").select2
         ({
             placeholder:"Choose Suppliers....     Or     Type Here To Search...."
         });
         var index = 1;
         $('#indexValue').val(index);
+
         $(document.body).on('select2:select', ".suppliers", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
             hideOption(index,value);
             disableDropdown();
         });
+
         $(document.body).on('select2:unselect', ".suppliers", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
@@ -108,6 +121,7 @@
             for(var i=1;i<=indexValue;i++) {
                 $('#suppliers'+i).append($('<option>', {value: id, text :text}))
             }
+            sortDropDownListByText();
         }
 
         function hideOption(index,value) {
@@ -126,6 +140,7 @@
                     $('#suppliers'+i).append($('<option>', {value: data.id, text : data.text}))
                 }
             }
+            sortDropDownListByText();
         }
         $(document.body).on('click', ".removeButton", function (e) {
             var countRow = 0;
@@ -174,14 +189,11 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Supplier and Price Required',function (e) {
                    }).set({title:"Can't Remove Supplier And Prices"})
                 }
-           
-
         })
     });
 
     $("body").on("click",".addSupplierAndPriceWithoutKit", function ()
     {
-
         var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1;
 
         $('#indexValue').val(index);
