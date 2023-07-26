@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BrandController extends Controller
 {
@@ -12,7 +13,8 @@ class BrandController extends Controller
      */
     public function index()
     {
-        //
+        $brands = Brand::orderBy('id','DESC')->get();
+        return view('brands.index', compact('brands'));
     }
 
     /**
@@ -20,7 +22,7 @@ class BrandController extends Controller
      */
     public function create()
     {
-        //
+        return view('brands.create');
     }
 
     /**
@@ -28,7 +30,17 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $this->validate($request, [
+            'brand_name' => 'required',
+        ]);
+
+        $brand = new Brand();
+        $brand->brand_name = $request->brand_name;
+        $brand->created_by = Auth::id();
+        $brand->save();
+
+        return redirect()->route('brands.index')->with('success','Brand Created Successfully.');
     }
 
     /**
@@ -44,7 +56,9 @@ class BrandController extends Controller
      */
     public function edit(Brand $brand)
     {
-        //
+        $brand = Brand::findOrFail($brand->id);
+
+        return view('brands.edit',compact('brand'));
     }
 
     /**
@@ -52,7 +66,16 @@ class BrandController extends Controller
      */
     public function update(Request $request, Brand $brand)
     {
-        //
+        $this->validate($request, [
+            'brand_name' => 'required',
+        ]);
+
+        $brand = Brand::findOrFail($brand->id);
+        $brand->brand_name = $request->brand_name;
+        $brand->updated_by = Auth::id();
+        $brand->save();
+
+        return redirect()->route('brands.index')->with('success','Brand Updated Successfully.');
     }
 
     /**
