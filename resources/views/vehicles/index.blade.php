@@ -255,21 +255,21 @@
             Previous Year
         </td>
         <td style="font-size: 12px;">
-    @php
-    $currentYear = \Carbon\Carbon::now()->year;
-    $previousYear = $currentYear - 1;
-    $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
-    $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
-    $countpreviouseyear = \Illuminate\Support\Facades\DB::table('vehicles')
-        ->whereExists(function ($query) use ($startDate, $endDate) {
-            $query->select(DB::raw(1))
-                ->from('grn')
-                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                ->whereBetween('grn.date', [$startDate, $endDate]);
-        })
-        ->count();
-          @endphp
-          {{$countpreviouseyear}}
+        @php
+        $currentYear = \Carbon\Carbon::now()->year;
+        $previousYear = $currentYear - 1;
+        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+        $countpreviouseyear = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw(1))
+                    ->from('grn')
+                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->whereBetween('grn.date', [$startDate, $endDate]);
+            })
+            ->count();
+              @endphp
+              {{$countpreviouseyear}}
         </td>
         <td style="font-size: 12px;">
             {{$previousYearSold}}
@@ -278,40 +278,41 @@
             {{$previousYearBooked}}
         </td>
         <td style="font-size: 12px;">
-              @php
-              $currentYear = \Carbon\Carbon::now()->year;
-              $previousYear = $currentYear - 1;
-              $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
-              $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
-              $countVehiclesWithGRN = \Illuminate\Support\Facades\DB::table('vehicles')
-                          ->whereNull('so_id')
-                          ->whereNull('gdn_id')
-                          ->whereExists(function ($query) use ($startDate, $endDate) {
-                          $query->select(DB::raw(1))
-                          ->from('grn')
-                          ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                          ->whereBetween('grn.date', [$startDate, $endDate]);
-                  })
-                  ->count();
-              $countVehiclesWithSO = \Illuminate\Support\Facades\DB::table('vehicles')
-                          ->whereExists(function ($query) use ($startDate, $endDate) {
-                          $query->select(DB::raw(1))
-                          ->from('so')
-                          ->whereColumn('so.id', '=', 'vehicles.so_id')
-                          ->whereBetween('so.so_date', [$startDate, $endDate]);
-                          })
-                          ->count();
-              $countVehiclesWithGDN = \Illuminate\Support\Facades\DB::table('vehicles')
-                          ->whereExists(function ($query) use ($startDate, $endDate) {
-                          $query->select(DB::raw(1))
-                          ->from('gdn')
-                          ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
-                          ->whereBetween('gdn.date', [$startDate, $endDate]);
-                  })
-                  ->count();
-              $totalCountPreviousYear = $countVehiclesWithGRN + $countVehiclesWithSO + $countVehiclesWithGDN;
-          @endphp
-          {{$totalCountPreviousYear}}
+{{--              @php--}}
+{{--              $currentYear = \Carbon\Carbon::now()->year;--}}
+{{--              $previousYear = $currentYear - 1;--}}
+{{--              $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);--}}
+{{--              $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);--}}
+{{--              $countVehiclesWithGRN = \Illuminate\Support\Facades\DB::table('vehicles')--}}
+{{--                          ->whereNull('so_id')--}}
+{{--                          ->whereNull('gdn_id')--}}
+{{--                          ->whereExists(function ($query) use ($startDate, $endDate) {--}}
+{{--                          $query->select(DB::raw(1))--}}
+{{--                          ->from('grn')--}}
+{{--                          ->whereColumn('grn.id', '=', 'vehicles.grn_id')--}}
+{{--                          ->whereBetween('grn.date', [$startDate, $endDate]);--}}
+{{--                  })--}}
+{{--                  ->count();--}}
+{{--              $countVehiclesWithSO = \Illuminate\Support\Facades\DB::table('vehicles')--}}
+{{--                          ->whereExists(function ($query) use ($startDate, $endDate) {--}}
+{{--                          $query->select(DB::raw(1))--}}
+{{--                          ->from('so')--}}
+{{--                          ->whereColumn('so.id', '=', 'vehicles.so_id')--}}
+{{--                          ->whereBetween('so.so_date', [$startDate, $endDate]);--}}
+{{--                          })--}}
+{{--                          ->count();--}}
+{{--              $countVehiclesWithGDN = \Illuminate\Support\Facades\DB::table('vehicles')--}}
+{{--                          ->whereExists(function ($query) use ($startDate, $endDate) {--}}
+{{--                          $query->select(DB::raw(1))--}}
+{{--                          ->from('gdn')--}}
+{{--                          ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')--}}
+{{--                          ->whereBetween('gdn.date', [$startDate, $endDate]);--}}
+{{--                  })--}}
+{{--                  ->count();--}}
+{{--              $totalCountPreviousYear = $countVehiclesWithGRN + $countVehiclesWithSO + $countVehiclesWithGDN;--}}
+{{--          @endphp--}}
+{{--          {{$totalCountPreviousYear}}--}}
+              {{ $previousYearAvailable }}
         </td>
       </tr>
       <tr>
@@ -343,7 +344,7 @@
             {{ $previousMonthBooked }}
         </td>
         <td style="font-size: 12px;">
-            Previous Month
+            {{ $previousMonthAvailable }}
         </td>
       </tr>
       <tr>
@@ -374,7 +375,7 @@
             {{ $yesterdayBooked }}
         </td>
         <td style="font-size: 12px;">
-            Yesterday - available
+            {{$yesterdayAvailable}}
         </td>
       </tr>
     </tbody>
