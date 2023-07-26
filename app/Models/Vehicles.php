@@ -11,6 +11,17 @@ class Vehicles extends Model
     use HasFactory;
     protected $table = 'vehicles';
     public const VEHICLE_STATUS_INCOMING = 'Incoming Stock';
+
+    public const FILTER_PREVIOUS_YEAR_SOLD = 'PREVIOUS YEAR SOLD';
+    public const FILTER_PREVIOUS_MONTH_SOLD = 'PREVIOUS MONTH SOLD';
+    public const FILTER_YESTERDAY_SOLD = 'YESTERDAY SOLD';
+    public const FILTER_PREVIOUS_YEAR_BOOKED = 'PREVIOUS YEAR BOOKED';
+    public const FILTER_PREVIOUS_MONTH_BOOKED = 'PREVIOUS MONTH BOOKED';
+    public const FILTER_YESTERDAY_BOOKED = 'YESTERDAY BOOKED';
+    public const FILTER_PREVIOUS_YEAR_AVAILABLE = 'PREVIOUS YEAR AVAILABLE';
+    public const FILTER_PREVIOUS_MONTH_AVAILABLE = 'PREVIOUS MONTH AVAILABLE';
+    public const FILTER_YESTERDAY_AVAILABLE = 'YESTERDAY AVAILABLE';
+
     public  $appends = [
         'similar_vehicles_with_active_stock',
         'similar_vehicles_with_inactive_stock',

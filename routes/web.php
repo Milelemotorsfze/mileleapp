@@ -331,4 +331,10 @@ Route::get('/d', function () {
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
 
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
+
+    // vehicle stock report
+
+    Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
+
+
 });

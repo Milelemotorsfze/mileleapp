@@ -33,7 +33,8 @@ class VehiclesController extends Controller
     public function index(Request $request)
     {
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
-        if ($hasPermission) {
+        if ($hasPermission)
+        {
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->where(function ($query) {
@@ -45,6 +46,13 @@ class VehiclesController extends Controller
                     });
             })
             ->get();
+
+            if($request->key) {
+                $searchKey = $request->key;
+                if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
+                    $data = $this->previousYearSold();
+                }
+            }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -60,16 +68,16 @@ class VehiclesController extends Controller
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
 
-        $previousYearSold = $this->previousYearSold();
-        $previousYearBooked = $this->previousYearBooked();
-        $previousMonthSold = $this->previousMonthSold();
-        $previousMonthBooked = $this->previousMonthBooked();
-        $yesterdaySold = $this->yesterdaySold();
-        $yesterdayBooked  = $this->yesterdayBooked();
-        $previousYearAvailable  = $this->previousYearAvailable();
-        $previousMonthAvailable  = $this->previousMonthAvailable();
-        $yesterdayAvailable  = $this->yesterdayAvailable();
-//        return $previousYearAvailable;
+        $previousYearSold = $this->previousYearSold()->count();
+        $previousYearBooked = $this->previousYearBooked()->count();
+        $previousMonthSold = $this->previousMonthSold()->count();
+        $previousMonthBooked = $this->previousMonthBooked()->count();
+        $yesterdaySold = $this->yesterdaySold()->count();
+        $yesterdayBooked  = $this->yesterdayBooked()->count();
+        $previousYearAvailable  = $this->previousYearAvailable()->count();
+        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
+        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
             'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
@@ -78,6 +86,85 @@ class VehiclesController extends Controller
         else{
             return redirect()->route('home');
         }
+    }
+    public function stockCountFilter(Request $request) {
+
+        if($request->key) {
+            $searchKey = $request->key;
+            $vehicleIds = Vehicles::pluck('id');
+
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
+                $vehicleIds = $this->previousYearSold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_SOLD) {
+                $vehicleIds = $this->previousMonthSold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_SOLD) {
+                $vehicleIds = $this->yesterdaySold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_BOOKED) {
+                $vehicleIds = $this->previousYearBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_BOOKED) {
+                $vehicleIds = $this->previousMonthBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_BOOKED) {
+                $vehicleIds = $this->yesterdayBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE) {
+                $vehicleIds = $this->previousYearAvailable()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE) {
+                $vehicleIds = $this->previousMonthAvailable()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
+                $vehicleIds = $this->yesterdayAvailable()->pluck('id');
+            }
+            $data = Vehicles::whereIn('id',$vehicleIds)->get();
+
+        }else{
+
+            $statuss = "Incoming Stock";
+            $data = Vehicles::where('payment_status', $statuss)
+                ->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                })
+                ->get();
+        }
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
+            ->groupBy('vehicle_id')->get();
+        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+        $sales_persons = ModelHasRoles::get();
+        $sales_ids = $sales_persons->pluck('model_id');
+        $sales = User::whereIn('id', $sales_ids)->get();
+        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+        $interiorColours = ColorCode::where('belong_to', 'int')->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $countwarehouse = $warehouses->count();
+
+        $previousYearSold = $this->previousYearSold()->count();
+        $previousYearBooked = $this->previousYearBooked()->count();
+        $previousMonthSold = $this->previousMonthSold()->count();
+        $previousMonthBooked = $this->previousMonthBooked()->count();
+        $yesterdaySold = $this->yesterdaySold()->count();
+        $yesterdayBooked  = $this->yesterdayBooked()->count();
+        $previousYearAvailable  = $this->previousYearAvailable()->count();
+        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
+        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
+            ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
+            'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
+            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable'));
     }
     public function previousYearSold() {
         // logic => if gdn id is there then that vehicle is completed.
@@ -92,7 +179,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->whereBetween('gdn.date', [$startDate, $endDate]);
             })
-            ->count();
+            ->get();
 
         return $countPreviouseYearSold;
     }
@@ -108,7 +195,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->whereBetween('so.so_date', [$startDate, $endDate]);
             })
-            ->count();
+            ->get();
 
         return $countPreviouseYearBooked;
     }
@@ -123,7 +210,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDate, $endDate])
             ->whereDate('so.so_date', '>=' , $endDate)
-            ->count();
+            ->get();
 
         return $countPreviouseYearAvailable;
     }
@@ -138,7 +225,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->count();
+            ->get();
 
         return $countLastMonth;
     }
@@ -154,7 +241,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->whereBetween('so.so_date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->count();
+            ->get();
 
         return $countLastMonth;
     }
@@ -168,7 +255,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth])
             ->whereDate('so.so_date', '>=' , $endDateLastMonth)
-            ->count();
+            ->get();
 
         return $countPreviousYearAvailable;
     }
@@ -182,7 +269,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->where('gdn.date', $yesterday);
             })
-            ->count();
+            ->get();
 
         return $countYesterdaySold;
     }
@@ -196,7 +283,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->where('so.so_date', $yesterday);
             })
-            ->count();
+            ->get();
 
         return $countYesterdayBooked;
     }
@@ -209,7 +296,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereDate('gdn.date', $yesterday)
             ->whereDate('so.so_date', '>=' , $yesterday)
-            ->count();
+            ->get();
 
         return $countYesterdayAvailable;
     }
