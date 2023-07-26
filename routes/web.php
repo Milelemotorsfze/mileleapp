@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
@@ -335,6 +336,7 @@ Route::get('/d', function () {
     // vehicle stock report
 
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
-
+    // Brand
+    Route::resource('brands', BrandController::class);
 
 });
