@@ -120,15 +120,27 @@
 
     @section('content')
         @php
-            $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-            $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+        $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
+        $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
         @endphp
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         @endphp
         @if ($hasPermission)
             <div class="card-header">
+            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warehouse-edit','conversion-edit',
+                     'document-edit','edit-so','edit-reservation']);
+                @endphp
+                @if ($hasPermission)
                 <h4 class="card-title">Pending Vehicles Updates</h4>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                @endphp
+                @if ($hasPermission)
+                <h4 class="card-title">Vehicles St</h4>
+                @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
                 @php
@@ -214,6 +226,157 @@
             Incoming Stock
         </td>
         <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+				@endif
+				@php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-striped table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Time Frame</th>
+        <th colspan="4" style="font-size: 12px; text-align: center;">Stock Status</th>
+      </tr>
+      <tr>
+    <th style="font-size: 12px;">Purchased</th>
+		<th style="font-size: 12px;">Sold</th>
+		<th style="font-size: 12px;">Booked</th>
+		<th style="font-size: 12px;">Available</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-size: 12px;">
+            Previous Year
+        </td>
+        <td style="font-size: 12px;">
+    @php
+    $currentYear = \Carbon\Carbon::now()->year;
+    $previousYear = $currentYear - 1;
+    $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+    $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+    $countpreviouseyear = \Illuminate\Support\Facades\DB::table('vehicles')
+        ->whereExists(function ($query) use ($startDate, $endDate) {
+            $query->select(DB::raw(1))
+                ->from('grn')
+                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                ->whereBetween('grn.date', [$startDate, $endDate]);
+        })
+        ->count();
+          @endphp
+          {{$countpreviouseyear}}     
+        </td>
+        <td style="font-size: 12px;">
+            Previous Year
+        </td>
+        <td style="font-size: 12px;">
+            Previous Year
+        </td>
+        <td style="font-size: 12px;">
+              @php
+              $currentYear = \Carbon\Carbon::now()->year;
+              $previousYear = $currentYear - 1;
+              $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+              $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+              $countVehiclesWithGRN = \Illuminate\Support\Facades\DB::table('vehicles')
+                          ->whereNull('so_id')
+                          ->whereNull('gdn_id')
+                          ->whereExists(function ($query) use ($startDate, $endDate) {
+                          $query->select(DB::raw(1))
+                          ->from('grn')
+                          ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                          ->whereBetween('grn.date', [$startDate, $endDate]);
+                  })
+                  ->count();
+              $countVehiclesWithSO = \Illuminate\Support\Facades\DB::table('vehicles')
+                          ->whereExists(function ($query) use ($startDate, $endDate) {
+                          $query->select(DB::raw(1))
+                          ->from('so')
+                          ->whereColumn('so.id', '=', 'vehicles.so_id')
+                          ->whereBetween('so.so_date', [$startDate, $endDate]);
+                          })
+                          ->count();
+              $countVehiclesWithGDN = \Illuminate\Support\Facades\DB::table('vehicles')
+                          ->whereExists(function ($query) use ($startDate, $endDate) {
+                          $query->select(DB::raw(1))
+                          ->from('gdn')
+                          ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                          ->whereBetween('gdn.date', [$startDate, $endDate]);
+                  })
+                  ->count();
+              $totalCountPreviousYear = $countVehiclesWithGRN + $countVehiclesWithSO + $countVehiclesWithGDN;
+          @endphp
+          {{$totalCountPreviousYear}}
+        </td>
+      </tr>
+      <tr>
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+        <td style="font-size: 12px;">
+        @php
+    $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+    $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+    $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+        ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+            $query->select(DB::raw(1))
+                ->from('grn')
+                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
+        })
+        ->count();
+@endphp
+{{$countLastMonth}}
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+          Yesterday
+        </td>
+        <td style="font-size: 12px;">
+        @php
+    $startDateLastDay = \Carbon\Carbon::now()->subDay(1)->startOfDay();
+    $endDateLastDay = \Carbon\Carbon::now()->subDay(1)->endOfDay();
+
+    $countLastDay = \Illuminate\Support\Facades\DB::table('vehicles')
+        ->whereExists(function ($query) use ($startDateLastDay, $endDateLastDay) {
+            $query->select(DB::raw(1))
+                ->from('grn')
+                ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                ->whereBetween('grn.date', [$startDateLastDay, $endDateLastDay]);
+        })
+        ->count();
+@endphp
+
+{{$countLastDay}}
+
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
+        <td style="font-size: 12px;">
+            Previous Month
+        </td>
       </tr>
     </tbody>
   </table>

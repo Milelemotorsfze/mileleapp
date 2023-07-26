@@ -17,12 +17,14 @@ class VariantPriceController extends Controller
      */
     public function index()
     {
-
+        $statuss = "Incoming Stock";
         $activeStocks = Vehicles::whereNull('gdn_id')
+                                ->where('payment_status', $statuss)
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')->get();
         $activeStocks = $activeStocks->sortBy('price_status');
         $InactiveStocks =  Vehicles::whereNotNull('gdn_id')
+                                ->where('payment_status', $statuss)
                                 ->groupBy('varaints_id')
                                 ->selectRaw('count(*) as total,id, varaints_id, int_colour, ex_colour, price')
                                 ->get();

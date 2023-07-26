@@ -183,5 +183,25 @@
             }
         });
     </script>
+    <script>
+    $(document).ready(function() {
+        $('#brand').on('change', function() {
+            var selectedBrandId = $(this).val();
+            $.ajax({
+                url: '/get-model-lines/' + selectedBrandId,
+                type: 'GET',
+                success: function(data) {
+                    $('#model').empty();
+                    $.each(data, function(index, modelLine) {
+                        $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.log('Error fetching model lines:', error);
+                }
+            });
+        });
+    });
+</script>
 @endpush
 

@@ -20,6 +20,7 @@ use App\Models\Solog;
 use App\Models\Remarks;
 use App\Models\Warehouse;
 use App\Models\VehiclePicture;
+use App\Models\MasterModelLines;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -1015,5 +1016,11 @@ class VehiclesController extends Controller
         }
 
         return redirect()->back()->with('success', 'Details updated successfully.');
+    }
+
+    public function getModelLines($brandId)
+    {
+        $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
+        return response()->json($modelLines);
     }
     }
