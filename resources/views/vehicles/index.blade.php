@@ -364,7 +364,6 @@
                     })
                     ->count();
             @endphp
-
             {{$countLastDay}}
 
         </td>

@@ -443,7 +443,6 @@
         var sub ='1';
         $(document).ready(function ()
         {
-
             $("#addon_type").change(function () {
                 var addonType = $(this).val();
                 let url = '{{ url('supplier-change-addon-type') }}';
@@ -1346,7 +1345,7 @@
                 }
             }
             else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
-            { 
+            {
                 var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                 for (let i = 1; i <= countModel; i++)
                 {
