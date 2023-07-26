@@ -47,7 +47,7 @@
                             </span>
                         @enderror
                     </div>
-                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop1Des1" hidden>
+                    <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
 {{--                            @foreach($modelLines as $modelLine)--}}
@@ -494,7 +494,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">

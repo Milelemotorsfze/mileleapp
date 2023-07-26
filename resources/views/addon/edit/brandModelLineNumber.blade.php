@@ -582,7 +582,7 @@
                          </span>
                          @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">
@@ -740,8 +740,10 @@
         }
         let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         showDivdropDr.hidden = false
-        let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
-        showDel.hidden = false
+        // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
+        // showDel.hidden = false
+        $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+
         let showaddtrimDis = document.getElementById('showaddtrimDis');
         showaddtrimDis.hidden = false
         $.ajax
