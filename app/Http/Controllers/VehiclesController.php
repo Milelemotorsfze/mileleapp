@@ -36,7 +36,7 @@ class VehiclesController extends Controller
         if ($hasPermission)
         {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
+        $data = Vehicles::where('payment_status', $statuss)
             ->where(function ($query) {
                 // Include vehicles with 'so_id' is null
                 $query->whereNull('so_id')
@@ -635,7 +635,6 @@ class VehiclesController extends Controller
 
                     $oldValue = $so->$fieldName ?? null;
                     $newValue = $fieldValue;
-
                     // Save changes to the log if the old and new values differ and the field is not sales_person_id
                     if ($oldValue !== $newValue) {
                         $soLog = new SoLog();
@@ -652,7 +651,7 @@ class VehiclesController extends Controller
                         $soLog->role = Auth::user()->selectedRole;
                         $soLog->save();
 
-                        if ($oldValue !== null && $newValue !== null) {
+                        if ($newValue !== null) {
                             $approvalLog = new VehicleApprovalRequests();
                             $approvalLog->vehicle_id = $vehicleId;
                             $approvalLog->status = 'Pending';
@@ -661,16 +660,6 @@ class VehiclesController extends Controller
                             $approvalLog->new_value = $fieldValue;
                             $approvalLog->updated_by = auth()->user()->id;
                             $approvalLog->save();
-                        }
-                    }
-                    // Update the field in the 'So' table only if the new value is not null
-                    if ($fieldValue !== null && $oldValue === null) {
-                        $so->$fieldName = $fieldValue;
-                        $so->save();
-                        // Save the 'so_id' back to the 'Vehicles' table if it's a new So record
-                        if (!$so_id) {
-                            $vehicle->so_id = $so->id;
-                            $vehicle->save();
                         }
                     }
                 }
@@ -694,7 +683,7 @@ class VehiclesController extends Controller
                                 $documentLog->created_by = auth()->user()->id;
                                 $documentLog->role = Auth::user()->selectedRole;
                                 $documentLog->save();
-                                if ($oldValue !== null && $newValue !== null) {
+                                if ($newValue !== null) {
                                 $approvalLog = new VehicleApprovalRequests();
                                 $approvalLog->vehicle_id = $vehicleId;
                                 $approvalLog->status = 'Pending';
@@ -705,24 +694,18 @@ class VehiclesController extends Controller
                                 $approvalLog->save();
                             }
                             }
-                        // Update the field in the 'So' table only if the new value is not null
-                        if ($fieldValue !== null && $oldValue === null) {
-                            $document->$fieldName = $fieldValue;
-                            $document->save();
-                            // Save the 'so_id' back to the 'Vehicles' table if it's a new So record
-                            if (!$documents_id) {
-                                $vehicle->documents_id = $document->id;
-                                $vehicle->save();
-                            }
-                        }
                     }
                     elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
-                        $department = ($fieldName === 'warehouse-remarks') ? 'warehouse' : 'sales';
+                        $department = ($fieldName === 'sales-remarks') ? 'sales' : 'warehouse';
                         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                         $currentDateTime = Carbon::now($dubaiTimeZone);
-
-                        // Check if the fieldValue is not null before saving the remark
                         if ($fieldValue !== null) {
+                            $fieldValue = rtrim($fieldValue, 'View All');
+                            $existingRemark = Remarks::where('vehicles_id', $vehicleId)
+                            ->where('department', $department)
+                            ->where('remarks', $fieldValue)
+                            ->first();
+                            if (!$existingRemark) {
                             $remarks = new Remarks();
                             $remarks->vehicles_id = $vehicleId;
                             $remarks->department = $department;
@@ -743,8 +726,8 @@ class VehiclesController extends Controller
                             $vehicleslog->save();
                         }
                     }
+                    }
             else {
-                // Update other fields in the 'Vehicles' table (same code as before)
                 $oldValues = $vehicle->getAttributes();
                 $changes = [];
                 foreach ($oldValues as $field => $oldValue) {
@@ -760,24 +743,23 @@ class VehiclesController extends Controller
                 }
                 if (!empty($changes)) {
                     // Save approval log if the old value is null and the new value is not null
-                    if ($oldValues[$fieldName] === null && $fieldValue !== null) {
+                    if ($fieldValue !== null) {
                         // Update the field in the 'Vehicles' table with the new value
                         $vehicle->$fieldName = $fieldValue;
-                        $vehicle->save();
-                        // Save vehicle log for the specific field
-                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-                        $currentDateTime = Carbon::now($dubaiTimeZone);
-                        $vehicleslog = new Vehicleslog();
-                        $vehicleslog->time = $currentDateTime->toTimeString();
-                        $vehicleslog->date = $currentDateTime->toDateString();
-                        $vehicleslog->status = 'Update QC Values';
-                        $vehicleslog->vehicles_id = $vehicleId;
-                        $vehicleslog->field = $fieldName;
-                        $vehicleslog->old_value = $oldValues[$fieldName];
-                        $vehicleslog->new_value = $fieldValue;
-                        $vehicleslog->created_by = auth()->user()->id;
-                        $vehicleslog->save();
-                    } else {
+                        // $vehicle->save();
+                        // // Save vehicle log for the specific field
+                        // $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        // $currentDateTime = Carbon::now($dubaiTimeZone);
+                        // $vehicleslog = new Vehicleslog();
+                        // $vehicleslog->time = $currentDateTime->toTimeString();
+                        // $vehicleslog->date = $currentDateTime->toDateString();
+                        // $vehicleslog->status = 'Update QC Values';
+                        // $vehicleslog->vehicles_id = $vehicleId;
+                        // $vehicleslog->field = $fieldName;
+                        // $vehicleslog->old_value = $oldValues[$fieldName];
+                        // $vehicleslog->new_value = $fieldValue;
+                        // $vehicleslog->created_by = auth()->user()->id;
+                        // $vehicleslog->save();
                         $approvalLog = new VehicleApprovalRequests();
                         $approvalLog->vehicle_id = $vehicleId;
                         $approvalLog->status = 'Pending';
