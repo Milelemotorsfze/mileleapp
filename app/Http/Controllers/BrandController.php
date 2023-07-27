@@ -32,7 +32,7 @@ class BrandController extends Controller
     {
 
         $this->validate($request, [
-            'brand_name' => 'required',
+            'brand_name' => 'required|unique:brands,brand_name',
         ]);
 
         $brand = new Brand();
@@ -67,7 +67,7 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         $this->validate($request, [
-            'brand_name' => 'required',
+            'brand_name' => 'required|unique:brands,brand_name,'.$brand->id,
         ]);
 
         $brand = Brand::findOrFail($brand->id);

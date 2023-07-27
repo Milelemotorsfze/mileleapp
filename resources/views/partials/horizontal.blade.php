@@ -240,7 +240,7 @@
                                                         <a href="{{route('addon.list','P')}}" class="dropdown-item" data-key="t-login">Accessories</a>
                                                         @endif
                                                         @endcan
-                                                        
+
                                                         @can('spare-parts-list')
                                                         @php
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['spare-parts-list']);
@@ -279,7 +279,7 @@
                             </li>
                         @endif
                         @endcanany
-    
+
                     @can('Calls-view')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -491,7 +491,27 @@
                                 </a>
                             </div>
                             @endif
-                            @php
+{{--                    @php--}}
+{{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-brand-list');--}}
+{{--                    @endphp--}}
+{{--                    @if ($hasPermission)--}}
+                        <div class="dropdown">
+                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('brands.index')}}" id="topnav-utility" role="button">
+                                <span data-key="t-utility">Brands </span>
+                            </a>
+                        </div>
+{{--                    @endif--}}
+{{--                    @php--}}
+{{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-model-lines-list');--}}
+{{--                    @endphp--}}
+{{--                    @if ($hasPermission)--}}
+                        <div class="dropdown">
+                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('model-lines.index')}}" id="topnav-utility" role="button">
+                                <span data-key="t-utility">Model Lines </span>
+                            </a>
+                        </div>
+{{--                    @endif--}}
+                    @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
                     @endphp
                     @if ($hasPermission)
