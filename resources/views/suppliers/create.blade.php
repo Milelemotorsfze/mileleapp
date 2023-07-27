@@ -262,122 +262,7 @@ input {
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="supplier" class="col-form-label text-md-end">{{ __('Supplier') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="supplier" type="text" class="form-control widthinput @error('supplier') is-invalid @enderror" name="supplier" 
-                            placeholder="Enter Supplier" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
-                            @error('supplier')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="supplierError" class="invalid-feedback"></span>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <!-- <span class="error">* </span> -->
-                            <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
-                                   placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
-                            @error('contact_person')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
 
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <!-- <span class="error">* </span> -->
-                            <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                   name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"
-                                   autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
-                            <!-- @error('contact_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
-                            <span id="contactRequired" class="email-phone required-class"></span>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="number" 
-                            class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]"
-                             placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}" 
-                             autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
-                            <!-- @error('alternative_contact_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
-                            <span id="alternativeContactRequired" class="email-phone required-class"></span>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <!-- <span class="error">* </span> -->
-                            <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                        <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email" 
-                        value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
-                            <!-- @error('email')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
-                            <span id="emailRequired" class="email-phone required-class"></span>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <!-- <span class="error">* </span> -->
-                            <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror"
-                                   name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"
-                                   autocomplete="person_contact_by" autofocus>
-                            @error('person_contact_by')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    </br>
-                </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                     <div class="row">
                         <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -385,7 +270,7 @@ input {
                             <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
-                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput" 
+                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput"
                                 onchange="validationOnKeyUp(this)">
                                 <option value="">Choose Supplier Type</option>
                                 <option value="accessories">Accessories</option>
@@ -414,7 +299,7 @@ input {
                             <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select id="is_primary_payment_method" name="is_primary_payment_method" 
+                            <select id="is_primary_payment_method" name="is_primary_payment_method"
                             class=" form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
                                 <option value="">Choose Payment Method</option>
                                 @foreach($paymentMethods as $paymentMethod)
@@ -431,28 +316,215 @@ input {
                     </div>
                     </br>
                 </div>
-                <div id="secondaryPayments" class="col-xxl-6 col-lg-6 col-md-12" hidden >
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Primary Information</h4>
+                </div>
+                <div class="card-body">
                     <div class="row">
-                        <div class="col-xxl-3 col-lg-2 col-md-4">
-                            <!-- <span class="error">* </span> -->
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="supplier" class="col-form-label text-md-end">{{ __('Vendor') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="supplier" type="text" class="form-control widthinput @error('supplier') is-invalid @enderror" name="supplier"
+                                           placeholder="Individual / Company Name" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
+                                    @error('supplier')
+                                    <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                    @enderror
+                                    <span id="supplierError" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+                            </br>
                         </div>
-                        @foreach($paymentMethods as $paymentMethod)
-                            <div class="col-xxl-3 col-lg-3 col-md-6" id="{{$paymentMethod->id}}">
-                                <input id="payment_methods_id" name="payment_methods_id[]" class="form-check-input" type="checkbox" value="{{ $paymentMethod->id }}">
-                                <label class="form-check-label" for="flexCheckIndeterminate">
-                                    {{ $paymentMethod->payment_methods }}
-                                </label>
-                                @error('payment_methods_id')
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="contact_person" class="col-form-label text-md-end">{{ __('Vendor Type') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <select class="widthinput form-control" name="type" id="type" autofocus>
+                                        <option value="Individual">Individual</option>
+                                        <option value="Company">Company</option>
+                                    </select>
+                                    @error('type')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
-
-                                @enderror
+                                    @enderror
+                                </div>
                             </div>
-                        @endforeach
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="contact_person" class="col-form-label text-md-end">{{ __('Category') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <select class="widthinput form-control" name="category[]" id="category" multiple  autofocus>
+                                        <option></option>
+                                        <option value="{{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}}">Vehicles</option>
+                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}">Parts & Accessories</option>
+                                        <option value="{{{ \App\Models\Supplier::SUPPLIER_CATEGORY_OTHER }}}">Other</option>
+                                    </select>
+                                    @error('category')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Sub Category') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <select class="widthinput form-control" name="category[]" id="sub_category" autofocus>
+
+                                    </select>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
                     </div>
-                    </br>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Contact Details</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
+                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"
+                                           autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                                    <!-- @error('contact_number')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror -->
+                                    <span id="contactRequired" class="email-phone required-class"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="alternative_contact_number" type="number"
+                                           class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]"
+                                           placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}"
+                                           autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                                    <!-- @error('alternative_contact_number')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror -->
+                                    <span id="alternativeContactRequired" class="email-phone required-class"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email"
+                                           value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
+                                    <!-- @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror -->
+                                    <span id="emailRequired" class="email-phone required-class"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror"
+                                           name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"
+                                           autocomplete="person_contact_by" autofocus>
+                                    @error('person_contact_by')
+                                    <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
+                                           placeholder="Enter Contact Person" value="{{ old('contact_person') }}"  autocomplete="contact_person" autofocus>
+                                    @error('contact_person')
+                                    <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                    @enderror
+
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Address</label>
+                                <textarea cols="25" rows="5" class="form-control" name="address_details" placeholder="Address Details"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Alternate Contact Number</label>
+                                <input type="tel" class="form-control" name="alternate_contact_number"
+                                       id="alternate-contact-number" placeholder="Alternate Contact Number">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label">Fax</label>
+                                <input type="text" class="form-control" name="fax" placeholder="fax">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         <div id="tabId" hidden>
@@ -491,9 +563,9 @@ input {
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                 <div class="input-group">
-                                                    <input id="addon_purchase_price_1" oninput="inputNumberAbs(this)" 
-                                                    class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror" 
-                                                    name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED" 
+                                                    <input id="addon_purchase_price_1" oninput="inputNumberAbs(this)"
+                                                    class="widthinput form-control @error('addon_purchase_price') is-invalid @enderror"
+                                                    name="supplierAddon[1][addon_purchase_price]" placeholder="1 USD = 3.6725 AED"
                                                     value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus>
                                                         <div class="input-group-append">
                                                             <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -503,10 +575,10 @@ input {
                                             <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                 <div class="input-group">
-                                                    <input id="addon_purchase_price_in_usd_1" oninput="inputNumberAbs(this)" 
-                                                    class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" 
-                                                    name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD" 
-                                                    value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus 
+                                                    <input id="addon_purchase_price_in_usd_1" oninput="inputNumberAbs(this)"
+                                                    class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
+                                                    name="supplierAddon[1][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD"
+                                                    value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus
                                                     onkeyup="calculateAED(1)">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
@@ -533,7 +605,7 @@ input {
                     </div>
                 </div>
             </div>
-            
+
 
             <div id="uploadExcel" class="tabcontent">
                 <div class="row">
@@ -559,17 +631,7 @@ input {
             <input id="hiddencontact" name="hiddencontact" value="{{old('hiddencontact')}}" hidden>
             <input id="hiddencontactCountryCode" name="hiddencontactCountryCode" value="{{old('hiddencontactCountryCode')}}" hidden>
         </div>
-            <!-- <label class="col-sm-2 control-label">Image</label>
-<div class="col-sm-12">
-<input id="image" type="file" name="image" accept="image/*" onchange="readURL1(this);">
-<input type="hidden" name="hidden_image" id="hidden_image">
-</div>
-</div>
-<img id="modal-preview" src="https://via.placeholder.com/150" alt="Preview" class="form-group hidden" width="100" height="100">
-<div class="col-sm-offset-2 col-sm-10">
-<button type="submit" class="btn btn-primary" id="btn-save" value="create">Save changes
-</button>
-</div> -->
+
             <div class="col-xxl-12 col-lg-12 col-md-12">
                 <button style="float:right;" type="submit" class="btn btn-sm btn-success" value="create" id="submit">Submit</button>
             </div>
@@ -592,6 +654,10 @@ input {
 
         $(document).ready(function ()
         {
+            $('#category').select2({
+                minimumResultsForSearch: -1,
+                placeholder:"Choose Category",
+            });
             $('#addon_1').select2({
                 allowClear: true,
                 minimumResultsForSearch: -1,
@@ -681,7 +747,7 @@ input {
                 //     var confirm = alertify.confirm('You are not able to edit this field because atleast ',function (e) {
                 //    }).set({title:"Not Able To Remove"})
                 // }
-              
+
             })
             function addOption(id,text) {
                 var indexValue = $('#indexValue').val();
@@ -743,7 +809,7 @@ input {
                                         <option value="AED">AED</option>
                                         <option value="USD">USD</option>
                                     </select>
-                                </div> 
+                                </div>
                                 <div class="col-xxl-2 col-lg-3 col-md-3 div-purchase_price_in_AED" id="div_price_in_aed_${index}">
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                     <div class="input-group">
@@ -755,7 +821,7 @@ input {
                                     </div>
                                 </div>
                                 </div>
-                               
+
                                 <div class="col-xxl-2 col-lg-3 col-md-3 usd-price-div" id="div_price_in_usd_${index}" hidden>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                     <div class="input-group">
@@ -768,7 +834,7 @@ input {
 
                                 </div>
                                 </div>
-                               
+
                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                     <a class="btn_round removeButton" id="remove-${index}" data-index="${index}">
                                         <i class="fas fa-trash-alt"></i>
@@ -1368,13 +1434,13 @@ input {
             document.getElementById("emailRequired").classList.remove("paragraph-class");
             document.getElementById("emailRequired").classList.add("requiredOne");
         }
-        function inputNumberAbs(currentPriceInput) 
+        function inputNumberAbs(currentPriceInput)
         {
             var id = currentPriceInput.id;
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2) 
+            if(val.split('.').length>2)
             {
                 val =val.replace(/\.+$/,"");
             }
@@ -1418,7 +1484,7 @@ input {
                             });
                         });
                         var countIndexRow = $(".form_field_outer").find(".form_field_outer_row").length;
-                        for (let i = 1; i <= countIndexRow; i++) 
+                        for (let i = 1; i <= countIndexRow; i++)
                         {
                             $('#addon_'+i).html("");
                             $('#addon_'+i).select2
@@ -1454,7 +1520,7 @@ input {
             if(canEnableDropdown == 'no')
             {
                 var countNotKitSuplr = $(".form_field_outer").find(".form_field_outer_row").length;
-                for (let i = 1; i <= countNotKitSuplr; i++) 
+                for (let i = 1; i <= countNotKitSuplr; i++)
                 {
                     if($('#currency_'+i).val() == 'USD')
                     {
@@ -1462,7 +1528,7 @@ input {
                         {
                             canEnableDropdown = 'yes';
                             break;
-                        }   
+                        }
                     }
                     else
                     {
@@ -1470,8 +1536,8 @@ input {
                         {
                             canEnableDropdown = 'yes';
                             break;
-                        }  
-                    } 
+                        }
+                    }
                 }
             }
             if(canEnableDropdown == 'yes')

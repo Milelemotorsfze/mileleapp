@@ -9,7 +9,7 @@
             width: 100%;
         }
         .iti__selected-flag{
-           height: 36px;
+            height: 36px;
         }
     </style>
     <div class="card-header">
@@ -43,6 +43,7 @@
         @endif
         <form id="form-create" action="{{ route('vendors.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Primary Information</h4>
@@ -74,7 +75,7 @@
                                 <label for="choices-single-default" class="form-label ">Trade / Individual Name </label>
                                 <input type="text" class="form-control @error('trade_name_or_individual_name') is-invalid @enderror"
                                        id="trade_name_or_individual_name" name="trade_name_or_individual_name" placeholder="Trade / Individual Name">
-                                       <span id="poNumberError" class="error" style="display: none;"></span>
+                                <span id="poNumberError" class="error" style="display: none;"></span>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
@@ -218,11 +219,11 @@
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label ">Mobile </label>
                                 <input id="mobile" type="tel"
-                                 class="mygroup form-control @error('mobile') is-invalid @enderror"
+                                       class="mygroup form-control @error('mobile') is-invalid @enderror"
                                        name="mobile" placeholder="Enter Mobile Number"
-                                      autofocus >
-{{--                                <input type="number" class="form-control mygroup @error('mobile') is-invalid @enderror" id="mobile"--}}
-{{--                                       name="mobile" placeholder="Mobile">--}}
+                                       autofocus >
+                                {{--                                <input type="number" class="form-control mygroup @error('mobile') is-invalid @enderror" id="mobile"--}}
+                                {{--                                       name="mobile" placeholder="Mobile">--}}
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
@@ -321,6 +322,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-12 text-center mb-3">
                 <button type="submit" class="btn btn-info" >Submit</button>
             </div>
@@ -460,10 +462,10 @@
 
                 },
                 trade_registration_place: {
-                        required: function(element){
-                            return $("#vendor-type").val() == "Company";
-                        },
+                    required: function(element){
+                        return $("#vendor-type").val() == "Company";
                     },
+                },
                 trade_license_number: {
                     required: function(element){
                         return $("#vendor-type").val() == "Company";
@@ -516,52 +518,52 @@
                     }
                 }
             },
-        submitHandler: function(form) {
-            // This function will be called when the form is submitted and passes validation
-            var trade_name_or_individual_name = $('#trade_name_or_individual_name').val();
-            $.ajax({
-                url: '{{ route('vendorchecking.checkingname') }}',
-                type: 'POST',
-                data: {
-                    '_token': '{{ csrf_token() }}',
-                    'trade_name_or_individual_name': trade_name_or_individual_name
-                },
-                success: function(response) {
-                    if (response.exists) {
-                        alert("Name Already Existing");
-                    } else {
-                        form.submit();
+            submitHandler: function(form) {
+                // This function will be called when the form is submitted and passes validation
+                var trade_name_or_individual_name = $('#trade_name_or_individual_name').val();
+                $.ajax({
+                    url: '{{ route('vendorchecking.checkingname') }}',
+                    type: 'POST',
+                    data: {
+                        '_token': '{{ csrf_token() }}',
+                        'trade_name_or_individual_name': trade_name_or_individual_name
+                    },
+                    success: function(response) {
+                        if (response.exists) {
+                            alert("Name Already Existing");
+                        } else {
+                            form.submit();
+                        }
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            alert("Name Already Existing");
+                        }
                     }
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                    alert("Name Already Existing");
-                }
-                }
-            });
-        }
-        });
-    $(document).ready(function() {
-    $('#trade_name_or_individual_name').on('blur', function() {
-        var trade_name_or_individual_name = $(this).val();
-        $.ajax({
-            url: '{{ route('vendorchecking.checkingname') }}',
-            type: 'POST',
-            data: {
-                '_token': '{{ csrf_token() }}',
-                'trade_name_or_individual_name': trade_name_or_individual_name
-            },
-            success: function(response) {
-                $('#trade_name_or_individual_nameError').hide().text('');
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    alert("Name Already Existing");
-                }
+                });
             }
         });
-    });
-});
+        $(document).ready(function() {
+            $('#trade_name_or_individual_name').on('blur', function() {
+                var trade_name_or_individual_name = $(this).val();
+                $.ajax({
+                    url: '{{ route('vendorchecking.checkingname') }}',
+                    type: 'POST',
+                    data: {
+                        '_token': '{{ csrf_token() }}',
+                        'trade_name_or_individual_name': trade_name_or_individual_name
+                    },
+                    success: function(response) {
+                        $('#trade_name_or_individual_nameError').hide().text('');
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            alert("Name Already Existing");
+                        }
+                    }
+                });
+            });
+        });
     </script>
 @endpush
 

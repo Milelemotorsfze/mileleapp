@@ -184,7 +184,7 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-        
+
         $supplierTypes = [];
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
         {
@@ -272,7 +272,7 @@ class SupplierController extends Controller
                 array_push($supTyp, 'SP');
             }
         }
-        $addons = AddonDetails::whereIn('addon_type_name',$supTyp)->whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();  
+        $addons = AddonDetails::whereIn('addon_type_name',$supTyp)->whereNotIn('id',$supplierAddons)->select('id','addon_code','addon_id')->with('AddonName')->get();
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons'));
     }
     public function destroy($id)
