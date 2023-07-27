@@ -217,6 +217,7 @@
                                                 @endphp
                                                 @if ($hasPermission)
                                                 <a href="{{ route('addon.create') }}" class="dropdown-item" data-key="t-login">Create Addon</a>
+                                                <a href="{{ route('kit.create') }}" class="dropdown-item" data-key="t-login">Create Kit</a>
                                                 @endif
                                                 @endcan
 

@@ -66,8 +66,6 @@
         });
     });
         function MainKitItemHideOption(index,value) {
-            alert(index);
-            alert(value);
             var indexValue = $('#MainKitItemIndex').val();
             for (var i = 1; i <= indexValue; i++) {
                 if (i != index) {
