@@ -273,5 +273,36 @@
             }
         });
     </script>
+<script>
+    $(document).ready(function() {
+        function fetchModelLines(selectedBrandId) {
+            $.ajax({
+                url: '/get-model-lines/' + selectedBrandId,
+                type: 'GET',
+                success: function(data) {
+                    $('#model').empty();
+                    $.each(data, function(index, modelLine) {
+                        $('#model').append('<option value="' + modelLine.id + '">' + modelLine.model_line + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.log('Error fetching model lines:', error);
+                }
+            });
+        }
+
+        // Trigger the AJAX call and populate the "Model Line" select element on page load
+        var selectedBrandId = $('#brand').val();
+        if (selectedBrandId) {
+            fetchModelLines(selectedBrandId);
+        }
+
+        // Add an event listener to the "Brand" select element
+        $('#brand').on('change', function() {
+            var selectedBrandId = $(this).val();
+            fetchModelLines(selectedBrandId);
+        });
+    });
+</script>
 @endpush
 

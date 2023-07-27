@@ -120,15 +120,27 @@
 
     @section('content')
         @php
-            $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
-            $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
+        $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
+        $intColours = \App\Models\ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
         @endphp
         @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         @endphp
         @if ($hasPermission)
             <div class="card-header">
+            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warehouse-edit','conversion-edit',
+                     'document-edit','edit-so','edit-reservation']);
+                @endphp
+                @if ($hasPermission)
                 <h4 class="card-title">Pending Vehicles Updates</h4>
+                @endif
+                @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+                @endphp
+                @if ($hasPermission)
+                <h4 class="card-title">Vehicles St</h4>
+                @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
                 @php
@@ -219,18 +231,135 @@
   </table>
 </div>
 @endif
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
+    @endphp
+    @if ($hasPermission)
+        <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+            <table class="table table-striped table-editable table-edits table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Time Frame</th>
+                        <th colspan="4" style="font-size: 12px; text-align: center;">Stock Status</th>
+                    </tr>
+                    <tr>
+                        <th style="font-size: 12px;">Purchased</th>
+                        <th style="font-size: 12px;">Sold</th>
+                        <th style="font-size: 12px;">Booked</th>
+                        <th style="font-size: 12px;">Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-size: 12px;">
+                            Previous Year
+                        </td>
+                        <td style="font-size: 12px;">
+                        @php
+                        $currentYear = \Carbon\Carbon::now()->year;
+                        $previousYear = $currentYear - 1;
+                        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+                        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+                        $countpreviouseyear = \Illuminate\Support\Facades\DB::table('vehicles')
+                            ->whereExists(function ($query) use ($startDate, $endDate) {
+                                $query->select(DB::raw(1))
+                                    ->from('grn')
+                                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                                    ->whereBetween('grn.date', [$startDate, $endDate]);
+                            })
+                            ->count();
+                              @endphp
+                              {{$countpreviouseyear}}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_SOLD]) }}';">
+                            {{$previousYearSold}}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_BOOKED]) }}';">
+                            {{$previousYearBooked}}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE]) }}';">
+                              {{ $previousYearAvailable }}
+                        </td>
+                    </tr>
+                    <tr>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px;">
+                            Previous Month
+                        </td>
+                        <td style="font-size: 12px;">
+                            @php
+                            $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+                            $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+                            $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+                                ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                                    $query->select(DB::raw(1))
+                                        ->from('grn')
+                                        ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                                        ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
+                                })
+                                ->count();
+                            @endphp
+                        {{$countLastMonth}}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_SOLD]) }}';">
+                            {{ $previousMonthSold }}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_BOOKED]) }}';">
+                            {{ $previousMonthBooked }}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE]) }}';">
+                            {{ $previousMonthAvailable }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 12px;">
+                          Yesterday
+                        </td>
+                        <td style="font-size: 12px;">
+                            @php
+                                $startDateLastDay = \Carbon\Carbon::now()->subDay(1)->startOfDay();
+                                $endDateLastDay = \Carbon\Carbon::now()->subDay(1)->endOfDay();
+
+                                $countLastDay = \Illuminate\Support\Facades\DB::table('vehicles')
+                                    ->whereExists(function ($query) use ($startDateLastDay, $endDateLastDay) {
+                                        $query->select(DB::raw(1))
+                                            ->from('grn')
+                                            ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                                            ->whereBetween('grn.date', [$startDateLastDay, $endDateLastDay]);
+                                    })
+                                    ->count();
+                            @endphp
+                            {{$countLastDay}}
+
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_SOLD]) }}';">
+                            {{ $yesterdaySold }}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_BOOKED]) }}';">
+                            {{ $yesterdayBooked }}
+                        </td>
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_AVAILABLE]) }}';">
+                            {{$yesterdayAvailable}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    @endif
   </div>
   @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
-                     'vehicles-detail-edit','enginee-edit','document-edit','edit-so','edit-reservation']);
-                @endphp
-                @if ($hasPermission)
-                <a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
-                <a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
-                @endif
-                <br>
-                <br>
-                <div id="searchContainer" class="mb-3">
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['inspection-edit','warehouse-edit','conversion-edit',
+     'vehicles-detail-edit','enginee-edit','document-edit','edit-so','edit-reservation']);
+@endphp
+@if ($hasPermission)
+<a href="#" class="btn btn-sm btn-primary float-end edit-btn">Edit</a>
+<a href="#" class="btn btn-sm btn-success float-end update-btn" style="display: none;">Update</a>
+@endif
+<br>
+<br>
+<div id="searchContainer" class="mb-3">
       <!-- Add your full-width search bar or input here -->
       <input type="text" id="tableSearch" placeholder="Search Table">
     </div>
@@ -485,8 +614,8 @@
                                      $sales_person_id = $so ? $so->sales_person_id : null;
                                     $sales_person = $sales_person_id ? DB::table('users')->where('id', $sales_person_id)->first() : null;
                                     $salesname = $sales_person ? $sales_person->name : null;
-                                    $booking = $vehicles->booking_id ? DB::table('booking')->where('id', $vehicles->booking_id)->first() : null;
-                                    $booking_name = $booking ? $booking->name : null;
+//                                    $booking = $vehicles->booking_id ? DB::table('booking')->where('id', $vehicles->booking_id)->first() : null;
+//                                    $booking_name = $booking ? $booking->name : null;
                                     $warehouse = $vehicles->vin ? DB::table('movements')->where('vin', $vehicles->vin)->latest()->first() : null;
                                     $warehouses = $warehouse ? DB::table('warehouse')->where('id', $warehouse->to)->value('name') : null;
                                      $result = DB::table('varaints')

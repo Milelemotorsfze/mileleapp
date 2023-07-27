@@ -165,7 +165,7 @@
                 </div>
                 @endforeach
                 <div class="row">
-                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel{{$i}}" class="delete-model-line-row" hidden>
+                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel{{$i}}" class="delete-model-line-row" >
                         <div id="showaddtrd{{$i}}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" >
                             <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr({{$i}})">
                                 <i class="fa fa-plus" aria-hidden="true"></i> Add
@@ -442,7 +442,6 @@
             var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
 
             $('#indexValue').val(index);
-
             var selectedBrands = [];
             for(let i=1; i<index; i++)
             {
@@ -473,16 +472,16 @@
                                     <div class="col-xxl-5 col-lg-5 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                         <select onchange=selectBrandDisp(${index},1) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
-                                         multiple="true" style="width: 100%;" class="brandRows">
+                                            multiple="true" style="width: 100%;" class="brandRows">
                                             @foreach($brands as $brand)
-                                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                             @endforeach
-                                            </select>
-                                            @error('is_primary_payment_method')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
+                                        </select>
+                                        @error('is_primary_payment_method')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
                                     </div>
                                     <div class="col-xxl-6 col-lg-6 col-md-12">
 
@@ -493,70 +492,77 @@
                                         </a>
                                     </div>
                                 </div>
-                                    <div class="MoDes${index}" id="model-line-first-row">
-                                        <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >
-                                            <div class="col-xxl-1 col-lg-1 col-md-12">
-                                            </div>
-                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
-                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
-                                                    id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                    @endforeach
-                                                    </select>
-                                                    @error('is_primary_payment_method')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                    @enderror
-                                            </div>
-                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
-                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                                                <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
+                                <div class="MoDes${index}" id="model-line-first-row">
+                                    <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >
+                                        <div class="col-xxl-1 col-lg-1 col-md-12">
+                                        </div>
+                                        <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
+                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                                            <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
+                                                id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
+
+                                            </select>
+                                             @error('is_primary_payment_method')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                             @enderror
+                                        </div>
+                                        <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
+                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                                            <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
                                                 multiple="true" style="width: 100%;">
-                                                    @foreach($modelLines as $modelLine)
-                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                                    @endforeach
-                                                    </select>
-                                                    @error('is_primary_payment_method')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
+
+                                            </select>
+                                            @error('is_primary_payment_method')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
+                                        <div class="col-xxl-1 col-lg-1 col-md-12">
+                                            <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
                                         </div>
                                     </div>
-                                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                                        <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel${index}" class="delete-model-line-row">
+                                        <div id="showaddtrd${index}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" hidden >
+                                            <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(${index})">
+                                            <i class="fa fa-plus" aria-hidden="true"></i> Add</a>
+                                        </div>
                                     </div>
-                    `);
-                    let brandDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        brandDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.brand_name
+                                </div>
+                        `);
+                        let brandDropdownData   = [];
+                        $.each(data,function(key,value)
+                        {
+                            brandDropdownData.push
+                            ({
+                                id: value.id,
+                                text: value.brand_name
+                            });
                         });
-                    });
-                    $('#selectBrandMo'+index).html("");
-                    $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-                    $("#selectBrandMo"+index).select2
-                    ({
-                        data:brandDropdownData,
-                        maximumSelectionLength: 1,
-                    });
+                        $('#selectBrandMo'+index).html("");
+                        $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
+                        $("#selectBrandMo"+index).select2
+                        ({
+                            data:brandDropdownData,
+                            maximumSelectionLength: 1,
+                        });
                     }
                 }
             });
         });
     });
+
     function addDiscr(supplier)
     {
         var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1;
+
+
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
                 <div class="col-xxl-1 col-lg-1 col-md-12">
@@ -566,38 +572,37 @@
                     <select class="compare-tag1 spare-parts-model-lines" name=brand[${supplier}][model][${index}][model_id]"
                         onchange=selectModelLineDescipt(${supplier},${index})
                         id="selectModelLineNum${supplier}Des${index}" multiple="true" style="width: 100%;" data-index="${supplier}" data-model-index="${index}">
-                        @foreach($modelLines as $modelLine)
-                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                        @endforeach
+{{--                        @foreach($modelLines as $modelLine)--}}
+        {{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+        {{--                        @endforeach--}}
                     </select>
-                    @error('is_primary_payment_method')
-                    <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+                        @error('is_primary_payment_method')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                         </span>
+                         @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">
-{{--                        @foreach($modelLines as $modelLine)--}}
-{{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
-{{--                        @endforeach--}}
+
                     </select>
                     @error('is_primary_payment_method')
-                    <span class="invalid-feedback" role="alert">
-                    <strong>{{ $message }}</strong>
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
                         </span>
-                    @enderror
+                        @enderror
                 </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
-                    <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" hidden id="removeModelNumberdrop${supplier}Des${index}">
+                    <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" id="removeModelNumberdrop${supplier}Des${index}">
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </div>
             </div>
             </div>
          `);
+
         selectBrandDisp(supplier, index);
         $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
         ({
@@ -612,12 +617,12 @@
         ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
         showModelNumberDropdown(id,row);
     }
-    function selectBrandDisp(id,row)
-    {
+    function showBrandModelLines(id,row) {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+
         for (let a = 1; a <= i; a++)
         {
-            var value =$('#selectBrandMo'+id).val();
+            var value = $('#selectBrandMo'+id).val();
             var currentAddonType = $('#addon_type').val();
             var brandId = value;
             globalThis.selectedBrandsDisArr .push(brandId);
@@ -647,13 +652,20 @@
                 {
                     RelatedDataCheck(id,row);
                     $('#showaddtrimDis').attr('hidden',true);
-                    // hideRelatedModalDis(id,row);
                 }
             }
-            // else
-            // {
-            //     hideRelatedModalDis(id,row);
-            // }
+
+        }
+    }
+    function selectBrandDisp(id,row) {
+        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+        if(indexValue == row) {
+            showBrandModelLines(id,row);
+
+        }else {
+            for(var i = 1;i<=indexValue;i++) {
+                showBrandModelLines(id,i);
+            }
         }
     }
     function  RelatedDataCheck() {
@@ -700,7 +712,6 @@
                         $("#selectBrandMo1").trigger('change');
                     }
                 }
-
             }
             var brandCount = brands.length;
             var ModelLineCount = modelLines.length;
@@ -729,8 +740,10 @@
         }
         let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         showDivdropDr.hidden = false
-        let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
-        showDel.hidden = false
+        // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
+        // showDel.hidden = false
+        $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+
         let showaddtrimDis = document.getElementById('showaddtrimDis');
         showaddtrimDis.hidden = false
         $.ajax
@@ -768,26 +781,32 @@
                     data: BrandModelLine,
                     maximumSelectionLength: 1,
                 });
-
                 $('#showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+                $("#selectModelNumberDiscri"+id+"Des"+row).select2
+                ({
+                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                    allowClear: true,
+                    maximumSelectionLength: 1,
+                });
             }
         });
     }
     function showModelNumberDropdown(id,row)
     {
-        let showPartNumber = document.getElementById('showModelNumberdrop'+id+'Des'+row);
-        showPartNumber.hidden = false
+        $('showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+        // showPartNumber.hidden = false;
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
-        showPartNumber1.hidden = false
-
+        showPartNumber1.hidden = false;
 
         var e = document.getElementById("addon_type");
         var value = e.value;
         // var selectedModelLine = [];
         var selectedModelLine = $("#selectModelLineNum"+id+"Des"+row).val();
-        if(selectedModelLine != ''){
-            if(selectedModelLine == 'allmodellines') {
-            RelatedModelLineCheck(id,row)
+        if(selectedModelLine != '')
+        {
+            if(selectedModelLine == 'allmodellines')
+            {
+                RelatedModelLineCheck(id,row)
             }else{
                 $('#showModelNumDel'+id).attr('hidden',false);
                 $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
@@ -817,7 +836,6 @@
                         $("#selectModelNumberDiscri"+id+"Des"+row).select2
                         ({
                             placeholder: 'Choose Model Number....     Or     Type Here To Search....',
-
                             allowClear: true,
                             data: ModelLineModelDescription
                         });
@@ -921,18 +939,5 @@
     //         }
     //     });
     // }
-    function hideRelatedModalDis(id,row)
-    {
-        let showDivdropModelLine = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropModelLine.hidden = true
-        let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropDr.hidden = true
-        let showaddtrim = document.getElementById('showaddtrimDis');
-        showaddtrim.hidden = true
-    }
-    function hideModelNumberDropdown(id,row)
-    {
-        let showPartNumber = document.getElementById('showModelNumberdrop'+row);
-        showPartNumber.hidden = true
-    }
+
 </script>

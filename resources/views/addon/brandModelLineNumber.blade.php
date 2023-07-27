@@ -47,7 +47,7 @@
                             </span>
                         @enderror
                     </div>
-                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop1Des1" hidden>
+                    <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
 {{--                            @foreach($modelLines as $modelLine)--}}
@@ -122,15 +122,13 @@
             var value = e.params.data.id;
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
             for(var i = 1;i<=indexValue;i++) {
-                $('#selectModelLineNum'+index+'Des'+i).empty();
+                // $('#selectModelLineNum'+index+'Des'+i).empty();
                 $('#selectModelNumberDiscri'+index+'Des'+i).empty();
             }
             hideOption(index,value);
-
         });
 
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
-            // alert("ok");
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
@@ -197,7 +195,6 @@
                 $('#selectBrandMo'+i).append($('<option>', {value: id, text :text}))
             }
             // sortDropDownListByText();
-
         }
         $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) {
             var countRow = 0;
@@ -497,7 +494,7 @@
                         </span>
                     @enderror
                 </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;">
@@ -527,9 +524,7 @@
         });
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
-
-
-    function selectBrandDisp(id,row) {
+    function showBrandModelLines(id,row) {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
 
         for (let a = 1; a <= i; a++)
@@ -567,6 +562,18 @@
                 }
             }
 
+        }
+    }
+    function selectBrandDisp(id,row) {
+        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+        if(indexValue == row) {
+            showBrandModelLines(id,row);
+
+        }else {
+            for(var i = 1;i<=indexValue;i++) {
+                // $('#selectModelLineNum'+index+'Des'+i).empty();
+                showBrandModelLines(id,i);
+            }
         }
     }
     function  RelatedDataCheck() {
@@ -703,11 +710,9 @@
     }
     function showModelNumberDropdown(id,row)
     {
-        let showPartNumber = document.getElementById('showModelNumberdrop'+id+'Des'+row);
-        showPartNumber.hidden = false
+        $('showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
         showPartNumber1.hidden = false
-
 
         var e = document.getElementById("addon_type");
         var value = e.value;
@@ -744,13 +749,12 @@
                         $("#selectModelNumberDiscri"+id+"Des"+row).select2
                         ({
                             placeholder: 'Choose Model Number....     Or     Type Here To Search....',
-
                             allowClear: true,
                             data: ModelLineModelDescription
                         });
                     }
                 });
-        }
+            }
         }
     }
 

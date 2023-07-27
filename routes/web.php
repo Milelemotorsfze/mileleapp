@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
@@ -326,6 +327,7 @@ Route::get('/d', function () {
     Route::get('/vehicleinspectionpending', [VehiclesController::class, 'pendinginspection'])->name('vehicleinspectionpending.pendinginspection');
     Route::get('/vehicleincomingstock', [VehiclesController::class, 'incomingstocks'])->name('vehiclesincoming.stock');
     Route::post('vendorchecking/check-name', [VendorController::class, 'checkingname'])->name('vendorchecking.checkingname');
+    Route::get('/get-model-lines/{brandId}', [VehiclesController::class, 'getModelLines']);
     // Vendors
 
     Route::resource('vendors', VendorController::class);
@@ -336,4 +338,11 @@ Route::get('/d', function () {
     Route::post('/vehicles/updatewarehouse', [VehiclesController::class, 'updatewarehouse'])->name('vehicles.updatewarehouse');
 
     Route::get('/listUsers',[LoginActivityController::class, 'listUsers'])->name('listUsers');
+
+    // vehicle stock report
+
+    Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
+    // Brand
+    Route::resource('brands', BrandController::class);
+
 });

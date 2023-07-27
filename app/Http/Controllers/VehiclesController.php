@@ -20,6 +20,7 @@ use App\Models\Solog;
 use App\Models\Remarks;
 use App\Models\Warehouse;
 use App\Models\VehiclePicture;
+use App\Models\MasterModelLines;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,8 @@ class VehiclesController extends Controller
     public function index(Request $request)
     {
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
-        if ($hasPermission) {
+        if ($hasPermission)
+        {
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->where(function ($query) {
@@ -44,6 +46,13 @@ class VehiclesController extends Controller
                     });
             })
             ->get();
+
+            if($request->key) {
+                $searchKey = $request->key;
+                if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
+                    $data = $this->previousYearSold();
+                }
+            }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -58,12 +67,238 @@ class VehiclesController extends Controller
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
+
+        $previousYearSold = $this->previousYearSold()->count();
+        $previousYearBooked = $this->previousYearBooked()->count();
+        $previousMonthSold = $this->previousMonthSold()->count();
+        $previousMonthBooked = $this->previousMonthBooked()->count();
+        $yesterdaySold = $this->yesterdaySold()->count();
+        $yesterdayBooked  = $this->yesterdayBooked()->count();
+        $previousYearAvailable  = $this->previousYearAvailable()->count();
+        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
+        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher'));
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
+            'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
+            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable'));
         }
         else{
             return redirect()->route('home');
         }
+    }
+    public function stockCountFilter(Request $request) {
+
+        if($request->key) {
+            $searchKey = $request->key;
+            $vehicleIds = Vehicles::pluck('id');
+
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
+                $vehicleIds = $this->previousYearSold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_SOLD) {
+                $vehicleIds = $this->previousMonthSold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_SOLD) {
+                $vehicleIds = $this->yesterdaySold()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_BOOKED) {
+                $vehicleIds = $this->previousYearBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_BOOKED) {
+                $vehicleIds = $this->previousMonthBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_BOOKED) {
+                $vehicleIds = $this->yesterdayBooked()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE) {
+                $vehicleIds = $this->previousYearAvailable()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE) {
+                $vehicleIds = $this->previousMonthAvailable()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
+                $vehicleIds = $this->yesterdayAvailable()->pluck('id');
+            }
+            $data = Vehicles::whereIn('id',$vehicleIds)->get();
+
+        }else{
+
+            $statuss = "Incoming Stock";
+            $data = Vehicles::where('payment_status', $statuss)
+                ->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                })
+                ->get();
+        }
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
+            ->groupBy('vehicle_id')->get();
+        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+        $sales_persons = ModelHasRoles::get();
+        $sales_ids = $sales_persons->pluck('model_id');
+        $sales = User::whereIn('id', $sales_ids)->get();
+        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+        $interiorColours = ColorCode::where('belong_to', 'int')->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $countwarehouse = $warehouses->count();
+
+        $previousYearSold = $this->previousYearSold()->count();
+        $previousYearBooked = $this->previousYearBooked()->count();
+        $previousMonthSold = $this->previousMonthSold()->count();
+        $previousMonthBooked = $this->previousMonthBooked()->count();
+        $yesterdaySold = $this->yesterdaySold()->count();
+        $yesterdayBooked  = $this->yesterdayBooked()->count();
+        $previousYearAvailable  = $this->previousYearAvailable()->count();
+        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
+        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
+            ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
+            'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
+            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable'));
+    }
+    public function previousYearSold() {
+        // logic => if gdn id is there then that vehicle is completed.
+        $currentYear = \Carbon\Carbon::now()->year;
+        $previousYear = $currentYear - 1;
+        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+        $countPreviouseYearSold = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw(1))
+                    ->from('gdn')
+                    ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                    ->whereBetween('gdn.date', [$startDate, $endDate]);
+            })
+            ->get();
+
+        return $countPreviouseYearSold;
+    }
+    public function previousYearBooked() {
+        $currentYear = \Carbon\Carbon::now()->year;
+        $previousYear = $currentYear - 1;
+        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+        $countPreviouseYearBooked = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw(1))
+                    ->from('so')
+                    ->whereColumn('so.id', '=', 'vehicles.so_id')
+                    ->whereBetween('so.so_date', [$startDate, $endDate]);
+            })
+            ->get();
+
+        return $countPreviouseYearBooked;
+    }
+    public function previousYearAvailable() {
+
+        $currentYear = \Carbon\Carbon::now()->year;
+        $previousYear = $currentYear - 1;
+        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+        $countPreviouseYearAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
+            ->join('so', 'so.id', '=', 'vehicles.so_id')
+            ->whereBetween('gdn.date', [$startDate, $endDate])
+            ->whereDate('so.so_date', '>=' , $endDate)
+            ->get();
+
+        return $countPreviouseYearAvailable;
+    }
+    public function previousMonthSold() {
+        $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+        $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+        $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                $query->select(DB::raw(1))
+                    ->from('gdn')
+                    ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                    ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth]);
+            })
+            ->get();
+
+        return $countLastMonth;
+    }
+    public function previousMonthBooked() {
+        // logic => if gdn id is there then that vehicle is completed.
+        $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+        $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+        $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                $query->select(DB::raw(1))
+                    ->from('so')
+                    ->whereColumn('so.id', '=', 'vehicles.so_id')
+                    ->whereBetween('so.so_date', [$startDateLastMonth, $endDateLastMonth]);
+            })
+            ->get();
+
+        return $countLastMonth;
+    }
+    public function previousMonthAvailable() {
+
+        $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+        $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+        $countPreviousYearAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
+            ->join('so', 'so.id', '=', 'vehicles.so_id')
+            ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth])
+            ->whereDate('so.so_date', '>=' , $endDateLastMonth)
+            ->get();
+
+        return $countPreviousYearAvailable;
+    }
+
+    public function yesterdaySold() {
+        $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+        $countYesterdaySold = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($yesterday) {
+                $query->select(DB::raw(1))
+                    ->from('gdn')
+                    ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                    ->where('gdn.date', $yesterday);
+            })
+            ->get();
+
+        return $countYesterdaySold;
+    }
+    public function yesterdayBooked() {
+          $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+
+        $countYesterdayBooked = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($yesterday) {
+                $query->select(DB::raw(1))
+                    ->from('so')
+                    ->whereColumn('so.id', '=', 'vehicles.so_id')
+                    ->where('so.so_date', $yesterday);
+            })
+            ->get();
+
+        return $countYesterdayBooked;
+    }
+    public function yesterdayAvailable() {
+
+        $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+
+        $countYesterdayAvailable = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->join('gdn', 'gdn.id', '=', 'vehicles.gdn_id')
+            ->join('so', 'so.id', '=', 'vehicles.so_id')
+            ->whereDate('gdn.date', $yesterday)
+            ->whereDate('so.so_date', '>=' , $yesterday)
+            ->get();
+
+        return $countYesterdayAvailable;
     }
 
     public function pendingapprovals(Request $request)
@@ -74,13 +309,13 @@ class VehiclesController extends Controller
             $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
             $statuss = "Incoming Stock";
         $data = Vehicles::where('payment_status', $statuss)
-    ->where('latest_location', $warehouseId)
-    ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
-    ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
-    ->where('vehicles.latest_location', '=', $warehouseId) // Replace $warehousesveher->id with $warehouseId
-    ->where(function ($query) use ($fieldValues) {
-        $query->whereIn('field', $fieldValues);
-    })
+                ->where('latest_location', $warehouseId)
+                ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
+                ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
+                ->where('vehicles.latest_location', '=', $warehouseId) // Replace $warehousesveher->id with $warehouseId
+                ->where(function ($query) use ($fieldValues) {
+                    $query->whereIn('field', $fieldValues);
+                })
     ->where(function ($query) {
         // Include vehicles with 'so_id' is null
         $query->whereNull('so_id')
@@ -1015,5 +1250,11 @@ class VehiclesController extends Controller
         }
 
         return redirect()->back()->with('success', 'Details updated successfully.');
+    }
+
+    public function getModelLines($brandId)
+    {
+        $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
+        return response()->json($modelLines);
     }
     }

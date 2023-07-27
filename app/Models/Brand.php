@@ -18,6 +18,14 @@ class Brand extends Model
     {
         return $this->belongsTo(MasterModelLines::class);
     }
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
     public function warrantyBrands()
     {
         return $this->hasMany(WarrantyBrands::class);
