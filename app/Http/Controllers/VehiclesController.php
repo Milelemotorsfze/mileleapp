@@ -47,14 +47,8 @@ class VehiclesController extends Controller
             })
             ->get();
 
-            if($request->key) {
-                $searchKey = $request->key;
-                if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_SOLD) {
-                    $data = $this->previousYearSold();
-                }
-            }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-        ->groupBy('vehicle_id')->get();
+                                                ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::whereNotNull('master_model_lines_id')->get();

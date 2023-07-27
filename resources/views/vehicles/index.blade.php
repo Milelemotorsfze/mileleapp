@@ -1339,7 +1339,7 @@ updateBtn.addEventListener('click', () => {
     // Table #dtBasicExample2
     var dataTable = $('#dtBasicExample1').DataTable({
       "order": [[4, "desc"]],
-      pageLength: 50,
+      pageLength: 10,
       initComplete: function() {
         this.api().columns().every(function(d) {
           var column = this;
