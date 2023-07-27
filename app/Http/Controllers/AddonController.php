@@ -15,6 +15,7 @@ use App\Models\KitItems;
 use App\Models\AddonSellingPrice;
 use App\Models\PurchasePriceHistory;
 use App\Models\SupplierType;
+use App\Models\KitCommonItem;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -268,40 +269,58 @@ class AddonController extends Controller
                     }
                 }
             }
+            // if($request->addon_type == 'K')
+            // {
+            //     if($request->kitSupplierAndPrice)
+            //     {
+            //         if(count($request->kitSupplierAndPrice) > 0 )
+            //         {
+            //             $supPriInput['created_by'] = $authId;
+            //             foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
+            //             {
+            //                 $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
+            //                 $supPriInput['addon_details_id'] = $addon_details->id;
+            //                 $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
+            //                 $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
+            //                 if($supPriInput['purchase_price_aed'] != '')
+            //                 {
+            //                     $CreateSupAddPri = SupplierAddons::create($supPriInput);
+            //                     $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+            //                     $createHistrory = PurchasePriceHistory::create($supPriInput);
+            //                 }
+            //                 if(count($kitSupplierAndPriceData['item']) > 0)
+            //                 {
+            //                     $createkit['created_by'] = $authId;
+            //                     $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
+            //                     foreach($kitSupplierAndPriceData['item'] as $kitItemData)
+            //                     {
+            //                         $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
+            //                         $createkit['quantity'] = $kitItemData['quantity'];
+            //                         $createkit['unit_price_in_aed'] = $kitItemData['unit_price_in_aed'];
+            //                         $createkit['total_price_in_aed'] = $kitItemData['total_price_in_aed'];
+            //                         $createkit['unit_price_in_usd'] = $kitItemData['unit_price_in_usd'];
+            //                         $createkit['total_price_in_usd'] = $kitItemData['total_price_in_usd'];
+            //                         $CreateSupAddPri = KitItems::create($createkit);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
             if($request->addon_type == 'K')
             {
-                if($request->kitSupplierAndPrice)
+                if($request->mainItem)
                 {
-                    if(count($request->kitSupplierAndPrice) > 0 )
+                    if(count($request->mainItem) > 0 )
                     {
-                        $supPriInput['created_by'] = $authId;
-                        foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
+                        foreach($request->mainItem as $kitItemData)
                         {
-                            $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
-                            $supPriInput['addon_details_id'] = $addon_details->id;
-                            $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
-                            $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
-                            if($supPriInput['purchase_price_aed'] != '')
-                            {
-                                $CreateSupAddPri = SupplierAddons::create($supPriInput);
-                                $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
-                                $createHistrory = PurchasePriceHistory::create($supPriInput);
-                            }
-                            if(count($kitSupplierAndPriceData['item']) > 0)
-                            {
-                                $createkit['created_by'] = $authId;
-                                $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
-                                foreach($kitSupplierAndPriceData['item'] as $kitItemData)
-                                {
-                                    $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
-                                    $createkit['quantity'] = $kitItemData['quantity'];
-                                    $createkit['unit_price_in_aed'] = $kitItemData['unit_price_in_aed'];
-                                    $createkit['total_price_in_aed'] = $kitItemData['total_price_in_aed'];
-                                    $createkit['unit_price_in_usd'] = $kitItemData['unit_price_in_usd'];
-                                    $createkit['total_price_in_usd'] = $kitItemData['total_price_in_usd'];
-                                    $CreateSupAddPri = KitItems::create($createkit);
-                                }
-                            }
+                            $createkit = [];
+                            $createkit['created_by'] = $authId;
+                            $createkit['item_id'] = $kitItemData['item'];
+                            $createkit['addon_details_id'] = $addon_details->id;
+                            $createkit['quantity'] = $kitItemData['quantity'];
+                            $CreateSupAddPri = KitCommonItem::create($createkit);
                         }
                     }
                 }
@@ -339,9 +358,18 @@ class AddonController extends Controller
                     }
                 }
             }
-            $data = 'all';
-            return redirect()->route('addon.list', $data)
-                            ->with('success','Addon created successfully');
+            if($request->addon_type == 'K')
+            {
+                return redirect()->route('kit.suppliers', $addon_details->id)
+                                ->with('success','Kit created successfully');
+            }
+            else
+            {
+                $data = 'all';
+                return redirect()->route('addon.list', $data)
+                                ->with('success','Addon created successfully');
+            }
+           
         // }
     }
 
@@ -381,8 +409,10 @@ class AddonController extends Controller
             $supplierAddons = SupplierAddons::where('addon_details_id', $id)->get();
             foreach($supplierAddons as $supplierAddon)
             {
+                KitItems::where('supplier_addon_id',$supplierAddon->id)->delete();
                 PurchasePriceHistory::where('supplier_addon_id', $supplierAddon->id)->delete();
             }
+            KitCommonItem::where('addon_details_id',$id)->delete();
             SupplierAddons::where('addon_details_id', $id)->delete();
             $addonDetails->delete();
         DB::commit();

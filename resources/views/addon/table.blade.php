@@ -223,7 +223,18 @@
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
                                             @endphp
                                             @if ($hasPermission)
-                                            <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                            @if($addonsdata->LeastPurchasePrices!= null)
+                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                                @can('addon-least-purchase-price-view')
+                                                @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                                @endif
+                                                @endcan
+                                            @endif
+                                            @endif
                                             @endif
                                             @endcan
                                             @can('addon-selling-price-view')

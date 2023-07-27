@@ -4,7 +4,7 @@
     <h4 class="card-title">Kit Items and Quantity</h4>
 </div>
 <div class="col-xxl-12 col-lg-12 col-md-12 supplierAddForKit1">
-    @include('addon.kitCreate')
+    @include('kit.kitCreate')
 </div>
 <div class="card-header">
     <h4 class="card-title">Kit Suppliers and Purchase Price</h4>

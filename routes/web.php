@@ -43,6 +43,7 @@ use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\ColorCodesController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\LoginActivityController;
+use App\Http\Controllers\KitCommonItemController;
 
 
 /*
@@ -104,6 +105,11 @@ Route::get('/d', function () {
     Route::post('getKitItemsForAddon', [AddonController::class, 'getKitItemsForAddon']);
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
+
+    // Kit
+    Route::resource('kit', KitCommonItemController::class);
+    Route::get('kit-suppliers/{id}', [KitCommonItemController::class,'kitSuppliers'])->name('kit.suppliers');
+
     // Warranty
     Route::resource('warranty', WarrantyController::class);
     Route::resource('warranty-brands', WarrantyBrandsController::class);
