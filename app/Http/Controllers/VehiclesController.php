@@ -37,14 +37,6 @@ class VehiclesController extends Controller
         {
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
-            ->where(function ($query) {
-                // Include vehicles with 'so_id' is null
-                $query->whereNull('so_id')
-                    // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                    ->orWhereHas('So', function ($query) {
-                        $query->where('sales_person_id', Auth::user()->role_id);
-                    });
-            })
             ->get();
 
             if($request->key) {
@@ -67,16 +59,12 @@ class VehiclesController extends Controller
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
-
-        $previousYearSold = $this->previousYearSold()->count();
-        $previousYearBooked = $this->previousYearBooked()->count();
-        $previousMonthSold = $this->previousMonthSold()->count();
-        $previousMonthBooked = $this->previousMonthBooked()->count();
-        $yesterdaySold = $this->yesterdaySold()->count();
-        $yesterdayBooked  = $this->yesterdayBooked()->count();
-        $previousYearAvailable  = $this->previousYearAvailable()->count();
-        $previousMonthAvailable  = $this->previousMonthAvailable()->count();
-        $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+        $previousYearSold = $this->previousYearSold();
+        $previousYearBooked = $this->previousYearBooked();
+        $previousMonthSold = $this->previousMonthSold();
+        $previousMonthBooked = $this->previousMonthBooked();
+        $yesterdaySold = $this->yesterdaySold();
+        $yesterdayBooked  = $this->yesterdayBooked();
 
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
@@ -183,6 +171,46 @@ class VehiclesController extends Controller
 
         return $countPreviouseYearSold;
     }
+    public function previousMonthSold() {
+        $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+        $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+        $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                $query->select(DB::raw(1))
+                    ->from('gdn')
+                    ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                    ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth]);
+            })
+            ->count();
+
+        return $countLastMonth;
+    }
+    public function yesterdaySold() {
+        $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+        $countYesterdaySold = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($yesterday) {
+                $query->select(DB::raw(1))
+                    ->from('gdn')
+                    ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
+                    ->where('gdn.date', $yesterday);
+            })
+            ->count();
+
+        return $countYesterdaySold;
+    }
+    public function yesterdayBooked() {
+          $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+        $countYesterdayBooked = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($yesterday) {
+                $query->select(DB::raw(1))
+                    ->from('so')
+                    ->whereColumn('so.id', '=', 'vehicles.so_id')
+                    ->where('so.so_date', $yesterday);
+            })
+            ->count();
+        return $countYesterdayBooked;
+    }
     public function previousYearBooked() {
         $currentYear = \Carbon\Carbon::now()->year;
         $previousYear = $currentYear - 1;
@@ -230,10 +258,8 @@ class VehiclesController extends Controller
         return $countLastMonth;
     }
     public function previousMonthBooked() {
-        // logic => if gdn id is there then that vehicle is completed.
         $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
         $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
-
         $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
             ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
                 $query->select(DB::raw(1))
@@ -241,8 +267,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->whereBetween('so.so_date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->get();
-
+            ->count();
         return $countLastMonth;
     }
     public function previousMonthAvailable() {

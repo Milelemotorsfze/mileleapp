@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\MovementsReference;
 use App\Models\Grn;
 use App\Models\Gdn;
+use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
@@ -43,13 +44,14 @@ class MovementController extends Controller
         ->pluck('vin');       
     $warehouses = Warehouse::select('id', 'name')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
+    $purchasing_order = PurchasingOrder::where('status', 'Approved')->get();
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
     $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
     return view('movement.create', [
         'movementsReferenceId' => $movementsReferenceId,
         'lastIdExists' => $lastIdExists,
         'NextIdExists' => $NextIdExists,
-    ], compact('vehicles', 'warehouses'));
+    ], compact('vehicles', 'warehouses','purchasing_order'));
     }
     /**
      * Store a newly created resource in storage.

@@ -5,7 +5,6 @@
       width: 25%;
       float: right;
     }
-
     #tableSearch {
       width: 100%;
       box-sizing: border-box;
@@ -139,7 +138,7 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
                 @endphp
                 @if ($hasPermission)
-                <h4 class="card-title">Vehicles St</h4>
+                <h4 class="card-title">Vehicles Status</h4>
                 @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
