@@ -33,20 +33,25 @@ class VehiclesController extends Controller
     public function index(Request $request)
     {
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
-        if ($hasPermission)
-        {
+        if ($hasPermission) {
             $statuss = "Incoming Stock";
-        $data = Vehicles::where('payment_status', $statuss)
-            ->where(function ($query) {
-                // Include vehicles with 'so_id' is null
-                $query->whereNull('so_id')
-                    // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                    ->orWhereHas('So', function ($query) {
-                        $query->where('sales_person_id', Auth::user()->role_id);
-                    });
-            })
-            ->get();
-
+            
+            $data = []; // Initialize an empty array to store the results
+            
+            Vehicles::where('payment_status', $statuss)
+                ->where(function ($query) {
+                    $query->whereNull('so_id')
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                })
+                ->chunk(100, function ($vehicles) use (&$data) {
+                    // Process each chunk of vehicles
+                    foreach ($vehicles as $vehicle) {
+                        // Perform any necessary operations on the $vehicle here
+                        $data[] = $vehicle;
+                    }
+                });
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                                 ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();

@@ -210,11 +210,13 @@ class PurchasingOrderController extends Controller
         }
         $poDate = $request->input('po_date');
         $poNumber = $request->input('po_number');
+        $po_type = $request->input('po_type');
         $vendors_id = $request->input('vendors_id');
         $purchasingOrder = new PurchasingOrder();
         $purchasingOrder->po_date = $poDate;
         $purchasingOrder->po_number = $poNumber;
         $purchasingOrder->vendors_id = $vendors_id;
+        $purchasingOrder->po_type = $po_type;
         $purchasingOrder->status = "Pending Approval";
         $purchasingOrder->created_by = auth()->user()->id;
         $purchasingOrder->save();
@@ -549,7 +551,14 @@ public function purchasingupdateStatus(Request $request)
         $vehicles = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'Rejected')->get();
         foreach ($vehicles as $vehicle) {
             if ($vehicle->status == 'New Changes' || $vehicle->status == 'Not Approved') {
-            $vehicle->status = 'Approved';
+            if($purchasingOrder->po_type === "Payment Adjustment")
+            {
+                $vehicle->status = 'Payment Completed';
+                $vehicle->payment_status = 'Payment Completed';
+            }
+            else{
+                $vehicle->status = 'Approved';
+            }
             $vehicle->save();
             $ex_colour = $vehicle->ex_colour; 
             $int_colour = $vehicle->int_colour; 
