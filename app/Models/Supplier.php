@@ -16,6 +16,26 @@ class Supplier extends Model
         'contact_number',
         'alternative_contact_number',
         'email',
+        'web_address',
+        'type',
+        'comment',
+        'notes',
+        'billing_address',
+        'shipping_address',
+        'prefered_label',
+        'prefered_id',
+        'vat_certificate_file',
+        'trade_license_file',
+        'passport_copy_file',
+        'fax',
+        'address',
+        'nationality',
+        'passport_number',
+        'prefered_label',
+        'prefered_id',
+        'trade_registration_place',
+        'trade_license_number',
+        'communication_channels',
         'person_contact_by',
         'supplier_type',
         'created_by',
@@ -35,7 +55,8 @@ class Supplier extends Model
     public const SUPPLIER_CATEGORY_VEHICLES = 'Vehicles';
     public const SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES = 'Parts and Accessories';
     public const SUPPLIER_CATEGORY_OTHER = 'Other';
-
+    public const SUPPLIER_SUB_CATEGORY_BULK = 'Bulk';
+    public const SUPPLIER_SUB_CATEGORY_SMALL_SEGMENT = 'Small Segment';
 
     public function supplierAddons()
     {

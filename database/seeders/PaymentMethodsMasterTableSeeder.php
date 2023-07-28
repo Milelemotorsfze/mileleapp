@@ -17,7 +17,8 @@ class PaymentMethodsMasterTableSeeder extends Seeder
             ['1','Bank Transfer'],
             ['2','Cash On Hand'],
             ['3','Cheque'],
-            ['4','Credit Note']
+            ['4','Credit Note'],
+            ['5','Any']
             ];
         foreach ($payment_methods as $key => $value):
         $payment_method[]     = [

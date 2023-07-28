@@ -263,59 +263,36 @@ input {
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
 
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
-                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput"
-                                onchange="validationOnKeyUp(this)">
-                                <option value="">Choose Supplier Type</option>
-                                <option value="accessories">Accessories</option>
-                                <option value="freelancer">Freelancer</option>
-                                <option value="garage">Garage</option>
-                                <option value="spare_parts">Spare Parts</option>
-                                <option value="warranty">Warranty</option>
-                            </select>
-                            <span id="supplierTypeError" class=" invalid-feedback"></span>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">
-                            <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">
-                                <span id="accessories" class="spanSub" hidden>Accessories</span>
-                                <span id="freelancer" class="spanSub" hidden>Freelancer</span>
-                                <span id="garage" class="spanSub" hidden>Garage</span>
-                                <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>
-                                <span id="warranty" class="spanSub" hidden>Warranty</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xxl-6 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
-                        </div>
-                        <div class="col-xxl-9 col-lg-6 col-md-12">
-                            <select id="is_primary_payment_method" name="is_primary_payment_method"
-                            class=" form-control @error('is_primary_payment_method') is-invalid @enderror" onchange="secondaryPaymentMethods(this)" >
-                                <option value="">Choose Payment Method</option>
-                                @foreach($paymentMethods as $paymentMethod)
-                                <option value="{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</option>
-                                @endforeach
-                            </select>
-                            @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="paymentMethodsError" class="invalid-feedback"></span>
-                        </div>
-                    </div>
-                    </br>
-                </div>
+{{--                <div class="col-xxl-6 col-lg-6 col-md-12">--}}
+{{--                    <div class="row">--}}
+{{--                        <div class="col-xxl-3 col-lg-6 col-md-12">--}}
+{{--                            <span class="error">* </span>--}}
+{{--                            <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">--}}
+{{--                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput"--}}
+{{--                                onchange="validationOnKeyUp(this)">--}}
+{{--                                <option value="">Choose Supplier Type</option>--}}
+{{--                                <option value="accessories">Accessories</option>--}}
+{{--                                <option value="freelancer">Freelancer</option>--}}
+{{--                                <option value="garage">Garage</option>--}}
+{{--                                <option value="spare_parts">Spare Parts</option>--}}
+{{--                                <option value="warranty">Warranty</option>--}}
+{{--                            </select>--}}
+{{--                            <span id="supplierTypeError" class=" invalid-feedback"></span>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">--}}
+{{--                            <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">--}}
+{{--                                <span id="accessories" class="spanSub" hidden>Accessories</span>--}}
+{{--                                <span id="freelancer" class="spanSub" hidden>Freelancer</span>--}}
+{{--                                <span id="garage" class="spanSub" hidden>Garage</span>--}}
+{{--                                <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>--}}
+{{--                                <span id="warranty" class="spanSub" hidden>Warranty</span>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+
             </div>
             <div class="card">
                 <div class="card-header">
@@ -331,7 +308,7 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="supplier" type="text" class="form-control widthinput @error('supplier') is-invalid @enderror" name="supplier"
-                                           placeholder="Individual / Company Name" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus onkeyup="validationOnKeyUp(this)">
+                                           placeholder="Individual / Company Name" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus >
                                     @error('supplier')
                                     <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -346,10 +323,11 @@ input {
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
                                     <!-- <span class="error">* </span> -->
-                                    <label for="contact_person" class="col-form-label text-md-end">{{ __('Vendor Type') }}</label>
+                                    <label for="type" class="col-form-label text-md-end">{{ __('Vendor Type') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <select class="widthinput form-control" name="type" id="type" autofocus>
+                                        <option ></option>
                                         <option value="Individual">Individual</option>
                                         <option value="Company">Company</option>
                                     </select>
@@ -369,17 +347,55 @@ input {
                                     <label for="contact_person" class="col-form-label text-md-end">{{ __('Category') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
-                                    <select class="widthinput form-control" name="category[]" id="category" multiple  autofocus>
+                                    <select class="widthinput form-control" name="categories[]" id="category" multiple  autofocus>
                                         <option></option>
-                                        <option value="{{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}}">Vehicles</option>
-                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}">Parts & Accessories</option>
-                                        <option value="{{{ \App\Models\Supplier::SUPPLIER_CATEGORY_OTHER }}}">Other</option>
+                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}">Vehicles</option>
+                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}">Parts and Accessories</option>
+                                        <option value="{{ \App\Models\Supplier::SUPPLIER_CATEGORY_OTHER }}">Other</option>
                                     </select>
                                     @error('category')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
+                                    <span id="supplierCategoryError" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <span class="error">* </span>
+                                    <label for="supplier_types" class="col-form-label text-md-end">{{ __('Sub Category') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
+                                    <select name="supplier_types[]" hidden="hidden" id="supplier_type" multiple="true" style="width: 100%;"
+                                            class="form-control widthinput" autofocus  onchange="validationOnKeyUp(this)">
+                                            <option value="">Choose Sub Category</option>
+                                    </select>
+                                    <span id="supplierTypeError" class=" invalid-feedback"></span>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">
+                                    <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">
+                                        <span id="accessories" class="spanSub" hidden>Accessories</span>
+                                        <span id="freelancer" class="spanSub" hidden>Freelancer</span>
+                                        <span id="garage" class="spanSub" hidden>Garage</span>
+                                        <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>
+                                        <span id="warranty" class="spanSub" hidden>Warranty</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Comment') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment" id="comment" autofocus></textarea>
                                 </div>
                             </div>
                             </br>
@@ -388,12 +404,10 @@ input {
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
                                     <!-- <span class="error">* </span> -->
-                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Sub Category') }}</label>
+                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Web Address') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
-                                    <select class="widthinput form-control" name="category[]" id="sub_category" autofocus>
-
-                                    </select>
+                                    <input class="widthinput form-control" name="web_address" id="web_address" placeholder="Web Address" autofocus>
                                 </div>
                             </div>
                             </br>
@@ -505,29 +519,484 @@ input {
                             </div>
                             </br>
                         </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="fax" class="col-form-label widthinput">{{ __('Fax') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="text" class="form-control" name="fax" placeholder="fax">
+
+                                    @error('fax')
+                                    <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                    @enderror
+
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="address" class="col-form-label widthinput">{{ __('Address') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <textarea cols="25" rows="5" class="form-control" name="address" placeholder="Address Details"></textarea>
+                                    @error('address_details')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Classification</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="contact_number" class="col-form-label widthinput">{{ __('Passport Number') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="text" class="form-control" name="passport_number" placeholder="Passport Number">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Nationality</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <select name="nationality" class="form-control widthinput" id="nationality">
+                                        <option ></option>
+                                        <option value="afghan">Afghan</option>
+                                        <option value="albanian">Albanian</option>
+                                        <option value="algerian">Algerian</option>
+                                        <option value="american">American</option>
+                                        <option value="andorran">Andorran</option>
+                                        <option value="angolan">Angolan</option>
+                                        <option value="antiguans">Antiguans</option>
+                                        <option value="argentinean">Argentinean</option>
+                                        <option value="armenian">Armenian</option>
+                                        <option value="australian">Australian</option>
+                                        <option value="austrian">Austrian</option>
+                                        <option value="azerbaijani">Azerbaijani</option>
+                                        <option value="bahamian">Bahamian</option>
+                                        <option value="bahraini">Bahraini</option>
+                                        <option value="bangladeshi">Bangladeshi</option>
+                                        <option value="barbadian">Barbadian</option>
+                                        <option value="barbudans">Barbudans</option>
+                                        <option value="batswana">Batswana</option>
+                                        <option value="belarusian">Belarusian</option>
+                                        <option value="belgian">Belgian</option>
+                                        <option value="belizean">Belizean</option>
+                                        <option value="beninese">Beninese</option>
+                                        <option value="bhutanese">Bhutanese</option>
+                                        <option value="bolivian">Bolivian</option>
+                                        <option value="bosnian">Bosnian</option>
+                                        <option value="brazilian">Brazilian</option>
+                                        <option value="british">British</option>
+                                        <option value="bruneian">Bruneian</option>
+                                        <option value="bulgarian">Bulgarian</option>
+                                        <option value="burkinabe">Burkinabe</option>
+                                        <option value="burmese">Burmese</option>
+                                        <option value="burundian">Burundian</option>
+                                        <option value="cambodian">Cambodian</option>
+                                        <option value="cameroonian">Cameroonian</option>
+                                        <option value="canadian">Canadian</option>
+                                        <option value="cape verdean">Cape Verdean</option>
+                                        <option value="central african">Central African</option>
+                                        <option value="chadian">Chadian</option>
+                                        <option value="chilean">Chilean</option>
+                                        <option value="chinese">Chinese</option>
+                                        <option value="colombian">Colombian</option>
+                                        <option value="comoran">Comoran</option>
+                                        <option value="congolese">Congolese</option>
+                                        <option value="costa rican">Costa Rican</option>
+                                        <option value="croatian">Croatian</option>
+                                        <option value="cuban">Cuban</option>
+                                        <option value="cypriot">Cypriot</option>
+                                        <option value="czech">Czech</option>
+                                        <option value="danish">Danish</option>
+                                        <option value="djibouti">Djibouti</option>
+                                        <option value="dominican">Dominican</option>
+                                        <option value="dutch">Dutch</option>
+                                        <option value="east timorese">East Timorese</option>
+                                        <option value="ecuadorean">Ecuadorean</option>
+                                        <option value="egyptian">Egyptian</option>
+                                        <option value="emirian">Emirian</option>
+                                        <option value="equatorial guinean">Equatorial Guinean</option>
+                                        <option value="eritrean">Eritrean</option>
+                                        <option value="estonian">Estonian</option>
+                                        <option value="ethiopian">Ethiopian</option>
+                                        <option value="fijian">Fijian</option>
+                                        <option value="filipino">Filipino</option>
+                                        <option value="finnish">Finnish</option>
+                                        <option value="french">French</option>
+                                        <option value="gabonese">Gabonese</option>
+                                        <option value="gambian">Gambian</option>
+                                        <option value="georgian">Georgian</option>
+                                        <option value="german">German</option>
+                                        <option value="ghanaian">Ghanaian</option>
+                                        <option value="greek">Greek</option>
+                                        <option value="grenadian">Grenadian</option>
+                                        <option value="guatemalan">Guatemalan</option>
+                                        <option value="guinea-bissauan">Guinea-Bissauan</option>
+                                        <option value="guinean">Guinean</option>
+                                        <option value="guyanese">Guyanese</option>
+                                        <option value="haitian">Haitian</option>
+                                        <option value="herzegovinian">Herzegovinian</option>
+                                        <option value="honduran">Honduran</option>
+                                        <option value="hungarian">Hungarian</option>
+                                        <option value="icelander">Icelander</option>
+                                        <option value="indian">Indian</option>
+                                        <option value="indonesian">Indonesian</option>
+                                        <option value="iranian">Iranian</option>
+                                        <option value="iraqi">Iraqi</option>
+                                        <option value="irish">Irish</option>
+                                        <option value="israeli">Israeli</option>
+                                        <option value="italian">Italian</option>
+                                        <option value="ivorian">Ivorian</option>
+                                        <option value="jamaican">Jamaican</option>
+                                        <option value="japanese">Japanese</option>
+                                        <option value="jordanian">Jordanian</option>
+                                        <option value="kazakhstani">Kazakhstani</option>
+                                        <option value="kenyan">Kenyan</option>
+                                        <option value="kittian and nevisian">Kittian and Nevisian</option>
+                                        <option value="kuwaiti">Kuwaiti</option>
+                                        <option value="kyrgyz">Kyrgyz</option>
+                                        <option value="laotian">Laotian</option>
+                                        <option value="latvian">Latvian</option>
+                                        <option value="lebanese">Lebanese</option>
+                                        <option value="liberian">Liberian</option>
+                                        <option value="libyan">Libyan</option>
+                                        <option value="liechtensteiner">Liechtensteiner</option>
+                                        <option value="lithuanian">Lithuanian</option>
+                                        <option value="luxembourger">Luxembourger</option>
+                                        <option value="macedonian">Macedonian</option>
+                                        <option value="malagasy">Malagasy</option>
+                                        <option value="malawian">Malawian</option>
+                                        <option value="malaysian">Malaysian</option>
+                                        <option value="maldivan">Maldivan</option>
+                                        <option value="malian">Malian</option>
+                                        <option value="maltese">Maltese</option>
+                                        <option value="marshallese">Marshallese</option>
+                                        <option value="mauritanian">Mauritanian</option>
+                                        <option value="mauritian">Mauritian</option>
+                                        <option value="mexican">Mexican</option>
+                                        <option value="micronesian">Micronesian</option>
+                                        <option value="moldovan">Moldovan</option>
+                                        <option value="monacan">Monacan</option>
+                                        <option value="mongolian">Mongolian</option>
+                                        <option value="moroccan">Moroccan</option>
+                                        <option value="mosotho">Mosotho</option>
+                                        <option value="motswana">Motswana</option>
+                                        <option value="mozambican">Mozambican</option>
+                                        <option value="namibian">Namibian</option>
+                                        <option value="nauruan">Nauruan</option>
+                                        <option value="nepalese">Nepalese</option>
+                                        <option value="new zealander">New Zealander</option>
+                                        <option value="ni-vanuatu">Ni-Vanuatu</option>
+                                        <option value="nicaraguan">Nicaraguan</option>
+                                        <option value="nigerien">Nigerien</option>
+                                        <option value="north korean">North Korean</option>
+                                        <option value="northern irish">Northern Irish</option>
+                                        <option value="norwegian">Norwegian</option>
+                                        <option value="omani">Omani</option>
+                                        <option value="pakistani">Pakistani</option>
+                                        <option value="palauan">Palauan</option>
+                                        <option value="panamanian">Panamanian</option>
+                                        <option value="papua new guinean">Papua New Guinean</option>
+                                        <option value="paraguayan">Paraguayan</option>
+                                        <option value="peruvian">Peruvian</option>
+                                        <option value="polish">Polish</option>
+                                        <option value="portuguese">Portuguese</option>
+                                        <option value="qatari">Qatari</option>
+                                        <option value="romanian">Romanian</option>
+                                        <option value="russian">Russian</option>
+                                        <option value="rwandan">Rwandan</option>
+                                        <option value="saint lucian">Saint Lucian</option>
+                                        <option value="salvadoran">Salvadoran</option>
+                                        <option value="samoan">Samoan</option>
+                                        <option value="san marinese">San Marinese</option>
+                                        <option value="sao tomean">Sao Tomean</option>
+                                        <option value="saudi">Saudi</option>
+                                        <option value="scottish">Scottish</option>
+                                        <option value="senegalese">Senegalese</option>
+                                        <option value="serbian">Serbian</option>
+                                        <option value="seychellois">Seychellois</option>
+                                        <option value="sierra leonean">Sierra Leonean</option>
+                                        <option value="singaporean">Singaporean</option>
+                                        <option value="slovakian">Slovakian</option>
+                                        <option value="slovenian">Slovenian</option>
+                                        <option value="solomon islander">Solomon Islander</option>
+                                        <option value="somali">Somali</option>
+                                        <option value="south african">South African</option>
+                                        <option value="south korean">South Korean</option>
+                                        <option value="spanish">Spanish</option>
+                                        <option value="sri lankan">Sri Lankan</option>
+                                        <option value="sudanese">Sudanese</option>
+                                        <option value="surinamer">Surinamer</option>
+                                        <option value="swazi">Swazi</option>
+                                        <option value="swedish">Swedish</option>
+                                        <option value="swiss">Swiss</option>
+                                        <option value="syrian">Syrian</option>
+                                        <option value="taiwanese">Taiwanese</option>
+                                        <option value="tajik">Tajik</option>
+                                        <option value="tanzanian">Tanzanian</option>
+                                        <option value="thai">Thai</option>
+                                        <option value="togolese">Togolese</option>
+                                        <option value="tongan">Tongan</option>
+                                        <option value="trinidadian or tobagonian">Trinidadian or Tobagonian</option>
+                                        <option value="tunisian">Tunisian</option>
+                                        <option value="turkish">Turkish</option>
+                                        <option value="tuvaluan">Tuvaluan</option>
+                                        <option value="ugandan">Ugandan</option>
+                                        <option value="ukrainian">Ukrainian</option>
+                                        <option value="uruguayan">Uruguayan</option>
+                                        <option value="uzbekistani">Uzbekistani</option>
+                                        <option value="venezuelan">Venezuelan</option>
+                                        <option value="vietnamese">Vietnamese</option>
+                                        <option value="welsh">Welsh</option>
+                                        <option value="yemenite">Yemenite</option>
+                                        <option value="zambian">Zambian</option>
+                                        <option value="zimbabwean">Zimbabwean</option>
+                                    </select>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Trade License Number</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="text" class="form-control" name="trade_license_number" placeholder="Trade License Number">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Trade Registration Place</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="text" class="form-control" name="trade_registration_place" placeholder="Trade Registration Place">
+
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Preferences</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Preference ID') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input class="widthinput form-control" name="prefered_id" id="prefered_id" placeholder="Preference ID" autofocus>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="Label" class="col-form-label text-md-end">{{ __('Label') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input class="widthinput form-control" name="prefered_label" id="label" placeholder="Label" autofocus>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="Label" class="col-form-label text-md-end">{{ __('Communication Channels') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <div class="form-check form-check-inline" >
+                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option1" value="mobile">
+                                        <label class="form-check-label" for="option1">Mobile</label>
+                                    </div>
+                                    <div class="form-check form-check-inline" for="option2">
+                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option2" value="email">
+                                        <label class="form-check-label" for="option2">Email</label>
+                                    </div>
+                                    <div class="form-check form-check-inline" for="option3">
+                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option3" value="fax" >
+                                        <label class="form-check-label" for="option3">Fax</label>
+                                    </div>
+                                    <div class="form-check form-check-inline" for="option4">
+                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option4" value="postal">
+                                        <label class="form-check-label" for="option4">Postal</label>
+                                    </div>
+                                    <div class="form-check form-check-inline" for="option5">
+                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option5" value="any" >
+                                        <label class="form-check-label" for="option5">Any</label>
+                                    </div>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="Label" class="col-form-label text-md-end">{{ __('Payment Channels') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    @foreach($paymentMethods as $paymentMethod)
+                                        <div class="form-check form-check-inline" >
+                                            <input class="form-check-input" name="payment_methods[]" type="checkbox" id="inlineCheckbox{{$paymentMethod->id}}">
+                                            <label class="form-check-label" for="inlineCheckbox{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</label>
+                                        </div>
+                                     @endforeach
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="shipping_address" class="col-form-label text-md-end">{{ __('Shipping Address') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <textarea cols="25" rows="5" class="form-control" name="shipping_address" placeholder="Shipping Address"></textarea>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="Label" class="col-form-label text-md-end">{{ __('Billing Address') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <textarea cols="25" rows="5" class=" form-control" name="billing_address" placeholder="Billing Address"
+                                              id="billing_address" autofocus></textarea>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <!-- <span class="error">* </span> -->
+                                    <label for="sub category" class="col-form-label text-md-end">{{ __('Notes') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <textarea cols="25" rows="5" class=" form-control" name="notes" id="note" placeholder="Notes" autofocus></textarea>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Upload Documents</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Passport</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="file" class="form-control" id="passport-upload" name="passport_copy_file"
+                                           accept="application/pdf, image/*">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Trade License </label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="file" class="form-control" id="trade-licence-upload" name="trade_license_file"
+                                           placeholder="Upload Trade License" accept="application/pdf, image/*">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Vat Certificate</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="file" class="form-control" id="vat-certificate-upload" name="vat_certificate_file"
+                                           placeholder="Upload Vat Certificate" accept="application/pdf, image/*">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="choices-single-default" class="form-label widthinput">Other Document</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input type="file" class="form-control" multiple id="documents" name="documents[]"
+                                           placeholder="Upload Other Document" accept="application/pdf, image/*">
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Address</label>
-                                <textarea cols="25" rows="5" class="form-control" name="address_details" placeholder="Address Details"></textarea>
+                            <div id="file1-preview">
                             </div>
                         </div>
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Alternate Contact Number</label>
-                                <input type="tel" class="form-control" name="alternate_contact_number"
-                                       id="alternate-contact-number" placeholder="Alternate Contact Number">
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <div id="file2-preview">
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div class="mb-3">
-                                <label for="choices-single-default" class="form-label">Fax</label>
-                                <input type="text" class="form-control" name="fax" placeholder="fax">
+                            <div id="file3-preview">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12">
+                            <div id="file4-preview">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        <div id="tabId" hidden>
+            <div id="tabId" hidden>
+
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
                 <h6 class="tablinks" onclick="openCity(event, 'uploadExcel')">Upload Supplier's Addon Excel</h6>
@@ -606,7 +1075,6 @@ input {
                 </div>
             </div>
 
-
             <div id="uploadExcel" class="tabcontent">
                 <div class="row">
                     <div class="col-xxl-6 col-lg-6 col-md-6">
@@ -650,20 +1118,172 @@ input {
         var addonDropdownCount = 1;
         // globalThis.selectedAddons .push(brandId);
       var sub ='1';
+        const file1InputLicense = document.querySelector("#passport-upload");
+        const file2InputLicense = document.querySelector("#trade-licence-upload");
+        const file3InputLicense = document.querySelector("#vat-certificate-upload");
+        const file4InputLicense = document.querySelector("#documents");
+
+        const previewFile1 = document.querySelector("#file1-preview");
+        const previewFile2 = document.querySelector("#file2-preview");
+        const previewFile3 = document.querySelector("#file3-preview");
+        const previewFile4 = document.querySelector("#file4-preview");
+
+
+        file1InputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile1.firstChild) {
+                previewFile1.removeChild(previewFile1.firstChild);
+            }
+            const file = files[0];
+            if (file.type.match("application/pdf"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFile1.appendChild(iframe);
+            }
+            else if (file.type.match("image/*"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const image = new Image();
+                image.src = objectUrl;
+                previewFile1.appendChild(image);
+            }
+        });
+        file2InputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile2.firstChild) {
+                previewFile2.removeChild(previewFile2.firstChild);
+            }
+            const file = files[0];
+            if (file.type.match("application/pdf"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFile2.appendChild(iframe);
+            }
+            else if (file.type.match("image/*"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const image = new Image();
+                image.src = objectUrl;
+                previewFile2.appendChild(image);
+            }
+        });
+        file3InputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile3.firstChild) {
+                previewFile3.removeChild(previewFile3.firstChild);
+            }
+            const file = files[0];
+            if (file.type.match("application/pdf"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const iframe = document.createElement("iframe");
+                iframe.src = objectUrl;
+                previewFile3.appendChild(iframe);
+            }
+            else if (file.type.match("image/*"))
+            {
+                const objectUrl = URL.createObjectURL(file);
+                const image = new Image();
+                image.src = objectUrl;
+                previewFile3.appendChild(image);
+            }
+        });
+        file4InputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile4.firstChild) {
+                previewFile4.removeChild(previewFile4.firstChild);
+            }
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type.match("application/pdf")) {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile4.appendChild(iframe);
+                } else if (file.type.match("image/*")) {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewFile4.appendChild(image);
+                }
+            }
+        });
 
 
         $(document).ready(function ()
         {
+            $('#category-vehicle').hide();
+            $('#category-parts').hide();
+
             $('#category').select2({
                 minimumResultsForSearch: -1,
                 placeholder:"Choose Category",
             });
+
+            $('#nationality').select2({
+
+                placeholder:"Choose Nationality",
+            });
+            $('#type').select2({
+                minimumResultsForSearch: -1,
+                placeholder:"Choose Vendor Type",
+            });
+            $(document.body).on('select2:unselect', "#category", function (e) {
+                var category =  e.params.data.id;
+                if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
+                {
+                    removeSubCategoryVehicle()
+
+                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
+                    removeSubCategoryParts();
+                }
+            })
+            $(document.body).on('select2:select', "#category", function (e) {
+                var category =  $(this).find('option:selected:last').text();
+                if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
+                {
+                    appendSubCategoryVehicle()
+
+                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
+                    appendSubCategoryParts();
+                }
+            })
+            function appendSubCategoryVehicle() {
+                $('#supplier_type').append($('<option>', { value: 'Bulk', text: 'Bulk' }));
+                $('#supplier_type').append($('<option>', { value:'Small Segment', text: 'Small Segment' }));
+            }
+            function removeSubCategoryVehicle() {
+                $("#supplier_type option[value='Bulk']").remove();
+                $("#supplier_type option[value='Small Segment']").remove();
+
+            }
+            function appendSubCategoryParts() {
+                $('#supplier_type').append($('<option>', { value: 'accessories', text: 'Accessories' }));
+                $('#supplier_type').append($('<option>', { value: 'freelancer', text: 'Freelancer' }));
+                $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
+                $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
+                $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
+            }
+            function removeSubCategoryParts() {
+                alert("ok");
+
+                $("#supplier_type option[value='accessories']").remove();
+                $("#supplier_type option[value='freelancer']").remove();
+                $("#supplier_type option[value='garage']").remove();
+                $("#supplier_type option[value='spare_parts']").remove();
+                $("#supplier_type option[value='warranty']").remove();
+
+            }
             $('#addon_1').select2({
                 allowClear: true,
                 minimumResultsForSearch: -1,
                 placeholder:"Choose Addon Code....     Or     Type Here To Search....",
             });
-            $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
+            $("#supplier_type").attr("data-placeholder","Choose Sub Category....     Or     Type Here To Search....");
             $("#supplier_type").select2();
 
             var index = 1;

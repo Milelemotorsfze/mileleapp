@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaymentMethods;
 use App\Models\Supplier;
+use App\Models\VendorCategory;
+use App\Models\VendorDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Monarobase\CountryList\CountryListFacade;
 use Validator;
 use App\Models\AddonDetails;
 use App\Models\SupplierAddons;
@@ -350,12 +354,13 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+        info($request->all());
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
             'supplier' => 'required',
-            'is_primary_payment_method' => 'required',
-            'supplier_types' => 'required',
+            'contact_number' => 'required',
+//            'supplier_types' => 'required',
         ]);
         if ($validator->fails())
         {
@@ -364,6 +369,82 @@ class SupplierController extends Controller
         else
         {
             $supplierTypeInput = $request->supplier_types;
+            $input = $request->all();
+
+            $input['contact_number'] = $request->contact_number['full'];
+            $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+            $input['created_by'] = $authId;
+
+            if ($request->hasFile('passport_copy_file'))
+            {
+                $file = $request->file('passport_copy_file');
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'vendor/passport';
+                $file->move($destinationPath, $fileName);
+
+                $input['passport_copy_file'] = $fileName;
+            }
+            if ($request->hasFile('trade_license_file'))
+            {
+                $file = $request->file('trade_license_file');
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'vendor/trade_license';
+                $file->move($destinationPath, $fileName);
+                $input['trade_license_file'] = $fileName;
+
+            }
+            if ($request->hasFile('vat_certificate_file'))
+            {
+                $file = $request->file('vat_certificate_file');
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'vendor/vat_certificate';
+                $file->move($destinationPath, $fileName);
+                $input['vat_certificate_file'] = $fileName;
+            }
+
+            $suppliers = Supplier::create($input);
+
+            if ($request->hasFile('documents'))
+            {
+                info("yes documents");
+                foreach ($request->file('documents') as $file)
+                {
+                    $extension = $file->getClientOriginalExtension();
+                    $fileName = time().'.'.$extension;
+                    info($fileName);
+                    $destinationPath = 'vendor-documents';
+                    $file->move($destinationPath, $fileName);
+
+                    $vendorDocument = new VendorDocument();
+                    $vendorDocument->supplier_id = $suppliers->id;
+                    $vendorDocument->file = $fileName;
+                    $vendorDocument->save();
+                }
+            }
+            if($request->categories) {
+                info("categories");
+                info($request->categories);
+                foreach ($request->categories as $categoryItem)
+                $category = new VendorCategory();
+                $category->supplier_id = $suppliers->id;
+                $category->category = $categoryItem;
+                $category->save();
+            }
+            if($request->payment_methods) {
+                info("payment methods");
+                foreach ($request->payment_methods as $paymentMethod)
+                    info($paymentMethod);
+
+                $payment_method = new PaymentMethods();
+                $payment_method->supplier_id = $suppliers->id;
+                $payment_method->payment_methods_id = $paymentMethod;
+                $payment_method->created_by = Auth::id();
+                $payment_method->save();
+            }
+
             if($request->activeTab == 'uploadExcel')
             {
                 if($request->file('file'))
@@ -565,12 +646,6 @@ class SupplierController extends Controller
                 }
                 else
                 {
-                    $input = $request->all();
-
-                    $input['contact_number'] = $request->contact_number['full'];
-                    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-                    $input['created_by'] = $authId;
-                    $suppliers = Supplier::create($input);
                     if($request->supplier_types != null)
                     {
                         if(count($request->supplier_types) > 0)
@@ -584,24 +659,24 @@ class SupplierController extends Controller
                             }
                         }
                     }
-                    $payment_methods['supplier_id'] = $suppliers->id;
-                    $payment_methods['created_by'] = $authId;
-                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-                    $payment_methods['is_primary_payment_method'] = 'yes';
-                    $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-                    $payment_methods_id = $request->payment_methods_id;
-                    if($payment_methods_id != null)
-                    {
-                        if(count($payment_methods_id) > 0)
-                        {
-                            foreach($payment_methods_id as $payment_methods_id)
-                            {
-                                $payment_methods['payment_methods_id'] = $payment_methods_id;
-                                    $payment_methods['is_primary_payment_method'] = 'no';
-                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-                            }
-                        }
-                    }
+//                    $payment_methods['supplier_id'] = $suppliers->id;
+//                    $payment_methods['created_by'] = $authId;
+//                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
+//                    $payment_methods['is_primary_payment_method'] = 'yes';
+//                    $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+//                    $payment_methods_id = $request->payment_methods_id;
+//                    if($payment_methods_id != null)
+//                    {
+//                        if(count($payment_methods_id) > 0)
+//                        {
+//                            foreach($payment_methods_id as $payment_methods_id)
+//                            {
+//                                $payment_methods['payment_methods_id'] = $payment_methods_id;
+//                                    $payment_methods['is_primary_payment_method'] = 'no';
+//                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+//                            }
+//                        }
+//                    }
                     $supplier_addon['supplier_id'] = $suppliers->id;
                     $isupplier_addonnput['created_by'] = $authId;
                     $addon_id = $request->addon_id;
@@ -665,12 +740,6 @@ class SupplierController extends Controller
             }
             elseif($request->activeTab == 'addSupplierDynamically')
             {
-                $input = $request->all();
-
-                $input['contact_number'] = $request->contact_number['full'];
-                $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-                $input['created_by'] = $authId;
-                $suppliers = Supplier::create($input);
                 if($request->supplier_types != null)
                 {
                     if(count($request->supplier_types) > 0)
@@ -684,24 +753,24 @@ class SupplierController extends Controller
                         }
                     }
                 }
-                $payment_methods['supplier_id'] = $suppliers->id;
-                $payment_methods['created_by'] = $authId;
-                $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-                $payment_methods['is_primary_payment_method'] = 'yes';
-                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-                $payment_methods_id = $request->payment_methods_id;
-                if($payment_methods_id != null)
-                {
-                    if(count($payment_methods_id) > 0)
-                    {
-                        foreach($payment_methods_id as $payment_methods_id)
-                        {
-                            $payment_methods['payment_methods_id'] = $payment_methods_id;
-                                $payment_methods['is_primary_payment_method'] = 'no';
-                            $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-                        }
-                    }
-                }
+//                $payment_methods['supplier_id'] = $suppliers->id;
+//                $payment_methods['created_by'] = $authId;
+//                $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
+//                $payment_methods['is_primary_payment_method'] = 'yes';
+//                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+//                $payment_methods_id = $request->payment_methods_id;
+//                if($payment_methods_id != null)
+//                {
+//                    if(count($payment_methods_id) > 0)
+//                    {
+//                        foreach($payment_methods_id as $payment_methods_id)
+//                        {
+//                            $payment_methods['payment_methods_id'] = $payment_methods_id;
+//                                $payment_methods['is_primary_payment_method'] = 'no';
+//                            $paymentMethods = SupplierAvailablePayments::create($payment_methods);
+//                        }
+//                    }
+//                }
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
                 $supAdd['supplier_id'] = $suppliers->id;
@@ -750,6 +819,8 @@ class SupplierController extends Controller
                 $data['successStore'] = true;
                 return response()->json(['success' => true,'data' => $data], 200);
             }
+
+
 
         }
     }

@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('notes')->nullable()->after('email');
             $table->longText('comment')->nullable()->after('email');
             $table->string('web_address')->nullable()->after('email');
+            $table->string('communication_channels')->nullable()->after('email');
 
         });
     }
