@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::table('suppliers', function (Blueprint $table)
         {
             $table->string('type')->comment('Individual,Company')->nullable()->after('supplier');
-            $table->string('trade_licence_number')->nullable()->after('email');
             $table->string('trade_registration_place')->nullable()->after('email');
             $table->string('passport_number')->nullable()->after('email');
             $table->string('nationality')->nullable()->after('email');

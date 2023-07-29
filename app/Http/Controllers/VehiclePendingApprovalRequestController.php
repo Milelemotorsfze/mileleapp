@@ -147,8 +147,7 @@ class VehiclePendingApprovalRequestController extends Controller
 
         if( $field == 'so_date')
         {
-            info("reached");
-            info("checking the so date existing");
+
             $existingSo = So::where('so_date', $oldValue)->first();
             if($existingSo) {
                 info("test".$pendingApprovalRequest->updated_by);
@@ -167,7 +166,6 @@ class VehiclePendingApprovalRequestController extends Controller
                 $solog->created_by = auth()->user()->id;
                 $solog->save();
             }else{
-                info("so date not existing");
                 if($vehicle->so_id){
                     $so = So::find($vehicle->so_id);
                     $so->so_date = $newValue;
@@ -179,10 +177,8 @@ class VehiclePendingApprovalRequestController extends Controller
             $existingSo = So::where('so_number', $newValue)->first();
 
             if($existingSo) {
-                info("existing");
                 if($existingSo->so_number != $newValue)
                 {
-                    info("sonumber should be update");
                     $solog = new Solog();
                     $solog->time = $currentDateTime->toTimeString();
                     $solog->date = $currentDateTime->toDateString();

@@ -35,7 +35,11 @@ class Supplier extends Model
         'prefered_id',
         'trade_registration_place',
         'trade_license_number',
-        'communication_channels',
+        'is_communication_mobile',
+        'is_communication_email',
+        'is_communication_postal',
+        'is_communication_fax',
+        'is_communication_any',
         'person_contact_by',
         'supplier_type',
         'created_by',
@@ -44,8 +48,21 @@ class Supplier extends Model
         'status'
     ];
     protected $appends = [
-        'is_deletable'
+        'is_deletable',
+        'sub_categories',
+        'passport_file',
+        'vat_file',
+        'trade_license_file'
+
     ];
+    public static function categories()
+    {
+        return [
+            'Vehicles' => 'Vehicles',
+            'Parts and Accessories' => 'Parts and Accessories',
+            'Other' => 'Other'
+         ];
+    }
     public const SUPPLIER_STATUS_ACTIVE = 'active';
     public const SUPPLIER_STATUS_INACTIVE = 'inactive';
     public const SUPPLIER_TYPE_DEMAND_PLANNING = 'demand_planning';
@@ -69,6 +86,23 @@ class Supplier extends Model
     public function paymentMethods()
     {
         return $this->hasMany(SupplierAvailablePayments::class,'supplier_id','id');
+    }
+    public function supplierDocuments()
+    {
+        return $this->hasMany(VendorDocument::class,'supplier_id','id');
+    }
+    public function getsubCategoriesAttribute() {
+
+        $vendorSubCategories = SupplierType::where('supplier_id', $this->id)->pluck('supplier_type')->toArray();
+
+        return [
+            'demand_planning' => 'Demand Planning',
+            'spare_parts' => 'Spare Parts',
+            'accessories' => 'Accessories',
+            'warranty' => 'Warranty',
+            'Bulk' => 'Bulk',
+            'Small Segment' => 'Small Segment'
+        ];
     }
     public function getIsDeletableAttribute()
     {

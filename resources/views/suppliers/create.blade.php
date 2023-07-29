@@ -263,36 +263,6 @@ input {
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
 
-{{--                <div class="col-xxl-6 col-lg-6 col-md-12">--}}
-{{--                    <div class="row">--}}
-{{--                        <div class="col-xxl-3 col-lg-6 col-md-12">--}}
-{{--                            <span class="error">* </span>--}}
-{{--                            <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">--}}
-{{--                            <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control widthinput"--}}
-{{--                                onchange="validationOnKeyUp(this)">--}}
-{{--                                <option value="">Choose Supplier Type</option>--}}
-{{--                                <option value="accessories">Accessories</option>--}}
-{{--                                <option value="freelancer">Freelancer</option>--}}
-{{--                                <option value="garage">Garage</option>--}}
-{{--                                <option value="spare_parts">Spare Parts</option>--}}
-{{--                                <option value="warranty">Warranty</option>--}}
-{{--                            </select>--}}
-{{--                            <span id="supplierTypeError" class=" invalid-feedback"></span>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">--}}
-{{--                            <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">--}}
-{{--                                <span id="accessories" class="spanSub" hidden>Accessories</span>--}}
-{{--                                <span id="freelancer" class="spanSub" hidden>Freelancer</span>--}}
-{{--                                <span id="garage" class="spanSub" hidden>Garage</span>--}}
-{{--                                <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>--}}
-{{--                                <span id="warranty" class="spanSub" hidden>Warranty</span>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-
             </div>
             <div class="card">
                 <div class="card-header">
@@ -371,7 +341,8 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">
                                     <select name="supplier_types[]" hidden="hidden" id="supplier_type" multiple="true" style="width: 100%;"
-                                            class="form-control widthinput" autofocus  onchange="validationOnKeyUp(this)">
+                                            class="form-control widthinput" autofocus
+                                            onchange="validationOnKeyUp(this)">
                                             <option value="">Choose Sub Category</option>
                                     </select>
                                     <span id="supplierTypeError" class=" invalid-feedback"></span>
@@ -828,7 +799,7 @@ input {
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                                    <label for="Label" class="col-form-label text-md-end">{{ __('Label') }}</label>
+                                    <label for="Label" class="col-form-label text-md-end">{{ __('Preference Label') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input class="widthinput form-control" name="prefered_label" id="label" placeholder="Label" autofocus>
@@ -843,23 +814,23 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <div class="form-check form-check-inline" >
-                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option1" value="mobile">
+                                        <input class="form-check-input" name="is_communication_mobile" type="checkbox" id="option1" value="mobile">
                                         <label class="form-check-label" for="option1">Mobile</label>
                                     </div>
                                     <div class="form-check form-check-inline" for="option2">
-                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option2" value="email">
+                                        <input class="form-check-input" name="is_communication_email" type="checkbox" id="option2" value="email">
                                         <label class="form-check-label" for="option2">Email</label>
                                     </div>
                                     <div class="form-check form-check-inline" for="option3">
-                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option3" value="fax" >
+                                        <input class="form-check-input" name="is_communication_fax" type="checkbox" id="option3" value="fax" >
                                         <label class="form-check-label" for="option3">Fax</label>
                                     </div>
                                     <div class="form-check form-check-inline" for="option4">
-                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option4" value="postal">
+                                        <input class="form-check-input" name="is_communication_postal" type="checkbox" id="option4" value="postal">
                                         <label class="form-check-label" for="option4">Postal</label>
                                     </div>
                                     <div class="form-check form-check-inline" for="option5">
-                                        <input class="form-check-input" name="communication_channels[]" type="checkbox" id="option5" value="any" >
+                                        <input class="form-check-input" name="is_communication_any" type="checkbox" id="option5" value="any" >
                                         <label class="form-check-label" for="option5">Any</label>
                                     </div>
                                 </div>
@@ -874,7 +845,7 @@ input {
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     @foreach($paymentMethods as $paymentMethod)
                                         <div class="form-check form-check-inline" >
-                                            <input class="form-check-input" name="payment_methods[]" type="checkbox" id="inlineCheckbox{{$paymentMethod->id}}">
+                                            <input class="form-check-input" name="payment_methods[]" value="{{ $paymentMethod->id }}" type="checkbox"  id="inlineCheckbox{{$paymentMethod->id}}">
                                             <label class="form-check-label" for="inlineCheckbox{{$paymentMethod->id}}">{{$paymentMethod->payment_methods}}</label>
                                         </div>
                                      @endforeach
@@ -975,21 +946,27 @@ input {
                             </br>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="file1-preview">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div id="file1-preview">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div id="file2-preview">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div id="file3-preview">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="file2-preview">
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="file3-preview">
-                            </div>
-                        </div>
-                        <div class="col-lg-4 col-md-12 col-sm-12">
-                            <div id="file4-preview">
+                            <div class="row">
+                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div id="file4-preview">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1011,7 +988,7 @@ input {
                                         <div class="row form_field_outer_row" id="row-1">
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                                <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;">
+                                                <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1][addon_id][]" multiple="true" style="width: 100%;">
                                                     <!-- @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                     @endforeach -->
@@ -1267,15 +1244,17 @@ input {
                 $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
                 $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
                 $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
+                $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
+
             }
             function removeSubCategoryParts() {
-                alert("ok");
 
                 $("#supplier_type option[value='accessories']").remove();
                 $("#supplier_type option[value='freelancer']").remove();
                 $("#supplier_type option[value='garage']").remove();
                 $("#supplier_type option[value='spare_parts']").remove();
                 $("#supplier_type option[value='warranty']").remove();
+                $("#supplier_type option[value='demand_planning']").remove();
 
             }
             $('#addon_1').select2({

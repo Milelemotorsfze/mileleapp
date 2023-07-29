@@ -1,5 +1,5 @@
 <style>
-    .modal-content 
+    .modal-content
     {
         position:fixed;
         top: 50%;
@@ -11,24 +11,24 @@
         border: 2px solid #e3e4f1;
         background-color: white;
     }
-    .modal-title 
+    .modal-title
     {
         margin-top: 10px;
         margin-bottom: 5px;
     }
-    .modal-paragraph 
+    .modal-paragraph
     {
         margin-top: 10px;
         margin-bottom: 10px;
         text-align: center;
     }
-    .modal-button-class 
+    .modal-button-class
     {
         margin-top: 20px;
         margin-left: 20px;
         margin-right: 20px;
     }
-    .icon-right 
+    .icon-right
     {
         z-index: 10;
         position: absolute;
@@ -44,7 +44,7 @@
         @endphp
         @if ($hasPermission)
             <div class="card-body">
-                <div class="table-responsive" id="addonListTable" hidden>     
+                <div class="table-responsive" id="addonListTable" hidden>
                     <table id="addonListDataTable" class="table table-striped table-editable table-edits table">
                         <thead>
                             <tr>
@@ -90,22 +90,22 @@
                             </tr>
                         </thead>
                         <div hidden>{{$i=0;}}</div>
-                        <tbody id="tBodyAddon">                           
+                        <tbody id="tBodyAddon">
                             @foreach ($addon1 as $key => $addonsdata)
                                 @if($addonsdata->is_all_brands == 'yes')
                                     <tr data-id="1" class="{{$addonsdata->id}}_allbrands tr" id="{{$addonsdata->id}}_allbrands">
-                                        <td>{{ ++$i }}</td>                                    
-                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
+                                        <td>{{ ++$i }}</td>
+                                        <td><img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
                                         style="width:100%; height:100px;"></td>
                                         <td>{{$addonsdata->AddonName->name}}</td>
-                                        <td>     
+                                        <td>
                                             @if($addonsdata->addon_type_name == 'K')
                                                 <label class="badge badge-soft-success">Kit</label>
                                             @elseif($addonsdata->addon_type_name == 'P')
                                                 <label class="badge badge-soft-primary">Accessories</label>
                                             @elseif($addonsdata->addon_type_name == 'SP')
                                                 <label class="badge badge-soft-warning">Spare Parts</label>
-                                            @endif                   
+                                            @endif
                                         </td>
                                         <td>{{$addonsdata->addon_code}}</td>
                                         <td>All Brands</td>
@@ -142,7 +142,7 @@
                                         @if ($hasPermission)
                                             <td>
                                                 @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
-                                                    <label class="badge badge-soft-info">Not Added</label>          
+                                                    <label class="badge badge-soft-info">Not Added</label>
                                                 @elseif($addonsdata->SellingPrice!= null OR $addonsdata->PendingSellingPrice!= null)
                                                     @if($addonsdata->SellingPrice!= null)
                                                         @if($addonsdata->SellingPrice->selling_price != '')
@@ -150,7 +150,7 @@
                                                         @endif
                                                     @elseif($addonsdata->PendingSellingPrice!= null)
                                                         @if($addonsdata->PendingSellingPrice->selling_price != '')
-                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED 
+                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED
                                                             <label class="badge badge-soft-danger">Approval Awaiting</label>
                                                         @endif
                                                     @endif
@@ -171,20 +171,20 @@
                                         <td>
                                         @include('addon.action.tableAddSellingPrice')
                                         @include('addon.action.action')
-                                            
+
                                         </td>
                                     </tr>
                                 @else
                                     @foreach($addonsdata->AddonTypes as $AddonTypes)
                                         <tr data-id="1" class="
-                                            @if($AddonTypes->is_all_model_lines == 'yes') 
+                                            @if($AddonTypes->is_all_model_lines == 'yes')
                                                 {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_all_model_lines
                                             @else
                                                 {{$addonsdata->id}}_{{$AddonTypes->brand_id}}_{{$AddonTypes->model_id}}
                                             @endif
                                                 tr" id="{{$addonsdata->id}}_{{$AddonTypes->brand_id}}">
-                                            <td>{{ ++$i }}</td>    
-                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
+                                            <td>{{ ++$i }}</td>
+                                            <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
                                             style="width:100%; height:100px;"></td>
                                             <td>{{$addonsdata->AddonName->name}}</td>
                                             <td>
@@ -194,7 +194,7 @@
                                                     <label class="badge badge-soft-primary">Accessories</label>
                                                 @elseif($addonsdata->addon_type_name == 'SP')
                                                     <label class="badge badge-soft-warning">Spare Parts</label>
-                                                @endif                       
+                                                @endif
                                             </td>
                                             <td>{{$addonsdata->addon_code}}</td>
                                             <td> {{$AddonTypes->brands->brand_name}}</td>
@@ -243,15 +243,15 @@
                                             @endphp
                                             @if ($hasPermission)
                                                 <td>
-                                                    @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')    
-                                                        <label class="badge badge-soft-info">Not Added</label>          
+                                                    @if($addonsdata->SellingPrice == '' && $addonsdata->PendingSellingPrice == '')
+                                                        <label class="badge badge-soft-info">Not Added</label>
                                                     @elseif($addonsdata->SellingPrice!= null)
                                                         @if($addonsdata->SellingPrice->selling_price != '')
                                                             {{$addonsdata->SellingPrice->selling_price}} AED
                                                         @endif
                                                     @elseif($addonsdata->PendingSellingPrice!= null)
                                                         @if($addonsdata->PendingSellingPrice->selling_price != '')
-                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED 
+                                                            {{$addonsdata->PendingSellingPrice->selling_price}} AED
                                                             <label class="badge badge-soft-danger">Approval Awaiting</label>
                                                         @endif
                                                     @endif
@@ -275,7 +275,7 @@
                                         </tr>
                                     @endforeach
                                 @endif
-                            @endforeach 
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

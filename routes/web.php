@@ -131,6 +131,7 @@ Route::get('/d', function () {
     Route::get('suppliers/destroy/{id}', [SupplierController::class,'delete'])->name('suppliers.delete');
     Route::post('suppliers/updateStatus', [SupplierController::class, 'updateStatus'])->name('suppliers.updateStatus');
     Route::post('suppliers/details/update', [SupplierController::class, 'updateDetails'])->name('suppliers.updatedetails');
+
     Route::get('supplier/addon/price/{id}', [SupplierController::class, 'addonprice'])->name('suppliers.addonprice');
     Route::post('createNewSupplierAddonPrice', [SupplierController::class, 'createNewSupplierAddonPrice'])->name('addon.createNewSupplierAddonPrice');
     Route::get('supplier/purchasepricehistory/{id}', [SupplierController::class, 'purchasepricehistory'])->name('suppliers.purchasepricehistory');
