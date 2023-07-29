@@ -5,7 +5,6 @@
       width: 25%;
       float: right;
     }
-
     #tableSearch {
       width: 100%;
       box-sizing: border-box;
@@ -139,7 +138,7 @@
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
                 @endphp
                 @if ($hasPermission)
-                <h4 class="card-title">Vehicles St</h4>
+                <h4 class="card-title">Vehicles Status</h4>
                 @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
@@ -212,7 +211,7 @@
         $countpendings = DB::table('vehicles')
         ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
         ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
-        ->where('vehicles.latest_location', '=', $warehousesveher->id)
+        ->where('vehicles.latest_location', '=', "$warehousesveher->id")
         ->where(function ($query) use ($fieldValues) {
         $query->whereIn('field', $fieldValues);
          })
@@ -642,8 +641,8 @@
                                                 $owership = $documents ? $documents->owership : null;
                                                 $document_with = $documents ? $documents->document_with : null;
                                                 $bl_number = $documents ? $documents->bl_number : null;
-                                                $latestRemarksales = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
-                                                $latestRemarkwarehouse = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'warehouse')->orderBy('created_at', 'desc')->value('remarks');
+                                                $latestRemarksales = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'warehouse')->orderBy('created_at', 'desc')->value('remarks');
+                                                $latestRemarkwarehouse = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                                                 @endphp
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
@@ -726,10 +725,9 @@
 									                  <td>{{ $vehicles->inspection_date }}</td>
 									                  @endif
 									                  @endif
-                                                                          @php
+                                    @php
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                       @endphp
-
                                       @if ($hasPermission)
                                           {{-- If $grn_date is set and $gdn_number is null --}}
                                           @if ($grn_date && $gdn_date === null)
@@ -738,7 +736,6 @@
                                               $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
                                               @endphp
                                               <td class="nowrap-td">{{ $aging }}</td>
-
                                           {{-- If $gdn_number is set, calculate aging as the difference between $grn_date and $gdn_number --}}
                                           @elseif ($gdn_date)
                                               @php
@@ -774,8 +771,8 @@
                                     @if ($hasPermission)
                                      <td class="editable-field so_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $so_number }}</td>
                                      <td class="editable-field so_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="so_date">{{ $so_date }}</td>
-									 @else
-									 <td>{{ $so_number }}</td>
+									                    @else
+									                    <td>{{ $so_number }}</td>
                                      <td>{{ $so_date }}</td>
                                      @endif
 									 @endif
@@ -783,23 +780,33 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                     @endphp
                                     @if ($hasPermission)
-									                  @php
+									@php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
                                     @endphp
                                     @if ($hasPermission)
-                                    <td class="editable-field sales_person_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
-                                        <select name="sales_person_id" class="form-control" placeholder="sales_person_id" disabled>
-                                                <option value=""></option>
-                                                @foreach ($sales as $sale)
-                                                    <option value="{{ $sale->id }} " {{ $salesname == $sale->name ? 'selected' : '' }}>{{ $sale->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
                                     <td class="editable-field reservation_start_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_start_dates">
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
                                     {{ $vehicles->reservation_end_date }}</td>
-									                  @else
+									 @else   
+								    <td>
+                                    {{ $vehicles->reservation_start_date }}</td>
+                                    <td>
+                                    {{ $vehicles->reservation_end_date }}</td>
+									@endif
+									@php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                    @endphp
+                                    @if ($hasPermission)
+									                  <td class="editable-field sales_person_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                        <select name="sales_person_id" class="form-control" placeholder="sales_person_id" disabled>
+                                                <option value=""></option>
+                                                @foreach ($sales as $sale)
+                                                    <option value="{{ $sale->id }} " {{ $salesname == $sale->name ? 'selected' : '' }}>{{ $sale->name }}</option>
+                                                @endforeach
+                                            </select>
+                                    </td>
+									@else
                                     <td>
                                         <select name="sales_person_id" class="form-control" placeholder="sales_person_id" disabled>
                                                 <option value=""></option>
@@ -808,11 +815,7 @@
                                                 @endforeach
                                             </select>
                                         </td>
-									                  <td>
-                                    {{ $vehicles->reservation_start_date }}</td>
-                                    <td>
-                                    {{ $vehicles->reservation_end_date }}</td>
-									                  @endif
+									@endif
                                     @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
@@ -824,12 +827,14 @@
                                     @if ($hasPermission)
                                     <td class="editable-field sales-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$latestRemarkwarehouse}}
                                             @if($latestRemarkwarehouse)
+                                            <br>
                                                 <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>
 									                @else
 									                <td>{{$latestRemarkwarehouse}}
                                             @if($latestRemarkwarehouse)
+                                            <br>
                                                 <a href="{{ route('vehiclesremarks.viewremarks', $vehicles->id) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                     </td>
@@ -886,6 +891,7 @@
                                     {{ $vehicles->variant->brand->brand_name ?? ''}}
                                      </td>
                                      <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
+                                     
                                            {{$vehicles->variant->master_model_lines->model_line ?? ''}}
                                      </td>
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
@@ -903,7 +909,7 @@
                                              {{ $vehicles->detail ?? '' }}
                                      </td>
                                      @endif
-									                    @endif
+									 @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                                     @endphp
@@ -1058,13 +1064,15 @@
                                         @if ($hasPermission)
 
                                         <td class="editable-field warehouse-remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $latestRemarksales }}
-                                            @if($latestRemarkwarehouse)
+                                            @if($latestRemarksales)
+                                            <br>
                                                 <a href="{{ route('vehiclesremarks.viewremarks', ['id' => $vehicles->id, 'type' => 'WareHouse'] ) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>
                                         @else
-                                          <td>{{ $latestRemarkwarehouse }}
-                                            @if($latestRemarkwarehouse)
+                                          <td>{{ $latestRemarksales }}
+                                            @if($latestRemarksales)
+                                            <br>
                                                 <a href="{{ route('vehiclesremarks.viewremarks', ['id' => $vehicles->id, 'type' => 'WareHouse'] ) }}" class="read-more" target="_blank">View All</a>
                                             @endif
                                         </td>

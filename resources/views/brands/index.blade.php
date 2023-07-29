@@ -1,11 +1,15 @@
 @extends('layouts.table')
 @section('content')
+{{--    @php--}}
+{{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-brand-list');--}}
+{{--    @endphp--}}
+{{--    @if ($hasPermission)--}}
     <div class="card-header">
         <h4 class="card-title">
            Brands
         </h4>
 {{--        @php--}}
-{{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole('brand-edit');--}}
+{{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}
 {{--        @endphp--}}
 {{--        @if ($hasPermission)--}}
             <a  class="btn btn-sm btn-info float-end" href="{{ route('brands.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
@@ -39,7 +43,7 @@
                     <th>Updated By</th>
 
 {{--                    @php--}}
-{{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('brand-edit');--}}
+{{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}
 {{--                    @endphp--}}
 {{--                    @if ($hasPermission)--}}
                         <th>Action</th>
@@ -57,7 +61,7 @@
                         <td>{{ $brand->updatedBy->name ?? '' }}</td>
                         <td>
 {{--                            @php--}}
-{{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');--}}
+{{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}
 {{--                            @endphp--}}
 {{--                            @if ($hasPermission)--}}
                                 <a data-placement="top" href="{{ route('brands.edit', $brand->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
@@ -70,7 +74,7 @@
             </table>
         </div>
     </div>
-
+{{--@endif--}}
 @endsection
 
 

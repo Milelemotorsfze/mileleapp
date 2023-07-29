@@ -1,11 +1,11 @@
 @extends('layouts.main')
 @section('content')
-@php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');
-@endphp
-@if ($hasPermission)
+    {{--    @php--}}
+    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-edit');--}}
+    {{--    @endphp--}}
+    {{--    @if ($hasPermission)--}}
     <div class="card-header">
-        <h4 class="card-title">Edit Brand</h4>
+        <h4 class="card-title">Edit Model Line</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -30,15 +30,26 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form id="form-update" action="{{ route('brands.update',$brand->id) }}" method="POST" >
+        <form id="form-update" action="{{ route('model-lines.update', $modelLine->id) }}" method="POST" >
             @csrf
             @method('PUT')
             <div class="row">
                 <div class="row ">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label"> Name</label>
-                            <input type="text" class="form-control" name="brand_name" value="{{ old('brand_name',$brand->brand_name) }}">
+                            <label for="choices-single-default" class="form-label"> Model Line</label>
+                            <input type="text" class="form-control" name="model_line" value="{{ old('model_line',$modelLine->model_line) }}">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label"> Brand</label>
+                            <select class="form-control" name="brand_id" id="brand_id">
+                                <option></option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ $modelLine->brand_id == $brand->id ? 'selected' : '' }}>{{ $brand->brand_name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     </br>
@@ -50,10 +61,16 @@
         </form>
     </div>
     </div>
-@endif
+    {{--    @endif--}}
 @endsection
 @push('scripts')
     <script>
+        $('#brand_id').select2({
+            placeholder: "Choose Brand"
+        })
+        $('#brand_id').on('change',function() {
+            $('#brand_id-error').remove();
+        })
         $("#form-update").validate({
             ignore: [],
             rules: {
@@ -61,7 +78,11 @@
                     required: true,
                     maxlength:255
                 },
+                brand_id: {
+                    required:true
+                }
             },
         });
     </script>
 @endpush
+

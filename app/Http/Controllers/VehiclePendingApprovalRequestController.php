@@ -147,26 +147,42 @@ class VehiclePendingApprovalRequestController extends Controller
 
         if( $field == 'so_date')
         {
+            info("reached");
+            info("checking the so date existing");
             $existingSo = So::where('so_date', $oldValue)->first();
-            $existingSo->so_date = $newValue;
-            $existingSo->save();
+            if($existingSo) {
+                info("test".$pendingApprovalRequest->updated_by);
+                $existingSo->sales_person_id  = $pendingApprovalRequest->updated_by;
+                $existingSo->so_date = $newValue;
+                $existingSo->save();
 
-            $solog = new Solog();
-            $solog->time = $currentDateTime->toTimeString();
-            $solog->date = $currentDateTime->toDateString();
-            $solog->status = 'Update Sales Values';
-            $solog->so_id = $vehicle->so_id;
-            $solog->field = 'so_date';
-            $solog->old_value = $oldValue;
-            $solog->new_value = $newValue;
-            $solog->created_by = auth()->user()->id;
-            $solog->save();
+                $solog = new Solog();
+                $solog->time = $currentDateTime->toTimeString();
+                $solog->date = $currentDateTime->toDateString();
+                $solog->status = 'Update Sales Values';
+                $solog->so_id = $vehicle->so_id;
+                $solog->field = 'so_date';
+                $solog->old_value = $oldValue;
+                $solog->new_value = $newValue;
+                $solog->created_by = auth()->user()->id;
+                $solog->save();
+            }else{
+                info("so date not existing");
+                if($vehicle->so_id){
+                    $so = So::find($vehicle->so_id);
+                    $so->so_date = $newValue;
+                    $so->save();
+                }
+            }
+
         }else if($field == 'so_number') {
             $existingSo = So::where('so_number', $newValue)->first();
 
             if($existingSo) {
+                info("existing");
                 if($existingSo->so_number != $newValue)
                 {
+                    info("sonumber should be update");
                     $solog = new Solog();
                     $solog->time = $currentDateTime->toTimeString();
                     $solog->date = $currentDateTime->toDateString();
@@ -179,6 +195,7 @@ class VehiclePendingApprovalRequestController extends Controller
                     $solog->save();
 
                     $existingSo->so_number = $newValue;
+                    $existingSo->sales_person_id  = $pendingApprovalRequest->updated_by;
                     $existingSo->save();
                 }
             }else{

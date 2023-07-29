@@ -103,6 +103,14 @@ input[type=number]::-webkit-outer-spin-button {
                                 @endforeach
             </select>
         </div>
+        <div class="col-lg-2 col-md-6">
+            <span class="error">* </span>
+            <label for="basicpill-firstname-input" class="form-label">PO Type: </label>
+            <select class="form-control" autofocus name="po_type" required>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Payment Adjustment">Payment Adjustment</option>
+            </select>
+        </div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
     <div class="bar">Stock Vehicles</div>

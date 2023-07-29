@@ -49,6 +49,15 @@
         <div id="rows-container">
         <div class="row">
         <div class="col-lg-2 col-md-6">
+    <label for="basicpill-firstname-input" class="form-label">PO Number</label>
+    <select name="vin[]" class="form-control mb-1" id="vin-input" required>
+        <option value="" selected disabled>Select PO</option>
+        @foreach ($purchasing_order as $purchasing_order)
+        <option value="{{ $vin }}">{{ $purchasing_order }}</option>
+        @endforeach
+    </select>
+</div>
+        <div class="col-lg-2 col-md-6">
     <label for="basicpill-firstname-input" class="form-label">Vin</label>
     <select name="vin[]" class="form-control mb-1" id="vin-input" required>
         <option value="" selected disabled>Select VIN</option>

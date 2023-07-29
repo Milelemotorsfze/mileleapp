@@ -1,5 +1,9 @@
 @extends('layouts.main')
 @section('content')
+{{--@php--}}
+{{--    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}
+{{--@endphp--}}
+{{--@if ($hasPermission)--}}
     <div class="card-header">
         <h4 class="card-title">Add Brand</h4>
     </div>
@@ -26,7 +30,7 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form action="{{ route('brands.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('brands.store') }}" method="POST" >
             @csrf
             <div class="row">
                 <div class="row ">
@@ -45,5 +49,19 @@
         </form>
     </div>
     </div>
+{{--@endif--}}
 @endsection
+@push('scripts')
+    <script>
+        $("#form-create").validate({
+            ignore: [],
+            rules: {
+                brand_name: {
+                    required: true,
+                    maxlength:255
+                },
+            },
+        });
+    </script>
+@endpush
 
