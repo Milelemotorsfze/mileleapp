@@ -127,6 +127,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     @endif
     @endcanany
     <ul class="nav nav-pills nav-fill">
+      
       <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Addons</a>
       </li>

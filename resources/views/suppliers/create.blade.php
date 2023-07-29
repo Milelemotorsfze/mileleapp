@@ -470,7 +470,7 @@ input {
                                         <div class="row form_field_outer_row" id="row-1">
                                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                                <select class="addons" id="addon_1" data-index="1" name="suppliericeAddon[1][addon_id][]" multiple="true" style="width: 100%;">
+                                                <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1[addon_id][]"  multiple="true" style="width: 100%;">
                                                     <!-- @foreach($addons as $addon)
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                     @endforeach -->
@@ -903,7 +903,7 @@ input {
                     {
                         document.getElementById("supplierAddonExcelError").textContent = result.data.headingError;
                         $('#submit').html('Save');
-                    $('.overlay').hide();
+                        $('.overlay').hide();
                     }
                     else if(result.data.dataError)
                     {

@@ -109,6 +109,9 @@ Route::get('/d', function () {
     // Kit
     Route::resource('kit', KitCommonItemController::class);
     Route::get('kit-suppliers/{id}', [KitCommonItemController::class,'kitSuppliers'])->name('kit.suppliers');
+    Route::get('kit-edit-suppliers/{id}', [KitCommonItemController::class,'editKitSuppliers'])->name('kit.editsuppliers');
+    Route::get('kits/details/edit/{id}', [KitCommonItemController::class,'editAddonDetails'])->name('kit.editDetails');
+    Route::post('kit/suppliers/update/{id}', [KitCommonItemController::class, 'updateKitSupplier'])->name('kit.updateKitSupplier');
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);

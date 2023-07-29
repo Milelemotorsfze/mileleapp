@@ -683,35 +683,184 @@ class AddonController extends Controller
                     }
                 }
             }
+            // if($request->addon_type == 'K')
+            // {
+            //     if($request->kitSupplierAndPrice)
+            //     {
+            //         if(count($request->kitSupplierAndPrice) > 0 )
+            //         {
+            //             $supPriInput['created_by'] = $authId;
+            //             foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
+            //             {
+            //                 $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
+            //                 $supPriInput['addon_details_id'] = $addon_details->id;
+            //                 $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
+            //                 $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
+            //                 $CreateSupAddPri = SupplierAddons::create($supPriInput);
+            //                 $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
+            //                 $createHistrory = PurchasePriceHistory::create($supPriInput);
+            //                 if(count($kitSupplierAndPriceData['item']) > 0)
+            //                 {
+            //                     $createkit['created_by'] = $authId;
+            //                     $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
+            //                     foreach($kitSupplierAndPriceData['item'] as $kitItemData)
+            //                     {
+            //                         $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
+            //                         $createkit['quantity'] = $kitItemData['quantity'];
+            //                         $createkit['unit_price_in_aed'] = $kitItemData['unit_price_in_aed'];
+            //                         $createkit['total_price_in_aed'] = $kitItemData['total_price_in_aed'];
+            //                         $createkit['unit_price_in_usd'] = $kitItemData['unit_price_in_usd'];
+            //                         $createkit['total_price_in_usd'] = $kitItemData['total_price_in_usd'];
+            //                         $CreateSupAddPri = KitItems::create($createkit);
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
             if($request->addon_type == 'K')
             {
-                if($request->kitSupplierAndPrice)
+                if($request->mainItem)
                 {
-                    if(count($request->kitSupplierAndPrice) > 0 )
+                    if(count($request->mainItem) > 0 )
                     {
-                        $supPriInput['created_by'] = $authId;
-                        foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
+                        $NotNelete = [];
+                        $existingItems = [];
+                        $existingItems2 = KitCommonItem::where('addon_details_id',$id)->select('item_id')->get();
+                        foreach( $existingItems2 as $existingItems1)
                         {
-                            $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
-                            $supPriInput['addon_details_id'] = $addon_details->id;
-                            $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
-                            $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
-                            $CreateSupAddPri = SupplierAddons::create($supPriInput);
-                            $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
-                            $createHistrory = PurchasePriceHistory::create($supPriInput);
-                            if(count($kitSupplierAndPriceData['item']) > 0)
+                            array_push($existingItems,$existingItems1->item_id);
+                        }
+                        $existingItemSuppliers = [];
+                        $existingItemSuppliers = SupplierAddons::where('addon_details_id',$id)->select('id','supplier_id')->get();
+                        $existingItemSuppliersId = [];
+                        $existingItemSuppliersId = SupplierAddons::where('addon_details_id',$id)->pluck('id');
+                        foreach($request->mainItem as $kitItemData)
+                        {
+                            // update
+                            if(in_array($kitItemData['item'], $existingItems))
                             {
-                                $createkit['created_by'] = $authId;
-                                $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
-                                foreach($kitSupplierAndPriceData['item'] as $kitItemData)
+                                // update
+                                $update =  KitCommonItem::where('item_id',$kitItemData['item'])->where('addon_details_id',$id)->first();
+                                $update->updated_by = Auth::id();                               
+                                $update->quantity =  $kitItemData['quantity'];
+                                $update->update();
+                                array_push($NotNelete,$update->id);
+                                if(count($existingItemSuppliers) > 0)
                                 {
-                                    $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
-                                    $createkit['quantity'] = $kitItemData['quantity'];
-                                    $createkit['unit_price_in_aed'] = $kitItemData['unit_price_in_aed'];
-                                    $createkit['total_price_in_aed'] = $kitItemData['total_price_in_aed'];
-                                    $createkit['unit_price_in_usd'] = $kitItemData['unit_price_in_usd'];
-                                    $createkit['total_price_in_usd'] = $kitItemData['total_price_in_usd'];
-                                    $CreateSupAddPri = KitItems::create($createkit);
+                                    foreach($existingItemSuppliers as $existingItemSupplier)
+                                    {
+                                        $updateSuplierKitQuanty = KitItems::where('addon_details_id',$update->item_id)->where('supplier_addon_id',$existingItemSupplier->id)->first();
+                                        if($updateSuplierKitQuanty != '')
+                                        {
+                                            if($updateSuplierKitQuanty->quantity != $update->quantity)
+                                            {
+                                                $updateSuplierKitQuanty->quantity = $update->quantity;
+                                                $updateSuplierKitQuanty->total_price_in_aed = $updateSuplierKitQuanty->unit_price_in_aed * $update->quantity;
+                                                $updateSuplierKitQuanty->unit_price_in_usd = $updateSuplierKitQuanty->unit_price_in_aed / 3.6725;
+                                                $updateSuplierKitQuanty->total_price_in_usd = $updateSuplierKitQuanty->total_price_in_aed / 3.6725;
+                                                $updateSuplierKitQuanty->updated_by = Auth::id();
+                                                $updateSuplierKitQuanty->update();
+                                                // var totalPriceAED = quantity * unitPriceAED;
+                                                // totalPriceAED = totalPriceAED.toFixed(4);
+                                                // totalPriceAED = parseFloat(totalPriceAED);
+                                                // var unitPriceUSD = unitPriceAED / 3.6725;
+                                                // unitPriceUSD = unitPriceUSD.toFixed(4);
+                                                // unitPriceUSD = parseFloat(unitPriceUSD);
+                                                // var totalPriceUSD = totalPriceAED / 3.6725;
+                                                // totalPriceUSD = totalPriceUSD.toFixed(4);
+                                                // totalPriceUSD = parseFloat(totalPriceUSD);                                               
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            // create
+                            else
+                            {
+                                //create
+                                $createkit = [];
+                                $createkit['created_by'] = $authId;
+                                $createkit['item_id'] = $kitItemData['item'];
+                                $createkit['addon_details_id'] = $addon_details->id;
+                                $createkit['quantity'] = $kitItemData['quantity'];
+                                $CreateSupAddPri = KitCommonItem::create($createkit);
+                                array_push($NotNelete,$CreateSupAddPri->id);
+                                if(count($existingItemSuppliers) > 0)
+                                {
+                                    foreach($existingItemSuppliers as $existingItemSupplier)
+                                    {
+                                        // $supPriInput = [];
+                                        // $supPriInput['created_by'] = Auth::id();
+                                        // $supPriInput['supplier_id'] = $existingItemSupplier->supplier_id;
+                                        // $supPriInput['addon_details_id'] = $addon_details->id;
+                                        // $CreateSupAddPri1 = SupplierAddons::create($supPriInput);
+                                        $createKitItemSup = [];
+                                        $createKitItemSup['addon_details_id'] = $CreateSupAddPri->item_id;
+                                        $createKitItemSup['supplier_addon_id'] = $existingItemSupplier->id;
+                                        $createKitItemSup['quantity'] = $CreateSupAddPri->quantity;
+                                        // $createKitItemSup['unit_price_in_aed'] = '0';
+                                        // $createKitItemSup['total_price_in_aed'] = '0';
+                                        // $createKitItemSup['unit_price_in_usd'] = '0';
+                                        // $createKitItemSup['total_price_in_usd'] = '0';
+                                        $createKitItemSup['created_by '] = Auth::id();
+                                        $createSupAddKit = KitItems::create($createKitItemSup);
+                                        // $supPriInput['supplier_addon_id'] = $existingItemSupplier->id;
+                                        // $createHistrory1 = PurchasePriceHistory::create($supPriInput);
+                                    }
+                                }
+                            }
+                        }
+                        // delete
+                        $newExiItems2 = [];
+                        $newExiItems = KitCommonItem::where('addon_details_id',$id)->pluck('id');
+                        foreach($newExiItems as $newExiItems1)
+                        {
+                            array_push($newExiItems2,$newExiItems1);
+                        }
+                        $differenceArray = array_diff($newExiItems2, $NotNelete);
+                        $delete = KitCommonItem::whereIn('id',$differenceArray)->get();
+                        foreach($delete as $del)
+                        {
+                            $deleteSupKit = KitItems::where('addon_details_id',$del->item_id)->whereIn('supplier_addon_id',$existingItemSuppliersId)->get();
+                            foreach($deleteSupKit as $deleteSupKit1)
+                            {
+                                $deleteSupKit1->delete();
+                            }
+                            $deletehistory = PurchasePriceHistory::whereIn('supplier_addon_id',$existingItemSuppliersId)->get();
+                            foreach($deletehistory as $deletehistory1)
+                            {
+                                $deletehistory1->delete();
+                            }
+                            $del = $del->delete();
+                        }
+                       
+                        // Recalculate Price by item and Quantity
+                        $supAddIds = [];
+                        $supAddIds = SupplierAddons::where('addon_details_id',$id)->pluck('id');
+                        if(count($supAddIds) > 0)
+                        {
+                            foreach($supAddIds as $supAddId)
+                            {
+                                $aedSum = '';
+                                $usdSum = '';
+                                $aedSum = KitItems::where('supplier_addon_id',$supAddId)->sum('total_price_in_aed');
+                                $usdSum = KitItems::where('supplier_addon_id',$supAddId)->sum('total_price_in_usd');
+                                $sup = SupplierAddons::where('id',$supAddId)->first();
+                                if($sup->purchase_price_aed != $aedSum)
+                                {
+                                    $sup->purchase_price_aed = $aedSum;
+                                    $sup->purchase_price_usd = $usdSum;
+                                    $sup->updated_by = Auth::id();
+                                    $sup->save();
+                                    $supPriInput = [];
+                                    $supPriInput['created_by'] = Auth::id();
+                                    $supPriInput['supplier_id'] = $sup->supplier_id;
+                                    $supPriInput['addon_details_id'] = $request->kit_addon_id;
+                                    $supPriInput['purchase_price_aed'] =  $aedSum;
+                                    $supPriInput['purchase_price_usd'] =  $usdSum;
+                                    $supPriInput['supplier_addon_id'] = $sup->id;
+                                    $createHistrory = PurchasePriceHistory::create($supPriInput);
                                 }
                             }
                         }
@@ -776,7 +925,7 @@ class AddonController extends Controller
                                             $supPriInput['supplier_id'] = $suppl1;
                                             $CreateSupAddPri = SupplierAddons::create($supPriInput);
                                             $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
-                                            $createHistrory = PurchasePriceHistory::create($supPriInput);
+                                            $createHistrory2 = PurchasePriceHistory::create($supPriInput);
                                         }
                                     }
                                 }
@@ -809,9 +958,17 @@ class AddonController extends Controller
                     }
                 }
             }
-            $data = 'all';
+            if($request->addon_type == 'K')
+            {
+                return redirect()->route('kit.editsuppliers', $id)
+                                ->with('success','Kit created successfully');
+            }
+            else
+            {
+                $data = 'all';
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
+            }          
     }
     public function existingImage($id)
     {
@@ -1192,7 +1349,7 @@ class AddonController extends Controller
 
     public function getKitItemsForAddon(Request $request)
     {
-        $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
+        $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
         $data = AddonDetails::select('id','addon_code','addon_id')
                 ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
         if($request->filteredArray)

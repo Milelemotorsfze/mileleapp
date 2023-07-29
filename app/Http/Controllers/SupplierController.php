@@ -350,6 +350,7 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+        // dd($request->all());
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
@@ -713,7 +714,8 @@ class SupplierController extends Controller
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
-                            if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                            
+                            if($supAddon['addon_purchase_price_in_usd'] != NULL || $supAddon['addon_purchase_price'] != NULL)
                             {
                                 if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')
                                 {

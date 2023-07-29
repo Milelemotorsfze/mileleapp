@@ -8,6 +8,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
     </a>
 @endif
 @endcan
+
+@if($addonsdata->addon_type_name == 'K')
+
+    <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('kit.editDetails',$addonsdata->id) }}">
+        <i class="fa fa-edit" aria-hidden="true"></i>
+    </a>
+
+
+@else
+
 @can('addon-edit')
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
@@ -18,6 +28,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
     </a>
 @endif
 @endcan
+
+@endif
+
 @can('view-addon-selling-price-history')
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-addon-selling-price-history']);
