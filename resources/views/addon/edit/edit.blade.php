@@ -230,12 +230,13 @@
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="selling_price" class="col-form-label text-md-end">
-                                @if(isset($addonDetails->SellingPrice->selling_price))
+                                <!-- @if(isset($addonDetails->SellingPrice->selling_price))
                                 {{ __('Selling Price') }}
                                 @elseif(isset($addonDetails->PendingSellingPrice->selling_price))
                                 {{ __('Selling Price') }}
                                 <label class="badge badge-soft-danger">Approval Awaiting</label>
-                                @endif
+                                @endif -->
+                                Selling Price
                             </label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
