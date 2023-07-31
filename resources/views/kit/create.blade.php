@@ -562,35 +562,35 @@
                 }
             });
              // $("#supplierArray1").select2();
-            //  $('#addon_id').change(function()
-            // {
-            //     // fetch addon existing detils
-            //     var id = $('#addon_id').val();
-            //     if(id != '')
-            //     {
-            //         $('#addnewAddonButton').hide();
-            //         $.ajax
-            //         ({
-            //             url: '/addons/existingImage/'+id,
-            //             type: "GET",
-            //             dataType: "json",
-            //             success:function(data)
-            //             {
-            //                 $msg = "";
-            //                 // removeAddonTypeError($msg);
-            //                 removeAddonNameError($msg);
-            //                 $('#addon_code').val(data.newAddonCode);
-            //                 $("#addon_type").val(data.addon_type.addon_type);
-            //                 $("#selectBrand1").removeAttr('disabled');
-            //                 $("#selectBrandMo1").removeAttr('disabled');
-            //             }
-            //         });
-            //     }
-            //     else
-            //     {
-            //         $('#addnewAddonButton').show();
-            //     }
-            // });
+             $('#addon_id').change(function()
+            {
+                // fetch addon existing detils
+                var id = $('#addon_id').val();
+                if(id != '')
+                {
+                    $('#addnewAddonButton').hide();
+                    $.ajax
+                    ({
+                        url: '/addons/existingImage/'+id,
+                        type: "GET",
+                        dataType: "json",
+                        success:function(data)
+                        {
+                            $msg = "";
+                            // removeAddonTypeError($msg);
+                            removeAddonNameError($msg);
+                            $('#addon_code').val(data.newAddonCode);
+                            $("#addon_type").val(data.addon_type.addon_type);
+                            $("#selectBrand1").removeAttr('disabled');
+                            $("#selectBrandMo1").removeAttr('disabled');
+                        }
+                    });
+                }
+                else
+                {
+                    $('#addnewAddonButton').show();
+                }
+            });
            $(document).on('click', '.btn_remove', function()
             {
                 var button_id = $(this).attr("id");
