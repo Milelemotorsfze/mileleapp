@@ -305,7 +305,8 @@
                     </div>
                     </br>
                     <div class="row">
-                    <div class="col-xxl-2 col-lg-6 col-md-12" id="partNumberDiv">
+                    @if($addonDetails->addon_type_name == 'SP')
+                        <div class="col-xxl-2 col-lg-6 col-md-12" id="partNumberDiv">
                             <span class="error">* </span>
                             <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
                         </div>
@@ -319,6 +320,7 @@
                             @enderror
                             <span id="partNumberError" class="invalid-feedback partNumberError"></span>
                         </div>
+                    @endif
                             <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
                             <span class="error">* </span>
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
