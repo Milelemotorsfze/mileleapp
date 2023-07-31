@@ -72,9 +72,9 @@
                     <th>Alternative Contact</th>
                     <th>Contact Person</th>
                     <th>Person Contact By</th>
-                    <th>Supplier Type</th>
-                    <th>Primary Payment Method</th>
-                    <th>Other Payment Methods</th>
+                    <th>Categories</th>
+                    <th>Sub Categories</th>
+                    <th>Payment Methods</th>
                     @endif
                     @endcan
                   <th>Status</th>
@@ -97,6 +97,13 @@
                         <td>{{ $supplier->alternative_contact_number }}</td>
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->person_contact_by }}</td>
+                          <td>
+                              @if($supplier->vendorCategories->count() > 0)
+                                  @foreach($supplier->vendorCategories as $vendorCategory)
+                                      <label class="badge badge-soft-info">   {{ $vendorCategory->category }} </label>
+                                  @endforeach
+                              @endif
+                          </td>
                         <td>
                           @if(count($supplier->supplierTypes) > 0)
                             @foreach($supplier->supplierTypes as $t)
@@ -112,27 +119,25 @@
                                 @elseif($t->supplier_type == 'warranty')
                                   Warranty
                                 @elseif($t->supplier_type == 'demand_planning')
-                                Demand Planning
+                                  Demand Planning
+                                @elseif($t->supplier_type == 'Bulk')
+                                  Bulk
+                                @elseif($t->supplier_type == 'Small Segment')
+                                  Small Segment
+                                @elseif($t->supplier_type == 'Other')
+                                   Other
                                 @endif
                               </label>
                             @endforeach
                           @endif
                         </td>
-                        <td>
-                          @if(count($supplier->paymentMethods) > 0)
-                            @foreach($supplier->paymentMethods as $v)
-                              @if($v->is_primary_payment_method == 'yes')
-                                <label class="badge badge-soft-info">{{ $v->PaymentMethods->payment_methods }}</label>
-                              @endif
-                            @endforeach
-                          @endif
-                        </td>
+
                         <td>
                           @if(!empty($supplier->paymentMethods()))
                             @foreach($supplier->paymentMethods as $v)
-                              @if($v->is_primary_payment_method == 'no')
+{{--                              @if($v->is_primary_payment_method == 'no')--}}
                                 <label class="badge badge-soft-warning">{{ $v->PaymentMethods->payment_methods }}</label>
-                              @endif
+{{--                              @endif--}}
                             @endforeach
                           @endif
                         </td>
@@ -152,8 +157,8 @@
                       @endphp
                       @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Addon" data-placement="top" class="btn btn-sm btn-warning"
-                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>  
-                      @endif                            
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('addon-supplier-view')
                       @php
@@ -163,7 +168,7 @@
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
                             href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                       @endif
-                      @endcan                       
+                      @endcan
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                       @php
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit']);
@@ -186,7 +191,7 @@
                         @endif
                       @endif
                       @endcan
-                      @can('supplier-active-inactive') 
+                      @can('supplier-active-inactive')
                       @php
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-active-inactive']);
                       @endphp
@@ -201,7 +206,7 @@
                           <i class="fa fa-check" aria-hidden="true"></i></a>
                         @endif
                       @endif
-                      @endcan                               
+                      @endcan
                     </td>
                   </tr>
                 @endforeach
@@ -225,9 +230,9 @@
                     <th>Alternative Contact</th>
                     <th>Contact Person</th>
                     <th>Person Contact By</th>
-                    <th>Supplier Type</th>
-                    <th>Primary Payment Method</th>
-                    <th>Other Payment Methods</th>
+                    <th>Categories</th>
+                    <th>Sub Categories</th>
+                    <th>Payment Methods</th>
                     @endif
                     @endcan
                   <th>Status</th>
@@ -251,6 +256,13 @@
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->person_contact_by }}</td>
                         <td>
+                          @if($supplier->vendorCategories->count() > 0)
+                              @foreach($supplier->vendorCategories as $vendorCategory)
+                                  <label class="badge badge-soft-info">   {{ $vendorCategory->category }} </label>
+                              @endforeach
+                          @endif
+                        </td>
+                        <td>
                           @if(count($supplier->supplierTypes) > 0)
                             @foreach($supplier->supplierTypes as $t)
                               <label class="badge badge-soft-primary">
@@ -265,27 +277,25 @@
                                 @elseif($t->supplier_type == 'warranty')
                                   Warranty
                                 @elseif($t->supplier_type == 'demand_planning')
-                                Demand Planning
+                                  Demand Planning
+                                @elseif($t->supplier_type == 'Bulk')
+                                   Bulk
+                                @elseif($t->supplier_type == 'Small Segment')
+                                   Small Segment
+                                @elseif($t->supplier_type == 'Other')
+                                   Other
                                 @endif
                               </label>
                             @endforeach
                           @endif
                         </td>
-                        <td>
-                          @if(count($supplier->paymentMethods) > 0)
-                            @foreach($supplier->paymentMethods as $v)
-                              @if($v->is_primary_payment_method == 'yes')
-                                <label class="badge badge-soft-info">{{ $v->PaymentMethods->payment_methods }}</label>
-                              @endif
-                            @endforeach
-                          @endif
-                        </td>
+
                         <td>
                           @if(!empty($supplier->paymentMethods()))
                             @foreach($supplier->paymentMethods as $v)
-                              @if($v->is_primary_payment_method == 'no')
+{{--                              @if($v->is_primary_payment_method == 'no')--}}
                                 <label class="badge badge-soft-warning">{{ $v->PaymentMethods->payment_methods }}</label>
-                              @endif
+{{--                              @endif--}}
                             @endforeach
                           @endif
                         </td>
@@ -305,8 +315,8 @@
                       @endphp
                       @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Addon Prices" data-placement="top" class="btn btn-sm btn-warning"
-                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>  
-                      @endif                            
+                          href="{{ route('suppliers.addonprice',$supplier->id) }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                      @endif
                       @endcan
                       @can('addon-supplier-view')
                       @php
@@ -316,7 +326,7 @@
                         <a data-toggle="popover" data-trigger="hover" title="View" data-placement="top" class="btn btn-sm btn-success"
                             href="{{ route('suppliers.show',$supplier->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                       @endif
-                      @endcan                       
+                      @endcan
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                       @php
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit']);
@@ -339,7 +349,7 @@
                         @endif
                       @endif
                       @endcan
-                      @can('supplier-active-inactive') 
+                      @can('supplier-active-inactive')
                       @php
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-active-inactive']);
                       @endphp
@@ -354,7 +364,7 @@
                           <i class="fa fa-check" aria-hidden="true"></i></a>
                         @endif
                       @endif
-                      @endcan                               
+                      @endcan
                     </td>
                   </tr>
                 @endforeach

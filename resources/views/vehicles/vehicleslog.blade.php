@@ -64,7 +64,7 @@
             <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$pictures}}" target="_blank">View Pictures</a>
             @endif
     </div>
-    
+
     <div class="card-body">
     @php
     $po = DB::table('purchasing_order')->where('id', $vehicle->purchasing_order_id)->first();
@@ -126,7 +126,6 @@
     <div class="bordered-section">
         <div class="row">
             <div class="col-sm-3">
-
             <div class="row">
                 <div class="col-lg-4 label">
                     <strong>PO Number:</strong></strong>
@@ -155,19 +154,19 @@
 
                 </div>
             </div>
-        @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
-        @endphp
-        @if ($hasPermission)
-        <div class="row">
-            <div class="col-lg-4 label">
-                <strong> Stock Status:</strong>
-            </div>
-            <div class="col-lg-8 value">
-             </div>
-       </div>
-       @endif
-    </div>
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
+            @endphp
+            @if ($hasPermission)
+            <div class="row">
+                <div class="col-lg-4 label">
+                    <strong> Stock Status:</strong>
+                </div>
+                <div class="col-lg-8 value">
+                 </div>
+           </div>
+           @endif
+        </div>
             <div class="col-sm-3">
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');

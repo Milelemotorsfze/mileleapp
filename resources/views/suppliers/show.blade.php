@@ -126,85 +126,94 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
     <div class="card-body">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Primary Information</div>
+                <div class="card-title fw-bold">Primary Information</div>
             </div>
             <div class="card-body">
-                @if($supplier->supplier)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
+                <div class="row">
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Vendor') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->supplier}}</span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{$supplier->supplier}}</span>
-                        </div>
-                    </div>
-                @endif
-                @if($supplier->type)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Vendor Type') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{$supplier->type}}</span>
-                        </div>
-                    </div>
-                @endif
-                @if($supplier->vendorCategories->count() > 0)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Categories') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>
-                                @foreach($supplier->vendorCategories as $vendorCategory)
-                                    {{ $vendorCategory->category }}
-                                @endforeach
-                            </span>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                            <label for="choices-single-default" class="form-label fw-bold">{{ __('Vendor Type') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->type}}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
-                @if(count($supplierTypes) > 0)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label class="col-form-label text-md-end">{{ __('Vendor Sub Categories') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                        <span>
-                             @foreach($supplierTypes as $t)
-                                @if($t->supplier_type == 'spare_parts')
-                                    Spare Parts ,
-                                @elseif($t->supplier_type == 'accessories')
-                                    Accessories ,
-                                @elseif($t->supplier_type == 'freelancer')
-                                    Freelancer ,
-                                @elseif($t->supplier_type == 'garage')
-                                    Garage ,
-                                @elseif($t->supplier_type == 'warranty')
-                                    Warranty ,
-                                @elseif($t->supplier_type == 'demand_planning')
-                                    Demand Planning ,
-                                @elseif($t->supplier_type == 'Bulk')
-                                    Bulk ,
-                                @elseif($t->supplier_type == 'Small Segment')
-                                    Small Segment ,
-                                @elseif($t->supplier_type == 'Other')
-                                    Other ,
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                            <label for="choices-single-default" class="form-label fw-bold">{{ __('Categories') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                @if($supplier->vendorCategories->count() > 0)
+                                    <span>
+                                    @foreach($supplier->vendorCategories as $vendorCategory)
+                                        {{ $vendorCategory->category }}
+                                    @endforeach
+                                    </span>
                                 @endif
-                            @endforeach
-                        </span>
+                            </div>
                         </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                            <label for="choices-single-default" class="form-label fw-bold">{{ __('Sub Categories') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>
+                                     @foreach($supplierTypes as $t)
+                                     @if($t->supplier_type == 'spare_parts')
+                                         Spare Parts ,
+                                     @elseif($t->supplier_type == 'accessories')
+                                         Accessories ,
+                                     @elseif($t->supplier_type == 'freelancer')
+                                         Freelancer ,
+                                     @elseif($t->supplier_type == 'garage')
+                                         Garage ,
+                                     @elseif($t->supplier_type == 'warranty')
+                                         Warranty ,
+                                     @elseif($t->supplier_type == 'demand_planning')
+                                         Demand Planning ,
+                                     @elseif($t->supplier_type == 'Bulk')
+                                         Bulk ,
+                                     @elseif($t->supplier_type == 'Small Segment')
+                                         Small Segment ,
+                                     @elseif($t->supplier_type == 'Other')
+                                         Other ,
+                                     @endif
+                                 @endforeach
+                                </span>
+                            </div>
+                        </div>
+
                     </div>
-                @endif
-                @if($supplier->comment)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Comment') }}</label>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Web Address') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->web_adress}}</span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                            <label for="choices-single-default" class="form-label fw-bold">{{ __('Comment') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
                             <span>{{$supplier->comment}}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
         <div class="card">
@@ -212,100 +221,256 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                 <div class="card-title">Contact Details</div>
             </div>
             <div class="card-body">
-                @if($supplier->contact_number)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Contact Number') }}</label>
+                <div class="row">
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Contact Number') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->contact_number}}</span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{ $supplier->contact_number }}</span>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Person Contact By') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->person_contact_by}}</span>
+                            </div>
                         </div>
-                    </div>
-                @endif
-                @if($supplier->person_contact_by)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{ $supplier->person_contact_by }}</span>
-                        </div>
-                    </div>
-                @endif
-                @if($supplier->email)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label class="col-form-label text-md-end">{{ __('Email') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{ $supplier->email }}</span>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Address') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->address}}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
-                @if($supplier->alternative_contact_number)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-5 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Alternative Contact Number') }}</label>
+                            </div>
+                            <div class="col-xxl-7 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->alternative_contact_number}}</span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{ $supplier->alternative_contact_number }}</span>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __(' Contact Person') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->contact_person}}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Email') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->email}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Fax') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->fax}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title fw-bold">Classification</div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Passport Number') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->passport_number}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Nationality') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->nationality}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Trade Registration Place') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->trade_registration_place}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Trade License Number') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->trade_license_number}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Trade Registration Place') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->trade_registration_place}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title fw-bold">Preferences</div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Preference ID') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->prefered_id}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Preference Label') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->prefered_label}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Notes ') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->notes}}</span>
+                            </div>
+                        </div>
 
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Classification</div>
-            </div>
-            <div class="card-body">
-                @if($supplier->supplier)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
+                    </div>
+
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Payment Methods') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>
+                                    @if(count($otherPaymentMethods) > 0)
+                                        @foreach($otherPaymentMethods as $otherPaymentMethod)
+                                            {{ $otherPaymentMethod->PaymentMethods->payment_methods }} ,
+                                        @endforeach
+                                    @endif
+                                </span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{$supplier->supplier}}</span>
+                        <div class="row">
+                            <div class="col-xxl-5 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Communication Channels') }}</label>
+                            </div>
+                            <div class="col-xxl-7 col-md-6 col-sm-12 ">
+                                <span>
+                                    @if($supplier->is_communication_mobile == true)
+                                      Mobile,
+                                    @endif
+                                    @if($supplier->is_communication_email == true)
+                                      Email,
+                                    @endif
+                                    @if($supplier->is_communication_postal == true)
+                                       Postal,
+                                    @endif
+                                    @if($supplier->is_communication_fax == true)
+                                       Fax,
+                                    @endif
+                                    @if($supplier->is_communication_any == true)
+                                      Any
+                                    @endif
+                                </span>
+                            </div>
                         </div>
                     </div>
-                @endif
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">Preferences</div>
-            </div>
-            <div class="card-body">
-                @if(count($otherPaymentMethods) > 0)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('payment Methods') }}</label>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Shipping Address') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->shipping_address}}</span>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>
-                                 @foreach($otherPaymentMethods as $otherPaymentMethod)
-                                    {{ $otherPaymentMethod->PaymentMethods->payment_methods }} ,
-                                @endforeach
-                            </span>
+
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Billing Address') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->billing_address}}</span>
+                            </div>
                         </div>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
         <div class="card">
             <div class="card-header">
-                <div class="card-title">Documents</div>
+                <div class="card-title fw-bold">Documents</div>
             </div>
             <div class="card-body">
-                @if($supplier->supplier)
-                    <div class="row">
-                        <div class="col-lg-4 col-md-6 col-sm-12">
-                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
-                        </div>
-                        <div class="col-lg-8 col-md-6 col-sm-12">
-                            <span>{{$supplier->supplier}}</span>
-                        </div>
+                <div class="row">
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                    @if($supplier->passport_copy_file)
+                            <h6 class="fw-bold text-center mb-1">Passport</h6>
+                            <iframe src="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" alt="Passport"></iframe>
+                        @endif
+                    </div>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        @if($supplier->trade_license_file)
+                            <h6 class="fw-bold text-center mb-1">Trade License</h6>
+                            <iframe src="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" alt="Trade License"></iframe>
+                        @endif
+                    </div>
+                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                        @if($supplier->passport_copy_file)
+                            <h6 class="fw-bold text-center mb-1">VAT Certificate</h6>
+                            <iframe src="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" alt="VAT Certificate"></iframe>
+                        @endif
+                    </div>
+                </div>
+                @if($supplier->supplierDocuments->count() > 0)
+                    <div class="row mt-3">
+                        <h6 class="fw-bold text-center mb-1">Other Documents</h6>
+                            @foreach($supplier->supplierDocuments as $document)
+                            <div class="col-xxl-4 col-md-6 col-sm-12">
+                                <iframe src="{{ url('vendor/other-documents/' . $document->file) }}" alt="Other Document"></iframe>
+                            </div>
+                            @endforeach
                     </div>
                 @endif
             </div>

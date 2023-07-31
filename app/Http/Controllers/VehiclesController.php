@@ -43,7 +43,7 @@ class VehiclesController extends Controller
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
                 });
-    
+
             $columnNames = $request->query('columnName');
             $searchQueries = $request->query('searchQuery');
             // Check if any filters were applied
@@ -449,7 +449,7 @@ class VehiclesController extends Controller
                     }
                 }
             }
-    
+
             $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                                 ->groupBy('vehicle_id')->get();
@@ -540,7 +540,7 @@ class VehiclesController extends Controller
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
                 })
-                ->paginate(30);
+                ->paginate(100);
         }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
             ->groupBy('vehicle_id')->get();

@@ -1523,4 +1523,26 @@ class SupplierController extends Controller
             return response()->json(['success' => true,'data' => $data], 200);
         }
     }
+    public function vendorUniqueCheck(Request $request) {
+        $contactNumber = $request->contact_number;
+        $vendorName = $request->name;
+        $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name)->first();
+        $isContactNumberExist = Supplier::where('contact_number', $contactNumber)->first();
+        $isNameExist = Supplier::where('supplier', $request->name)->first();
+        $data = [];
+        if($isVendorExist) {
+            if($isContactNumberExist) {
+                info("CONTACT NUMBER EXIST");
+                $data['contact_number'] = 'Contact number should be unique';
+                return response($data);
+            }elseif ($isVendorExist) {
+                info("CONTACT NUMBER EXIST");
+
+                $data['name'] = 'Contact number should be unique';
+                return response($data);
+            }
+        }else{
+            return response($data);
+        }
+    }
 }

@@ -358,7 +358,6 @@ input {
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -1368,7 +1367,34 @@ input {
                 }
             }
         });
+        {{--$('#supplier').keyup(function(){--}}
+        {{--    var contactNumber = $('#contact_number').val();--}}
+        {{--    var name = $('#supplier').val();--}}
+        {{--    uniqueCheck(contactNumber, name);--}}
+        {{--});--}}
+        {{--$('#contact_number').keyup(function(){--}}
+        {{--    var contactNumber = $('#contact_number').val();--}}
+        {{--    alert(contactNumber);--}}
+        {{--    var name = $('#supplier').val();--}}
+        {{--    uniqueCheck(contactNumber, name);--}}
+        {{--});--}}
 
+        {{--function uniqueCheck(contactNumber, name) {--}}
+        {{--    var url = '{{ route('vendor.vendorUniqueCheck') }}';--}}
+
+        {{--    $.ajax({--}}
+        {{--        type: "GET",--}}
+        {{--        url: url,--}}
+        {{--        dataType: "json",--}}
+        {{--        data: {--}}
+        {{--            contact_number: contactNumber,--}}
+        {{--            name: name--}}
+        {{--        },--}}
+        {{--        success:function (data) {--}}
+        {{--            console.log(data);--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--}--}}
         function clickAdd()
         {
             var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;

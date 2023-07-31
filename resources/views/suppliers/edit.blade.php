@@ -397,7 +397,7 @@
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                 </span>
-                            @enderror -->
+                                     @enderror -->
                                         <span id="alternativeContactRequired" class="email-phone required-class"></span>
                                     </div>
                                 </div>
