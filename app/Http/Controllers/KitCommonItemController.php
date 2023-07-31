@@ -66,6 +66,7 @@ class KitCommonItemController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         if($request->kitSupplierAndPrice)
         {
             if(count($request->kitSupplierAndPrice) > 0 )
