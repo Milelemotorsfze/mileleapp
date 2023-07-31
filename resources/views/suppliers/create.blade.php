@@ -946,7 +946,7 @@ input {
                             </br>
                         </div>
                     </div>
-                    <div class="card">
+                    <div class="card preview-div" hidden>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-lg-4 col-md-12 col-sm-12">
@@ -1052,7 +1052,6 @@ input {
                 </div>
             </div>
 
-
             <div id="uploadExcel" class="tabcontent">
                 <div class="row">
                     <div class="col-xxl-6 col-lg-6 col-md-6">
@@ -1108,6 +1107,7 @@ input {
 
 
         file1InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
             const files = event.target.files;
             while (previewFile1.firstChild) {
                 previewFile1.removeChild(previewFile1.firstChild);
@@ -1129,6 +1129,8 @@ input {
             }
         });
         file2InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile2.firstChild) {
                 previewFile2.removeChild(previewFile2.firstChild);
@@ -1150,6 +1152,8 @@ input {
             }
         });
         file3InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile3.firstChild) {
                 previewFile3.removeChild(previewFile3.firstChild);
@@ -1171,6 +1175,8 @@ input {
             }
         });
         file4InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile4.firstChild) {
                 previewFile4.removeChild(previewFile4.firstChild);
@@ -1190,7 +1196,6 @@ input {
                 }
             }
         });
-
 
         $(document).ready(function ()
         {
@@ -1218,16 +1223,22 @@ input {
 
                 }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
                     removeSubCategoryParts();
+                }else if(category == 'Other') {
+                    $("#supplier_type option[value='Other']").remove();
                 }
             })
             $(document.body).on('select2:select', "#category", function (e) {
-                var category =  $(this).find('option:selected:last').text();
+                var category =  e.params.data.text;
                 if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
                 {
                     appendSubCategoryVehicle()
 
-                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
+                }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}')
+                {
                     appendSubCategoryParts();
+                }else if(category == 'Other')
+                {
+                    $('#supplier_type').append($('<option>', { value: 'Other', text: 'Other' }));
                 }
             })
             function appendSubCategoryVehicle() {
@@ -1245,7 +1256,7 @@ input {
                 $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
                 $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
                 $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
-                $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
+                // $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
 
             }
             function removeSubCategoryParts() {
@@ -1255,7 +1266,7 @@ input {
                 $("#supplier_type option[value='garage']").remove();
                 $("#supplier_type option[value='spare_parts']").remove();
                 $("#supplier_type option[value='warranty']").remove();
-                $("#supplier_type option[value='demand_planning']").remove();
+                // $("#supplier_type option[value='demand_planning']").remove();
 
             }
             $('#addon_1').select2({

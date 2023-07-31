@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('supplier_types', function (Blueprint $table) {
-            $table->enum('supplier_type', ['Bulk','Small Segment','accessories','freelancer','garage','spare_parts','warranty','demand_planning'])->change();
+            $table->enum('supplier_type', ['Bulk','Small Segment','accessories','freelancer','garage','spare_parts','warranty','demand_planning','Other'])->change();
+
         });
     }
 

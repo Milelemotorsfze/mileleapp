@@ -52,7 +52,8 @@ class Supplier extends Model
         'sub_categories',
         'passport_file',
         'vat_file',
-        'trade_license_file'
+        'trade_license_file',
+        'is_any_document_available'
 
     ];
     public static function categories()
@@ -91,18 +92,57 @@ class Supplier extends Model
     {
         return $this->hasMany(VendorDocument::class,'supplier_id','id');
     }
-    public function getsubCategoriesAttribute() {
+    public function getSubCategoriesAttribute() {
 
-        $vendorSubCategories = SupplierType::where('supplier_id', $this->id)->pluck('supplier_type')->toArray();
-
-        return [
-            'demand_planning' => 'Demand Planning',
-            'spare_parts' => 'Spare Parts',
-            'accessories' => 'Accessories',
-            'warranty' => 'Warranty',
+        $vehicleSubCategories = [
             'Bulk' => 'Bulk',
             'Small Segment' => 'Small Segment'
         ];
+        $partsSubCategories = [
+            'spare_parts' => 'Spare Parts',
+            'accessories' => 'Accessories',
+            'warranty' => 'Warranty',
+            'freelancer' => 'freelancer',
+            'garage' => 'garage'
+        ];
+
+        $vendorCategories = VendorCategory::where('supplier_id', $this->id)->pluck('category')->toArray();
+        if($vendorCategories) {
+            if(count($vendorCategories) > 1) {
+                if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
+                    in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES, $vendorCategories))
+                {
+                        $subCategories = array_merge($vehicleSubCategories, $partsSubCategories);
+                        return $subCategories;
+                }else if(in_array(Supplier::SUPPLIER_CATEGORY_VEHICLES,$vendorCategories) &&
+                    in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
+                {
+                    $partsSubCategories['Other'] = 'Other';
+                    return $vehicleSubCategories;
+                }else if(in_array(Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES,$vendorCategories) &&
+                    in_array(Supplier::SUPPLIER_CATEGORY_OTHER, $vendorCategories))
+                {
+                    $partsSubCategories['Other'] = 'Other';
+                    return $partsSubCategories;
+                }
+            }else{
+                if($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_VEHICLES)
+                {
+                    return $vehicleSubCategories;
+                }elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES)
+                {
+                    return $partsSubCategories;
+                }
+                elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_OTHER)
+                {
+                    $otherSubCategories = [
+                        'Other' => 'Other'
+                    ];
+                    return $otherSubCategories;
+                }
+            }
+        }
+
     }
     public function getIsDeletableAttribute()
     {
@@ -115,6 +155,14 @@ class Supplier extends Model
                     return true;
                 }
             }
+        }
+        return false;
+    }
+    public function getIsAnyDocumentAvailableAttribute()
+    {
+        $documentsCount = VendorDocument::where('supplier_id', $this->id)->count();
+        if($this->passport_copy_file || $this->vat_certificate_file || $this->trade_license_file || $documentsCount > 0) {
+            return true;
         }
         return false;
     }

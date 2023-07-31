@@ -123,7 +123,7 @@
                     <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
-                            <span data-key="t-extra-pages">Supplier</span>
+                            <span data-key="t-extra-pages">Vendor</span>
                             <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
@@ -134,7 +134,7 @@
                             @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.create') }}" id="topnav-auth" role="button">
-                                    <span data-key="t-authentication">Create Supplier</span>
+                                    <span data-key="t-authentication">Create Vendor</span>
                                 </a>
                             </div>
                             @endif
@@ -146,7 +146,7 @@
                             @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
-                                    <span data-key="t-utility">Supplier Info </span>
+                                    <span data-key="t-utility">Vendor Info </span>
                                 </a>
                             </div>
                             @endif
@@ -397,7 +397,7 @@
                                 <div class="dropdown">
                                     <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}"
                                        id="topnav-auth" role="button" >
-                                        <span data-key="t-authentication">Supplier</span>
+                                        <span data-key="t-authentication">Vendors</span>
                                     </a>
                                 </div>
                                 @can('demand-create')

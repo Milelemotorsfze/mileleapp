@@ -86,14 +86,14 @@
                 <div class="row">
                     <div class="col-xxl-5 col-lg-5 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                        <!-- <select onchange=selectBrandDisp({{$i}},1) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"
-                                multiple="true" style="width: 100%;" class="brandRows">
-                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
-                                @foreach($brands as $brand)
-                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                @endforeach
-                        </select> -->
+{{--                        <!-- <select onchange=selectBrandDisp({{$i}},1) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"--}}
+{{--                                multiple="true" style="width: 100%;" class="brandRows">--}}
+{{--                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
+{{--                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>--}}
+{{--                                @foreach($brands as $brand)--}}
+{{--                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
+{{--                                @endforeach--}}
+{{--                        </select> -->--}}
                         <select disabled onchange=selectBrandDisp({{$i}},1)  id="selectBrandMo{{$i}}" data-index="{{$i}}"
                                 multiple="true" style="width: 100%;" class="brandRows">
                                 <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>

@@ -597,7 +597,6 @@
                                             <option value="bosnian" {{ $supplier->nationality == 'bosnian' ? 'selected' : '' }}>Bosnian</option>
                                             <option value="brazilian" {{ $supplier->nationality == 'brazilian' ? 'selected' : '' }}>Brazilian</option>
                                             <option value="british" {{ $supplier->nationality == 'british' ? 'selected' : '' }}>British</option>
-
                                             <option value="bruneian" {{ $supplier->nationality == 'bruneian' ? 'selected' : '' }}>Bruneian</option>
                                             <option value="bulgarian" {{ $supplier->nationality == 'bulgarian' ? 'selected' : '' }}>Bulgarian</option>
                                             <option value="burkinabe" {{ $supplier->nationality == 'burkinabe' ? 'selected' : '' }}>Burkinabe</option>
@@ -623,7 +622,6 @@
                                             <option value="djibouti" {{ $supplier->nationality == 'djibouti' ? 'selected' : '' }}>Djibouti</option>
                                             <option value="dominican" {{ $supplier->nationality == 'dominican' ? 'selected' : '' }}>Dominican</option>
                                             <option value="dutch" {{ $supplier->nationality == 'dutch' ? 'selected' : '' }}>Dutch</option>
-
                                             <option value="east timorese" {{ $supplier->nationality == 'east timorese' ? 'selected' : '' }}>East Timorese</option>
                                             <option value="ecuadorean" {{ $supplier->nationality == 'ecuadorean' ? 'selected' : '' }}>Ecuadorean</option>
                                             <option value="emirian" {{ $supplier->nationality == 'emirian' ? 'selected' : '' }}>Emirian</option>
@@ -631,11 +629,9 @@
                                             <option value="eritrean" {{ $supplier->nationality == 'eritrean' ? 'selected' : '' }}>Eritrean</option>
                                             <option value="estonian" {{ $supplier->nationality == 'estonian' ? 'selected' : '' }}>Estonian</option>
                                             <option value="ethiopian" {{ $supplier->nationality == 'ethiopian' ? 'selected' : '' }}>Ethiopian</option>
-
                                             <option value="fijian" {{ $supplier->nationality == 'fijian' ? 'selected' : '' }}>Fijian</option>
                                             <option value="filipino" {{ $supplier->nationality == 'filipino' ? 'selected' : '' }}>Filipino</option>
                                             <option value="finnish" {{ $supplier->nationality == 'finnish' ? 'selected' : '' }}>Finnish</option>
-
                                             <option value="french" {{ $supplier->nationality == 'french' ? 'selected' : '' }}>French</option>
                                             <option value="gabonese" {{ $supplier->nationality == 'gabonese' ? 'selected' : '' }}>Gabonese</option>
                                             <option value="gambian" {{ $supplier->nationality == 'gambian' ? 'selected' : '' }}>Gambian</option>
@@ -653,13 +649,11 @@
                                             <option value="honduran" {{ $supplier->nationality == 'honduran' ? 'selected' : '' }}>Honduran</option>
                                             <option value="hungarian" {{ $supplier->nationality == 'hungarian' ? 'selected' : '' }}>Hungarian</option>
                                             <option value="icelander" {{ $supplier->nationality == 'icelander' ? 'selected' : '' }}>Icelander</option>
-
                                             <option value="indian" {{ $supplier->nationality == 'indian' ? 'selected' : '' }}>Indian</option>
                                             <option value="indonesian" {{ $supplier->nationality == 'indonesian' ? 'selected' : '' }}>Indonesian</option>
                                             <option value="iranian" {{ $supplier->nationality == 'iranian' ? 'selected' : '' }}>Iranian</option>
                                             <option value="iraqi" {{ $supplier->nationality == 'iraqi' ? 'selected' : '' }}>Iraqi</option>
                                             <option value="irish" {{ $supplier->nationality == 'irish' ? 'selected' : '' }}>Irish</option>
-
                                             <option value="israeli" {{ $supplier->nationality == 'israeli' ? 'selected' : '' }}>Israeli</option>
                                             <option value="italian" {{ $supplier->nationality == 'italian' ? 'selected' : '' }}>Italian</option>
                                             <option value="ivorian" {{ $supplier->nationality == 'ivorian' ? 'selected' : '' }}>Ivorian</option>
@@ -979,7 +973,7 @@
                                 </br>
                             </div>
                         </div>
-                        <div class="card">
+                        <div class="card preview-div" @if($supplier->is_any_document_available == false) hidden @endif>
                             <div class="body">
                                 <div class="row p-2">
                                     <div class="col-lg-4 col-md-12 col-sm-12">
@@ -1009,7 +1003,7 @@
 
                                 </div>
                                 <div class="row p-2 pb-4">
-                                    @if($supplier->supplierDocuments)
+                                    @if($supplier->supplierDocuments->count() > 0)
                                         <h6 class="fw-bold text-center">Other Documents</h6>
                                         @foreach($supplier->supplierDocuments as $document)
                                             <div class="col-lg-4 col-md-12 col-sm-12">
@@ -1025,7 +1019,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         <div id="tabId" hidden>
             <div class="tab">
@@ -1259,23 +1252,26 @@
                 var category =  e.params.data.id;
                 if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
                 {
-                    removeSubCategoryVehicle()
-
+                    removeSubCategoryVehicle();
                 }else if(category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES }}') {
                     removeSubCategoryParts();
+                }else if(category == 'Other') {
+                    $("#supplier_type option[value='Other']").remove();
                 }
             })
             $(document.body).on('select2:select', "#category", function (e) {
-                var category =  $(this).find('option:selected:last').text();
-                alert(category);
+                var value =   e.params.data.text;
+                var category = $.trim(value);
+                alert(value);
                 if(category == 'Vehicles')
                 {
-                    alert("vehile category");
                     appendSubCategoryVehicle()
 
                 }else if(category == 'Parts and Accessories') {
-                    alert("parts");
                     appendSubCategoryParts();
+                } else if(category == 'Other')
+                {
+                    $('#supplier_type').append($('<option>', { value: 'Other', text: 'Other' }));
                 }
             })
             function appendSubCategoryVehicle() {
@@ -1290,7 +1286,7 @@
             function appendSubCategoryParts() {
                 $('#supplier_type').append($('<option>', { value: 'accessories', text: 'Accessories' }));
                 $('#supplier_type').append($('<option>', { value: 'freelancer', text: 'Freelancer' }));
-                $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
+                // $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
                 $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
                 $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
                 $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
@@ -1300,7 +1296,7 @@
                 $("#supplier_type option[value='accessories']").remove();
                 $("#supplier_type option[value='freelancer']").remove();
                 $("#supplier_type option[value='garage']").remove();
-                $("#supplier_type option[value='demand_planning']").remove();
+                // $("#supplier_type option[value='demand_planning']").remove();
                 $("#supplier_type option[value='spare_parts']").remove();
                 $("#supplier_type option[value='warranty']").remove();
 

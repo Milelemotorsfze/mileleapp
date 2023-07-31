@@ -805,7 +805,7 @@ class SupplierController extends Controller
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
-                            
+
                             if($supAddon['addon_purchase_price_in_usd'] != NULL || $supAddon['addon_purchase_price'] != NULL)
                             {
                                 if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')

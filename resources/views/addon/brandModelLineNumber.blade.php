@@ -159,7 +159,6 @@
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
         });
-
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
@@ -188,7 +187,6 @@
             }
             // sortDropDownListByText();
         }
-
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
             for(var i=1;i<=indexValue;i++) {
@@ -196,6 +194,7 @@
             }
             // sortDropDownListByText();
         }
+
         $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) {
             var countRow = 0;
             var countRow =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
