@@ -1,8 +1,7 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-    <style>
+<style>
 #searchContainer {
-      width: 25%;
       float: right;
     }
     #tableSearch {
@@ -13,42 +12,56 @@
       border-radius: 4px;
       font-size: 14px;
     }
+    /* Hide the default "Show x entries" dropdown */
+  #dtBasicExample1_length {
+    display: none;
+  }
+  div.dataTables_wrapper div.dataTables_info {
+    display: none;
+  }
     /* Custom pagination container styles */
-#paginationContainer {
-  float: right;
-  margin-top: 10px;
-  display: flex;
-  justify-content: space-between;
-}
+/* Your custom CSS styles for pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+  }
 
-/* Custom pagination button styles */
-#prevBtn,
-#nextBtn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
+  .pagination-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .pagination-list li {
+    margin: 0 5px;
+  }
+
+  .pagination-list li a,
+  .pagination-list li span {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .pagination-list li.active a {
   background-color: #007bff;
   color: #fff;
-  cursor: pointer;
-  font-size: 14px;
+  border-color: #007bff;
 }
-/* Custom page info styles */
-#pageInfo {
-  display: inline-block;
-  padding: 8px;
-  font-size: 14px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin: 0 10px;
-}
-#prevBtn:hover,
-#nextBtn:hover {
-  background-color: #0056b3;
-}
-  .editable-field[contenteditable="true"] {
-    background-color: white !important;
-    border: 1px solid black  !important;
+
+  .pagination-list li.disabled span {
+    color: #aaa;
+    pointer-events: none;
+  }
+
+  .page-info {
+    margin-right: 20px;
   }
       .table-responsive {
       overflow: auto;
@@ -359,9 +372,13 @@
 <br>
 <br>
 <div id="searchContainer" class="mb-3">
-      <!-- Add your full-width search bar or input here -->
-      <input type="text" id="tableSearch" placeholder="Search Table">
+<button id="applyFilterBtn" class="btn btn-primary">Apply Filters</button> 
+<a href="{{ route('Vehicles.index') }}" class="btn btn-danger" role="button">
+Clear Filters
+                                  </a>
+      <!-- <input type="text" id="tableSearch" placeholder="Search Table"> -->
     </div>
+    
                 @if (count($errors) > 0)
                     <div class="alert alert-danger">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -401,8 +418,8 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
                                     @if ($hasPermission)
-                                <th class="nowrap-td">PO Number</th>
-                                <th class="nowrap-td">PO Date</th>
+                                <th id="po_number" class="nowrap-td">PO Number</th>
+                                <th id="po_date" class="nowrap-td">PO Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
@@ -414,14 +431,14 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('estimated-arrival-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Estimated Arrival</th>
+                                <th id="estimation_date" class="nowrap-td">Estimated Arrival</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('grn-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">GRN</th>
-                                <th class="nowrap-td">GRN Date</th>
+                                <th id="grn_number" class="nowrap-td">GRN</th>
+                                <th id="date" class="nowrap-td">GRN Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -433,28 +450,29 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Inspection Date</th>
+                                <th id="inspection_date" class="nowrap-td">Inspection Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Aging</th>
+                                <th class="nowrap-td">Stock Aging</th>
+                                <th class="nowrap-td">Stock Aging</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">SO Number</th>
-                                    <th class="nowrap-td">SO Date</th>
+                                    <th id="so_number" class="nowrap-td">SO Number</th>
+                                    <th id="so_date" class="nowrap-td">SO Date</th>
                                     @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Sales Person</th>
-                                    <th class="nowrap-td">Reservation Date</th>
-                                    <th class="nowrap-td">Reservation Due Date</th>
+                                <th id="sales_person_id" class="nowrap-td">Sales Person</th>
+                                    <th id="reservation_start_date" class="nowrap-td">Reservation Date</th>
+                                    <th id="reservation_end_date" class="nowrap-td">Reservation Due Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
@@ -466,45 +484,45 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">GDN</th>
-                                    <th class="nowrap-td">GDN Date</th>
+                                    <th id="gdn_number" class="nowrap-td">GDN</th>
+                                    <th id="gdn_date" class="nowrap-td">GDN Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Brand</th>
-                                    <th class="nowrap-td">Model Line</th>
-                                    <th class="nowrap-td">Model Description</th>
-                                    <th id="variant" style="vertical-align: middle;" class="nowrap-td">Variant</th>
-                                    <th class="nowrap-td">Variant Detail</th>
+                                    <th id="brand" class="nowrap-td">Brand</th>
+                                    <th id="model_line" class="nowrap-td">Model Line</th>
+                                    <th id="model_description" class="nowrap-td">Model Description</th>
+                                    <th id="variant" id="variant" style="vertical-align: middle;" class="nowrap-td">Variant</th>
+                                    <th id="variant_details" class="nowrap-td">Variant Detail</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">VIN Number</th>
+                                <th id="vin" class="nowrap-td">VIN Number</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Conversion</th>
+                                <th id="conversion" class="nowrap-td">Conversion</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Engine</th>
+                                    <th id="engine" class="nowrap-td">Engine</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Model Year</th>
-                                    <th class="nowrap-td">Steering</th>
-                                    <th class="nowrap-td">Seats</th>
-                                    <th class="nowrap-td">Fuel Type</th>
+                                    <th id="model_year" class="nowrap-td">Model Year</th>
+                                    <th id="steering" class="nowrap-td">Steering</th>
+                                    <th id="seats" class="nowrap-td">Seats</th>
+                                    <th id="fuel_type" class="nowrap-td">Fuel Type</th>
                                     <th class="nowrap-td">Transmission</th>
                                     <th class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
                                     <th class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
@@ -520,7 +538,7 @@
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Allowed Territory</th>
+                                    <th id="territory" class="nowrap-td">Allowed Territory</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
@@ -653,17 +671,17 @@
                                      <td class="nowrap-td PoNumber">PO - {{ $po_number }}</td>
                                      <td class="nowrap-td PoDate">{{ date('d-M-Y', strtotime($po_date)) }}</td>
                                      @endif
-                                     @php
+                                @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('ETA-timer-view');
                                 @endphp
                                 @if ($hasPermission)
                                 @if($vehicles->estimation_date && $grn_number === null)
                                 @php
-                                                  $savedDate = $$vehicles->estimation_date;
+                                                  $savedDate = $vehicles->estimation_date;
                                                   $today = now()->format('Y-m-d');
                                                   $numberOfDayseta = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
                                                   @endphp
-                                <td class="nowrap-td eta">$numberOfDayseta</td>
+                                <td class="nowrap-td eta">{{$numberOfDayseta}} Day</td>
                                 @elseif($grn_number)
                                 <td class="nowrap-td eta">Arrived</td>
                                 @else
@@ -701,7 +719,7 @@
                                 @if ($hasPermission)
                                 @if($grn_number === null)
                                 <td class="nowrap-td stockstatus">Incoming</td>
-                                @elseif($so_number === null && $vehicles->reservation_end_date && $vehicles->reservation_end_date->greaterThan(\Carbon\Carbon::now()))
+                                @elseif($so_number === null && $vehicles->reservation_end_date && $vehicles->reservation_end_date > \Carbon\Carbon::now())
                                 <td class="nowrap-td stockstatus">Reserved</td>
                                 @elseif($so_number)
                                 <td class="nowrap-td stockstatus">Booked</td>
@@ -729,37 +747,51 @@
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                       @endphp
                                       @if ($hasPermission)
-                                          {{-- If $grn_date is set and $gdn_number is null --}}
                                           @if ($grn_date && $gdn_date === null)
                                               @php
                                               $grn_date = \Carbon\Carbon::parse($grn_date);
                                               $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
                                               @endphp
                                               <td class="nowrap-td">{{ $aging }}</td>
-                                          {{-- If $gdn_number is set, calculate aging as the difference between $grn_date and $gdn_number --}}
                                           @elseif ($gdn_date)
                                               @php
                                               $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_date);
                                               @endphp
                                               <td class="nowrap-td">{{ $aging }}</td>
-
-                                          {{-- If neither $grn_date nor $gdn_number is set, check for payment logs --}}
                                           @else
-                                              @php
-                                              $paymentLog = DB::table('payment_logs')->where('vehicle_id', $vehicles->id)->latest()->first();
-                                              @endphp
-                                              @if ($paymentLog)
-                                                  @php
-                                                  $savedDate = $paymentLog->date;
-                                                  $today = now()->format('Y-m-d');
-                                                  $numberOfDays = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
-                                                  @endphp
-                                                  <td class="nowrap-td">{{ $numberOfDays }}</td>
-                                              @else
-                                                  <td class="nowrap-td">-</td>
-                                              @endif
+                                              <td class="nowrap-td"></td>
                                           @endif
-
+                                          @endif
+                                          @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                                      @endphp
+                                      @if ($hasPermission)
+                                          @php
+                                          $paymentLog = DB::table('payment_logs')->where('vehicle_id', $vehicles->id)->latest()->first();
+                                          @endphp
+										                      @if($grn_date !== null)
+                                          @if ($paymentLog)
+                                          @php
+                                          $savedDate = $paymentLog->date;
+                                          $today = Carbon\Carbon::parse($grn_date)->format('Y-m-d');
+                                          $numberOfDays = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
+                                          @endphp
+													                <td class="nowrap-td">{{ $numberOfDays }}</td>
+										                      @else
+                                          <td class="nowrap-td"></td>
+                                          @endif
+                                          @else
+                                          @if ($paymentLog)
+                                          @php
+                                          $savedDate = $paymentLog->date;
+                                          $today = now()->format('Y-m-d');
+                                          $numberOfDays = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
+                                          @endphp
+													                <td class="nowrap-td">{{ $numberOfDays }}</td>
+                                          @else
+                                          <td class="nowrap-td"></td>
+                                          @endif
+                                          @endif
                                       @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
@@ -780,21 +812,7 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                     @endphp
                                     @if ($hasPermission)
-									@php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
-                                    @endphp
-                                    @if ($hasPermission)
-                                    <td class="editable-field reservation_start_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_start_dates">
-                                    {{ $vehicles->reservation_start_date }}</td>
-                                    <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
-                                    {{ $vehicles->reservation_end_date }}</td>
-									 @else   
-								    <td>
-                                    {{ $vehicles->reservation_start_date }}</td>
-                                    <td>
-                                    {{ $vehicles->reservation_end_date }}</td>
-									@endif
-									@php
+                                    @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                     @endphp
                                     @if ($hasPermission)
@@ -815,6 +833,20 @@
                                                 @endforeach
                                             </select>
                                         </td>
+									@endif
+									@php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-reservation');
+                                    @endphp
+                                    @if ($hasPermission)
+                                    <td class="editable-field reservation_start_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_start_date">
+                                    {{ $vehicles->reservation_start_date }}</td>
+                                    <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
+                                    {{ $vehicles->reservation_end_date }}</td>
+									 @else   
+								    <td>
+                                    {{ $vehicles->reservation_start_date }}</td>
+                                    <td>
+                                    {{ $vehicles->reservation_end_date }}</td>
 									@endif
                                     @endif
                                      @php
@@ -1204,11 +1236,8 @@
                         </table>
                         </div>
                         <div id="paginationContainer" class="mt-3">
-      <!-- Custom pagination buttons -->
-      <button id="prevBtn">Previous</button>
-      <span id="pageInfo"></span>
-      <button id="nextBtn">Next</button>
-    </div>
+  {{ $data->links() }}
+</div>
                     </div>
             </form>
         @endif
@@ -1342,116 +1371,153 @@ updateBtn.addEventListener('click', () => {
 });
 </script>
 <script>
-  $(document).ready(function() {
-    $('.select2').select2();
+$(document).ready(function() {
+  var currentFilters = new URLSearchParams(window.location.search); // Get the current filters from the query string
 
-    // Table #dtBasicExample2
-    var dataTable = $('#dtBasicExample1').DataTable({
-      "order": [[4, "desc"]],
-      pageLength: 50,
-      initComplete: function() {
-        this.api().columns().every(function(d) {
-          var column = this;
-          var columnId = column.index();
-          var columnName = $(column.header()).attr('id');
-          if (columnName === "sales_remarks") {
-            return;
-          }
-          if (columnName === "int-colour") {
-            return;
-          }
-          if (columnName === "ex-colour") {
-            return;
-          }
+  function updateFilters(columnName, searchQuery) {
+    // Update the currentFilters with the new filter
+    currentFilters.append('columnName[]', columnName);
+    currentFilters.append('searchQuery[]', searchQuery);
+  }
 
-          if (columnName === "importdoc") {
-            return;
-          }
-          if (columnName === "ownership") {
-            return;
-          }
-          if (columnName === "documentwith") {
-            return;
-          }
-          if (columnName === "changelogs") {
-            return;
-          }
-          if (columnName === "variant") {
-            return;
-          }
-          var selectWrapper = $('<div class="select-wrapper"></div>');
-          var select = $('<select class="form-control my-1" multiple></select>')
-            .appendTo(selectWrapper)
-            .select2({
-              width: '100%',
-              dropdownCssClass: 'select2-blue'
-            });
+  function getQueryStringWithFilters() {
+    // Return the updated query string with all the filters
+    return '?' + currentFilters.toString();
+  }
 
-          select.on('change', function() {
-            var selectedValues = $(this).val();
+// Function to display the applied filters in the search inputs
+function displayAppliedFilters() {
+  // Loop through each search input in the table header
+  $('#dtBasicExample1 thead input').each(function() {
+    var columnName = $(this).data('column-name'); // Get the data attribute value for column name
 
-            // Check if the blank option is selected
-            if (selectedValues && selectedValues.includes('')) {
-              column.search('^$', true, false); // Filter blank values
-            } else {
-              column.search(selectedValues ? selectedValues.join('|') : '', true, false); // Filter other selected values
-            }
-
-            column.draw();
-          });
-
-          selectWrapper.appendTo($(column.header()));
-          $(column.header()).addClass('nowrap-td');
-
-          column.data().unique().sort().each(function(d, j) {
-            // Add option for blank value
-            var optionValue = d === null ? '' : d;
-            var optionText = d === null ? 'Blank' : d === '' ? 'Null' : d;
-            select.append('<option value="' + optionValue + '">' + optionText + '</option>');
-          });
-        });
-      }
+    // Get the search query for the current column from the current filters
+    var searchQuery = currentFilters.getAll('searchQuery[]').find(function(query, index) {
+      return currentFilters.getAll('columnName[]')[index] === columnName;
     });
-    // Apply search functionality
-    $('#tableSearch').on('keyup', function () {
-        dataTable.search(this.value).draw();
+
+    // Display the search query in the input if it exists in the filters
+    if (searchQuery !== undefined && searchQuery !== '') {
+      $(this).val(searchQuery);
+    } else {
+      $(this).val(''); // Clear the search input if no filter exists or the filter is empty for this column
+    }
+  });
+}
+  $('.select2').select2();
+  var dataTable = $('#dtBasicExample1').DataTable({
+    "order": [[4, "desc"]],
+    pageLength: 50,
+    initComplete: function() {
+      this.api().columns().every(function(d) {
+        var column = this;
+        var columnId = column.index();
+        var columnName = $(column.header()).attr('id');
+        if (columnName === "changelogs") {
+          return;
+        }
+        // Add search input at the top of each column
+       // Inside the initComplete function when creating search inputs
+    var searchInput = $('<input type="text" class="form-control form-control-sm" placeholder="">')
+  .appendTo($(column.header()))
+  .attr('data-column-name', columnName) // Add the data attribute for column name
+  .on('keyup', function() {
+    column.search($(this).val()).draw();
+  });
+        $(column.header()).addClass('nowrap-td');
+
+        column.data().unique().sort().each(function(d, j) {
+          // Add option for blank value
+          var optionValue = d === null ? '' : d;
+          var optionText = d === null ? 'Blank' : d === '' ? 'Null' : d;
+          searchInput.append('<option value="' + optionValue + '">' + optionText + '</option>');
+        });
       });
-      // Hide the default search bar
-      $('#dtBasicExample1_filter').hide();
-      $('#dtBasicExample1_paginate').hide();
+    },
+    searchCols: [{ // Set the default search to the top of each column
+      search: ''
+    }]
+  });
 
-// Implement custom pagination
-var currentPage = 0;
-var pageSize = 50; // Set the number of rows per page here
+   // Call the function to display the applied filters on page load
+  displayAppliedFilters();
 
-function showPage(page) {
-  dataTable.page(page).draw(false);
+// Function to handle the Apply Filters button click event
+$('#applyFilterBtn').on('click', function() {
+  var filters = [];
+
+  // Loop through each search input in the table header
+  $('#dtBasicExample1 thead input').each(function() {
+    var columnName = $(this).data('column-name'); // Get the data attribute value for column name
+    var searchQuery = $(this).val();
+
+    // If the search input has data, add it to the filters array
+    if (searchQuery !== '') {
+      filters.push({
+        columnName: columnName,
+        searchQuery: searchQuery
+      });
+    }
+  });
+
+  // Update the filters in the URL
+  filters.forEach(function(filter) {
+    updateFilters(filter.columnName, filter.searchQuery);
+  });
+
+  // Create the query string with the filters for all columns
+  var queryString = getQueryStringWithFilters();
+
+  // Update the URL using the History API without reloading the page
+  var newUrl = window.location.href.split('?')[0] + queryString;
+  history.pushState({ path: newUrl }, '', newUrl);
+
+  // Redirect to the filtered route with the updated query string
+  window.location.href = newUrl;
+});
+  // Hide the default search bar
+  $('#dtBasicExample1_filter').hide();
+  $('#dtBasicExample1_paginate').hide();
+  // Implement custom pagination using DataTables API
+  var currentPage = dataTable.page.info().page; // Get the initial active page
+  function showPage(page) {
+    dataTable.page(page).draw(false);
+  }
+  function updatePageInfo() {
+    var pageInfo = dataTable.page.info();
+    $('#pageInfo').text('Page ' + (currentPage + 1) + ' of ' + pageInfo.pages);
+
+    // Remove active class from all pagination links
+    $('.pagination-list li').removeClass('active');
+
+    // Add active class to the current page number
+    $('.pagination-list li').eq(currentPage).addClass('active');
+  }
+
+  $('#prevBtn').on('click', function (e) {
+    e.preventDefault();
+    if (currentPage > 0) {
+      currentPage--;
+      showPage(currentPage);
+    }
+  });
+
+  $('#nextBtn').on('click', function (e) {
+    e.preventDefault();
+    if (currentPage < dataTable.page.info().pages - 1) {
+      currentPage++;
+      showPage(currentPage);
+    }
+  });
+
+  // Event handler for table draw event
+  dataTable.on('draw.dt', function () {
+    currentPage = dataTable.page.info().page; // Update the currentPage variable
+    updatePageInfo();
+  });
+
+  // Initial page info update
   updatePageInfo();
-}
-
-function updatePageInfo() {
-  var pageInfo = dataTable.page.info();
-  $('#pageInfo').text('Page ' + (currentPage + 1) + ' of ' + pageInfo.pages);
-}
-
-$('#prevBtn').on('click', function (e) {
-  e.preventDefault(); // Prevent default behavior (page reload)
-  if (currentPage > 0) {
-    currentPage--;
-    showPage(currentPage);
-  }
-});
-
-$('#nextBtn').on('click', function (e) {
-  e.preventDefault(); // Prevent default behavior (page reload)
-  if (currentPage < dataTable.page.info().pages - 1) {
-    currentPage++;
-    showPage(currentPage);
-  }
-});
-
-// Initial page info update
-updatePageInfo();
 });
 </script>
    {{--@endif--}}

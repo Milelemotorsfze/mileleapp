@@ -34,7 +34,7 @@
                     <th>Name</th>
                     <th>Belong To</th>
                     <th>Parent Colour</th>
-                    <th>Status</th>
+                    <!-- <th>Status</th> -->
                     <th>Created By</th>
                     <th>Action</th>
                 </tr>
@@ -54,14 +54,14 @@
                         @endif
                         </td>
                         <td>{{ $colorcodes->parent ?? '' }}</td>
-                        <td>@if ($colorcodes->status == 'Active')
+                        <!-- <td>@if ($colorcodes->status == 'Active')
                             <button class="btn btn-success">Active</button>
                         @elseif ($colorcodes->status == 'De-Active')
                             <button class="btn btn-danger">De-Active</button>
                         @else
                             {{ $colorcodes->status ?? '' }}
                         @endif
-                        </td>
+                        </td> -->
                         <td>
                         @php
                         $names = DB::table('users')->where('id', $colorcodes->created_by )->first();

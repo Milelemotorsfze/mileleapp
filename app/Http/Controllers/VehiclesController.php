@@ -35,23 +35,46 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            
-            $data = []; // Initialize an empty array to store the results
-            
-            Vehicles::where('payment_status', $statuss)
+            $data = Vehicles::where('payment_status', $statuss)
                 ->where(function ($query) {
                     $query->whereNull('so_id')
                         ->orWhereHas('So', function ($query) {
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
-                })
-                ->chunk(100, function ($vehicles) use (&$data) {
-                    // Process each chunk of vehicles
-                    foreach ($vehicles as $vehicle) {
-                        // Perform any necessary operations on the $vehicle here
-                        $data[] = $vehicle;
-                    }
                 });
+    
+            $columnNames = $request->query('columnName');
+            $searchQueries = $request->query('searchQuery');
+    
+            // Check if any filters were applied
+            if (!empty($columnNames) && !empty($searchQueries)) {
+                // Loop through the array of column names and search queries
+                foreach ($columnNames as $index => $columnName) {
+                    $searchQuery = $searchQueries[$index];
+                    // Apply filtering logic based on the column name and search query
+                    // Customize this part based on your filtering requirements
+                    switch ($columnName) {
+                        case 'vin':
+                            // Split the search query by commas to get individual VIN numbers
+                            $vinNumbers = explode(',', $searchQuery);
+                            // Apply the filter for each VIN number using OR condition
+                            $data = $data->where(function ($query) use ($vinNumbers) {
+                                foreach ($vinNumbers as $vin) {
+                                    $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
+                                }
+                            });
+                            break;
+                        case 'territory':
+                            $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
+                            break;
+                        // Add more cases for other columns if needed
+                        default:
+                            break;
+                    }
+                }
+            }
+    
+            $data = $data->paginate(30);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                                 ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -66,7 +89,6 @@ class VehiclesController extends Controller
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
-
         $previousYearSold = $this->previousYearSold()->count();
         $previousYearBooked = $this->previousYearBooked()->count();
         $previousMonthSold = $this->previousMonthSold()->count();
@@ -76,7 +98,6 @@ class VehiclesController extends Controller
         $previousYearAvailable  = $this->previousYearAvailable()->count();
         $previousMonthAvailable  = $this->previousMonthAvailable()->count();
         $yesterdayAvailable  = $this->yesterdayAvailable()->count();
-
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
             'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
@@ -86,6 +107,17 @@ class VehiclesController extends Controller
             return redirect()->route('home');
         }
     }
+        public function searchData(Request $request)
+        {
+            $filters = $request->except('page'); // Get all the filters except the 'page' parameter
+            $query = PurchasingOrder::query();
+            foreach ($filters as $column => $searchQuery) {
+            // Apply the filtering logic for each column
+                 $query->where($column, 'LIKE', '%' . $searchQuery . '%');
+            }
+            $data = $query->get();
+            return view('your_another_page_view', compact('data'));
+        }
     public function stockCountFilter(Request $request) {
 
         if($request->key) {
@@ -122,7 +154,6 @@ class VehiclesController extends Controller
             $data = Vehicles::whereIn('id',$vehicleIds)->get();
 
         }else{
-
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
                 ->where(function ($query) {
@@ -133,7 +164,7 @@ class VehiclesController extends Controller
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
                 })
-                ->get();
+                ->paginate(30);
         }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
             ->groupBy('vehicle_id')->get();
