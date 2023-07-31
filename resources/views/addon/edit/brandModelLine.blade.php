@@ -8,19 +8,20 @@
                     <div class="col-xxl-4 col-lg-6 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                         <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                            multiple="true" style="width: 100%;" required>
+                            multiple="true" style="width: 100%;">
                             <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                 @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                 @endforeach
                         </select>
-                        <span id="brandError" class=" invalid-feedback"></span>
+                        <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
                     </div> 
                     <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                         <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
-                            style="width: 100%;" required>
+                            style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
                         </select>
+                        <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
                     </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -45,7 +46,7 @@
                                 @endforeach
                         </select> -->
                         <select onchange=selectBrand(this.id,{{$i}})  class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                            multiple="true" style="width: 100%;" required disabled>
+                            multiple="true" style="width: 100%;" disabled>
                             <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                 <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
                                 @foreach($brands as $brand)
@@ -53,12 +54,12 @@
                                 @endforeach
                         </select>
                         <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">
-                        <span id="brandError" class=" invalid-feedback"></span>
+                        <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
                     </div> 
                     <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                         <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
-                            style="width: 100%;" required>
+                            style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
                             <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>All Model Lines</option>
                             @foreach($existingBrand->ModalLines as $modelLine)
                             <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif 
@@ -66,6 +67,7 @@
                             >{{ $modelLine->model_line }}</option>
                             @endforeach
                         </select>
+                        <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
                     </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -295,17 +297,19 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                         <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
-                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;" required>
+                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
                                             @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                             @endforeach
                                     </select>
+                                    <span id="brandError${index}" class="brandError invalid-feedback"></span>
                                 </div>
                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" required>
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>
                                         </select>
+                                        <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                         <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
@@ -375,6 +379,21 @@
         else
         {
             hideRelatedModal(brandId,row);
+        }
+    }
+    function selectModelLine(id,row)
+    {
+        var value =$('#'+id).val();
+        var ModelId = value;
+        if(ModelId != '')
+        {
+            $msg = "";
+            removeModelLineError($msg,row);
+        }
+        else
+        {
+            $msg = "Model Line is Required";
+            showModelLineError($msg,row);
         }
     }
     function showRelatedModal(value,row,currentAddonType)
