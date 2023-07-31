@@ -347,14 +347,7 @@
                                                                             <div class="row">
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                                                                    <!-- <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                                                                                        multiple="true" style="width: 100%;" >
-                                                                                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                                                                                            <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
-                                                                                            @foreach($brands as $brand)
-                                                                                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                                                            @endforeach
-                                                                                    </select> -->
+                                                                                    
                                                                                     <select onchange=selectBrand(this.id,{{$i}})  class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
                                                                                         multiple="true" style="width: 100%;" disabled>
                                                                                         <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
@@ -370,7 +363,7 @@
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                                     <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
                                                                                         style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
-                                                                                        <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>ALL Model Lines</option>
+                                                                                        <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>All Model Lines</option>
                                                                                         @foreach($existingBrand->ModalLines as $modelLine)
                                                                                         <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif 
                                                                                             @if($existingBrand->is_all_model_lines == "yes") disabled @endif

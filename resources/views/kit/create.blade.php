@@ -1766,6 +1766,7 @@
     }
     function hideRelatedModal(id,row)
     {
+        
         let showDivdrop = document.getElementById('showDivdrop'+row);
         showDivdrop.hidden = true
         let showaddtrim = document.getElementById('showaddtrim');

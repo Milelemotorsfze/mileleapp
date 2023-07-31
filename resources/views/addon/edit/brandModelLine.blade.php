@@ -59,7 +59,7 @@
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                         <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
                             style="width: 100%;" required>
-                            <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>ALL Model Lines</option>
+                            <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>All Model Lines</option>
                             @foreach($existingBrand->ModalLines as $modelLine)
                             <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif 
                                 @if($existingBrand->is_all_model_lines == "yes") disabled @endif
