@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class VendorDocument extends Model
 {
     use HasFactory;
-    protected $table= 'vendor_documnets';
+    protected $table= 'vendor_documents';
 }
