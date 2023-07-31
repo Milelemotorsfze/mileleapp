@@ -413,7 +413,7 @@ Clear Filters
                             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
                                <tr>
-                                <th>Ref No</th>
+                                <th id="vehicle_id">Ref No</th>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
@@ -438,7 +438,7 @@ Clear Filters
                                 @endphp
                                 @if ($hasPermission)
                                 <th id="grn_number" class="nowrap-td">GRN</th>
-                                <th id="date" class="nowrap-td">GRN Date</th>
+                                <th id="grn_date" class="nowrap-td">GRN Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -523,16 +523,16 @@ Clear Filters
                                     <th id="steering" class="nowrap-td">Steering</th>
                                     <th id="seats" class="nowrap-td">Seats</th>
                                     <th id="fuel_type" class="nowrap-td">Fuel Type</th>
-                                    <th class="nowrap-td">Transmission</th>
-                                    <th class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
-                                    <th class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
-                                    <th class="nowrap-td">Upholstery</th>
+                                    <th id="gear" class="nowrap-td">Transmission</th>
+                                    <th id="ex_colour" class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
+                                    <th id="int_colour" class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
+                                    <th id="upholestry" class="nowrap-td">Upholstery</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Production Year</th>
+                                    <th id="ppmmyyy" class="nowrap-td">Production Year</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
@@ -544,7 +544,7 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Warehouse</th>
+                                    <th id="latest_location" class="nowrap-td">Warehouse</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-remarks-view');
@@ -556,7 +556,7 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">Price</th>
+                                    <th id="price"class="nowrap-td">Price</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-view');
@@ -570,7 +570,7 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th class="nowrap-td">BL Number</th>
+                                    <th id="bl_number"class="nowrap-td">BL Number</th>
                                 @endif
                                     <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Details</th>
                                </tr>
@@ -1407,7 +1407,7 @@ function displayAppliedFilters() {
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
     "order": [[4, "desc"]],
-    pageLength: 50,
+    pageLength: 100,
     initComplete: function() {
       this.api().columns().every(function(d) {
         var column = this;

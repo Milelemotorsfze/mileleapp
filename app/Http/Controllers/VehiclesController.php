@@ -6,7 +6,8 @@ use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
 use App\Models\Varaint;
-use App\Models\grn;
+use App\Models\Brand;
+use App\Models\Grn;
 use App\Models\Gdn;
 use App\Models\Document;
 use App\Models\Documentlog;
@@ -45,7 +46,6 @@ class VehiclesController extends Controller
     
             $columnNames = $request->query('columnName');
             $searchQueries = $request->query('searchQuery');
-    
             // Check if any filters were applied
             if (!empty($columnNames) && !empty($searchQueries)) {
                 // Loop through the array of column names and search queries
@@ -55,26 +55,402 @@ class VehiclesController extends Controller
                     // Customize this part based on your filtering requirements
                     switch ($columnName) {
                         case 'vin':
-                            // Split the search query by commas to get individual VIN numbers
                             $vinNumbers = explode(',', $searchQuery);
-                            // Apply the filter for each VIN number using OR condition
                             $data = $data->where(function ($query) use ($vinNumbers) {
                                 foreach ($vinNumbers as $vin) {
                                     $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
                                 }
                             });
                             break;
+                            case 'vehicle_id':
+                                $vehicle_id = explode(',', $searchQuery);
+                                $data = $data->where(function ($query) use ($vehicle_id) {
+                                    foreach ($vehicle_id as $id) {
+                                        $query->orWhere('id', 'LIKE', '%' . trim($id) . '%');
+                                    }
+                                });
+                                break;
+                                case 'estimation_date':
+                                    $estimation_date = explode(',', $searchQuery);
+                                    $data = $data->where(function ($query) use ($estimation_date) {
+                                        foreach ($estimation_date as $estimation_date) {
+                                            $query->orWhere('estimation_date', 'LIKE', '%' . trim($estimation_date) . '%');
+                                        }
+                                    });
+                                    break;
+                                    case 'inspection_date':
+                                        $inspection_date = explode(',', $searchQuery);
+                                        $data = $data->where(function ($query) use ($inspection_date) {
+                                            foreach ($inspection_date as $inspection_date) {
+                                                $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
+                                            }
+                                        });
+                                        break;
+                                        case 'reservation_start_date':
+                                            $reservation_start_date = explode(',', $searchQuery);
+                                            $data = $data->where(function ($query) use ($reservation_start_date) {
+                                                foreach ($reservation_start_date as $reservation_start_date) {
+                                                    $query->orWhere('reservation_start_date', 'LIKE', '%' . trim($reservation_start_date) . '%');
+                                                }
+                                            });
+                                            break;
+                                            case 'reservation_end_date':
+                                                $reservation_end_date = explode(',', $searchQuery);
+                                                $data = $data->where(function ($query) use ($reservation_end_date) {
+                                                    foreach ($reservation_end_date as $reservation_end_date) {
+                                                        $query->orWhere('reservation_end_date', 'LIKE', '%' . trim($reservation_end_date) . '%');
+                                                    }
+                                                });
+                                                break;
+                                                case 'engine':
+                                                    $engine = explode(',', $searchQuery);
+                                                    $data = $data->where(function ($query) use ($engine) {
+                                                        foreach ($engine as $engine) {
+                                                            $query->orWhere('engine', 'LIKE', '%' . trim($engine) . '%');
+                                                        }
+                                                    });
+                                                    break;
+                                                    case 'ppmmyyy':
+                                                        $ppmmyyy = explode(',', $searchQuery);
+                                                        $data = $data->where(function ($query) use ($ppmmyyy) {
+                                                            foreach ($ppmmyyy as $ppmmyyy) {
+                                                                $query->orWhere('ppmmyyy', 'LIKE', '%' . trim($ppmmyyy) . '%');
+                                                            }
+                                                        });
+                                                        break;
+                                                        case 'price':
+                                                            $price = explode(',', $searchQuery);
+                                                            $data = $data->where(function ($query) use ($price) {
+                                                                foreach ($price as $price) {
+                                                                    $query->orWhere('price', 'LIKE', '%' . trim($price) . '%');
+                                                                }
+                                                            });
+                                                            break;
+                                case 'po_number':
+                                    $poNumbers = explode(',', $searchQuery);
+                                    $data = $data->where(function ($query) use ($poNumbers) {
+                                        foreach ($poNumbers as $poNumber) {
+                                            // Find the purchasing_order_id based on the po_number
+                                            $purchasingOrder = PurchasingOrder::where('po_number', 'LIKE', '%' . trim($poNumber) . '%')->first();
+                                            if ($purchasingOrder) {
+                                                $query->orWhere('purchasing_order_id', $purchasingOrder->id);
+                                            }
+                                        }
+                                    });
+                                    break;
+                                    case 'po_date':
+                                        $po_date = explode(',', $searchQuery);
+                                        $data = $data->where(function ($query) use ($po_date) {
+                                            foreach ($po_date as $po_date) {
+                                                // Find the purchasing_order_id based on the po_number
+                                                $purchasingOrder = PurchasingOrder::where('po_date', 'LIKE', '%' . trim($po_date) . '%')->first();
+                                                if ($purchasingOrder) {
+                                                    $query->orWhere('purchasing_order_id', $purchasingOrder->id);
+                                                }
+                                            }
+                                        });
+                                        break;
+                                        case 'grn_number':
+                                            $grn_number = explode(',', $searchQuery);
+                                            $data = $data->where(function ($query) use ($grn_number) {
+                                                foreach ($grn_number as $grn_number) {
+                                                    // Find the purchasing_order_id based on the po_number
+                                                    $grn = Grn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
+                                                    if ($grn) {
+                                                        $query->orWhere('grn_id', $grn->id);
+                                                    }
+                                                }
+                                            });
+                                            break;
+                                            case 'grn_date':
+                                                $grn_date = explode(',', $searchQuery);
+                                                $data = $data->where(function ($query) use ($grn_date) {
+                                                    foreach ($grn_date as $grn_date) {
+                                                        // Find the purchasing_order_id based on the po_number
+                                                        $grn = Grn::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
+                                                        if ($grn) {
+                                                            $query->orWhere('grn_id', $grn->id);
+                                                        }
+                                                    }
+                                                });
+                                                break;
+                                                case 'so_number':
+                                                    $so_number = explode(',', $searchQuery);
+                                                    $data = $data->where(function ($query) use ($so_number) {
+                                                        foreach ($so_number as $so_number) {
+                                                            // Find the purchasing_order_id based on the po_number
+                                                            $so = So::where('so_number', 'LIKE', '%' . trim($so_number) . '%')->first();
+                                                            if ($so) {
+                                                                $query->orWhere('so_id', $so->id);
+                                                            }
+                                                        }
+                                                    });
+                                                    break;
+                                                    case 'so_date':
+                                                        $so_date = explode(',', $searchQuery);
+                                                        $data = $data->where(function ($query) use ($so_date) {
+                                                            foreach ($so_date as $so_date) {
+                                                                // Find the purchasing_order_id based on the po_number
+                                                                $sodte = So::where('so_date', 'LIKE', '%' . trim($so_date) . '%')->first();
+                                                                if ($sodte) {
+                                                                    $query->orWhere('so_id', $sodte->id);
+                                                                }
+                                                            }
+                                                        });
+                                                        break;
+                                                        case 'sales_person_id':
+                                                            $sales_person_id = explode(',', $searchQuery);
+                                                            $data = $data->where(function ($query) use ($sales_person_id) {
+                                                                foreach ($sales_person_id as $sales_person_id) {
+                                                                    // Find the purchasing_order_id based on the po_number
+                                                                    $sosales = So::where('sales_person_id', 'LIKE', '%' . trim($sales_person_id) . '%')->first();
+                                                                    if ($sosales) {
+                                                                        $query->orWhere('so_id', $sosales->id);
+                                                                    }
+                                                                }
+                                                            });
+                                                            break;
+                                                            case 'gdn_number':
+                                                                $gdn_number = explode(',', $searchQuery);
+                                                                $data = $data->where(function ($query) use ($gdn_number) {
+                                                                    foreach ($gdn_number as $gdn_number) {
+                                                                        // Find the purchasing_order_id based on the po_number
+                                                                        $gdnumber = Gdn::where('gdn_number', 'LIKE', '%' . trim($gdn_number) . '%')->first();
+                                                                        if ($gdnumber) {
+                                                                            $query->orWhere('gdn_id', $gdnumber->id);
+                                                                        }
+                                                                    }
+                                                                });
+                                                                break;
+                                                                case 'gdn_date':
+                                                                    $gdn_date = explode(',', $searchQuery);
+                                                                    $data = $data->where(function ($query) use ($gdn_date) {
+                                                                        foreach ($gdn_date as $gdn_date) {
+                                                                            // Find the purchasing_order_id based on the po_number
+                                                                            $gdndate = Gdn::where('date', 'LIKE', '%' . trim($gdn_date) . '%')->first();
+                                                                            if ($gdndate) {
+                                                                                $query->orWhere('gdn_id', $gdndate->id);
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                    break;
+                                                                    case 'variant':
+                                                                        $variant = explode(',', $searchQuery);
+                                                                        $data = $data->where(function ($query) use ($variant) {
+                                                                            foreach ($variant as $variant) {
+                                                                                // Find the purchasing_order_id based on the po_number
+                                                                                $variant = Varaint::where('name', 'LIKE', '%' . trim($variant) . '%')->first();
+                                                                                if ($variant) {
+                                                                                    $query->orWhere('varaints_id', $variant->id);
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                        break;
+                                                                        case 'variant_details':
+                                                                            $variant_details = explode(',', $searchQuery);
+                                                                            $data = $data->where(function ($query) use ($variant_details) {
+                                                                                foreach ($variant_details as $variant_details) {
+                                                                                    // Find the purchasing_order_id based on the po_number
+                                                                                    $variant_details = Varaint::where('detail', 'LIKE', '%' . trim($variant_details) . '%')->first();
+                                                                                    if ($variant_details) {
+                                                                                        $query->orWhere('varaints_id', $variant_details->id);
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                            break;
+                                                                                case 'model_description':
+                                                                                    $model_description = explode(',', $searchQuery);
+                                                                                    $data = $data->where(function ($query) use ($model_description) {
+                                                                                        foreach ($model_description as $model_description) {
+                                                                                            // Find the purchasing_order_id based on the po_number
+                                                                                            $model_description = Varaint::where('model_detail', 'LIKE', '%' . trim($model_description) . '%')->first();
+                                                                                            if ($model_description) {
+                                                                                                $query->orWhere('varaints_id', $model_description->id);
+                                                                                            }
+                                                                                        }
+                                                                                    });
+                                                                                    break;
+                                                                                        case 'model_year':
+                                                                                            $model_year = explode(',', $searchQuery);
+                                                                                            $data = $data->where(function ($query) use ($model_year) {
+                                                                                                foreach ($model_year as $model_year) {
+                                                                                                    // Find the purchasing_order_id based on the po_number
+                                                                                                    $model_year = Varaint::where('my', 'LIKE', '%' . trim($model_year) . '%')->first();
+                                                                                                    if ($model_year) {
+                                                                                                        $query->orWhere('varaints_id', $model_year->id);
+                                                                                                    }
+                                                                                                }
+                                                                                            });
+                                                                                            break;
+                                                                                            case 'steering':
+                                                                                                $steering = explode(',', $searchQuery);
+                                                                                                $data = $data->where(function ($query) use ($steering) {
+                                                                                                    foreach ($steering as $steering) {
+                                                                                                        // Find the purchasing_order_id based on the po_number
+                                                                                                        $steering = Varaint::where('steering', 'LIKE', '%' . trim($steering) . '%')->first();
+                                                                                                        if ($steering) {
+                                                                                                            $query->orWhere('varaints_id', $steering->id);
+                                                                                                        }
+                                                                                                    }
+                                                                                                });
+                                                                                                break;
+                                                                                                case 'seats':
+                                                                                                    $seats = explode(',', $searchQuery);
+                                                                                                    $data = $data->where(function ($query) use ($seats) {
+                                                                                                        foreach ($seats as $seats) {
+                                                                                                            // Find the purchasing_order_id based on the po_number
+                                                                                                            $seats = Varaint::where('seat', 'LIKE', '%' . trim($seats) . '%')->first();
+                                                                                                            if ($seats) {
+                                                                                                                $query->orWhere('varaints_id', $seats->id);
+                                                                                                            }
+                                                                                                        }
+                                                                                                    });
+                                                                                                    break;
+                                                                                                    case 'upholestry':
+                                                                                                        $upholestry = explode(',', $searchQuery);
+                                                                                                        $data = $data->where(function ($query) use ($upholestry) {
+                                                                                                            foreach ($upholestry as $upholestry) {
+                                                                                                                // Find the purchasing_order_id based on the po_number
+                                                                                                                $upholestry = Varaint::where('upholestry', 'LIKE', '%' . trim($upholestry) . '%')->first();
+                                                                                                                if ($upholestry) {
+                                                                                                                    $query->orWhere('varaints_id', $upholestry->id);
+                                                                                                                }
+                                                                                                            }
+                                                                                                        });
+                                                                                                        break;
+                                                                                                    case 'fuel_type':
+                                                                                                        $fuel_type = explode(',', $searchQuery);
+                                                                                                        $data = $data->where(function ($query) use ($fuel_type) {
+                                                                                                            foreach ($fuel_type as $fuel_type) {
+                                                                                                                // Find the purchasing_order_id based on the po_number
+                                                                                                                $fuel_type = Varaint::where('fuel_type', 'LIKE', '%' . trim($fuel_type) . '%')->first();
+                                                                                                                if ($fuel_type) {
+                                                                                                                    $query->orWhere('varaints_id', $fuel_type->id);
+                                                                                                                }
+                                                                                                            }
+                                                                                                        });
+                                                                                                        break;
+                                                                                                        case 'brand':
+                                                                                                            $brandNames = explode(',', $searchQuery);
+                                                                                                            $data = $data->where(function ($query) use ($brandNames) {
+                                                                                                                foreach ($brandNames as $brandName) {
+                                                                                                                    // Find the brand_id based on the brand name from the brands table
+                                                                                                                    $brand = Brand::where('brand_name', 'LIKE', '%' . trim($brandName) . '%')->first();
+                                                                                                                    if ($brand) {
+                                                                                                                        // Find the varaints_id based on the brand_id from the variants table
+                                                                                                                        $variantsWithBrand = Varaint::where('brands_id', $brand->id)->pluck('id');
+                                                                                                                        $query->orWhereIn('varaints_id', $variantsWithBrand);
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            });
+                                                                                                            break;
+                                                                                                            case 'model_line':
+                                                                                                                $modelline = explode(',', $searchQuery);
+                                                                                                                $data = $data->where(function ($query) use ($modelline) {
+                                                                                                                    foreach ($modelline as $modellines) {
+                                                                                                                        // Find the brand_id based on the brand name from the brands table
+                                                                                                                        $modelline = MasterModelLines::where('model_line', 'LIKE', '%' . trim($modellines) . '%')->first();
+                                                                                                                        if ($modelline) {
+                                                                                                                            // Find the varaints_id based on the brand_id from the variants table
+                                                                                                                            $variantsWithBrand = Varaint::where('master_model_lines_id', $modelline->id)->pluck('id');
+                                                                                                                            $query->orWhereIn('varaints_id', $variantsWithBrand);
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                });
+                                                                                                                break;
+                                                                                                        case 'ex_colour':
+                                                                                                            $ex_colour = explode(',', $searchQuery);
+                                                                                                            $data = $data->where(function ($query) use ($ex_colour) {
+                                                                                                                foreach ($ex_colour as $ex_colour) {
+                                                                                                                    $ex_colour = ColorCode::where('name', 'LIKE', '%' . trim($ex_colour) . '%')->where('belong_to', 'ex')->first();
+                                                                                                                    if ($ex_colour) {
+                                                                                                                        $query->orWhere('ex_colour', $ex_colour->id);
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            });
+                                                                                                            break;
+                                                                                                            case 'int_colour':
+                                                                                                                $int_colour = explode(',', $searchQuery);
+                                                                                                                $data = $data->where(function ($query) use ($int_colour) {
+                                                                                                                    foreach ($int_colour as $int_colour) {
+                                                                                                                        // Find the purchasing_order_id based on the po_number
+                                                                                                                        $int_colour = ColorCode::where('name', 'LIKE', '%' . trim($int_colour) . '%')->where('belong_to', 'int')->first();
+                                                                                                                        if ($int_colour) {
+                                                                                                                            $query->orWhere('int_colour', $int_colour->id);
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                });
+                                                                                                                break;
+                                                                                                            case 'importdoc':
+                                                                                                                $import_type = explode(',', $searchQuery);
+                                                                                                                $data = $data->where(function ($query) use ($import_type) {
+                                                                                                                    foreach ($import_type as $import_type) {
+                                                                                                                        // Find the purchasing_order_id based on the po_number
+                                                                                                                        $import_type = Varaint::where('import_type', 'LIKE', '%' . trim($import_type) . '%')->first();
+                                                                                                                        if ($import_type) {
+                                                                                                                            $query->orWhere('documents_id', $import_type->id);
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                });
+                                                                                                                break;
+                                                                                                                case 'ownership':
+                                                                                                                    $owership = explode(',', $searchQuery);
+                                                                                                                    $data = $data->where(function ($query) use ($owership) {
+                                                                                                                        foreach ($owership as $owership) {
+                                                                                                                            // Find the purchasing_order_id based on the po_number
+                                                                                                                            $owership = Varaint::where('owership', 'LIKE', '%' . trim($owership) . '%')->first();
+                                                                                                                            if ($owership) {
+                                                                                                                                $query->orWhere('documents_id', $owership->id);
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    });
+                                                                                                                    break;
+                                                                                                                    case 'documentwith':
+                                                                                                                        $documentwith = explode(',', $searchQuery);
+                                                                                                                        $data = $data->where(function ($query) use ($documentwith) {
+                                                                                                                            foreach ($documentwith as $documentwith) {
+                                                                                                                                // Find the purchasing_order_id based on the po_number
+                                                                                                                                $documentwith = Varaint::where('documentwith', 'LIKE', '%' . trim($documentwith) . '%')->first();
+                                                                                                                                if ($documentwith) {
+                                                                                                                                    $query->orWhere('documents_id', $documentwith->id);
+                                                                                                                                }
+                                                                                                                            }
+                                                                                                                        });
+                                                                                                                        break;
+                                                                                                                        case 'bl_number':
+                                                                                                                            $bl_number = explode(',', $searchQuery);
+                                                                                                                            $data = $data->where(function ($query) use ($bl_number) {
+                                                                                                                                foreach ($bl_number as $bl_number) {
+                                                                                                                                    // Find the purchasing_order_id based on the po_number
+                                                                                                                                    $bl_number = Varaint::where('bl_number', 'LIKE', '%' . trim($bl_number) . '%')->first();
+                                                                                                                                    if ($bl_number) {
+                                                                                                                                        $query->orWhere('documents_id', $bl_number->id);
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                            });
+                                                                                                                            break;
+                                                                                                                            case 'latest_location':
+                                                                                                                                $latest_location = explode(',', $searchQuery);
+                                                                                                                                $data = $data->where(function ($query) use ($latest_location) {
+                                                                                                                                    foreach ($latest_location as $latest_location) {
+                                                                                                                                        // Find the purchasing_order_id based on the po_number
+                                                                                                                                        $latest_location = Warehouse::where('latest_location', 'LIKE', '%' . trim($latest_location) . '%')->first();
+                                                                                                                                        if ($latest_location) {
+                                                                                                                                            $query->orWhere('latest_location', $latest_location->id);
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                });
+                                                                                                                                break;
                         case 'territory':
                             $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
                             break;
-                        // Add more cases for other columns if needed
                         default:
                             break;
                     }
                 }
             }
     
-            $data = $data->paginate(30);
+            $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                                 ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
