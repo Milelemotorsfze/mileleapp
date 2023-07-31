@@ -374,10 +374,12 @@
                 hideRelatedModal(brandId,row);
             }
             $msg = "";
-            removeBrandError($msg);
+            removeBrandError($msg,row);
         }
         else
         {
+            $msg = "Brand is Required";
+            showBrandError($msg,row);
             hideRelatedModal(brandId,row);
         }
     }
