@@ -155,6 +155,9 @@
                 if(countRow > 1)
                 {
                     var indexNumber = $(this).attr('data-index');
+                    if(indexNumber == 1) {
+                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
+                    }
                     $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
                         var id = (this.value);
                         var text = (this.text);

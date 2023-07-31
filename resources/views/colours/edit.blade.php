@@ -79,7 +79,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12">
+                    <!-- <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="mb-3">
                         <span class="error">* </span>
                             <label for="choices-single-default" class="form-label">Status</label>
@@ -88,7 +88,7 @@
                                 <option value="De-Active" {{ old('status') == 'De-Active' || $colorcodes->status == 'De-Active' ? 'selected' : '' }}>De-Active</option>
                             </select>
                         </div>
-                    </div>
+                    </div> -->
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-dark">Submit</button>
                 </div>

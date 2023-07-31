@@ -37,7 +37,7 @@ class ColorCodesController extends Controller
             'name' => 'string|required|max:255',
             'belong_to' => 'required',
             'parent' => 'required',
-            'status' => 'required',
+            // 'status' => 'required',
         ]);
         $name = $request->input('name');
         $belong_to = $request->input('belong_to');
@@ -50,7 +50,7 @@ class ColorCodesController extends Controller
         $colourcodes->code = $request->input('code');
         $colourcodes->belong_to = $belong_to;
         $colourcodes->parent = $request->input('parent');
-        $colourcodes->status = $request->input('status');
+        // $colourcodes->status = $request->input('status');
         $colourcodes->created_by = auth()->user()->id;
         $colourcodes->save();
         $colorcodeId = $colourcodes->id;
@@ -94,7 +94,7 @@ class ColorCodesController extends Controller
             'name' => 'string|required|max:255',
             'belong_to' => 'required',
             'parent' => 'required',
-            'status' => 'required',
+            // 'status' => 'required',
         ]);
         $name = $request->input('name');
         $belong_to = $request->input('belong_to');
@@ -111,7 +111,7 @@ class ColorCodesController extends Controller
         $colourcodes->code = $request->input('code');
         $colourcodes->belong_to = $belong_to;
         $colourcodes->parent = $request->input('parent');
-        $colourcodes->status = $request->input('status');
+        // $colourcodes->status = $request->input('status');
         $changes = [];
         foreach ($oldValues as $field => $oldValue) {
             if ($field !== 'created_at' && $field !== 'updated_at') {
