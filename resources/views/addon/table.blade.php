@@ -202,7 +202,7 @@
                                                 @if($AddonTypes->is_all_model_lines == 'yes')
                                                     All Model Lines
                                                 @else
-                                                    {{$AddonTypes->modelLines->model_line}}
+                                                    {{$AddonTypes->modelLines->model_line ?? ''}}
                                                 @endif
                                             </td>
                                             <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>

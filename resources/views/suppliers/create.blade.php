@@ -313,7 +313,7 @@ input {
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                                    <!-- <span class="error">* </span> -->
+                                     <span class="error">* </span>
                                     <label for="contact_person" class="col-form-label text-md-end">{{ __('Category') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -396,7 +396,7 @@ input {
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                                    <!-- <span class="error">* </span> -->
+                                   <span class="error">* </span>
                                     <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -1228,6 +1228,7 @@ input {
                 }
             })
             $(document.body).on('select2:select', "#category", function (e) {
+                removeSupplierCategoryError()
                 var category =  e.params.data.text;
                 if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
                 {
@@ -1515,6 +1516,7 @@ input {
             sub = '2';
             var inputSupplier = $('#supplier').val();
             var inputSupplierType = $('#supplier_type').val();
+            var inputSupplierCatgeory = $('#category').val();
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
@@ -1531,6 +1533,12 @@ input {
             {
                 $msg = "Supplier type is required";
                 showSupplierTypeError($msg);
+                formInputError = true;
+                e.preventDefault();
+            }
+            if(inputSupplierCatgeory == '') {
+                $msg = "Supplier Category is required";
+                showSupplierCategoryError($msg);
                 formInputError = true;
                 e.preventDefault();
             }
@@ -1737,6 +1745,23 @@ input {
                     }
                 }
             }
+            if(clickInput.id == 'category')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    if(value.legth != 0)
+                    {
+                        $msg = "Supplier Category is required";
+                        showSupplierCategoryError($msg);
+                    }
+                }
+                else
+                {
+                    removeSupplierCategoryError();
+                }
+            }
+
             if(clickInput.id == 'is_primary_payment_method')
             {
                 var value = clickInput.value;
@@ -2017,15 +2042,25 @@ input {
             document.getElementById("is_primary_payment_method").classList.remove("is-invalid");
             document.getElementById("paymentMethodsError").classList.remove("paragraph-class");
         }
+        function showSupplierCategoryError($msg)
+        {
+            document.getElementById("supplierCategoryError").textContent=$msg;
+            document.getElementById("category").classList.add("is-invalid");
+            document.getElementById("supplierCategoryError").classList.add("paragraph-class");
+
+        }
+        function removeSupplierCategoryError()
+        {
+            document.getElementById("supplierCategoryError").textContent="";
+            document.getElementById("category").classList.remove("is-invalid");
+            document.getElementById("supplierCategoryError").classList.remove("paragraph-class");
+        }
         function showSupplierTypeError($msg)
         {
             document.getElementById("supplierTypeError").textContent=$msg;
             document.getElementById("supplier_type").classList.add("is-invalid");
             document.getElementById("supplierTypeError").classList.add("paragraph-class");
-            // $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
-            // $("#supplier_type").select2({
-            //     containerCssClass : "form-control is-invalid"
-            // });
+
         }
         function removeSupplierTypeError()
         {
@@ -2033,6 +2068,7 @@ input {
             document.getElementById("supplier_type").classList.remove("is-invalid");
             document.getElementById("supplierTypeError").classList.remove("paragraph-class");
         }
+
         function emailContactError()
         {
             document.getElementById("contactRequired").textContent=$msg;

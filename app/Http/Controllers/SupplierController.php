@@ -151,8 +151,12 @@ class SupplierController extends Controller
     {
         $content = '';
         $addon1 = $addons = $supplierTypes = '';
-        $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->with('PaymentMethods')->first();
-        $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','no')->with('PaymentMethods')->get();
+        $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')
+            ->with('PaymentMethods')->first();
+        $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)
+//            ->where('is_primary_payment_method','no')
+            ->with('PaymentMethods')
+            ->get();
         $supplierAddonId = SupplierAddons::where('supplier_id',$supplier->id)->pluck('addon_details_id');
         $supplierTypes = SupplierType::where('supplier_id',$supplier->id)->get();
         if(count($supplierAddonId) > 0)
@@ -207,6 +211,7 @@ class SupplierController extends Controller
 
         // find using Supplier types
         $supAddTypesName = [];
+        $nonRemovableVendorCategories = [];
         $supAddTypes = AddonDetails::whereNot('addon_type_name','K')->whereIn('id',$supplierAddons)->select('addon_type_name')->distinct()->get();
         if(count($supAddTypes) > 0)
         {
@@ -215,10 +220,14 @@ class SupplierController extends Controller
                 if($supAddType->addon_type_name == 'P')
                 {
                     array_push($supAddTypesName, 'accessories');
+                    array_push($nonRemovableVendorCategories, Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES);
+
                 }
                 elseif($supAddType->addon_type_name == 'SP')
                 {
                     array_push($supAddTypesName, 'spare_parts');
+                    array_push($nonRemovableVendorCategories, Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES);
+
                 }
             }
         }
@@ -239,10 +248,14 @@ class SupplierController extends Controller
                             if($kitSupAddon->addon_type_name == 'P' && !in_array('accessories', $supAddTypesName))
                             {
                                 array_push($supAddTypesName, 'accessories');
+                                array_push($nonRemovableVendorCategories, Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES);
+
                             }
                             elseif($kitSupAddon->addon_type_name == 'SP' && !in_array('spare_parts', $supAddTypesName))
                             {
                                 array_push($supAddTypesName, 'spare_parts');
+                                array_push($nonRemovableVendorCategories, Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES);
+
                             }
                         }
                     }
@@ -253,6 +266,8 @@ class SupplierController extends Controller
         if(count($warrantySupp) > 0)
         {
             array_push($supAddTypesName, 'warranty');
+            array_push($nonRemovableVendorCategories, Supplier::SUPPLIER_CATEGORY_PARTS_AND_ACCESSORIES);
+
         }
         // end find using Supplier types
         // addon based on supplier type
@@ -285,7 +300,7 @@ class SupplierController extends Controller
             ->select('id','addon_code','addon_id')->with('AddonName')->get();
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods',
             'addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons','vendorCategories',
-            'vendorSubCategories','vendorPaymentMethods'));
+            'vendorSubCategories','vendorPaymentMethods','nonRemovableVendorCategories'));
     }
     public function destroy($id)
     {

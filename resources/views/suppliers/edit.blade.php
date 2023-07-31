@@ -231,47 +231,6 @@
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
                 <input id="supplier_id" name="supplier_id" value="{{ $supplier->id }}" hidden>
-
-{{--                <div class="col-xxl-6 col-lg-6 col-md-12">--}}
-{{--                    <div class="row">--}}
-{{--                        <div class="col-xxl-3 col-lg-6 col-md-12">--}}
-{{--                            <span class="error">* </span>--}}
-{{--                            <label for="supplier_types" class="col-form-label text-md-end">{{ __('Supplier Types') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="mainSelect">--}}
-{{--                        <select name="supplier_types[]" id="supplier_type" multiple="true" style="width: 100%;" class="form-control " onchange="validationOnKeyUp(this)">--}}
-{{--                            <option value="">Choose Supplier Type</option>--}}
-{{--                            <option value="accessories" data-select2-id="1" @if(in_array("accessories", $supplierTypes)) selected @endif --}}
-{{--                                                                            @if(in_array("accessories", $supAddTypesName)) locked="locked" @endif>Accessories</option>--}}
-{{--                            <option value="freelancer" data-select2-id="2" @if(in_array("freelancer", $supplierTypes)) selected @endif--}}
-{{--                                                                            @if(in_array("freelancer", $supAddTypesName)) locked="locked" @endif>Freelancer</option>--}}
-{{--                            <option value="garage" data-select2-id="3" @if(in_array("garage", $supplierTypes)) selected @endif--}}
-{{--                                                                    @if(in_array("garage", $supAddTypesName)) locked="locked" @endif>Garage</option>--}}
-{{--                            <option value="spare_parts" data-select2-id="4" @if(in_array("spare_parts", $supplierTypes)) selected @endif--}}
-{{--                                                                    @if(in_array("spare_parts", $supAddTypesName)) locked="locked" @endif>Spare Parts</option>--}}
-{{--                            <option value="warranty" data-select2-id="5" @if(in_array("warranty", $supplierTypes)) selected @endif--}}
-{{--                                                                    @if(in_array("warranty", $supAddTypesName)) locked="locked" @endif>Warranty</option>--}}
-{{--                        </select>--}}
-{{--                        @error('supplier_types')--}}
-{{--                                <span class="invalid-feedback" role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                            @enderror--}}
-{{--                            <span id="supplierTypeError" class=" invalid-feedback"></span>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-9 col-lg-6 col-md-12" id="subSelect" hidden onclick="showAlert()">--}}
-{{--                            <div id="supplier_type_sub" style="width: 100%; background-color:#e4e4e4;" class="form-control widthinput">--}}
-{{--                                <span id="accessories" class="spanSub" hidden>Accessories</span>--}}
-{{--                                <span id="freelancer" class="spanSub" hidden>Freelancer</span>--}}
-{{--                                <span id="garage" class="spanSub" hidden>Garage</span>--}}
-{{--                                <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>--}}
-{{--                                <span id="warranty" class="spanSub" hidden>Warranty</span>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-
-
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Primary Information</h4>
@@ -322,14 +281,15 @@
                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
+                                        <span class="error">* </span>
                                         <label for="contact_person" class="col-form-label text-md-end">{{ __('Category') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
                                         <select class="widthinput form-control" name="categories[]" id="category" multiple  autofocus>
 
                                             @foreach( \App\Models\Supplier::categories() as $key =>  $vendorCategory)
-                                                <option value="{{$key}}" {{ (in_array($vendorCategory, $vendorCategories)) ? 'selected' : '' }} >
+                                                <option value="{{$key}}" {{ (in_array($vendorCategory, $vendorCategories)) ? 'selected' : '' }}
+                                                @if(in_array($key, $nonRemovableVendorCategories)) locked="locked" @endif>
                                                     {{ $vendorCategory }}</option>
                                             @endforeach
                                         </select>
@@ -353,7 +313,8 @@
                                         <select name="supplier_types[]" hidden="hidden" id="supplier_type" multiple="true" style="width: 100%;"
                                                 class="form-control widthinput" autofocus  onchange="validationOnKeyUp(this)">
                                                 @foreach($supplier->sub_categories as $key => $subCategory)
-                                                    <option value="{{$key}}" {{ (in_array($key, $vendorSubCategories)) ? 'selected' : ''   }}>
+                                                    <option value="{{$key}}" {{ (in_array($key, $vendorSubCategories)) ? 'selected' : ''   }}
+                                                    @if(in_array($key, $supAddTypesName)) locked="locked" @endif >
                                                         {{ $subCategory }}</option>
                                                 @endforeach
                                         </select>
@@ -409,19 +370,15 @@
                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
+                                             <span class="error">* </span>
                                         <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
                                         <input id="contact_number" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
                                                name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"
                                                autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
-                                        <!-- @error('contact_number')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
-                                        <span id="contactRequired" class="email-phone required-class"></span>
+
+                                         <span id="contactRequired" class="email-phone required-class"></span>
                                     </div>
                                 </div>
                                 </br>
@@ -433,7 +390,7 @@
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
                                         <input id="alternative_contact_number" type="tel" class="widthinput form-control @error('alternative_contact_number[full]')
-                             is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number"
+                                            is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number"
                                                value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus
                                                onkeyup="validationOnKeyUp(this)">
                                         <!-- @error('alternative_contact_number')
@@ -1250,6 +1207,7 @@
             });
             $(document.body).on('select2:unselect', "#category", function (e) {
                 var category =  e.params.data.id;
+
                 if( category == '{{ \App\Models\Supplier::SUPPLIER_CATEGORY_VEHICLES }}' )
                 {
                     removeSubCategoryVehicle();
@@ -1260,9 +1218,9 @@
                 }
             })
             $(document.body).on('select2:select', "#category", function (e) {
+                removeSupplierCategoryError();
                 var value =   e.params.data.text;
                 var category = $.trim(value);
-                alert(value);
                 if(category == 'Vehicles')
                 {
                     appendSubCategoryVehicle()
@@ -1565,6 +1523,7 @@
             sub = '2';
             var inputSupplier = $('#supplier').val();
             var inputSupplierType = $('#supplier_type').val();
+            var inputSupplierCatgeory = $('#category').val();
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
@@ -1581,6 +1540,12 @@
             {
                 $msg = "Supplier type is required";
                 showSupplierTypeError($msg);
+                formInputError = true;
+                e.preventDefault();
+            }
+            if(inputSupplierCatgeory == '') {
+                $msg = "Supplier Category is required";
+                showSupplierCategoryError($msg);
                 formInputError = true;
                 e.preventDefault();
             }
@@ -1827,6 +1792,22 @@
                     removeSupplierError();
                 }
             }
+            if(clickInput.id == 'category')
+            {
+                var value = clickInput.value;
+                if(value == '')
+                {
+                    if(value.legth != 0)
+                    {
+                        $msg = "Supplier Category is required";
+                        showSupplierCategoryError($msg);
+                    }
+                }
+                else
+                {
+                    removeSupplierCategoryError();
+                }
+            }
             if(clickInput.id == 'contact_number')
             {
                 var value = clickInput.value;
@@ -1956,6 +1937,19 @@
                 }
             }
         }
+        function showSupplierCategoryError($msg)
+        {
+            document.getElementById("supplierCategoryError").textContent=$msg;
+            document.getElementById("category").classList.add("is-invalid");
+            document.getElementById("supplierCategoryError").classList.add("paragraph-class");
+
+        }
+        function removeSupplierCategoryError()
+        {
+            document.getElementById("supplierCategoryError").textContent="";
+            document.getElementById("category").classList.remove("is-invalid");
+            document.getElementById("supplierCategoryError").classList.remove("paragraph-class");
+        }
         function showContactNumberError($msg)
         {
             document.getElementById("contactRequired").textContent=$msg;
@@ -1982,6 +1976,7 @@
             document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
             document.getElementById("alternative_contact_number").classList.remove("is-invalid");
         }
+
         function showEmailError($msg)
         {
             document.getElementById("emailRequired").textContent=$msg;
@@ -2050,31 +2045,55 @@
     </script>
      <script>
        $(function() {
-   $('#supplier_type').select2({
-   	 tags: true,
-     placeholder: 'Select an option',
-     templateSelection : function (tag, container){
-     		// here we are finding option element of tag and
-        // if it has property 'locked' we will add class 'locked-tag'
-        // to be able to style element in select
-      	var $option = $('#supplier_type option[value="'+tag.id+'"]');
-        if ($option.attr('locked')){
-           $(container).addClass('locked-tag');
-           tag.locked = true;
-        }
-        return tag.text;
-     },
-   })
-   .on('select2:unselecting', function(e){
-   		// before removing tag we check option element of tag and
-      // if it has property 'locked' we will create error to prevent all select2 functionality
-       if ($(e.params.args.data.element).attr('locked')) {
-        var confirm = alertify.confirm('You are not able to remove this type',function (e) {
-                   }).set({title:"Not Able to Remove"})
-           e.preventDefault();
-        }
-     });
-});
+           $('#supplier_type').select2({
+             tags: true,
+             placeholder: 'Select an option',
+             templateSelection : function (tag, container){
+                    // here we are finding option element of tag and
+                // if it has property 'locked' we will add class 'locked-tag'
+                // to be able to style element in select
+                var $option = $('#supplier_type option[value="'+tag.id+'"]');
+                if ($option.attr('locked')){
+                   $(container).addClass('locked-tag');
+                   tag.locked = true;
+                }
+                return tag.text;
+             },
+           })
+           .on('select2:unselecting', function(e){
+                // before removing tag we check option element of tag and
+              // if it has property 'locked' we will create error to prevent all select2 functionality
+               if ($(e.params.args.data.element).attr('locked')) {
+                var confirm = alertify.confirm('You are not able to remove this type',function (e) {
+                           }).set({title:"Not Able to Remove"})
+                   e.preventDefault();
+                }
+             });
+           $('#category').select2({
+               tags: true,
+               placeholder: 'Select an option',
+               templateSelection : function (tag, container){
+                   // here we are finding option element of tag and
+                   // if it has property 'locked' we will add class 'locked-tag'
+                   // to be able to style element in select
+                   var $option = $('#category option[value="'+tag.id+'"]');
+                   if ($option.attr('locked')){
+                       $(container).addClass('locked-tag');
+                       tag.locked = true;
+                   }
+                   return tag.text;
+               },
+           })
+               .on('select2:unselecting', function(e){
+                   // before removing tag we check option element of tag and
+                   // if it has property 'locked' we will create error to prevent all select2 functionality
+                   if ($(e.params.args.data.element).attr('locked')) {
+                       var confirm = alertify.confirm('You are not able to remove this type',function (e) {
+                       }).set({title:"Not Able to Remove"})
+                       e.preventDefault();
+                   }
+               });
+        });
         function showDynamic()
         {
             var selectedAddonTypes = $("#supplier_type").val();

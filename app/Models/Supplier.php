@@ -50,9 +50,6 @@ class Supplier extends Model
     protected $appends = [
         'is_deletable',
         'sub_categories',
-        'passport_file',
-        'vat_file',
-        'trade_license_file',
         'is_any_document_available'
 
     ];
@@ -83,6 +80,10 @@ class Supplier extends Model
     public function supplierTypes()
     {
         return $this->hasMany(SupplierType::class);
+    }
+    public function vendorCategories()
+    {
+        return $this->hasMany(VendorCategory::class,'supplier_id','id');
     }
     public function paymentMethods()
     {

@@ -4,7 +4,7 @@
     {
         width: 140px !important;
     } */
-      .modal 
+      .modal
     {
         width: 100% !important;
         height: 100% !important;
@@ -59,7 +59,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 /* Add Animation */
-.modalContentForImage, #caption {  
+.modalContentForImage, #caption {
   -webkit-animation-name: zoom;
   -webkit-animation-duration: 0.6s;
   animation-name: zoom;
@@ -67,12 +67,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 @-webkit-keyframes zoom {
-  from {-webkit-transform:scale(0)} 
+  from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}
 }
 
 @keyframes zoom {
-  from {transform:scale(0)} 
+  from {transform:scale(0)}
   to {transform:scale(1)}
 }
 
@@ -100,6 +100,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
     width: 100%;
   }
 }
+ .error
+ {
+     color: #FF0000;
+ }
+.iti
+{
+    width: 100%;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
@@ -111,173 +120,223 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
 @endphp
 @if ($hasPermission)
     <div class="card-header">
-        <h4 class="card-title">Supplier Details</h4>
+        <h4 class="card-title">Vendor Details</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-            <div class="row">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Primary Information</div>
+            </div>
+            <div class="card-body">
                 @if($supplier->supplier)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Supplier') }}</label>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input class="form-control" value="{{$supplier->supplier}}" readonly>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{$supplier->supplier}}</span>
                         </div>
                     </div>
-                    </br>
-                </div>
                 @endif
-                @if($supplier->contact_person)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
+                @if($supplier->type)
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Vendor Type') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input class="form-control" value="{{ $supplier->contact_person }}"readonly>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{$supplier->type}}</span>
                         </div>
                     </div>
-                    </br>
-                </div>
                 @endif
-                @if($supplier->person_contact_by)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
+                @if($supplier->vendorCategories->count() > 0)
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Categories') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input class="form-control" value="{{ $supplier->person_contact_by }}" readonly>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>
+                                @foreach($supplier->vendorCategories as $vendorCategory)
+                                    {{ $vendorCategory->category }}
+                                @endforeach
+                            </span>
                         </div>
                     </div>
-                    </br>
-                </div>
-                @endif
-                @if($supplier->email)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Email') }}</label>
-                        </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                        <input class="form-control"  value="{{ $supplier->email }}" readonly>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                @endif
-                @if($supplier->contact_number)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                        </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input id="contact_number" type="tel" class="form-control" value="{{ $supplier->contact_number }}" readonly>
-                        </div>
-                    </div>
-                    </br>
-                </div>
-                @endif
-                @if($supplier->alternative_contact_number)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label class="col-form-label text-md-end">{{ __('Alternative Contact') }}</label>
-                        </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input id="alternative_contact_number" type="tel" class="form-control" value="{{ $supplier->alternative_contact_number }}" readonly>
-                        </div>
-                    </div>
-                    </br>
-                </div>
                 @endif
                 @if(count($supplierTypes) > 0)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-2 col-md-4">
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Supplier Type') }}</label>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label class="col-form-label text-md-end">{{ __('Vendor Sub Categories') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">                            
-                            <p class="form-control" readonly>
-                            @foreach($supplierTypes as $t)
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                        <span>
+                             @foreach($supplierTypes as $t)
                                 @if($t->supplier_type == 'spare_parts')
-                                Spare Parts ,
+                                    Spare Parts ,
                                 @elseif($t->supplier_type == 'accessories')
-                                Accessories ,
+                                    Accessories ,
                                 @elseif($t->supplier_type == 'freelancer')
-                                Freelancer ,
+                                    Freelancer ,
                                 @elseif($t->supplier_type == 'garage')
-                                Garage ,
+                                    Garage ,
                                 @elseif($t->supplier_type == 'warranty')
-                                Warranty ,
-                                @endif 
+                                    Warranty ,
+                                @elseif($t->supplier_type == 'demand_planning')
+                                    Demand Planning ,
+                                @elseif($t->supplier_type == 'Bulk')
+                                    Bulk ,
+                                @elseif($t->supplier_type == 'Small Segment')
+                                    Small Segment ,
+                                @elseif($t->supplier_type == 'Other')
+                                    Other ,
+                                @endif
                             @endforeach
-                            </p>                
+                        </span>
                         </div>
                     </div>
-                    </br>
-                </div>
                 @endif
-                @if($primaryPaymentMethod->PaymentMethods->payment_methods)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
+                @if($supplier->comment)
                     <div class="row">
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                            <label for="is_primary_payment_method" class="col-form-label text-md-end">{{ __('Primary Payment Method') }}</label>
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Comment') }}</label>
                         </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            <input class="form-control" value="{{ $primaryPaymentMethod->PaymentMethods->payment_methods }}" readonly>
-                        </div>
-                    </div>
-                    </br>
-                </div> 
-                @endif
-                @if(count($otherPaymentMethods) > 0)
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <div class="row">
-                        <div class="col-xxl-4 col-lg-2 col-md-4">
-                            <label for="payment_methods_id" class="col-form-label text-md-end">{{ __('Secondary Payment Methods') }}</label>
-                        </div>
-                        <div class="col-xxl-8 col-lg-6 col-md-12">
-                            
-                            <p class="form-control" readonly>
-                            @foreach($otherPaymentMethods as $otherPaymentMethod)
-                                {{ $otherPaymentMethod->PaymentMethods->payment_methods }} , 
-                            @endforeach
-                            </p>
-                
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{$supplier->comment}}</span>
                         </div>
                     </div>
-                    </br>
-                </div>
-                @endif
-                @if($addons OR $addon1)
-                <div class="card-header">
-                    <h4 class="card-title" style="background-color:#e6e6ff; color:Black; padding-top:5px; padding-bottom:5px;">
-                        <center>
-                            Addons
-                        </center>
-                    </h4>
-                    <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-info">
-                    <i class="fa fa-table" aria-hidden="true"></i>
-                    </a>  
-                    <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn  btn-info" hidden>
-                    <i class="fa fa-th-large" aria-hidden="true"></i>
-                    </a> 
-                </div>
-                @include('addon.listbox')
-                @include('addon.table')
                 @endif
             </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Contact Details</div>
+            </div>
+            <div class="card-body">
+                @if($supplier->contact_number)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Contact Number') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{ $supplier->contact_number }}</span>
+                        </div>
+                    </div>
+                @endif
+                @if($supplier->person_contact_by)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{ $supplier->person_contact_by }}</span>
+                        </div>
+                    </div>
+                @endif
+                @if($supplier->email)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label class="col-form-label text-md-end">{{ __('Email') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{ $supplier->email }}</span>
+                        </div>
+                    </div>
+                @endif
+                @if($supplier->alternative_contact_number)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{ $supplier->alternative_contact_number }}</span>
+                        </div>
+                    </div>
+                @endif
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Classification</div>
+            </div>
+            <div class="card-body">
+                @if($supplier->supplier)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{$supplier->supplier}}</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Preferences</div>
+            </div>
+            <div class="card-body">
+                @if(count($otherPaymentMethods) > 0)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('payment Methods') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>
+                                 @foreach($otherPaymentMethods as $otherPaymentMethod)
+                                    {{ $otherPaymentMethod->PaymentMethods->payment_methods }} ,
+                                @endforeach
+                            </span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Documents</div>
+            </div>
+            <div class="card-body">
+                @if($supplier->supplier)
+                    <div class="row">
+                        <div class="col-lg-4 col-md-6 col-sm-12">
+                            <label for="choices-single-default" class="form-label">{{ __('Vendor') }}</label>
+                        </div>
+                        <div class="col-lg-8 col-md-6 col-sm-12">
+                            <span>{{$supplier->supplier}}</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="row">
+            @if($addons OR $addon1)
+            <div class="card-header">
+                <h4 class="card-title" style="background-color:#e6e6ff; color:Black; padding-top:5px; padding-bottom:5px;">
+                    <center>
+                        Addons
+                    </center>
+                </h4>
+                <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-info">
+                <i class="fa fa-table" aria-hidden="true"></i>
+                </a>
+                <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn  btn-info" hidden>
+                <i class="fa fa-th-large" aria-hidden="true"></i>
+                </a>
+            </div>
+            @include('addon.listbox')
+            @include('addon.table')
+            @endif
+        </div>
     </div>
     <div id="myModal" class="modal modalForImage">
   <span class="closeImage close">&times;</span>
   <img class="modalContentForImage" id="img01">
   <div id="caption"></div>
-</div> 
-    @endif 
+</div>
+    @endif
     @endcan
     <script type="text/javascript">
         var data = {!! json_encode($supplier) !!};
@@ -287,7 +346,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
             // $("#adoon").select2();
         });
          // show image in large view
-    $('.image-click-class').click(function (e) 
+    $('.image-click-class').click(function (e)
     {
         var id =  $(this).attr('id');
         var src = $(this).attr('src');
@@ -299,13 +358,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
         modalImg.src = src;
         captionText.innerHTML = this.alt;
       })
-      $('.closeImage').click(function (e) 
+      $('.closeImage').click(function (e)
       {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
-      })   
+      })
         if(data.contact_number != null)
-        { 
+        {
             var contact_number = window.intlTelInput(document.querySelector("#contact_number"), {
             separateDialCode: true,
             preferredCountries:["ae"],
@@ -352,13 +411,4 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
         }
     </script>
 @endsection
-<style>
-    .error 
-    {
-        color: #FF0000;
-    }
-    .iti 
-    { 
-        width: 100%; 
-    }
-</style>
+
