@@ -6,7 +6,7 @@
                 <div class="col-xxl-5 col-lg-5 col-md-12">
                 <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                    <select onchange=selectBrandDisp(1,1) name="brand[1][brand_id]" id="selectBrandMo1" data-index="1"
+                    <select onchange=selectBrandDisp(1) name="brand[1][brand_id]" id="selectBrandMo1" data-index="1"
                             class="brandRows" multiple="true" style="width: 100%;">
                         <option id="allbrandsMo" class="allbrands" value="allbrands">ALL BRANDS</option>
                         @foreach($brands as $brand)
@@ -18,7 +18,7 @@
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
-                    <span id="mobrandError" class=" invalid-feedback"></span>
+                    <span id="mobrandError1" class="mobrandError invalid-feedback"></span>
                 </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                 </div>
@@ -41,6 +41,7 @@
                                 <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
                             @endforeach
                         </select>
+                        <span id="ModelLineError_1_1" class="ModelLineError invalid-feedback"></span>
                         @error('is_primary_payment_method')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -220,7 +221,7 @@
                         $(this).find('.brandRows').attr('data-index', index);
                         $(this).find('.brandRows').attr('id','selectBrandMo'+ index);
                         $(this).find('.brandRows').attr('name','brand['+ index +'][brand_id]');
-                        $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +',1)');
+                        $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +')');
                         $('#selectBrandMo'+index).select2
                         ({
                             placeholder:"Choose Brands....     Or     Type Here To Search....",
@@ -233,7 +234,7 @@
                         $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
                         $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
                         $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
-
+                        $(this).find('.mobrandError').attr('id', 'mobrandError'+index);
                         var oldIndex = '';
                         oldIndex = index+1;
                         itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
@@ -380,12 +381,13 @@
                                 <div class="row">
                                     <div class="col-xxl-5 col-lg-5 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrandDisp(${index},1) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
+                                        <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
                                          multiple="true" style="width: 100%;" class="brandRows">
                                             @foreach($brands as $brand)
                                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                             @endforeach
                                             </select>
+                                            <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>
                                             @error('is_primary_payment_method')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -413,6 +415,7 @@
 {{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                                                    @endforeach--}}
                                                     </select>
+                                                    <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
                                                     @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -487,6 +490,7 @@
 {{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                        @endforeach--}}
                     </select>
+                    <span id="ModelLineError_${supplier}_${index}" class="ModelLineError invalid-feedback"></span>
                     @error('is_primary_payment_method')
                     <span class="invalid-feedback" role="alert">
                     <strong>{{ $message }}</strong>
@@ -515,7 +519,7 @@
             </div>
             </div>
          `);
-        selectBrandDisp(supplier, index);
+        selectBrandDisp(supplier);
         $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -563,16 +567,24 @@
 
         }
     }
-    function selectBrandDisp(id,row) {
-        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-        if(indexValue == row) {
-            showBrandModelLines(id,row);
-
-        }else {
-            for(var i = 1;i<=indexValue;i++) {
-                // $('#selectModelLineNum'+index+'Des'+i).empty();
+    function selectBrandDisp(id) 
+    {
+        var value =$('#selectBrandMo'+id).val();
+        var brandId = value;
+        if(brandId != '')
+        {
+            $msg = "";
+            removeSPBrandError($msg,id);
+            var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+            for(var i = 1;i<=indexValue;i++) 
+            {
                 showBrandModelLines(id,i);
             }
+        }
+        else
+        {
+            $msg = "Brand is Required";
+            showSPBrandError($msg,id);
         }
     }
     function  RelatedDataCheck() {

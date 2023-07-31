@@ -626,19 +626,25 @@
                 if(inputAddonType == 'SP')
                 {
                     var inputPartNumber = $('#part_number').val();
-                    var inputSPBrand = $('#selectBrandMo1').val();
                     if(inputPartNumber == '')
                     {
                         $msg = "Part Number is required";
                         showPartNumberError($msg);
                         formInputError = true;
                     }
-                    if(inputSPBrand == '')
+                    var countBrandRow = 0;
+                    countBrandRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                    for (let i = 1; i <= countBrandRow; i++) 
                     {
-                        $msg = "Brand is required";
-                        showSPBrandError($msg);
-                        formInputError = true;
+                        var inputSPBrand = $('#selectBrandMo'+i).val();
+                        if(inputSPBrand == '')
+                        {
+                            $msg = "Brand is required";
+                            showSPBrandError($msg,i);
+                            formInputError = true;
+                        }
                     }
+                    
                 }
                 else
                 {
@@ -813,17 +819,17 @@
             document.getElementById("selectModelLine"+i).classList.remove("is-invalid");
             document.getElementById("ModelLineError"+i).classList.remove("paragraph-class");
         }
-        function showSPBrandError($msg)
+        function showSPBrandError($msg,i)
         {
-            document.getElementById("mobrandError").textContent=$msg;
-            document.getElementById("selectBrandMo1").classList.add("is-invalid");
-            document.getElementById("mobrandError").classList.add("paragraph-class");
+            document.getElementById("mobrandError"+i).textContent=$msg;
+            document.getElementById("selectBrandMo"+i).classList.add("is-invalid");
+            document.getElementById("mobrandError"+i).classList.add("paragraph-class");
         }
-        function removeSPBrandError($msg)
+        function removeSPBrandError($msg,i)
         {
-            document.getElementById("mobrandError").textContent="";
-            document.getElementById("selectBrandMo1").classList.remove("is-invalid");
-            document.getElementById("mobrandError").classList.remove("paragraph-class");
+            document.getElementById("mobrandError"+i).textContent="";
+            document.getElementById("selectBrandMo"+i).classList.remove("is-invalid");
+            document.getElementById("mobrandError"+i).classList.remove("paragraph-class");
         }
         function showkitSupplierDropdown1Error($msg)
         {
