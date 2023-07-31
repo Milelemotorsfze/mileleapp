@@ -8,13 +8,14 @@
                 <div class="row">
                     <div class="col-xxl-5 col-lg-5 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                        <select onchange=selectBrandDisp({{$i}},1) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"
+                        <select onchange=selectBrandDisp({{$i}}) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"
                                 multiple="true" style="width: 100%;" class="brandRows">
                                 <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                             @foreach($brands as $brand)
                                 <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                             @endforeach
                         </select>
+                        <span id="mobrandError{{$i}}" class="mobrandError invalid-feedback"></span>
                         @error('is_primary_payment_method')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -41,6 +42,7 @@
                                     <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
                                 @endforeach
                             </select>
+                            <span id="ModelLineError_{{$i}}_1" class="ModelLineError invalid-feedback"></span>
                             @error('is_primary_payment_method')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -86,7 +88,7 @@
                 <div class="row">
                     <div class="col-xxl-5 col-lg-5 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-{{--                        <!-- <select onchange=selectBrandDisp({{$i}},1) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"--}}
+{{--                        <!-- <select onchange=selectBrandDisp({{$i}}) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"--}}
 {{--                                multiple="true" style="width: 100%;" class="brandRows">--}}
 {{--                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
 {{--                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>--}}
@@ -94,7 +96,7 @@
 {{--                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
 {{--                                @endforeach--}}
 {{--                        </select> -->--}}
-                        <select disabled onchange=selectBrandDisp({{$i}},1)  id="selectBrandMo{{$i}}" data-index="{{$i}}"
+                        <select disabled onchange=selectBrandDisp({{$i}})  id="selectBrandMo{{$i}}" data-index="{{$i}}"
                                 multiple="true" style="width: 100%;" class="brandRows">
                                 <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                 <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
@@ -102,6 +104,7 @@
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                 @endforeach
                         </select>
+                        <span id="mobrandError{{$i}}" class="mobrandError invalid-feedback"></span>
                         <input hidden value="{{$existingBrand->brands->id}}" name="brand[{{$i}}][brand_id]">
                         @error('is_primary_payment_method')
                             <span class="invalid-feedback" role="alert">
@@ -133,6 +136,7 @@
                                     <option value="{{$drop->id}}" @if($drop->id == $ModelLine->model_id) selected @endif>{{$drop->model_line}}</option>
                                     @endforeach
                             </select>
+                            <span id="ModelLineError_{{$i}}_{{$j}}" class="ModelLineError invalid-feedback"></span>
                             @error('is_primary_payment_method')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -314,7 +318,7 @@
                     $(this).find('.brandRows').attr('data-index', index);
                     $(this).find('.brandRows').attr('id','selectBrandMo'+ index);
                     $(this).find('.brandRows').attr('name','brand['+ index +'][brand_id]');
-                    $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +',1)');
+                    $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +')');
                     $('#selectBrandMo'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
@@ -471,12 +475,13 @@
                                 <div class="row">
                                     <div class="col-xxl-5 col-lg-5 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrandDisp(${index},1) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
+                                        <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
                                             multiple="true" style="width: 100%;" class="brandRows">
                                             @foreach($brands as $brand)
                                                 <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                             @endforeach
                                         </select>
+                                        <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>
                                         @error('is_primary_payment_method')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
@@ -502,6 +507,7 @@
                                                 id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
 
                                             </select>
+                                            <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
                                              @error('is_primary_payment_method')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -576,6 +582,7 @@
         {{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
         {{--                        @endforeach--}}
                     </select>
+                    <span id="ModelLineError_${supplier}_${index}" class="ModelLineError invalid-feedback"></span>
                         @error('is_primary_payment_method')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
@@ -603,7 +610,7 @@
             </div>
          `);
 
-        selectBrandDisp(supplier, index);
+        selectBrandDisp(supplier);
         $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -657,15 +664,32 @@
 
         }
     }
-    function selectBrandDisp(id,row) {
-        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-        if(indexValue == row) {
-            showBrandModelLines(id,row);
+    function selectBrandDisp(id) {
+        // var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+        // if(indexValue == row) {
+        //     showBrandModelLines(id,row);
 
-        }else {
-            for(var i = 1;i<=indexValue;i++) {
+        // }else {
+        //     for(var i = 1;i<=indexValue;i++) {
+        //         showBrandModelLines(id,i);
+        //     }
+        // }
+        var value =$('#selectBrandMo'+id).val();
+        var brandId = value;
+        if(brandId != '')
+        {
+            $msg = "";
+            removeSPBrandError($msg,id);
+            var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+            for(var i = 1;i<=indexValue;i++) 
+            {
                 showBrandModelLines(id,i);
             }
+        }
+        else
+        {
+            $msg = "Brand is Required";
+            showSPBrandError($msg,id);
         }
     }
     function  RelatedDataCheck() {
