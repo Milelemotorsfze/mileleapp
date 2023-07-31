@@ -771,17 +771,29 @@
                 }
             }
         }
-        function showBrandError($msg)
+        function showBrandError($msg,i)
         {
-            document.getElementById("brandError").textContent=$msg;
-            document.getElementById("selectBrand1").classList.add("is-invalid");
-            document.getElementById("brandError").classList.add("paragraph-class");
+            document.getElementById("brandError"+i).textContent=$msg;
+            document.getElementById("selectBrand"+i).classList.add("is-invalid");
+            document.getElementById("brandError"+i).classList.add("paragraph-class");
         }
-        function removeBrandError($msg)
+        function removeBrandError($msg,i)
         {
-            document.getElementById("brandError").textContent="";
-            document.getElementById("selectBrand1").classList.remove("is-invalid");
-            document.getElementById("brandError").classList.remove("paragraph-class");
+            document.getElementById("brandError"+i).textContent="";
+            document.getElementById("selectBrand"+i).classList.remove("is-invalid");
+            document.getElementById("brandError"+i).classList.remove("paragraph-class");
+        }
+        function showModelLineError($msg,i)
+        {
+            document.getElementById("ModelLineError"+i).textContent=$msg;
+            document.getElementById("selectModelLine"+i).classList.add("is-invalid");
+            document.getElementById("ModelLineError"+i).classList.add("paragraph-class");
+        }
+        function removeModelLineError($msg,i)
+        {
+            document.getElementById("ModelLineError"+i).textContent="";
+            document.getElementById("selectModelLine"+i).classList.remove("is-invalid");
+            document.getElementById("ModelLineError"+i).classList.remove("paragraph-class");
         }
         function showSPBrandError($msg)
         {

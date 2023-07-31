@@ -178,4 +178,5 @@ class Vehicles extends Model
         }
         return " ";
     }
+    
 }

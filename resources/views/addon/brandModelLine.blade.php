@@ -12,14 +12,15 @@
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
                     </select>
-                    <span id="brandError" class=" invalid-feedback"></span>
+                    <span id="brandError1" class=" invalid-feedback"></span>
                 </div>
                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1" data-index="1" multiple="true"
-                            style="width: 100%;">
+                            style="width: 100%;" onchange=selectModelLine(this.id,1)>
                     </select>
+                    <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
                 </div>
                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                     <a class="btn_round removeButtonbrandModelLineDiscription" data-index="1" >
@@ -176,7 +177,10 @@
                         $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
                         $(this).find('.model-lines').attr('id','selectModelLine'+index);
                         $(this).find('.model-lines').attr('data-index',index);
+                        $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
                         $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                        $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
+                        $(this).find('.brandError').attr('id', 'brandError'+index);
                         $('#selectBrand'+index).select2
                         ({
                             placeholder:"Choose Brands....     Or     Type Here To Search....",
@@ -231,17 +235,19 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                         <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
-                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;" required>
+                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
                                             @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                             @endforeach
                                     </select>
+                                    <span id="brandError${index}" class="brandError invalid-feedback"></span>
                                 </div>
                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" required>
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>
                                         </select>
+                                        <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                         <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
@@ -280,7 +286,7 @@
     });
 
     function selectBrand(id,row)
-    {
+    { 
         var value =$('#'+id).val();
         var currentAddonType = $('#addon_type').val();
         var brandId = value;
@@ -306,11 +312,28 @@
                 hideRelatedModal(brandId,row);
             }
             $msg = "";
-            removeBrandError($msg);
+            removeBrandError($msg,row);
         }
         else
         {
+            $msg = "Brand is Required";
+            showBrandError($msg,row);
             hideRelatedModal(brandId,row);
+        }
+    }
+    function selectModelLine(id,row)
+    {
+        var value =$('#'+id).val();
+        var ModelId = value;
+        if(ModelId != '')
+        {
+            $msg = "";
+            removeModelLineError($msg,row);
+        }
+        else
+        {
+            $msg = "Model Line is Required";
+            showModelLineError($msg,row);
         }
     }
     function showRelatedModal(value,row,currentAddonType)
