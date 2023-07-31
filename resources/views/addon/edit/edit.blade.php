@@ -586,35 +586,35 @@
         {
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            var inputBrand = $('#selectBrand1').val();
-            var inputsupplierId = $('#itemArr1').val();
-            var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-            var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+            // var inputBrand = $('#selectBrand1').val();
+            // var inputsupplierId = $('#itemArr1').val();
+            // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
+            // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
             var formInputError = false;
-            if(inputsupplierId == '')
-            {
-                $msg = "Supplier is required";
-                showSupplierError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceAED == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceAEDError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceUSD == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceUSDError($msg);
-                formInputError = true;
-            }
-            if(inputBrand == '')
-            {
-                $msg = "Brand is required";
-                showBrandError($msg);
-                formInputError = true;
-            }
+            // if(inputsupplierId == '')
+            // {
+            //     $msg = "Supplier is required";
+            //     showSupplierError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputPurchasePriceAED == '')
+            // {
+            //     $msg = "Purchase price is required";
+            //     showPurchasePriceAEDError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputPurchasePriceUSD == '')
+            // {
+            //     $msg = "Purchase price is required";
+            //     showPurchasePriceUSDError($msg);
+            //     formInputError = true;
+            // }
+            // if(inputBrand == '')
+            // {
+            //     $msg = "Brand is required";
+            //     showBrandError($msg);
+            //     formInputError = true;
+            // }
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
@@ -642,96 +642,112 @@
                 }
                 else
                 {
-                    var inputBrand = $('#selectBrand1').val();
-                    if(inputBrand == '')
+                    var countBrandRow = 0;
+                    countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                    for (let i = 1; i <= countBrandRow; i++) 
                     {
-                        $msg = "Brand is required";
-                        showBrandError($msg);
-                        formInputError = true;
+                        var inputBrand = $('#selectBrand'+i).val();
+                        if(inputBrand == '')
+                        {
+                            $msg = "Brand is required";
+                            showBrandError($msg,i);
+                            formInputError = true;
+                        }
+                        else if(inputBrand != 'allbrands')
+                        {
+                            var inputModelLines = '';
+                            var inputModelLines = $('#selectModelLine'+i).val();
+                            if(inputModelLines == '')
+                            {
+                                $msg = "Model Line is required";
+                                showModelLineError($msg,i);
+                                formInputError = true;
+                            }
+                        }
                     }
                 }
-                if(inputAddonType == 'K')
-                {
-                    var inputkitSupplierDropdown1 = $('#kitSupplierDropdown1').val();
-                    var inputkitSupplier1Item1 = $('#kitSupplier1Item1').val();
-                    var inputSupplier1Kit1Quantity = $('#Supplier1Kit1Quantity').val();
-                    var inputSupplier1Kit1UnitPriceAED = $('#Supplier1Kit1UnitPriceAED').val();
-                    var inputSupplier1Kit1TotalPriceAED = $('#Supplier1Kit1TotalPriceAED').val();
-                    var inputSupplier1Kit1UnitPriceUSD = $('#Supplier1Kit1UnitPriceUSD').val();
-                    var inputSupplier1Kit1TotalPriceUSD = $('#Supplier1Kit1TotalPriceUSD').val();
-                    if(inputkitSupplierDropdown1 == '')
-                    {
-                        $msg = "Supplier is required";
-                        showkitSupplierDropdown1Error($msg);
-                        formInputError = true;
-                    }
-                    if(inputkitSupplier1Item1 == '')
-                    {
-                        $msg = "Kit item is required";
-                        showkitSupplier1Item1Error($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1Quantity == '')
-                    {
-                        $msg = "Item quantity is required";
-                        showSupplier1Kit1QuantityError($msg);
-                        formInputError = true;
-                    }
-                    else if(inputSupplier1Kit1Quantity <= 0)
-                    {
-                        $msg = "Item quantity is must be greater than zero";
-                        showSupplier1Kit1QuantityError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1UnitPriceAED == '')
-                    {
-                        $msg = "Item unit price is required";
-                        showSupplier1Kit1UnitPriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1TotalPriceAED == '')
-                    {
-                        $msg = "Item total price is required";
-                        showSupplier1Kit1TotalPriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1UnitPriceUSD == '')
-                    {
-                        $msg = "Item unit price is required";
-                        showSupplier1Kit1UnitPriceUSDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1TotalPriceUSD == '')
-                    {
-                        $msg = "Item total price is required";
-                        showSupplier1Kit1TotalPriceUSDError($msg);
-                        formInputError = true;
-                    }
-                }
-                else
-                {
-                    var inputsupplierId = $('#itemArr1').val();
-                    var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-                    var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
-                    if(inputsupplierId == '')
-                    {
-                        $msg = "Supplier is required";
-                        showSupplierError($msg);
-                        formInputError = true;
-                    }
-                    if(inputPurchasePriceAED == '')
-                    {
-                        $msg = "Purchase price is required";
-                        showPurchasePriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputPurchasePriceUSD == '')
-                    {
-                        $msg = "Purchase price is required";
-                        showPurchasePriceUSDError($msg);
-                        formInputError = true;
-                    }
-                }
+                // if(inputAddonType == 'K')
+                // {
+                //     var inputkitSupplierDropdown1 = $('#kitSupplierDropdown1').val();
+                //     var inputkitSupplier1Item1 = $('#kitSupplier1Item1').val();
+                //     var inputSupplier1Kit1Quantity = $('#Supplier1Kit1Quantity').val();
+                //     var inputSupplier1Kit1UnitPriceAED = $('#Supplier1Kit1UnitPriceAED').val();
+                //     var inputSupplier1Kit1TotalPriceAED = $('#Supplier1Kit1TotalPriceAED').val();
+                //     var inputSupplier1Kit1UnitPriceUSD = $('#Supplier1Kit1UnitPriceUSD').val();
+                //     var inputSupplier1Kit1TotalPriceUSD = $('#Supplier1Kit1TotalPriceUSD').val();
+                //     if(inputkitSupplierDropdown1 == '')
+                //     {
+                //         $msg = "Supplier is required";
+                //         showkitSupplierDropdown1Error($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputkitSupplier1Item1 == '')
+                //     {
+                //         $msg = "Kit item is required";
+                //         showkitSupplier1Item1Error($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputSupplier1Kit1Quantity == '')
+                //     {
+                //         $msg = "Item quantity is required";
+                //         showSupplier1Kit1QuantityError($msg);
+                //         formInputError = true;
+                //     }
+                //     else if(inputSupplier1Kit1Quantity <= 0)
+                //     {
+                //         $msg = "Item quantity is must be greater than zero";
+                //         showSupplier1Kit1QuantityError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputSupplier1Kit1UnitPriceAED == '')
+                //     {
+                //         $msg = "Item unit price is required";
+                //         showSupplier1Kit1UnitPriceAEDError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputSupplier1Kit1TotalPriceAED == '')
+                //     {
+                //         $msg = "Item total price is required";
+                //         showSupplier1Kit1TotalPriceAEDError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputSupplier1Kit1UnitPriceUSD == '')
+                //     {
+                //         $msg = "Item unit price is required";
+                //         showSupplier1Kit1UnitPriceUSDError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputSupplier1Kit1TotalPriceUSD == '')
+                //     {
+                //         $msg = "Item total price is required";
+                //         showSupplier1Kit1TotalPriceUSDError($msg);
+                //         formInputError = true;
+                //     }
+                // }
+                // else
+                // {
+                //     var inputsupplierId = $('#itemArr1').val();
+                //     var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
+                //     var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+                //     if(inputsupplierId == '')
+                //     {
+                //         $msg = "Supplier is required";
+                //         showSupplierError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputPurchasePriceAED == '')
+                //     {
+                //         $msg = "Purchase price is required";
+                //         showPurchasePriceAEDError($msg);
+                //         formInputError = true;
+                //     }
+                //     if(inputPurchasePriceUSD == '')
+                //     {
+                //         $msg = "Purchase price is required";
+                //         showPurchasePriceUSDError($msg);
+                //         formInputError = true;
+                //     }
+                // }
             }
             if(inputAddonName == '')
             {

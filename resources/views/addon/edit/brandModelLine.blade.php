@@ -245,7 +245,10 @@
                     $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
                     $(this).find('.model-lines').attr('id','selectModelLine'+index);
                     $(this).find('.model-lines').attr('data-index',index);
+                    $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
                     $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                    $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
+                    $(this).find('.brandError').attr('id', 'brandError'+index);
                     $('#selectBrand'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
