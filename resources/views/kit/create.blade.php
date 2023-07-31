@@ -297,7 +297,7 @@
                     </br>
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>
+                    <label for="choices-single-default" class="form-label font-size-13">Choose Kit Image</label>
                     <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
                     <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
                     </br>
@@ -308,7 +308,7 @@
                 </div>
                 <div class="card" id="branModaDiv">
     <div class="card-header">
-        <h4 class="card-title">Addon Brand and Model Lines</h4>
+        <h4 class="card-title">Kit Brand and Model Lines</h4>
     </div>
     <div id="London" class="tabcontent">
         <div class="row">
@@ -532,7 +532,7 @@
             // $('#kitSupplier').hide();
             // $('#branModaDiv').hide();
             $('#blah').css('visibility', 'hidden');
-            $("#addon_id").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
+            $("#addon_id").attr("data-placeholder","Choose Kit Name....     Or     Type Here To Search....");
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });

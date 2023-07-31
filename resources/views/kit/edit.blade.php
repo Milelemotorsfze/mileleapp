@@ -318,19 +318,20 @@
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                                                                     <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                                                                                        multiple="true" style="width: 100%;" required>
+                                                                                        multiple="true" style="width: 100%;">
                                                                                         <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                                                                             @foreach($brands as $brand)
                                                                                                 <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                                                                             @endforeach
                                                                                     </select>
-                                                                                    <span id="brandError" class=" invalid-feedback"></span>
+                                                                                    <span id="brandError1" class="brandError invalid-feedback"></span>
                                                                                 </div> 
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}" hidden>
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                                     <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
-                                                                                        style="width: 100%;">
+                                                                                        style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
                                                                                     </select>
+                                                                                    <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
                                                                                 </div>
                                                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                                                     <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -347,7 +348,7 @@
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                                                                     <!-- <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                                                                                        multiple="true" style="width: 100%;" required>
+                                                                                        multiple="true" style="width: 100%;" >
                                                                                         <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                                                                             <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
                                                                                             @foreach($brands as $brand)
@@ -355,7 +356,7 @@
                                                                                             @endforeach
                                                                                     </select> -->
                                                                                     <select onchange=selectBrand(this.id,{{$i}})  class="brands" data-index="{{$i}}" id="selectBrand{{$i}}" 
-                                                                                        multiple="true" style="width: 100%;" required disabled>
+                                                                                        multiple="true" style="width: 100%;" disabled>
                                                                                         <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
                                                                                             <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
                                                                                             @foreach($brands as $brand)
@@ -368,7 +369,7 @@
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                                     <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true" 
-                                                                                        style="width: 100%;" required>
+                                                                                        style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
                                                                                         <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>ALL Model Lines</option>
                                                                                         @foreach($existingBrand->ModalLines as $modelLine)
                                                                                         <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif 
@@ -551,6 +552,7 @@
         var currentAddonType = '';
         var selectedBrands = [];
         var i=1;
+        var sub ='2';
         var fixingCharge = 'yes';
         var countKitItems = {!! json_encode($count) !!};
     $(document).ready(function ()
@@ -674,39 +676,202 @@
                 }
             });
         });
-        $('form').on('submit', function (e) 
+        // $('form').on('submit', function (e) 
+        // {
+        //     var inputAddonType = $('#addon_type').val();
+        //     var inputAddonName = $('#addon_id').val();
+        //     // var inputBrand = $('#selectBrand1').val();
+        //     // var inputsupplierId = $('#itemArr1').val();
+        //     // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
+        //     // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+        //     var formInputError = false;
+        //     if(inputsupplierId == '')
+        //     {
+        //         $msg = "Supplier is required";
+        //         showSupplierError($msg);
+        //         formInputError = true;
+        //     }
+        //     if(inputPurchasePriceAED == '')
+        //     {
+        //         $msg = "Purchase price is required";
+        //         showPurchasePriceAEDError($msg);
+        //         formInputError = true;
+        //     }
+        //     if(inputPurchasePriceUSD == '')
+        //     {
+        //         $msg = "Purchase price is required";
+        //         showPurchasePriceUSDError($msg);
+        //         formInputError = true;
+        //     }
+        //     if(inputBrand == '')
+        //     {
+        //         $msg = "Brand is required";
+        //         showBrandError($msg,i);
+        //         formInputError = true;
+        //     }
+        //     else if(inputBrand != 'allbrands')
+        //             {
+        //                 var inputModelLines = '';
+        //                 var inputModelLines = $('#selectModelLine'+i).val();
+        //                 if(inputModelLines == '')
+        //                 {
+        //                     $msg = "Model Line is required";
+        //                     showModelLineError($msg,i);
+        //                     formInputError = true;
+        //                 }
+        //             }
+        //     if(inputAddonType == '')
+        //     {
+        //         $msg = "Addon Type is required";
+        //         showAddonTypeError($msg);
+        //         formInputError = true;
+        //     }
+        //     else
+        //     {
+        //         if(inputAddonType == 'SP')
+        //         {
+        //             var inputPartNumber = $('#part_number').val();
+        //             var inputSPBrand = $('#selectBrandMo1').val();
+        //             if(inputPartNumber == '')
+        //             {
+        //                 $msg = "Part Number is required";
+        //                 showPartNumberError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSPBrand == '')
+        //             {
+        //                 $msg = "Brand is required";
+        //                 showSPBrandError($msg);
+        //                 formInputError = true;
+        //             }
+        //         }
+        //         else
+        //         {
+        //             var inputBrand = $('#selectBrand1').val();
+        //             if(inputBrand == '')
+        //             {
+        //                 $msg = "Brand is required";
+        //                 showBrandError($msg,row);
+        //                 formInputError = true;
+        //             }
+        //         }
+        //         if(inputAddonType == 'K')
+        //         {
+        //             var inputkitSupplierDropdown1 = $('#kitSupplierDropdown1').val();
+        //             var inputkitSupplier1Item1 = $('#kitSupplier1Item1').val();
+        //             var inputSupplier1Kit1Quantity = $('#Supplier1Kit1Quantity').val();
+        //             var inputSupplier1Kit1UnitPriceAED = $('#Supplier1Kit1UnitPriceAED').val();
+        //             var inputSupplier1Kit1TotalPriceAED = $('#Supplier1Kit1TotalPriceAED').val();
+        //             var inputSupplier1Kit1UnitPriceUSD = $('#Supplier1Kit1UnitPriceUSD').val();
+        //             var inputSupplier1Kit1TotalPriceUSD = $('#Supplier1Kit1TotalPriceUSD').val();
+        //             if(inputkitSupplierDropdown1 == '')
+        //             {
+        //                 $msg = "Supplier is required";
+        //                 showkitSupplierDropdown1Error($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputkitSupplier1Item1 == '')
+        //             {
+        //                 $msg = "Kit item is required";
+        //                 showkitSupplier1Item1Error($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSupplier1Kit1Quantity == '')
+        //             {
+        //                 $msg = "Item quantity is required";
+        //                 showSupplier1Kit1QuantityError($msg);
+        //                 formInputError = true;
+        //             }
+        //             else if(inputSupplier1Kit1Quantity <= 0)
+        //             {
+        //                 $msg = "Item quantity is must be greater than zero";
+        //                 showSupplier1Kit1QuantityError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSupplier1Kit1UnitPriceAED == '')
+        //             {
+        //                 $msg = "Item unit price is required";
+        //                 showSupplier1Kit1UnitPriceAEDError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSupplier1Kit1TotalPriceAED == '')
+        //             {
+        //                 $msg = "Item total price is required";
+        //                 showSupplier1Kit1TotalPriceAEDError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSupplier1Kit1UnitPriceUSD == '')
+        //             {
+        //                 $msg = "Item unit price is required";
+        //                 showSupplier1Kit1UnitPriceUSDError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputSupplier1Kit1TotalPriceUSD == '')
+        //             {
+        //                 $msg = "Item total price is required";
+        //                 showSupplier1Kit1TotalPriceUSDError($msg);
+        //                 formInputError = true;
+        //             }
+        //         }
+        //         else
+        //         {
+        //             var inputsupplierId = $('#itemArr1').val();
+        //             var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
+        //             var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+        //             if(inputsupplierId == '')
+        //             {
+        //                 $msg = "Supplier is required";
+        //                 showSupplierError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputPurchasePriceAED == '')
+        //             {
+        //                 $msg = "Purchase price is required";
+        //                 showPurchasePriceAEDError($msg);
+        //                 formInputError = true;
+        //             }
+        //             if(inputPurchasePriceUSD == '')
+        //             {
+        //                 $msg = "Purchase price is required";
+        //                 showPurchasePriceUSDError($msg);
+        //                 formInputError = true;
+        //             }
+        //         }
+        //     }
+        //     if(inputAddonName == '')
+        //     {
+        //         $msg = "Addon Name is required";
+        //         showAddonNameError($msg);
+        //         formInputError = true;
+        //     }
+        //     if(fixingCharge == 'no')
+        //     {
+        //         var inputFixingChargeAmount = $('#fixing_charge_amount').val();
+        //         if(inputFixingChargeAmount == '')
+        //         {
+        //             $msg = "Fixing Charge Amount is required";
+        //             showFixingChargeAmountError($msg);
+        //             formInputError = true;
+        //         }
+        //     }
+        //     if(formInputError == true)
+        //     {
+        //         e.preventDefault();
+        //     }
+        // });
+        $('form').on('submit', function (e)
         {
+            sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            var inputBrand = $('#selectBrand1').val();
-            var inputsupplierId = $('#itemArr1').val();
-            var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-            var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
+            // var inputBrand = $('#selectBrand1').val();
             var formInputError = false;
-            if(inputsupplierId == '')
-            {
-                $msg = "Supplier is required";
-                showSupplierError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceAED == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceAEDError($msg);
-                formInputError = true;
-            }
-            if(inputPurchasePriceUSD == '')
-            {
-                $msg = "Purchase price is required";
-                showPurchasePriceUSDError($msg);
-                formInputError = true;
-            }
-            if(inputBrand == '')
-            {
-                $msg = "Brand is required";
-                showBrandError($msg);
-                formInputError = true;
-            }
+            // if(inputBrand == '')
+            // {
+            //     $msg = "Brand is required";
+            //     showBrandError($msg);
+            //     formInputError = true;
+            // }
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
@@ -715,113 +880,27 @@
             }
             else
             {
-                if(inputAddonType == 'SP')
+                countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                for (let i = 1; i <= countBrandRow; i++) 
                 {
-                    var inputPartNumber = $('#part_number').val();
-                    var inputSPBrand = $('#selectBrandMo1').val();
-                    if(inputPartNumber == '')
-                    {
-                        $msg = "Part Number is required";
-                        showPartNumberError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSPBrand == '')
-                    {
-                        $msg = "Brand is required";
-                        showSPBrandError($msg);
-                        formInputError = true;
-                    }
-                }
-                else
-                {
-                    var inputBrand = $('#selectBrand1').val();
+                    var inputBrand = '';
+                    var inputBrand = $('#selectBrand'+i).val();
                     if(inputBrand == '')
                     {
                         $msg = "Brand is required";
-                        showBrandError($msg);
+                        showBrandError($msg,i);
                         formInputError = true;
                     }
-                }
-                if(inputAddonType == 'K')
-                {
-                    var inputkitSupplierDropdown1 = $('#kitSupplierDropdown1').val();
-                    var inputkitSupplier1Item1 = $('#kitSupplier1Item1').val();
-                    var inputSupplier1Kit1Quantity = $('#Supplier1Kit1Quantity').val();
-                    var inputSupplier1Kit1UnitPriceAED = $('#Supplier1Kit1UnitPriceAED').val();
-                    var inputSupplier1Kit1TotalPriceAED = $('#Supplier1Kit1TotalPriceAED').val();
-                    var inputSupplier1Kit1UnitPriceUSD = $('#Supplier1Kit1UnitPriceUSD').val();
-                    var inputSupplier1Kit1TotalPriceUSD = $('#Supplier1Kit1TotalPriceUSD').val();
-                    if(inputkitSupplierDropdown1 == '')
+                    else if(inputBrand != 'allbrands')
                     {
-                        $msg = "Supplier is required";
-                        showkitSupplierDropdown1Error($msg);
-                        formInputError = true;
-                    }
-                    if(inputkitSupplier1Item1 == '')
-                    {
-                        $msg = "Kit item is required";
-                        showkitSupplier1Item1Error($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1Quantity == '')
-                    {
-                        $msg = "Item quantity is required";
-                        showSupplier1Kit1QuantityError($msg);
-                        formInputError = true;
-                    }
-                    else if(inputSupplier1Kit1Quantity <= 0)
-                    {
-                        $msg = "Item quantity is must be greater than zero";
-                        showSupplier1Kit1QuantityError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1UnitPriceAED == '')
-                    {
-                        $msg = "Item unit price is required";
-                        showSupplier1Kit1UnitPriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1TotalPriceAED == '')
-                    {
-                        $msg = "Item total price is required";
-                        showSupplier1Kit1TotalPriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1UnitPriceUSD == '')
-                    {
-                        $msg = "Item unit price is required";
-                        showSupplier1Kit1UnitPriceUSDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputSupplier1Kit1TotalPriceUSD == '')
-                    {
-                        $msg = "Item total price is required";
-                        showSupplier1Kit1TotalPriceUSDError($msg);
-                        formInputError = true;
-                    }
-                }
-                else
-                {
-                    var inputsupplierId = $('#itemArr1').val();
-                    var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-                    var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
-                    if(inputsupplierId == '')
-                    {
-                        $msg = "Supplier is required";
-                        showSupplierError($msg);
-                        formInputError = true;
-                    }
-                    if(inputPurchasePriceAED == '')
-                    {
-                        $msg = "Purchase price is required";
-                        showPurchasePriceAEDError($msg);
-                        formInputError = true;
-                    }
-                    if(inputPurchasePriceUSD == '')
-                    {
-                        $msg = "Purchase price is required";
-                        showPurchasePriceUSDError($msg);
-                        formInputError = true;
+                        var inputModelLines = '';
+                        var inputModelLines = $('#selectModelLine'+i).val();
+                        if(inputModelLines == '')
+                        {
+                            $msg = "Model Line is required";
+                            showModelLineError($msg,i);
+                            formInputError = true;
+                        }
                     }
                 }
             }
@@ -865,30 +944,42 @@
                 }
             }
         }
-        function showBrandError($msg)
+        function showBrandError($msg,i)
         {
-            document.getElementById("brandError").textContent=$msg;
-            document.getElementById("selectBrand1").classList.add("is-invalid");
-            document.getElementById("brandError").classList.add("paragraph-class");
+            document.getElementById("brandError"+i).textContent=$msg;
+            document.getElementById("selectBrand"+i).classList.add("is-invalid");
+            document.getElementById("brandError"+i).classList.add("paragraph-class");
         }
-        function removeBrandError($msg)
+        function removeBrandError($msg,i)
         {
-            document.getElementById("brandError").textContent="";
-            document.getElementById("selectBrand1").classList.remove("is-invalid");
-            document.getElementById("brandError").classList.remove("paragraph-class");
+            document.getElementById("brandError"+i).textContent="";
+            document.getElementById("selectBrand"+i).classList.remove("is-invalid");
+            document.getElementById("brandError"+i).classList.remove("paragraph-class");
         }
-        function showSPBrandError($msg)
+        function showModelLineError($msg,i)
         {
-            document.getElementById("mobrandError").textContent=$msg;
-            document.getElementById("selectBrandMo1").classList.add("is-invalid");
-            document.getElementById("mobrandError").classList.add("paragraph-class");
+            document.getElementById("ModelLineError"+i).textContent=$msg;
+            document.getElementById("selectModelLine"+i).classList.add("is-invalid");
+            document.getElementById("ModelLineError"+i).classList.add("paragraph-class");
         }
-        function removeSPBrandError($msg)
+        function removeModelLineError($msg,i)
         {
-            document.getElementById("mobrandError").textContent="";
-            document.getElementById("selectBrandMo1").classList.remove("is-invalid");
-            document.getElementById("mobrandError").classList.remove("paragraph-class");
+            document.getElementById("ModelLineError"+i).textContent="";
+            document.getElementById("selectModelLine"+i).classList.remove("is-invalid");
+            document.getElementById("ModelLineError"+i).classList.remove("paragraph-class");
         }
+        // function showSPBrandError($msg)
+        // {
+        //     document.getElementById("mobrandError").textContent=$msg;
+        //     document.getElementById("selectBrandMo1").classList.add("is-invalid");
+        //     document.getElementById("mobrandError").classList.add("paragraph-class");
+        // }
+        // function removeSPBrandError($msg)
+        // {
+        //     document.getElementById("mobrandError").textContent="";
+        //     document.getElementById("selectBrandMo1").classList.remove("is-invalid");
+        //     document.getElementById("mobrandError").classList.remove("paragraph-class");
+        // }
         function showkitSupplierDropdown1Error($msg)
         {
             document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
@@ -1541,7 +1632,10 @@
                     $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
                     $(this).find('.model-lines').attr('id','selectModelLine'+index);
                     $(this).find('.model-lines').attr('data-index',index);
+                    $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
                     $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                    $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
+                    $(this).find('.brandError').attr('id', 'brandError'+index);
                     $('#selectBrand'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
@@ -1560,85 +1654,87 @@
                 }).set({title:"Can't Remove Brand And Model Lines"})
             }
         })
-        // $("#add").on("click", function ()
-        // {
-        //     // $('#allbrands').prop('disabled',true);
-        //     var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1;
-        //     $('#index').val(index);
-        //     var selectedAddonBrands = [];
-        //     for(let i=1; i<index; i++)
-        //     {
-        //         var eachSelectedBrand = $('#selectBrand'+i).val();
-        //         if(eachSelectedBrand) {
-        //             selectedAddonBrands.push(eachSelectedBrand);
-        //         }
-        //     }
+        $("#add").on("click", function ()
+        {
+            // $('#allbrands').prop('disabled',true);
+            var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1;
+            $('#index').val(index);
+            var selectedAddonBrands = [];
+            for(let i=1; i<index; i++)
+            {
+                var eachSelectedBrand = $('#selectBrand'+i).val();
+                if(eachSelectedBrand) {
+                    selectedAddonBrands.push(eachSelectedBrand);
+                }
+            }
 
-        //     $.ajax({
-        //         url:"{{url('getBranchForWarranty')}}",
-        //         type: "POST",
-        //         data:
-        //             {
-        //                 filteredArray: selectedAddonBrands,
-        //                 _token: '{{csrf_token()}}'
-        //             },
-        //         dataType : 'json',
-        //         success: function(data) {
-        //             myarray = data;
-        //             var size = myarray.length;
-        //             if (size >= 1) {
-        //                 $(".brandModelLineDiscription").append(`
-        //                     <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
-        //                         <div class="row">
-        //                             <div class="col-xxl-4 col-lg-6 col-md-12">
-        //                                 <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-        //                                 <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
-        //                                   data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;" required>
-        //                                     @foreach($brands as $brand)
-        //                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-        //                                     @endforeach
-        //                             </select>
-        //                         </div>
-        //                         <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
-        //                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-        //                                 <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-        //                                 id="selectModelLine${index}"  multiple="true" style="width: 100%;" required>
-        //                                 </select>
-        //                             </div>
-        //                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-        //                                 <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
-        //                                     <i class="fas fa-trash-alt"></i>
-        //                                 </a>
-        //                             </div>
-        //                         </div>
-        //                     </div>
-        //                 `);
+            $.ajax({
+                url:"{{url('getBranchForWarranty')}}",
+                type: "POST",
+                data:
+                    {
+                        filteredArray: selectedAddonBrands,
+                        _token: '{{csrf_token()}}'
+                    },
+                dataType : 'json',
+                success: function(data) {
+                    myarray = data;
+                    var size = myarray.length;
+                    if (size >= 1) {
+                        $(".brandModelLineDiscription").append(`
+                            <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
+                                <div class="row">
+                                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+                                        <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
+                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
+                                            @foreach($brands as $brand)
+                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                            @endforeach
+                                    </select>
+                                    <span id="brandError${index}" class="brandError invalid-feedback"></span>
+                                </div>
+                                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
+                                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                                        <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>
+                                        </select>
+                                        <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
+                                    </div>
+                                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
 
-        //                 let brandDropdownData   = [];
-        //                 $.each(data,function(key,value)
-        //                 {
-        //                     brandDropdownData.push
-        //                     ({
+                        let brandDropdownData   = [];
+                        $.each(data,function(key,value)
+                        {
+                            brandDropdownData.push
+                            ({
 
-        //                         id: value.id,
-        //                         text: value.brand_name
-        //                     });
-        //                 });
-        //                 $('#selectBrand'+index).html("");
-        //                 $('#selectBrand'+index).select2
-        //                 ({
-        //                     placeholder:"Choose Brands....     Or     Type Here To Search....",
-        //                     allowClear: true,
-        //                     data: brandDropdownData,
-        //                     maximumSelectionLength: 1,
-        //                 });
-        //             }
-        //         }
-        //     });
+                                id: value.id,
+                                text: value.brand_name
+                            });
+                        });
+                        $('#selectBrand'+index).html("");
+                        $('#selectBrand'+index).select2
+                        ({
+                            placeholder:"Choose Brands....     Or     Type Here To Search....",
+                            allowClear: true,
+                            data: brandDropdownData,
+                            maximumSelectionLength: 1,
+                        });
+                    }
+                }
+            });
 
-        //     $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-        //     $("#selectModelLine"+index).select2();
-        // });
+            $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+            $("#selectModelLine"+index).select2();
+        });
     });
 
     function selectBrand(id,row)
@@ -1668,10 +1764,12 @@
                 hideRelatedModal(brandId,row);
             }
             $msg = "";
-            removeBrandError($msg);
+            removeBrandError($msg,row);
         }
         else
         {
+            $msg = "Brand is Required";
+            showBrandError($msg,row);
             hideRelatedModal(brandId,row);
         }
     }
@@ -1915,6 +2013,21 @@
                 }
             }
         });
+    }
+    function selectModelLine(id,row)
+    {
+        var value =$('#'+id).val();
+        var ModelId = value;
+        if(ModelId != '')
+        {
+            $msg = "";
+            removeModelLineError($msg,row);
+        }
+        else
+        {
+            $msg = "Model Line is Required";
+            showModelLineError($msg,row);
+        }
     }
 </script>
 @endsection
