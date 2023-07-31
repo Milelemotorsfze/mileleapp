@@ -372,13 +372,13 @@
 <br>
 <br>
 <div id="searchContainer" class="mb-3">
-<button id="applyFilterBtn" class="btn btn-primary">Apply Filters</button> 
+<button id="applyFilterBtn" class="btn btn-primary">Apply Filters</button>
 <a href="{{ route('Vehicles.index') }}" class="btn btn-danger" role="button">
 Clear Filters
                                   </a>
       <!-- <input type="text" id="tableSearch" placeholder="Search Table"> -->
     </div>
-    
+
                 @if (count($errors) > 0)
                     <div class="alert alert-danger">
                         <strong>Whoops!</strong> There were some problems with your input.<br><br>
@@ -842,7 +842,7 @@ Clear Filters
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
                                     {{ $vehicles->reservation_end_date }}</td>
-									 @else   
+									 @else
 								    <td>
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td>
@@ -923,7 +923,7 @@ Clear Filters
                                     {{ $vehicles->variant->brand->brand_name ?? ''}}
                                      </td>
                                      <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
-                                     
+
                                            {{$vehicles->variant->master_model_lines->model_line ?? ''}}
                                      </td>
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
@@ -1236,8 +1236,8 @@ Clear Filters
                         </table>
                         </div>
                         <div id="paginationContainer" class="mt-3">
-  {{ $data->links() }}
-</div>
+                        {{ $data->links() }}
+                    </div>
                     </div>
             </form>
         @endif
