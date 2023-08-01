@@ -618,6 +618,18 @@
                             showSPBrandError($msg,i);
                             formInputError = true;
                         }
+                        var countModelDescriptionRow = 0;
+                        countModelDescriptionRow = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                        for (let j = 1; j <= countModelDescriptionRow; j++) 
+                        {
+                            var inputSPModelLine = $('#selectModelLineNum'+i+'Des'+j).val();
+                            if(inputSPModelLine == '')
+                            {
+                                $msg = "Model line is required";
+                                showSPModelLineError($msg,i,j);
+                                formInputError = true;
+                            }   
+                        }
                     }
                     
                 }
@@ -840,6 +852,18 @@
             document.getElementById("mobrandError"+i).textContent="";
             document.getElementById("selectBrandMo"+i).classList.remove("is-invalid");
             document.getElementById("mobrandError"+i).classList.remove("paragraph-class");
+        }
+        function showSPModelLineError($msg,i,j)
+        {
+            document.getElementById('ModelLineError_'+i+'_'+j).textContent=$msg;
+            document.getElementById('selectModelLineNum'+i+'Des'+j).classList.add("is-invalid");
+            document.getElementById('ModelLineError_'+i+'_'+j).classList.add("paragraph-class");
+        }
+        function removeSPModelLineError($msg,i,j)
+        {
+            document.getElementById('ModelLineError_'+i+'_'+j).textContent="";
+            document.getElementById('selectModelLineNum'+i+'Des'+j).classList.remove("is-invalid");
+            document.getElementById('ModelLineError_'+i+'_'+j).classList.remove("paragraph-class");
         }
         function showkitSupplierDropdown1Error($msg)
         {

@@ -723,7 +723,6 @@
     function selectModelLineDescipt(id,row)
     {
         ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
-
         showModelNumberDropdown(id,row);
     }
     function showModelNumberDropdown(id,row)
