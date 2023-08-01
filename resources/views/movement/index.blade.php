@@ -14,14 +14,14 @@
                     @endphp
                     @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('movement.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Vehicles Transaction
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Movement Transection
       </a>
       <div class="clearfix"></div>
       @endif
       <br>
       <ul class="nav nav-pills nav-fill">
       <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Vehicles Transaction</a>
+        <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Movement Transection</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">All Vehicle Movements</a>
@@ -54,10 +54,11 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                <th>Date</th>
-                    <th>Ref No</th>
-                    <th>Created By</th>
-                    <th>Action</th>
+                <th>Movement Batch</th>
+                <th>Vehicle Quantity</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+                <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -65,13 +66,17 @@
                         </div>
                         @foreach ($movementreference as $movementreference)
                         <tr data-id="1">
-                        <td>{{ date('d-M-Y', strtotime($movementreference->date)) }} {{ date('H:i:s', strtotime($movementreference->created_at)) }}</td>
                         <td>MOV - {{ $movementreference->id }}</td>
+                        @php
+                        $vehicles = DB::table('movements')->where('reference_id', $movementreference->id)->count();
+                        @endphp
+                        <td>{{$vehicles}}</td>
                         @php
                         $created_bys = DB::table('users')->where('id', $movementreference->created_by)->first();
                         $created_by = $created_bys->name;
                         @endphp
                         <td>{{ $created_by }}</td>
+                        <td>{{ date('d-M-Y', strtotime($movementreference->date)) }} {{ date('H:i:s', strtotime($movementreference->created_at)) }}</td>
                         <td><a title="Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('movement.show', $movementreference->id) }}"><i class="fa fa-car" aria-hidden="true"></i> View Details</a></td>
                       </tr>
                         @endforeach
@@ -186,7 +191,7 @@
         .every(function(d) {
           var column = this;
           var theadname = $("#dtBasicExample1 th").eq([d]).text();
-          if (d === 3) {
+          if (d === 4) {
             return;
           }
           var select = $('<select class="form-control my-1"><option value="">All</option></select>')

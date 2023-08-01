@@ -58,7 +58,13 @@ class VehiclesController extends Controller
                             $vinNumbers = explode(',', $searchQuery);
                             $data = $data->where(function ($query) use ($vinNumbers) {
                                 foreach ($vinNumbers as $vin) {
+                                    if($vin == "null")
+                                    {
+                                    $query->orWhere('vin', null);   
+                                    }
+                                    else{
                                     $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
+                                    }
                                 }
                             });
                             break;
@@ -66,7 +72,13 @@ class VehiclesController extends Controller
                                 $vehicle_id = explode(',', $searchQuery);
                                 $data = $data->where(function ($query) use ($vehicle_id) {
                                     foreach ($vehicle_id as $id) {
+                                        if($id == "null")
+                                    {
+                                        $query->orWhere('id', null);   
+                                    }
+                                    else{
                                         $query->orWhere('id', 'LIKE', '%' . trim($id) . '%');
+                                    }
                                     }
                                 });
                                 break;
@@ -74,7 +86,13 @@ class VehiclesController extends Controller
                                     $estimation_date = explode(',', $searchQuery);
                                     $data = $data->where(function ($query) use ($estimation_date) {
                                         foreach ($estimation_date as $estimation_date) {
+                                    if($estimation_date == "null")
+                                    {
+                                        $query->orWhere('estimation_date', null);   
+                                    }
+                                    else{
                                             $query->orWhere('estimation_date', 'LIKE', '%' . trim($estimation_date) . '%');
+                                    }
                                         }
                                     });
                                     break;
@@ -82,7 +100,13 @@ class VehiclesController extends Controller
                                         $inspection_date = explode(',', $searchQuery);
                                         $data = $data->where(function ($query) use ($inspection_date) {
                                             foreach ($inspection_date as $inspection_date) {
+                                                if($inspection_date == "null")
+                                                {
+                                                    $query->orWhere('inspection_date', null);   
+                                                }
+                                                else{
                                                 $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
+                                                }
                                             }
                                         });
                                         break;
@@ -90,7 +114,13 @@ class VehiclesController extends Controller
                                             $reservation_start_date = explode(',', $searchQuery);
                                             $data = $data->where(function ($query) use ($reservation_start_date) {
                                                 foreach ($reservation_start_date as $reservation_start_date) {
+                                                    if($reservation_start_date == "null")
+                                                    {
+                                                        $query->orWhere('reservation_start_date', null);   
+                                                    }
+                                                    else{
                                                     $query->orWhere('reservation_start_date', 'LIKE', '%' . trim($reservation_start_date) . '%');
+                                                    }
                                                 }
                                             });
                                             break;
@@ -98,7 +128,13 @@ class VehiclesController extends Controller
                                                 $reservation_end_date = explode(',', $searchQuery);
                                                 $data = $data->where(function ($query) use ($reservation_end_date) {
                                                     foreach ($reservation_end_date as $reservation_end_date) {
+                                                        if($reservation_end_date == "null")
+                                                    {
+                                                        $query->orWhere('reservation_end_date', null);   
+                                                    }
+                                                    else{
                                                         $query->orWhere('reservation_end_date', 'LIKE', '%' . trim($reservation_end_date) . '%');
+                                                    }
                                                     }
                                                 });
                                                 break;
@@ -106,7 +142,13 @@ class VehiclesController extends Controller
                                                     $engine = explode(',', $searchQuery);
                                                     $data = $data->where(function ($query) use ($engine) {
                                                         foreach ($engine as $engine) {
+                                                            if($engine == "null")
+                                                            {
+                                                                $query->orWhere('engine', null);   
+                                                            }
+                                                            else{
                                                             $query->orWhere('engine', 'LIKE', '%' . trim($engine) . '%');
+                                                            }
                                                         }
                                                     });
                                                     break;
@@ -114,7 +156,13 @@ class VehiclesController extends Controller
                                                         $ppmmyyy = explode(',', $searchQuery);
                                                         $data = $data->where(function ($query) use ($ppmmyyy) {
                                                             foreach ($ppmmyyy as $ppmmyyy) {
+                                                                if($ppmmyyy == "null")
+                                                            {
+                                                                $query->orWhere('ppmmyyy', null);   
+                                                            }
+                                                            else{
                                                                 $query->orWhere('ppmmyyy', 'LIKE', '%' . trim($ppmmyyy) . '%');
+                                                            }
                                                             }
                                                         });
                                                         break;
@@ -122,7 +170,13 @@ class VehiclesController extends Controller
                                                             $price = explode(',', $searchQuery);
                                                             $data = $data->where(function ($query) use ($price) {
                                                                 foreach ($price as $price) {
+                                                                    if($price == "null")
+                                                            {
+                                                                $query->orWhere('price', null);   
+                                                            }
+                                                            else{
                                                                     $query->orWhere('price', 'LIKE', '%' . trim($price) . '%');
+                                                            }
                                                                 }
                                                             });
                                                             break;
@@ -130,11 +184,17 @@ class VehiclesController extends Controller
                                     $poNumbers = explode(',', $searchQuery);
                                     $data = $data->where(function ($query) use ($poNumbers) {
                                         foreach ($poNumbers as $poNumber) {
+                                            if($poNumber == "null")
+                                            {
+                                                $query->orWhere('purchasing_order_id', null);   
+                                            }
+                                            else{
                                             // Find the purchasing_order_id based on the po_number
                                             $purchasingOrder = PurchasingOrder::where('po_number', 'LIKE', '%' . trim($poNumber) . '%')->first();
                                             if ($purchasingOrder) {
                                                 $query->orWhere('purchasing_order_id', $purchasingOrder->id);
                                             }
+                                        }
                                         }
                                     });
                                     break;
@@ -142,11 +202,17 @@ class VehiclesController extends Controller
                                         $po_date = explode(',', $searchQuery);
                                         $data = $data->where(function ($query) use ($po_date) {
                                             foreach ($po_date as $po_date) {
+                                                if($po_date == "null")
+                                            {
+                                                $query->orWhere('purchasing_order_id', null); 
+                                            }
+                                            else{
                                                 // Find the purchasing_order_id based on the po_number
                                                 $purchasingOrder = PurchasingOrder::where('po_date', 'LIKE', '%' . trim($po_date) . '%')->first();
                                                 if ($purchasingOrder) {
                                                     $query->orWhere('purchasing_order_id', $purchasingOrder->id);
                                                 }
+                                            }
                                             }
                                         });
                                         break;
@@ -154,11 +220,17 @@ class VehiclesController extends Controller
                                             $grn_number = explode(',', $searchQuery);
                                             $data = $data->where(function ($query) use ($grn_number) {
                                                 foreach ($grn_number as $grn_number) {
+                                                    if($grn_number == "null")
+                                            {
+                                                $query->orWhere('grn_id', null); 
+                                            }
+                                            else{
                                                     // Find the purchasing_order_id based on the po_number
                                                     $grn = Grn::where('grn_number', 'LIKE', '%' . trim($grn_number) . '%')->first();
                                                     if ($grn) {
                                                         $query->orWhere('grn_id', $grn->id);
                                                     }
+                                                }
                                                 }
                                             });
                                             break;
@@ -166,11 +238,17 @@ class VehiclesController extends Controller
                                                 $grn_date = explode(',', $searchQuery);
                                                 $data = $data->where(function ($query) use ($grn_date) {
                                                     foreach ($grn_date as $grn_date) {
+                                                        if($grn_date == "null")
+                                            {
+                                                $query->orWhere('grn_id', null);   
+                                            }
+                                            else{
                                                         // Find the purchasing_order_id based on the po_number
                                                         $grn = Grn::where('date', 'LIKE', '%' . trim($grn_date) . '%')->first();
                                                         if ($grn) {
                                                             $query->orWhere('grn_id', $grn->id);
                                                         }
+                                                    }
                                                     }
                                                 });
                                                 break;
@@ -178,11 +256,17 @@ class VehiclesController extends Controller
                                                     $so_number = explode(',', $searchQuery);
                                                     $data = $data->where(function ($query) use ($so_number) {
                                                         foreach ($so_number as $so_number) {
+                                                            if($so_number == "null")
+                                                            {
+                                                                $query->orWhere('so_id', null);  
+                                                            }
+                                                            else{
                                                             // Find the purchasing_order_id based on the po_number
                                                             $so = So::where('so_number', 'LIKE', '%' . trim($so_number) . '%')->first();
                                                             if ($so) {
                                                                 $query->orWhere('so_id', $so->id);
                                                             }
+                                                        }
                                                         }
                                                     });
                                                     break;
@@ -190,11 +274,17 @@ class VehiclesController extends Controller
                                                         $so_date = explode(',', $searchQuery);
                                                         $data = $data->where(function ($query) use ($so_date) {
                                                             foreach ($so_date as $so_date) {
+                                                                if($so_date == "null")
+                                                                {
+                                                                    $query->orWhere('so_id', null);  
+                                                                }
+                                                                else{
                                                                 // Find the purchasing_order_id based on the po_number
                                                                 $sodte = So::where('so_date', 'LIKE', '%' . trim($so_date) . '%')->first();
                                                                 if ($sodte) {
                                                                     $query->orWhere('so_id', $sodte->id);
                                                                 }
+                                                            }
                                                             }
                                                         });
                                                         break;
@@ -202,11 +292,17 @@ class VehiclesController extends Controller
                                                             $sales_person_id = explode(',', $searchQuery);
                                                             $data = $data->where(function ($query) use ($sales_person_id) {
                                                                 foreach ($sales_person_id as $sales_person_id) {
+                                                                    if($sales_person_id == "null")
+                                                                    {
+                                                                        $query->orWhere('so_id', null);  
+                                                                    }
+                                                                    else{
                                                                     // Find the purchasing_order_id based on the po_number
                                                                     $sosales = So::where('sales_person_id', 'LIKE', '%' . trim($sales_person_id) . '%')->first();
                                                                     if ($sosales) {
                                                                         $query->orWhere('so_id', $sosales->id);
                                                                     }
+                                                                }
                                                                 }
                                                             });
                                                             break;
@@ -214,11 +310,17 @@ class VehiclesController extends Controller
                                                                 $gdn_number = explode(',', $searchQuery);
                                                                 $data = $data->where(function ($query) use ($gdn_number) {
                                                                     foreach ($gdn_number as $gdn_number) {
+                                                                        if($gdn_number == "null")
+                                                                    {
+                                                                        $query->orWhere('gdn_id', null);   
+                                                                    }
+                                                                    else{
                                                                         // Find the purchasing_order_id based on the po_number
                                                                         $gdnumber = Gdn::where('gdn_number', 'LIKE', '%' . trim($gdn_number) . '%')->first();
                                                                         if ($gdnumber) {
                                                                             $query->orWhere('gdn_id', $gdnumber->id);
                                                                         }
+                                                                    }
                                                                     }
                                                                 });
                                                                 break;
@@ -226,11 +328,17 @@ class VehiclesController extends Controller
                                                                     $gdn_date = explode(',', $searchQuery);
                                                                     $data = $data->where(function ($query) use ($gdn_date) {
                                                                         foreach ($gdn_date as $gdn_date) {
+                                                                            if($gdn_date == "null")
+                                                                            {
+                                                                                $query->orWhere('gdn_id', null);   
+                                                                            }
+                                                                            else{
                                                                             // Find the purchasing_order_id based on the po_number
                                                                             $gdndate = Gdn::where('date', 'LIKE', '%' . trim($gdn_date) . '%')->first();
                                                                             if ($gdndate) {
                                                                                 $query->orWhere('gdn_id', $gdndate->id);
                                                                             }
+                                                                        }
                                                                         }
                                                                     });
                                                                     break;
@@ -238,11 +346,17 @@ class VehiclesController extends Controller
                                                                         $variant = explode(',', $searchQuery);
                                                                         $data = $data->where(function ($query) use ($variant) {
                                                                             foreach ($variant as $variant) {
+                                                                                if($variant == "null")
+                                                                                {
+                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                }
+                                                                                else{
                                                                                 // Find the purchasing_order_id based on the po_number
                                                                                 $variant = Varaint::where('name', 'LIKE', '%' . trim($variant) . '%')->first();
                                                                                 if ($variant) {
                                                                                     $query->orWhere('varaints_id', $variant->id);
                                                                                 }
+                                                                            }
                                                                             }
                                                                         });
                                                                         break;
@@ -250,90 +364,137 @@ class VehiclesController extends Controller
                                                                             $variant_details = explode(',', $searchQuery);
                                                                             $data = $data->where(function ($query) use ($variant_details) {
                                                                                 foreach ($variant_details as $variant_details) {
+                                                                                    if($variant_details == "null")
+                                                                                {
+                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                }
+                                                                                else{
                                                                                     // Find the purchasing_order_id based on the po_number
                                                                                     $variant_details = Varaint::where('detail', 'LIKE', '%' . trim($variant_details) . '%')->first();
                                                                                     if ($variant_details) {
                                                                                         $query->orWhere('varaints_id', $variant_details->id);
                                                                                     }
                                                                                 }
+                                                                            }
                                                                             });
                                                                             break;
                                                                                 case 'model_description':
                                                                                     $model_description = explode(',', $searchQuery);
                                                                                     $data = $data->where(function ($query) use ($model_description) {
                                                                                         foreach ($model_description as $model_description) {
+                                                                                            if($model_description == "null")
+                                                                                {
+                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                }
+                                                                                else{
                                                                                             // Find the purchasing_order_id based on the po_number
                                                                                             $model_description = Varaint::where('model_detail', 'LIKE', '%' . trim($model_description) . '%')->first();
                                                                                             if ($model_description) {
                                                                                                 $query->orWhere('varaints_id', $model_description->id);
                                                                                             }
                                                                                         }
+                                                                                    }
                                                                                     });
                                                                                     break;
                                                                                         case 'model_year':
                                                                                             $model_year = explode(',', $searchQuery);
                                                                                             $data = $data->where(function ($query) use ($model_year) {
                                                                                                 foreach ($model_year as $model_year) {
+                                                                                                    if($model_year == "null")
+                                                                                                    {
+                                                                                                        $query->orWhere('varaints_id', null);  
+                                                                                                    }
+                                                                                                    else{
                                                                                                     // Find the purchasing_order_id based on the po_number
                                                                                                     $model_year = Varaint::where('my', 'LIKE', '%' . trim($model_year) . '%')->first();
                                                                                                     if ($model_year) {
                                                                                                         $query->orWhere('varaints_id', $model_year->id);
                                                                                                     }
                                                                                                 }
+                                                                                            }
                                                                                             });
                                                                                             break;
                                                                                             case 'steering':
                                                                                                 $steering = explode(',', $searchQuery);
                                                                                                 $data = $data->where(function ($query) use ($steering) {
                                                                                                     foreach ($steering as $steering) {
+                                                                                                        if($steering == "null")
+                                                                                                    {
+                                                                                                        $query->orWhere('varaints_id', null);  
+                                                                                                    }
+                                                                                                    else{
                                                                                                         // Find the purchasing_order_id based on the po_number
                                                                                                         $steering = Varaint::where('steering', 'LIKE', '%' . trim($steering) . '%')->first();
                                                                                                         if ($steering) {
                                                                                                             $query->orWhere('varaints_id', $steering->id);
                                                                                                         }
                                                                                                     }
+                                                                                                }
                                                                                                 });
                                                                                                 break;
                                                                                                 case 'seats':
                                                                                                     $seats = explode(',', $searchQuery);
                                                                                                     $data = $data->where(function ($query) use ($seats) {
                                                                                                         foreach ($seats as $seats) {
+                                                                                                            if($seats == "null")
+                                                                                                            {
+                                                                                                                $query->orWhere('varaints_id', null);   
+                                                                                                            }
+                                                                                                            else{
                                                                                                             // Find the purchasing_order_id based on the po_number
                                                                                                             $seats = Varaint::where('seat', 'LIKE', '%' . trim($seats) . '%')->first();
                                                                                                             if ($seats) {
                                                                                                                 $query->orWhere('varaints_id', $seats->id);
                                                                                                             }
                                                                                                         }
+                                                                                                    }
                                                                                                     });
                                                                                                     break;
                                                                                                     case 'upholestry':
                                                                                                         $upholestry = explode(',', $searchQuery);
                                                                                                         $data = $data->where(function ($query) use ($upholestry) {
                                                                                                             foreach ($upholestry as $upholestry) {
+                                                                                                                if($upholestry == "null")
+                                                                                                            {
+                                                                                                                $query->orWhere('varaints_id', null);   
+                                                                                                            }
+                                                                                                            else{
                                                                                                                 // Find the purchasing_order_id based on the po_number
                                                                                                                 $upholestry = Varaint::where('upholestry', 'LIKE', '%' . trim($upholestry) . '%')->first();
                                                                                                                 if ($upholestry) {
                                                                                                                     $query->orWhere('varaints_id', $upholestry->id);
                                                                                                                 }
                                                                                                             }
+                                                                                                        }
                                                                                                         });
                                                                                                         break;
                                                                                                     case 'fuel_type':
                                                                                                         $fuel_type = explode(',', $searchQuery);
                                                                                                         $data = $data->where(function ($query) use ($fuel_type) {
                                                                                                             foreach ($fuel_type as $fuel_type) {
+                                                                                                                if($fuel_type == "null")
+                                                                                                            {
+                                                                                                                $query->orWhere('varaints_id', null);  
+                                                                                                            }
+                                                                                                            else{
                                                                                                                 // Find the purchasing_order_id based on the po_number
                                                                                                                 $fuel_type = Varaint::where('fuel_type', 'LIKE', '%' . trim($fuel_type) . '%')->first();
                                                                                                                 if ($fuel_type) {
                                                                                                                     $query->orWhere('varaints_id', $fuel_type->id);
                                                                                                                 }
                                                                                                             }
+                                                                                                        }
                                                                                                         });
                                                                                                         break;
                                                                                                         case 'brand':
                                                                                                             $brandNames = explode(',', $searchQuery);
                                                                                                             $data = $data->where(function ($query) use ($brandNames) {
                                                                                                                 foreach ($brandNames as $brandName) {
+                                                                                                                    if($brandName == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhereIn('varaints_id', null);   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                     // Find the brand_id based on the brand name from the brands table
                                                                                                                     $brand = Brand::where('brand_name', 'LIKE', '%' . trim($brandName) . '%')->first();
                                                                                                                     if ($brand) {
@@ -342,6 +503,7 @@ class VehiclesController extends Controller
                                                                                                                         $query->orWhereIn('varaints_id', $variantsWithBrand);
                                                                                                                     }
                                                                                                                 }
+                                                                                                                }
                                                                                                             });
                                                                                                             break;
                                                                                                             case 'model_line':
@@ -349,6 +511,11 @@ class VehiclesController extends Controller
                                                                                                                 $data = $data->where(function ($query) use ($modelline) {
                                                                                                                     foreach ($modelline as $modellines) {
                                                                                                                         // Find the brand_id based on the brand name from the brands table
+                                                                                                                        if($modellines == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhereIn('varaints_id', null);   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                         $modelline = MasterModelLines::where('model_line', 'LIKE', '%' . trim($modellines) . '%')->first();
                                                                                                                         if ($modelline) {
                                                                                                                             // Find the varaints_id based on the brand_id from the variants table
@@ -356,16 +523,23 @@ class VehiclesController extends Controller
                                                                                                                             $query->orWhereIn('varaints_id', $variantsWithBrand);
                                                                                                                         }
                                                                                                                     }
+                                                                                                                }
                                                                                                                 });
                                                                                                                 break;
                                                                                                         case 'ex_colour':
                                                                                                             $ex_colour = explode(',', $searchQuery);
                                                                                                             $data = $data->where(function ($query) use ($ex_colour) {
                                                                                                                 foreach ($ex_colour as $ex_colour) {
+                                                                                                                    if($ex_colour == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhere('ex_colour', null);   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                     $ex_colour = ColorCode::where('name', 'LIKE', '%' . trim($ex_colour) . '%')->where('belong_to', 'ex')->first();
                                                                                                                     if ($ex_colour) {
                                                                                                                         $query->orWhere('ex_colour', $ex_colour->id);
                                                                                                                     }
+                                                                                                                }
                                                                                                                 }
                                                                                                             });
                                                                                                             break;
@@ -373,47 +547,71 @@ class VehiclesController extends Controller
                                                                                                                 $int_colour = explode(',', $searchQuery);
                                                                                                                 $data = $data->where(function ($query) use ($int_colour) {
                                                                                                                     foreach ($int_colour as $int_colour) {
+                                                                                                                        if($int_colour == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhere('int_colour', null);   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                         // Find the purchasing_order_id based on the po_number
                                                                                                                         $int_colour = ColorCode::where('name', 'LIKE', '%' . trim($int_colour) . '%')->where('belong_to', 'int')->first();
                                                                                                                         if ($int_colour) {
                                                                                                                             $query->orWhere('int_colour', $int_colour->id);
                                                                                                                         }
                                                                                                                     }
+                                                                                                                }
                                                                                                                 });
                                                                                                                 break;
                                                                                                             case 'importdoc':
                                                                                                                 $import_type = explode(',', $searchQuery);
                                                                                                                 $data = $data->where(function ($query) use ($import_type) {
                                                                                                                     foreach ($import_type as $import_type) {
+                                                                                                                        if($import_type == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhere('documents_id', null);   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                         // Find the purchasing_order_id based on the po_number
-                                                                                                                        $import_type = Varaint::where('import_type', 'LIKE', '%' . trim($import_type) . '%')->first();
+                                                                                                                        $import_type = Document::where('import_type', 'LIKE', '%' . trim($import_type) . '%')->first();
                                                                                                                         if ($import_type) {
                                                                                                                             $query->orWhere('documents_id', $import_type->id);
                                                                                                                         }
                                                                                                                     }
+                                                                                                                }
                                                                                                                 });
                                                                                                                 break;
                                                                                                                 case 'ownership':
                                                                                                                     $owership = explode(',', $searchQuery);
                                                                                                                     $data = $data->where(function ($query) use ($owership) {
                                                                                                                         foreach ($owership as $owership) {
+                                                                                                                            if($owership == "null")
+                                                                                                                    {
+                                                                                                                        $query->orWhere('documents_id', null);;   
+                                                                                                                    }
+                                                                                                                    else{
                                                                                                                             // Find the purchasing_order_id based on the po_number
-                                                                                                                            $owership = Varaint::where('owership', 'LIKE', '%' . trim($owership) . '%')->first();
+                                                                                                                            $owership = Document::where('owership', 'LIKE', '%' . trim($owership) . '%')->first();
                                                                                                                             if ($owership) {
                                                                                                                                 $query->orWhere('documents_id', $owership->id);
                                                                                                                             }
                                                                                                                         }
+                                                                                                                    }
                                                                                                                     });
                                                                                                                     break;
                                                                                                                     case 'documentwith':
                                                                                                                         $documentwith = explode(',', $searchQuery);
                                                                                                                         $data = $data->where(function ($query) use ($documentwith) {
                                                                                                                             foreach ($documentwith as $documentwith) {
+                                                                                                                                if($documentwith == "null")
+                                                                                                                                {
+                                                                                                                                    $query->orWhere('documents_id', null);   
+                                                                                                                                }
+                                                                                                                                else{
                                                                                                                                 // Find the purchasing_order_id based on the po_number
-                                                                                                                                $documentwith = Varaint::where('documentwith', 'LIKE', '%' . trim($documentwith) . '%')->first();
+                                                                                                                                $documentwith = Document::where('documentwith', 'LIKE', '%' . trim($documentwith) . '%')->first();
                                                                                                                                 if ($documentwith) {
                                                                                                                                     $query->orWhere('documents_id', $documentwith->id);
                                                                                                                                 }
+                                                                                                                            }
                                                                                                                             }
                                                                                                                         });
                                                                                                                         break;
@@ -421,28 +619,46 @@ class VehiclesController extends Controller
                                                                                                                             $bl_number = explode(',', $searchQuery);
                                                                                                                             $data = $data->where(function ($query) use ($bl_number) {
                                                                                                                                 foreach ($bl_number as $bl_number) {
+                                                                                                                                    if($bl_number == "null")
+                                                                                                                                {
+                                                                                                                                    $query->orWhere('documents_id', null);  
+                                                                                                                                }
+                                                                                                                                else{
                                                                                                                                     // Find the purchasing_order_id based on the po_number
-                                                                                                                                    $bl_number = Varaint::where('bl_number', 'LIKE', '%' . trim($bl_number) . '%')->first();
+                                                                                                                                    $bl_number = Document::where('bl_number', 'LIKE', '%' . trim($bl_number) . '%')->first();
                                                                                                                                     if ($bl_number) {
                                                                                                                                         $query->orWhere('documents_id', $bl_number->id);
                                                                                                                                     }
                                                                                                                                 }
+                                                                                                                            }
                                                                                                                             });
                                                                                                                             break;
                                                                                                                             case 'latest_location':
                                                                                                                                 $latest_location = explode(',', $searchQuery);
                                                                                                                                 $data = $data->where(function ($query) use ($latest_location) {
                                                                                                                                     foreach ($latest_location as $latest_location) {
+                                                                                                                                        if($latest_location == "null")
+                                                                                                                                        {
+                                                                                                                                            $query->orWhere('latest_location', null);   
+                                                                                                                                        }
+                                                                                                                                        else{
                                                                                                                                         // Find the purchasing_order_id based on the po_number
                                                                                                                                         $latest_location = Warehouse::where('latest_location', 'LIKE', '%' . trim($latest_location) . '%')->first();
                                                                                                                                         if ($latest_location) {
                                                                                                                                             $query->orWhere('latest_location', $latest_location->id);
                                                                                                                                         }
                                                                                                                                     }
+                                                                                                                                    }
                                                                                                                                 });
                                                                                                                                 break;
                         case 'territory':
+                            if($searchQuery == "null")
+                            {
+                            $data->where('territory', null);   
+                            }
+                            else{
                             $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
+                            }
                             break;
                         default:
                             break;
@@ -483,17 +699,6 @@ class VehiclesController extends Controller
             return redirect()->route('home');
         }
     }
-        public function searchData(Request $request)
-        {
-            $filters = $request->except('page'); // Get all the filters except the 'page' parameter
-            $query = PurchasingOrder::query();
-            foreach ($filters as $column => $searchQuery) {
-            // Apply the filtering logic for each column
-                 $query->where($column, 'LIKE', '%' . $searchQuery . '%');
-            }
-            $data = $query->get();
-            return view('your_another_page_view', compact('data'));
-        }
     public function stockCountFilter(Request $request) {
 
         if($request->key) {
@@ -527,7 +732,7 @@ class VehiclesController extends Controller
             if($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
                 $vehicleIds = $this->yesterdayAvailable()->pluck('id');
             }
-            $data = Vehicles::whereIn('id',$vehicleIds)->get();
+            $data = Vehicles::whereIn('id',$vehicleIds)->paginate(100);
 
         }else{
             $statuss = "Incoming Stock";
@@ -730,7 +935,7 @@ class VehiclesController extends Controller
                 $query->where('sales_person_id', Auth::user()->role_id);
             });
     })
-    ->get();
+    ->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -769,7 +974,7 @@ class VehiclesController extends Controller
                         $query->where('sales_person_id', Auth::user()->role_id);
                     });
             })
-            ->get();
+            ->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -807,7 +1012,7 @@ class VehiclesController extends Controller
                         $query->where('sales_person_id', Auth::user()->role_id);
                     });
             })
-            ->get();
+            ->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
