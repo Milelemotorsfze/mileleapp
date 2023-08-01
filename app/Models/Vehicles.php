@@ -32,7 +32,9 @@ class Vehicles extends Model
         'old_price',
         'old_price_dated',
         'updated_by',
-        'price_status'
+        'active_vehicle_price_status',
+        'inactive_vehicle_price_status'
+
     ];
     protected $fillable = [
         'varaints_id',
@@ -69,7 +71,7 @@ class Vehicles extends Model
     public function getSimilarVehiclesWithInactiveStockAttribute()
     {
         $vehicles = Vehicles::whereNotNull('gdn_id')
-            ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
+            ->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour', 'ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -80,7 +82,7 @@ class Vehicles extends Model
     }
     public function getSimilarVehiclesWithActiveStockAttribute() {
         $vehicles =  Vehicles::whereNull('gdn_id')
-            ->where('status', Vehicles::VEHICLE_STATUS_INCOMING)
+            ->where('payment_status', Vehicles::VEHICLE_STATUS_INCOMING)
             ->where('varaints_id', $this->varaints_id)
             ->groupBy('int_colour','ex_colour')
             ->selectRaw('count(*) as count,id, varaints_id, int_colour, ex_colour, price')
@@ -108,12 +110,14 @@ class Vehicles extends Model
         }
         return 0;
     }
-    public function getPriceStatusAttribute() {
+    public function getActiveVehiclePriceStatusAttribute() {
 
         $similarVehicles = Vehicles::whereNull('gdn_id')
             ->where('varaints_id', $this->varaints_id)
-            ->groupBy('int_colour','ex_colour')
+            ->where('int_colour', $this->int_colour)
+            ->where('ex_colour', $this->ex_colour)
             ->pluck('id');
+
         $priceStatus = [];
 
         foreach ($similarVehicles as $similarVehicle) {
@@ -129,10 +133,36 @@ class Vehicles extends Model
             }
         }
         if (array_unique($priceStatus) === array('true')) {
-//            return 'Available';
             return 1;
         }else{
-//            return 'Not Available';
+            return 0;
+        }
+    }
+    public function getInactiveVehiclePriceStatusAttribute() {
+
+        $similarVehicles = Vehicles::whereNotNull('gdn_id')
+            ->where('varaints_id', $this->varaints_id)
+            ->where('int_colour', $this->int_colour)
+            ->where('ex_colour', $this->ex_colour)
+            ->pluck('id');
+
+        $priceStatus = [];
+
+        foreach ($similarVehicles as $similarVehicle) {
+            $vehicle = Vehicles::find($similarVehicle);
+            $availableColour = AvailableColour::where('varaint_id', $vehicle->varaints_id)
+                ->where('int_colour', $vehicle->int_colour)
+                ->where('ext_colour', $vehicle->ex_colour)
+                ->first();
+            if(!empty($availableColour)) {
+                $priceStatus[] = 'true';
+            }else{
+                $priceStatus[] = 'false';
+            }
+        }
+        if (array_unique($priceStatus) === array('true')) {
+            return 1;
+        }else{
             return 0;
         }
     }
