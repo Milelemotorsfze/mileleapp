@@ -21,6 +21,10 @@ class Vehicles extends Model
     public const FILTER_PREVIOUS_YEAR_AVAILABLE = 'PREVIOUS YEAR AVAILABLE';
     public const FILTER_PREVIOUS_MONTH_AVAILABLE = 'PREVIOUS MONTH AVAILABLE';
     public const FILTER_YESTERDAY_AVAILABLE = 'YESTERDAY AVAILABLE';
+    public const FILTER_YESTERDAY_PURCHASED = 'YESTERDAY PURCHASED';
+    public const FILTER_PREVIOUS_MONTH_PURCHASED = 'FILTER PREVIOUS MONTH PURCHASED';
+    public const FILTER_PREVIOUS_YEAR_PURCHASED = 'FILTER PREVIOUS YEAR PURCHASED';
+
 
     public  $appends = [
         'similar_vehicles_with_active_stock',
@@ -178,5 +182,5 @@ class Vehicles extends Model
         }
         return " ";
     }
-    
+
 }

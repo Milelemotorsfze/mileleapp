@@ -266,22 +266,8 @@
                         <td style="font-size: 12px;">
                             Previous Year
                         </td>
-                        <td style="font-size: 12px;">
-                        @php
-                        $currentYear = \Carbon\Carbon::now()->year;
-                        $previousYear = $currentYear - 1;
-                        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
-                        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
-                        $countpreviouseyear = \Illuminate\Support\Facades\DB::table('vehicles')
-                            ->whereExists(function ($query) use ($startDate, $endDate) {
-                                $query->select(DB::raw(1))
-                                    ->from('grn')
-                                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                                    ->whereBetween('grn.date', [$startDate, $endDate]);
-                            })
-                            ->count();
-                              @endphp
-                              {{$countpreviouseyear}}
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_PURCHASED]) }}';">
+                            {{ $previousYearPurchased }}
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_SOLD]) }}';">
                             {{$previousYearSold}}
@@ -299,21 +285,8 @@
                         <td style="font-size: 12px;">
                             Previous Month
                         </td>
-                        <td style="font-size: 12px;">
-                            @php
-                            $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
-                            $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
-
-                            $countLastMonth = \Illuminate\Support\Facades\DB::table('vehicles')
-                                ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
-                                    $query->select(DB::raw(1))
-                                        ->from('grn')
-                                        ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                                        ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
-                                })
-                                ->count();
-                            @endphp
-                        {{$countLastMonth}}
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_SOLD]) }}';">
+                            {{ $previousMonthPurchased }}
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_SOLD]) }}';">
                             {{ $previousMonthSold }}
@@ -329,22 +302,8 @@
                         <td style="font-size: 12px;">
                           Yesterday
                         </td>
-                        <td style="font-size: 12px;">
-                            @php
-                                $startDateLastDay = \Carbon\Carbon::now()->subDay(1)->startOfDay();
-                                $endDateLastDay = \Carbon\Carbon::now()->subDay(1)->endOfDay();
-
-                                $countLastDay = \Illuminate\Support\Facades\DB::table('vehicles')
-                                    ->whereExists(function ($query) use ($startDateLastDay, $endDateLastDay) {
-                                        $query->select(DB::raw(1))
-                                            ->from('grn')
-                                            ->whereColumn('grn.id', '=', 'vehicles.grn_id')
-                                            ->whereBetween('grn.date', [$startDateLastDay, $endDateLastDay]);
-                                    })
-                                    ->count();
-                            @endphp
-                            {{$countLastDay}}
-
+                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_PURCHASED]) }}';">
+                            {{ $yesterdayPurchased}}
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_SOLD]) }}';">
                             {{ $yesterdaySold }}
