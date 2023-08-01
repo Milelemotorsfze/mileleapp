@@ -1590,8 +1590,8 @@
                 showContactNumberError($msg);
                 formInputError = true;
                 e.preventDefault();
-            }else{
-                var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);;
+            } else{
+                var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
 
@@ -1604,10 +1604,13 @@
                         name: name,
                         id: '{{ $supplier->id }}'
                     },
-                    success:function (data) {
+                    success:function (event,data) {
                         if(data.error) {
+                            alert("error");
                             showContactNumberError(data.error);
-                            formInputError == true;
+                            formInputError = true;
+                            alert(formInputError);
+                            event.preventDefault();
                             e.preventDefault();
                             $('#submit').html('Save');
                             $('.overlay').hide();
@@ -1630,8 +1633,7 @@
 
             if(formInputError == false )
             {
-                alert(formInputError);
-                alert("invalid");
+                alert("inside submit");
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
