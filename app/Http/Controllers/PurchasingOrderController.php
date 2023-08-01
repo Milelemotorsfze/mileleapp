@@ -509,7 +509,7 @@ public function checkcreatevins(Request $request)
             }
             info($changes);
             if (!empty($changes)) {
-                $vehicle->status = 'New Changes'; // Set the vehicle status
+                // $vehicle->status = 'New Changes'; // Set the vehicle status
                 $vehicle->save();
                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                 $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -557,7 +557,7 @@ public function purchasingupdateStatus(Request $request)
                 $vehicle->payment_status = 'Payment Completed';
             }
             else{
-                $vehicle->status = 'Approved';
+                $vehicle->status = $status;
             }
             $vehicle->save();
             $ex_colour = $vehicle->ex_colour; 

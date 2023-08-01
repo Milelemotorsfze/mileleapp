@@ -19,18 +19,18 @@
     </style>
 @section('content')
     <div class="card-header">
-        @if ($previousId)
+        <!-- @if ($previousId)
 
     <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $previousId) }}">
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </a>
-@endif
+@endif -->
 <b>Purchase Order Number : {{$purchasingOrder->po_number}}</b> 
-@if ($nextId)
+<!-- @if ($nextId)
     <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $nextId) }}">
        <i class="fa fa-arrow-right" aria-hidden="true"></i>
     </a>
-@endif
+@endif -->
 
         <a  class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
         
@@ -339,12 +339,10 @@
                                 <th style="vertical-align: middle;" id="estimated">Estimated Arrival</th>
                                 <th id="serno" style="vertical-align: middle;">Vehicle Status:</th>
                                 @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
                             @endphp
                             @if ($hasPermission)
-                            @if ($purchasingOrder->status === 'Approved')
                                 <th>Payment Status</th>
-                                @endif
                                 @endif
                                 <th id="action" style="vertical-align: middle; text-align: center;">Action</th>
                             </tr>
@@ -480,12 +478,10 @@
                             @endif
                             </td>
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-po-payment-details', 'price-edit', 'edit-po-colour-details']);
                             @endphp
                             @if ($hasPermission)
-                            @if ($purchasingOrder->status === 'Approved')
                             <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
-                                @endif
                                 @endif
                                 <td style ="width:160px;">  
                                 <div class="row">
@@ -560,7 +556,7 @@
 										@endphp
 										@if ($hasPermission) 
 										@if ($purchasingOrder->status === 'Approved')
-										@if ($vehicles->status === 'Approved')
+										@if ($vehicles->status === 'Approved' && $vehicles->payment_status === '')
 										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Initiate Payment
 										</a>

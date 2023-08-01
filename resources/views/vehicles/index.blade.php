@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+  .editing {
+    background-color: white !important;
+    border: 1px solid black  !important;
+}
 #searchContainer {
       float: right;
     }
@@ -29,7 +33,6 @@
     padding: 0;
     margin: 10px 0;
   }
-
   .pagination-list {
     display: flex;
     list-style: none;
@@ -185,7 +188,7 @@
                 @endphp
                 @if ($hasPermission)
   <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
-  <table class="table table-striped table-editable table-edits table-bordered">
+  <table class="table table-editable table-edits table-bordered">
     <thead>
       <tr>
         <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
@@ -198,7 +201,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+    <tr style="background-color: yellow !important;">
         <td style="font-size: 12px;">
             Pending Inspection
         </td>
@@ -415,7 +418,7 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th class="nowrap-td">Stock Aging</th>
+                                <th class="nowrap-td">Payment Aging</th>
                                 <th class="nowrap-td">Stock Aging</th>
                                 @endif
                                 @php
@@ -486,6 +489,7 @@ Clear Filters
                                     <th id="ex_colour" class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
                                     <th id="int_colour" class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
                                     <th id="upholestry" class="nowrap-td">Upholstery</th>
+                                    <th id="upholestry" class="nowrap-td">Extra Features</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
@@ -636,15 +640,17 @@ Clear Filters
                                 @if ($hasPermission)
                                 @if($vehicles->estimation_date && $grn_number === null)
                                 @php
-                                                  $savedDate = $vehicles->estimation_date;
-                                                  $today = now()->format('Y-m-d');
-                                                  $numberOfDayseta = \Carbon\Carbon::parse($savedDate)->diffInDays($today);
-                                                  @endphp
-                                <td class="nowrap-td eta">{{$numberOfDayseta}} Day</td>
-                                @elseif($grn_number)
-                                <td class="nowrap-td eta">Arrived</td>
-                                @else
-                                <td class="nowrap-td eta">Incoming</td>
+                                  $savedDate = \Carbon\Carbon::createFromFormat('d-m-Y', $vehicles->estimation_date);
+                                  $today = now();
+                                  $numberOfDaysEta = $today->diffInDays($savedDate, false);
+                                  $sign = ($numberOfDaysEta >= 0) ? '' : '-';
+                                  $numberOfDaysEta = abs($numberOfDaysEta);
+                                  @endphp
+                                  <td class="nowrap-td eta">{{ $sign . $numberOfDaysEta }} Day</td>
+                                  @elseif($grn_number)
+                                  <td class="nowrap-td eta">Arrived</td>
+                                  @else
+                                  <td class="nowrap-td eta">Incoming</td>
                                 @endif
                                 @endif
                                 @php
@@ -697,34 +703,19 @@ Clear Filters
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
                                     @endphp
                                     @if ($hasPermission)
+                                    @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                    <td>{{ $vehicles->inspection_date }}</td>
+                                    @else
                                     <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
+                                    @endif
                                     @else
 									                  <td>{{ $vehicles->inspection_date }}</td>
 									                  @endif
 									                  @endif
                                     @php
-                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
-                                      @endphp
-                                      @if ($hasPermission)
-                                          @if ($grn_date && $gdn_date === null)
-                                              @php
-                                              $grn_date = \Carbon\Carbon::parse($grn_date);
-                                              $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
-                                              @endphp
-                                              <td class="nowrap-td">{{ $aging }}</td>
-                                          @elseif ($gdn_date)
-                                              @php
-                                              $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_date);
-                                              @endphp
-                                              <td class="nowrap-td">{{ $aging }}</td>
-                                          @else
-                                              <td class="nowrap-td"></td>
-                                          @endif
-                                          @endif
-                                          @php
-                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
-                                      @endphp
-                                      @if ($hasPermission)
+                                          $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                                          @endphp
+                                          @if ($hasPermission)
                                           @php
                                           $paymentLog = DB::table('payment_logs')->where('vehicle_id', $vehicles->id)->latest()->first();
                                           @endphp
@@ -752,6 +743,25 @@ Clear Filters
                                           @endif
                                           @endif
                                       @endif
+                                    @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
+                                      @endphp
+                                      @if ($hasPermission)
+                                          @if ($grn_date && $gdn_date === null)
+                                              @php
+                                              $grn_date = \Carbon\Carbon::parse($grn_date);
+                                              $aging = $grn_date->diffInDays(\Carbon\Carbon::today());
+                                              @endphp
+                                              <td class="nowrap-td">{{ $aging }}</td>
+                                          @elseif ($gdn_date)
+                                              @php
+                                              $aging = \Carbon\Carbon::parse($grn_date)->diffInDays($gdn_date);
+                                              @endphp
+                                              <td class="nowrap-td">{{ $aging }}</td>
+                                          @else
+                                              <td class="nowrap-td"></td>
+                                          @endif
+                                          @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-so');
                                     @endphp
@@ -766,7 +776,7 @@ Clear Filters
 									                    <td>{{ $so_number }}</td>
                                      <td>{{ $so_date }}</td>
                                      @endif
-									 @endif
+									                  @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('reservation-view');
                                     @endphp
@@ -863,6 +873,16 @@ Clear Filters
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
                                              {{ $vehicles->variant->model_detail ?? '' }}
                                      </td>
+                                     @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                     <td>
+                                    <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
+                                    @foreach($varaint as $variantItem)
+                                         <option value="{{$variantItem->id}}" {{ $variantItem->id == $vehicles->varaints_id ? "selected" : "" }}>
+                                             {{ $variantItem->name }}</option>
+                                    @endforeach
+                                    </select>
+                                    </td>
+                                     @else
                                      <td class="editable-field varaints_id" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
                                             @foreach($varaint as $variantItem)
@@ -874,6 +894,7 @@ Clear Filters
                                             @endforeach
                                         </select>
                                     </td>
+                                    @endif
                                      <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
                                              {{ $vehicles->detail ?? '' }}
                                      </td>
@@ -900,7 +921,7 @@ Clear Filters
                                              {{ $vehicles->detail ?? '' }}
                                      </td>
                                      @endif
-									 @endif
+									                  @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vin-view');
                                     @endphp
@@ -928,8 +949,12 @@ Clear Filters
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('enginee-edit');
                                       @endphp
                                       @if ($hasPermission)
+                                      @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                      <td>{{ $vehicles->engine }}</td>
+                                      @else
                                       <td class="editable-field engine" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->engine }}</td>
-                                     @else
+                                     @endif
+                                      @else
                                     <td>{{ $vehicles->engine }}</td>
                                     @endif
                                     @endif
@@ -956,6 +981,26 @@ Clear Filters
                                         <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
                                             {{ $vehicles->variant->gearbox }}
                                         </td>
+                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        <td>
+                                        <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
+                                                <option value=""></option>
+                                                @foreach($exteriorColours as $exColour)
+                                                    <option value="{{$exColour->id}} " {{ $exColour->id == $vehicles->ex_colour ? 'selected' : "" }}   >
+                                                        {{ $exColour->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                        <select name="int_colour" class="form-control" placeholder="int_colour" disabled>
+                                                <option value=""></option>
+                                                @foreach($interiorColours as $interiorColour)
+                                                    <option value="{{$interiorColour->id}} " {{ $interiorColour->id == $vehicles->int_colour ? 'selected' : "" }}   >
+                                                        {{ $interiorColour->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        @else
                                         <td class="editable-field ex_colour" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
                                         <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
                                                 <option value=""></option>
@@ -974,10 +1019,16 @@ Clear Filters
                                                 @endforeach
                                             </select>
                                         </td>
+                                        @endif
                                         <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
                                         {{ $vehicles->variant->upholestry ?? '' }}
                                         </td>
-										                    @else
+                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        <td class="nowrap-td">{{ $vehicles->extra_features }}</td>
+                                        @else
+                                        <td class="editable-field extra_features" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->extra_features }}</td>
+										                    @endif
+                                        @else
 										                    <td class="nowrap-td" id="my-{{ $vehicles->id }}">
                                         {{ $vehicles->variant->my }}
                                          </td>
@@ -1014,6 +1065,7 @@ Clear Filters
                                         <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
                                         {{ $vehicles->variant->upholestry ?? '' }}
                                         </td>
+                                        <td class="nowrap-td">{{ $vehicles->extra_features }}</td>
                                         @endif
 										                    @endif
                                         @php
@@ -1024,7 +1076,11 @@ Clear Filters
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                         @endphp
                                         @if ($hasPermission)
+                                        @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
+                                        <td>{{ $vehicles->ppmmyyy }}</td>
+                                        @else
                                         <td class="editable-field ppmmyyy" data-is-date="true" data-type="date" contenteditable="false" data-field-name="ppmmyyy" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                        @endif
                                         @else
                                       <td>{{ $vehicles->ppmmyyy }}</td>
                                       @endif
@@ -1201,7 +1257,6 @@ Clear Filters
             </form>
         @endif
         <script>
-// Function to get data from the editable fields and update the server
 function updateData() {
   const editableFields = document.querySelectorAll('.editable-field');
   const updateDataUrl = '{{ route('vehicles.updatedata') }}';
@@ -1222,7 +1277,6 @@ function updateData() {
     }
   });
 console.log(updatedData);
-  // Perform the fetch request to update the data on the server
   fetch(updateDataUrl, {
     method: 'POST',
     headers: {
@@ -1233,10 +1287,7 @@ console.log(updatedData);
   })
   .then(response => response.json())
   .then(data => {
-      // Handle the response from the controller if needed
       console.log(data);
-
-      // Display the success flash message on the page
       const flashMessage = document.getElementById('flash-message');
       flashMessage.textContent = 'Record is successfully saved';
       flashMessage.style.display = 'block';

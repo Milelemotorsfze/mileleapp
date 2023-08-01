@@ -40,6 +40,10 @@ class MovementController extends Controller
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
         ->whereNull('gdn_id')
+        ->where(function ($query) {
+            $query->where('latest_location', '!=', '2')
+                  ->orWhereNull('latest_location');
+        })
         ->where('payment_status', '=', 'Incoming Stock')
         ->pluck('vin');       
     $warehouses = Warehouse::select('id', 'name')->get();
@@ -74,7 +78,7 @@ class MovementController extends Controller
                 return back()->withErrors("The 'from' and 'to' values cannot be the same.");
             } 
             $vehicle = Vehicles::where('vin', $vin[$index])->first();
-            if ($vehicle && !$vehicle->grn_id) {
+            if ($vehicle && !$vehicle->grn_id && $to[$index] !== '6') {
                 $grn = new Grn();
                 $grn->date = $date;
                 $grn->save();
@@ -238,5 +242,41 @@ public function grnfilepost(Request $request)
         return back()->with('success', 'GRN information updated successfully.');
     }
     return back()->with('error', 'No valid file found.');
+    }
+    public function getVehiclesDataformovement(Request $request)
+    {
+        $selectedPOId = $request->input('po_id');
+        $vehicles = Vehicles::where('purchasing_order_id', $selectedPOId)
+            ->whereNotNull('vin')
+            ->where('status', '!=', 'cancel')
+            ->whereNull('gdn_id')
+            ->where('payment_status', '=', 'Incoming Stock')
+            ->pluck('id');
+            
+            $vehicleDetails = [];
+            foreach($vehicles  as $key =>  $vehicle) {
+                $data = Vehicles::find($vehicle);
+                $vehicleDetails[$key]['vin'] = $data->vin;
+                $vehicle = Vehicles::where('vin', $data->vin)->first();
+                $variant = Varaint::find($vehicle->varaints_id)->name;
+                $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+                $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+                $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
+                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+                if (empty($warehouseName)) {
+                 $warehouseName = 1;
+                 }
+                 if (empty($warehouseNames)) {
+                    $warehouseNames = "Supplier";
+                    }
+                 $vehicleDetails[$key]['variant'] = $variant;
+                 $vehicleDetails[$key]['modelLine'] = $modelLine;
+                 $vehicleDetails[$key]['brand'] = $variant;
+                 $vehicleDetails[$key]['warehouseName'] = $warehouseName;
+                 $vehicleDetails[$key]['warehouseNames'] = $warehouseNames;
+            }
+            //  info($vehicleDetails);
+         return response()->json($vehicleDetails);
     }
     }

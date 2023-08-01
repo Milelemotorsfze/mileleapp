@@ -5,7 +5,7 @@
                     @endphp
                     @if ($hasPermission)
 <div class="card-header">
-        <h4 class="card-title">Add New Vehicles Transaction</h4>
+        <h4 class="card-title">Add New Movement Transection</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
 			</div>
@@ -44,12 +44,49 @@
         <label for="basicpill-firstname-input" class="form-label">Date : </label>
         <input type="Date" id="date" name="date" class="form-control" placeholder="PO Date" required value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
+        <div class="col-lg-2 col-md-6">
+    <label for="basicpill-firstname-input" class="form-label">PO</label>
+    <select name="po_number" class="form-control mb-1" id="po_number" required>
+        <option value="" selected disabled>Select PO</option>
+        @foreach ($purchasing_order as $purchasing_order)
+        <option value="{{ $purchasing_order->id }}">{{ $purchasing_order->po_number }}</option>
+        @endforeach
+    </select>
+</div>
         </div>
         <br>
-        <div id="rows-container">
+        <div id ="rows-containertitle">
         <div class="row">
         <div class="col-lg-2 col-md-6">
-    <label for="basicpill-firstname-input" class="form-label">Vin</label>
+        <label for="basicpill-firstname-input" class="form-label">Vin</label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+        <label for="basicpill-firstname-input" class="form-label">From </label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+        <label for="basicpill-firstname-input" class="form-label">To </label>
+        </div>
+        <div class="col-lg-1 col-md-6">
+        <label for="QTY" class="form-label">Brand:</label>
+        </div>
+        <div class="col-lg-2 col-md-6">
+        <label for="QTY" class="form-label">Model Line:</label>
+        </div>
+        <div class="col-lg-2 col-md-6">
+        <label for="QTY" class="form-label">Variant:</label>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <label for="basicpill-firstname-input" class="form-label">Remarks </label>
+        </div>
+        </div>
+        </div>
+        <div id ="rows-containerpo">
+        </div>
+        <div id ="rows-container">
+        </div>
+        <div id="rows-containers">
+        <div class="row">
+        <div class="col-lg-2 col-md-6">
     <select name="vin[]" class="form-control mb-1" id="vin-input" required>
         <option value="" selected disabled>Select VIN</option>
         @foreach ($vehicles as $vin)
@@ -58,7 +95,6 @@
     </select>
 </div>
         <div class="col-lg-1 col-md-6">
-        <label for="basicpill-firstname-input" class="form-label">From </label>
         <select class="form-control mb-1" id="from" readonly disabled>
         @foreach ($warehouses as $warehouse)
         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -67,7 +103,6 @@
         <input type="hidden" name="from[]" class="form-control mb-1" id="from-input">
         </div>
 <div class="col-lg-1 col-md-6">
-<label for="basicpill-firstname-input" class="form-label">To </label>
     <select name="to[]" class="form-control mb-1" id="to" required>
         @foreach ($warehouses as $warehouse)
         @if ($warehouse->name !== 'Supplier')
@@ -77,19 +112,15 @@
     </select>
 </div>
 <div class="col-lg-1 col-md-6">
-        <label for="QTY" class="form-label">Brand:</label>
         <input type="text" id="brand" name="brand" class="form-control" placeholder="Variants Detail" readonly>
     </div>
     <div class="col-lg-2 col-md-6">
-        <label for="QTY" class="form-label">Model Line:</label>
         <input type="text" id="model-line" name="model-line" class="form-control" placeholder="Variants Detail" readonly>
     </div>
         <div class="col-lg-2 col-md-6">
-        <label for="QTY" class="form-label">Variant:</label>
         <input type="text" id="variant" name="variant" class="form-control" placeholder="Variants Detail" readonly>
     </div>
 <div class="col-lg-2 col-md-6">
-            <label for="basicpill-firstname-input" class="form-label">Remarks </label>
             <input type="text" id="remarks" name="remarks[]" class="form-control" placeholder="Remarks">
         </div>
         </div>
@@ -114,6 +145,7 @@
 <script>
     $(document).ready(function() {
         $('#vin-input').select2();
+        $('#po_number').select2();
     });
 </script>
 <script>
@@ -161,7 +193,7 @@
                     <input type="text" id="remarks" name="remarks[]" class="form-control" placeholder="Remarks">
                 </div>
                 <div class="col-lg-1 col-md-6">
-                    <button type="button" class="btn btn-danger remove-row-btn" data-row="${row}">Remove</button>
+                    <button type="button" class="btn btn-danger btn-sm remove-row-btn" data-row="${row}">Remove</button>
                 </div>
             </div>
             `;
@@ -268,6 +300,71 @@
         // You can submit the form or perform any other action here
         return true;
     }
+</script>
+<script>
+    $(document).ready(function () {
+        $("#po_number").change(function () {
+            var selectedPOId = $(this).val();
+            $.ajax({
+                type: "GET",
+                url: "{{ route('vehicles.getVehiclesDataformovement') }}",
+                data: { po_id: selectedPOId },
+                dataType: "json",
+                success: function (response) {
+                    $("#rows-containerpo").empty();
+
+                    response.forEach(function (vehicle) {
+                        console.log(vehicle.movement);
+                        var rowHtml = `
+                            <div class="row">
+                                <div class="col-lg-2 col-md-6">
+                                    <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
+                                    <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <select name="to[]" class="form-control mb-1" id="to" required>
+                                        @foreach ($warehouses as $warehouse)
+                                            @if ($warehouse->name !== 'Supplier')
+                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <input type="text" name="brand" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.brand}">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <input type="text" name="model-line" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.modelLine}">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
+                                </div>
+                                <div class="col-lg-2 col-md-6">
+                                    <input type="text" name="remarks[]" class="form-control" placeholder="Remarks">
+                                </div>
+                                <div class="col-lg-1 col-md-6">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn">Remove</button>
+                                </div>
+                            </div>
+                        `;
+
+                        $("#rows-containerpo").append(rowHtml);
+                    });
+
+                    // Add event listener to remove buttons
+                    $(".remove-row-btn").on("click", function () {
+                        $(this).closest(".row").remove();
+                    });
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
 </script>
 @else
     @php

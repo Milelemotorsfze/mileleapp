@@ -46,7 +46,7 @@
                         @endphp
                         {{ $created_bys ?? '' }}</td>
                         <td>
-                            @can('variants-edit')
+                            @can('warehouse-edit')
                                 <a data-placement="top" href="{{ route('warehouse.edit', $warehouselist->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
                             @endcan
