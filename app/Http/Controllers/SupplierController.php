@@ -700,10 +700,41 @@ class SupplierController extends Controller
         $input['is_communication_email'] = $request->is_communication_email ? true : false;
         $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
         $input['is_communication_any'] = $request->is_communication_any ? true : false;
-
+        if($request->form_action == 'UPDATE') {
+            $suppliers = Supplier::find($request->supplier_id);
+            if($request->is_passport_delete = true && $suppliers->passport_copy_file) {
+                if (file_exists(public_path('vendor/passport/'.$suppliers->passport_copy_file))){
+                    $filedeleted = unlink(public_path('vendor/passport/'.$suppliers->passport_copy_file));
+                    if ($filedeleted) {
+                        $input['passport_copy_file'] = NULL;
+                    }
+                }
+            }
+            if($request->is_trade_license_delete = true && $suppliers->trade_license_file) {
+                if (file_exists(public_path('vendor/trade_license/'.$suppliers->trade_license_file))){
+                    $filedeleted = unlink(public_path('vendor/trade_license/'.$suppliers->trade_license_file));
+                    if ($filedeleted) {
+                        $input['trade_license_file'] = NULL;
+                    }
+                }
+            }
+            if($request->is_vat_delete = true && $suppliers->vat_certificate_file) {
+                if (file_exists(public_path('vendor/vat_certificate/'.$suppliers->vat_certificate_file))){
+                    $filedeleted = unlink(public_path('vendor/vat_certificate/'.$suppliers->vat_certificate_file));
+                    if ($filedeleted) {
+                        $input['vat_certificate_file'] = NULL;
+                    }
+                }
+            }
+        }
 
         if ($request->hasFile('passport_copy_file'))
         {
+            if($request->form_action == 'UPDATE' && $suppliers->passport_copy_file) {
+                if (file_exists(public_path('vendor/passport/' . $suppliers->passport_copy_file))) {
+                   unlink(public_path('vendor/passport/' . $suppliers->passport_copy_file));
+                }
+            }
             $file = $request->file('passport_copy_file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
@@ -714,6 +745,11 @@ class SupplierController extends Controller
         }
         if ($request->hasFile('trade_license_file'))
         {
+            if($request->form_action == 'UPDATE' && $suppliers->trade_license_file) {
+                if (file_exists(public_path('vendor/trade_license/' . $suppliers->trade_license_file))) {
+                    unlink(public_path('vendor/trade_license/' . $suppliers->trade_license_file));
+                }
+            }
             $file = $request->file('trade_license_file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;
@@ -724,6 +760,11 @@ class SupplierController extends Controller
         }
         if ($request->hasFile('vat_certificate_file'))
         {
+            if($request->form_action == 'UPDATE' && $suppliers->vat_certificate_file) {
+                if (file_exists(public_path('vendor/vat_certificate/' . $suppliers->vat_certificate_file))) {
+                    unlink(public_path('vendor/vat_certificate/' . $suppliers->vat_certificate_file));
+                }
+            }
             $file = $request->file('vat_certificate_file');
             $extension = $file->getClientOriginalExtension();
             $fileName = time().'.'.$extension;

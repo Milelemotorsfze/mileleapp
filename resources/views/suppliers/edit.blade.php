@@ -929,27 +929,49 @@
                         <div class="card preview-div" @if($supplier->is_any_document_available == false) hidden @endif>
                             <div class="body">
                                 <div class="row p-2">
-                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                                         <div id="file1-preview">
                                             @if($supplier->passport_copy_file)
                                                 <h6 class="fw-bold text-center mb-1">Passport</h6>
                                                 <iframe src="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" alt="Passport"></iframe>
+                                                <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                    <a href="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" download class="text-white">
+                                                        Download
+                                                    </a>
+                                                </button>
+                                                <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button"
+                                                         data-file-type="PASSPORT"> Delete</button>
+
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                                         <div id="file2-preview">
                                             @if($supplier->trade_license_file)
                                                 <h6 class="fw-bold text-center">Trade License</h6>
                                                 <iframe src="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" alt="Trade License "></iframe>
+                                                <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                    <a href="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" download class="text-white">
+                                                        Download
+                                                    </a>
+                                                </button>
+                                                <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button"
+                                                         data-file-type="TRADE_LICENSE"> Delete</button>
+
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-lg-4 col-md-12 col-sm-12">
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
                                         <div id="file3-preview">
                                             @if($supplier->vat_certificate_file)
                                                 <h6 class="fw-bold text-center">VAT Certificate</h6>
                                                 <iframe src="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" alt="VAT Certificate"></iframe>
+                                                <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                    <a href="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" download class="text-white">
+                                                        Download
+                                                    </a>
+                                                </button>
+                                                <button  type="button" class="btn btn-sm btn-danger mt-3 delete-button" data-file-type="VAT"> Delete</button>
                                             @endif
                                         </div>
                                     </div>
@@ -967,7 +989,6 @@
                                                             Download
                                                         </a>
                                                     </button>
-
                                                     <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button"
                                                         data-id="{{ $document->id }}"> Delete</button>
                                                 </div>
@@ -1090,6 +1111,9 @@
         </form>
     </div>
 
+    <input type="hidden" id="passport-file-delete" name="is_passport_delete" value="">
+    <input type="hidden" id="vat-file-delete" name="is_vat_delete" value="">
+    <input type="hidden" id="trade-license-file-delete" name="is_trade_license_delete" value="">
     <input type="hidden" value="" id="indexValue">
     <div class="overlay"></div>
 
@@ -1116,6 +1140,7 @@
         const previewFile4 = document.querySelector("#file4-preview");
 
         file1InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
             const files = event.target.files;
             while (previewFile1.firstChild) {
                 previewFile1.removeChild(previewFile1.firstChild);
@@ -1138,6 +1163,8 @@
 
         });
         file2InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile2.firstChild) {
                 previewFile2.removeChild(previewFile2.firstChild);
@@ -1159,6 +1186,8 @@
             }
         });
         file3InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile3.firstChild) {
                 previewFile3.removeChild(previewFile3.firstChild);
@@ -1180,6 +1209,8 @@
             }
         });
         file4InputLicense.addEventListener("change", function(event) {
+            $('.preview-div').attr('hidden', false);
+
             const files = event.target.files;
             while (previewFile4.firstChild) {
                 previewFile4.removeChild(previewFile4.firstChild);
@@ -1209,7 +1240,24 @@
                 deletedDocuments.push(id);
             }
         });
-        console.log("test");
+        $('.delete-button').on('click',function(){
+            var fileType = $(this).attr('data-file-type');
+            if (confirm('Are you sure you want to Delete this item ?')) {
+                if(fileType == 'PASSPORT') {
+                    $('#file1-preview').remove();
+                    $('#passport-file-delete').val(1);
+
+                }else if(fileType == 'TRADE_LICENSE') {
+                    $('#file2-preview').remove();
+                    $('#trade-license-file-delete').val(1);
+
+                }else if(fileType == 'VAT') {
+                    $('#file3-preview').remove();
+                    $('#vat-file-delete').val(1);
+
+                }
+            }
+        });
 
         $(document).ready(function ()
         {

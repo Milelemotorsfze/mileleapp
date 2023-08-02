@@ -1177,9 +1177,9 @@ input {
             $('.preview-div').attr('hidden', false);
 
             const files = event.target.files;
-            while (previewFile4.firstChild) {
-                previewFile4.removeChild(previewFile4.firstChild);
-            }
+            // while (previewFile4.firstChild) {
+            //     previewFile4.removeChild(previewFile4.firstChild);
+            // }
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.type.match("application/pdf")) {
