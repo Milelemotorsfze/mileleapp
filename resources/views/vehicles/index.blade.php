@@ -412,7 +412,9 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
                                 @endphp
                                 @if ($hasPermission)
-                                <th id="inspection_date" class="nowrap-td">Inspection Date</th>
+                                <th id="inspection_date" class="nowrap-td">GRN Inspection Date</th>
+                                <th id="grn_remark" class="nowrap-td">GRN Remarks</th>
+                                <th id="qc_remarks" class="nowrap-td">QC Remarks</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
@@ -442,6 +444,8 @@ Clear Filters
                                 @if ($hasPermission)
                                     <th id="sales_remarks" style="vertical-align: middle;" class="nowrap-td">Sales Remarks</th>
                                 @endif
+                                <th id="pdi_date" class="nowrap-td">PDI Inspection Date</th>
+                                <th id="pdi_remarks" class="nowrap-td">PDI Remarks</th>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
                                 @endphp
@@ -489,7 +493,7 @@ Clear Filters
                                     <th id="ex_colour" class="nowrap-td" id="ex-colour" style="vertical-align: middle;" style="min-width:150px">Ext Colour</th>
                                     <th id="int_colour" class="nowrap-td" id="int-colour"  style="vertical-align: middle;" style="min-width:150px">Int Colour</th>
                                     <th id="upholestry" class="nowrap-td">Upholstery</th>
-                                    <th id="upholestry" class="nowrap-td">Extra Features</th>
+                                    <th id="extra_features" class="nowrap-td">Extra Features</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('py-mm-yyyy-view');
@@ -640,13 +644,16 @@ Clear Filters
                                 @if ($hasPermission)
                                 @if($vehicles->estimation_date && $grn_number === null)
                                 @php
-                                  $savedDate = \Carbon\Carbon::createFromFormat('d-m-Y', $vehicles->estimation_date);
-                                  $today = now();
-                                  $numberOfDaysEta = $today->diffInDays($savedDate, false);
-                                  $sign = ($numberOfDaysEta >= 0) ? '' : '-';
-                                  $numberOfDaysEta = abs($numberOfDaysEta);
-                                  @endphp
-                                  <td class="nowrap-td eta">{{ $sign . $numberOfDaysEta }} Day</td>
+    $savedDate = \Carbon\Carbon::createFromFormat('Y-m-d', $vehicles->estimation_date);
+    $today = \Carbon\Carbon::now();
+    $numberOfDaysEta = $today->diffInDays($savedDate, false);
+    $sign = ($numberOfDaysEta >= 0) ? '' : '-';
+    $numberOfDaysEta = abs($numberOfDaysEta);
+@endphp
+
+<td class="nowrap-td eta">
+    {{ $sign . $numberOfDaysEta }} {{ $numberOfDaysEta == 1 ? 'Day' : 'Days' }}
+</td>
                                   @elseif($grn_number)
                                   <td class="nowrap-td eta">Arrived</td>
                                   @else
@@ -699,19 +706,27 @@ Clear Filters
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-view');
                                     @endphp
                                     @if ($hasPermission)
-									                  @php
-                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
+  								                  @if (!empty($vehicles->inspection_date))
+                                    <td>{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
+                                    @else
+                                    <td></td>
+                                    @endif
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                                     @endphp
                                     @if ($hasPermission)
-                                    @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
-                                    <td>{{ $vehicles->inspection_date }}</td>
-                                    @else
-                                    <td class="editable-field inspection_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="inspection_date">{{ $vehicles->inspection_date }}</td>
+                                    @if ($vehicles->grn_id && $vehicles->so_id === null)
+                                    <td class="editable-field grn_remark" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->grn_remark }}</td>
+                                    <td class="editable-field qc_remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->qc_remarks }}</td>
+									                  @else
+                                    <td>{{ $vehicles->grn_remark }}</td>
+                                    <td>{{ $vehicles->qc_remarks }}</td>
                                     @endif
                                     @else
-									                  <td>{{ $vehicles->inspection_date }}</td>
-									                  @endif
-									                  @endif
+                                    <td>{{ $vehicles->grn_remark }}</td>
+                                    <td>{{ $vehicles->qc_remarks }}</td>
+                                    @endif
+                                    @endif
                                     @php
                                           $hasPermission = Auth::user()->hasPermissionForSelectedRole('aging-view');
                                           @endphp
@@ -840,6 +855,23 @@ Clear Filters
                                             @endif
                                     </td>
 									                  @endif
+                                    @endif
+                                    @if (!empty($vehicles->pdi_date))
+                                    <td>{{ date('d-M-Y', strtotime($vehicles->pdi_date)) }}</td>
+                                    @else
+                                    <td></td>
+                                    @endif
+                                    @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
+                                    @endphp
+                                    @if ($hasPermission)
+                                    @if ($vehicles->so_id && $vehicles->gdn_id === null)
+                                    <td class="editable-field pdi_remarks" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->pdi_remarks }}</td>
+                                    @else
+                                    <td>{{ $vehicles->pdi_remarks }}</td>
+                                    @endif
+                                    @else
+                                    <td>{{ $vehicles->pdi_remarks }}</td>
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
