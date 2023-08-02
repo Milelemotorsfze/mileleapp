@@ -7,6 +7,7 @@ use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
 use App\Http\Controllers\VehiclePendingApprovalRequestController;
 use App\Http\Controllers\VendorController;
+use App\Http\Controllers\VendorDocumentController;
 use App\Http\Controllers\WarrantyBrandsController;
 use App\Http\Controllers\WarrantyPriceHistoriesController;
 use Illuminate\Support\Facades\Auth;
@@ -339,6 +340,7 @@ Route::get('/d', function () {
     // Vendors
 
     Route::resource('vendors', VendorController::class);
+    Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
 
     Route::post('/vehicles/updatelogistics', [VehiclesController::class, 'updatelogistics'])->name('vehicles.updatelogistics');
     Route::get('/view-pictures-details/{id}', [VehiclesController::class, 'viewpictures'])->name('vehiclespictures.viewpictures');
@@ -353,7 +355,5 @@ Route::get('/d', function () {
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
-    //
-    Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
 
 });

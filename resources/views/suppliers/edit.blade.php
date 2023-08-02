@@ -953,19 +953,31 @@
                                             @endif
                                         </div>
                                     </div>
-
                                 </div>
                                 <div class="row p-2 pb-4">
                                     @if($supplier->supplierDocuments->count() > 0)
                                         <h6 class="fw-bold text-center">Other Documents</h6>
                                         @foreach($supplier->supplierDocuments as $document)
-                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                <div id="file4-preview">
+                                            <div class="col-lg-4 col-md-12 col-sm-12 text-center" id="preview-div-{{$document->id}}">
+                                                <div>
                                                     <iframe src="{{ url('vendor/other-documents/' . $document->file) }}"
-                                                            alt="Other Document"></iframe>
+                                                         class="mt-2" alt="Other Document"></iframe>
+                                                    <button  type="button" class="btn btn-sm btn-info mt-3 ">
+                                                        <a href="{{url('vendor/other-documents/' . $document->file)}}" download class="text-white">
+                                                            Download
+                                                        </a>
+                                                    </button>
+
+                                                    <button  type="button" class="btn btn-sm btn-danger mt-3 document-delete-button"
+                                                        data-id="{{ $document->id }}"> Delete</button>
                                                 </div>
                                             </div>
                                         @endforeach
+                                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                            <div id="file4-preview">
+
+                                            </div>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -973,6 +985,7 @@
                     </div>
                 </div>
             </div>
+
         <div id="tabId" hidden>
             <div class="tab">
                 <h6 class="tablinks" onclick="openCity(event, 'addSupplierDynamically')" id="defaultOpen">Add Supplier Addons</h6>
@@ -1076,9 +1089,10 @@
             </div>
         </form>
     </div>
-    <input type="hidden" value="" id="indexValue">
 
+    <input type="hidden" value="" id="indexValue">
     <div class="overlay"></div>
+
     @endif
 @endcan
     <script type="text/javascript">
@@ -1101,7 +1115,6 @@
         const previewFile3 = document.querySelector("#file3-preview");
         const previewFile4 = document.querySelector("#file4-preview");
 
-
         file1InputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
             while (previewFile1.firstChild) {
@@ -1122,6 +1135,7 @@
                 image.src = objectUrl;
                 previewFile1.appendChild(image);
             }
+
         });
         file2InputLicense.addEventListener("change", function(event) {
             const files = event.target.files;
@@ -1185,6 +1199,17 @@
                 }
             }
         });
+
+        var deletedDocuments = [];
+
+        $('.document-delete-button').on('click',function(){
+            let id = $(this).attr('data-id');
+            if (confirm('Are you sure you want to Delete this item ?')) {
+                $('#preview-div-'+id).remove();
+                deletedDocuments.push(id);
+            }
+        });
+        console.log("test");
 
         $(document).ready(function ()
         {
@@ -1591,34 +1616,36 @@
                 formInputError = true;
                 e.preventDefault();
             } else{
+                // alert("ok");
                 var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
-
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        contact_number: contactNumber,
-                        name: name,
-                        id: '{{ $supplier->id }}'
-                    },
-                    success:function (event,data) {
-                        if(data.error) {
-                            alert("error");
-                            showContactNumberError(data.error);
-                            formInputError = true;
-                            alert(formInputError);
-                            event.preventDefault();
-                            e.preventDefault();
-                            $('#submit').html('Save');
-                            $('.overlay').hide();
-                        }else{
-                            removeContactNumberError();
+                if(contactNumber) {
+                    $.ajax({
+                        type: "GET",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            contact_number: contactNumber,
+                            name: name,
+                            id: '{{ $supplier->id }}'
+                        },
+                        success:function (data) {
+                            if(data.error) {
+                                // alert("error");
+                                showContactNumberError(data.error);
+                                formInputError = true;
+                                // alert("yes",formInputError);
+                                // e.preventDefault();
+                                // $('#submit').html('Save');
+                                // $('.overlay').hide();
+                            }else{
+                                // alert("no error");
+                                removeContactNumberError();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
 
             // if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
@@ -1633,7 +1660,7 @@
 
             if(formInputError == false )
             {
-                alert("inside submit");
+
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
@@ -1772,7 +1799,6 @@
                 document.getElementById('addon_purchase_price_'+i).value = aed;
             }
         }
-
 
         function readURL(input)
         {

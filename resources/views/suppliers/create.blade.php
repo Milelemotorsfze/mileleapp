@@ -278,7 +278,8 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="supplier" type="text" class="form-control widthinput @error('supplier') is-invalid @enderror" name="supplier"
-                                           placeholder="Individual / Company Name" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus >
+                                           placeholder="Individual / Company Name" value="{{ old('supplier') }}"  autocomplete="supplier" autofocus
+                                           onchange="validationOnKeyUp(this)">
                                     @error('supplier')
                                     <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -1528,6 +1529,7 @@ input {
                 formInputError = true;
                 e.preventDefault();
             }
+
             if(inputSupplierType == '')
             {
                 $msg = "Supplier type is required";
@@ -1794,22 +1796,22 @@ input {
                 }
             }
 
-            if(clickInput.id == 'is_primary_payment_method')
-            {
-                var value = clickInput.value;
-                if(value == '')
-                {
-                    if(value.legth != 0)
-                    {
-                        $msg = "Primary payment method is required";
-                        showPaymentMethodsError($msg);
-                    }
-                }
-                else
-                {
-                    removePaymentMethodsError();
-                }
-            }
+            // if(clickInput.id == 'is_primary_payment_method')
+            // {
+            //     var value = clickInput.value;
+            //     if(value == '')
+            //     {
+            //         if(value.legth != 0)
+            //         {
+            //             $msg = "Primary payment method is required";
+            //             showPaymentMethodsError($msg);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         removePaymentMethodsError();
+            //     }
+            // }
             if(clickInput.id == 'supplier')
             {
                 var value = clickInput.value;
