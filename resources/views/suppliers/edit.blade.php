@@ -994,12 +994,12 @@
                                                 </div>
                                             </div>
                                         @endforeach
-                                        <div class="col-lg-4 col-md-12 col-sm-12 text-center">
-                                            <div id="file4-preview">
-
-                                            </div>
-                                        </div>
                                     @endif
+                                    <div class="col-lg-4 col-md-12 col-sm-12 text-center">
+                                        <div id="file4-preview">
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1212,9 +1212,10 @@
             $('.preview-div').attr('hidden', false);
 
             const files = event.target.files;
-            while (previewFile4.firstChild) {
-                previewFile4.removeChild(previewFile4.firstChild);
-            }
+            console.log(files);
+            // while (previewFile4.firstChild) {
+            //     previewFile4.removeChild(previewFile4.firstChild);
+            // }
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.type.match("application/pdf")) {
@@ -1231,8 +1232,8 @@
             }
         });
 
-        var deletedDocuments = [];
-
+        // var deletedDocuments = [];
+        var deletedDocuments = new Array();
         $('.document-delete-button').on('click',function(){
             let id = $(this).attr('data-id');
             if (confirm('Are you sure you want to Delete this item ?')) {
@@ -1586,37 +1587,7 @@
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        {{--$(document).on('click.once', function () {--}}
-        {{--    uniqueCheck();--}}
 
-        {{--})--}}
-        {{--function uniqueCheck( ) {--}}
-        {{--    var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);;--}}
-        {{--    var name = $('#supplier').val();--}}
-        {{--    var url = '{{ route('vendor.vendorUniqueCheck') }}';--}}
-
-        {{--    $.ajax({--}}
-        {{--        type: "GET",--}}
-        {{--        url: url,--}}
-        {{--        dataType: "json",--}}
-        {{--        data: {--}}
-        {{--            contact_number: contactNumber,--}}
-        {{--            name: name,--}}
-        {{--            id: '{{ $supplier->id }}'--}}
-        {{--        },--}}
-        {{--        success:function (data) {--}}
-        {{--            if(data.error) {--}}
-        {{--                showContactNumberError(data.error);--}}
-        {{--                var formInputError = true;--}}
-        {{--                e.preventDefault();--}}
-        {{--                $('#submit').html('Save');--}}
-        {{--                $('.overlay').hide();--}}
-        {{--            }else{--}}
-        {{--                removeContactNumberError();--}}
-        {{--            }--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--}--}}
 
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
@@ -1658,7 +1629,7 @@
                 e.preventDefault();
             }
             if(inputContactNumber == '')
-            { 
+            {
                 $msg ="Contact number is required";
                 showContactNumberError($msg);
                 formInputError = true;
@@ -1678,7 +1649,7 @@
                         name: name,
                         id: '{{ $supplier->id }}'
                     },
-                    success:function (data) { 
+                    success:function (data) {
                         if(data.error) {
                         formInputError = true;
                         $('#submit').html('Save');
@@ -1697,16 +1668,16 @@
         });
         function submitForm(e)
         {
-            var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164); 
-                $("input[name='contact_number[full]'").val(full_number); 
+            var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+                $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
                 $("input[name='activeTab'").val(activeTab);
-                
+
                 e.preventDefault();
                 var actionType = $('#submit').val();
                 var formData = new FormData(document.getElementById("createSupplierForm"));
-                formData.append('deletedDocuments', deletedDocuments);
+                formData.append('deletedDocuments[]', deletedDocuments);
                 console.log(formData);
                 var $notifications = $('#notifications')
                 $('#submit').html('Sending..');

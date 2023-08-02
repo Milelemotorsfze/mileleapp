@@ -192,7 +192,6 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
-
         $supplierTypes = [];
         if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
         {
@@ -700,6 +699,16 @@ class SupplierController extends Controller
         $input['is_communication_email'] = $request->is_communication_email ? true : false;
         $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
         $input['is_communication_any'] = $request->is_communication_any ? true : false;
+        info($request->deletedDocuments);
+        if($request->deletedDocuments[0] !== NULL) {
+            foreach ($request->deletedDocuments as $deletedDocument) {
+                info($deletedDocument);
+                $document = VendorDocument::find($deletedDocument);
+                info($document);
+                $document->delete();
+            }
+        }
+
         if($request->form_action == 'UPDATE') {
             $suppliers = Supplier::find($request->supplier_id);
             if($request->is_passport_delete = true && $suppliers->passport_copy_file) {
@@ -785,7 +794,7 @@ class SupplierController extends Controller
             foreach ($request->file('documents') as $file)
             {
                 $extension = $file->getClientOriginalExtension();
-                $fileName = time().'.'.$extension;
+                $fileName = time().'_'.$file->getClientOriginalName();
                 $destinationPath = 'vendor/other-documents';
                 $file->move($destinationPath, $fileName);
 
@@ -812,7 +821,6 @@ class SupplierController extends Controller
                 $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->delete();
             }
             foreach ($request->payment_methods as $paymentMethod) {
-                info($paymentMethod);
                 $payment_method = new SupplierAvailablePayments();
                 $payment_method->supplier_id = $suppliers->id;
                 $payment_method->payment_methods_id = $paymentMethod;
@@ -836,12 +844,7 @@ class SupplierController extends Controller
             }
         }
 
-        if($request->deletedDocumnets) {
-            info("deleted documents");
-            foreach ($request->deletedDocumnets as $deletedDocumnet)
-                $document = VendorDocument::find($deletedDocumnet);
-            $document->delete();
-        }
+
 
         return $suppliers;
     }
