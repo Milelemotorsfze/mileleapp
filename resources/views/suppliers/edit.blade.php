@@ -1706,6 +1706,7 @@
                 e.preventDefault();
                 var actionType = $('#submit').val();
                 var formData = new FormData(document.getElementById("createSupplierForm"));
+                formData.append('deletedDocuments', deletedDocuments);
                 console.log(formData);
                 var $notifications = $('#notifications')
                 $('#submit').html('Sending..');

@@ -847,7 +847,7 @@ class SupplierController extends Controller
     }
     public function updateDetails(Request $request)
     {
-// dd($request->all());
+// dd($request->deletedDocuments);
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
