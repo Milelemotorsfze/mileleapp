@@ -831,7 +831,7 @@ class SupplierController extends Controller
     }
     public function updateDetails(Request $request)
     {
-
+// dd($request->all());
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
@@ -1531,6 +1531,7 @@ class SupplierController extends Controller
     }
     public function vendorUniqueCheck(Request $request)
     {
+        // dd('hi');
         $contactNumber = $request->contact_number;
         $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name);
         if($request->id) {
@@ -1545,5 +1546,6 @@ class SupplierController extends Controller
         }else{
             return response($data);
         }
+        // dd($data);
     }
 }

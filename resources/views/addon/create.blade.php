@@ -859,7 +859,7 @@
             document.getElementById('selectModelLineNum'+i+'Des'+j).classList.add("is-invalid");
             document.getElementById('ModelLineError_'+i+'_'+j).classList.add("paragraph-class");
         }
-        function removeSPModelLineError($msg,i,j)
+        function removeSPModelLineError(i,j)
         {
             document.getElementById('ModelLineError_'+i+'_'+j).textContent="";
             document.getElementById('selectModelLineNum'+i+'Des'+j).classList.remove("is-invalid");

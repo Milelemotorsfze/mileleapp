@@ -1585,7 +1585,7 @@
                 e.preventDefault();
             }
             if(inputContactNumber == '')
-            {
+            { 
                 $msg ="Contact number is required";
                 showContactNumberError($msg);
                 formInputError = true;
@@ -1594,7 +1594,7 @@
                 var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
-
+                e.preventDefault();
                 $.ajax({
                     type: "GET",
                     url: url,
@@ -1604,44 +1604,34 @@
                         name: name,
                         id: '{{ $supplier->id }}'
                     },
-                    success:function (event,data) {
+                    success:function (data) { 
                         if(data.error) {
-                            alert("error");
-                            showContactNumberError(data.error);
-                            formInputError = true;
-                            alert(formInputError);
-                            event.preventDefault();
-                            e.preventDefault();
-                            $('#submit').html('Save');
+                        formInputError = true;
+                        $('#submit').html('Save');
                             $('.overlay').hide();
+                            showContactNumberError(data.error);
                         }else{
                             removeContactNumberError();
+                            if(formInputError == false )
+                            {
+                                submitForm(e);
+                            }
                         }
                     }
                 });
             }
-
-            // if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
-            // {
-            //     $msg ="One among contact number or alternative contact number or email is required";
-            //     showContactNumberError($msg);
-            //     showAlternativeContactNumberError($msg);
-            //     showEmailError($msg);
-            //     formInputError = true;
-            //     e.preventDefault();
-            // }
-
-            if(formInputError == false )
-            {
-                alert("inside submit");
-                var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-                $("input[name='contact_number[full]'").val(full_number);
+        });
+        function submitForm(e)
+        {
+            var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164); 
+                $("input[name='contact_number[full]'").val(full_number); 
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='alternative_contact_number[full]'").val(full_alternative_contact_number);
                 $("input[name='activeTab'").val(activeTab);
+                
                 e.preventDefault();
                 var actionType = $('#submit').val();
-                var formData = new FormData(this);
+                var formData = new FormData(document.getElementById("createSupplierForm"));
                 console.log(formData);
                 var $notifications = $('#notifications')
                 $('#submit').html('Sending..');
@@ -1698,8 +1688,7 @@
                     $('.overlay').hide();
                 }
                 });
-            }
-        });
+        }
         //===== delete the form fieed row
           $("body").on("click", ".remove_node_btn_frm_field", function ()
         {

@@ -317,6 +317,9 @@
                         $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
                         $(this).find('.removeButtonModelItem').attr('data-model-index',modelIndex);
 
+                        // $(this).find('.ModelLineError').attr('id','ModelLineError_'indexNumber'_'modelIndex');
+                        // <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
+
 
                         $('#selectBrandMo'+indexNumber).select2
                         ({
@@ -723,7 +726,16 @@
     function selectModelLineDescipt(id,row)
     {
         ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
-        showModelNumberDropdown(id,row);
+        if(ifModelLineExist == '')
+        {
+            $msg="Model line is required";
+            showSPModelLineError($msg,id,row);
+        }
+        else
+        {
+            showModelNumberDropdown(id,row);
+            removeSPModelLineError(id,row);
+        }
     }
     function showModelNumberDropdown(id,row)
     {
