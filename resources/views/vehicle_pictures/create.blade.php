@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <div class="form_field_outer" >
                         <div class="row form_field_outer_row" id="row-1">
-                            <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label"> VIN</label>
                                     <select class="form-control widthinput vehicles" multiple="true" required  id="vehicles-1" data-index="1" autofocus name="vins[1]" >
@@ -51,7 +51,18 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="col-lg-2 col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Pictures Category</label>
+                                    <select id="category" class="form-control mb-1">
+                                <option value="GRN">GRN</option>
+                                <option value="Modification">Modification</option>
+                                <option value="PDI">PDI</option>
+                                </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Variant Detail</label>
                                     <input type="text" class="form-control widthinput" id="variant-detail-1" readonly placeholder="Vehicle Details">
@@ -83,6 +94,12 @@
 
 @endsection
 @push('scripts')
+<script>
+    $(document).ready(function() {
+        $('#category').select2();
+        $('#vehicles-1').select2();
+    });
+</script>
     <script>
         var index = 1;
         $('#indexValue').val(index);
@@ -186,9 +203,6 @@
                 });
             });
         })
-
-
-
         function clickAdd()
         {
             var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;

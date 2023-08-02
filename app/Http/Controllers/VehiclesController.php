@@ -96,20 +96,90 @@ class VehiclesController extends Controller
                                         }
                                     });
                                     break;
-                                    case 'inspection_date':
-                                        $inspection_date = explode(',', $searchQuery);
-                                        $data = $data->where(function ($query) use ($inspection_date) {
-                                            foreach ($inspection_date as $inspection_date) {
-                                                if($inspection_date == "null")
+                                    case 'grn_remark':
+                                        $grn_remark = explode(',', $searchQuery);
+                                        $data = $data->where(function ($query) use ($grn_remark) {
+                                            foreach ($grn_remark as $grn_remark) {
+                                                if($grn_remark == "null")
                                                 {
-                                                    $query->orWhere('inspection_date', null);
+                                                    $query->orWhere('grn_remark', null);   
                                                 }
                                                 else{
-                                                $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
+                                                $query->orWhere('grn_remark', 'LIKE', '%' . trim($grn_remark) . '%');
                                                 }
                                             }
                                         });
                                         break;
+                                        case 'qc_remarks':
+                                            $qc_remarks = explode(',', $searchQuery);
+                                            $data = $data->where(function ($query) use ($qc_remarks) {
+                                                foreach ($qc_remarks as $qc_remarks) {
+                                                    if($qc_remarks == "null")
+                                                    {
+                                                        $query->orWhere('qc_remarks', null);   
+                                                    }
+                                                    else{
+                                                    $query->orWhere('qc_remarks', 'LIKE', '%' . trim($qc_remarks) . '%');
+                                                    }
+                                                }
+                                            });
+                                            break;
+                                            case 'pdi_date':
+                                                $pdi_date = explode(',', $searchQuery);
+                                                $data = $data->where(function ($query) use ($pdi_date) {
+                                                    foreach ($pdi_date as $pdi_date) {
+                                                        if($pdi_date == "null")
+                                                        {
+                                                            $query->orWhere('pdi_date', null);   
+                                                        }
+                                                        else{
+                                                        $query->orWhere('pdi_date', 'LIKE', '%' . trim($pdi_date) . '%');
+                                                        }
+                                                    }
+                                                });
+                                                break;
+                                                case 'pdi_remarks':
+                                                    $pdi_remarks = explode(',', $searchQuery);
+                                                    $data = $data->where(function ($query) use ($pdi_remarks) {
+                                                        foreach ($pdi_remarks as $pdi_remarks) {
+                                                            if($pdi_remarks == "null")
+                                                            {
+                                                                $query->orWhere('pdi_remarks', null);   
+                                                            }
+                                                            else{
+                                                            $query->orWhere('pdi_remarks', 'LIKE', '%' . trim($pdi_remarks) . '%');
+                                                            }
+                                                        }
+                                                    });
+                                                    break;
+                                                    case 'extra_features':
+                                                        $extra_features = explode(',', $searchQuery);
+                                                        $data = $data->where(function ($query) use ($extra_features) {
+                                                            foreach ($extra_features as $extra_features) {
+                                                                if($extra_features == "null")
+                                                                {
+                                                                    $query->orWhere('extra_features', null);   
+                                                                }
+                                                                else{
+                                                                $query->orWhere('extra_features', 'LIKE', '%' . trim($extra_features) . '%');
+                                                                }
+                                                            }
+                                                        });
+                                                        break;
+                                        case 'inspection_date':
+                                            $inspection_date = explode(',', $searchQuery);
+                                            $data = $data->where(function ($query) use ($inspection_date) {
+                                                foreach ($inspection_date as $inspection_date) {
+                                                    if($inspection_date == "null")
+                                                    {
+                                                        $query->orWhere('inspection_date', null);   
+                                                    }
+                                                    else{
+                                                    $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
+                                                    }
+                                                }
+                                            });
+                                            break;
                                         case 'reservation_start_date':
                                             $reservation_start_date = explode(',', $searchQuery);
                                             $data = $data->where(function ($query) use ($reservation_start_date) {
@@ -1581,7 +1651,6 @@ class VehiclesController extends Controller
             if ($request->reservation_start_dates[$key]) {
                 $newReservationStartDate = $request->reservation_start_dates[$key];
                 $isStartDateChanged = $vehicle->reservation_start_date != $newReservationStartDate;
-
                 if (!empty($vehicle->reservation_start_date)) {
                     if ($vehicle->reservation_start_date != $newReservationStartDate) {
 

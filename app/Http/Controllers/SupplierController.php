@@ -381,7 +381,6 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
-//        return $request->all();
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
@@ -403,85 +402,6 @@ class SupplierController extends Controller
         {
             $supplierTypeInput = $request->supplier_types;
             $input = $request->all();
-
-            $input['contact_number'] = $request->contact_number['full'];
-            $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-            $input['created_by'] = $authId;
-            $input['is_communication_fax'] = $request->is_communication_fax ? true : false;
-            $input['is_communication_mobile'] = $request->is_communication_mobile ? true : false;
-            $input['is_communication_email'] = $request->is_communication_email ? true : false;
-            $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
-            $input['is_communication_any'] = $request->is_communication_any ? true : false;
-
-
-            if ($request->hasFile('passport_copy_file'))
-            {
-                $file = $request->file('passport_copy_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time().'.'.$extension;
-                $destinationPath = 'vendor/passport';
-                $file->move($destinationPath, $fileName);
-
-                $input['passport_copy_file'] = $fileName;
-            }
-            if ($request->hasFile('trade_license_file'))
-            {
-                $file = $request->file('trade_license_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time().'.'.$extension;
-                $destinationPath = 'vendor/trade_license';
-                $file->move($destinationPath, $fileName);
-                $input['trade_license_file'] = $fileName;
-
-            }
-            if ($request->hasFile('vat_certificate_file'))
-            {
-                $file = $request->file('vat_certificate_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time().'.'.$extension;
-                $destinationPath = 'vendor/vat_certificate';
-                $file->move($destinationPath, $fileName);
-                $input['vat_certificate_file'] = $fileName;
-            }
-
-            $suppliers = Supplier::create($input);
-
-            if ($request->hasFile('documents'))
-            {
-                foreach ($request->file('documents') as $file)
-                {
-                    $extension = $file->getClientOriginalExtension();
-                    $fileName = time().'.'.$extension;
-                    $destinationPath = 'vendor/other-documents';
-                    $file->move($destinationPath, $fileName);
-
-                    $vendorDocument = new VendorDocument();
-                    $vendorDocument->supplier_id = $suppliers->id;
-                    $vendorDocument->file = $fileName;
-                    $vendorDocument->save();
-                }
-            }
-            if($request->categories) {
-
-                foreach ($request->categories as $categoryItem) {
-                    $category = new VendorCategory();
-                    $category->supplier_id = $suppliers->id;
-                    $category->category = $categoryItem;
-                    $category->save();
-                }
-
-            }
-            if($request->payment_methods) {
-                foreach ($request->payment_methods as $paymentMethod) {
-                    info($paymentMethod);
-                    $payment_method = new SupplierAvailablePayments();
-                    $payment_method->supplier_id = $suppliers->id;
-                    $payment_method->payment_methods_id = $paymentMethod;
-                    $payment_method->created_by = Auth::id();
-                    $payment_method->save();
-                }
-
-            }
 
             if($request->activeTab == 'uploadExcel')
             {
@@ -576,43 +496,8 @@ class SupplierController extends Controller
                                 }
                                 else
                                 {
-                                    $input = $request->all();
+                                    $suppliers = $this->createSupplier($request);
 
-                                    $input['contact_number'] = $request->contact_number['full'];
-                                    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-                                    $input['created_by'] = $authId;
-                                    $suppliers = Supplier::create($input);
-                                    if($request->supplier_types != null)
-                                    {
-                                        if(count($request->supplier_types) > 0)
-                                        {
-                                            $supplier_typeData['supplier_id'] = $suppliers->id;
-                                            $supplier_typeData['created_by'] = $authId;
-                                            foreach($request->supplier_types as $supplier_typeData1)
-                                            {
-                                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
-                                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-                                            }
-                                        }
-                                    }
-//                                    $payment_methods['supplier_id'] = $suppliers->id;
-//                                    $payment_methods['created_by'] = $authId;
-//                                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-//                                    $payment_methods['is_primary_payment_method'] = 'yes';
-//                                    $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-//                                    $payment_methods_id = $request->payment_methods_id;
-//                                    if($payment_methods_id != null)
-//                                    {
-//                                        if(count($payment_methods_id) > 0)
-//                                        {
-//                                            foreach($payment_methods_id as $payment_methods_id)
-//                                            {
-//                                                $payment_methods['payment_methods_id'] = $payment_methods_id;
-//                                                    $payment_methods['is_primary_payment_method'] = 'no';
-//                                                $paymentMethods = SupplierAvailablePayments::create($payment_methods);
-//                                            }
-//                                        }
-//                                    }
                                     $supplier_addon['supplier_id'] = $suppliers->id;
                                     $isupplier_addonnput['created_by'] = $authId;
                                     $addon_id = $request->addon_id;
@@ -684,19 +569,7 @@ class SupplierController extends Controller
                 }
                 else
                 {
-                    if($request->supplier_types != null)
-                    {
-                        if(count($request->supplier_types) > 0)
-                        {
-                            $supplier_typeData['supplier_id'] = $suppliers->id;
-                            $supplier_typeData['created_by'] = $authId;
-                            foreach($request->supplier_types as $supplier_typeData1)
-                            {
-                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
-                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-                            }
-                        }
-                    }
+                    $suppliers = $this->createSupplier($request);
 
                     $supplier_addon['supplier_id'] = $suppliers->id;
                     $isupplier_addonnput['created_by'] = $authId;
@@ -761,19 +634,8 @@ class SupplierController extends Controller
             }
             elseif($request->activeTab == 'addSupplierDynamically')
             {
-                if($request->supplier_types != null)
-                {
-                    if(count($request->supplier_types) > 0)
-                    {
-                        $supplier_typeData['supplier_id'] = $suppliers->id;
-                        $supplier_typeData['created_by'] = $authId;
-                        foreach($request->supplier_types as $supplier_typeData1)
-                        {
-                            $supplier_typeData['supplier_type'] = $supplier_typeData1;
-                            $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-                        }
-                    }
-                }
+               $suppliers = $this->createSupplier($request);
+
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['created_by'] = $authId;
                 $supAdd['supplier_id'] = $suppliers->id;
@@ -825,9 +687,163 @@ class SupplierController extends Controller
                 return response()->json(['success' => true,'data' => $data], 200);
             }
 
+        }
+    }
+    public function createSupplier(Request $request)
+    {
+        $input = $request->all();
+        $input['contact_number'] = $request->contact_number['full'];
+        $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+        $input['created_by'] = Auth::id();
+        $input['is_communication_fax'] = $request->is_communication_fax ? true : false;
+        $input['is_communication_mobile'] = $request->is_communication_mobile ? true : false;
+        $input['is_communication_email'] = $request->is_communication_email ? true : false;
+        $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
+        $input['is_communication_any'] = $request->is_communication_any ? true : false;
+        if($request->form_action == 'UPDATE') {
+            $suppliers = Supplier::find($request->supplier_id);
+            if($request->is_passport_delete = true && $suppliers->passport_copy_file) {
+                if (file_exists(public_path('vendor/passport/'.$suppliers->passport_copy_file))){
+                    $filedeleted = unlink(public_path('vendor/passport/'.$suppliers->passport_copy_file));
+                    if ($filedeleted) {
+                        $input['passport_copy_file'] = NULL;
+                    }
+                }
+            }
+            if($request->is_trade_license_delete = true && $suppliers->trade_license_file) {
+                if (file_exists(public_path('vendor/trade_license/'.$suppliers->trade_license_file))){
+                    $filedeleted = unlink(public_path('vendor/trade_license/'.$suppliers->trade_license_file));
+                    if ($filedeleted) {
+                        $input['trade_license_file'] = NULL;
+                    }
+                }
+            }
+            if($request->is_vat_delete = true && $suppliers->vat_certificate_file) {
+                if (file_exists(public_path('vendor/vat_certificate/'.$suppliers->vat_certificate_file))){
+                    $filedeleted = unlink(public_path('vendor/vat_certificate/'.$suppliers->vat_certificate_file));
+                    if ($filedeleted) {
+                        $input['vat_certificate_file'] = NULL;
+                    }
+                }
+            }
+        }
 
+        if ($request->hasFile('passport_copy_file'))
+        {
+            if($request->form_action == 'UPDATE' && $suppliers->passport_copy_file) {
+                if (file_exists(public_path('vendor/passport/' . $suppliers->passport_copy_file))) {
+                   unlink(public_path('vendor/passport/' . $suppliers->passport_copy_file));
+                }
+            }
+            $file = $request->file('passport_copy_file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $destinationPath = 'vendor/passport';
+            $file->move($destinationPath, $fileName);
+
+            $input['passport_copy_file'] = $fileName;
+        }
+        if ($request->hasFile('trade_license_file'))
+        {
+            if($request->form_action == 'UPDATE' && $suppliers->trade_license_file) {
+                if (file_exists(public_path('vendor/trade_license/' . $suppliers->trade_license_file))) {
+                    unlink(public_path('vendor/trade_license/' . $suppliers->trade_license_file));
+                }
+            }
+            $file = $request->file('trade_license_file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $destinationPath = 'vendor/trade_license';
+            $file->move($destinationPath, $fileName);
+            $input['trade_license_file'] = $fileName;
 
         }
+        if ($request->hasFile('vat_certificate_file'))
+        {
+            if($request->form_action == 'UPDATE' && $suppliers->vat_certificate_file) {
+                if (file_exists(public_path('vendor/vat_certificate/' . $suppliers->vat_certificate_file))) {
+                    unlink(public_path('vendor/vat_certificate/' . $suppliers->vat_certificate_file));
+                }
+            }
+            $file = $request->file('vat_certificate_file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $destinationPath = 'vendor/vat_certificate';
+            $file->move($destinationPath, $fileName);
+            $input['vat_certificate_file'] = $fileName;
+        }
+        if($request->form_action == 'UPDATE') {
+            $suppliers = Supplier::find($request->supplier_id);
+
+            $suppliers->update($input);
+        }else{
+            $suppliers = Supplier::create($input);
+        }
+
+        if ($request->hasFile('documents'))
+        {
+            foreach ($request->file('documents') as $file)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time().'.'.$extension;
+                $destinationPath = 'vendor/other-documents';
+                $file->move($destinationPath, $fileName);
+
+                $vendorDocument = new VendorDocument();
+                $vendorDocument->supplier_id = $suppliers->id;
+                $vendorDocument->file = $fileName;
+                $vendorDocument->save();
+            }
+        }
+        if($request->categories) {
+            if($request->form_action == 'UPDATE') {
+                $existingVendorCategories = VendorCategory::where('supplier_id',$request->supplier_id)->delete();
+            }
+            foreach ($request->categories as $categoryItem) {
+                $category = new VendorCategory();
+                $category->supplier_id = $suppliers->id;
+                $category->category = $categoryItem;
+                $category->save();
+            }
+
+        }
+        if($request->payment_methods) {
+            if($request->form_action == 'UPDATE') {
+                $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->delete();
+            }
+            foreach ($request->payment_methods as $paymentMethod) {
+                info($paymentMethod);
+                $payment_method = new SupplierAvailablePayments();
+                $payment_method->supplier_id = $suppliers->id;
+                $payment_method->payment_methods_id = $paymentMethod;
+                $payment_method->created_by = Auth::id();
+                $payment_method->save();
+            }
+
+        }
+        if($request->supplier_types)
+        {
+            if($request->form_action == 'UPDATE') {
+                $existingSupplierTypes = SupplierType::where('supplier_id', $request->supplier_id)->delete();
+            }
+            foreach ($request->supplier_types as $supplierType)
+            {
+                $supplier_type = new SupplierType();
+                $supplier_type->supplier_id = $suppliers->id;
+                $supplier_type->supplier_type = $supplierType;
+                $supplier_type->created_by = Auth::id();
+                $supplier_type->save();
+            }
+        }
+
+        if($request->deletedDocumnets) {
+            info("deleted documents");
+            foreach ($request->deletedDocumnets as $deletedDocumnet)
+                $document = VendorDocument::find($deletedDocumnet);
+            $document->delete();
+        }
+
+        return $suppliers;
     }
     public function updateDetails(Request $request)
     {
@@ -846,99 +862,9 @@ class SupplierController extends Controller
         }
         else {
 
+            $request['form_action'] = 'UPDATE';
             $supplierTypeInput = $request->supplier_types;
             $input = $request->all();
-            $suppliers = Supplier::find($request->supplier_id);
-            $input['contact_number'] = $request->contact_number['full'];
-            $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-
-            $input['is_communication_fax'] = $request->is_communication_fax ? true : false;
-            $input['is_communication_mobile'] = $request->is_communication_mobile ? true : false;
-            $input['is_communication_email'] = $request->is_communication_email ? true : false;
-            $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
-            $input['is_communication_any'] = $request->is_communication_any ? true : false;
-
-            $input['updated_by'] = $authId;
-
-            if ($request->hasFile('passport_copy_file')) {
-                $file = $request->file('passport_copy_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time() . '.' . $extension;
-                $destinationPath = 'vendor/passport';
-                $file->move($destinationPath, $fileName);
-
-                $input['passport_copy_file'] = $fileName;
-            }
-            if ($request->hasFile('trade_license_file')) {
-                $file = $request->file('trade_license_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time() . '.' . $extension;
-                $destinationPath = 'vendor/trade_license';
-                $file->move($destinationPath, $fileName);
-                $input['trade_license_file'] = $fileName;
-
-            }
-            if ($request->hasFile('vat_certificate_file')) {
-                $file = $request->file('vat_certificate_file');
-                $extension = $file->getClientOriginalExtension();
-                $fileName = time() . '.' . $extension;
-                $destinationPath = 'vendor/vat_certificate';
-                $file->move($destinationPath, $fileName);
-                $input['vat_certificate_file'] = $fileName;
-            }
-
-            $suppliers->update($input);
-
-            if ($request->hasFile('documents')) {
-                info($request->file('documents'));
-
-                foreach ($request->file('documents') as $file) {
-                    $extension = $file->getClientOriginalExtension();
-                     $fileName = $file->getClientOriginalName();
-                    info("file name");
-                    $destinationPath = 'vendor/other-documents';
-                    $file->move($destinationPath, $fileName);
-
-                    $vendorDocument = new VendorDocument();
-                    $vendorDocument->supplier_id = $suppliers->id;
-                    $vendorDocument->file = $fileName;
-                    $vendorDocument->save();
-                }
-            }
-            if ($request->categories) {
-                $existingVendorCategories = VendorCategory::where('supplier_id',$request->supplier_id)->delete();
-
-                foreach ($request->categories as $categoryItem) {
-                    $category = new VendorCategory();
-                    $category->supplier_id = $suppliers->id;
-                    $category->category = $categoryItem;
-                    $category->save();
-                }
-            }
-            if($request->payment_methods) {
-                $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->delete();
-
-                foreach ($request->payment_methods as $paymentMethod) {
-
-                    $payment_method = new SupplierAvailablePayments();
-                    $payment_method->supplier_id = $suppliers->id;
-                    $payment_method->payment_methods_id = $paymentMethod;
-                    $payment_method->created_by = Auth::id();
-                    $payment_method->save();
-                }
-            }
-            if($request->supplier_types)
-            {
-                $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->delete();
-                foreach ($request->supplier_types as $supplierType)
-                {
-                    $supplier_type = new SupplierType();
-                    $supplier_type->supplier_id = $suppliers->id;
-                    $supplier_type->supplier_type = $supplierType;
-                    $supplier_type->created_by = Auth::id();
-                    $supplier_type->save();
-                }
-            }
 
             if($request->activeTab == 'uploadExcel')
             {
@@ -1041,79 +967,8 @@ class SupplierController extends Controller
                                 }
                                 else
                                 {
-//                                    $input = $request->all();
-//                                    $suppliers = Supplier::find($request->supplier_id);
-//                                    $input['contact_number'] = $request->contact_number['full'];
-//                                    $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
-//                                    $input['updated_by'] = $authId;
-//                                    $suppliers->update($input);
-//                                    if($request->supplier_types != null)
-//                                    {
-//                                        if(count($request->supplier_types) > 0)
-//                                        {
-//                                            $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
-//                                            $existingSupplierTypes = json_decode($existingSupplierTypes);
-//                                            $supplier_typeData['supplier_id'] = $suppliers->id;
-//                                            $supplier_typeData['updated_by'] = $authId;
-//                                            foreach($request->supplier_types as $supplier_typeData1)
-//                                            {
-//                                                if(!in_array($supplier_typeData1,$existingSupplierTypes))
-//                                                {
-//                                                    $supplier_typeData['supplier_type'] = $supplier_typeData1;
-//                                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-//                                                }
-//                                            }
-//                                            foreach($existingSupplierTypes as $existingSupplierTypes1)
-//                                            {
-//                                                if(!in_array($existingSupplierTypes1,$request->supplier_types))
-//                                                {
-//                                                    $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
-//                                                    if($deleSupType)
-//                                                    {
-//                                                        $deleSupType->delete();
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                    $paymentMethodsUpdate = SupplierAvailablePayments::where('is_primary_payment_method','yes')->where('supplier_id',$request->supplier_id)->first();
-//                                    $payment_methods['supplier_id'] = $request->supplier_id;
-//                                    $payment_methods['updated_by'] = $authId;
-//                                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-//                                    $payment_methods['is_primary_payment_method'] = 'yes';
-//                                    $paymentMethodsUpdate->update($payment_methods);
-//                                    $payment_methods_id = $request->payment_methods_id;
-//                                    if($payment_methods_id != null)
-//                                    {
-//                                        if(count($payment_methods_id) > 0)
-//                                        {
-//                                            $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
-//                                            $existingPaymentMethods = json_decode($existingPaymentMethods);
-//                                            $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
-//                                            $paymentMethodsUpdate1['updated_by'] = $authId;
-//                                            foreach($payment_methods_id as $payment_methods_id1)
-//                                            {
-//                                                if(!in_array($payment_methods_id1,$existingPaymentMethods))
-//                                                {
-//                                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
-//                                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
-//                                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
-//                                                }
-//                                            }
-//                                            foreach($existingPaymentMethods as $existingPaymentMethods1)
-//                                            {
-//
-//                                                if(!in_array($existingPaymentMethods1,$payment_methods_id))
-//                                                {
-//                                                    $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
-//                                                    if($delSupPayMet)
-//                                                    {
-//                                                        $delSupPayMet->delete();
-//                                                    }
-//                                                }
-//                                            }
-//                                        }
-//                                    }
+                                    $suppliers = $this->createSupplier($request);
+
                                     $supplier_addon['supplier_id'] = $suppliers->id;
                                     $isupplier_addonnput['updated_by'] = $authId;
                                     $addon_id = $request->addon_id;
@@ -1185,73 +1040,8 @@ class SupplierController extends Controller
                 }
                 else
                 {
-//                    if($request->supplier_types != null)
-//                    {
-//                        if(count($request->supplier_types) > 0)
-//                        {
-//                            $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
-//                            $existingSupplierTypes = json_decode($existingSupplierTypes);
-//                            $supplier_typeData['supplier_id'] = $suppliers->id;
-//                            $supplier_typeData['updated_by'] = $authId;
-//                            foreach($request->supplier_types as $supplier_typeData1)
-//                            {
-//                                if(!in_array($supplier_typeData1,$existingSupplierTypes))
-//                                {
-//                                    $supplier_typeData['supplier_type'] = $supplier_typeData1;
-//                                    $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-//                                }
-//                            }
-//                            foreach($existingSupplierTypes as $existingSupplierTypes1)
-//                            {
-//                                if(!in_array($existingSupplierTypes1,$request->supplier_types))
-//                                {
-//                                    $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
-//                                    if($deleSupType)
-//                                    {
-//                                        $deleSupType->delete();
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    $paymentMethodsUpdate = SupplierAvailablePayments::where('is_primary_payment_method','yes')->where('supplier_id',$request->supplier_id)->first();
-//                    $payment_methods['supplier_id'] = $request->supplier_id;
-//                    $payment_methods['updated_by'] = $authId;
-//                    $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-//                    $payment_methods['is_primary_payment_method'] = 'yes';
-//                    $paymentMethodsUpdate->update($payment_methods);
-//                    $payment_methods_id = $request->payment_methods_id;
-//                    if($payment_methods_id != null)
-//                    {
-//                        if(count($payment_methods_id) > 0)
-//                        {
-//                            $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
-//                            $existingPaymentMethods = json_decode($existingPaymentMethods);
-//                            $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
-//                            $paymentMethodsUpdate1['updated_by'] = $authId;
-//                            foreach($payment_methods_id as $payment_methods_id1)
-//                            {
-//                                if(!in_array($payment_methods_id1,$existingPaymentMethods))
-//                                {
-//                                    $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
-//                                    $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
-//                                    $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
-//                                }
-//                            }
-//                            foreach($existingPaymentMethods as $existingPaymentMethods1)
-//                            {
-//
-//                                if(!in_array($existingPaymentMethods1,$payment_methods_id))
-//                                {
-//                                    $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
-//                                    if($delSupPayMet)
-//                                    {
-//                                        $delSupPayMet->delete();
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
+                    $suppliers = $this->createSupplier($request);
+
                     $supplier_addon['supplier_id'] = $suppliers->id;
                     $isupplier_addonnput['updated_by'] = $authId;
                     $addon_id = $request->addon_id;
@@ -1315,74 +1105,8 @@ class SupplierController extends Controller
             }
             elseif($request->activeTab == 'addSupplierDynamically')
             {
+                $suppliers = $this->createSupplier($request);
 
-            info("dynamic add");
-//                if($request->supplier_types != null)
-//                {
-//                    if(count($request->supplier_types) > 0)
-//                    {
-//                        $existingSupplierTypes = SupplierType::where('supplier_id',$request->supplier_id)->pluck('supplier_type');
-//                        $existingSupplierTypes = json_decode($existingSupplierTypes);
-//                        $supplier_typeData['supplier_id'] = $suppliers->id;
-//                        $supplier_typeData['updated_by'] = $authId;
-//                        foreach($request->supplier_types as $supplier_typeData1)
-//                        {
-//                            if(!in_array($supplier_typeData1,$existingSupplierTypes))
-//                            {
-//                                $supplier_typeData['supplier_type'] = $supplier_typeData1;
-//                                $supplier_typeDataCreate = SupplierType::create($supplier_typeData);
-//                            }
-//                        }
-//                        foreach($existingSupplierTypes as $existingSupplierTypes1)
-//                        {
-//                            if(!in_array($existingSupplierTypes1,$request->supplier_types))
-//                            {
-//                                $deleSupType = SupplierType::where('supplier_id',$request->supplier_id)->where('supplier_type',$existingSupplierTypes1)->first();
-//                                if($deleSupType)
-//                                {
-//                                    $deleSupType->delete();
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                $paymentMethodsUpdate = SupplierAvailablePayments::where('is_primary_payment_method','yes')->where('supplier_id',$request->supplier_id)->first();
-//                $payment_methods['supplier_id'] = $request->supplier_id;
-//                $payment_methods['updated_by'] = $authId;
-//                $payment_methods['payment_methods_id'] = $request->is_primary_payment_method;
-//                $payment_methods['is_primary_payment_method'] = 'yes';
-//                $paymentMethodsUpdate->update($payment_methods);
-//                $payment_methods_id = $request->payment_methods_id;
-//                if($payment_methods_id != null)
-//                {
-//                    if(count($payment_methods_id) > 0)
-//                    {
-//                        $existingPaymentMethods = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('is_primary_payment_method','no')->pluck('payment_methods_id');
-//                        $existingPaymentMethods = json_decode($existingPaymentMethods);
-//                        $paymentMethodsUpdate1['supplier_id'] = $request->supplier_id;
-//                        $paymentMethodsUpdate1['updated_by'] = $authId;
-//                        foreach($payment_methods_id as $payment_methods_id1)
-//                        {
-//                            if(!in_array($payment_methods_id1,$existingPaymentMethods))
-//                            {
-//                                $paymentMethodsUpdate1['payment_methods_id'] = $payment_methods_id1;
-//                                $paymentMethodsUpdate1['is_primary_payment_method'] = 'no';
-//                                $supplier_typeDataCreate = SupplierAvailablePayments::create($paymentMethodsUpdate1);
-//                            }
-//                        }
-//                        foreach($existingPaymentMethods as $existingPaymentMethods1)
-//                        {
-//                            if(!in_array($existingPaymentMethods1,$payment_methods_id))
-//                            {
-//                                $delSupPayMet = SupplierAvailablePayments::where('supplier_id',$request->supplier_id)->where('payment_methods_id',$existingPaymentMethods1)->where('is_primary_payment_method','no')->first();
-//                                if($delSupPayMet)
-//                                {
-//                                    $delSupPayMet->delete();
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
                 $supplier_addon['supplier_id'] = $suppliers->id;
                 $isupplier_addonnput['updated_by'] = $authId;
                 $addon_id = $request->addon_id;

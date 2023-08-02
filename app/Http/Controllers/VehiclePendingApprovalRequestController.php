@@ -95,9 +95,9 @@ class VehiclePendingApprovalRequestController extends Controller
 
         $vehicle = Vehicles::find($pendingApprovalRequest->vehicle_id);
 
-
-        if($field == 'inspection_date' || $field == 'varaints_id' || $field == 'engine' || $field == 'ex_colour'
-            || $field == 'int_colour' || $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date')
+        if($field == 'inspection_date' || $field == 'varaints_id' || $field == 'engine' || $field == 'ex_colour' || $field == 'qc_remarks'
+            || $field == 'pdi_remarks' ||  $field == 'grn_remark'|| $field == 'extra_features' || $field == 'int_colour' ||
+            $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date')
         {
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -216,10 +216,10 @@ class VehiclePendingApprovalRequestController extends Controller
                 $colorlog->save();
 
             }
-        }else{
-            $vehicle->$field = $newValue;
-
         }
+
+        $vehicle->$field = $newValue;
+
         $vehicle->save();
         $pendingApprovalRequest->status = $request->status;
         if($request->status == 'approved') {
