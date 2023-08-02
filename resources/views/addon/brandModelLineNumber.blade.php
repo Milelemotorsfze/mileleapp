@@ -519,7 +519,7 @@
             </div>
             </div>
          `);
-        selectBrandDisp(supplier);
+        selectBrandDisp(supplier,index);
         $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -567,18 +567,25 @@
 
         }
     }
-    function selectBrandDisp(id) 
+    function selectBrandDisp(id,row)
     {
+        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+
+
         var value =$('#selectBrandMo'+id).val();
         var brandId = value;
         if(brandId != '')
         {
             $msg = "";
             removeSPBrandError($msg,id);
-            var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-            for(var i = 1;i<=indexValue;i++) 
-            {
-                showBrandModelLines(id,i);
+            if(indexValue == row) {
+                showBrandModelLines(id,row);
+
+            }else {
+                for(var i = 1;i<=indexValue;i++) {
+                    // $('#selectModelLineNum'+index+'Des'+i).empty();
+                    showBrandModelLines(id,i);
+                }
             }
         }
         else

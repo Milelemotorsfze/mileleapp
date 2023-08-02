@@ -393,11 +393,7 @@
                                             is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number"
                                                value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus
                                                onkeyup="validationOnKeyUp(this)">
-                                        <!-- @error('alternative_contact_number')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                </span>
-                                     @enderror -->
+
                                         <span id="alternativeContactRequired" class="email-phone required-class"></span>
                                     </div>
                                 </div>
@@ -1517,6 +1513,38 @@
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
+        {{--$(document).on('click.once', function () {--}}
+        {{--    uniqueCheck();--}}
+
+        {{--})--}}
+        {{--function uniqueCheck( ) {--}}
+        {{--    var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);;--}}
+        {{--    var name = $('#supplier').val();--}}
+        {{--    var url = '{{ route('vendor.vendorUniqueCheck') }}';--}}
+
+        {{--    $.ajax({--}}
+        {{--        type: "GET",--}}
+        {{--        url: url,--}}
+        {{--        dataType: "json",--}}
+        {{--        data: {--}}
+        {{--            contact_number: contactNumber,--}}
+        {{--            name: name,--}}
+        {{--            id: '{{ $supplier->id }}'--}}
+        {{--        },--}}
+        {{--        success:function (data) {--}}
+        {{--            if(data.error) {--}}
+        {{--                showContactNumberError(data.error);--}}
+        {{--                var formInputError = true;--}}
+        {{--                e.preventDefault();--}}
+        {{--                $('#submit').html('Save');--}}
+        {{--                $('.overlay').hide();--}}
+        {{--            }else{--}}
+        {{--                removeContactNumberError();--}}
+        {{--            }--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--}--}}
+
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
@@ -1556,17 +1584,56 @@
                 formInputError = true;
                 e.preventDefault();
             }
-            if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
+            if(inputContactNumber == '')
             {
-                $msg ="One among contact number or alternative contact number or email is required";
+                $msg ="Contact number is required";
                 showContactNumberError($msg);
-                showAlternativeContactNumberError($msg);
-                showEmailError($msg);
                 formInputError = true;
                 e.preventDefault();
+            } else{
+                var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+                var name = $('#supplier').val();
+                var url = '{{ route('vendor.vendorUniqueCheck') }}';
+
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        contact_number: contactNumber,
+                        name: name,
+                        id: '{{ $supplier->id }}'
+                    },
+                    success:function (event,data) {
+                        if(data.error) {
+                            alert("error");
+                            showContactNumberError(data.error);
+                            formInputError = true;
+                            alert(formInputError);
+                            event.preventDefault();
+                            e.preventDefault();
+                            $('#submit').html('Save');
+                            $('.overlay').hide();
+                        }else{
+                            removeContactNumberError();
+                        }
+                    }
+                });
             }
-            if(formInputError == false)
+
+            // if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
+            // {
+            //     $msg ="One among contact number or alternative contact number or email is required";
+            //     showContactNumberError($msg);
+            //     showAlternativeContactNumberError($msg);
+            //     showEmailError($msg);
+            //     formInputError = true;
+            //     e.preventDefault();
+            // }
+
+            if(formInputError == false )
             {
+                alert("inside submit");
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 $("input[name='contact_number[full]'").val(full_number);
                 var full_alternative_contact_number = alternative_contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
@@ -1639,37 +1706,37 @@
             $(this).closest(".form_field_outer_row").remove();
                 // addonDropdownCount = addonDropdownCount-1;
         });
-        function secondaryPaymentMethods(changePayment)
-        {
-            var e = document.getElementById("is_primary_payment_method");
-            var value = e.value;
-            // alert(value);
-            if(value != '')
-            {
-                if(PreviousHidden != '')
-                {
-                    let addonTable = document.getElementById(PreviousHidden);
-                    addonTable.hidden = false
-                    // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
-                    // uncheckedPaymentMethod.checked = false;
-
-                }
-                validationOnKeyUp(changePayment);
-
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = false
-                let primaryPaymentMethod = document.getElementById(value);
-                primaryPaymentMethod.hidden = true
-                PreviousHidden = value;
-            }
-            else
-            {
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = true
-                $msg = "Primary payment method required"
-                showPaymentMethodsError($msg);
-            }
-        }
+        // function secondaryPaymentMethods(changePayment)
+        // {
+        //     var e = document.getElementById("is_primary_payment_method");
+        //     var value = e.value;
+        //     // alert(value);
+        //     if(value != '')
+        //     {
+        //         if(PreviousHidden != '')
+        //         {
+        //             let addonTable = document.getElementById(PreviousHidden);
+        //             addonTable.hidden = false
+        //             // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
+        //             // uncheckedPaymentMethod.checked = false;
+        //
+        //         }
+        //         validationOnKeyUp(changePayment);
+        //
+        //         let addonTable = document.getElementById('secondaryPayments');
+        //         addonTable.hidden = false
+        //         let primaryPaymentMethod = document.getElementById(value);
+        //         primaryPaymentMethod.hidden = true
+        //         PreviousHidden = value;
+        //     }
+        //     else
+        //     {
+        //         let addonTable = document.getElementById('secondaryPayments');
+        //         addonTable.hidden = true
+        //         $msg = "Primary payment method required"
+        //         showPaymentMethodsError($msg);
+        //     }
+        // }
         function changeCurrency(i)
         {
             var e = document.getElementById("currency_"+i);
@@ -1760,22 +1827,22 @@
                     }
                 }
             }
-            if(clickInput.id == 'is_primary_payment_method')
-            {
-                var value = clickInput.value;
-                if(value == '')
-                {
-                    if(value.legth != 0)
-                    {
-                        $msg = "Primary payment method is required";
-                        showPaymentMethodsError($msg);
-                    }
-                }
-                else
-                {
-                    removePaymentMethodsError();
-                }
-            }
+            // if(clickInput.id == 'is_primary_payment_method')
+            // {
+            //     var value = clickInput.value;
+            //     if(value == '')
+            //     {
+            //         if(value.legth != 0)
+            //         {
+            //             $msg = "Primary payment method is required";
+            //             showPaymentMethodsError($msg);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         removePaymentMethodsError();
+            //     }
+            // }
             if(clickInput.id == 'supplier')
             {
                 var value = clickInput.value;

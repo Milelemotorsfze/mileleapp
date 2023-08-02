@@ -381,14 +381,20 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+//        return $request->all();
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
             'supplier' => 'required',
-            'contact_number' => 'required',
             'supplier_types' => 'required',
-            'categories' => 'required'
+            'categories' => 'required',
+            'contact_number' => 'required'
         ]);
+
+        $isSupplierExist = Supplier::where('supplier', $request->supplier)->where('contact_number', $request->contact_number['full'])->first();
+        if($isSupplierExist) {
+            return redirect(route('suppliers.create'))->with('error','Name and Contact Number should be unique.');
+        }
         if ($validator->fails())
         {
             return redirect(route('suppliers.create'))->withInput()->withErrors($validator);
@@ -1523,24 +1529,19 @@ class SupplierController extends Controller
             return response()->json(['success' => true,'data' => $data], 200);
         }
     }
-    public function vendorUniqueCheck(Request $request) {
+    public function vendorUniqueCheck(Request $request)
+    {
         $contactNumber = $request->contact_number;
-        $vendorName = $request->name;
-        $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name)->first();
-        $isContactNumberExist = Supplier::where('contact_number', $contactNumber)->first();
-        $isNameExist = Supplier::where('supplier', $request->name)->first();
+        $isVendorExist = Supplier::where('contact_number', $contactNumber)->where('supplier', $request->name);
+        if($request->id) {
+            $isVendorExist = $isVendorExist->whereNot('id', $request->id);
+        }
+        $isVendorExist = $isVendorExist->first();
         $data = [];
         if($isVendorExist) {
-            if($isContactNumberExist) {
-                info("CONTACT NUMBER EXIST");
-                $data['contact_number'] = 'Contact number should be unique';
-                return response($data);
-            }elseif ($isVendorExist) {
-                info("CONTACT NUMBER EXIST");
 
-                $data['name'] = 'Contact number should be unique';
-                return response($data);
-            }
+            $data['error'] = 'Combination of Name and Contact Number should be unique';
+            return response($data);
         }else{
             return response($data);
         }

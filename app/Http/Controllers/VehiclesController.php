@@ -60,7 +60,7 @@ class VehiclesController extends Controller
                                 foreach ($vinNumbers as $vin) {
                                     if($vin == "null")
                                     {
-                                    $query->orWhere('vin', null);   
+                                    $query->orWhere('vin', null);
                                     }
                                     else{
                                     $query->orWhere('vin', 'LIKE', '%' . trim($vin) . '%');
@@ -74,7 +74,7 @@ class VehiclesController extends Controller
                                     foreach ($vehicle_id as $id) {
                                         if($id == "null")
                                     {
-                                        $query->orWhere('id', null);   
+                                        $query->orWhere('id', null);
                                     }
                                     else{
                                         $query->orWhere('id', 'LIKE', '%' . trim($id) . '%');
@@ -88,7 +88,7 @@ class VehiclesController extends Controller
                                         foreach ($estimation_date as $estimation_date) {
                                     if($estimation_date == "null")
                                     {
-                                        $query->orWhere('estimation_date', null);   
+                                        $query->orWhere('estimation_date', null);
                                     }
                                     else{
                                             $query->orWhere('estimation_date', 'LIKE', '%' . trim($estimation_date) . '%');
@@ -102,7 +102,7 @@ class VehiclesController extends Controller
                                             foreach ($inspection_date as $inspection_date) {
                                                 if($inspection_date == "null")
                                                 {
-                                                    $query->orWhere('inspection_date', null);   
+                                                    $query->orWhere('inspection_date', null);
                                                 }
                                                 else{
                                                 $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
@@ -116,7 +116,7 @@ class VehiclesController extends Controller
                                                 foreach ($reservation_start_date as $reservation_start_date) {
                                                     if($reservation_start_date == "null")
                                                     {
-                                                        $query->orWhere('reservation_start_date', null);   
+                                                        $query->orWhere('reservation_start_date', null);
                                                     }
                                                     else{
                                                     $query->orWhere('reservation_start_date', 'LIKE', '%' . trim($reservation_start_date) . '%');
@@ -130,7 +130,7 @@ class VehiclesController extends Controller
                                                     foreach ($reservation_end_date as $reservation_end_date) {
                                                         if($reservation_end_date == "null")
                                                     {
-                                                        $query->orWhere('reservation_end_date', null);   
+                                                        $query->orWhere('reservation_end_date', null);
                                                     }
                                                     else{
                                                         $query->orWhere('reservation_end_date', 'LIKE', '%' . trim($reservation_end_date) . '%');
@@ -144,7 +144,7 @@ class VehiclesController extends Controller
                                                         foreach ($engine as $engine) {
                                                             if($engine == "null")
                                                             {
-                                                                $query->orWhere('engine', null);   
+                                                                $query->orWhere('engine', null);
                                                             }
                                                             else{
                                                             $query->orWhere('engine', 'LIKE', '%' . trim($engine) . '%');
@@ -158,7 +158,7 @@ class VehiclesController extends Controller
                                                             foreach ($ppmmyyy as $ppmmyyy) {
                                                                 if($ppmmyyy == "null")
                                                             {
-                                                                $query->orWhere('ppmmyyy', null);   
+                                                                $query->orWhere('ppmmyyy', null);
                                                             }
                                                             else{
                                                                 $query->orWhere('ppmmyyy', 'LIKE', '%' . trim($ppmmyyy) . '%');
@@ -172,7 +172,7 @@ class VehiclesController extends Controller
                                                                 foreach ($price as $price) {
                                                                     if($price == "null")
                                                             {
-                                                                $query->orWhere('price', null);   
+                                                                $query->orWhere('price', null);
                                                             }
                                                             else{
                                                                     $query->orWhere('price', 'LIKE', '%' . trim($price) . '%');
@@ -186,7 +186,7 @@ class VehiclesController extends Controller
                                         foreach ($poNumbers as $poNumber) {
                                             if($poNumber == "null")
                                             {
-                                                $query->orWhere('purchasing_order_id', null);   
+                                                $query->orWhere('purchasing_order_id', null);
                                             }
                                             else{
                                             // Find the purchasing_order_id based on the po_number
@@ -204,7 +204,7 @@ class VehiclesController extends Controller
                                             foreach ($po_date as $po_date) {
                                                 if($po_date == "null")
                                             {
-                                                $query->orWhere('purchasing_order_id', null); 
+                                                $query->orWhere('purchasing_order_id', null);
                                             }
                                             else{
                                                 // Find the purchasing_order_id based on the po_number
@@ -222,7 +222,7 @@ class VehiclesController extends Controller
                                                 foreach ($grn_number as $grn_number) {
                                                     if($grn_number == "null")
                                             {
-                                                $query->orWhere('grn_id', null); 
+                                                $query->orWhere('grn_id', null);
                                             }
                                             else{
                                                     // Find the purchasing_order_id based on the po_number
@@ -240,7 +240,7 @@ class VehiclesController extends Controller
                                                     foreach ($grn_date as $grn_date) {
                                                         if($grn_date == "null")
                                             {
-                                                $query->orWhere('grn_id', null);   
+                                                $query->orWhere('grn_id', null);
                                             }
                                             else{
                                                         // Find the purchasing_order_id based on the po_number
@@ -258,7 +258,7 @@ class VehiclesController extends Controller
                                                         foreach ($so_number as $so_number) {
                                                             if($so_number == "null")
                                                             {
-                                                                $query->orWhere('so_id', null);  
+                                                                $query->orWhere('so_id', null);
                                                             }
                                                             else{
                                                             // Find the purchasing_order_id based on the po_number
@@ -276,7 +276,7 @@ class VehiclesController extends Controller
                                                             foreach ($so_date as $so_date) {
                                                                 if($so_date == "null")
                                                                 {
-                                                                    $query->orWhere('so_id', null);  
+                                                                    $query->orWhere('so_id', null);
                                                                 }
                                                                 else{
                                                                 // Find the purchasing_order_id based on the po_number
@@ -294,7 +294,7 @@ class VehiclesController extends Controller
                                                                 foreach ($sales_person_id as $sales_person_id) {
                                                                     if($sales_person_id == "null")
                                                                     {
-                                                                        $query->orWhere('so_id', null);  
+                                                                        $query->orWhere('so_id', null);
                                                                     }
                                                                     else{
                                                                     // Find the purchasing_order_id based on the po_number
@@ -312,7 +312,7 @@ class VehiclesController extends Controller
                                                                     foreach ($gdn_number as $gdn_number) {
                                                                         if($gdn_number == "null")
                                                                     {
-                                                                        $query->orWhere('gdn_id', null);   
+                                                                        $query->orWhere('gdn_id', null);
                                                                     }
                                                                     else{
                                                                         // Find the purchasing_order_id based on the po_number
@@ -330,7 +330,7 @@ class VehiclesController extends Controller
                                                                         foreach ($gdn_date as $gdn_date) {
                                                                             if($gdn_date == "null")
                                                                             {
-                                                                                $query->orWhere('gdn_id', null);   
+                                                                                $query->orWhere('gdn_id', null);
                                                                             }
                                                                             else{
                                                                             // Find the purchasing_order_id based on the po_number
@@ -348,7 +348,7 @@ class VehiclesController extends Controller
                                                                             foreach ($variant as $variant) {
                                                                                 if($variant == "null")
                                                                                 {
-                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                    $query->orWhere('varaints_id', null);
                                                                                 }
                                                                                 else{
                                                                                 // Find the purchasing_order_id based on the po_number
@@ -366,7 +366,7 @@ class VehiclesController extends Controller
                                                                                 foreach ($variant_details as $variant_details) {
                                                                                     if($variant_details == "null")
                                                                                 {
-                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                    $query->orWhere('varaints_id', null);
                                                                                 }
                                                                                 else{
                                                                                     // Find the purchasing_order_id based on the po_number
@@ -384,7 +384,7 @@ class VehiclesController extends Controller
                                                                                         foreach ($model_description as $model_description) {
                                                                                             if($model_description == "null")
                                                                                 {
-                                                                                    $query->orWhere('varaints_id', null);   
+                                                                                    $query->orWhere('varaints_id', null);
                                                                                 }
                                                                                 else{
                                                                                             // Find the purchasing_order_id based on the po_number
@@ -402,7 +402,7 @@ class VehiclesController extends Controller
                                                                                                 foreach ($model_year as $model_year) {
                                                                                                     if($model_year == "null")
                                                                                                     {
-                                                                                                        $query->orWhere('varaints_id', null);  
+                                                                                                        $query->orWhere('varaints_id', null);
                                                                                                     }
                                                                                                     else{
                                                                                                     // Find the purchasing_order_id based on the po_number
@@ -420,7 +420,7 @@ class VehiclesController extends Controller
                                                                                                     foreach ($steering as $steering) {
                                                                                                         if($steering == "null")
                                                                                                     {
-                                                                                                        $query->orWhere('varaints_id', null);  
+                                                                                                        $query->orWhere('varaints_id', null);
                                                                                                     }
                                                                                                     else{
                                                                                                         // Find the purchasing_order_id based on the po_number
@@ -438,7 +438,7 @@ class VehiclesController extends Controller
                                                                                                         foreach ($seats as $seats) {
                                                                                                             if($seats == "null")
                                                                                                             {
-                                                                                                                $query->orWhere('varaints_id', null);   
+                                                                                                                $query->orWhere('varaints_id', null);
                                                                                                             }
                                                                                                             else{
                                                                                                             // Find the purchasing_order_id based on the po_number
@@ -456,7 +456,7 @@ class VehiclesController extends Controller
                                                                                                             foreach ($upholestry as $upholestry) {
                                                                                                                 if($upholestry == "null")
                                                                                                             {
-                                                                                                                $query->orWhere('varaints_id', null);   
+                                                                                                                $query->orWhere('varaints_id', null);
                                                                                                             }
                                                                                                             else{
                                                                                                                 // Find the purchasing_order_id based on the po_number
@@ -474,7 +474,7 @@ class VehiclesController extends Controller
                                                                                                             foreach ($fuel_type as $fuel_type) {
                                                                                                                 if($fuel_type == "null")
                                                                                                             {
-                                                                                                                $query->orWhere('varaints_id', null);  
+                                                                                                                $query->orWhere('varaints_id', null);
                                                                                                             }
                                                                                                             else{
                                                                                                                 // Find the purchasing_order_id based on the po_number
@@ -492,7 +492,7 @@ class VehiclesController extends Controller
                                                                                                                 foreach ($brandNames as $brandName) {
                                                                                                                     if($brandName == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhereIn('varaints_id', null);   
+                                                                                                                        $query->orWhereIn('varaints_id', null);
                                                                                                                     }
                                                                                                                     else{
                                                                                                                     // Find the brand_id based on the brand name from the brands table
@@ -513,7 +513,7 @@ class VehiclesController extends Controller
                                                                                                                         // Find the brand_id based on the brand name from the brands table
                                                                                                                         if($modellines == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhereIn('varaints_id', null);   
+                                                                                                                        $query->orWhereIn('varaints_id', null);
                                                                                                                     }
                                                                                                                     else{
                                                                                                                         $modelline = MasterModelLines::where('model_line', 'LIKE', '%' . trim($modellines) . '%')->first();
@@ -532,7 +532,7 @@ class VehiclesController extends Controller
                                                                                                                 foreach ($ex_colour as $ex_colour) {
                                                                                                                     if($ex_colour == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhere('ex_colour', null);   
+                                                                                                                        $query->orWhere('ex_colour', null);
                                                                                                                     }
                                                                                                                     else{
                                                                                                                     $ex_colour = ColorCode::where('name', 'LIKE', '%' . trim($ex_colour) . '%')->where('belong_to', 'ex')->first();
@@ -549,7 +549,7 @@ class VehiclesController extends Controller
                                                                                                                     foreach ($int_colour as $int_colour) {
                                                                                                                         if($int_colour == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhere('int_colour', null);   
+                                                                                                                        $query->orWhere('int_colour', null);
                                                                                                                     }
                                                                                                                     else{
                                                                                                                         // Find the purchasing_order_id based on the po_number
@@ -567,7 +567,7 @@ class VehiclesController extends Controller
                                                                                                                     foreach ($import_type as $import_type) {
                                                                                                                         if($import_type == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhere('documents_id', null);   
+                                                                                                                        $query->orWhere('documents_id', null);
                                                                                                                     }
                                                                                                                     else{
                                                                                                                         // Find the purchasing_order_id based on the po_number
@@ -585,7 +585,7 @@ class VehiclesController extends Controller
                                                                                                                         foreach ($owership as $owership) {
                                                                                                                             if($owership == "null")
                                                                                                                     {
-                                                                                                                        $query->orWhere('documents_id', null);;   
+                                                                                                                        $query->orWhere('documents_id', null);;
                                                                                                                     }
                                                                                                                     else{
                                                                                                                             // Find the purchasing_order_id based on the po_number
@@ -603,7 +603,7 @@ class VehiclesController extends Controller
                                                                                                                             foreach ($documentwith as $documentwith) {
                                                                                                                                 if($documentwith == "null")
                                                                                                                                 {
-                                                                                                                                    $query->orWhere('documents_id', null);   
+                                                                                                                                    $query->orWhere('documents_id', null);
                                                                                                                                 }
                                                                                                                                 else{
                                                                                                                                 // Find the purchasing_order_id based on the po_number
@@ -621,7 +621,7 @@ class VehiclesController extends Controller
                                                                                                                                 foreach ($bl_number as $bl_number) {
                                                                                                                                     if($bl_number == "null")
                                                                                                                                 {
-                                                                                                                                    $query->orWhere('documents_id', null);  
+                                                                                                                                    $query->orWhere('documents_id', null);
                                                                                                                                 }
                                                                                                                                 else{
                                                                                                                                     // Find the purchasing_order_id based on the po_number
@@ -639,7 +639,7 @@ class VehiclesController extends Controller
                                                                                                                                     foreach ($latest_location as $latest_location) {
                                                                                                                                         if($latest_location == "null")
                                                                                                                                         {
-                                                                                                                                            $query->orWhere('latest_location', null);   
+                                                                                                                                            $query->orWhere('latest_location', null);
                                                                                                                                         }
                                                                                                                                         else{
                                                                                                                                         // Find the purchasing_order_id based on the po_number
@@ -654,7 +654,7 @@ class VehiclesController extends Controller
                         case 'territory':
                             if($searchQuery == "null")
                             {
-                            $data->where('territory', null);   
+                            $data->where('territory', null);
                             }
                             else{
                             $data->where('territory', 'LIKE', '%' . $searchQuery . '%');
@@ -690,10 +690,15 @@ class VehiclesController extends Controller
         $previousYearAvailable  = $this->previousYearAvailable()->count();
         $previousMonthAvailable  = $this->previousMonthAvailable()->count();
         $yesterdayAvailable  = $this->yesterdayAvailable()->count();
-        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
+        $previousYearPurchased = $this->previousYearPurchased()->count();
+        $previousMonthPurchased = $this->previousMonthPurchased()->count();
+        $yesterdayPurchased = $this->yesterdayPurchased()->count();
+
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending',
+            'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
             'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
-            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable'));
+            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable',
+            'yesterdayAvailable', 'yesterdayPurchased','previousMonthPurchased','previousYearPurchased'));
         }
         else{
             return redirect()->route('home');
@@ -731,6 +736,15 @@ class VehiclesController extends Controller
             }
             if($searchKey == Vehicles::FILTER_YESTERDAY_AVAILABLE) {
                 $vehicleIds = $this->yesterdayAvailable()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_YEAR_PURCHASED) {
+                $vehicleIds = $this->previousYearPurchased()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_PREVIOUS_MONTH_PURCHASED) {
+                $vehicleIds = $this->previousMonthPurchased()->pluck('id');
+            }
+            if($searchKey == Vehicles::FILTER_YESTERDAY_PURCHASED) {
+                $vehicleIds = $this->yesterdayPurchased()->pluck('id');
             }
             $data = Vehicles::whereIn('id',$vehicleIds)->paginate(100);
 
@@ -771,11 +785,62 @@ class VehiclesController extends Controller
         $previousYearAvailable  = $this->previousYearAvailable()->count();
         $previousMonthAvailable  = $this->previousMonthAvailable()->count();
         $yesterdayAvailable  = $this->yesterdayAvailable()->count();
+        $previousYearPurchased = $this->previousYearPurchased()->count();
+        $previousMonthPurchased = $this->previousMonthPurchased()->count();
+        $yesterdayPurchased = $this->yesterdayPurchased()->count();
 
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
             ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
             'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
-            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable'));
+            'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable',
+            'yesterdayPurchased','previousMonthPurchased','previousYearPurchased'));
+    }
+    public function previousYearPurchased() {
+
+        $currentYear = \Carbon\Carbon::now()->year;
+        $previousYear = $currentYear - 1;
+        $startDate = \Carbon\Carbon::createFromDate($previousYear, 1, 1);
+        $endDate = \Carbon\Carbon::createFromDate($previousYear, 12, 31);
+        $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDate, $endDate) {
+                $query->select(DB::raw(1))
+                    ->from('grn')
+                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->whereBetween('grn.date', [$startDate, $endDate]);
+            })
+            ->get();
+
+        return $data;
+    }
+    public function previousMonthPurchased() {
+
+        $startDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->startOfMonth();
+        $endDateLastMonth = \Carbon\Carbon::now()->subMonth(1)->endOfMonth();
+
+        $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($startDateLastMonth, $endDateLastMonth) {
+                $query->select(DB::raw(1))
+                    ->from('grn')
+                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
+            })
+            ->get();
+
+        return $data;
+    }
+    public function yesterdayPurchased() {
+
+        $yesterday = Carbon::now()->subDay(1)->format('Y-m-d');
+        $data = \Illuminate\Support\Facades\DB::table('vehicles')
+            ->whereExists(function ($query) use ($yesterday) {
+                $query->select(DB::raw(1))
+                    ->from('grn')
+                    ->whereColumn('grn.id', '=', 'vehicles.grn_id')
+                    ->whereDate('grn.date', $yesterday);
+            })
+            ->get();
+
+        return $data;
     }
     public function previousYearSold() {
         // logic => if gdn id is there then that vehicle is completed.

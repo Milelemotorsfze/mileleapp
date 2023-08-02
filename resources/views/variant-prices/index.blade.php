@@ -51,7 +51,7 @@
                                     <td>{{ $activeStock->variant->name }}</td>
                                     <td>{{ $activeStock->variant->detail ?? '' }}</td>
                                     <td>
-                                        @if($activeStock->price_status == 1)
+                                        @if($activeStock->active_vehicle_price_status == 1)
                                             Available
                                         @else
                                             Not Available
@@ -98,7 +98,7 @@
                                     <td>{{ $InactiveStock->variant->name }}</td>
                                     <td>{{ $InactiveStock->variant->detail ?? '' }}</td>
                                     <td>
-                                        @if($InactiveStock->price_status == 1)
+                                        @if($InactiveStock->inactive_vehicle_price_status == 1)
                                             Available
                                         @else
                                             Not Available

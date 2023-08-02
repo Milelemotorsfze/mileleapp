@@ -152,8 +152,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h4 class="card-title">Vehicle Price Details</h4>
-                        <button type="button" class="btn btn-sm btn-primary float-end enable-price-filed" >Price Update</button>
-                        <button type="submit" class="btn btn-sm btn-success float-end update-prices" hidden> Update</button>
+                        @if(request()->type == 1)
+                            <button type="button" class="btn btn-sm btn-primary float-end enable-price-filed" >Price Update</button>
+                            <button type="submit" class="btn btn-sm btn-success float-end update-prices" hidden> Update</button>
+                         @endif
                     </div>
                     <div class="card-body">
                         <div class="table-responsive" >
@@ -183,7 +185,7 @@
                                         <td>{{ $vehicle->exterior->name ?? ''}} </td>
                                         <td>{{ $vehicle->count }}</td>
                                         <td>
-                                            @if($vehicle->price_status == 1)
+                                            @if($vehicle->price)
                                                 Available
                                             @else
                                                 Not Available

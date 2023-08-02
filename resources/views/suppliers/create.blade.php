@@ -244,7 +244,7 @@ input {
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
-        <!-- @if (count($errors) > 0)
+     @if (count($errors) > 0)
             <div class="alert alert-danger">
                 <strong>Whoops!</strong> There were some problems with your input.<br><br>
                 <ul>
@@ -253,7 +253,7 @@ input {
                     @endforeach
                 </ul>
             </div>
-        @endif -->
+        @endif
 
         <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST">
         <!-- action="{{ route('suppliers.store') }}" -->
@@ -538,7 +538,7 @@ input {
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                                    <label for="contact_number" class="col-form-label widthinput">{{ __('Passport Number') }}</label>
+                                    <label for="passport_number" class="col-form-label widthinput">{{ __('Passport Number') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input type="text" class="form-control" name="passport_number" placeholder="Passport Number">
@@ -1104,7 +1104,6 @@ input {
         const previewFile3 = document.querySelector("#file3-preview");
         const previewFile4 = document.querySelector("#file4-preview");
 
-
         file1InputLicense.addEventListener("change", function(event) {
             $('.preview-div').attr('hidden', false);
             const files = event.target.files;
@@ -1367,34 +1366,6 @@ input {
                 }
             }
         });
-        {{--$('#supplier').keyup(function(){--}}
-        {{--    var contactNumber = $('#contact_number').val();--}}
-        {{--    var name = $('#supplier').val();--}}
-        {{--    uniqueCheck(contactNumber, name);--}}
-        {{--});--}}
-        {{--$('#contact_number').keyup(function(){--}}
-        {{--    var contactNumber = $('#contact_number').val();--}}
-        {{--    alert(contactNumber);--}}
-        {{--    var name = $('#supplier').val();--}}
-        {{--    uniqueCheck(contactNumber, name);--}}
-        {{--});--}}
-
-        {{--function uniqueCheck(contactNumber, name) {--}}
-        {{--    var url = '{{ route('vendor.vendorUniqueCheck') }}';--}}
-
-        {{--    $.ajax({--}}
-        {{--        type: "GET",--}}
-        {{--        url: url,--}}
-        {{--        dataType: "json",--}}
-        {{--        data: {--}}
-        {{--            contact_number: contactNumber,--}}
-        {{--            name: name--}}
-        {{--        },--}}
-        {{--        success:function (data) {--}}
-        {{--            console.log(data);--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--}--}}
         function clickAdd()
         {
             var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
@@ -1524,6 +1495,7 @@ input {
         }
         var contact_number = window.intlTelInput(document.querySelector("#contact_number"),
         {
+
             separateDialCode: true,
             preferredCountries:["ae"],
             hiddenInput: "full",
@@ -1552,6 +1524,7 @@ input {
             {
                 $msg = "Supplier field is required";
                 showSupplierError($msg);
+
                 formInputError = true;
                 e.preventDefault();
             }
@@ -1575,15 +1548,48 @@ input {
                 formInputError = true;
                 e.preventDefault();
             }
-            if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
+            if(inputContactNumber == '' )
             {
-                $msg ="One among contact number or alternative contact number or email is required";
+                $msg ="Contact number is required";
                 showContactNumberError($msg);
-                showAlternativeContactNumberError($msg);
-                showEmailError($msg);
+
                 formInputError = true;
                 e.preventDefault();
+            }else{
+                var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+                var name = $('#supplier').val();
+                var url = '{{ route('vendor.vendorUniqueCheck') }}';
+                // alert(contactNumber);
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        contact_number: contactNumber,
+                        name: name
+                    },
+                    success:function (data) {
+                        if(data.error) {
+                            showContactNumberError(data.error);
+                            formInputError == true;
+                            e.preventDefault();
+                            $('#submit').html('Save');
+                            $('.overlay').hide();
+                        }else{
+                            removeContactNumberError();
+                        }
+                    }
+                });
             }
+            // if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
+            // {
+            //     $msg ="One among contact number or alternative contact number or email is required";
+            //     showContactNumberError($msg);
+            //     showAlternativeContactNumberError($msg);
+            //     showEmailError($msg);
+            //     formInputError = true;
+            //     e.preventDefault();
+            // }
             if(formInputError == false)
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
@@ -1655,32 +1661,32 @@ input {
 
         //===== delete the form fieed row
 
-        function secondaryPaymentMethods(changePayment)
-        {
-            var e = document.getElementById("is_primary_payment_method");
-            var value = e.value;
-            if(value != '')
-            {
-                if(PreviousHidden != '')
-                {
-                    let addonTable = document.getElementById(PreviousHidden);
-                    addonTable.hidden = false
-                }
-                validationOnKeyUp(changePayment);
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = false
-                let primaryPaymentMethod = document.getElementById(value);
-                primaryPaymentMethod.hidden = true
-                PreviousHidden = value;
-            }
-            else
-            {
-                let addonTable = document.getElementById('secondaryPayments');
-                addonTable.hidden = true
-                $msg = "Primary payment method required"
-                showPaymentMethodsError($msg);
-            }
-        }
+        // function secondaryPaymentMethods(changePayment)
+        // {
+        //     var e = document.getElementById("is_primary_payment_method");
+        //     var value = e.value;
+        //     if(value != '')
+        //     {
+        //         if(PreviousHidden != '')
+        //         {
+        //             let addonTable = document.getElementById(PreviousHidden);
+        //             addonTable.hidden = false
+        //         }
+        //         validationOnKeyUp(changePayment);
+        //         let addonTable = document.getElementById('secondaryPayments');
+        //         addonTable.hidden = false
+        //         let primaryPaymentMethod = document.getElementById(value);
+        //         primaryPaymentMethod.hidden = true
+        //         PreviousHidden = value;
+        //     }
+        //     else
+        //     {
+        //         let addonTable = document.getElementById('secondaryPayments');
+        //         addonTable.hidden = true
+        //         $msg = "Primary payment method required"
+        //         showPaymentMethodsError($msg);
+        //     }
+        // }
         function changeCurrency(i)
         {
             var e = document.getElementById("currency_"+i);
