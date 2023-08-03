@@ -700,6 +700,7 @@ class SupplierController extends Controller
         $input['is_communication_postal'] = $request->is_communication_postal ? true : false;
         $input['is_communication_any'] = $request->is_communication_any ? true : false;
 
+        if($request->form_action == 'UPDATE') {
         info($request->deletedDocuments);
 
         if($request->deletedDocuments[0] !== NULL) {
@@ -710,6 +711,7 @@ class SupplierController extends Controller
                 $document->delete();
             }
         }
+    }
 
         if($request->form_action == 'UPDATE') {
             $suppliers = Supplier::find($request->supplier_id);
