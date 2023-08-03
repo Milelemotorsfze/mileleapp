@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BrandRegion;
 use App\Models\Supplier;
 use App\Models\WarrantyPriceHistory;
 use App\Models\WarrantySellingPriceHistory;
@@ -20,11 +21,18 @@ class WarrantyController extends Controller
      */
     public function index()
     {
+
         $premiums = WarrantyPremiums::with('PolicyName')
                     ->orderBy('id','desc')->get();
         return view('warranty.index', compact('premiums'));
-}
-    
+    }
+    public function list()
+    {
+        $warrantyBrands = WarrantyBrands::with('brand','country','premium')
+            ->orderBy('id','desc')->get();
+
+        return view('warranty.list', compact('warrantyBrands'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -33,13 +41,15 @@ class WarrantyController extends Controller
     {
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
+        $brandRegions = BrandRegion::select('id','name')->get();
+
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
             })
             ->get();
 
-        return view('warranty.create', compact('policyNames','brands','suppliers'));
+        return view('warranty.create', compact('policyNames','brands','suppliers','brandRegions'));
     }
 
     /**
@@ -62,6 +72,8 @@ class WarrantyController extends Controller
                 {
                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
                     $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
+                    $inputbrandPrice['brand_region_id'] = $brandPrice['country'];
+
                     if(isset($brandPrice['brands']))
                     {
                         if(count($brandPrice['brands']) > 0)
@@ -136,9 +148,10 @@ class WarrantyController extends Controller
             ->get();
         $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
         $isOpenMilage = $premium->is_open_milage;
+        $brandRegions = BrandRegion::select('id','name')->get();
 
         return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands',
-            'alreadyAddedBrands','isOpenMilage','existingBrands'));
+            'alreadyAddedBrands','isOpenMilage','existingBrands','brandRegions'));
     }
 
     /**
@@ -193,6 +206,7 @@ class WarrantyController extends Controller
                                     $update->updated_by = Auth::id();
                                     $update->brand_id = $brandData;
                                     $update->price =  $brandPrice['purchase_price'];
+                                    $update->brand_region_id =  $brandPrice['country'];
                                     if($brandPrice['selling_price'] != '')
                                     {
                                         $update->selling_price =  $brandPrice['selling_price'];
@@ -202,7 +216,7 @@ class WarrantyController extends Controller
                                     if($oldPrice != $update->price)
                                     {
                                         $priceHistory = new WarrantyPriceHistory();
-                                        $priceHistory->warranty_brand_id  = $createBrandPrice->id;
+                                        $priceHistory->warranty_brand_id  = $update->id;
                                         $priceHistory->updated_price = $brandPrice['purchase_price'];
                                         $priceHistory->created_by = Auth::id();
                                         $priceHistory->updated_by = Auth::id();
@@ -213,7 +227,7 @@ class WarrantyController extends Controller
                                         if($oldSellingPrice != $update->selling_price)
                                         {
                                             $sellingPriceHistory = new WarrantySellingPriceHistory();
-                                            $sellingPriceHistory->warranty_brand_id = $createBrandPrice->id;
+                                            $sellingPriceHistory->warranty_brand_id = $update->id;
                                             $sellingPriceHistory->updated_price = $brandPrice['selling_price'];
                                             $sellingPriceHistory->updated_by = Auth::id();
                                             $sellingPriceHistory->created_by = Auth::id();
@@ -227,6 +241,8 @@ class WarrantyController extends Controller
                                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
                                     $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
                                     $inputbrandPrice['brand_id'] = $brandData;
+                                    $inputbrandPrice['brand_region_id'] =  $brandPrice['country'];
+
                                     $createBrandPrice = WarrantyBrands::create($inputbrandPrice);
 
                                     $priceHistory = new WarrantyPriceHistory();
@@ -260,7 +276,7 @@ class WarrantyController extends Controller
             $differenceArray = array_diff($newExiBrands2, $NotNelete);
             $delete = WarrantyBrands::whereIn('brand_id',$differenceArray)->where('warranty_premiums_id',$id)->get();
             foreach($delete as $del)
-            {     
+            {
                 $deletehistory = WarrantyPriceHistory::where('warranty_brand_id',$del->id)->get();
                 foreach($deletehistory as $deletehistory1)
                 {
@@ -302,7 +318,7 @@ class WarrantyController extends Controller
             }
         }
         // dynamic field removal for warranty brands
-        
+
         // if($request->id) {
         //     $id = $request->id;
         //     $alreadyAddedBrandIds = WarrantyBrands::where('warranty_premiums_id',$id)->pluck('brand_id');

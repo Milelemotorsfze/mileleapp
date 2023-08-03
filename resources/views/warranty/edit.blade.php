@@ -182,7 +182,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                         @foreach($existingBrands as $existingBrand)
                         <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
                         <div class="row form_field_outer_row" id="row-{{$i}}" >
-                            <div class="col-xxl-5 col-lg-5 col-md-5">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
+                                <span class="error">* </span>
+                                <label for="country" class="col-form-label text-md-end">{{ __('Country') }}</label>
+                                <select name="brandPrice[{{$i}}][country]" id="regions{{$i}}" data-index="{{$i}}" multiple="true" style="width: 100%;"
+                                        class="form-control regions" autofocus required>
+                                    @foreach($brandRegions as $region)
+                                        <option  value="{{$region->id}}" {{ $existingBrand->brand_region_id == $region->id ? 'selected' : '' }}>
+                                            {{$region->name}}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span id="Country1Error" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-xxl-3 col-lg-3 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[{{$i}}][brands][]" id="brands{{$i}}" data-index="{{$i}}" multiple="true" style="width: 100%;"
@@ -194,9 +207,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                     @endforeach
                                 </select>
-                                <span id="supplierError" class="invalid-feedback"></span>
+                                <span id="brandError" class="invalid-feedback"></span>
                             </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
+
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
@@ -210,7 +224,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
 
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}
                                     @if($existingBrand->is_selling_price_approved == 1) ( Approved )
                                     @elseif($existingBrand->is_selling_price_approved == 0)
@@ -223,7 +237,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                     <input class="form-control widthinput" value="@if($existingBrand->is_selling_price_approved != 2) @if($existingBrand->selling_price != NULL) {{$existingBrand->selling_price}} AED @endif @endif" readonly>
                                 </div>
                             </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('New Selling Price') }}</label>
                                 <div class="input-group">
@@ -235,7 +249,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 </div>
                                 <span id="sellingError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-6 add_del_btn_outer" style="margin-top:36px" >
                                 <button type="button" class="btn btn-danger removeButton" id="remove-{{$i}}" data-index="{{$i}}" >
                                     <i class="fa fa-trash"></i>
                                 </button>
@@ -279,6 +293,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
+            });
+            $('#regions'+i).select2({
+                allowClear: true,
+                maximumSelectionLength:1,
+                placeholder:"Choose Country... Or Search Here...",
             });
         }
 
@@ -491,7 +510,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                 {
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-7 col-lg-7 col-md-5">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Country') }}</label>
+                                <select name="brandPrice[${index}][country]" id="regions${index}" data-index="${index}" required multiple="true" style="width: 100%;"
+                                    class="form-control widthinput regions" autofocus onchange="validationOnKeyUp(this)">
+                                        @foreach($brandRegions as $region)
+                                            <option value="{{$region->id}}">{{$region->name}}</option>
+                                        @endforeach
+                                </select>
+                                    <span id="Country1Error" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-xxl-45 col-lg-5 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"
@@ -500,7 +530,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 </select>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
@@ -512,7 +542,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                             <div class="col-xxl-2 col-lg-2 col-md-3">
+                             <div class="col-xxl-2 col-lg-2 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
@@ -524,7 +554,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 </div>
                                 <span id="sellingError" class="invalid-feedback"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-6 add_del_btn_outer" style="margin-top:36px" >
                                 <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
                                     <i class="fa fa-trash"></i>
                                 </button>
@@ -550,6 +580,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
                         // templateResult: hideSelected,
+                    });
+                    $('#regions'+index).select2
+                    ({
+                        placeholder:"Choose Country... Or Search Here...",
+                        allowClear: true,
+                        maximumSelectionLength:1,
+                        // data: brandDropdownData,
+                        minimumResultsForSearch: -1,
                     });
                 }
             }

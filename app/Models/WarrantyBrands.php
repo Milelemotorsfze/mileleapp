@@ -13,6 +13,7 @@ class WarrantyBrands extends Model
     protected $fillable = [
         'warranty_premiums_id',
         'brand_id',
+        'brand_region_id',
         'price',
         'selling_price',
         'status',
@@ -30,6 +31,10 @@ class WarrantyBrands extends Model
     public function brandName()
     {
         return $this->hasOne(Brand::class,'id','brand_id');
+    }
+    public function country()
+    {
+        return $this->belongsTo(BrandRegion::class,'brand_region_id','id');
     }
     public function user()
     {
