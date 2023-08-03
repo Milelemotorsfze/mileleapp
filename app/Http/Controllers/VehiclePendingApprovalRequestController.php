@@ -97,7 +97,8 @@ class VehiclePendingApprovalRequestController extends Controller
 
         if($field == 'inspection_date' || $field == 'varaints_id' || $field == 'engine' || $field == 'ex_colour' || $field == 'qc_remarks'
             || $field == 'pdi_remarks' ||  $field == 'grn_remark'|| $field == 'extra_features' || $field == 'int_colour' ||
-            $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date')
+            $field == 'ppmmyyy' || $field == 'reservation_start_date' || $field == 'reservation_end_date' || $field == 'netsuit_grn_date'
+            || $field == 'netsuit_grn_number' )
         {
             $vehicleslog = new Vehicleslog();
             $vehicleslog->time = $currentDateTime->toTimeString();

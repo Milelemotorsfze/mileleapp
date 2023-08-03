@@ -183,12 +183,13 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-delete']);
                       @endphp
                       @if ($hasPermission)
-                        @if($supplier->is_deletable)
+{{--                        @if($supplier->is_deletable)--}}
                           <button type="button" class="btn btn-danger btn-sm supplier-delete sm-mt-3" title="Delete"
-                            data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}">
+                            data-id="{{$supplier->id}}" data-url="{{ route('suppliers.destroy', $supplier->id) }}"
+                                  data-is-deletable="{{$supplier->is_deletable}}">
                             <i class="fa fa-trash"></i>
                           </button>
-                        @endif
+{{--                        @endif--}}
                       @endif
                       @endcan
                       @can('supplier-active-inactive')
@@ -373,31 +374,36 @@
             </div>
         </div>
 
-
-
-
   <script type="text/javascript">
      $('.supplier-delete').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
-            var confirm = alertify.confirm('Are you sure you want to Delete this Supplier ?',function (e) {
-                if (e) {
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        dataType: "json",
-                        data: {
-                            _method: 'DELETE',
-                            id: 'id',
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success:function (data) {
-                            location.reload();
-                            alertify.success('Supplier Deleted successfully.');
-                        }
-                    });
-                }
-            }).set({title:"Delete Supplier"})
+            let isDeletable =  $(this).attr('data-is-deletable');
+            if(isDeletable == true) {
+                var confirm = alertify.confirm('Are you sure you want to Delete this Vendor ?',function (e) {
+                    if (e) {
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                _method: 'DELETE',
+                                id: 'id',
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success:function (data) {
+                                location.reload();
+                                alertify.success('Supplier Deleted successfully.');
+                            }
+                        });
+                    }
+                }).set({title:"Delete Supplier"})
+            }else{
+                alertify.confirm('Sorry! This vendor is not deletable, It is have dependent data',function (e) {
+
+                }).set({title:"Warning!"})
+            }
+
         });
         $('.status-active-button').click(function (e) {
             // alert("ok");
