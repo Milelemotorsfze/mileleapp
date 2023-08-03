@@ -23,32 +23,69 @@ class VehiclePicturesController extends Controller
      */
     public function create()
     {
-        $alreadyAddedVehicleIds = VehiclePicture::pluck('vehicle_id');
-        $vins = Vehicles::whereNotIn('id', $alreadyAddedVehicleIds)
-                            ->get();
+        $vins = Vehicles::whereNotNull('vin')->get();
         return view('vehicle_pictures.create',compact('vins'));
     }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-//        return $request->all();
         $this->validate($request, [
-            'vins' => 'required',
+            'vin' => 'required',
         ]);
-
-        $vins = $request->vins;
-        foreach ($request->vins as $key => $vin) {
+        $counts = 0;
+        $vins = $request->vin;
+        foreach ($request->vin as $key => $vin) {
+            $vehicle = Vehicles::where('vin', $vin)->first();
+            if($request->category[$key] === "Modification")
+            {
             $vehiclePicture = new VehiclePicture();
-            $vehiclePicture->vehicle_id  = $vin;
+            $vehiclePicture->vehicle_id  = $vehicle->id;
             $vehiclePicture->vehicle_picture_link = $request->vehicle_picture_link[$key];
+            $vehiclePicture->category = $request->category[$key];
             $vehiclePicture->save();
+            }
+            else{
+                $existing = VehiclePicture::where('vehicle_id', $vehicle->id)->where('category', $request->category[$key])->first();
+                if(!$existing)
+                {
+                $vehiclePicture = new VehiclePicture();
+                $vehiclePicture->vehicle_id  = $vehicle->id;
+                $vehiclePicture->vehicle_picture_link = $request->vehicle_picture_link[$key];
+                $vehiclePicture->category = $request->category[$key];
+                $vehiclePicture->save();
+                if($request->category[$key] === "GRN")
+                {
+                    $vehicle = Vehicles::find($vehicle->id);
+                    if ($vehicle) {
+                        $currentDate = now();
+                        $vehicle->inspection_date = $currentDate;
+                        $vehicle->save();
+                    }
+                }
+                if($request->category[$key] === "PDI")
+                {
+                    $vehicle = Vehicles::find($vehicle->id);
+                    if ($vehicle) {
+                        $currentDate = now();
+                        $vehicle->pdi_date = $currentDate;
+                        $vehicle->save();
+                    }
+                    
+                }
+                }
+                else{
+                $counts = 1;
+                }
+            }
         }
-
-        return redirect()->route('vehicle-pictures.index')->with('success','Vehicle picture added successfully.');
-
+        if($counts > 0)
+        {
+        return redirect()->route('vehicle-pictures.index')->with('error', 'Items Already Existing that cannot save Other Picture Record Saved');
+        }
+        else
+        return redirect()->route('vehicle-pictures.index')->with('success', 'Picture Record Saved');
     }
 
     /**

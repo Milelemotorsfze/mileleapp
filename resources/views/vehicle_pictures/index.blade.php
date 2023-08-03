@@ -9,21 +9,16 @@
         @endcan
     </div>
     <div class="card-body">
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br>
-                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
         @if (Session::has('success'))
             <div class="alert alert-success" id="success-alert">
                 <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
                 {{ Session::get('success') }}
+            </div>
+        @endif
+        @if (Session::has('error'))
+            <div class="alert alert-danger" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert">x</button>
+                {{ Session::get('error') }}
             </div>
         @endif
         <div class="table-responsive">

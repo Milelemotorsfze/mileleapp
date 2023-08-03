@@ -336,6 +336,8 @@ Route::get('/d', function () {
     Route::get('/vehicleincomingstock', [VehiclesController::class, 'incomingstocks'])->name('vehiclesincoming.stock');
     Route::get('/get-model-lines/{brandId}', [VehiclesController::class, 'getModelLines']);
     Route::get('/get-vehicles-data-for-movement', [MovementController::class, 'getVehiclesDataformovement'])->name('vehicles.getVehiclesDataformovement');
+    Route::get('/vehicleincomingpendingpdis', [VehiclesController::class, 'incomingpendingpdis'])->name('vehiclesincoming.pendingpdis');
+    Route::post('/checkEntry', [VehiclesController::class, 'checkEntry'])->name('vehicles.checkEntry');
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
