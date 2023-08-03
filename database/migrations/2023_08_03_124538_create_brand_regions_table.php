@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('brand_regions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('name')->nullable();
+            $table->string('name')->nullable();
             $table->timestamps();
         });
     }
