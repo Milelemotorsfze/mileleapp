@@ -54,7 +54,7 @@
             @endif
     </div>
     <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="supplierAddonPrices" class="table table-striped table-editable table-edits table">
@@ -87,11 +87,11 @@
                         <label class="badge badge-soft-info">Pending</label>
                         @endif
                     </td>
-                    <td>{{$historyData->created_at}}</td>  
-                    <td>{{$historyData->CreatedBy->name}}</td> 
+                    <td>{{$historyData->created_at}}</td>
+                    <td>{{$historyData->CreatedBy->name ?? ''}}</td>
                     @isset($historyData->StatusUpdatedBy)
-                    <td>{{$historyData->updated_at}}</td>  
-                    <td>{{$historyData->StatusUpdatedBy->name}}</td> 
+                    <td>{{$historyData->updated_at}}</td>
+                    <td>{{$historyData->StatusUpdatedBy->name ?? ''}}</td>
                     @else
                     <td></td>
                     <td></td>
@@ -107,7 +107,7 @@
                                 <button title="Rejected" data-placement="top" class="btn btn-sm btn-danger reject"
                           data-id="{{ $historyData->id }}" data-status="rejected" >
                       <i class="fa fa-ban" aria-hidden="true"></i></button>
-                    
+
                         @endif
                     </td> -->
                     <td>
@@ -205,7 +205,7 @@
                                                                         <label class="form-label font-size-13 text-center">Current Price</label>
                                                                     </div>
                                                                     <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                        
+
                                                                                <div class="input-group">
                                                                                <input type="text" value="{{$currentPrice->selling_price}}"
                                                                                class="form-control" readonly >
@@ -221,7 +221,7 @@
                                                                         <label class="form-label font-size-13">New Price</label>
                                                                     </div>
                                                                     <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                        
+
                                                                                <div class="input-group">
                                                                                <input type="text" value="{{$historyData->selling_price}}"
                                                                                id="updated-price"  class="form-control" readonly >
@@ -237,7 +237,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                 
+
                                                     <button type="button" class="btn btn-primary approve"
                                                             data-id="{{ $historyData->id }}" data-status="active">Approve</button>
                                                 </div>
@@ -277,7 +277,7 @@
                                                                         <label class="form-label font-size-13">New Price</label>
                                                                     </div>
                                                                     <div class="col-lg-9 col-md-12 col-sm-12">
-                                                                        
+
                                                                                <div class="input-group">
                                                                                <input type="text" value="{{$historyData->selling_price}}"
                                                                                id="updated-price"  class="form-control" readonly >
@@ -303,8 +303,8 @@
                 @endforeach
               </tbody>
             </table>
-          </div>  
-        </div>  
+          </div>
+        </div>
       </div>
     </div>
     @endif
@@ -338,7 +338,7 @@
         $('#suppliersList').DataTable();
       });
     });
- 
+
     // function closemodal()
     // {
     //   $('.modal').addClass('modalhide');
@@ -399,13 +399,13 @@
                 }
             }).set({title: message +" Addon Selling Price"})
         }
-        function inputNumberAbs(currentPriceInput) 
-        { 
+        function inputNumberAbs(currentPriceInput)
+        {
             var id = currentPriceInput.id
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2) 
+            if(val.split('.').length>2)
             {
                 val =val.replace(/\.+$/,"");
             }
@@ -415,7 +415,7 @@
                 var value = currentPriceInput.value;
                 if(value == '')
                 {
-                   
+
                     if(value.legth != 0)
                     {
                         $msg = "Selling Price is required";

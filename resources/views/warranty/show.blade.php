@@ -44,7 +44,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-2 col-md-3 col-sm-12">
-                    <label for="choices-single-default" class="form-label"> Supplier</label>
+                    <label for="choices-single-default" class="form-label"> Vendor</label>
                 </div>
                 <div class="col-lg-6 col-md-9 col-sm-12">
                     <span>{{$premium->supplier->supplier}}</span>

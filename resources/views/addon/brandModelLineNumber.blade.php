@@ -273,7 +273,7 @@
                         var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required', function (e) {
                         }).set({title: "Can't Remove Brand And Model Lines"})
                     }
-                }
+                // }
             // }).set({title:"Delete Item"});
         })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {

@@ -16,7 +16,7 @@
 @section('content')
   <div class="card-header">
     <h4 class="card-title">
-      Suppliers Info
+      Vendors Info
     </h4>
     @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
     @php
@@ -24,7 +24,7 @@
     @endphp
     @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> New Supplier
+        <i class="fa fa-plus" aria-hidden="true"></i> New Vendor
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
       <div class="clearfix"></div>
@@ -419,7 +419,7 @@
             }else{
                 var message = 'Inactive';
             }
-            var confirm = alertify.confirm('Are you sure you want to '+ message +' this supplier ?',function (e) {
+            var confirm = alertify.confirm('Are you sure you want to '+ message +' this Vendor ?',function (e) {
                 if (e) {
                     $.ajax({
                         type: "POST",

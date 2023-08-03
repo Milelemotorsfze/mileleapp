@@ -21,12 +21,12 @@
   @if ($hasPermission)
     <div class="card-header">
       <h4 class="card-title">
-        Supplier Addon prices History
+        Vendor Addon prices History
       </h4>
       <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.addonprice',$supplierId) }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="tab-content">
-      <div class="tab-pane fade show active" id="tab1"> 
+      <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
             <table id="supplierAddonPrices" class="table table-striped table-editable table-edits table">
@@ -46,14 +46,14 @@
                     <td>{{++$i}}</td>
                     <td >{{$historyData->purchase_price_aed}} AED</td>
                     <td >{{$historyData->status}}</td>
-                    <td>{{$historyData->created_at}}</td>  
-                    <td>{{$historyData->CreatedBy->name ?? ''}}</td> 
+                    <td>{{$historyData->created_at}}</td>
+                    <td>{{$historyData->CreatedBy->name ?? ''}}</td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
-        </div>  
+          </div>
+        </div>
       </div>
     </div>
   @endif
@@ -86,7 +86,7 @@
         $('#suppliersList').DataTable();
       });
     });
- 
+
     // function closemodal()
     // {
     //   $('.modal').addClass('modalhide');
@@ -106,4 +106,4 @@
   </script>
 @endsection
 
-   
+

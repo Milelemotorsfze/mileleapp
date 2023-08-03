@@ -14,7 +14,7 @@
     @if ($hasPermission)
     <div class="card-header">
       <h4 class="card-title">
-        Supplier Addon prices Info
+        Vendor Addon prices Info
       </h4>
       <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
       @if (count($errors) > 0)
@@ -93,7 +93,7 @@
                                             <input hidden id="inputId" name="id" value="{{ $supplierAddon->id }}">
                                             <input hidden id="inputSupplierId" name="supplier_id" value="{{ $supplierAddon->supplier_id }}">
                                             <div class="input-group">
-                                                <input id="new_addon_name_{{$supplierAddon->id}}" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price" 
+                                                <input id="new_addon_name_{{$supplierAddon->id}}" class="form-control @error('name') is-invalid @enderror" name="name" placeholder="Enter New Purchase Price"
                                                 value="{{ old('name') }}" autofocus oninput="inputNumberAbs(this)" required>
                                                 <div class="input-group-append">
                                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -283,13 +283,13 @@
 //   $("#modal").css({"display":"block"});
 //   // $('#suppliersList').DataTable().css({"display":"block"});
 // }
-        function inputNumberAbs(currentPriceInput) 
+        function inputNumberAbs(currentPriceInput)
         {
             var id = currentPriceInput.id;
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2) 
+            if(val.split('.').length>2)
             {
                 val =val.replace(/\.+$/,"");
             }

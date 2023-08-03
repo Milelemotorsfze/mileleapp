@@ -149,7 +149,6 @@
         }
         //===== delete the form fieed row
         $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
-            // $("body").on("click", ".", function ()
             {
                var countRow = 0;
                 var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
@@ -198,8 +197,8 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
                    }).set({title:"Can't Remove Brand And Model Lines"})
                 }
-     
-           
+
+
 
         })
         $("#add").on("click", function ()
@@ -286,7 +285,7 @@
     });
 
     function selectBrand(id,row)
-    { 
+    {
         var value =$('#'+id).val();
         var currentAddonType = $('#addon_type').val();
         var brandId = value;
@@ -338,7 +337,6 @@
     }
     function showRelatedModal(value,row,currentAddonType)
     {
-        // alert("div");
         let showDivdrop = document.getElementById('showDivdrop'+row);
 
         showDivdrop.hidden = false

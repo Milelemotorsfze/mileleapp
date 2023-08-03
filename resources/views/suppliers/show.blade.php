@@ -444,31 +444,57 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                    <div class="col-xxl-4 col-md-6 col-sm-12 text-center">
                     @if($supplier->passport_copy_file)
                             <h6 class="fw-bold text-center mb-1">Passport</h6>
                             <iframe src="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" alt="Passport"></iframe>
+                            <a href="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" target="_blank">
+                                <button class="btn btn-primary m-2">View</button>
+                            </a>
+                            <a href="{{ url('vendor/passport/' . $supplier->passport_copy_file) }}" download>
+                                <button class="btn btn-info">Download</button>
+                            </a>
+
                         @endif
                     </div>
-                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                    <div class="col-xxl-4 col-md-6 col-sm-12 text-center">
                         @if($supplier->trade_license_file)
                             <h6 class="fw-bold text-center mb-1">Trade License</h6>
                             <iframe src="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" alt="Trade License"></iframe>
+                            <a href="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" target="_blank">
+                                <button class="btn btn-primary m-2">View</button>
+                            </a>
+                            <a href="{{ url('vendor/trade_license/' . $supplier->trade_license_file) }}" download>
+                                <button class="btn btn-info">Download</button>
+                            </a>
                         @endif
                     </div>
-                    <div class="col-xxl-4 col-md-6 col-sm-12">
+                    <div class="col-xxl-4 col-md-6 col-sm-12 text-center">
                         @if($supplier->passport_copy_file)
                             <h6 class="fw-bold text-center mb-1">VAT Certificate</h6>
                             <iframe src="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" alt="VAT Certificate"></iframe>
+                            <a href="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" target="_blank">
+                                <button class="btn btn-primary m-2">View</button>
+                            </a>
+                            <a href="{{ url('vendor/vat_certificate/' . $supplier->vat_certificate_file) }}" download>
+                                <button class="btn btn-info">Download</button>
+                            </a>
                         @endif
                     </div>
                 </div>
                 @if($supplier->supplierDocuments->count() > 0)
-                    <div class="row mt-3">
-                        <h6 class="fw-bold text-center mb-1">Other Documents</h6>
+                    <div class="row m-3">
+                        <h6 class="fw-bold text-center mb-13">Other Documents</h6>
                             @foreach($supplier->supplierDocuments as $document)
-                            <div class="col-xxl-4 col-md-6 col-sm-12">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 text-center">
                                 <iframe src="{{ url('vendor/other-documents/' . $document->file) }}" alt="Other Document"></iframe>
+                                <a href="{{ url('vendor/other-documents/' . $document->file) }}" target="_blank">
+                                    <button class="btn btn-primary m-2">View</button>
+                                </a>
+                                <a href="{{ url('vendor/other-documents/' . $document->file) }}" download>
+                                    <button class="btn btn-info">Download</button>
+                                </a>
+
                             </div>
                             @endforeach
                     </div>

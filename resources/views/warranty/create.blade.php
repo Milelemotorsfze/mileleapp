@@ -136,7 +136,7 @@
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
                         <div class="input-group">
                             <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
-                             class="form-control widthinput" placeholder="Enter Claim Limit" 
+                             class="form-control widthinput" placeholder="Enter Claim Limit"
                              aria-label="measurement" aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -146,7 +146,7 @@
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
-                        <label for="supplier" class="col-form-label text-md-end">Supplier</label>
+                        <label for="supplier" class="col-form-label text-md-end">Vendor</label>
                         <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus onchange="validationOnKeyUp(this)" >
                             <option></option>
                             @foreach($suppliers as $supplier)
@@ -181,7 +181,7 @@
                             <div class="col-xxl-7 col-lg-7 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  
+                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"
                                 class="form-control widthinput brands" autofocus onchange="validationOnKeyUp(this)">
                                     @foreach($brands as $brand)
                                         <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
@@ -193,7 +193,7 @@
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)" 
+                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
                                     class="form-control widthinput" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -245,7 +245,7 @@
     $(document).ready(function ()
     {
         $('#supplier_id').select2({
-            placeholder:"Choose Supplier",
+            placeholder:"Choose Vendor",
         });
         $('#brands1').select2({
             allowClear: true,
@@ -301,7 +301,7 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Price Required',function (e) {
                    }).set({title:"Can't Remove Brands And Prices"})
                 }
-           
+
         })
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
@@ -371,7 +371,7 @@
         }
         if(inputSupplierId == '')
         {
-            $msg = "Supplier is required";
+            $msg = "Vendor is required";
             showSupplierError($msg);
             formInputError = true;
             e.preventDefault();
@@ -439,7 +439,7 @@
                             <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"  
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"
                                 class="form-control brands" autofocus onchange="validationOnKeyUp(this)">
 
                                 </select>
@@ -730,13 +730,13 @@
         document.getElementById("purchase_price1").classList.remove("is-invalid");
         document.getElementById("Price1Error").classList.remove("paragraph-class");
     }
-    function inputNumberAbs(currentPriceInput) 
+    function inputNumberAbs(currentPriceInput)
     {
         var id = currentPriceInput.id;
         var input = document.getElementById(id);
         var val = input.value;
         val = val.replace(/^0+|[^\d.]/g, '');
-        if(val.split('.').length>2) 
+        if(val.split('.').length>2)
         {
             val =val.replace(/\.+$/,"");
         }

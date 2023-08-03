@@ -208,7 +208,7 @@
     @endphp
     @if ($hasPermission)
     <div class="card-header">
-        <h4 class="card-title">Edit Suppliers</h4>
+        <h4 class="card-title">Edit Vendor</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -1239,8 +1239,10 @@
             if (confirm('Are you sure you want to Delete this item ?')) {
                 $('#preview-div-'+id).remove();
                 deletedDocuments.push(id);
+                console.log(deletedDocuments);
             }
         });
+
         $('.delete-button').on('click',function(){
             var fileType = $(this).attr('data-file-type');
             if (confirm('Are you sure you want to Delete this item ?')) {

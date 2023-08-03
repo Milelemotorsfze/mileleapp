@@ -1,6 +1,6 @@
 @extends('layouts.main')
 <style>
-    .modal 
+    .modal
     {
         width: 100% !important;
         height: 100% !important;
@@ -79,7 +79,7 @@
           #blah
             {
                 width: 250px;
-                height: 250px;  
+                height: 250px;
                 padding-top:0px;
                 margin-top:0px;
             }
@@ -137,7 +137,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 /* Add Animation */
-.modalContentForImage, #caption {  
+.modalContentForImage, #caption {
   -webkit-animation-name: zoom;
   -webkit-animation-duration: 0.6s;
   animation-name: zoom;
@@ -145,12 +145,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 @-webkit-keyframes zoom {
-  from {-webkit-transform:scale(0)} 
+  from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}
 }
 
 @keyframes zoom {
-  from {transform:scale(0)} 
+  from {transform:scale(0)}
   to {transform:scale(1)}
 }
 
@@ -181,7 +181,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </style>
 @section('content')
     <div class="card-header">
-        <h4 class="card-title"> 
+        <h4 class="card-title">
         @if($supplierAddonDetails->addon_type_name == 'K')
             Kit
             @else
@@ -236,7 +236,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     </div>
                     @endif
 
-                   
+
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Fixing Charge Amount :</label>
                     </div>
@@ -258,14 +258,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             <div class="col-lg-6 col-md-6 col-sm-12">
                                 <label for="choices-single-default" class="form-label"> Selling Price :</label>
                             </div>
-                            <div class="col-lg-6 col-md-9 col-sm-12"> 
+                            <div class="col-lg-6 col-md-9 col-sm-12">
                                 @if($supplierAddonDetails->SellingPrice!= null)
                                     @if($supplierAddonDetails->SellingPrice->selling_price != '')
                                         {{$supplierAddonDetails->SellingPrice->selling_price}} AED
                                     @endif
                                 @elseif($supplierAddonDetails->PendingSellingPrice!= null)
                                     @if($supplierAddonDetails->PendingSellingPrice->selling_price != '')
-                                        {{$supplierAddonDetails->PendingSellingPrice->selling_price}} AED 
+                                        {{$supplierAddonDetails->PendingSellingPrice->selling_price}} AED
                                         <label class="badge badge-soft-danger">Approval Awaiting</label>
                                     @endif
                                 @endif
@@ -315,7 +315,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 </div>
                                 <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
                                 {{$AddonTypes->brands->brand_name}}
-                                </div>                   
+                                </div>
                                 <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
                                 @if($AddonTypes->is_all_model_lines == 'yes')
                                 All Model Lines
@@ -325,7 +325,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 </div>
                                 <div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
                                 {{$AddonTypes->modelDescription->model_description ?? ''}}
-                                </div>   
+                                </div>
                             @endforeach
                         @endif
                     @else
@@ -348,7 +348,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 </div>
                                 <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                                 {{$AddonTypes->brands->brand_name}}
-                                </div>                   
+                                </div>
                                 <div class="divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6">
                                 @if($AddonTypes->is_all_model_lines == 'yes')
                                 All Model Lines
@@ -372,11 +372,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
     </br>
     <center><h5 class="card-title">
     @if($supplierAddonDetails->addon_type_name == 'K')
-    Suppliers Details And Kit Items
+    Vendors Details And Kit Items
             @else
-            Suppliers Details And Purchase Prices
+                Vendors Details And Purchase Prices
             @endif
-    
+
 </h5></center>
     </br>
         @foreach($supplierAddonDetails->AddonSuppliers as $AddonSuppliers)
@@ -384,7 +384,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 <div class="row">
 
                     <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Supplier Name :</label>
+                        <label for="choices-single-default" class="form-label">Vendor Name :</label>
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         <span>{{ $AddonSuppliers->Suppliers->supplier}}</span>
@@ -403,7 +403,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         <span>{{ $AddonSuppliers->purchase_price_usd}} USD</span>
                     </div>
-                   
+
                     @if($AddonSuppliers->Suppliers->contact_number != '')
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Contact Number :</label>
@@ -449,13 +449,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     </div>
                     @endif
                 </div>
-            
-                </br> 
+
+                </br>
                 <div class="row">
                 @foreach($AddonSuppliers->Kit as $Kit)
                         <!-- <div class="list2" id="addonbox"> -->
                             <!-- <div class="row related-addon">  -->
-                                <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">  
+                                <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
                                     <div class="row">
                                         <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
                                             Item Name
@@ -464,7 +464,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             {{$Kit->addon->AddonName->name}}
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class" 
+                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class"
                                             style="width:100%; height:125px;" alt="Addon Image"  />
                                         </div>
                                         <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
@@ -518,11 +518,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                     {{ $Kit->addon->part_number}}
                                                 </div>
                                                 @endif
-                                                
-                                            </div>                     
-                                        </div> 
+
+                                            </div>
+                                        </div>
                                         </br>
-                                    </div>  
+                                    </div>
                                 </div>
                             <!-- </div> -->
                         <!-- </div> -->
@@ -539,7 +539,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </div>
 <script type="text/javascript">
 // show image in large view
-    $('.image-click-class').click(function (e) 
+    $('.image-click-class').click(function (e)
     {
         var id =  $(this).attr('id');
         var src = $(this).attr('src');
@@ -551,11 +551,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
         modalImg.src = src;
         captionText.innerHTML = this.alt;
       })
-      $('.closeImage').click(function (e) 
+      $('.closeImage').click(function (e)
       {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
-      })   
+      })
       </script>
 @endsection
 

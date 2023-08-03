@@ -133,7 +133,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Claim Limit') }}</label>
                         <div class="input-group">
                             <input name="claim_limit_in_aed" id="claim_limit_in_aed" onkeyup="validationOnKeyUp(this)" value="{{ $premium->claim_limit_in_aed }}"
-                            oninput="inputNumberAbs(this)" class="form-control widthinput" placeholder="Enter Claim Limit" aria-label="measurement" 
+                            oninput="inputNumberAbs(this)" class="form-control widthinput" placeholder="Enter Claim Limit" aria-label="measurement"
                             aria-describedby="basic-addon2">
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -143,7 +143,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
-                        <label for="supplier" class="col-form-label text-md-end">Supplier</label>
+                        <label for="supplier" class="col-form-label text-md-end">Vendor</label>
                         <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus >
                             <option></option>
                             @foreach($suppliers as $supplier)
@@ -176,87 +176,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     </center>
                 </div>
                 <div class="card-body">
-                    <!-- <div class="row">
-                        @foreach($warrantyBrands as $key => $warrantyBrand)
-                            <div class="col-xxl-7 col-lg-7 col-md-5">
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select class="form-control" readonly>
-                                    <option>{{$warrantyBrand->brand->brand_name}}</option>
-                                </select>
-                            </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
-                                <div class="input-group">
-                                    <input value="{{$warrantyBrand->price}}" readonly oninput="inputNumberAbs(this)" class="form-control widthinput">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                    <span id="Price1Error" class="invalid-feedback"></span>
-                                </div>
-                            </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
-                                <div class="input-group">
-                                    <input value="{{$warrantyBrand->selling_price ?? ''}}" readonly oninput="inputNumberAbs(this)" class="form-control widthinput">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                    <span id="Price1Error" class="invalid-feedback"></span>
-                                </div>
-                            </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1" style="margin-top: 36px">
 
-                                <button type="button" class="btn btn-danger remove-item"  data-id="{{ $warrantyBrand->id }}"
-                                        data-url="{{ route('warranty-brands.destroy', $warrantyBrand->id) }}">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        @endforeach
-                    </div> -->
-                    <!-- <div class="form_field_outer">
-                        <div class="row form_field_outer_row">
-                            <div class="col-xxl-7 col-lg-7 col-md-5">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"  class="form-control brands" autofocus>
-                                    @foreach($brands as $brand)
-                                        <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                    @endforeach
-                                </select>
-                                <span id="Brand1Error" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
-                                <div class="input-group">
-                                    <input name="brandPrice[1][purchase_price]" id="purchase_price1"  oninput="inputNumberAbs(this)" class="form-control widthinput" 
-                                     placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                    <span id="Price1Error" class="invalid-feedback"></span>
-                                </div>
-                            </div>
-                             <div class="col-xxl-2 col-lg-2 col-md-3">
-                                    <span class="error">* </span>
-                                    <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
-                                    <div class="input-group">
-                                        <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)"
-                                               oninput="inputNumberAbs(this)" class="form-control widthinput" 
-                                                placeholder="Enter Selling Price">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                        </div>
-                                        <span id="SellingPrice1Error" class="invalid-feedback"></span>
-                                    </div>
-                                </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <button class="btn_round  removeButtonSupplierWithoutKit" disabled hidden>
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="form_field_outer">
                     <div hidden>{{$i=0;}}</div>
                         @foreach($existingBrands as $existingBrand)
@@ -265,7 +185,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                             <div class="col-xxl-5 col-lg-5 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[{{$i}}][brands][]" id="brands{{$i}}" data-index="{{$i}}" multiple="true" style="width: 100%;" 
+                                <select name="brandPrice[{{$i}}][brands][]" id="brands{{$i}}" data-index="{{$i}}" multiple="true" style="width: 100%;"
                                  class="form-control brands" autofocus required>
                                     @foreach($existingBrand->brand as $brand)
                                     <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}" selected>{{$brand->brand_name}}</option>
@@ -280,7 +200,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[{{$i}}][purchase_price]" oninput="inputNumberAbs(this)" class="form-control widthinput purchase-price" 
+                                    <input name="brandPrice[{{$i}}][purchase_price]" oninput="inputNumberAbs(this)" class="form-control widthinput purchase-price"
                                     id="purchase_price{{$i}}" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2"
                                      value="{{$existingBrand->price}}" required>
                                     <div class="input-group-append">
@@ -289,21 +209,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 </div>
                                 <span id="supplierError" class="invalid-feedback"></span>
                             </div>
-                            <!-- <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
-                                <div class="input-group">
-                                    <input name="brandPrice[{{$i}}][selling_price]" oninput="inputNumberAbs(this)" class="form-control widthinput selling-price"
-                                    id="selling_price{{$i}}" placeholder="Enter Selling Price" value="{{$existingBrand->selling_price}}" 
-                                    @if($existingBrand->is_selling_price_approved == 1) readonly @endif>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" >AED</span>
-                                    </div>
-                                </div>
-                                <span id="sellingError" class="invalid-feedback"></span>
-                            </div> -->
+
                             <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }} 
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}
                                     @if($existingBrand->is_selling_price_approved == 1) ( Approved )
                                     @elseif($existingBrand->is_selling_price_approved == 0)
                                        ( Approval Awaiting )
@@ -362,18 +270,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
     {
         lengthExistingBrand = existingBrands.length;
         $('#supplier_id').select2({
-            placeholder:"Choose Supplier",
+            placeholder:"Choose Vendor",
         });
-       
+
         for(let i=1; i<=lengthExistingBrand; i++)
-        {   
+        {
             $('#brands'+i).select2({
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
             });
         }
-     
+
         $('.remove-item').on('click',function(){
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
@@ -447,7 +355,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Price Required',function (e) {
                    }).set({title:"Can't Remove Brands And Prices"})
                 }
-         
+
         })
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
@@ -516,7 +424,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         }
         if(inputSupplierId == '')
         {
-            $msg = "Supplier is required";
+            $msg = "Vendor is required";
             showSupplierError($msg);
             formInputError = true;
             e.preventDefault();
@@ -586,7 +494,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                             <div class="col-xxl-7 col-lg-7 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"  
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" multiple="true" style="width: 100%;"
                                 class="form-control brands" autofocus required>
 
                                 </select>
@@ -596,7 +504,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" class="form-control widthinput purchase-price" 
+                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" class="form-control widthinput purchase-price"
                                     id="purchase_price${index}" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2" required>
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" >AED</span>
@@ -829,13 +737,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         document.getElementById("extended_warranty_milage").classList.remove("is-invalid");
         document.getElementById("ExtendedWarrantyMilageError").classList.remove("paragraph-class");
     }
-    function inputNumberAbs(currentPriceInput) 
+    function inputNumberAbs(currentPriceInput)
     {
         var id = currentPriceInput.id;
         var input = document.getElementById(id);
         var val = input.value;
         val = val.replace(/^0+|[^\d.]/g, '');
-        if(val.split('.').length>2) 
+        if(val.split('.').length>2)
         {
             val =val.replace(/\.+$/,"");
         }

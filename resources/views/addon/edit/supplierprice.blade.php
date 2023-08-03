@@ -12,7 +12,7 @@
                                         <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
                                         <div class="row supplierWithoutKitApendHere" id="row-{{$i}}" >
                                             <div class="col-xxl-5 col-lg-6 col-md-12">
-                                                <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
+                                                <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                                 <select class="addonClass suppliers" data-index="{{$i}}"  id="suppliers{{$i}}" name="supplierAndPrice[{{$i}}][supplier_id][]"
                                                 multiple="true" style="width: 100%;" required>
                                                 @foreach($supplierAddon->suppliers as $supplier)
@@ -65,7 +65,7 @@
                         <div class="row">
                             <div class="col-xxl-12 col-lg-12 col-md-12">
                                 <a id="addSupplier" style="float: right;" class="btn btn-sm btn-info addSupplierAndPriceWithoutKit">
-                                    <i class="fa fa-plus" aria-hidden="true"></i> Add Supplier</a>
+                                    <i class="fa fa-plus" aria-hidden="true"></i> Add Vendor</a>
                             </div>
                         </div>
                     </div>
@@ -83,20 +83,20 @@
     {
         lengthExistingSuppliers = supplierAddons.length;
         for(let i=1; i<=lengthExistingSuppliers; i++)
-        {   
+        {
             $('#suppliers'+i).select2({
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
             });
         }
-    
+
     });
     $(document).ready(function ()
     {
         $("#suppliers1").select2
         ({
-            placeholder:"Choose Suppliers....     Or     Type Here To Search...."
+            placeholder:"Choose Vendors....     Or     Type Here To Search...."
         });
         $('#indexValue').val(lengthExistingSuppliers);
         $(document.body).on('select2:select', ".suppliers", function (e) {
@@ -135,7 +135,7 @@
                 }
             }
         }
-        $(document.body).on('click', ".removeButton", function (e) 
+        $(document.body).on('click', ".removeButton", function (e)
         {
             var countRow = 0;
             var countRow = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
@@ -169,7 +169,7 @@
                     $(this).find('a').attr('data-index', index);
                     $('#suppliers'+index).select2
                     ({
-                        placeholder:"Choose Suppliers....     Or     Type Here To Search....",
+                        placeholder:"Choose  Vendors....     Or     Type Here To Search....",
                         allowClear: true,
                         minimumResultsForSearch: -1,
                     });
@@ -178,8 +178,8 @@
             }
             else
             {
-                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Supplier and Price Required',function (e) {
-                }).set({title:"Can't Remove Supplier And Prices"})
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Vendor and Price Required',function (e) {
+                }).set({title:"Can't Remove Vendor And Prices"})
             }
         })
     });
@@ -218,7 +218,7 @@
                     $(".supplierWithoutKit").append(`
                         <div class="row supplierWithoutKitApendHere" id="row-${index}" >
                             <div class="col-xxl-5 col-lg-6 col-md-12">
-                                <label for="choices-single-default" class="form-label font-size-13">Choose Suppliers</label>
+                                <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                 <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
                                  multiple="true" style="width: 100%;" required>
                                 </select>
@@ -270,7 +270,7 @@
                     });
                     $('#suppliers'+index).select2
                     ({
-                        placeholder:"Choose Supplier....     Or     Type Here To Search....",
+                        placeholder:"Choose Vendor....     Or     Type Here To Search....",
                         allowClear: true,
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
@@ -281,10 +281,4 @@
         });
 
 
-        //===== delete the form fieed row
-        // $("body").on("click", ".removeButtonSupplierWithoutKit", function ()
-        // {
-        //     alert(currentAddonType);
-        //     $(this).closest(".supplierWithoutKitApendHere").remove();
-        // });
 </script>

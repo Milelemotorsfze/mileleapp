@@ -477,7 +477,7 @@
                 maximumSelectionLength: 1,
             });
             // $('#addon_id').select2();
-            $("#supplierArray1").attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
+            $("#supplierArray1").attr("data-placeholder","Choose Vendor....     Or     Type Here To Search....");
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
@@ -609,7 +609,7 @@
                     }
                     var countBrandRow = 0;
                     countBrandRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-                    for (let i = 1; i <= countBrandRow; i++) 
+                    for (let i = 1; i <= countBrandRow; i++)
                     {
                         var inputSPBrand = $('#selectBrandMo'+i).val();
                         if(inputSPBrand == '')
@@ -620,7 +620,7 @@
                         }
                         var countModelDescriptionRow = 0;
                         countModelDescriptionRow = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
-                        for (let j = 1; j <= countModelDescriptionRow; j++) 
+                        for (let j = 1; j <= countModelDescriptionRow; j++)
                         {
                             var inputSPModelLine = $('#selectModelLineNum'+i+'Des'+j).val();
                             if(inputSPModelLine == '')
@@ -628,16 +628,16 @@
                                 $msg = "Model line is required";
                                 showSPModelLineError($msg,i,j);
                                 formInputError = true;
-                            }   
+                            }
                         }
                     }
-                    
+
                 }
                 else
                 {
                     var countBrandRow = 0;
                     countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                    for (let i = 1; i <= countBrandRow; i++) 
+                    for (let i = 1; i <= countBrandRow; i++)
                     {
                         var inputBrand = $('#selectBrand'+i).val();
                         if(inputBrand == '')
@@ -658,7 +658,7 @@
                             }
                         }
                     }
-                    
+
                 }
                 // if(inputAddonType == 'K')
                 // {
@@ -1161,7 +1161,7 @@
                             });
                             $('#suppliers1').select2
                             ({
-                                placeholder: 'Choose Supplier ....     Or     Type Here To Search....',
+                                placeholder: 'Choose Vendor ....     Or     Type Here To Search....',
                                 allowClear: true,
                                 data: SupplierDropdownData,
                                 // maximumSelectionLength: 1,
@@ -1513,8 +1513,8 @@
         }
         function showAlert()
         {
-            var confirm = alertify.confirm('You are not able to edit this field while any Supplier is in selection',function (e) {
-                   }).set({title:"Remove Brands and Suppliers"})
+            var confirm = alertify.confirm('You are not able to edit this field while any Vendor is in selection',function (e) {
+                   }).set({title:"Remove Brands and Vendors"})
         }
 </script>
 @endsection

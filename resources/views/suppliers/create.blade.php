@@ -240,7 +240,7 @@ input {
     @endphp
     @if ($hasPermission)
     <div class="card-header">
-        <h4 class="card-title">Create Suppliers</h4>
+        <h4 class="card-title">Create Vendors</h4>
         <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('suppliers.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
