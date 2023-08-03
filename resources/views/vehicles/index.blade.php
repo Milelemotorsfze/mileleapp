@@ -1307,7 +1307,6 @@ function updateData() {
   const editableFields = document.querySelectorAll('.editable-field');
   const updateDataUrl = '{{ route('vehicles.updatedata') }}';
   const updatedData = [];
-
   editableFields.forEach(field => {
     const vehicleId = field.getAttribute('data-vehicle-id');
     const fieldName = field.classList[1];
@@ -1422,25 +1421,21 @@ updateBtn.addEventListener('click', () => {
       field.innerHTML = fieldValue;
     }
   });
-
   updateData(); // Call the function to update the server with the edited data
 });
 </script>
 <script>
 $(document).ready(function() {
   var currentFilters = new URLSearchParams(window.location.search); // Get the current filters from the query string
-
   function updateFilters(columnName, searchQuery) {
     // Update the currentFilters with the new filter
     currentFilters.append('columnName[]', columnName);
     currentFilters.append('searchQuery[]', searchQuery);
   }
-
   function getQueryStringWithFilters() {
     // Return the updated query string with all the filters
     return '?' + currentFilters.toString();
   }
-
 // Function to display the applied filters in the search inputs
 function displayAppliedFilters() {
   // Loop through each search input in the table header
@@ -1541,31 +1536,9 @@ $('#applyFilterBtn').on('click', function() {
   }
   function updatePageInfo() {
     var pageInfo = dataTable.page.info();
+    console.log(pageInfo);
     $('#pageInfo').text('Page ' + (currentPage + 1) + ' of ' + pageInfo.pages);
-
-    // Remove active class from all pagination links
-    $('.pagination-list li').removeClass('active');
-
-    // Add active class to the current page number
-    $('.pagination-list li').eq(currentPage).addClass('active');
   }
-
-  $('#prevBtn').on('click', function (e) {
-    e.preventDefault();
-    if (currentPage > 0) {
-      currentPage--;
-      showPage(currentPage);
-    }
-  });
-
-  $('#nextBtn').on('click', function (e) {
-    e.preventDefault();
-    if (currentPage < dataTable.page.info().pages - 1) {
-      currentPage++;
-      showPage(currentPage);
-    }
-  });
-
   // Event handler for table draw event
   dataTable.on('draw.dt', function () {
     currentPage = dataTable.page.info().page; // Update the currentPage variable

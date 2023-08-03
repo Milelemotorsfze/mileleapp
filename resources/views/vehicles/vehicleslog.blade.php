@@ -4,13 +4,11 @@
         display: flex;
         align-items: center;
     }
-
     .label {
     flex-basis: 30%;
     font-family: Calibri, sans-serif;
     font-size: 16px;
 }
-
 .value {
     flex-basis: 70%;
     font-family: Calibri, sans-serif;
@@ -56,12 +54,29 @@
         </div>
     </div>
     <br>
-            @php
-            $pictureslink = DB::table('vehicle_pictures')->where('vehicle_id', $vehicle->id)->first();
-            $pictures = $pictureslink->vehicle_picture_link ?? '';
+    @php
+            $picturespdi = DB::table('vehicle_pictures')->where('vehicle_id', $vehicle->id)->where('category', 'PDI')->first();
+            $pdipictures = $picturespdi->vehicle_picture_link ?? '';
             @endphp
-            @if($pictures)
-            <a title="Vehicles Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$pictures}}" target="_blank">View Pictures</a>
+            @if($pdipictures)
+            <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+            <a title="Vehicles PDI Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$pdipictures}}" target="_blank">View PDI Pictures</a>
+            @endif
+            @php
+            $picturesmodification = DB::table('vehicle_pictures')->where('vehicle_id', $vehicle->id)->where('category', 'Modification')->first();
+            $modificationpictures = $picturesmodification->vehicle_picture_link ?? '';
+            @endphp
+            @if($modificationpictures)
+            <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+            <a title="Vehicles Modification Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$modificationpictures}}" target="_blank">View Modification Pictures</a>
+            @endif
+            @php
+            $picturegrn = DB::table('vehicle_pictures')->where('vehicle_id', $vehicle->id)->where('category', 'GRN')->first();
+            $grnpictures = $picturegrn->vehicle_picture_link ?? '';
+            @endphp
+            @if($grnpictures)
+            <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+            <a title="Vehicles GRN Pictures Details" data-placement="top" class="btn btn-sm btn-primary float-end" href="{{$grnpictures}}" target="_blank">View GRN Pictures</a>
             @endif
     </div>
 
