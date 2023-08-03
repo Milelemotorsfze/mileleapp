@@ -415,6 +415,8 @@ Clear Filters
                                 @if ($hasPermission)
                                 <th id="grn_number" class="nowrap-td">GRN</th>
                                 <th id="grn_date" class="nowrap-td">GRN Date</th>
+                                <th id="netsuit_grn_number" class="nowrap-td">Netsuit GRN Number</th>
+                                <th id="netsuit_grn_date" class="nowrap-td">Netsuit GDN Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -699,6 +701,16 @@ Clear Filters
                                      @else
                                      <td class="nowrap-td grnDate"></td>
                                     @endif
+                                    @php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-edit');
+                                      @endphp
+                                      @if ($hasPermission)
+                                      <td class="editable-field netsuit_grn_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->netsuit_grn_number }}</td>
+                                      <td class="editable-field netsuit_grn_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="netsuit_grn_date">{{ $vehicles->netsuit_grn_date }}</td>
+                                      @else
+                                      <td>{{ $vehicles->netsuit_grn_number }}</td>
+                                      <td>{{ $vehicles->netsuit_grn_date }}</td>
+                                      @endif
                                     @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
                                 @endphp
