@@ -216,10 +216,10 @@ class VehiclePendingApprovalRequestController extends Controller
                 $colorlog->save();
 
             }
-        }else{
-            $vehicle->$field = $newValue;
-
         }
+
+        $vehicle->$field = $newValue;
+
         $vehicle->save();
         $pendingApprovalRequest->status = $request->status;
         if($request->status == 'approved') {

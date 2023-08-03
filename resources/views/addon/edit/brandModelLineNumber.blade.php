@@ -296,6 +296,7 @@
         }
         $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e)
         {
+
             var countRow = 0;
             var countRow =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
             if(countRow > 1)
@@ -681,7 +682,7 @@
             $msg = "";
             removeSPBrandError($msg,id);
             var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-            for(var i = 1;i<=indexValue;i++) 
+            for(var i = 1;i<=indexValue;i++)
             {
                 showBrandModelLines(id,i);
             }
