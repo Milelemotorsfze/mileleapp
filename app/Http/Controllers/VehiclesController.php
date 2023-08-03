@@ -36,14 +36,18 @@ class VehiclesController extends Controller
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
         if ($hasPermission) {
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
-                ->where(function ($query) {
+            $data = Vehicles::where('payment_status', $statuss);
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
                     $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
                         ->orWhereHas('So', function ($query) {
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
                 });
-
+            }
             $columnNames = $request->query('columnName');
             $searchQueries = $request->query('searchQuery');
             // Check if any filters were applied
@@ -735,7 +739,6 @@ class VehiclesController extends Controller
                     }
                 }
             }
-
             $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                                 ->groupBy('vehicle_id')->get();
@@ -749,6 +752,7 @@ class VehiclesController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
         $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
         $previousYearSold = $this->previousYearSold()->count();
@@ -766,7 +770,7 @@ class VehiclesController extends Controller
 
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending',
             'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
-            'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
+            'warehousesveh','warehousesvehss', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
             'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable',
             'yesterdayAvailable', 'yesterdayPurchased','previousMonthPurchased','previousYearPurchased'));
         }
@@ -820,16 +824,19 @@ class VehiclesController extends Controller
 
         }else{
             $statuss = "Incoming Stock";
-            $data = Vehicles::where('payment_status', $statuss)
-                ->where(function ($query) {
+            $data = Vehicles::where('payment_status', $statuss);
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
                     // Include vehicles with 'so_id' is null
                     $query->whereNull('so_id')
                         // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
                         ->orWhereHas('So', function ($query) {
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
-                })
-                ->paginate(100);
+                });
+            }
+            $data = $data->paginate(100);
         }
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
             ->groupBy('vehicle_id')->get();
@@ -843,6 +850,7 @@ class VehiclesController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
         $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
 
@@ -861,7 +869,7 @@ class VehiclesController extends Controller
 
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
             ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse',
-            'warehousesveh', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
+            'warehousesveh','warehousesvehss', 'warehousesveher','previousYearSold','previousMonthSold','previousYearBooked',
             'previousMonthBooked','yesterdaySold','yesterdayBooked','previousYearAvailable','previousMonthAvailable','yesterdayAvailable',
             'yesterdayPurchased','previousMonthPurchased','previousYearPurchased'));
     }
@@ -1061,16 +1069,19 @@ class VehiclesController extends Controller
                 ->where('vehicles.latest_location', '=', $warehouseId) // Replace $warehousesveher->id with $warehouseId
                 ->where(function ($query) use ($fieldValues) {
                     $query->whereIn('field', $fieldValues);
-                })
-    ->where(function ($query) {
-        // Include vehicles with 'so_id' is null
-        $query->whereNull('so_id')
-            // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-            ->orWhereHas('So', function ($query) {
-                $query->where('sales_person_id', Auth::user()->role_id);
-            });
-    })
-    ->paginate(100);
+                });
+                $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+                if ($hasEditSOPermission) {
+                    $data = $data->where(function ($query) {
+                        // Include vehicles with 'so_id' is null
+                        $query->whereNull('so_id')
+                            // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                            ->orWhereHas('So', function ($query) {
+                                $query->where('sales_person_id', Auth::user()->role_id);
+                            });
+                    });
+                }
+                $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -1083,10 +1094,11 @@ class VehiclesController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
         $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher'));
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher'));
         }
         else{
             return redirect()->route('home');
@@ -1100,16 +1112,19 @@ class VehiclesController extends Controller
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->where('latest_location', $warehouseId)
-            ->whereNull('inspection_date')
-            ->where(function ($query) {
-                // Include vehicles with 'so_id' is null
-                $query->whereNull('so_id')
-                    // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                    ->orWhereHas('So', function ($query) {
-                        $query->where('sales_person_id', Auth::user()->role_id);
-                    });
-            })
-            ->paginate(100);
+            ->whereNull('inspection_date');
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                });
+            }
+            $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -1122,10 +1137,11 @@ class VehiclesController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
         $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher'));
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher'));
         }
         else{
             return redirect()->route('home');
@@ -1138,16 +1154,19 @@ class VehiclesController extends Controller
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->whereNull('grn_id')
-            ->whereNull('gdn_id')
-            ->where(function ($query) {
-                // Include vehicles with 'so_id' is null
-                $query->whereNull('so_id')
-                    // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
-                    ->orWhereHas('So', function ($query) {
-                        $query->where('sales_person_id', Auth::user()->role_id);
-                    });
-            })
-            ->paginate(100);
+            ->whereNull('gdn_id');
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                });
+            }
+            $data = $data->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
         ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
@@ -1160,10 +1179,11 @@ class VehiclesController extends Controller
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
         $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
         $countwarehouse = $warehouses->count();
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
-        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher'));
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher'));
         }
         else{
             return redirect()->route('home');
@@ -1983,5 +2003,64 @@ class VehiclesController extends Controller
     {
         $modelLines = MasterModelLines::where('brand_id', $brandId)->get();
         return response()->json($modelLines);
+    }
+    public function incomingpendingpdis(Request $request)
+    {
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
+        $warehouseId = $request->query('warehouse_id');
+        if ($hasPermission) {
+            $statuss = "Incoming Stock";
+            $data = Vehicles::where('payment_status', $statuss)
+            ->where('latest_location', $warehouseId)
+            ->whereNotNull('so_id')
+            ->whereNull('pdi_date');
+            $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
+            if ($hasEditSOPermission) {
+                $data = $data->where(function ($query) {
+                    // Include vehicles with 'so_id' is null
+                    $query->whereNull('so_id')
+                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
+                        ->orWhereHas('So', function ($query) {
+                            $query->where('sales_person_id', Auth::user()->role_id);
+                        });
+                });
+            }
+            $data = $data->paginate(100);
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
+        ->groupBy('vehicle_id')->get();
+        $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
+        $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
+        $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
+        $sales_persons = ModelHasRoles::get();
+        $sales_ids = $sales_persons->pluck('model_id');
+        $sales = User::whereIn('id', $sales_ids)->get();
+        $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
+        $interiorColours = ColorCode::where('belong_to', 'int')->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $countwarehouse = $warehouses->count() ?? 0;
+        return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
+        ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss'));
+        }
+        else{
+            return redirect()->route('home');
+        }
+    }
+    public function checkEntry(Request $request)
+    {
+        $vin = $request->input('vin');
+    $vehicle = Vehicles::where('vin', $vin)->first();
+    if ($vehicle) {
+        $vehiclePicture = VehiclePicture::where('vehicle_id', $vehicle->id)->get();
+        if ($vehiclePicture) {
+            return response()->json(['entryExists' => true, 'category' => $vehiclePicture->category]);
+        } else {
+            return response()->json(['entryExists' => false]);
+        }
+    } else {
+        return response()->json(['entryExists' => false]);
+    }
     }
     }

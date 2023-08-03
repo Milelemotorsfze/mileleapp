@@ -337,6 +337,8 @@ Route::get('/d', function () {
     Route::post('vendorchecking/check-name', [VendorController::class, 'checkingname'])->name('vendorchecking.checkingname');
     Route::get('/get-model-lines/{brandId}', [VehiclesController::class, 'getModelLines']);
     Route::get('/get-vehicles-data-for-movement', [MovementController::class, 'getVehiclesDataformovement'])->name('vehicles.getVehiclesDataformovement');
+    Route::get('/vehicleincomingpendingpdis', [VehiclesController::class, 'incomingpendingpdis'])->name('vehiclesincoming.pendingpdis');
+    Route::post('/checkEntry', [VehiclesController::class, 'checkEntry'])->name('vehicles.checkEntry');
     // Vendors
 
     Route::resource('vendors', VendorController::class);

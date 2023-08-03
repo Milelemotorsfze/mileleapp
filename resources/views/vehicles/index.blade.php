@@ -201,13 +201,13 @@
       </tr>
     </thead>
     <tbody>
+    @php
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    @endphp
     <tr style="background-color: yellow !important;">
         <td style="font-size: 12px;">
             Pending Inspection
         </td>
-        @php
-        $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
-        @endphp
         @foreach ($warehousesveh as $warehousesveh)
         @php
         $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
@@ -234,6 +234,20 @@
         ->count();
         @endphp
         <td onclick="window.location.href = '{{ route('vehicleinspectionapprovals.pendingapprovals', ['warehouse_id' => $warehousesveher->id]) }}'" style="font-size: 12px;">{{ $countpendings }}</td>
+        @endforeach
+      </tr>
+      <tr style="background-color: yellow !important;">
+        <td style="font-size: 12px;">
+            Pending PDI
+        </td>
+        @foreach ($warehousesvehss as $warehousesvehss)
+        @php
+        $pendingpdi = DB::table('vehicles')->where('latest_location', $warehousesvehss->id)
+        ->whereNotNull('so_id')
+        ->whereNull('pdi_date')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.pendingpdis', ['warehouse_id' => $warehousesvehss->id]) }}'" style="font-size: 12px;">{{$pendingpdi}}</td>
         @endforeach
       </tr>
       <tr>
