@@ -200,7 +200,8 @@
             // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
             //     if (e) {
                     var countRow = 0;
-                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; alert(countRow);
+                    // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
                     if (countRow > 1) {
                         var indexNumber = $(this).attr('data-index');
 
@@ -262,6 +263,7 @@
                                     placeholder: 'Choose Model Description....     Or     Type Here To Search....',
                                     allowClear: true,
                                 });
+                                $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
                                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
 
                             }
@@ -282,7 +284,7 @@
            //      if (e) {
                     var indexNumber = $(this).attr('data-index');
                     var countRow = 0;
-                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length; 
+                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;  alert(countRow);
                     if (countRow > 1) {
                         var modelIndex = $(this).attr('data-model-index');
                         if (modelIndex == 1) {
