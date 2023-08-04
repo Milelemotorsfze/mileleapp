@@ -348,25 +348,51 @@
             showBrandDiv();
         });
 
-        $(document.body).on('select2:unselect', ".brands", function (e) {
-            var index = $(this).attr('data-index');
-            var data = e.params.data;
-            appendOption(index,data);
-        });
+        // $(document.body).on('select2:unselect', ".brands", function (e) {
+        //     var index = $(this).attr('data-index');
+        //     var data =  $('#regions'+index).val();
+        //     appendOption(index,data);
+        // });
+        // $(document.body).on('select2:select', ".brands", function (e) {
+        //     var index = $(this).attr('data-index');
+        //     var value = $('#regions'+index).val();
+        //     hideOption(index,value);
+        // });
         function hideOption(index,value) {
+            alert(value);
             var indexValue = $('#indexValue').val();
-            for (var i = 1; i <= indexValue; i++) {
-                if (i != index) {
-                    var currentId = 'brands' + i;
-                    $('#' + currentId + ' option[value=' + value + ']').detach();
+            console.log(index);
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            for(let i=1; i<brandTotalIndex; i++)
+            {
+                console.log(value);
+
+                var country = $('#regions'+i).val();
+                console.log(country);
+                if(country == 2) {
+                    console.log("value eqaul");
+                    if(index != i) {
+                        console.log("not clicked item")
+                        var currentId = 'brands' + i;
+                        $('#' + currentId + ' option[value=' + value + ']').detach();
+                    }
+
                 }
             }
         }
         function appendOption(index,data) {
-            var indexValue = $('#indexValue').val();
-            for(var i=1;i<=indexValue;i++) {
-                if(i != index) {
-                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+            alert(index);
+            // check if this brand country is choosen anywhere in list, if yes find the corresponding brand
+            // dropdown id and append data in that dropdown nly
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            for(let i=1; i<brandTotalIndex; i++)
+            {
+                var eachSelectedCountry = $("#regions"+i).val();
+
+                if(eachSelectedCountry == data) {
+                    if(index != i) {
+                        $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+                    }
                 }
             }
         }
@@ -378,9 +404,9 @@
                     var indexNumber = $(this).attr('data-index');
 
                     $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                    var id = (this.value);
-                    var text = (this.text);
-                        addOption(id,text)
+                    // var id = (this.value);
+                    // var text = (this.text);
+                    //     addOption(id,text)
                     });
 
                     $(this).closest('#row-'+indexNumber).remove();

@@ -52,22 +52,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                 <div class="row">
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Policy Name') }}</label>
-                        <select name="warranty_policies_id" id="warranty_policies_id" class="form-control widthinput" autofocus>
+                        <select name="warranty_policies_id" id="warranty_policies_id" multiple="true" class="form-control widthinput"
+                                onchange="validationOnKeyUp(this)"  autofocus>
                             @foreach($policyNames as $policyName)
-                                <option value="{{$policyName->id}}" {{$policyName->id == $premium->warranty_policies_id  ? 'selected' : ''}}>{{$policyName->name}}</option>
+                                <option value="{{$policyName->id}}" {{$policyName->id == $premium->warranty_policies_id  ? 'selected' : ''}}>
+                                    {{$policyName->name}}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 1') }}</label>
-                        <select name="vehicle_category1" id="vehicle_category1" class="form-control widthinput" autofocus>
+                        <select name="vehicle_category1" onchange="validationOnKeyUp(this)"  id="vehicle_category1" multiple="true" class="form-control widthinput" autofocus>
                                 <option value="non_electric" {{"non_electric" == $premium->vehicle_category1  ? 'selected' : ''}}>Non Electric</option>
                                 <option value="electric" {{"electric" == $premium->vehicle_category1  ? 'selected' : ''}}>Electric</option>
                         </select>
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 2') }}</label>
-                        <select name="vehicle_category2" id="vehicle_category2" class="form-control widthinput" autofocus>
+                        <select name="vehicle_category2" onchange="validationOnKeyUp(this)"  id="vehicle_category2" multiple="true" class="form-control widthinput" autofocus>
                             <option value="normal_and_premium" {{"normal_and_premium" == $premium->vehicle_category2  ? 'selected' : ''}}>Normal And Premium</option>
                             <option value="lux_sport_exotic" {{"lux_sport_exotic" == $premium->vehicle_category2  ? 'selected' : ''}}>Lux/Sport/Exotic</option>
                         </select>
@@ -144,7 +146,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">Vendor</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus >
+                        <select name="supplier_id" onchange="validationOnKeyUp(this)"  id="supplier_id" multiple="true" class="form-control widthinput" autofocus >
                             <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}" {{ $supplier->id == $premium->supplier_id ? 'selected' : '' }} >{{$supplier->supplier}}</option>
@@ -283,10 +285,27 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
     $(document).ready(function ()
     {
         lengthExistingBrand = existingBrands.length;
+
         $('#supplier_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
             placeholder:"Choose Vendor",
         });
-
+        $('#warranty_policies_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Policy",
+        });
+        $('#vehicle_category1').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Vehicle Category",
+        });
+        $('#vehicle_category2').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Vehicle Category",
+        });
         for(let i=1; i<=lengthExistingBrand; i++)
         {
             $('#brands'+i).select2({
@@ -383,15 +402,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             }
         }
 
-        function hideOption(index,value) {
-            var indexValue = $('#indexValue').val();
-            for (var i = 1; i <= indexValue; i++) {
-                if (i != index) {
-                    var currentId = 'brands' + i;
-                    $('#' + currentId + ' option[value=' + value + ']').detach();
-                }
-            }
-        }
         function appendOption(index,data) {
             var indexValue = $('#indexValue').val();
             for(var i=1;i<=indexValue;i++) {
@@ -412,7 +422,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
         var inputPurchasePrice1 = $('#purchase_price1').val();
-        // var formInputError = false;
+        var inputCountry1 = $('#regions1').val();
+        var inputPolicy = $('#warranty_policies_id').val();
+        var inputVehicleCategory1 = $('#vehicle_category1').val();
+        var inputVehicleCategory2 = $('#vehicle_category2').val();
+
+
+        if(inputCountry1 == '')
+        {
+            $msg = "Country is required";
+            showCountry1Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
         if(inputEligibilityYears == '')
         {
             $msg = "Eligibility Years is required";
@@ -598,6 +620,58 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
     {
         if(save == 2)
         {
+            if(clickInput.id == 'regions1')
+            {
+                value = $('#regions1').val();
+                if(value == '')
+                {
+                    $msg = "Country is required";
+                    showCountry1Error($msg);
+                }
+                else
+                {
+                    removeCountry1Error();
+                }
+            }
+            if(clickInput.id == 'warranty_policies_id')
+            {
+                value = $('#warranty_policies_id').val();
+                if(value == '')
+                {
+                    $msg = "Policy is required";
+                    showPolicyError($msg);
+                }
+                else
+                {
+                    removePolicyError();
+                }
+            }
+            if(clickInput.id == 'vehicle_category1')
+            {
+                value = $('#vehicle_category1').val();
+                if(value == '')
+                {
+                    $msg = "Category is required";
+                    showVehicleCategory1Error($msg);
+                }
+                else
+                {
+                    removeVehicleCategory1Error();
+                }
+            }
+            if(clickInput.id == 'vehicle_category2')
+            {
+                value = $('#vehicle_category2').val();
+                if(value == '')
+                {
+                    $msg = "Category is required";
+                    showVehicleCategory2Error($msg);
+                }
+                else
+                {
+                    removeVehicleCategory2Error();
+                }
+            }
             if(clickInput.id == 'eligibility_year')
             {
                 var value = clickInput.value;
@@ -703,6 +777,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         // $('#extended_warranty_milage').val(0);
         showExtendedWarrantyMilage.hidden = true
     }
+
+    function showVehicleCategory1Error($msg)
+    {
+        document.getElementById("VehicleCategory1Error").textContent=$msg;
+        document.getElementById("vehicle_category1").classList.add("is-invalid");
+        document.getElementById("VehicleCategory1Error").classList.add("paragraph-class");
+    }
+    function showVehicleCategory2Error($msg)
+    {
+        document.getElementById("VehicleCategory2Error").textContent=$msg;
+        document.getElementById("vehicle_category2").classList.add("is-invalid");
+        document.getElementById("VehicleCategory2Error").classList.add("paragraph-class");
+    }
+    function showPolicyError($msg)
+    {
+        document.getElementById("PolicyError").textContent=$msg;
+        document.getElementById("warranty_policies_id").classList.add("is-invalid");
+        document.getElementById("PolicyError").classList.add("paragraph-class");
+    }
+    function removeVehicleCategory1Error()
+    {
+        document.getElementById("VehicleCategory1Error").textContent="";
+        document.getElementById("vehicle_category1").classList.remove("is-invalid");
+        document.getElementById("VehicleCategory1Error").classList.remove("paragraph-class");
+    }
+    function removeVehicleCategory2Error()
+    {
+        document.getElementById("VehicleCategory2Error").textContent="";
+        document.getElementById("vehicle_category2").classList.remove("is-invalid");
+        document.getElementById("VehicleCategory2Error").classList.remove("paragraph-class");
+    }
+    function removePolicyError()
+    {
+        document.getElementById("PolicyError").textContent="";
+        document.getElementById("warranty_policies_id").classList.remove("is-invalid");
+        document.getElementById("PolicyError").classList.remove("paragraph-class");
+    }
+
     function showEligibilityYearsError($msg)
     {
         document.getElementById("EligibilityYearsError").textContent=$msg;
