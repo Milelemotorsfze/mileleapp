@@ -319,8 +319,7 @@
                             $(this).find('.removeButtonModelItem').attr('data-index', indexNumber);
                             $(this).find('.removeButtonModelItem').attr('data-model-index', modelIndex);
 
-                        // $(this).find('.ModelLineError').attr('id','ModelLineError_'indexNumber'_'modelIndex');
-                        // <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
+                            $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
 
 
                             $('#selectBrandMo' + indexNumber).select2
