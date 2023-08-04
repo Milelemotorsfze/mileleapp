@@ -282,7 +282,7 @@
            //      if (e) {
                     var indexNumber = $(this).attr('data-index');
                     var countRow = 0;
-                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;
+                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length; 
                     if (countRow > 1) {
                         var modelIndex = $(this).attr('data-model-index');
                         if (modelIndex == 1) {
@@ -318,6 +318,8 @@
 
                             $(this).find('.removeButtonModelItem').attr('data-index', indexNumber);
                             $(this).find('.removeButtonModelItem').attr('data-model-index', modelIndex);
+                            $(this).find('.removeButtonModelItem').attr('id', 'removeModelNumberdrop'+indexNumber+'Des'+modelIndex);
+                            
 
                             $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
 
@@ -832,8 +834,9 @@
             for(var i=1;i<=index;i++) {
                 $('#showModelNumberdrop'+id+'Des'+i).attr('hidden',true);
                 if(i != 1) {
-                    $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
-                    $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                    // $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
+                    // $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                    $('#row-spare-part-brand-'+id+'-model-'+i).remove();
                 }
             }
         }
@@ -844,4 +847,6 @@
     //     let showPartNumber = document.getElementById('showModelNumberdrop'+row);
     //     showPartNumber.hidden = true
     // }
+
+    // $('#row-spare-part-brand-'+id+'-model-'+i).remove();
 </script>
