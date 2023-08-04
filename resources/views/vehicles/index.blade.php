@@ -554,6 +554,7 @@ Clear Filters
                                 @endphp
                                 @if ($hasPermission)
                                     <th id="bl_number"class="nowrap-td">BL Number</th>
+                                    <th id="bl_dms_uploading"class="nowrap-td">BL DMS Upload</th>
                                 @endif
                                     <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Details</th>
                                </tr>
@@ -642,6 +643,7 @@ Clear Filters
                                                 $owership = $documents ? $documents->owership : null;
                                                 $document_with = $documents ? $documents->document_with : null;
                                                 $bl_number = $documents ? $documents->bl_number : null;
+                                                $bl_dms_uploading = $documents ? $documents->bl_dms_uploading : null;
                                                 $latestRemarksales = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'warehouse')->orderBy('created_at', 'desc')->value('remarks');
                                                 $latestRemarkwarehouse = DB::table('vehicles_remarks')->where('vehicles_id', $vehicles->id)->where('department', 'sales')->orderBy('created_at', 'desc')->value('remarks');
                                                 @endphp
@@ -711,7 +713,7 @@ Clear Filters
                                       <td>{{ $vehicles->netsuit_grn_number }}</td>
                                       <td>{{ $vehicles->netsuit_grn_date }}</td>
                                       @endif
-                                    @php
+                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
                                 @endphp
                                 @if ($hasPermission)
@@ -1300,10 +1302,33 @@ Clear Filters
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-view');
                                         @endphp
                                         @if ($hasPermission)
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('bl-edit');
+                                        @endphp
+                                        @if ($hasPermission)
                                         <td class="editable-field bl_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{$bl_number}}</td>
-                                       @endif
+                                        <td class="editable-field bl_dms_uploading" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">
+                                        <select name="bl_dms_uploading" class="form-control" placeholder="bl_dms_uploading" disabled>
+                                                <option value=""></option>
+                                                <option value="Yes" {{ $bl_dms_uploading == 'Yes' ? 'selected' : ''  }}>Yes</option>
+                                                <option value="No" {{ $bl_dms_uploading == 'No' ? 'selected' : ''  }}>No</option>
+                                            </select>
+                                    {{--{{ $document_with }}--}}
+                                        </td>
+                                        @else
+                                        <td>{{$bl_number}}</td>
+                                        <td class="filterable-column">
+                                        <select name="bl_dms_uploading" class="form-control" placeholder="bl_dms_uploading" disabled>
+                                                <option value=""></option>
+                                                <option value="Yes" {{ $bl_dms_uploading == 'Yes' ? 'selected' : ''  }}>Yes</option>
+                                                <option value="No" {{ $bl_dms_uploading == 'No' ? 'selected' : ''  }}>No</option>
+                                            </select>
+                                    {{--{{ $document_with }}--}}
+                                        </td>
+                                        @endif
+                                        @endif
                                         <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Details</a></td>
-                                    </tr>
+                                      </tr>
                                 @endforeach
                             </tbody>
                         </table>

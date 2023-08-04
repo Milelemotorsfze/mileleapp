@@ -31,7 +31,7 @@ class VehiclePendingApprovalRequestController extends Controller
         $data = Vehicles::whereIn('id', $pendingApprovalVehicleIds)
                 ->where('status', '!=', 'cancel')
 //            ->where('payment_status', $statuss)
-            ->get();
+                ->paginate(100);
         $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
                                             ->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();

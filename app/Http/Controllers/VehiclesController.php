@@ -707,6 +707,24 @@ class VehiclesController extends Controller
                                                                                                                             }
                                                                                                                             });
                                                                                                                             break;
+                                                                                                                            case 'bl_dms_uploading':
+                                                                                                                                $bl_dms_uploading = explode(',', $searchQuery);
+                                                                                                                                $data = $data->where(function ($query) use ($bl_dms_uploading) {
+                                                                                                                                    foreach ($bl_dms_uploading as $bl_dms_uploading) {
+                                                                                                                                        if($bl_dms_uploading == "null")
+                                                                                                                                    {
+                                                                                                                                        $query->orWhere('documents_id', null);
+                                                                                                                                    }
+                                                                                                                                    else{
+                                                                                                                                        // Find the purchasing_order_id based on the po_number
+                                                                                                                                        $bl_dms_uploading = Document::where('bl_dms_uploading', 'LIKE', '%' . trim($bl_dms_uploading) . '%')->first();
+                                                                                                                                        if ($bl_dms_uploading) {
+                                                                                                                                            $query->orWhere('documents_id', $bl_dms_uploading->id);
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                }
+                                                                                                                                });
+                                                                                                                                break;
                                                                                                                             case 'latest_location':
                                                                                                                                 $latest_location = explode(',', $searchQuery);
                                                                                                                                 $data = $data->where(function ($query) use ($latest_location) {
@@ -886,7 +904,7 @@ class VehiclesController extends Controller
                     ->whereColumn('grn.id', '=', 'vehicles.grn_id')
                     ->whereBetween('grn.date', [$startDate, $endDate]);
             })
-            ->get();
+            ->paginate(100);
 
         return $data;
     }
@@ -902,7 +920,7 @@ class VehiclesController extends Controller
                     ->whereColumn('grn.id', '=', 'vehicles.grn_id')
                     ->whereBetween('grn.date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->get();
+            ->paginate(100);
 
         return $data;
     }
@@ -916,7 +934,7 @@ class VehiclesController extends Controller
                     ->whereColumn('grn.id', '=', 'vehicles.grn_id')
                     ->whereDate('grn.date', $yesterday);
             })
-            ->get();
+            ->paginate(100);
 
         return $data;
     }
@@ -933,7 +951,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->whereBetween('gdn.date', [$startDate, $endDate]);
             })
-            ->get();
+            ->paginate(100);
 
         return $countPreviouseYearSold;
     }
@@ -949,7 +967,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->whereBetween('so.so_date', [$startDate, $endDate]);
             })
-            ->get();
+            ->paginate(100);
 
         return $countPreviouseYearBooked;
     }
@@ -964,7 +982,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDate, $endDate])
             ->whereDate('so.so_date', '>=' , $endDate)
-            ->get();
+            ->paginate(100);
 
         return $countPreviouseYearAvailable;
     }
@@ -979,7 +997,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->get();
+            ->paginate(100);
 
         return $countLastMonth;
     }
@@ -995,7 +1013,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->whereBetween('so.so_date', [$startDateLastMonth, $endDateLastMonth]);
             })
-            ->get();
+            ->paginate(100);
 
         return $countLastMonth;
     }
@@ -1009,7 +1027,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereBetween('gdn.date', [$startDateLastMonth, $endDateLastMonth])
             ->whereDate('so.so_date', '>=' , $endDateLastMonth)
-            ->get();
+            ->paginate(100);
 
         return $countPreviousYearAvailable;
     }
@@ -1023,7 +1041,7 @@ class VehiclesController extends Controller
                     ->whereColumn('gdn.id', '=', 'vehicles.gdn_id')
                     ->where('gdn.date', $yesterday);
             })
-            ->get();
+            ->paginate(100);
 
         return $countYesterdaySold;
     }
@@ -1037,7 +1055,7 @@ class VehiclesController extends Controller
                     ->whereColumn('so.id', '=', 'vehicles.so_id')
                     ->where('so.so_date', $yesterday);
             })
-            ->get();
+            ->paginate(100);
 
         return $countYesterdayBooked;
     }
@@ -1050,7 +1068,7 @@ class VehiclesController extends Controller
             ->join('so', 'so.id', '=', 'vehicles.so_id')
             ->whereDate('gdn.date', $yesterday)
             ->whereDate('so.so_date', '>=' , $yesterday)
-            ->get();
+            ->paginate(100);
 
         return $countYesterdayAvailable;
     }
@@ -1435,12 +1453,34 @@ class VehiclesController extends Controller
                         }
                     }
                 }
-                elseif (in_array($fieldName, ['import_type', 'document_with', 'bl_number', 'owership'])) {
-                    $documents_id = $vehicle->documents_id; // Corrected assignment
+                elseif (in_array($fieldName, ['import_type', 'document_with', 'bl_number', 'owership', 'bl_dms_uploading'])) {
+                    $documents_id = $vehicle->documents_id;
                     $document = $documents_id ? Document::find($documents_id) : new Document();
                     $oldValue = $document->$fieldName ?? null;
                     $newValue = $fieldValue;
-                    // Save changes to the log if the old and new values differ
+                    if($documents_id === null && $newValue !== null)
+                    {
+                        $documentupdate = new Document();
+                        $documentupdate->$fieldName = $newValue;
+                        $documentupdate->save();
+                        $newdocuments_id = $documentupdate->id;
+                        $vehicle->documents_id = $newdocuments_id;
+                        $vehicle->save();
+                        $documentLog = new DocumentLog();
+                        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                        $currentDateTime = Carbon::now($dubaiTimeZone);
+                        $documentLog->time = $currentDateTime->toTimeString();
+                        $documentLog->date = $currentDateTime->toDateString();
+                        $documentLog->status = 'Update Document';
+                        $documentLog->documents_id = $documents_id;
+                        $documentLog->field = $fieldName;
+                        $documentLog->old_value = $oldValue;
+                        $documentLog->new_value = $newValue;
+                        $documentLog->created_by = auth()->user()->id;
+                        $documentLog->role = Auth::user()->selectedRole;
+                        $documentLog->save();  
+                    }
+                    else{
                     if ($oldValue !== $newValue) {
                                 $documentLog = new DocumentLog();
                                 $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
@@ -1455,17 +1495,20 @@ class VehiclesController extends Controller
                                 $documentLog->created_by = auth()->user()->id;
                                 $documentLog->role = Auth::user()->selectedRole;
                                 $documentLog->save();
-                                if ($newValue !== null) {
-                                $approvalLog = new VehicleApprovalRequests();
-                                $approvalLog->vehicle_id = $vehicleId;
-                                $approvalLog->status = 'Pending';
-                                $approvalLog->field = $fieldName;
-                                $approvalLog->old_value = $oldValue;
-                                $approvalLog->new_value = $fieldValue;
-                                $approvalLog->updated_by = auth()->user()->id;
-                                $approvalLog->save();
+                                $document->$fieldName = $newValue;
+                                $document->save();
+                            //     if ($newValue !== null) {
+                            //     $approvalLog = new VehicleApprovalRequests();
+                            //     $approvalLog->vehicle_id = $vehicleId;
+                            //     $approvalLog->status = 'Pending';
+                            //     $approvalLog->field = $fieldName;
+                            //     $approvalLog->old_value = $oldValue;
+                            //     $approvalLog->new_value = $fieldValue;
+                            //     $approvalLog->updated_by = auth()->user()->id;
+                            //     $approvalLog->save();
+                            // }
                             }
-                            }
+                        }
                     }
                     elseif (in_array($fieldName, ['warehouse-remarks', 'sales-remarks'])) {
                         $department = ($fieldName === 'sales-remarks') ? 'sales' : 'warehouse';
@@ -1499,6 +1542,37 @@ class VehiclesController extends Controller
                         }
                     }
                     }
+                    elseif (in_array($fieldName, ['conversion', 'netsuit_grn_number', 'netsuit_grn_date', 'qc_remarks'])) {
+                        $oldValues = $vehicle->getAttributes();
+                        $changes = [];
+                        foreach ($oldValues as $field => $oldValue) {
+                            if ($field !== 'created_at' && $field !== 'updated_at') {
+                                $newValue = $field === $fieldName ? $fieldValue : $vehicle->$field;
+                                if ($oldValue != $newValue) {
+                                    $changes[$field] = [
+                                        'old_value' => $oldValue,
+                                        'new_value' => $newValue,
+                                    ];
+                                }
+                            }
+                        }
+                        if (!empty($changes)) {
+                            $vehicle->$fieldName = $fieldValue;
+                            $vehicle->save();
+                            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+                            $currentDateTime = Carbon::now($dubaiTimeZone);
+                            $vehicleslog = new Vehicleslog();
+                            $vehicleslog->time = $currentDateTime->toTimeString();
+                            $vehicleslog->date = $currentDateTime->toDateString();
+                            $vehicleslog->status = 'Update QC Values';
+                            $vehicleslog->vehicles_id = $vehicleId;
+                            $vehicleslog->field = $fieldName;
+                            $vehicleslog->old_value = $oldValues[$fieldName];
+                            $vehicleslog->new_value = $fieldValue;
+                            $vehicleslog->created_by = auth()->user()->id;
+                            $vehicleslog->save();
+                        }   
+                    } 
             else {
                 $oldValues = $vehicle->getAttributes();
                 $changes = [];
@@ -1806,10 +1880,7 @@ class VehiclesController extends Controller
         $soLog = Solog::with('roleName')->where('so_id', $vehicle->so_id);
         $vehiclesLog = Vehicleslog::with('roleName')->where('vehicles_id', $vehicle->id);
         $mergedLogs = $documentsLog->union($soLog)->union($vehiclesLog)->orderBy('updated_at')->get();
-//        return $mergedLogs;
-        // $mergedLogs = Vehicles::all();
         $pendingVehicleDetailApprovalRequests = VehicleApprovalRequests::where('vehicle_id', $id)->orderBy('id','DESC')->get();
-
         $previousId = Vehicles::where('id', '<', $id)->max('id');
         $nextId = Vehicles::where('id', '>', $id)->min('id');
         return view('vehicles.vehicleslog', [
