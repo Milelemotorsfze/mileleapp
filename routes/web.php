@@ -125,8 +125,7 @@ Route::get('/d', function () {
     Route::post('warranty-brands/update-selling-price', [WarrantyBrandsController::class, 'updateSellingPrice'])
             ->name('warranty-brands.update-selling-price');
     Route::get('warranty-sales-views', [WarrantyController::class, 'view'])->name('warranty.view');
-
-
+    Route::get('warranty-lists', [WarrantyController::class, 'list'])->name('warranty.list');
     Route::post('getBranchForWarranty', [WarrantyController::class, 'getBranchForWarranty'])->name('addon.getBranchForWarranty');
 
     // Suppliers

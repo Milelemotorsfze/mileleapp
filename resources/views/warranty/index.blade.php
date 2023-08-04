@@ -16,6 +16,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
       <i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
     @endif
     @endcan
+      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-primary" href="{{ route('warranty.list') }}" text-align: right>
+          <i class="fa fa-list" aria-hidden="true"></i></a>
       @can('warranty-sales-view')
       @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-sales-view']);

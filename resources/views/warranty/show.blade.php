@@ -128,6 +128,7 @@
                         <tr>
                             <th>S.NO</th>
                             <th>Brand</th>
+                            <th>Country</th>
                             <th>Purchase Price (AED)</th>
                             <th>Selling Price (AED) </th>
                             <th> Created By </th>
@@ -141,6 +142,7 @@
                             <tr>
                                 <td> {{ ++$i }}</td>
                                 <td>{{ $warrantyBrand->brand->brand_name }}</td>
+                                <td>{{ $warrantyBrand->country->name ?? '' }}</td>
                                 <td>{{ $warrantyBrand->price }} </td>
 
                                 <td>

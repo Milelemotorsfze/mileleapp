@@ -200,7 +200,8 @@
             // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
             //     if (e) {
                     var countRow = 0;
-                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; alert(countRow);
+                    // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
                     if (countRow > 1) {
                         var indexNumber = $(this).attr('data-index');
 
@@ -262,6 +263,7 @@
                                     placeholder: 'Choose Model Description....     Or     Type Here To Search....',
                                     allowClear: true,
                                 });
+                                $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
                                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
 
                             }
@@ -282,7 +284,7 @@
            //      if (e) {
                     var indexNumber = $(this).attr('data-index');
                     var countRow = 0;
-                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;
+                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;  alert(countRow);
                     if (countRow > 1) {
                         var modelIndex = $(this).attr('data-model-index');
                         if (modelIndex == 1) {
@@ -318,9 +320,10 @@
 
                             $(this).find('.removeButtonModelItem').attr('data-index', indexNumber);
                             $(this).find('.removeButtonModelItem').attr('data-model-index', modelIndex);
+                            $(this).find('.removeButtonModelItem').attr('id', 'removeModelNumberdrop'+indexNumber+'Des'+modelIndex);
+                            
 
-                        // $(this).find('.ModelLineError').attr('id','ModelLineError_'indexNumber'_'modelIndex');
-                        // <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
+                            $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
 
 
                             $('#selectBrandMo' + indexNumber).select2
@@ -833,8 +836,9 @@
             for(var i=1;i<=index;i++) {
                 $('#showModelNumberdrop'+id+'Des'+i).attr('hidden',true);
                 if(i != 1) {
-                    $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
-                    $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                    // $('#removeModelNumberdrop'+id+'Des'+i).attr('hidden', true);
+                    // $('#showDivdropDr'+id+'Des'+i).attr('hidden',true);
+                    $('#row-spare-part-brand-'+id+'-model-'+i).remove();
                 }
             }
         }
@@ -845,4 +849,6 @@
     //     let showPartNumber = document.getElementById('showModelNumberdrop'+row);
     //     showPartNumber.hidden = true
     // }
+
+    // $('#row-spare-part-brand-'+id+'-model-'+i).remove();
 </script>

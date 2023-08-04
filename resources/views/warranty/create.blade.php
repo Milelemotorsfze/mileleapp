@@ -147,7 +147,7 @@
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">Vendor</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" autofocus onchange="validationOnKeyUp(this)" >
+                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" multiple="true" autofocus onchange="validationOnKeyUp(this)" >
                             <option></option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
@@ -178,7 +178,18 @@
                 <div class="card-body">
                     <div class="form_field_outer" >
                         <div class="row form_field_outer_row" id="row-1">
-                            <div class="col-xxl-7 col-lg-7 col-md-6">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Country') }}</label>
+                                <select name="brandPrice[1][country]" id="regions1"  data-index="1" multiple="true" style="width: 100%;"
+                                        class="form-control widthinput regions" autofocus onchange="validationOnKeyUp(this)">
+                                        @foreach($brandRegions as $region)
+                                            <option  value="{{$region->id}}">{{$region->name}}</option>
+                                        @endforeach
+                                </select>
+                                <span id="Country1Error" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-xxl-5 col-lg-5 col-md-6">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"
@@ -245,12 +256,19 @@
     $(document).ready(function ()
     {
         $('#supplier_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
             placeholder:"Choose Vendor",
         });
         $('#brands1').select2({
             allowClear: true,
             minimumResultsForSearch: -1,
             placeholder:"Choose Brands....     Or     Type Here To Search....",
+        });
+        $('#regions1').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Country.. Or Search Here....",
         });
         var index = 1;
         $('#indexValue').val(index);
@@ -281,9 +299,12 @@
                     $('.form_field_outer_row').each(function(i){
                     var index = +i + +1;
                         $(this).attr('id','row-'+ index);
-                        $(this).find('select').attr('data-index', index);
-                        $(this).find('select').attr('id','brands'+ index);
-                        $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
+                        $(this).find('.brands').attr('data-index', index);
+                        $(this).find('.brands').attr('id','brands'+ index);
+                        $(this).find('.brands').attr('name','brandPrice['+ index +'][brands][]');
+                        $(this).find('.regions').attr('data-index', index);
+                        $(this).find('.regions').attr('id','regions'+ index);
+                        $(this).find('.regions').attr('name','brandPrice['+ index +'][regions]');
                         $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
                         $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
                         $(this).find('button').attr('data-index', index);
@@ -292,6 +313,14 @@
                         ({
                             placeholder:"Choose Brands....     Or     Type Here To Search....",
                             allowClear: true,
+                            minimumResultsForSearch: -1,
+                        });
+                        $('#regions'+index).select2
+                        ({
+                            placeholder:"Choose Country... Or Search Here...",
+                            allowClear: true,
+                            maximumSelectionLength:1,
+                            // data: brandDropdownData,
                             minimumResultsForSearch: -1,
                         });
                     });
@@ -338,6 +367,8 @@
         var inputClaimLimit = $('#claim_limit_in_aed').val();
         var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
+        var inputCountry1 = $('#regions1').val();
+
         var inputPurchasePrice1 = $('#purchase_price1').val();
 
         // var formInputError = false;
@@ -373,6 +404,13 @@
         {
             $msg = "Vendor is required";
             showSupplierError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputCountry1 == '')
+        {
+            $msg = "Country is required";
+            showCountry1Error($msg);
             formInputError = true;
             e.preventDefault();
         }
@@ -436,7 +474,18 @@
                 {
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-7 col-lg-7 col-md-5">
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Country') }}</label>
+                                <select name="brandPrice[${index}][country]" id="regions${index}" data-index="${index}" required multiple="true" style="width: 100%;"
+                                    class="form-control widthinput regions" autofocus onchange="validationOnKeyUp(this)">
+                                      @foreach($brandRegions as $region)
+                                        <option value="{{$region->id}}">{{$region->name}}</option>
+                                    @endforeach
+                                </select>
+                                <span id="Country1Error" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-xxl-5 col-lg-5 col-md-5">
                                 <span class="error">* </span>
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"
@@ -494,6 +543,14 @@
                         data: brandDropdownData,
                         minimumResultsForSearch: -1,
                     });
+                    $('#regions'+index).select2
+                    ({
+                        placeholder:"Choose Country... Or Search Here...",
+                        allowClear: true,
+                        maximumSelectionLength:1,
+                        // data: brandDropdownData,
+                        minimumResultsForSearch: -1,
+                    });
                 }
             }
         });
@@ -501,6 +558,7 @@
 
     function validationOnKeyUp(clickInput)
     {
+
         if(save == 2)
         {
             if(clickInput.id == 'eligibility_year')
@@ -605,6 +663,19 @@
                 else
                 {
                     removeBrand1Error();
+                }
+            }
+            if(clickInput.id == 'regions1')
+            {
+                value = $('#regions1').val();
+                if(value == '')
+                {
+                    $msg = "Country is required";
+                    showCountry1Error($msg);
+                }
+                else
+                {
+                    removeCountry1Error();
                 }
             }
 
@@ -717,6 +788,18 @@
         document.getElementById("Brand1Error").textContent="";
         document.getElementById("brands1").classList.remove("is-invalid");
         document.getElementById("Brand1Error").classList.remove("paragraph-class");
+    }
+    function showCountry1Error($msg)
+    {
+        document.getElementById("Country1Error").textContent=$msg;
+        document.getElementById("regions1").classList.add("is-invalid");
+        document.getElementById("Country1Error").classList.add("paragraph-class");
+    }
+    function removeCountry1Error()
+    {
+        document.getElementById("Country1Error").textContent="";
+        document.getElementById("regions1").classList.remove("is-invalid");
+        document.getElementById("Country1Error").classList.remove("paragraph-class");
     }
     function showPrice1Error($msg)
     {
