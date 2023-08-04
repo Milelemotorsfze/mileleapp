@@ -55,25 +55,34 @@
                 <div class="row">
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Policy Name') }}</label>
-                        <select name="warranty_policies_id" id="warranty_policies_id" class="form-control widthinput" autofocus>
+                        <select name="warranty_policies_id" id="warranty_policies_id" multiple="true" class="form-control widthinput"
+                                onchange="validationOnKeyUp(this)" autofocus>
                             @foreach($policyNames as $policyName)
                                 <option value="{{$policyName->id}}">{{$policyName->name}}</option>
                             @endforeach
                         </select>
+                        <span id="PolicyError" class="invalid-feedback"></span>
+
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 1') }}</label>
-                        <select name="vehicle_category1" id="vehicle_category1" class="form-control widthinput" autofocus>
+                        <select name="vehicle_category1" id="vehicle_category1" multiple="true" class="form-control widthinput"
+                                onchange="validationOnKeyUp(this)" autofocus>
                                 <option value="non_electric">Non Electric</option>
                                 <option value="electric">Electric</option>
                         </select>
+                        <span id="VehicleCategory1Error" class="invalid-feedback"></span>
+
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <label for="supplier" class="col-form-label text-md-end">{{ __('Choose Vehicle Category 2') }}</label>
-                        <select name="vehicle_category2" id="vehicle_category2" class="form-control widthinput" autofocus>
+                        <select name="vehicle_category2" id="vehicle_category2" multiple="true" class="form-control widthinput"
+                                onchange="validationOnKeyUp(this)" autofocus>
                             <option value="normal_and_premium">Normal And Premium</option>
                             <option value="lux_sport_exotic">Lux/Sport/Exotic</option>
                         </select>
+                        <span id="VehicleCategory2Error" class="invalid-feedback"></span>
+
                     </div>
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
@@ -147,8 +156,7 @@
                     <div class="col-xxl-2 col-lg-3 col-md-4">
                         <span class="error">* </span>
                         <label for="supplier" class="col-form-label text-md-end">Vendor</label>
-                        <select name="supplier_id" id="supplier_id" class="form-control widthinput" multiple="true" autofocus onchange="validationOnKeyUp(this)" >
-                            <option></option>
+                        <select name="supplier_id" id="supplier_id" class="form-control widthinput"  multiple="true" autofocus onchange="validationOnKeyUp(this)" >
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
                             @endforeach
@@ -169,7 +177,7 @@
                 </div>
             </div>
             </br>
-            <div class="card"  id="kitSupplier" >
+            <div class="card"  id="kitSupplier" hidden>
                 <div class="card-header">
                     <center>
                         <h4 class="card-title">Warranty Brands</h4>
@@ -194,9 +202,9 @@
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
                                 <select name="brandPrice[1][brands][]" id="brands1" data-index="1" multiple="true" style="width: 100%;"
                                 class="form-control widthinput brands" autofocus onchange="validationOnKeyUp(this)">
-                                    @foreach($brands as $brand)
-                                        <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                    @endforeach
+{{--                                    @foreach($brands as $brand)--}}
+{{--                                        <option id="brand1Option{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
+{{--                                    @endforeach--}}
                                 </select>
                                 <span id="Brand1Error" class="invalid-feedback"></span>
                             </div>
@@ -260,6 +268,21 @@
             maximumSelectionLength: 1,
             placeholder:"Choose Vendor",
         });
+        $('#warranty_policies_id').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Policy",
+        });
+        $('#vehicle_category1').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Vehicle Category",
+        });
+        $('#vehicle_category2').select2({
+            allowClear: true,
+            maximumSelectionLength: 1,
+            placeholder:"Choose Vehicle Category",
+        });
         $('#brands1').select2({
             allowClear: true,
             minimumResultsForSearch: -1,
@@ -270,18 +293,83 @@
             maximumSelectionLength: 1,
             placeholder:"Choose Country.. Or Search Here....",
         });
+
         var index = 1;
         $('#indexValue').val(index);
-        $(document.body).on('select2:select', ".brands", function (e) {
+
+        $(document.body).on('select2:unselect', "#warranty_policies_id", function (e) {
+            e.preventDefault();
+            var field = 'Policy';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+        });
+        $(document.body).on('select2:select', "#warranty_policies_id", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#vehicle_category1", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#vehicle_category2", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#supplier_id", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:unselect', "#vehicle_category1", function (e) {
+            e.preventDefault();
+            var field = 'VehicleCategory1';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+            showBrandDiv();
+
+        });
+        $(document.body).on('select2:unselect', "#vehicle_category2", function (e) {
+            e.preventDefault();
+            var field = 'VehicleCategory2';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+
+        });
+        $(document.body).on('select2:unselect', "#supplier_id", function (e) {
+            e.preventDefault();
+            var field = 'Vendor';
+            var value = e.params.data.id;
+
+            RelatedDataCheck(field,value)
+        });
+        $(document.body).on('select2:select', ".regions", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
-            hideOption(index,value);
+            checkUniqueWarranty(index, value);
         });
+        $(document.body).on('select2:unselect', ".regions", function (e) {
+            var index = $(this).attr('data-index');
+            $('#brands'+index).empty();
+            showBrandDiv();
+        });
+
         $(document.body).on('select2:unselect', ".brands", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
         });
+        function hideOption(index,value) {
+            var indexValue = $('#indexValue').val();
+            for (var i = 1; i <= indexValue; i++) {
+                if (i != index) {
+                    var currentId = 'brands' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();
+                }
+            }
+        }
+        function appendOption(index,data) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+                if(i != index) {
+                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+                }
+            }
+        }
         $(document.body).on('click', ".removeButton", function (e) {
             var countRow = 0;
             var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
@@ -332,6 +420,7 @@
                 }
 
         })
+
         function addOption(id,text) {
             var indexValue = $('#indexValue').val();
             for(var i=1;i<=indexValue;i++) {
@@ -339,22 +428,103 @@
             }
         }
 
-        function hideOption(index,value) {
-            var indexValue = $('#indexValue').val();
-            for (var i = 1; i <= indexValue; i++) {
-                if (i != index) {
-                    var currentId = 'brands' + i;
-                    $('#' + currentId + ' option[value=' + value + ']').detach();
+        function showBrandDiv() {
+            var policy = $('#warranty_policies_id').val();
+            if(policy != '')
+            {
+                var vehicleCategory1 = $('#vehicle_category1').val();
+                if(vehicleCategory1 != '') {
+                    var vehicleCategory2 = $('#vehicle_category2').val();
+                    if(vehicleCategory2 != '') {
+                        var vendor = $('#supplier_id').val();
+                        if(vendor != '') {
+                            $('#kitSupplier').attr('hidden', false);
+                        }
+                    }
                 }
             }
         }
-        function appendOption(index,data) {
-            var indexValue = $('#indexValue').val();
-            for(var i=1;i<=indexValue;i++) {
-                if(i != index) {
-                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+
+        function  RelatedDataCheck(field,value) {
+
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            var brands = [];
+            var countries = [];
+            if (brandTotalIndex > 0) {
+                for(let i=1; i<=brandTotalIndex; i++)
+                {
+                    var eachBrand = $('#brands'+i).val();
+                    var eachRegion = $('#regions'+i).val();
+                    if(eachBrand != '') {
+                        brands.push(eachBrand);
+                    }
+                    if(eachRegion != '') {
+                        countries.push(eachRegion);
+                    }
+                }
+                var brandCount = brands.length;
+                var regionCount = countries.length;
+                if(brandCount > 0 || regionCount > 0 ) {
+                    if(field == 'Vendor' ) {
+                        $("#supplier_id").val(value).trigger('change');
+                    }else if(field == 'Policy') {
+                        $("#warranty_policies_id").val(value).trigger('change');
+                    }else if(field == 'VehicleCategory1') {
+                        $("#vehicle_category1").val(value).trigger('change');
+
+                    }else if(field == 'VehicleCategory2') {
+                        $("#vehicle_category2").val(value).trigger('change');
+                    }
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Country.' +
+                        'Please remove those items to edit this field.', function (e) {
+                    }).set({title: "Remove Brands and Countries"})
                 }
             }
+        }
+
+        function checkUniqueWarranty(index, value) {
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            var selectedBrands = [];
+            for(let i=1; i<brandTotalIndex; i++)
+            {
+                var eachSelectedCountry = $("#regions"+i).val();
+                if(eachSelectedCountry == value) {
+                    var eachSelectedBrand = $("#brands"+i).val();
+                    $.each(eachSelectedBrand, function( ind, value )
+                        {
+                            selectedBrands.push(value);
+                        });
+                }
+            }
+
+            var policy = $('#warranty_policies_id').val();
+            var vehicle_category1 = $('#vehicle_category1').val();
+            var vehicle_category2 = $('#vehicle_category2').val();
+            var supplier_id = $("#supplier_id").val();
+
+            $.ajax({
+                url: "{{url('getBrandForWarranty')}}",
+                type: "GET",
+                data:
+                    {
+                        brand_region_id: value,
+                        warranty_policies_id:policy,
+                        vehicle_category1:vehicle_category1,
+                        vehicle_category2:vehicle_category2,
+                        supplier_id:supplier_id,
+                        selectedBrands:selectedBrands
+                    },
+                dataType : 'json',
+                success: function (data) {
+                    $('#brands'+index).empty();
+                    $('#brands'+index).html('<option value=""> Select Brand</option>');
+                    // check if any option chooses current region if choosen then remove that brand in this array
+
+                    jQuery.each(data, function(key,value){
+                        $('#brands'+index).append('<option value="'+ value.id +'">'+ value.brand_name +'</option>');
+                    });
+                }
+            });
         }
     });
 
@@ -368,10 +538,33 @@
         var inputSupplierId = $('#supplier_id').val();
         var inputBrands1 = $('#brands1').val();
         var inputCountry1 = $('#regions1').val();
-
+        var inputPolicy = $('#warranty_policies_id').val();
+        var inputVehicleCategory1 = $('#vehicle_category1').val();
+        var inputVehicleCategory2 = $('#vehicle_category2').val();
         var inputPurchasePrice1 = $('#purchase_price1').val();
 
         // var formInputError = false;
+        if(inputVehicleCategory1 == '')
+        {
+            $msg = "Catgory is required";
+            showVehicleCategory1Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputVehicleCategory2 == '')
+        {
+            $msg = "Catgory is required";
+            showVehicleCategory2Error($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
+        if(inputPolicy == '')
+        {
+            $msg = "Policy is required";
+            showPolicyError($msg);
+            formInputError = true;
+            e.preventDefault();
+        }
         if(inputEligibilityYears == '')
         {
             $msg = "Eligibility Years is required";
@@ -448,30 +641,30 @@
         var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
         $('#indexValue').val(index);
-        var selectedBrands = [];
-        for(let i=1; i<index; i++)
-        {
-            var eachSelectedBrand = $("#brands"+i).val();
-            $.each(eachSelectedBrand, function( ind, value )
-            {
-                selectedBrands.push(value);
-            });
-        }
-        $.ajax({
-            url:"{{url('getBranchForWarranty')}}",
-            type: "POST",
-            data:
-                {
-                    filteredArray: selectedBrands,
-                    _token: '{{csrf_token()}}'
-                },
-            dataType : 'json',
-            success: function(data)
-            {
-                myarray = data;
-                var size= myarray.length;
-                if(size >= 1)
-                {
+        {{--var selectedBrands = [];--}}
+        // for(let i=1; i<index; i++)
+        // {
+        //     var eachSelectedBrand = $("#brands"+i).val();
+        //     $.each(eachSelectedBrand, function( ind, value )
+        //     {
+        //         selectedBrands.push(value);
+        //     });
+        // }
+        {{--$.ajax({--}}
+        {{--    url:"{{url('getBranchForWarranty')}}",--}}
+        {{--    type: "POST",--}}
+        {{--    data:--}}
+        {{--        {--}}
+        {{--            filteredArray: selectedBrands,--}}
+        {{--            _token: '{{csrf_token()}}'--}}
+        {{--        },--}}
+        {{--    dataType : 'json',--}}
+        {{--    success: function(data)--}}
+        {{--    {--}}
+        {{--        myarray = data;--}}
+        {{--        var size= myarray.length;--}}
+        {{--        if(size >= 1)--}}
+        {{--        {--}}
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
                             <div class="col-xxl-2 col-lg-2 col-md-6">
@@ -526,21 +719,20 @@
                         </div>
                     `);
 
-                    let brandDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        brandDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.brand_name
-                        });
-                    });
-                    $('#brands'+index).html("");
+                    // let brandDropdownData   = [];
+                    // $.each(data,function(key,value)
+                    // {
+                    //     brandDropdownData.push
+                    //     ({
+                    //         id: value.id,
+                    //         text: value.brand_name
+                    //     });
+                    // });
+                    // $('#brands'+index).html("");
                     $('#brands'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
                         allowClear: true,
-                        data: brandDropdownData,
                         minimumResultsForSearch: -1,
                     });
                     $('#regions'+index).select2
@@ -551,9 +743,9 @@
                         // data: brandDropdownData,
                         minimumResultsForSearch: -1,
                     });
-                }
-            }
-        });
+        //         }
+        //     }
+        // });
     }
 
     function validationOnKeyUp(clickInput)
@@ -678,6 +870,45 @@
                     removeCountry1Error();
                 }
             }
+            if(clickInput.id == 'warranty_policies_id')
+            {
+                value = $('#warranty_policies_id').val();
+                if(value == '')
+                {
+                    $msg = "Policy is required";
+                    showPolicyError($msg);
+                }
+                else
+                {
+                    removePolicyError();
+                }
+            }
+            if(clickInput.id == 'vehicle_category1')
+            {
+                value = $('#vehicle_category1').val();
+                if(value == '')
+                {
+                    $msg = "Category is required";
+                    showVehicleCategory1Error($msg);
+                }
+                else
+                {
+                    removeVehicleCategory1Error();
+                }
+            }
+            if(clickInput.id == 'vehicle_category2')
+            {
+                value = $('#vehicle_category2').val();
+                if(value == '')
+                {
+                    $msg = "Category is required";
+                    showVehicleCategory2Error($msg);
+                }
+                else
+                {
+                    removeVehicleCategory2Error();
+                }
+            }
 
         }
     }
@@ -694,6 +925,43 @@
             showExtendedWarrantyMileage();
         }
     });
+
+    function showVehicleCategory1Error($msg)
+    {
+        document.getElementById("VehicleCategory1Error").textContent=$msg;
+        document.getElementById("vehicle_category1").classList.add("is-invalid");
+        document.getElementById("VehicleCategory1Error").classList.add("paragraph-class");
+    }
+    function showVehicleCategory2Error($msg)
+    {
+        document.getElementById("VehicleCategory2Error").textContent=$msg;
+        document.getElementById("vehicle_category2").classList.add("is-invalid");
+        document.getElementById("VehicleCategory2Error").classList.add("paragraph-class");
+    }
+    function showPolicyError($msg)
+    {
+        document.getElementById("PolicyError").textContent=$msg;
+        document.getElementById("warranty_policies_id").classList.add("is-invalid");
+        document.getElementById("PolicyError").classList.add("paragraph-class");
+    }
+    function removeVehicleCategory1Error()
+    {
+        document.getElementById("VehicleCategory1Error").textContent="";
+        document.getElementById("vehicle_category1").classList.remove("is-invalid");
+        document.getElementById("VehicleCategory1Error").classList.remove("paragraph-class");
+    }
+    function removeVehicleCategory2Error()
+    {
+        document.getElementById("VehicleCategory2Error").textContent="";
+        document.getElementById("vehicle_category2").classList.remove("is-invalid");
+        document.getElementById("VehicleCategory2Error").classList.remove("paragraph-class");
+    }
+    function removePolicyError()
+    {
+        document.getElementById("PolicyError").textContent="";
+        document.getElementById("warranty_policies_id").classList.remove("is-invalid");
+        document.getElementById("PolicyError").classList.remove("paragraph-class");
+    }
     function showExtendedWarrantyMileage()
     {
         let showExtendedWarrantyMilage = document.getElementById('ExtendedWarrantyMileageDiv');

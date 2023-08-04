@@ -327,6 +327,26 @@ class WarrantyController extends Controller
         $data = $data->get();
         return response()->json($data);
     }
+
+    public function getBrandForWarranty(Request $request) {
+        $existingWarrantyBrands = WarrantyBrands::with('premium')
+            ->whereHas('premium', function ($query) use($request){
+                $query->where('warranty_policies_id',$request->warranty_policies_id)
+                    ->where('vehicle_category1',$request->vehicle_category1)
+                    ->where('vehicle_category2',$request->vehicle_category2)
+                    ->where('supplier_id',$request->supplier_id);
+                })
+            ->where('brand_region_id', $request->brand_region_id)
+            ->pluck('brand_id');
+
+        $availableWarrantyBrands = Brand::whereNotIn('id',$existingWarrantyBrands);
+        if($request->selectedBrands) {
+            $availableWarrantyBrands = $availableWarrantyBrands->whereNotIn('id',$request->selectedBrands);
+        }
+        $availableWarrantyBrands = $availableWarrantyBrands->get();
+        return response($availableWarrantyBrands);
+
+    }
     public function statusChange(Request $request)
     {
         $warranty = WarrantyPremiums::find($request->id);
