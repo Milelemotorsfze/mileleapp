@@ -14,9 +14,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
 @can('Calls-view')
-@if (Auth::user()->selectedRole === '3' || Auth::user()->selectedRole === '4')
-<div class="row">
-                        <div class="col-xl-5 col-md-6">
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
+                    <div class="row">
+                        <div class="col-xl-12 col-md-12">
                             <!-- card -->
                             <div class="card card-h-100">
                                 <!-- card body -->
@@ -38,11 +41,12 @@
                                 </div><!-- end card body -->
                             </div><!-- end card -->
                         </div><!-- end col -->
-@if (Auth::user()->selectedRole === '4')
+                        <!-- @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
                         <div class="col-xl-5 col-md-6">
-                            <!-- card -->
                             <div class="card card-h-100">
-                                <!-- card body -->
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-6">
@@ -57,15 +61,16 @@
                                         <canvas id="totalvariantss"></canvas>
                                         </div>
                                     </div>
-                                </div><!-- end card body -->
-                            </div><!-- end card -->
-                        </div><!-- end col-->
+                                </div>
+                            </div>
+                        </div>
 						@endif
-						@if (Auth::user()->selectedRole === '4')
+						@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
                         <div class="col-xl-2 col-md-6">
-                            <!-- card -->
                             <div class="card card-h-50">
-                                <!-- card body -->
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-12">
@@ -91,11 +96,11 @@
                                         <span class="badge bg-soft-success text-success">+ {{ $countpendingreelsdays }}</span>
                                         <span class="ms-1 text-muted font-size-13">Since last week</span>
                                     </div>
-                                </div><!-- end card body -->
-                            </div><!-- end card -->
-                        </div><!-- end col -->
-                    </div><!-- end row-->
-@endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+@endif -->
               <div class="row">
               <div class="col-xl-8">
                 
@@ -312,7 +317,10 @@
                         </div>
                         <!-- end col -->
 </div>
-@if (Auth::user()->selectedRole === '4')
+<!-- @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
 <div class="row">
                         <div class="col-xl-6">
                         <div class = "card">
@@ -408,7 +416,7 @@
           </div>
           </div>
                         </div>
-                        @endif
+                        @endif -->
                         <!-- end col -->
 <script>
 var chartData = {!! json_encode($chartData) !!};
@@ -490,4 +498,7 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
     </script>
     @endif
     @endcan
+    <!-- <div id="root"></div>
+    <link href="static/css/main.073c9b0a.css" rel="stylesheet">
+    <script src="static/js/main.03fee2c2.js"></script> -->
 @endsection

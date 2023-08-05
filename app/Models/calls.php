@@ -6,7 +6,7 @@ use App\Models\CallsRequirement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class calls extends Model
+class Calls extends Model
 {
     use HasFactory;
     protected $table = 'calls';

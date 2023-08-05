@@ -29,10 +29,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    // public function getSelectedRoleAttribute()
-    // {
-    //     return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
-    // }
+    public function getSelectedRoleAttribute()
+    {
+        return $this->attributes['selected_role'] ?? $this->roles()->first()->name;
+    }
     public function hasPermissionForSelectedRole($permissionName)
     {
         $selectedRole = $this->selected_role;

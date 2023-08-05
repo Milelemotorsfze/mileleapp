@@ -18,8 +18,10 @@ textarea {
 }
     </style>
 @section('content')
-@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
-@can('daily-leads-create')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    @endphp
+                    @if ($hasPermission)
 <div class="card-header">
     <h4 class="card-title">Prospecting</h4>
     <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right>
@@ -201,7 +203,6 @@ textarea {
 </div>
     </div>
 </div>
-@endcan
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.min.js"></script>
 <script>
     $(document).ready(function() {
