@@ -345,70 +345,227 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
 
         var index = lengthExistingBrand;
         $('#indexValue').val(index);
+        ////////////////////////
+        $(document.body).on('select2:unselect', "#warranty_policies_id", function (e) {
+            e.preventDefault();
+            var field = 'Policy';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+        });
+        $(document.body).on('select2:unselect', "#vehicle_category1", function (e) {
+            e.preventDefault();
+            var field = 'VehicleCategory1';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+        });
+        $(document.body).on('select2:unselect', "#vehicle_category2", function (e) {
+            e.preventDefault();
+            var field = 'VehicleCategory2';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
 
-        $(document.body).on('select2:select', ".brands", function (e) {
+        });
+        $(document.body).on('select2:unselect', "#supplier_id", function (e) {
+            e.preventDefault();
+            var field = 'Vendor';
+            var value = e.params.data.id;
+            RelatedDataCheck(field,value)
+        });
+        $(document.body).on('select2:select', ".regions", function (e) {
             var index = $(this).attr('data-index');
             var value = e.params.data.id;
-            hideOption(index,value);
+            checkUniqueWarranty(index, value);
         });
+        $(document.body).on('select2:unselect', ".regions", function (e) {
+            var index = $(this).attr('data-index');
+            $('#brands'+index).empty();
+        });
+        ////////////////////////
         $(document.body).on('select2:unselect', ".brands", function (e) {
             var index = $(this).attr('data-index');
-            var data = e.params.data;
-            appendOption(index,data);
+            var data =  $('#regions'+index).val();
+            var brand =  e.params.data;
+            appendOption(index,data,brand);
         });
-        $(document.body).on('click', ".removeButton", function (e) {
-            var countRow = 0;
-            var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
-                if(countRow > 1)
-                {
-                    var indexNumber = $(this).attr('data-index');
-                    // alert('#row-'+indexNumber);
-                    $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                        var id = (this.value);
-                        var text = (this.text);
-                        addOption(id,text)
-                    });
-                    $(this).closest('#row-'+indexNumber).remove();
+        $(document.body).on('select2:select', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var value = $('#regions'+index).val();
+            var brand = e.params.data.id;
+            hideOption(index,value,brand);
+        });
+        function hideOption(index,value,brand) {
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            for(let i=1; i<=brandTotalIndex; i++)
+            {
+                var country = $('#regions'+i).val();
+                console.log(country[0]);
+                console.log(value[0]);
+                if(country[0] == value[0]) {
 
-                    $('.form_field_outer_row').each(function(i){
-                        var index = +i + +1;
-                        $(this).attr('id','row-'+ index);
-                        $(this).find('select').attr('data-index', index);
-                        $(this).find('select').attr('id','brands'+ index);
-                        $(this).find('select').attr('name','brandPrice['+ index +'][brands][]');
-                        $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
-                        $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
-                        $(this).find('button').attr('data-index', index);
-                        $(this).find('button').attr('id','remove-'+ index);
-                        $('#brands'+index).select2
-                        ({
-                            placeholder:"Choose Brands....     Or     Type Here To Search....",
-                            allowClear: true,
-                            minimumResultsForSearch: -1,
-                        });
-                    });
+                    if(index != i) {
+                        console.log("not clicked item")
+                        var currentId = 'brands' + i;
+                        $('#' + currentId + ' option[value=' + brand + ']').detach();
+                    }
                 }
-                else
-                {
-                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Price Required',function (e) {
-                   }).set({title:"Can't Remove Brands And Prices"})
-                }
+            }
+        }
+        function appendOption(index,data,brand) {
+            // check if this brand country is choosen anywhere in list, if yes find the corresponding brand
+            // dropdown id and append data in that dropdown nly
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            alert(brandTotalIndex);
+            for(let i=1; i<=brandTotalIndex; i++)
+            {
+                var country = $('#regions'+i).val();
+                console.log(country);
+                console.log(data[0]);
+                if(country[0] == data[0]) {
 
-        })
-        function addOption(id,text) {
-            var indexValue = $('#indexValue').val();
-            for(var i=1;i<=indexValue;i++) {
-                $('#brands'+i).append($('<option>', {value: id, text :text}))
+                    if(index != i) {
+                        $('#brands'+i).append($('<option>', {value: brand.id, text : brand.text}))
+                    }
+                }
+            }
+        }
+        function addOption(id,text,country) {
+            //get the
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            for(var i=1;i<=brandTotalIndex;i++) {
+                var eachCountry = $('#regions'+i).val();
+                if(country[0] == eachCountry[0]) {
+                    $('#brands'+i).append($('<option>', {value: id, text :text}))
+                }
             }
         }
 
-        function appendOption(index,data) {
-            var indexValue = $('#indexValue').val();
-            for(var i=1;i<=indexValue;i++) {
-                if(i != index) {
-                    $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+        $(document.body).on('click', ".removeButton", function (e) {
+            var countRow = 0;
+            var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
+            if(countRow > 1)
+            {
+                var indexNumber = $(this).attr('data-index');
+                // alert('#row-'+indexNumber);
+                $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = (this.value);
+                    var text = (this.text);
+                    var country = $('#regions'+indexNumber).val();
+                    addOption(id,text,country)
+                });
+                $(this).closest('#row-'+indexNumber).remove();
+
+                $('.form_field_outer_row').each(function(i){
+                    var index = +i + +1;
+                    $(this).attr('id','row-'+ index);
+                    $(this).find('.brands').attr('data-index', index);
+                    $(this).find('.brands').attr('id','brands'+ index);
+                    $(this).find('.brands').attr('name','brandPrice['+ index +'][brands][]');
+                    $(this).find('.regions').attr('data-index', index);
+                    $(this).find('.regions').attr('id','regions'+ index);
+                    $(this).find('.regions').attr('name','brandPrice['+ index +'][regions]');
+                    $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
+                    $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
+                    $(this).find('button').attr('data-index', index);
+                    $(this).find('button').attr('id','remove-'+ index);
+                    $('#brands'+index).select2
+                    ({
+                        placeholder:"Choose Brands....     Or     Type Here To Search....",
+                        allowClear: true,
+                        minimumResultsForSearch: -1,
+                    });
+                });
+            }
+            else
+            {
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Price Required',function (e) {
+                }).set({title:"Can't Remove Brands And Prices"})
+            }
+
+        })
+
+        function  RelatedDataCheck(field,value) {
+
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            alert(brandTotalIndex);
+            var brands = [];
+            var countries = [];
+            if (brandTotalIndex > 0) {
+                for(let i=1; i<=brandTotalIndex; i++)
+                {
+                    var eachBrand = $('#brands'+i).val();
+                    var eachRegion = $('#regions'+i).val();
+                    if(eachBrand != '') {
+                        brands.push(eachBrand);
+                    }
+                    if(eachRegion != '') {
+                        countries.push(eachRegion);
+                    }
+                }
+                var brandCount = brands.length;
+                var regionCount = countries.length;
+                console.log(brandCount);
+                console.log(regionCount);
+                if(brandCount > 0 || regionCount > 0 ) {
+                    if(field == 'Vendor' ) {
+                        $("#supplier_id").val(value).trigger('change');
+                    }else if(field == 'Policy') {
+                        $("#warranty_policies_id").val(value).trigger('change');
+                    }else if(field == 'VehicleCategory1') {
+                        $("#vehicle_category1").val(value).trigger('change');
+
+                    }else if(field == 'VehicleCategory2') {
+                        $("#vehicle_category2").val(value).trigger('change');
+                    }
+                    var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Country.' +
+                        'Please remove those items to edit this field.', function (e) {
+                    }).set({title: "Remove Brands and Countries"})
                 }
             }
+        }
+
+        function checkUniqueWarranty(index, value) {
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            var selectedBrands = [];
+            for(let i=1; i<brandTotalIndex; i++)
+            {
+                var eachSelectedCountry = $("#regions"+i).val();
+                if(eachSelectedCountry == value) {
+                    var eachSelectedBrand = $("#brands"+i).val();
+                    $.each(eachSelectedBrand, function( ind, value )
+                    {
+                        selectedBrands.push(value);
+                    });
+                }
+            }
+
+            var policy = $('#warranty_policies_id').val();
+            var vehicle_category1 = $('#vehicle_category1').val();
+            var vehicle_category2 = $('#vehicle_category2').val();
+            var supplier_id = $("#supplier_id").val();
+
+            $.ajax({
+                url: "{{url('getBrandForWarranty')}}",
+                type: "GET",
+                data:
+                    {
+                        brand_region_id: value,
+                        warranty_policies_id:policy,
+                        vehicle_category1:vehicle_category1,
+                        vehicle_category2:vehicle_category2,
+                        supplier_id:supplier_id,
+                        selectedBrands:selectedBrands
+                    },
+                dataType : 'json',
+                success: function (data) {
+                    $('#brands'+index).empty();
+                    $('#brands'+index).html('<option value=""> Select Brand</option>');
+                    // check if any option chooses current region if choosen then remove that brand in this array
+
+                    jQuery.each(data, function(key,value){
+                        $('#brands'+index).append('<option value="'+ value.id +'">'+ value.brand_name +'</option>');
+                    });
+                }
+            });
         }
     });
 
@@ -504,32 +661,32 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
     {
         var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
         $('#indexValue').val(index);
-        var selectedBrands = [];
-        for(let i=1; i<index; i++)
-        {
-            var eachSelectedBrand = $("#brands"+i).val();
-            $.each(eachSelectedBrand, function( ind, value )
-            {
-                selectedBrands.push(value);
-            });
-        }
-        $.ajax
-        ({
-            url:"{{url('getBranchForWarranty')}}",
-            type: "POST",
-            data:
-                {
-                    filteredArray: selectedBrands,
-                    id: '{{ $premium->id }}',
-                    _token: '{{csrf_token()}}'
-                },
-            dataType : 'json',
-            success: function(data)
-            {console.log(data);
-                myarray = data;
-                var size= myarray.length;
-                if(size >= 1)
-                {
+        {{--var selectedBrands = [];--}}
+        {{--for(let i=1; i<index; i++)--}}
+        {{--{--}}
+        {{--    var eachSelectedBrand = $("#brands"+i).val();--}}
+        {{--    $.each(eachSelectedBrand, function( ind, value )--}}
+        {{--    {--}}
+        {{--        selectedBrands.push(value);--}}
+        {{--    });--}}
+        {{--}--}}
+        {{--$.ajax--}}
+        {{--({--}}
+        {{--    url:"{{url('getBranchForWarranty')}}",--}}
+        {{--    type: "POST",--}}
+        {{--    data:--}}
+        {{--        {--}}
+        {{--            filteredArray: selectedBrands,--}}
+        {{--            id: '{{ $premium->id }}',--}}
+        {{--            _token: '{{csrf_token()}}'--}}
+        {{--        },--}}
+        {{--    dataType : 'json',--}}
+        {{--    success: function(data)--}}
+        {{--    {console.log(data);--}}
+        {{--        myarray = data;--}}
+        {{--        var size= myarray.length;--}}
+        {{--        if(size >= 1)--}}
+        {{--        {--}}
                     $(".form_field_outer").append(`
                         <div class="row form_field_outer_row" id="row-${index}" >
                             <div class="col-xxl-2 col-lg-2 col-md-6">
@@ -583,23 +740,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                             </div>
                         </div>
                     `);
-                    let brandDropdownData   = [];
-
-                    $.each(data,function(key,value)
-                    {
-                        brandDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.brand_name
-                        });
-                    });
-                    console.log("brand_data".brandDropdownData);
-                    $('#brands'+index).html("");
+                    // let brandDropdownData   = [];
+                    //
+                    // $.each(data,function(key,value)
+                    // {
+                    //     brandDropdownData.push
+                    //     ({
+                    //         id: value.id,
+                    //         text: value.brand_name
+                    //     });
+                    // });
+                    //
+                    // $('#brands'+index).html("");
                     $('#brands'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
                         allowClear: true,
-                        data: brandDropdownData,
+                        // data: brandDropdownData,
                         minimumResultsForSearch: -1,
                         // templateResult: hideSelected,
                     });
@@ -611,9 +768,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                         // data: brandDropdownData,
                         minimumResultsForSearch: -1,
                     });
-                }
-            }
-        });
+        //         }
+        //     }
+        // });
     }
 
     function validationOnKeyUp(clickInput)

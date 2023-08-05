@@ -213,7 +213,7 @@
                                 <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
                                 <div class="input-group">
                                     <input name="brandPrice[1][purchase_price]" id="purchase_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
-                                    class="form-control widthinput" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
+                                    class="form-control widthinput purchase-price" placeholder="Enter Purchase Price" aria-label="measurement" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -225,7 +225,7 @@
                                 <label class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
                                 <div class="input-group">
                                     <input name="brandPrice[1][selling_price]" data-index="1" id="selling_price1" onkeyup="validationOnKeyUp(this)" oninput="inputNumberAbs(this)"
-                                           class="form-control widthinput" placeholder="Enter Selling Price">
+                                           class="form-control widthinput selling-price" placeholder="Enter Selling Price">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -334,7 +334,7 @@
             e.preventDefault();
             var field = 'Vendor';
             var value = e.params.data.id;
-
+            showBrandDiv();
             RelatedDataCheck(field,value)
         });
         $(document.body).on('select2:select', ".regions", function (e) {
@@ -348,54 +348,63 @@
             showBrandDiv();
         });
 
-        // $(document.body).on('select2:unselect', ".brands", function (e) {
-        //     var index = $(this).attr('data-index');
-        //     var data =  $('#regions'+index).val();
-        //     appendOption(index,data);
-        // });
-        // $(document.body).on('select2:select', ".brands", function (e) {
-        //     var index = $(this).attr('data-index');
-        //     var value = $('#regions'+index).val();
-        //     hideOption(index,value);
-        // });
-        function hideOption(index,value) {
-            alert(value);
-            var indexValue = $('#indexValue').val();
-            console.log(index);
+        $(document.body).on('select2:unselect', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var data =  $('#regions'+index).val();
+            var brand =  e.params.data;
+            appendOption(index,data,brand);
+        });
+        $(document.body).on('select2:select', ".brands", function (e) {
+            var index = $(this).attr('data-index');
+            var value = $('#regions'+index).val();
+            var brand = e.params.data.id;
+            hideOption(index,value,brand);
+        });
+        function hideOption(index,value,brand) {
             var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
-            for(let i=1; i<brandTotalIndex; i++)
+            for(let i=1; i<=brandTotalIndex; i++)
             {
-                console.log(value);
-
                 var country = $('#regions'+i).val();
-                console.log(country);
-                if(country == 2) {
-                    console.log("value eqaul");
+                console.log(country[0]);
+                console.log(value[0]);
+                if(country[0] == value[0]) {
+
                     if(index != i) {
                         console.log("not clicked item")
                         var currentId = 'brands' + i;
-                        $('#' + currentId + ' option[value=' + value + ']').detach();
+                        $('#' + currentId + ' option[value=' + brand + ']').detach();
                     }
-
                 }
             }
         }
-        function appendOption(index,data) {
-            alert(index);
+        function appendOption(index,data,brand) {
             // check if this brand country is choosen anywhere in list, if yes find the corresponding brand
             // dropdown id and append data in that dropdown nly
             var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
-            for(let i=1; i<brandTotalIndex; i++)
+            for(let i=1; i<=brandTotalIndex; i++)
             {
-                var eachSelectedCountry = $("#regions"+i).val();
+                var country = $('#regions'+i).val();
+                console.log(country[0]);
+                console.log(data[0]);
+                if(country[0] == data[0]) {
 
-                if(eachSelectedCountry == data) {
                     if(index != i) {
-                        $('#brands'+i).append($('<option>', {value: data.id, text : data.text}))
+                        $('#brands'+i).append($('<option>', {value: brand.id, text : brand.text}))
                     }
                 }
             }
         }
+        function addOption(id,text,country) {
+            //get the
+            var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
+            for(var i=1;i<=brandTotalIndex;i++) {
+                var eachCountry = $('#regions'+i).val();
+                if(country[0] == eachCountry[0]) {
+                    $('#brands'+i).append($('<option>', {value: id, text :text}))
+                }
+            }
+        }
+
         $(document.body).on('click', ".removeButton", function (e) {
             var countRow = 0;
             var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
@@ -404,9 +413,10 @@
                     var indexNumber = $(this).attr('data-index');
 
                     $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                    // var id = (this.value);
-                    // var text = (this.text);
-                    //     addOption(id,text)
+                    var id = (this.value);
+                    var text = (this.text);
+                    var country = $('#regions'+indexNumber).val();
+                        addOption(id,text,country)
                     });
 
                     $(this).closest('#row-'+indexNumber).remove();
@@ -447,13 +457,6 @@
 
         })
 
-        function addOption(id,text) {
-            var indexValue = $('#indexValue').val();
-            for(var i=1;i<=indexValue;i++) {
-              $('#brands'+i).append($('<option>', {value: id, text :text}))
-            }
-        }
-
         function showBrandDiv() {
             var policy = $('#warranty_policies_id').val();
             if(policy != '')
@@ -490,6 +493,7 @@
                 }
                 var brandCount = brands.length;
                 var regionCount = countries.length;
+
                 if(brandCount > 0 || regionCount > 0 ) {
                     if(field == 'Vendor' ) {
                         $("#supplier_id").val(value).trigger('change');
@@ -551,6 +555,120 @@
                     });
                 }
             });
+        }
+
+        function clickAdd()
+        {
+            var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+
+            $('#indexValue').val(index);
+
+            {{--var selectedBrands = [];--}}
+            // for(let i=1; i<index; i++)
+            // {
+            //     var eachSelectedBrand = $("#brands"+i).val();
+            //     $.each(eachSelectedBrand, function( ind, value )
+            //     {
+            //         selectedBrands.push(value);
+            //     });
+            // }
+            {{--$.ajax({--}}
+            {{--    url:"{{url('getBranchForWarranty')}}",--}}
+            {{--    type: "POST",--}}
+            {{--    data:--}}
+            {{--        {--}}
+            {{--            filteredArray: selectedBrands,--}}
+            {{--            _token: '{{csrf_token()}}'--}}
+            {{--        },--}}
+            {{--    dataType : 'json',--}}
+            {{--    success: function(data)--}}
+            {{--    {--}}
+            {{--        myarray = data;--}}
+            {{--        var size= myarray.length;--}}
+            {{--        if(size >= 1)--}}
+            {{--        {--}}
+            $(".form_field_outer").append(`
+                        <div class="row form_field_outer_row" id="row-${index}" >
+                            <div class="col-xxl-2 col-lg-2 col-md-6">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Country') }}</label>
+                                <select name="brandPrice[${index}][country]" id="regions${index}" data-index="${index}" required multiple="true" style="width: 100%;"
+                                    class="form-control widthinput regions" autofocus onchange="validationOnKeyUp(this)">
+                                      @foreach($brandRegions as $region)
+            <option value="{{$region->id}}">{{$region->name}}</option>
+                                    @endforeach
+            </select>
+            <span id="Country1Error" class="invalid-feedback"></span>
+        </div>
+        <div class="col-xxl-5 col-lg-5 col-md-5">
+            <span class="error">* </span>
+            <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
+                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"
+                                class="form-control brands" autofocus onchange="validationOnKeyUp(this)">
+
+                                </select>
+                                <span id="supplierError" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <span class="error">* </span>
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" required onkeyup="validationOnKeyUp(this)"
+                                    class="form-control widthinput purchase-price"
+                                    placeholder="Enter Purchase Price" id="purchase_price${index}" >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+                                <span id="supplierError" class="invalid-feedback"></span>
+                            </div>
+                             <div class="col-xxl-2 col-lg-2 col-md-3">
+                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
+                                <div class="input-group">
+                                    <input name="brandPrice[${index}][selling_price]" id="selling_price${index}" oninput="inputNumberAbs(this)"
+                                     class="form-control widthinput selling-price"
+                                     placeholder="Enter Selling Price" >
+                                    <div class="input-group-append">
+                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
+                                <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `);
+
+            // let brandDropdownData   = [];
+            // $.each(data,function(key,value)
+            // {
+            //     brandDropdownData.push
+            //     ({
+            //         id: value.id,
+            //         text: value.brand_name
+            //     });
+            // });
+            // $('#brands'+index).html("");
+            $('#brands'+index).select2
+            ({
+                placeholder:"Choose Brands....     Or     Type Here To Search....",
+                allowClear: true,
+                minimumResultsForSearch: -1,
+            });
+            $('#regions'+index).select2
+            ({
+                placeholder:"Choose Country... Or Search Here...",
+                allowClear: true,
+                maximumSelectionLength:1,
+                // data: brandDropdownData,
+                minimumResultsForSearch: -1,
+            });
+            //         }
+            //     }
+            // });
         }
     });
 
@@ -662,117 +780,7 @@
             e.preventDefault();
         }
     });
-    function clickAdd()
-    {
-        var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
 
-        $('#indexValue').val(index);
-        {{--var selectedBrands = [];--}}
-        // for(let i=1; i<index; i++)
-        // {
-        //     var eachSelectedBrand = $("#brands"+i).val();
-        //     $.each(eachSelectedBrand, function( ind, value )
-        //     {
-        //         selectedBrands.push(value);
-        //     });
-        // }
-        {{--$.ajax({--}}
-        {{--    url:"{{url('getBranchForWarranty')}}",--}}
-        {{--    type: "POST",--}}
-        {{--    data:--}}
-        {{--        {--}}
-        {{--            filteredArray: selectedBrands,--}}
-        {{--            _token: '{{csrf_token()}}'--}}
-        {{--        },--}}
-        {{--    dataType : 'json',--}}
-        {{--    success: function(data)--}}
-        {{--    {--}}
-        {{--        myarray = data;--}}
-        {{--        var size= myarray.length;--}}
-        {{--        if(size >= 1)--}}
-        {{--        {--}}
-                    $(".form_field_outer").append(`
-                        <div class="row form_field_outer_row" id="row-${index}" >
-                            <div class="col-xxl-2 col-lg-2 col-md-6">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Country') }}</label>
-                                <select name="brandPrice[${index}][country]" id="regions${index}" data-index="${index}" required multiple="true" style="width: 100%;"
-                                    class="form-control widthinput regions" autofocus onchange="validationOnKeyUp(this)">
-                                      @foreach($brandRegions as $region)
-                                        <option value="{{$region->id}}">{{$region->name}}</option>
-                                    @endforeach
-                                </select>
-                                <span id="Country1Error" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-xxl-5 col-lg-5 col-md-5">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Brands') }}</label>
-                                <select name="brandPrice[${index}][brands][]" id="brands${index}" data-index="${index}" required multiple="true" style="width: 100%;"
-                                class="form-control brands" autofocus onchange="validationOnKeyUp(this)">
-
-                                </select>
-                                <span id="supplierError" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <span class="error">* </span>
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Purchase Price') }}</label>
-                                <div class="input-group">
-                                    <input name="brandPrice[${index}][purchase_price]" oninput="inputNumberAbs(this)" required onkeyup="validationOnKeyUp(this)"
-                                    class="form-control widthinput purchase-price"
-                                    placeholder="Enter Purchase Price" id="purchase_price${index}" >
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                </div>
-                                <span id="supplierError" class="invalid-feedback"></span>
-                            </div>
-                             <div class="col-xxl-2 col-lg-2 col-md-3">
-                                <label for="supplier" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
-                                <div class="input-group">
-                                    <input name="brandPrice[${index}][selling_price]" id="selling_price${index}" oninput="inputNumberAbs(this)" class="form-control widthinput selling-price"
-                                     placeholder="Enter Selling Price" >
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer" style="margin-top:36px" >
-                                <button type="button" class="btn btn-danger removeButton" id="remove-${index}" data-index="${index}" >
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `);
-
-                    // let brandDropdownData   = [];
-                    // $.each(data,function(key,value)
-                    // {
-                    //     brandDropdownData.push
-                    //     ({
-                    //         id: value.id,
-                    //         text: value.brand_name
-                    //     });
-                    // });
-                    // $('#brands'+index).html("");
-                    $('#brands'+index).select2
-                    ({
-                        placeholder:"Choose Brands....     Or     Type Here To Search....",
-                        allowClear: true,
-                        minimumResultsForSearch: -1,
-                    });
-                    $('#regions'+index).select2
-                    ({
-                        placeholder:"Choose Country... Or Search Here...",
-                        allowClear: true,
-                        maximumSelectionLength:1,
-                        // data: brandDropdownData,
-                        minimumResultsForSearch: -1,
-                    });
-        //         }
-        //     }
-        // });
-    }
 
     function validationOnKeyUp(clickInput)
     {
