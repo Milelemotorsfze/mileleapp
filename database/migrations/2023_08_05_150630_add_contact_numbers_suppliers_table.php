@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('suppliers', function (Blueprint $table) {
-            $table->string('phone')->nullable()->after('contact_number');
-            $table->string('office_phone')->nullable()->after('contact_number');
+            $table->dropColumn('phone');
+            $table->dropColumn('office_phone');
 
         });
     }

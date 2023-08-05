@@ -395,6 +395,7 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
+
                                     </div>
                                 </div>
                             </form>
@@ -1021,6 +1022,18 @@
             document.getElementById("addon_id").classList.remove("is-invalid");
             document.getElementById("addonNameError").classList.remove("paragraph-class");
         }
+        function showAddonUniqueError($msg)
+        {
+            document.getElementById("addonNameUniqueError").textContent=$msg;
+            document.getElementById("addon_id").classList.add("is-invalid");
+            document.getElementById("addonNameUniqueError").classList.add("paragraph-class");
+        }
+        function removeAddonUniqueError($msg)
+        {
+            document.getElementById("addonNameUniqueError").textContent="";
+            document.getElementById("addon_id").classList.remove("is-invalid");
+            document.getElementById("addonNameUniqueError").classList.remove("paragraph-class");
+        }
         function showFixingChargeAmountError($msg)
         {
             document.getElementById("fixingChargeAmountError1").textContent=$msg;
@@ -1033,6 +1046,18 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
         }
+        function showNewAddonError($msg)
+        {
+            document.getElementById("newAddonError").textContent=$msg;
+            document.getElementById("new_addon_name").classList.add("is-invalid");
+            document.getElementById("newAddonError").classList.add("paragraph-class");
+        }
+        // function removeNewAddonError($msg)
+        // {
+        //     document.getElementById("newAddonError").textContent="";
+        //     document.getElementById("new_addon_name").classList.add("is-invalid");
+        //     document.getElementById("newAddonError").classList.add("paragraph-class");
+        // }
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
@@ -1204,18 +1229,25 @@
                     dataType : 'json',
                     success: function(result)
                     {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        $('#addon_id').val(result.id);
-                        var selectedValues = new Array();
-                        resetSelectedSuppliers(selectedValues);
-                        $('#addnewAddonButton').hide();
-                        $('#new_addon_name').val("");
-                        document.getElementById("newAddonError").textContent='';
-                        $msg = "";
-                        removeAddonNameError($msg);
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewAddonError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+                            $('#addon_id').val(result.id);
+                            var selectedValues = new Array();
+                            resetSelectedSuppliers(selectedValues);
+                            $('#addnewAddonButton').hide();
+                            $('#new_addon_name').val("");
+                            document.getElementById("newAddonError").textContent='';
+                            $msg = "";
+                            removeAddonNameError($msg);
+                            // removeNewAddonError();
+                        }
+
                     }
                 });
             }

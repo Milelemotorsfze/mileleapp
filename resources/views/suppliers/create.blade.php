@@ -423,16 +423,41 @@ input {
                                            class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]"
                                            placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}"
                                            autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
-                                    <!-- @error('alternative_contact_number')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
                                     <span id="alternativeContactRequired" class="email-phone required-class"></span>
                                 </div>
                             </div>
                             </br>
                         </div>
+{{--                        <div class="col-xxl-6 col-lg-6 col-md-12">--}}
+{{--                            <div class="row">--}}
+{{--                                <div class="col-xxl-3 col-lg-6 col-md-12">--}}
+{{--                                    <label for="phone" class="col-form-label text-md-end">{{ __('Phone') }}</label>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-9 col-lg-6 col-md-12">--}}
+{{--                                    <input id="phone" type="number"--}}
+{{--                                           class="widthinput form-control @error('phone[full]') is-invalid @enderror"--}}
+{{--                                           name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]') }}"--}}
+{{--                                           autocomplete="phone[full]" autofocus onkeyup="validationOnKeyUp(this)">--}}
+{{--                                     <span id="phoneRequired" class="phone required-class"></span>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            </br>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-6 col-lg-6 col-md-12">--}}
+{{--                            <div class="row">--}}
+{{--                                <div class="col-xxl-3 col-lg-6 col-md-12">--}}
+{{--                                    <label for="office_phone" class="col-form-label text-md-end">{{ __('Office Contact Number') }}</label>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-xxl-9 col-lg-6 col-md-12">--}}
+{{--                                    <input id="office_phone" type="number"--}}
+{{--                                           class="widthinput form-control @error('office_phone[full]') is-invalid @enderror" name="office_phone[main]"--}}
+{{--                                           placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]') }}"--}}
+{{--                                           autocomplete="office_phone[full]" autofocus onkeyup="validationOnKeyUp(this)">--}}
+{{--                                    <span id="phoneRequired" class="phone required-class"></span>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            </br>--}}
+{{--                        </div>--}}
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -1509,6 +1534,20 @@ input {
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
+        var phone = window.intlTelInput(document.querySelector("#phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
@@ -1615,7 +1654,6 @@ input {
                 processData: false,
                 success: (result) =>
                 {
-                    console.log(result)
                     let dataErrorCard = document.getElementById('dataErrorCard');
                     dataErrorCard.hidden = true
                     if(result.data.headingError)
@@ -1661,34 +1699,6 @@ input {
             }
         });
 
-        //===== delete the form fieed row
-
-        // function secondaryPaymentMethods(changePayment)
-        // {
-        //     var e = document.getElementById("is_primary_payment_method");
-        //     var value = e.value;
-        //     if(value != '')
-        //     {
-        //         if(PreviousHidden != '')
-        //         {
-        //             let addonTable = document.getElementById(PreviousHidden);
-        //             addonTable.hidden = false
-        //         }
-        //         validationOnKeyUp(changePayment);
-        //         let addonTable = document.getElementById('secondaryPayments');
-        //         addonTable.hidden = false
-        //         let primaryPaymentMethod = document.getElementById(value);
-        //         primaryPaymentMethod.hidden = true
-        //         PreviousHidden = value;
-        //     }
-        //     else
-        //     {
-        //         let addonTable = document.getElementById('secondaryPayments');
-        //         addonTable.hidden = true
-        //         $msg = "Primary payment method required"
-        //         showPaymentMethodsError($msg);
-        //     }
-        // }
         function changeCurrency(i)
         {
             var e = document.getElementById("currency_"+i);
@@ -1904,10 +1914,10 @@ input {
                 {
                     if(sub == '2')
                     {
-                        $msg ="One among contact number or alternative contact number or email is required";
+                        $msg ="Contact number is required";
                         showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
+                        // showEmailError($msg);
+                        // showAlternativeContactNumberError($msg);
                     }
                     else
                     {
