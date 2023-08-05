@@ -692,8 +692,9 @@
 
                         <tbody>
                             @foreach($pendingVehicleDetailApprovalRequests as $pendingVehicleDetailApprovalRequest)
-
-                                <tr>
+                            <tr>
+									@if($hasPermissionVehicleDetailApprove)
+                                    @if(in_array($pendingVehicleDetailApprovalRequest->field, ['ex_colour','int_colour','varaints_id','ppmmyyy', 'engine', 'grn_remark', 'pdi_remarks']))
                                     <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
                                     <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
                                     <td>
@@ -703,6 +704,8 @@
                                             Interior Colour
                                         @elseif($pendingVehicleDetailApprovalRequest->field == 'varaints_id')
                                             Variant
+										@elseif($pendingVehicleDetailApprovalRequest->field == 'ppmmyyy')
+                                            Production Year
                                         @else
                                             {{ str_replace('_', ' ', ucwords( $pendingVehicleDetailApprovalRequest->field))}}
                                         @endif
@@ -738,70 +741,58 @@
                                             Approved
                                         @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
                                             Rejected
+                                        @else 
+                                        <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                        data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                        Approve
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                        Reject
+                                        </button>
+										</td>
+                                        @endif
+                                        @endif
+                                        @endif
+                                        @if($hasPermissionReservationApprove)
+                                        @if(in_array($pendingVehicleDetailApprovalRequest->field, ['so_number','so_date','sales_person_id','reservation_end_date','reservation_start_date']))
+                                        <td>{{ Carbon::parse($pendingVehicleDetailApprovalRequest->created_at)->format('d M y, H:i:s') }}</td>
+                                    <td>{{ $pendingVehicleDetailApprovalRequest->updatedBy->name }}</td>
+                                    <td>
+                                            {{ str_replace('_', ' ', ucwords( $pendingVehicleDetailApprovalRequest->field))}}
+                                    </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->old_sales_person ?? ''  }}
                                         @else
-                                            @if($hasPermissionEngineApprove )
-                                                @if($pendingVehicleDetailApprovalRequest->field == 'engine')
-                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Approve
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Reject
-                                                    </button>
-                                                @endif
-                                           @endif
-                                            @if($hasPermissionInspectionApprove )
-                                                @if($pendingVehicleDetailApprovalRequest->field == 'inspection_date' )
-                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Approve
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Reject
-                                                    </button>
-                                                @endif
-                                            @endif
-                                            @if($hasPermissionVehicleDetailApprove)
-                                                @if(in_array($pendingVehicleDetailApprovalRequest->field, ['ex_colour','int_colour','varaints_id','ppmmyyy']))
-                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Approve
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Reject
-                                                    </button>
-                                                @endif
-                                            @endif
-                                            @if($hasPermissionSOApprove)
-                                                @if(in_array($pendingVehicleDetailApprovalRequest->field, ['so_number','so_date']))
-                                                    <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                            data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Approve
-                                                    </button>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                            data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                        Reject
-                                                    </button>
-                                                @endif
-                                            @endif
-                                                @if($hasPermissionReservationApprove)
-                                                    @if(in_array($pendingVehicleDetailApprovalRequest->field, ['sales_person_id',
-                                                        'reservation_end_date','reservation_start_date']))
-                                                        <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
-                                                                data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                            Approve
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
-                                                                data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
-                                                            Reject
-                                                        </button>
-                                                    @endif
-                                                @endif
+                                            {{ $pendingVehicleDetailApprovalRequest->old_value }}
                                         @endif
                                     </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->field == 'sales_person_id')
+                                            {{ $pendingVehicleDetailApprovalRequest->new_sales_person ?? ''  }}
+                                        @else
+                                            {{ $pendingVehicleDetailApprovalRequest->new_value ?? ''}}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($pendingVehicleDetailApprovalRequest->status == 'approved')
+                                            Approved
+                                        @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
+                                            Rejected
+                                        @else 
+                                        <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
+                                        data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                        Approve
+                                        </button>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#reject-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
+                                        Reject
+                                        </button>
+										</td>
+                                        @endif
+										@endif
+										@endif
                                     @php
                                         if($pendingVehicleDetailApprovalRequest->field == 'ex_colour') {
                                             $new_value =  $pendingVehicleDetailApprovalRequest->new_exterior ?? '';

@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('export:csv')->monthlyOn(date('t'), '00:00');
     }
 
     /**
@@ -24,4 +24,7 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+    protected $commands = [
+        \App\Console\Commands\ExportCSV::class,
+    ];    
 }
