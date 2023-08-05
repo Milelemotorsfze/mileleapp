@@ -473,7 +473,6 @@
                 }
             }
         }
-
         function  RelatedDataCheck(field,value) {
 
             var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
