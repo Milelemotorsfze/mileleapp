@@ -59,6 +59,9 @@ use App\Http\Controllers\KitCommonItemController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/react-page', function () {
+    return view('react-app.index');
+});
 Route::get('/d', function () {
     return view('addon.ff');
 });

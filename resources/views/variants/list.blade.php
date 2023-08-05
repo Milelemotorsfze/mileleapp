@@ -70,20 +70,22 @@
                         <td>{{ $variant->upholestry ?? '' }}</td>
                         
                         
-                        <td>
+                        
                         @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                     @endphp
                     @if ($hasPermission)
+                    <td>
                                 <a data-placement="top" href="{{ route('variants.edit', $variant->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
+                                </td>
                             @endif
                             <!-- @can('variants-delete')
                                 @if($variant->is_deletable == true)
                                 <a data-placement="top" id="{{ $variant->id }}" href="{{ route('variants.destroy',$variant->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i> </a>
                                 @endif
                             @endcan -->
-                        </td>
+                        
                     </tr>
                 @endforeach
                 </tbody>
