@@ -1,6 +1,6 @@
 @extends('layouts.main')
 <style>
-    .paragraph-class 
+    .paragraph-class
     {
         color: red;
         font-size:11px;
@@ -149,7 +149,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12" >
-                            
+
                             <input class="form-control" value="Kit" readonly>
                             <input id="addon_type_show" type="text" class="form-control" hidden readonly onclick=showAlert()>
                             <span id="AddonTypeError" class="required-class invalid-feedback"></span>
@@ -190,15 +190,15 @@
                             <span id="addonNameError" class="invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
-                            @can('master-kit-create')
-                            @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-create']);
-                            @endphp
-                            @if ($hasPermission)
+{{--                            @can('master-kit-create')--}}
+{{--                            @php--}}
+{{--                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-create']);--}}
+{{--                            @endphp--}}
+{{--                            @if ($hasPermission)--}}
                             <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;"
                             class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
-                            @endif
-                        @endcan
+{{--                            @endif--}}
+{{--                        @endcan--}}
                         </div>
                     </div>
                     </br>
@@ -244,7 +244,7 @@
                     </div>
                     </br>
                     <div class="row">
-                        
+
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
@@ -357,14 +357,14 @@
     </div>
     <input type="hidden" value="" id="index">
 </div>
-                                        </div> 
-                                    </div> 
-                                </div> 
-                            </div> 
-                        </div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>  
+            </div>
         </div>
     </div>
 </div>
@@ -383,7 +383,7 @@
                                 <div class="col-xxl-10 col-lg-6 col-md-12">
                                     <span class="error">* </span>
                                     <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                    <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1" 
+                                    <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1"
                                             multiple="true" style="width: 100%;" data-index="1" required>
                                             @foreach($kitItemDropdown as $kitItemDropdownData)
                                                 <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
@@ -393,8 +393,8 @@
                                 <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                     <span class="error">* </span>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                                    <input name="mainItem[1][quantity]" id="mainQuantity1" placeholder="Enter Quantity" type="number" value="1" min="1" 
-                                            class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus 
+                                    <input name="mainItem[1][quantity]" id="mainQuantity1" placeholder="Enter Quantity" type="number" value="1" min="1"
+                                            class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus
                                             oninput="validity.valid||(value='1');" required>
                                 </div>
                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
@@ -638,7 +638,7 @@
             else
             {
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                for (let i = 1; i <= countBrandRow; i++) 
+                for (let i = 1; i <= countBrandRow; i++)
                 {
                     var inputBrand = '';
                     var inputBrand = $('#selectBrand'+i).val();
@@ -939,6 +939,18 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
         }
+        function showNewAddonError($msg)
+        {
+            document.getElementById("newAddonError").textContent=$msg;
+            document.getElementById("new_addon_name").classList.add("is-invalid");
+            document.getElementById("newAddonError").classList.add("paragraph-class");
+        }
+        function removeNewAddonError()
+        {
+            document.getElementById("newAddonError").textContent="";
+            document.getElementById("new_addon_name").classList.remove("is-invalid");
+            document.getElementById("newAddonError").classList.remove("paragraph-class");
+        }
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
@@ -1110,18 +1122,25 @@
                     dataType : 'json',
                     success: function(result)
                     {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        $('#addon_id').val(result.id);
-                        var selectedValues = new Array();
-                        resetSelectedSuppliers(selectedValues);
-                        $('#addnewAddonButton').hide();
-                        $('#new_addon_name').val("");
-                        document.getElementById("newAddonError").textContent='';
-                        $msg = "";
-                        removeAddonNameError($msg);
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewAddonError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+                            $('#addon_id').val(result.id);
+                            var selectedValues = new Array();
+                            resetSelectedSuppliers(selectedValues);
+                            $('#addnewAddonButton').hide();
+                            $('#new_addon_name').val("");
+                            document.getElementById("newAddonError").textContent='';
+                            $msg = "";
+                            removeAddonNameError($msg);
+                            removeNewAddonError();
+                        }
+
                     }
                 });
             }
@@ -1310,7 +1329,7 @@
                 }
             }
             else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
-            { 
+            {
                 var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                 for (let i = 1; i <= countModel; i++)
                 {
@@ -1589,8 +1608,8 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
                    }).set({title:"Can't Remove Brand And Model Lines"})
                 }
-     
-           
+
+
 
         })
         $("#add").on("click", function ()
@@ -1639,7 +1658,7 @@
                                         id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index}) >
                                         </select>
                                         <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
-                                        
+
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                         <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
@@ -1676,7 +1695,7 @@
             $("#selectModelLine"+index).select2();
         });
     });
-    
+
     function selectBrand(id,row)
     {
         var value =$('#'+id).val();
@@ -1769,7 +1788,7 @@
     }
     function hideRelatedModal(id,row)
     {
-        
+
         let showDivdrop = document.getElementById('showDivdrop'+row);
         showDivdrop.hidden = true
         let showaddtrim = document.getElementById('showaddtrim');
@@ -1820,14 +1839,14 @@
                 }
             }
         }
-    $(document.body).on('click', ".removeMainItem", function (e) 
+    $(document.body).on('click', ".removeMainItem", function (e)
     {
         var countRow = 0;
         var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
         if(countRow > 1)
         {
             var indexNumber = $(this).attr('data-index');
-            $(this).closest('#item-'+indexNumber).find("option:selected").each(function() 
+            $(this).closest('#item-'+indexNumber).find("option:selected").each(function()
             {
                 var id = (this.value);
                 var text = (this.text);
@@ -1858,10 +1877,10 @@
             }).set({title:"Can't Remove Kit Item and Quantity"})
         }
     })
-    function MainKitItemAddOption(id,text) 
+    function MainKitItemAddOption(id,text)
     {
         var indexValue = $('#MainKitItemIndex').val();
-        for(var i=1;i<=indexValue;i++) 
+        for(var i=1;i<=indexValue;i++)
         {
             $('#mainItem'+i).append($('<option>', {value: id, text :text}))
         }
@@ -1900,7 +1919,7 @@
                                     @foreach($kitItemDropdown as $kitItemDropdownData)
                                 <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
                                     @endforeach
-                                </select>                               
+                                </select>
                                 </div>
                                 <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>

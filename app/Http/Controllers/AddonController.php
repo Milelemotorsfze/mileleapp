@@ -1119,9 +1119,10 @@ class AddonController extends Controller
         {
             $input = $request->all();
             $input['created_by'] = $authId;
-            $isExisting = Addon::where('name', $request->name)->first();
+            $isExisting = Addon::where('name', $request->name)
+                ->where('addon_type', $request->addon_type)->first();
             if($isExisting) {
-                $addons['error'] =  "Addon Already Existing";
+                $addons['error'] =  "This Addon is Already Existing";
             }else{
                 $addons = Addon::create($input);
             }

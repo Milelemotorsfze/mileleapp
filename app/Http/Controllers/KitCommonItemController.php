@@ -86,8 +86,8 @@ class KitCommonItemController extends Controller
                         if(count($kitSupplierAndPriceData['item']) > 0)
                         {
                             foreach($kitSupplierAndPriceData['item'] as $kitItemData)
-                            {  
-                                $createkit = [];                
+                            {
+                                $createkit = [];
                                 $createkit['created_by'] = Auth::id();
                                 $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
                                 $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
@@ -128,7 +128,7 @@ class KitCommonItemController extends Controller
      */
     public function update(Request $request, KitCommonItem $kitCommonItem)
     {
-       
+
     }
 
     /**
@@ -163,7 +163,7 @@ class KitCommonItemController extends Controller
         $otherSuppliers = Supplier::whereNotIn('id',$kitSupId)->select('id','supplier')->get();
         return view('kit.editsuppliers',compact('suppliers','kitItemDropdown','id','otherSuppliers'));
     }
-    
+
     public function editAddonDetails($id)
     {
         // AddonSuppliersUsed
@@ -172,7 +172,7 @@ class KitCommonItemController extends Controller
         $price = '';
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
         $addonDetails->LeastPurchasePrices = $price;
-        $addons = Addon::select('id','name')->get();
+        $addons = Addon::whereIn('addon_type',['K'])->select('id','name')->orderBy('name', 'ASC')->get();
         $existingBrandId = [];
         $existingBrandModel = [];
         if($addonDetails->is_all_brands == 'no')
@@ -298,7 +298,7 @@ class KitCommonItemController extends Controller
                         $supPriInput['supplier_addon_id'] = $updateSupAdd->id;
                         $createHistrory = PurchasePriceHistory::create($supPriInput);
                     }
-                    
+
                     if(count($kitSupplierAndPrice['item']) > 0 )
                     {
                         foreach($kitSupplierAndPrice['item'] as $item)
@@ -332,8 +332,8 @@ class KitCommonItemController extends Controller
                         if(count($kitSupplierAndPrice['item']) > 0)
                         {
                             foreach($kitSupplierAndPrice['item'] as $kitItemData)
-                            {  
-                                $createkit = [];                
+                            {
+                                $createkit = [];
                                 $createkit['created_by'] = Auth::id();
                                 $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
                                 $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
@@ -346,7 +346,7 @@ class KitCommonItemController extends Controller
                             }
                         }
                     }
-                }              
+                }
             }
         }
         // delete
@@ -371,7 +371,7 @@ class KitCommonItemController extends Controller
                 }
             }
             $del = $del->delete();
-        }       
+        }
         $data = 'K';
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
