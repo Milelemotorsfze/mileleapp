@@ -1108,9 +1108,17 @@ class AddonController extends Controller
     public function createMasterAddon(Request $request)
     {
         $authId = Auth::id();
-        $validator = Validator::make($request->all(), [
-           'name' => 'required',
-        ]);
+        if($request->addon_type == 'K') {
+            $validator = Validator::make($request->all(), [
+                'kit_year' => 'required',
+                'kit_km' => 'required',
+
+            ]);
+        }else{
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+            ]);
+        }
         if ($validator->fails())
         {
             return redirect(route('addon.create'))->withInput()->withErrors($validator);
@@ -1119,7 +1127,11 @@ class AddonController extends Controller
         {
             $input = $request->all();
             $input['created_by'] = $authId;
-            $isExisting = Addon::where('name', $request->name)
+            if($request->addon_type == 'K') {
+                $input['name'] = 'Kit: '.$request->kit_year.' year | '.$request->kit_km.'KM';
+            }
+
+            $isExisting = Addon::where('name', $input['name'])
                 ->where('addon_type', $request->addon_type)->first();
             if($isExisting) {
                 $addons['error'] =  "This Addon is Already Existing";

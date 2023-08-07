@@ -490,17 +490,25 @@
                                 <div class="row modal-row">
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                         <span class="error">* </span>
-                                        <label for="name" class="col-form-label text-md-end ">Addon Name</label>
+                                        <label for="name" class="col-form-label text-md-end ">Kit Year</label>
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                                        placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
-                                        <span id="newAddonError" class="required-class paragraph-class"></span>
-                                        @error('name')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
+                                        <div class="input-group">
+                                            <input type="number" id="kit_year" class="form-control @error('kit_year') is-invalid @enderror" name="kit_year"  >
+                                            <span class="input-group-text">Year</span>
+                                        </div>
+                                        <span id="newAddonYearError" class="required-class paragraph-class"></span>
+                                    </div>
+                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                        <span class="error">* </span>
+                                        <label for="kit Year" class="col-form-label text-md-end ">Kit KiloMeter</label>
+                                    </div>
+                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                        <div class="input-group">
+                                            <input type="number" id="kit_km" class="form-control @error('kit_km') is-invalid @enderror" name="kit_km"  >
+                                            <span class="input-group-text">KM</span>
+                                        </div>
+                                        <span id="newAddonKMError" class="required-class paragraph-class"></span>
                                     </div>
                                 </div>
                             </form>
@@ -1140,17 +1148,41 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
         }
-         function showNewAddonError($msg)
+         // function showNewAddonError($msg)
+         // {
+         //     document.getElementById("newAddonError").textContent=$msg;
+         //     document.getElementById("new_addon_name").classList.add("is-invalid");
+         //     document.getElementById("newAddonError").classList.add("paragraph-class");
+         // }
+         // function removeNewAddonError()
+         // {
+         //     document.getElementById("newAddonError").textContent="";
+         //     document.getElementById("new_addon_name").classList.remove("is-invalid");
+         //     document.getElementById("newAddonError").classList.remove("paragraph-class");
+         // }
+         function showNewAddonYearError($msg)
          {
-             document.getElementById("newAddonError").textContent=$msg;
-             document.getElementById("new_addon_name").classList.add("is-invalid");
-             document.getElementById("newAddonError").classList.add("paragraph-class");
+             document.getElementById("newAddonYearError").textContent=$msg;
+             document.getElementById("kit_year").classList.add("is-invalid");
+             document.getElementById("newAddonYearError").classList.add("paragraph-class");
          }
-         function removeNewAddonError()
+         function removeNewAddonYearError()
          {
-             document.getElementById("newAddonError").textContent="";
-             document.getElementById("new_addon_name").classList.remove("is-invalid");
-             document.getElementById("newAddonError").classList.remove("paragraph-class");
+             document.getElementById("newAddonYearError").textContent="";
+             document.getElementById("kit_year").classList.remove("is-invalid");
+             document.getElementById("newAddonYearError").classList.remove("paragraph-class");
+         }
+         function showNewAddonKMError($msg)
+         {
+             document.getElementById("newAddonKMError").textContent=$msg;
+             document.getElementById("kit_km").classList.add("is-invalid");
+             document.getElementById("newAddonKMError").classList.add("paragraph-class");
+         }
+         function removeNewAddonKMError()
+         {
+             document.getElementById("newAddonKMError").textContent="";
+             document.getElementById("kit_km").classList.remove("is-invalid");
+             document.getElementById("newAddonKMError").classList.remove("paragraph-class");
          }
         function showImage()
         {
@@ -1268,10 +1300,17 @@
         $('#createAddonId').on('click', function()
         {
             // create new addon and list new addon in addon list
-            var value = $('#new_addon_name').val();
-            if(value == '')
+            var year = $('#kit_year').val();
+            var kiloMeter = $('#kit_km').val();
+
+            if(year == '' || kiloMeter == '')
             {
-                document.getElementById("newAddonError").textContent='Addon Name is Required';
+                if(year == '') {
+                    document.getElementById("newAddonYearError").textContent='Addon Year is Required';
+                }
+                if(kiloMeter == '') {
+                    document.getElementById("newAddonKMError").textContent='Addon KiloMeter is Required';
+                }
             }
             else
             {
@@ -1282,7 +1321,8 @@
                     type: "POST",
                     data:
                     {
-                        name: value,
+                        kit_year: year,
+                        kit_km:kiloMeter,
                         addon_type: currentAddonType,
                         _token: '{{csrf_token()}}'
                     },
@@ -1290,8 +1330,8 @@
                     success: function(result)
                     {
                         if(result.error) {
-                            $msg = result.error;
-                            showNewAddonError($msg);
+                            $msg = "Addon with this year and kilometer is already Existing.";
+                            showNewAddonYearError($msg);
                         }else{
                             $('.overlay').hide();
                             $('.modal').removeClass('modalshow');
@@ -1301,11 +1341,12 @@
                             var selectedValues = new Array();
                             resetSelectedSuppliers(selectedValues);
                             $('#addnewAddonButton').hide();
-                            $('#new_addon_name').val("");
-                            document.getElementById("newAddonError").textContent='';
+                            $('#kit_year').val("");
+                            $('#kit_km').val("");
+
                             $msg = "";
-                            removeAddonNameError($msg);
-                            removeNewAddonError();
+                            removeNewAddonKMError($msg);
+                            removeNewAddonYearError($msg);
                         }
 
                     }

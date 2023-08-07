@@ -13,6 +13,8 @@ class Addon extends Model
     protected $fillable = [
         'addon_type',
         'name',
+        'kit_year',
+        'kit_km',
         'created_by',
         'updated_by',
         'deleted_by'
