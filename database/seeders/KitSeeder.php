@@ -16,7 +16,7 @@ class KitSeeder extends Seeder
     {
         $modules = [
             ['22', 'Master Brand'],
-            ['22', 'Master Model Line'],
+            ['23', 'Master Model Line'],
             ];
         foreach ($modules as $key => $value):
         $module[] = [
