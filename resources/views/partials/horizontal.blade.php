@@ -501,7 +501,7 @@
                                 </a>
                             </div>
                             @endif
-@php
+<!-- @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
 @endphp
 @if ($hasPermission)
@@ -520,7 +520,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
                                 <span data-key="t-utility">Model Lines </span>
                             </a>
                         </div>
-@endif
+@endif -->
                             @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
                     @endphp

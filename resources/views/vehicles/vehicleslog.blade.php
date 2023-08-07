@@ -1067,6 +1067,7 @@
             }
             $('.select2').select2();
             var dataTable = $('#dtBasicExample1').DataTable({
+                "order": [[3, "desc"]]
                 pageLength: 10,
                 initComplete: function() {
                     this.api().columns().every(function(d) {

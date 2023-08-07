@@ -848,7 +848,7 @@ function saveBasicInfo() {
       success: function (response) {
         if (response.success) {
           alert("Password updated successfully.");
-          // Close the modal or perform any other necessary actions
+          window.location.href = "/";
         } else {
           if (response.error === "incorrect_old_password") {
             alert("Old password is incorrect.");

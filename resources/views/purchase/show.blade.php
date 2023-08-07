@@ -206,7 +206,7 @@
 @if ($purchasingOrder->status === 'Approved')
   @if($vehicles->contains('purchasing_order_id', $purchasingOrder->id) && $vehicles->contains('payment_status', 'Payment Initiate Request Approved'))
 <div class="col-lg-2 col-md-3 col-sm-12">
-  <label for="choices-single-default" class="form-label"><strong>Payment Initiatie</strong></label>
+  <label for="choices-single-default" class="form-label"><strong>Initiate Payment</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
  
@@ -613,7 +613,7 @@
 								$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 								@endphp
 								@if ($hasPermission)
-								@if ($purchasingOrder->status === 'Approved')
+								@if ($purchasingOrder->status === 'Approved' && $vehicles->payment_status === '')
 								<a title="Cancel" data-placement="top" class="btn btn-sm btn-danger" href="{{ route('vehicles.cancel', $vehicles->id) }}" onclick="return confirmCancel();" style="white-space: nowrap;">
 									Cancel
 								</a>
@@ -1249,7 +1249,6 @@ var exColourDropdown = exColourCol.find('select');
     var matchFound = false;
     for (var i = 0; i < options.length; i++) {
       var option = options[i];
-      
       if (inputValue === option.value) {
         matchFound = true;
         break;

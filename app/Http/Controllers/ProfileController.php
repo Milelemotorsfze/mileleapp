@@ -113,6 +113,7 @@ class ProfileController extends Controller
         }
         $user->password = Hash::make($newPassword);
         $user->save();
+        session()->flush();
         return response()->json(['success' => true]);
     }    
     public function updatepictureInfo(Request $request)
