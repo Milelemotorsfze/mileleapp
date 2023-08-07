@@ -256,9 +256,7 @@ input {
         @endif
 
         <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST">
-        <!-- action="{{ route('suppliers.store') }}" -->
-        <!-- method="POST" enctype="multipart/form-data" -->
-        <!-- action="{{ route('suppliers.store') }}" method="POST"  -->
+
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -1534,20 +1532,20 @@ input {
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        var phone = window.intlTelInput(document.querySelector("#phone"),
-            {
-                separateDialCode: true,
-                preferredCountries:["ae"],
-                hiddenInput: "full",
-                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-            });
-        var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
-            {
-                separateDialCode: true,
-                preferredCountries:["ae"],
-                hiddenInput: "full",
-                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-            });
+        // var phone = window.intlTelInput(document.querySelector("#phone"),
+        //     {
+        //         separateDialCode: true,
+        //         preferredCountries:["ae"],
+        //         hiddenInput: "full",
+        //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        //     });
+        // var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
+        //     {
+        //         separateDialCode: true,
+        //         preferredCountries:["ae"],
+        //         hiddenInput: "full",
+        //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+        //     });
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
