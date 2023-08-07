@@ -22,6 +22,7 @@ class AddonDetails extends Model
         'updated_by',
         'deleted_by',
         'image',
+        'description',
         'is_all_brands',
         'fixing_charges_included',
         'fixing_charge_amount',

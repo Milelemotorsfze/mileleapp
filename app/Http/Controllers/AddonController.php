@@ -69,7 +69,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+         dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -1434,6 +1434,14 @@ class AddonController extends Controller
 //        }
         $data = $data->get();
         return response()->json($data);
+
+    }
+    public function getAddonDescription(Request $request) {
+        $descriptions = AddonDetails::where('addon_type_name', 'P')
+            ->where('addon_id', $request->addon_id)
+            ->whereNotNull('description')->select('id','description')->get();
+
+        return response($descriptions);
 
     }
 }

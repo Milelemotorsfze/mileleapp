@@ -184,7 +184,7 @@
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Name') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
-                            <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
+                            <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;" autofocus>
                                 @foreach($addons as $addon)
                                     <option value="{{$addon->id}}">{{$addon->name}}</option>
                                 @endforeach
@@ -209,20 +209,53 @@
                         </div>
                     </div>
                     </br>
+                    <div class="row mb-3" hidden id="addon-description">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
+                        </div>
+                        <div class="col-xxl-9 col-lg-5 col-md-11">
+                            <div id="select-description">
+                                <select name="description" id="description" multiple="true" style="width: 100%;" >
+
+                                </select>
+                            </div>
+                            <input type="text" hidden name="description_text" id="description-text" placeholder="Enter Addon Description" value=""
+                                   class="form-control widthinput @error('description') is-invalid @enderror"
+                            autofocus>
+                            @error('description')
+                            <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                            <span id="addonDescriptionError" class="invalid-feedback"></span>
+                        </div>
+                        <div class="col-xxl-1 col-lg-1 col-md-1">
+{{--                            @can('master-addon-description-create')--}}
+{{--                                @php--}}
+{{--                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-description-create']);--}}
+{{--                                @endphp--}}
+{{--                                @if ($hasPermission)--}}
+                                    <button id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
+                                       class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</button>
+                                    <button id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
+                                    class="btn btn-sm btn-info" >Choose From List</button>
+{{--                                @endif--}}
+{{--                            @endcan--}}
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-
                         <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
-                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus
-                        readonly>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
+                            name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ old('purchase_price') }}"  autocomplete="purchase_price" autofocus
+                            readonly>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                        </div>
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -444,8 +477,31 @@
         var sub ='1';
         $(document).ready(function ()
         {
+            $("#addnewDescriptionButton").click(function () {
+                $('#descr-dropdown-button').attr('hidden', false);
+                $('#description-text').attr('hidden', false);
+                $('#select-description').attr('hidden', true);
+                $('#addnewDescriptionButton').attr('hidden', true);
+                $('#description').attr('selected', false);
+
+            });
+            $("#descr-dropdown-button").click(function () {
+                $('#description-text').attr('hidden', true);
+                $('#select-description').attr('hidden', false);
+                $("#addnewDescriptionButton").attr('hidden', false);
+                $('#descr-dropdown-button').attr('hidden', true);
+                $('#description-text').val("");
+
+            });
+
+
             $("#addon_type").change(function () {
                 var addonType = $(this).val();
+                if(addonType == 'P') {
+                    $('#addon-description').attr('hidden', false);
+                }else{
+                    $('#addon-description').attr('hidden', true);
+                }
                 let url = '{{ url('supplier-change-addon-type') }}';
                 $.ajax({
                     type: "GET",
@@ -477,6 +533,10 @@
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
+            $("#description").attr("data-placeholder","Choose Addon Description....     Or     Type Here To Search....");
+            $("#description").select2({
+                maximumSelectionLength: 1,
+            });
             // $('#addon_id').select2();
             $("#supplierArray1").attr("data-placeholder","Choose Vendor....     Or     Type Here To Search....");
             $("#supplierArray1").select2({
@@ -505,8 +565,29 @@
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
             {
-                // fetch addon existing detils
                 var id = $('#addon_id').val();
+
+                var addonType = $('#addon_type').val();
+
+                let url = '{{ route('addon.getAddonDescription') }}';
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        addon_id: id,
+                    },
+                    success: function (data) {
+                        $('#description').empty();
+                        jQuery.each(data, function (key, value) {
+                            console.log(value.description);
+                            console.log('values')
+                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
+                        });
+                    }
+                });
+                // fetch addon existing detils
+
                 if(id != '')
                 {
                     $('#addnewAddonButton').hide();
@@ -522,6 +603,11 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
+                            if(data.addon_type.addon_type == 'P') {
+                                $('#addon-description').attr('hidden', false);
+                            }else{
+                                $('#addon-description').attr('hidden', true);
+                            }
                             $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
@@ -633,7 +719,7 @@
                                     formInputError = true;
                                 }
                                 else if(inputSPModelLine != 'allmodellines')
-                                { 
+                                {
                                     var inputSPModelDescription = $('#selectModelNumberDiscri'+i+'Des'+j).val();
                                     if(inputSPModelDescription == '')
                                     {
@@ -645,7 +731,7 @@
 
                             }
                         }
-                       
+
                     }
 
                 }
@@ -893,7 +979,7 @@
             document.getElementById('selectModelNumberDiscri'+i+'Des'+j).classList.remove("is-invalid");
             document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.remove("paragraph-class");
         }
-        
+
         function showkitSupplierDropdown1Error($msg)
         {
             document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
