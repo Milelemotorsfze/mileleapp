@@ -1052,12 +1052,12 @@
             document.getElementById("new_addon_name").classList.add("is-invalid");
             document.getElementById("newAddonError").classList.add("paragraph-class");
         }
-        // function removeNewAddonError($msg)
-        // {
-        //     document.getElementById("newAddonError").textContent="";
-        //     document.getElementById("new_addon_name").classList.add("is-invalid");
-        //     document.getElementById("newAddonError").classList.add("paragraph-class");
-        // }
+        function removeNewAddonError()
+        {
+            document.getElementById("newAddonError").textContent="";
+            document.getElementById("new_addon_name").classList.remove("is-invalid");
+            document.getElementById("newAddonError").classList.remove("paragraph-class");
+        }
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
@@ -1245,7 +1245,7 @@
                             document.getElementById("newAddonError").textContent='';
                             $msg = "";
                             removeAddonNameError($msg);
-                            // removeNewAddonError();
+                            removeNewAddonError();
                         }
 
                     }
