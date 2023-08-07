@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->string('phone')->nullable()->after('contact_number');
-            $table->string('office_phone')->nullable()->after('contact_number');
+        Schema::table('purchasing_order', function (Blueprint $table) {
+            $table->bigInteger('vendors_id')->unsigned()->index()->nullable();
+            $table->foreign('vendors_id')->references('id')->on('suppliers');
         });
     }
 
@@ -22,10 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('suppliers', function (Blueprint $table) {
-            $table->dropColumn('phone');
-            $table->dropColumn('office_phone');
-
+        Schema::table('purchasing_order', function (Blueprint $table) {
+            //
         });
     }
 };

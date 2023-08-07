@@ -9,7 +9,6 @@ use App\Models\Varaint;
 use App\Models\Supplier;
 use App\Models\Vehicles;
 use App\Models\Movement;
-use App\Models\Vendor;
 use App\Models\PaymentLog;
 use App\Models\User;
 use App\Models\Vehicleslog;
@@ -187,7 +186,9 @@ class PurchasingOrderController extends Controller
      */
     public function create()
 {
-    $vendors = Vendor::where('category', 'vehicle-procurment')->get();
+    $vendors = Supplier::whereHas('vendorCategories', function ($query) {
+        $query->where('category', 'Vehicles');
+    })->get();    
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')
@@ -287,7 +288,7 @@ class PurchasingOrderController extends Controller
         ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
-    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+    $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $vehicleslog = Vehicleslog::whereIn('vehicles_id', $vehicles->pluck('id'))->get();
     $purchasinglog = Purchasinglog::where('purchasing_order_id', $id)->get();
         $previousId = PurchasingOrder::where('id', '<', $id)->max('id');
@@ -307,7 +308,7 @@ class PurchasingOrderController extends Controller
         ->get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
-    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+    $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname'));
 }
     /**
@@ -427,7 +428,7 @@ class PurchasingOrderController extends Controller
     $varaint = Varaint::get();
     $purchasingOrder = PurchasingOrder::findOrFail($id);
     $data = Vehicles::where('purchasing_order_id', $id)->where('status', '!=', 'cancel')->get();
-    $vendorsname = Vendor::where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+    $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     $sales_persons = ModelHasRoles::get();
     $sales_ids = $sales_persons->pluck('model_id');
     $sales = User::whereIn('id', $sales_ids)->get();

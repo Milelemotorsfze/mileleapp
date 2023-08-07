@@ -171,7 +171,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                 </div>
             </div>
             </br>
-            <div class="card" >
+            <div class="card"  id="kitSupplier" >
                 <div class="card-header">
                     <center>
                         <h4 class="card-title">Warranty Brands</h4>
@@ -236,7 +236,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                                     @endif
                                 </label>
                                 <div class="input-group">
-                                    <input class="form-control widthinput" value="@if($existingBrand->is_selling_price_approved != 2) @if($existingBrand->selling_price != NULL) {{$existingBrand->selling_price}} AED @endif @endif" readonly>
+                                    <input class="form-control widthinput pending_selling_price"  id="pending_selling_price{{$i}}"
+                                           value="@if($existingBrand->is_selling_price_approved != 2) @if($existingBrand->selling_price != NULL){{$existingBrand->selling_price}} AED @endif @endif" readonly>
                                 </div>
                             </div>
                             <div class="col-xxl-2 col-lg-2 col-md-6">
@@ -306,6 +307,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             maximumSelectionLength: 1,
             placeholder:"Choose Vehicle Category",
         });
+        $(document.body).on('select2:select', "#warranty_policies_id", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#vehicle_category1", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#vehicle_category2", function (e) {
+            showBrandDiv();
+        })
+        $(document.body).on('select2:select', "#supplier_id", function (e) {
+            showBrandDiv();
+        })
         for(let i=1; i<=lengthExistingBrand; i++)
         {
             $('#brands'+i).select2({
@@ -379,6 +392,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         $(document.body).on('select2:unselect', ".regions", function (e) {
             var index = $(this).attr('data-index');
             $('#brands'+index).empty();
+            $('#purchase_price'+index).val('');
+            $('#selling_price'+index).val('');
+            $('#pending_selling_price'+index).val('');
+
         });
         ////////////////////////
         $(document.body).on('select2:unselect', ".brands", function (e) {
@@ -414,7 +431,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
             // check if this brand country is choosen anywhere in list, if yes find the corresponding brand
             // dropdown id and append data in that dropdown nly
             var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
-            alert(brandTotalIndex);
             for(let i=1; i<=brandTotalIndex; i++)
             {
                 var country = $('#regions'+i).val();
@@ -438,7 +454,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                 }
             }
         }
-
+        function showBrandDiv() {
+            var policy = $('#warranty_policies_id').val();
+            if(policy != '')
+            {
+                var vehicleCategory1 = $('#vehicle_category1').val();
+                if(vehicleCategory1 != '') {
+                    var vehicleCategory2 = $('#vehicle_category2').val();
+                    if(vehicleCategory2 != '') {
+                        var vendor = $('#supplier_id').val();
+                        if(vendor != '') {
+                            $('#kitSupplier').attr('hidden', false);
+                        }
+                    }
+                }
+            }
+        }
         $(document.body).on('click', ".removeButton", function (e) {
             var countRow = 0;
             var countRow = $(".form_field_outer").find(".form_field_outer_row").length;
@@ -464,12 +495,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     $(this).find('.regions').attr('id','regions'+ index);
                     $(this).find('.regions').attr('name','brandPrice['+ index +'][regions]');
                     $(this).find('.selling-price').attr('name','brandPrice['+ index +'][selling_price]');
+                    $(this).find('.selling-price').attr('id','selling_price'+index);
+                    $(this).find('.purchase-price').attr('id','purchase_price'+index);
+                    $(this).find('.pending_selling_price').attr('id','pending_selling_price'+index);
                     $(this).find('.purchase-price').attr('name','brandPrice['+ index +'][purchase_price]');
                     $(this).find('button').attr('data-index', index);
                     $(this).find('button').attr('id','remove-'+ index);
                     $('#brands'+index).select2
                     ({
                         placeholder:"Choose Brands....     Or     Type Here To Search....",
+                        allowClear: true,
+                        minimumResultsForSearch: -1,
+                    });
+                    $('#regions'+index).select2
+                    ({
+                        placeholder:"Choose Country.. Or Search Here....",
                         allowClear: true,
                         minimumResultsForSearch: -1,
                     });
@@ -486,26 +526,38 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
         function  RelatedDataCheck(field,value) {
 
             var brandTotalIndex = $(".form_field_outer").find(".form_field_outer_row").length;
-            alert(brandTotalIndex);
+
             var brands = [];
             var countries = [];
+            var purcahsePrice = [];
+            var sellingPrice = [];
             if (brandTotalIndex > 0) {
                 for(let i=1; i<=brandTotalIndex; i++)
                 {
                     var eachBrand = $('#brands'+i).val();
                     var eachRegion = $('#regions'+i).val();
+                    var eachSellingPrice = $('#selling_price'+i).val();
+                    var eachPurchasePrice = $('#purchase_price'+i).val();
+
                     if(eachBrand != '') {
                         brands.push(eachBrand);
                     }
                     if(eachRegion != '') {
                         countries.push(eachRegion);
                     }
+                    if(eachSellingPrice != '') {
+                        sellingPrice.push(eachSellingPrice);
+                    }
+                    if(eachPurchasePrice != '') {
+                        purcahsePrice.push(eachPurchasePrice);
+                    }
                 }
                 var brandCount = brands.length;
                 var regionCount = countries.length;
-                console.log(brandCount);
-                console.log(regionCount);
-                if(brandCount > 0 || regionCount > 0 ) {
+                var sellingPriceCount = sellingPrice.length;
+                var purcahsePriceCount = purcahsePrice.length;
+
+                if(brandCount > 0 || regionCount > 0 || sellingPriceCount > 0 || purcahsePriceCount > 0) {
                     if(field == 'Vendor' ) {
                         $("#supplier_id").val(value).trigger('change');
                     }else if(field == 'Policy') {
@@ -519,6 +571,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-edit']);
                     var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Country.' +
                         'Please remove those items to edit this field.', function (e) {
                     }).set({title: "Remove Brands and Countries"})
+                }else{
+                    $('#kitSupplier').attr('hidden', true);
                 }
             }
         }

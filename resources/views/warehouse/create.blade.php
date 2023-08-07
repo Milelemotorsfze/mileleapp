@@ -99,7 +99,7 @@ input[type=number]::-webkit-outer-spin-button {
             <select class="form-control" autofocus name="vendors_id" id="vendors" required>
                                 <option value="" disabled>Select The Vendor</option>
                                 @foreach($vendors as $vendors)
-                                    <option value="{{ $vendors->id }}">{{ $vendors->trade_name_or_individual_name }}</option>
+                                    <option value="{{ $vendors->id }}">{{ $vendors->supplier }}</option>
                                 @endforeach
             </select>
         </div>

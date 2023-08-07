@@ -1,7 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
-@if (Auth::user()->selectedRole === '7' || Auth::user()->selectedRole === '8')
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+                    @endphp
+                    @if ($hasPermission)
   <div class="card-header">
   <style>
   .wrapper 
@@ -119,12 +122,12 @@ input[type=number]::-webkit-outer-spin-button
     <h4 class="card-title">
       Leads Info
     </h4>
-    @can('user-view')
+    <!-- @can('user-view')
     <a class="btn btn-sm btn-success float-end" href="{{ route('users.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Demand
       </a>
-      @endcan
-      @can('daily-leads-create')
+      @endcan -->
+      @can('sales-view')
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
@@ -165,7 +168,7 @@ input[type=number]::-webkit-outer-spin-button
     </ul>      
   </div>
   <div class="tab-content">
-    @can('daily-leads-list')
+    @can('sales-view')
       <div class="tab-pane fade show active" id="tab1">
         <div class="card-body">
           <div class="table-responsive">
@@ -227,7 +230,7 @@ input[type=number]::-webkit-outer-spin-button
       <i class="fa fa-bars" aria-hidden="true"></i>
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
-    @can('user-view')
+    @can('sales-view')
       <li><a class="dropdown-item" href="{{ route('dailyleads.prospecting',$calls->id) }}">Prospecting</a></li>
       <li><a class="dropdown-item" href="#">Qualificaton</a></li>
       <li><a class="dropdown-item" href="#">Demand</a></li>
@@ -343,7 +346,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div>
     @endcan
-    @can('user-view')
+    @can('sales-view')
       <div class="tab-pane fade show" id="tab2">
         <div class="card-body">
         <div class="wrapper">	
@@ -426,7 +429,7 @@ input[type=number]::-webkit-outer-spin-button
         </div>  
       </div> 
       @endcan
-      @can('user-view')
+      @can('sales-view')
         <div class="tab-pane fade show" id="tab3">
           <div class="card-body">
             <div class="table-responsive">
@@ -455,7 +458,7 @@ input[type=number]::-webkit-outer-spin-button
             </div>
           </div>
         @endcan
-		    @can('daily-leads-list')
+		    @can('sales-view')
       <div class="tab-pane fade show" id="tab5">
         <div class="card-body">
           <div class="table-responsive">
@@ -582,7 +585,7 @@ input[type=number]::-webkit-outer-spin-button
   </div>
 </div>
     @endcan
-    @can('daily-leads-list')
+    @can('sales-view')
       <div class="tab-pane fade show" id="tab7">
         <div class="card-body">
           <div class="table-responsive">
@@ -650,7 +653,7 @@ input[type=number]::-webkit-outer-spin-button
         </div>  
       </div>  
     @endcan
-    @can('daily-leads-list')
+    @can('sales-view')
       <div class="tab-pane fade show" id="tab8">
         <div class="card-body">
           <div class="table-responsive">

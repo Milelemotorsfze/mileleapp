@@ -446,7 +446,7 @@ $pendingvendorfol = DB::table('purchasing_order')
                 <td style="vertical-align: middle; text-align: center;">{{ date('d-M-Y', strtotime($purchasingOrder->po_date)) }}</td>
                 <td style="vertical-align: middle; text-align: center;">
                             @php
-                            $resultname = DB::table('vendors')->where('id', $purchasingOrder->vendors_id)->value('trade_name_or_individual_name');
+                            $resultname = DB::table('suppliers')->where('id', $purchasingOrder->vendors_id)->value('supplier');
                             @endphp
                             {{ $resultname }}
                         </td>

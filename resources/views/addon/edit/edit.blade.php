@@ -1005,6 +1005,18 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
         }
+     function showNewAddonError($msg)
+     {
+         document.getElementById("newAddonError").textContent=$msg;
+         document.getElementById("new_addon_name").classList.add("is-invalid");
+         document.getElementById("newAddonError").classList.add("paragraph-class");
+     }
+     function removeNewAddonError()
+     {
+         document.getElementById("newAddonError").textContent="";
+         document.getElementById("new_addon_name").classList.remove("is-invalid");
+         document.getElementById("newAddonError").classList.remove("paragraph-class");
+     }
         function showImage()
         {
             var modal = document.getElementById("showImageModal");
@@ -1143,18 +1155,24 @@
                     dataType : 'json',
                     success: function(result)
                     {
-                        $('.overlay').hide();
-                        $('.modal').removeClass('modalshow');
-                        $('.modal').addClass('modalhide');
-                        $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
-                        $('#addon_id').val(result.id);
-                        var selectedValues = new Array();
-                        resetSelectedSuppliers(selectedValues);
-                        $('#addnewAddonButton').hide();
-                        $('#new_addon_name').val("");
-                        document.getElementById("newAddonError").textContent='';
-                        $msg = "";
-                        removeAddonNameError($msg);
+                        if(result.error) {
+                            $msg = result.error;
+                            showNewAddonError($msg);
+                        }else{
+                            $('.overlay').hide();
+                            $('.modal').removeClass('modalshow');
+                            $('.modal').addClass('modalhide');
+                            $('#addon_id').append("<option value='" + result.id + "'>" + result.name + "</option>");
+                            $('#addon_id').val(result.id);
+                            var selectedValues = new Array();
+                            resetSelectedSuppliers(selectedValues);
+                            $('#addnewAddonButton').hide();
+                            $('#new_addon_name').val("");
+                            document.getElementById("newAddonError").textContent='';
+                            $msg = "";
+                            removeAddonNameError($msg);
+                            removeNewAddonError();
+                        }
                     }
                 });
             }

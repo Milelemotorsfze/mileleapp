@@ -369,7 +369,7 @@ class AddonController extends Controller
                 return redirect()->route('addon.list', $data)
                                 ->with('success','Addon created successfully');
             }
-           
+
         // }
     }
 
@@ -742,7 +742,7 @@ class AddonController extends Controller
                             {
                                 // update
                                 $update =  KitCommonItem::where('item_id',$kitItemData['item'])->where('addon_details_id',$id)->first();
-                                $update->updated_by = Auth::id();                               
+                                $update->updated_by = Auth::id();
                                 $update->quantity =  $kitItemData['quantity'];
                                 $update->update();
                                 array_push($NotNelete,$update->id);
@@ -769,7 +769,7 @@ class AddonController extends Controller
                                                 // unitPriceUSD = parseFloat(unitPriceUSD);
                                                 // var totalPriceUSD = totalPriceAED / 3.6725;
                                                 // totalPriceUSD = totalPriceUSD.toFixed(4);
-                                                // totalPriceUSD = parseFloat(totalPriceUSD);                                               
+                                                // totalPriceUSD = parseFloat(totalPriceUSD);
                                             }
                                         }
                                     }
@@ -834,7 +834,7 @@ class AddonController extends Controller
                             }
                             $del = $del->delete();
                         }
-                       
+
                         // Recalculate Price by item and Quantity
                         $supAddIds = [];
                         $supAddIds = SupplierAddons::where('addon_details_id',$id)->pluck('id');
@@ -968,7 +968,7 @@ class AddonController extends Controller
                 $data = 'all';
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
-            }          
+            }
     }
     public function existingImage($id)
     {
@@ -1119,7 +1119,12 @@ class AddonController extends Controller
         {
             $input = $request->all();
             $input['created_by'] = $authId;
-            $addons = Addon::create($input);
+            $isExisting = Addon::where('name', $request->name)->first();
+            if($isExisting) {
+                $addons['error'] =  "Addon Already Existing";
+            }else{
+                $addons = Addon::create($input);
+            }
             return response()->json($addons);
         }
     }
