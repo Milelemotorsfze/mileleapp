@@ -456,13 +456,23 @@
                             <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
-                        @php
+                    @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-view');
                     @endphp
                     @if ($hasPermission)
                         <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('variants.index')}}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Variants </span>
+                                </a>
+                            </div>
+                            @endif
+                            @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('vendor-view');
+                    @endphp
+                    @if ($hasPermission)
+                        <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
+                                    <span data-key="t-utility">Vendors </span>
                                 </a>
                             </div>
                             @endif
