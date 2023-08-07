@@ -159,8 +159,7 @@
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
                 @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warehouse-edit','conversion-edit',
-                     'document-edit','edit-so','edit-reservation']);
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
                 @endphp
                 @if ($hasPermission)
                 <div class="col-lg-3 col-md-3 col-sm-12 table-responsive">
@@ -183,6 +182,259 @@
                     </table>
                 </div>
                 @endif
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
+      </tr>
+      <tr>
+      @foreach ($warehouses as $warehouses)
+        <th style="font-size: 12px;">{{$warehouses->name}}</th>
+       @endforeach
+      </tr>
+    </thead>
+    <tbody>
+    @php
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    @endphp
+	<tr>
+        <td style="font-size: 12px;">
+            Incoming Stock
+        </td>
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+    </tr>
+	<tr>
+        <td style="font-size: 12px;">
+            Available Stock
+        </td>
+        @foreach ($warehousesvehss as $warehousesvehss)
+        @php
+        $avalibless = DB::table('vehicles')->where('latest_location', $warehousesvehss->id)
+        ->whereNotNull('inspection_date')
+        ->whereNull('so_id')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.avalibless', ['warehouse_id' => $warehousesvehss->id]) }}'" style="font-size: 12px;">{{$avalibless}}</td>
+        @endforeach
+      </tr>
+    <tr>
+        <td style="font-size: 12px;">
+            Pending Approval (Booking / Reserve)
+        </td>
+		@foreach ($warehousesveher as $warehousesveher)
+@php
+$fieldValues = ['so_number', 'so_date', 'sales_person_id', 'reservation_start_date', 'reservation_end_date'];
+
+$countpendingsinspectionso = DB::table('vehicles')
+    ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
+    ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
+    ->where('vehicles.latest_location', '=', $warehousesveher->id)
+    ->whereIn('field', $fieldValues)
+    ->whereExists(function ($query) {
+        $query->select(DB::raw(1))
+            ->from('so') // Replace with the actual name of your sales order table
+            ->whereColumn('so.id', 'vehicles.so_id')
+            ->where('so.sales_person_id', auth()->user()->id);
+    })
+    ->count();
+@endphp
+        <td onclick="window.location.href = '{{ route('vehicleinspectionpending.pendingapprovalssales', ['warehouse_id' => $warehousesveher->id]) }}'" style="font-size: 12px;">{{ $countpendingsinspectionso }}</td>
+        @endforeach
+      </tr>
+	   <tr>
+        <td style="font-size: 12px;">
+            Booked / Reverved Stock
+        </td>
+        @foreach ($warehousessold as $warehousessold)
+        @php
+        $today = today();
+        $recivedandbooked = DB::table('vehicles')->where('latest_location', $warehousessold->id)
+        ->whereNotNull('reservation_end_date')
+		->where('reservation_end_date', '<=', $today)
+		->whereNotNull('so_id')
+		->whereNull('gdn_id')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.bookedstocked', ['warehouse_id' => $warehousessold->id]) }}'" style="font-size: 12px;">{{$recivedandbooked}}</td>
+        @endforeach
+      </tr>
+    </tbody>
+  </table>
+</div>
+@endif
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
+      </tr>
+      <tr>
+      @foreach ($warehouses as $warehouses)
+        <th style="font-size: 12px;">{{$warehouses->name}}</th>
+       @endforeach
+      </tr>
+    </thead>
+    <tbody>
+    @php
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    @endphp
+	<tr>
+        <td style="font-size: 12px;">
+            Incoming Stock
+        </td>
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+@endif
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
+      </tr>
+      <tr>
+      @foreach ($warehouses as $warehouses)
+        <th style="font-size: 12px;">{{$warehouses->name}}</th>
+       @endforeach
+      </tr>
+    </thead>
+    <tbody>
+    @php
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    @endphp
+	<tr>
+        <td style="font-size: 12px;">
+            Incoming Stock
+        </td>
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+    </tr>
+	   <tr>
+        <td style="font-size: 12px;">
+            Pending Newsuit GRN
+        </td>
+        @foreach ($warehousessold as $warehousessold)
+        @php
+        $pendinggrnnetsuilt = DB::table('vehicles')->where('latest_location', $warehousessold->id)
+        ->whereNotNull('grn_id')
+		->whereNotNull('netsuit_grn_number')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.pendinggrnnetsuilt', ['warehouse_id' => $warehousessold->id]) }}'" style="font-size: 12px;">{{$pendinggrnnetsuilt}}</td>
+        @endforeach
+      </tr>
+    </tbody>
+  </table>
+</div>
+@endif
+
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
+                @endphp
+                @if ($hasPermission)
+  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
+  <table class="table table-editable table-edits table-bordered">
+    <thead>
+      <tr>
+        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
+      </tr>
+      <tr>
+      @foreach ($warehouses as $warehouses)
+        <th style="font-size: 12px;">{{$warehouses->name}}</th>
+       @endforeach
+      </tr>
+    </thead>
+    <tbody>
+    @php
+    $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
+    @endphp
+	<tr>
+        <td style="font-size: 12px;">
+            Incoming Stock
+        </td>
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+    </tr>
+    <tr>
+        <td style="font-size: 12px;">
+            Pending Inspection
+        </td>
+        @foreach ($warehousesveh as $warehousesveh)
+        @php
+        $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
+            ->whereNull('inspection_date')
+            ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehicleinspectionpending.pendinginspection', ['warehouse_id' => $warehousesveh->id]) }}'" style="font-size: 12px;">{{ $pendinginspection }}</td>
+        @endforeach
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+            Pending Inspection Approval
+        </td>
+        @foreach ($warehousesveher as $warehousesveher)
+        @php
+        $fieldValues = ['ex_colour', 'int_colour', 'variants_id', 'ppmmyyy', 'inspection_date', 'engine'];
+        $countpendings = DB::table('vehicles')
+        ->join('vehicle_detail_approval_requests', 'vehicles.id', '=', 'vehicle_detail_approval_requests.vehicle_id')
+        ->where('vehicle_detail_approval_requests.status', '=', 'Pending')
+        ->where('vehicles.latest_location', '=', "$warehousesveher->id")
+        ->where(function ($query) use ($fieldValues) {
+        $query->whereIn('field', $fieldValues);
+         })
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehicleinspectionapprovals.pendingapprovals', ['warehouse_id' => $warehousesveher->id]) }}'" style="font-size: 12px;">{{ $countpendings }}</td>
+        @endforeach
+      </tr>
+      <tr>
+        <td style="font-size: 12px;">
+            Available Stock
+        </td>
+        @foreach ($warehousesvehss as $warehousesvehss)
+        @php
+        $avalibless = DB::table('vehicles')->where('latest_location', $warehousesvehss->id)
+        ->whereNotNull('inspection_date')
+        ->whereNull('so_id')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.avalibless', ['warehouse_id' => $warehousesvehss->id]) }}'" style="font-size: 12px;">{{$avalibless}}</td>
+        @endforeach
+      </tr>
+	   <tr>
+        <td style="font-size: 12px;">
+            Sold Stock
+        </td>
+        @foreach ($warehousessold as $warehousessold)
+        @php
+        $soldvehss = DB::table('vehicles')->where('latest_location', $warehousessold->id)
+        ->whereNotNull('so_id')
+        ->count();
+        @endphp
+        <td onclick="window.location.href = '{{ route('vehiclesincoming.soldvehss', ['warehouse_id' => $warehousessold->id]) }}'" style="font-size: 12px;">{{$soldvehss}}</td>
+        @endforeach
+      </tr>
+    </tbody>
+  </table>
+</div>
+@endif
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
                 @endphp
@@ -273,9 +525,8 @@
                     </tr>
                     <tr>
                         <th style="font-size: 12px;">Purchased</th>
+                        <th style="font-size: 12px;">In Stock</th>
                         <th style="font-size: 12px;">Sold</th>
-                        <th style="font-size: 12px;">Booked</th>
-                        <th style="font-size: 12px;">Available</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -288,9 +539,6 @@
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_SOLD]) }}';">
                             {{$previousYearSold}}
-                        </td>
-                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_BOOKED]) }}';">
-                            {{$previousYearBooked}}
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_YEAR_AVAILABLE]) }}';">
                               {{ $previousYearAvailable }}
@@ -308,9 +556,6 @@
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_SOLD]) }}';">
                             {{ $previousMonthSold }}
                         </td>
-                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_BOOKED]) }}';">
-                            {{ $previousMonthBooked }}
-                        </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_PREVIOUS_MONTH_AVAILABLE]) }}';">
                             {{ $previousMonthAvailable }}
                         </td>
@@ -324,9 +569,6 @@
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_SOLD]) }}';">
                             {{ $yesterdaySold }}
-                        </td>
-                        <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_BOOKED]) }}';">
-                            {{ $yesterdayBooked }}
                         </td>
                         <td style="font-size: 12px;" onclick="window.location='{{ route('vehicle-stock-report.filter',['key' => \App\Models\Vehicles::FILTER_YESTERDAY_AVAILABLE]) }}';">
                             {{$yesterdayAvailable}}
