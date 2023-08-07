@@ -174,7 +174,7 @@
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                         <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Name') }}</label>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Type') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
@@ -532,7 +532,7 @@
             // $('#kitSupplier').hide();
             // $('#branModaDiv').hide();
             $('#blah').css('visibility', 'hidden');
-            $("#addon_id").attr("data-placeholder","Choose Kit Name....     Or     Type Here To Search....");
+            $("#addon_id").attr("data-placeholder","Choose Kit Type....     Or     Type Here To Search....");
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });

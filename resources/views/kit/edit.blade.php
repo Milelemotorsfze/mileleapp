@@ -154,7 +154,7 @@
                 <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Name') }}</label>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Type') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
@@ -878,7 +878,6 @@
             // else
             // {
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            alert(countBrandRow);
                 for (let i = 1; i <= countBrandRow; i++)
                 {
                     var inputBrand = '';
@@ -895,7 +894,6 @@
                         var inputModelLines = $('#selectModelLine'+i).val();
                         if(inputModelLines == '')
                         {
-                            alert("required");
                             $msg = "Model Line is required";
                             showModelLineError($msg,i);
                             formInputError = true;
