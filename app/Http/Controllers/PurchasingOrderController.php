@@ -187,7 +187,7 @@ class PurchasingOrderController extends Controller
     public function create()
 {
     $vendors = Supplier::whereHas('vendorCategories', function ($query) {
-        $query->where('category', 'vehicle-procurment');
+        $query->where('category', 'Vehicles');
     })->get();    
     $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')

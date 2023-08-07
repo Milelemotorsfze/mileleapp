@@ -619,18 +619,33 @@
                             showSPBrandError($msg,i);
                             formInputError = true;
                         }
-                        var countModelDescriptionRow = 0;
-                        countModelDescriptionRow = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
-                        for (let j = 1; j <= countModelDescriptionRow; j++)
+                        else if(inputSPBrand != 'allbrands')
                         {
-                            var inputSPModelLine = $('#selectModelLineNum'+i+'Des'+j).val();
-                            if(inputSPModelLine == '')
+                            var countModelDescriptionRow = 0;
+                            countModelDescriptionRow = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                            for (let j = 1; j <= countModelDescriptionRow; j++)
                             {
-                                $msg = "Model line is required";
-                                showSPModelLineError($msg,i,j);
-                                formInputError = true;
+                                var inputSPModelLine = $('#selectModelLineNum'+i+'Des'+j).val();
+                                if(inputSPModelLine == '')
+                                {
+                                    $msg = "Model line is required";
+                                    showSPModelLineError($msg,i,j);
+                                    formInputError = true;
+                                }
+                                else if(inputSPModelLine != 'allmodellines')
+                                { 
+                                    var inputSPModelDescription = $('#selectModelNumberDiscri'+i+'Des'+j).val();
+                                    if(inputSPModelDescription == '')
+                                    {
+                                        $msg = "Model Description is required";
+                                        showSPModelDescriptionError($msg,i,j);
+                                        formInputError = true;
+                                    }
+                                }
+
                             }
                         }
+                       
                     }
 
                 }
@@ -866,6 +881,19 @@
             document.getElementById('selectModelLineNum'+i+'Des'+j).classList.remove("is-invalid");
             document.getElementById('ModelLineError_'+i+'_'+j).classList.remove("paragraph-class");
         }
+        function showSPModelDescriptionError($msg,i,j)
+        {
+            document.getElementById('ModelDescriptionError_'+i+'_'+j).textContent=$msg;
+            document.getElementById('selectModelNumberDiscri'+i+'Des'+j).classList.add("is-invalid");
+            document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.add("paragraph-class");
+        }
+        function removeSPModelDescriptionError(i,j)
+        {
+            document.getElementById('ModelDescriptionError_'+i+'_'+j).textContent="";
+            document.getElementById('selectModelNumberDiscri'+i+'Des'+j).classList.remove("is-invalid");
+            document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.remove("paragraph-class");
+        }
+        
         function showkitSupplierDropdown1Error($msg)
         {
             document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
@@ -886,9 +914,6 @@
         }
         function removekitSupplier1Item1Error($msg)
         {
-            document.getElementById("kitSupplier1Item1Error").textContent="";
-            document.getElementById("kitSupplier1Item1").classList.remove("is-invalid");
-            document.getElementById("kitSupplier1Item1Error").classList.remove("paragraph-class");
         }
         function showSupplier1Kit1QuantityError($msg)
         {

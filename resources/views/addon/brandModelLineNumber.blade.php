@@ -50,11 +50,13 @@
                     </div>
                     <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                        <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
+                        <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" onchange=selectModelDescipt(1,1)
+                        id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
 {{--                            @foreach($modelLines as $modelLine)--}}
 {{--                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                            @endforeach--}}
                         </select>
+                        <span id="ModelDescriptionError_1_1" class="ModelDescriptionError invalid-feedback"></span>
                         @error('is_primary_payment_method')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
@@ -154,7 +156,7 @@
             // sortDropDownListByText();
         }
 
-        $(document.body).on('select2:select', ".spare-parts-model-lines", function (e) {
+        $(document.body).on('select2:select', ".spare-parts-model-lines", function (e) { 
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
@@ -200,7 +202,7 @@
             // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
             //     if (e) {
                     var countRow = 0;
-                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; alert(countRow);
+                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; 
                     // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
                     if (countRow > 1) {
                         var indexNumber = $(this).attr('data-index');
@@ -257,6 +259,7 @@
 
                                 $(this).find('#showModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'showModelNumberdrop' + index + 'Des' + i);
                                 $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('name', 'brand[' + index + '][model][' + i + '][model_number][]');
+                                $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('onchange', 'selectModelDescipt(' + index + ',' + i + ')');
                                 $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('id', 'selectModelNumberDiscri' + index + 'Des' + i);
                                 $("#selectModelNumberDiscri" + index + "Des" + i).select2
                                 ({
@@ -265,7 +268,8 @@
                                 });
                                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
                                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
-
+                                $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
+                                $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
                             }
                             $(this).find(".MoDes" + oldIndex).attr('class', "MoDes" + index);
                             $(this).find(".MoDesApndHere" + oldIndex).attr('class', "row MoDesApndHere" + index);
@@ -284,7 +288,7 @@
            //      if (e) {
                     var indexNumber = $(this).attr('data-index');
                     var countRow = 0;
-                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;  alert(countRow);
+                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;  
                     if (countRow > 1) {
                         var modelIndex = $(this).attr('data-model-index');
                         if (modelIndex == 1) {
@@ -315,6 +319,7 @@
                             $(this).find('.model-description-dropdown').attr('id', 'showModelNumberdrop' + indexNumber + 'Des' + modelIndex);
 
                             $(this).find('.model-descriptions').attr('name', 'brand[' + indexNumber + '][model][' + modelIndex + '][model_number][]');
+                            $(this).find('.model-descriptions').attr('onchange', 'selectModelDescipt(' + indexNumber + ',' + modelIndex + ')');
                             $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri' + indexNumber + 'Des' + modelIndex);
                             ////////////// end ////////////////
 
@@ -324,7 +329,7 @@
                             
 
                             $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
-
+                            $(this).find('.ModelDescriptionError').attr('id','ModelDescriptionError_'+indexNumber+'_'+modelIndex);
 
                             $('#selectBrandMo' + indexNumber).select2
                             ({
@@ -433,11 +438,12 @@
                                             <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                                 <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
-                                                multiple="true" style="width: 100%;">
+                                                multiple="true" style="width: 100%;" onchange=selectModelDescipt(${index},1)>
 {{--                                                    @foreach($modelLines as $modelLine)--}}
 {{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                                                    @endforeach--}}
                                                     </select>
+                                                    <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>
                                                     @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -508,7 +514,7 @@
                 <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
-                        multiple="true" style="width: 100%;">
+                        multiple="true" style="width: 100%;" onchange=selectModelDescipt(${supplier},${index})>
 {{--                        @foreach($modelLines as $modelLine)--}}
 {{--                            <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                        @endforeach--}}
@@ -518,6 +524,7 @@
                     <strong>{{ $message }}</strong>
                         </span>
                     @enderror
+                    <span id="ModelDescriptionError_${supplier}_${index}" class="ModelDescriptionError invalid-feedback"></span>
                 </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
                     <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" id="removeModelNumberdrop${supplier}Des${index}">
@@ -742,8 +749,21 @@
             removeSPModelLineError(id,row);
         }
     }
-    function showModelNumberDropdown(id,row)
+    function selectModelDescipt(id,row)
     {
+        ifModelDiscExist = $("#selectModelNumberDiscri"+id+"Des"+row).val();
+        if(ifModelDiscExist == '')
+        {
+            $msg="Model Description is required";
+            showSPModelDescriptionError($msg,id,row);
+        }
+        else
+        {
+            removeSPModelDescriptionError(id,row);
+        }
+    }
+    function showModelNumberDropdown(id,row)
+    { 
         $('showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
         showPartNumber1.hidden = false
@@ -779,7 +799,7 @@
                                 text: value.model_description
                             });
                         });
-                        $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+                        $("#selectModelNumberDiscri"+id+"Des"+row).html("");
                         $("#selectModelNumberDiscri"+id+"Des"+row).select2
                         ({
                             placeholder: 'Choose Model Number....     Or     Type Here To Search....',

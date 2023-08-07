@@ -26,5 +26,11 @@ class DatabaseSeeder extends Seeder
         $this->call(PaymentMethodsMasterTableSeeder::class);
         $this->call(ModelDescriptionMasterTableSeeder::class);
         $this->call(WarrantyMasterDataSeeder::class);
+        $this->call(StrategySeeder::class);
+        $this->call(KitSeeder::class);
+        $this->call(BrandRegionsSeeder::class);
+        
+        
+        
     }
 }
