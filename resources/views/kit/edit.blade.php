@@ -325,14 +325,14 @@
                                                                                                 <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                                                                             @endforeach
                                                                                     </select>
-                                                                                    <span id="brandError1" class="brandError invalid-feedback"></span>
+                                                                                    <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
                                                                                 </div>
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}" hidden>
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                                     <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true"
                                                                                         style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
                                                                                     </select>
-                                                                                    <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
+                                                                                    <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
                                                                                 </div>
                                                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                                                     <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -358,7 +358,7 @@
                                                                                             @endforeach
                                                                                     </select>
                                                                                     <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">
-                                                                                    <span id="brandError" class=" invalid-feedback"></span>
+                                                                                    <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
                                                                                 </div>
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
@@ -371,6 +371,8 @@
                                                                                         >{{ $modelLine->model_line }}</option>
                                                                                         @endforeach
                                                                                     </select>
+                                                                                    <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
+
                                                                                 </div>
                                                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                                                     <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -866,15 +868,17 @@
             //     showBrandError($msg);
             //     formInputError = true;
             // }
+
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
                 formInputError = true;
             }
-            else
-            {
+            // else
+            // {
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+            alert(countBrandRow);
                 for (let i = 1; i <= countBrandRow; i++)
                 {
                     var inputBrand = '';
@@ -891,13 +895,14 @@
                         var inputModelLines = $('#selectModelLine'+i).val();
                         if(inputModelLines == '')
                         {
+                            alert("required");
                             $msg = "Model Line is required";
                             showModelLineError($msg,i);
                             formInputError = true;
                         }
                     }
                 }
-            }
+            // }
             if(inputAddonName == '')
             {
                 $msg = "Addon Name is required";
@@ -952,6 +957,7 @@
         }
         function showModelLineError($msg,i)
         {
+            alert("show error");
             document.getElementById("ModelLineError"+i).textContent=$msg;
             document.getElementById("selectModelLine"+i).classList.add("is-invalid");
             document.getElementById("ModelLineError"+i).classList.add("paragraph-class");
