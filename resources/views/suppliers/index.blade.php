@@ -18,9 +18,9 @@
     <h4 class="card-title">
       Vendors Info
     </h4>
-    @canany(['demand-planning-supplier-create', 'addon-supplier-create'])
+    @canany(['demand-planning-supplier-create', 'addon-supplier-create', 'vendor-edit'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create','addon-supplier-create']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create','addon-supplier-create', 'vendor-edit']);
     @endphp
     @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
@@ -171,7 +171,7 @@
                       @endcan
                       @canany(['demand-planning-supplier-edit', 'addon-supplier-edit'])
                       @php
-                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit']);
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit', 'vendor-edit']);
                       @endphp
                       @if ($hasPermission)
                         <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
@@ -180,7 +180,7 @@
                       @endcanany
                       @can('addon-supplier-delete')
                       @php
-                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-delete']);
+                      $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-delete', 'vendor-edit']);
                       @endphp
                       @if ($hasPermission)
 {{--                        @if($supplier->is_deletable)--}}

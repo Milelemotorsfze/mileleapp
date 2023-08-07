@@ -202,9 +202,9 @@
     }
 </style>
 @section('content')
-@can('addon-supplier-edit')
+@canany(['addon-supplier-edit', 'addon-supplier-create', 'vendor-edit'])
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-edit']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-edit', 'vendor-edit']);
     @endphp
     @if ($hasPermission)
     <div class="card-header">
