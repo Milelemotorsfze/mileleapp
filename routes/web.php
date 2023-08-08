@@ -96,6 +96,8 @@ Route::get('/d', function () {
     Route::get('addons/existingImage/{id}', [AddonController::class, 'existingImage'])->name('addon.existingImage');
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
     Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon');
+    Route::get('getAddonDescription', [AddonController::class, 'getAddonDescription'])->name('addon.getAddonDescription');
+
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');

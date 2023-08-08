@@ -148,6 +148,11 @@ class AddonController extends Controller
             }
             $input['addon_type_name'] = $request->addon_type;
             $input['addon_id']= $request->addon_id;
+            if($request->description != null) {
+                $input['description'] = $request->description;
+            }elseif ($request->description_text != null) {
+                $input['description'] = $request->description_text;
+            }
             $addon_details = AddonDetails::create($input);
             if($request->selling_price != '')
             {
