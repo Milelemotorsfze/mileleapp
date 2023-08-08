@@ -79,6 +79,7 @@
             var value = $(this).val();
             var index = $(this).attr('data-index');
             optionDisable(index, value);
+            uniqueCheckAccessories();
 
         });
          function optionDisable(index, value){
@@ -116,6 +117,9 @@
             var value = e.params.data.id;
             hideOption(index,value);
             disableDropdown();
+            if(value == 'allbrands') {
+                uniqueCheckAccessories();
+            }
 
         });
         function hideOption(index,value) {

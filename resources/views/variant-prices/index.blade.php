@@ -43,7 +43,7 @@
                             <div hidden>{{$i=0;}}
                             </div>
                             @foreach ($activeStocks as $key => $activeStock)
-                               <tr  onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $activeStock->id, 'type' => '1']) }}'">
+                               <tr   onclick="window.location.href = '{{ route('variant-price.edit',[ 'id' => $activeStock->id, 'type' => '1']) }}'">
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $activeStock->variant->brand->brand_name ?? '' }}</td>
                                     <td>{{ $activeStock->variant->master_model_lines->model_line ?? '' }}</td>

@@ -97,6 +97,8 @@ Route::get('/d', function () {
     Route::post('addonFilters', [AddonController::class, 'addonFilters'])->name('addon.addonFilters');
     Route::post('createMasterAddon', [AddonController::class, 'createMasterAddon'])->name('addon.createMasterAddon');
     Route::get('getAddonDescription', [AddonController::class, 'getAddonDescription'])->name('addon.getAddonDescription');
+    Route::get('getUniqueAccessories', [AddonController::class, 'getUniqueAccessories'])->name('addon.getUniqueAccessories');
+        Route::get('getUniqueAddonDescription', [AddonController::class, 'getUniqueAddonDescription'])->name('addon.getUniqueAddonDescription');
 
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
