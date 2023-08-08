@@ -1,5 +1,11 @@
 @extends('layouts.main')
 <style>
+    .invalid-feedback-lead {
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #fd625e;
+}
     .modal-xl
     {
         max-width: 99% !important;
@@ -118,7 +124,7 @@
         height:32px!important;
     }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Addon Master</h4>
@@ -286,7 +292,7 @@
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
                         </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
+                        <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
 
 
@@ -302,7 +308,37 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
+                        </div> -->
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
+                                </div>
+                                <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2"
+                                class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time"
+                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                </div>
+                            </div>
+                            <span id="minLeadTimeError" class="invalid-feedback-lead"></span>
                         </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                </div>
+                                <input id="lead_time_max" aria-label="measurement" aria-describedby="basic-addon2"
+                                class="form-control widthinput @error('lead_time_max') is-invalid @enderror" name="lead_time_max" oninput="checkGreater(this)"
+                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                </div>
+                            </div>
+                            <span id="maxLeadTimeError" class="invalid-feedback-lead"></span>
+                        </div>
+                        
+    
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
@@ -1624,6 +1660,67 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
+        function checkGreater(CurrentInput)
+        {    
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');           
+            input.value = val;
+            var minLeadTime = $('#lead_time').val();
+            var maxLeadTime = $('#lead_time_max').val();
+            if(minLeadTime != '' && maxLeadTime != '')
+            {
+                if(Number(minLeadTime) > Number(maxLeadTime))
+                {
+                    var id = CurrentInput.id;
+                    if(id == 'lead_time')
+                    {
+                        showMinLeadTimeError();
+                        removeMaxLeadTimeError();
+                    }
+                    else
+                    {
+                        showMaxLeadTimeError();
+                        removeMinLeadTimeError();
+                    }
+                }
+                else
+                {
+                    removeMinLeadTimeError();
+                    removeMaxLeadTimeError();
+                }
+            }
+            else
+            {
+                removeMinLeadTimeError();
+                removeMaxLeadTimeError();
+            }          
+        }
+        function showMinLeadTimeError()
+        {
+            document.getElementById('minLeadTimeError').textContent="Enter smaller value than max leadtime";
+            document.getElementById('lead_time').classList.add("is-invalid");
+            document.getElementById('minLeadTimeError').classList.add("paragraph-class");
+        }
+        function showMaxLeadTimeError()
+        {
+            document.getElementById('maxLeadTimeError').textContent="Enter higher value than min leadtime";
+            document.getElementById('lead_time_max').classList.add("is-invalid");
+            document.getElementById('maxLeadTimeError').classList.add("paragraph-class");
+        }
+        function removeMinLeadTimeError()
+        {
+            document.getElementById('minLeadTimeError').textContent="";
+            document.getElementById('lead_time').classList.remove("is-invalid");
+            document.getElementById('minLeadTimeError').classList.remove("paragraph-class");
+        }
+        function removeMaxLeadTimeError()
+        {
+            document.getElementById('maxLeadTimeError').textContent="";
+            document.getElementById('lead_time_max').classList.remove("is-invalid");
+            document.getElementById('maxLeadTimeError').classList.remove("paragraph-class");
+        }  
         function inputNumberAbs(currentPriceInput)
         {
 
