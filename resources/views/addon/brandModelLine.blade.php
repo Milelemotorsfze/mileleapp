@@ -232,6 +232,7 @@
                             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
                                 <div class="row">
                                     <div class="col-xxl-4 col-lg-6 col-md-12">
+                                    <span class="error">* </span>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                         <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
                                           data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
@@ -242,6 +243,7 @@
                                     <span id="brandError${index}" class="brandError invalid-feedback"></span>
                                 </div>
                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
+                                <span class="error">* </span>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
                                         id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>

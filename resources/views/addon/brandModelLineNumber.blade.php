@@ -49,6 +49,7 @@
                         @enderror
                     </div>
                     <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
+                    <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" onchange=selectModelDescipt(1,1)
                         id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
@@ -393,6 +394,7 @@
                                     id="row-addon-brand-${index}">
                                 <div class="row">
                                     <div class="col-xxl-5 col-lg-5 col-md-12">
+                                    <span class="error">* </span>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                                         <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
                                          multiple="true" style="width: 100%;" class="brandRows">
@@ -421,6 +423,7 @@
                                             <div class="col-xxl-1 col-lg-1 col-md-12">
                                             </div>
                                             <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
+                                            <span class="error">* </span>
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                 <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
                                                     id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
@@ -436,6 +439,7 @@
                                                     @enderror
                                             </div>
                                             <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
+                                            <span class="error">* </span>
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                                 <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
                                                 multiple="true" style="width: 100%;" onchange=selectModelDescipt(${index},1)>
@@ -496,6 +500,7 @@
                 <div class="col-xxl-1 col-lg-1 col-md-12">
                 </div>
                 <div class="col-xxl-5 col-lg-5 col-md-12 model-line-item-dropdown" id="showDivdropDr${supplier}Des${index}">
+                <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1 spare-parts-model-lines" name=brand[${supplier}][model][${index}][model_id]"
                         onchange=selectModelLineDescipt(${supplier},${index})
@@ -512,6 +517,7 @@
                     @enderror
                 </div>
                 <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
+                <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
                         multiple="true" style="width: 100%;" onchange=selectModelDescipt(${supplier},${index})>
