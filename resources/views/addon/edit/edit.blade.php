@@ -299,7 +299,7 @@
                         <div class="input-group">
 
 
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"
+                        <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2" oninput="inputNumberAbsLeadTime(this)"
                         class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
                         value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">
                                                     <div class="input-group-append">
@@ -1559,6 +1559,19 @@
                 document.getElementById("addon_type_show").value='';
                 document.getElementById("addon_type_show").hidden=true;
             }
+        }
+        function inputNumberAbsLeadTime(currentPriceInput)
+        {
+
+            var id = currentPriceInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d-]/g, '');
+            if(val.split('-').length>2)
+            {
+                val =val.replace(/\-+$/,"");
+            }
+            input.value = val;
         }
 </script>
 @endsection
