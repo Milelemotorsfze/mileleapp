@@ -37,11 +37,11 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                    <th>S.No</th>
-                    <th>Name</th>
+                    <th>Ref.No</th>
                     <th>Brand</th>
+                    <th>Model Line</th>
                     <th>Created By</th>
-                    <th>Updated By</th>
+                    <th>Created At</th>
 
                     {{--                    @php--}}
                     {{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-edit');--}}
@@ -57,10 +57,10 @@
                     @foreach ($modelLines as $key => $modelLine)
                         <tr>
                             <td>{{ ++$i }}</td>
-                            <td>{{ $modelLine->model_line ?? ''}}</td>
                             <td>{{ $modelLine->brand->brand_name }}</td>
+                            <td>{{ $modelLine->model_line ?? ''}}</td>
                             <td>{{ $modelLine->createdBy->name ?? '' }}</td>
-                            <td>{{ $modelLine->updatedBy->name ?? '' }}</td>
+                            <td>{{ $modelLine->created_at ?? '' }}</td>
                             <td>
                                 {{--                            @php--}}
                                 {{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-edit');--}}

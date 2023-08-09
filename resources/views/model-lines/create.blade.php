@@ -64,6 +64,7 @@
 @endsection
 @push('scripts')
     <script>
+        
         $('#brand_id').select2({
             placeholder: "Choose Brand"
         })

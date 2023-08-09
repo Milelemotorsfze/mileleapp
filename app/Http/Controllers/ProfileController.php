@@ -117,28 +117,40 @@ class ProfileController extends Controller
         return response()->json(['success' => true]);
     }    
     public function updatepictureInfo(Request $request)
-    {
-        if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
-            $file = $request->file('picture');
-            $path = $file->store('pictures', 'public');
-            $userId = Auth::id();
-            $profile = Profile::where('user_id', $userId)->first();
-            if ($profile) {
-                if ($profile->image_path && Storage::disk('public')->exists($profile->image_path)) {
-                    Storage::disk('public')->delete($profile->image_path);
-                }
-                $profile->image_path = $path;
-                $profile->save();
-            } else {
-                Profile::create([
-                    'user_id' => $userId,
-                    'picture_path' => $path,
-                ]);
+{
+    if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
+        $file = $request->file('picture');
+        
+        // Specify the desired storage path
+        $storagePath = 'profile_pic';
+        
+        // Move the uploaded file to the desired storage directory
+        $filePath = $file->move(public_path($storagePath), $file->getClientOriginalName());
+
+        $userId = Auth::id();
+        $profile = Profile::where('user_id', $userId)->first();
+
+        if ($profile) {
+            if ($profile->image_path && file_exists(public_path($profile->image_path))) {
+                // Check if the user has an existing profile image
+                // Delete the existing image if it exists
+                unlink(public_path($profile->image_path));
             }
-            return response()->json(['status' => 'success']);
+
+            $profile->image_path = $storagePath . '/' . $file->getClientOriginalName();
+            $profile->save();
+        } else {
+            Profile::create([
+                'user_id' => $userId,
+                'picture_path' => $storagePath . '/' . $file->getClientOriginalName(),
+            ]);
         }
-        return response()->json(['status' => 'error']);
-    }    
+
+        return response()->json(['status' => 'success']);
+    }
+
+    return response()->json(['status' => 'error']);
+}
     public function deleteDocument($id)
     {
     $document = EmpDoc::findOrFail($id);

@@ -23,7 +23,7 @@
     }
 </style>
 <div class="topnav" style="overflow: unset;">
-    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
+    <button type="button" class="btn btn-sm px-3 font-size-16 d-lg-none header-item waves-effect waves-light text-dark" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
         <i class="fa fa-fw fa-bars"></i>
     </button>
     <div class="dropdown d-inline-block responsiveButton">
@@ -40,12 +40,17 @@
             <a class="dropdown-item" href="{{ route('users.updateRole', $role->id) }}">
                 <i class="fa fa-user-circle" aria-hidden="true"></i> {{ $role->name }}
             </a>
-            <div class="dropdown-divider"></div>
+            <div class="dropdown-divider">
+            </div>
         @endforeach
     </div>
 </div>
+<div class="d-none d-lg-block">
+<div class="dropdown d-inline-block" style="position: absolute; left: 0px; z-index: 500;">
+<img src="{{ asset('logo.jpg') }}" width="35" height="53" alt="Logo">
+</div>
+</div>
     <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">
-
 <!-- <div class="cart-icon-container">
   <a href=""><i class="fa fa-bell fa-2x" aria-hidden="true"></i></a>
   <span class="cart-icon-number"></span>
@@ -378,7 +383,7 @@
                      <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Vehicle Pictures</span>
+                            <span data-key="t-extra-pages">QC Pictures Upload</span>
                         </a>
                     </li>
                     @endif

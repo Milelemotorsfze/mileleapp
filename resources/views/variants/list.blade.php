@@ -8,11 +8,11 @@
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
         @endphp
         @if ($hasPermission)
-            <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Varitants</a>
-            <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-            <a  class="btn btn-sm btn-primary float-end" href="{{ route('brands.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Brands</a>
+        <a  class="btn btn-sm btn-info float-end" href="{{ route('variants.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create Varitants</a>
             <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
             <a  class="btn btn-sm btn-primary float-end" href="{{ route('model-lines.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Model Lines</a>
+            <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+            <a  class="btn btn-sm btn-primary float-end" href="{{ route('brands.index') }}" ><i class="fa fa-info-circle" aria-hidden="true"></i> Brands</a>
         @endif
     </div>
     <div class="card-body">

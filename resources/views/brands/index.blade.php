@@ -37,10 +37,10 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
                 <tr>
-                    <th>S.No</th>
-                    <th>Name</th>
+                    <th>Ref No</th>
+                    <th>Brand</th>
                     <th>Created By</th>
-                    <th>Updated By</th>
+                    <th>Created At</th>
 
 {{--                    @php--}}
 {{--                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}
@@ -58,7 +58,7 @@
                         <td>{{ ++$i }}</td>
                         <td>{{ $brand->brand_name ?? ''}}</td>
                         <td>{{ $brand->createdBy->name ?? '' }}</td>
-                        <td>{{ $brand->updatedBy->name ?? '' }}</td>
+                        <td>{{ $brand->createdat ?? '' }}</td>
                         <td>
 {{--                            @php--}}
 {{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}
