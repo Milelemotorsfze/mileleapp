@@ -561,7 +561,7 @@ class AddonController extends Controller
         {
             foreach($deleteAddonTypes as $deleteAddonType)
             {
-                $deleteAddonType->updated_by = Auth::id();
+                $deleteAddonType->deleted_by = Auth::id();
                 $deleteAddonType->update();
                 $deleteAddonType->delete();
             }

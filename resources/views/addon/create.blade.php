@@ -215,7 +215,28 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row mb-3" >
+                    <div class="row" hidden id="model_year">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
+                        </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
+                        </div>
+                    </div>
+                    <br hidden id="model_year_br">
+                    <div class="row mb-3" hidden id="addon-description">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -515,6 +536,11 @@
 
         $(document).ready(function () {
 
+            $(".yearpicker").yearpicker({
+                year: 2023,
+                startYear: 2019,
+                endYear: 2050,
+            });
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
                 $('#description-text').attr('hidden', false);
@@ -751,6 +777,7 @@
 
         $('form').on('submit', function (e)
         {
+            removeModelYearEndError();
             sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
@@ -800,6 +827,13 @@
                     {
                         $msg = "Part Number is required";
                         showPartNumberError($msg);
+                        formInputError = true;
+                    }
+                    var inputModelYearStart = $('#model_year_start').val();
+                    var inputModelYearEnd = $('#model_year_end').val();
+                    if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                    {
+                        showModelYearEndError();
                         formInputError = true;
                     }
                     var countBrandRow = 0;
@@ -1253,6 +1287,10 @@
                     showPartNumber.hidden = false
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = false
+                    let showModelYear = document.getElementById('model_year');
+                    showModelYear.hidden = false
+                    let showModelYearBr = document.getElementById('model_year_br');
+                    showModelYearBr.hidden = false
                 }
                 else
                 {
@@ -1260,6 +1298,10 @@
                     showPartNumber.hidden = true
                     let showPartNumberBr = document.getElementById('partNumberDivBr');
                     showPartNumberBr.hidden = true
+                    let showModelYear = document.getElementById('model_year');
+                    showModelYear.hidden = true
+                    let showModelYearBr = document.getElementById('model_year_br');
+                    showModelYearBr.hidden = true
                     $("#brandModelLineId").show();
                     $("#brandModelNumberId").hide();
                     $("#showaddtrim").show();
@@ -1663,6 +1705,59 @@
             $('#kitSupplierIdToHideandshow').hide();
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
+        }
+        function checkGreaterYear(CurrentInput)
+        {   alert('hi') ;
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');
+            input.value = val;
+            var modelYearStart = $('#model_year_start').val();
+            var modelYearEnd = $('#model_year_end').val();
+                // if(Number(modelYearStart) > Number(modelYearEnd))
+                // {
+                //     var id = CurrentInput.id;
+                //     if(id == 'model_year_start')
+                //     {
+                //         showModelYearStartError();
+                //         removeModelYearEndError();
+                //     }
+                //     else
+                //     {
+                //         showModelYearEndError();
+                //         removeModelYearStartError();
+                //     }
+                // }
+                // else
+                // {
+                //     removeModelYearStartError();
+                //     removeModelYearEndError();
+                // }
+        }
+        function showModelYearStartError()
+        {
+            document.getElementById('modelYearStartError').textContent="Enter smaller value than max leadtime";
+            document.getElementById('model_year_start').classList.add("is-invalid");
+            document.getElementById('modelYearStartError').classList.add("paragraph-class");
+        }
+        function showModelYearEndError()
+        {
+            document.getElementById('modelYearEndError').textContent="Enter higher value than min leadtime";
+            document.getElementById('model_year_end').classList.add("is-invalid");
+            document.getElementById('modelYearEndError').classList.add("paragraph-class");
+        }
+        function removeModelYearStartError()
+        {
+            document.getElementById('modelYearStartError').textContent="";
+            document.getElementById('model_year_start').classList.remove("is-invalid");
+            document.getElementById('modelYearStartError').classList.remove("paragraph-class");
+        }
+        function removeModelYearEndError()
+        {
+            document.getElementById('modelYearEndError').textContent="";
+            document.getElementById('model_year_end').classList.remove("is-invalid");
+            document.getElementById('modelYearEndError').classList.remove("paragraph-class");
         }
         function checkGreater(CurrentInput)
         {
