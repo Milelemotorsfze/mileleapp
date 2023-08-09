@@ -532,6 +532,7 @@
                 removeAddonDescriptionError();
                 formInputError = false;
             });
+
         ////////description section jquery //////////////////
             $('#description-text').change(function () {
                 addonDescriptionUniqueCheck();
@@ -548,13 +549,13 @@
                     data: {
                         addon_id: id,
                         description: description
-
                     },
                     success: function (data) {
                         if (data > 0) {
                             var msg = "This Description is already existing"
                             showAddonDescriptionError(msg);
                             formInputError = true;
+
                         } else {
                             var msg = "";
                             removeAddonDescriptionError();
@@ -562,46 +563,6 @@
                         }
                     }
                 })
-            }
-
-            function uniqueCheckAccessories() {
-                var addon_id = $('#addon_id').val();
-                var description = $('#description').val();
-                var newDescription = $('#description-text').val();
-                var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                for (var i = 1; i <= indexValue; i++) {
-                    var brand =  $('#selectBrand'+i).val();
-                    var modelLine = $("#selectModelLine"+i).val();
-                    $.ajax({
-                        url: "{{url('getUniqueAccessories')}}",
-                        type: "GET",
-                        data:
-                            {
-                                addon_id: addon_id[0],
-                                description:description[0],
-                                newDescription:newDescription,
-                                brand:brand[0],
-                                index:i,
-                                model_line:modelLine[0],
-                                id: {{ $addonDetails->id }}
-                            },
-                        dataType: 'json',
-                        success: function (data) {
-                            if(data.count > 0 ) {
-                                $msg = "This Addon,Description,Brand and model line Combination is existing";
-                                showBrandError($msg,data.index);
-                                formInputError = true;
-
-                            }else{
-                                $msg = "";
-                                removeBrandError($msg,data.index);
-                                formInputError = false;
-
-                            }
-
-                        }
-                    });
-                }
             }
 
             //////////////// end /////////////
@@ -699,6 +660,7 @@
                 var id = $('#addon_id').val();
                 addonDescriptionUniqueCheck();
                 showDescriptions();
+                uniqueCheckAccessories();
                 if(id != '')
                 {
                     $('#addnewAddonButton').hide();
@@ -748,8 +710,60 @@
                 }
             });
         });
-        $('form').on('submit', function (e)
+
+        function uniqueCheckAccessories() {
+          var addon_id = $('#addon_id').val();
+          var description = $('#description').val();
+          var newDescription = $('#description-text').val();
+          var uniqueCounts = [];
+          var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+            for (var i = 1; i <= indexValue; i++) {
+             var brand =  $('#selectBrand'+i).val();
+             var modelLine = $("#selectModelLine"+i).val();
+             $.ajax({
+                 url: "{{url('getUniqueAccessories')}}",
+                 type: "GET",
+                 async: false,
+                 cache: false,
+                 data:
+                     {
+                         addon_id: addon_id[0],
+                         description:description[0],
+                         newDescription:newDescription,
+                         brand:brand[0],
+                         index:i,
+                         model_line:modelLine[0],
+                         id: {{ $addonDetails->id }}
+                     },
+                 dataType: 'json',
+                 success: function (data) {
+                     if(data.count > 0 ) {
+                         $msg = "This Addon,Description,Brand and model line Combination is existing";
+                         showBrandError($msg,data.index);
+                         var count = data.count;
+                         uniqueCounts.push(count);
+                         // alert(formInputError);
+
+                     }else{
+                         $msg = "";
+                         removeBrandError($msg,data.index);
+                         uniqueCounts.pop();
+                     }
+                 }
+             });
+         }
+
+             var  uniqueValueCount = uniqueCounts.length;
+             if(uniqueValueCount > 0) {
+                 formInputError = true;
+             }else{
+                 formInputError = false;
+             }
+        }
+
+     $('form').on('submit', function (e)
         {
+            // alert(false);
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
             // var inputBrand = $('#selectBrand1').val();
@@ -860,6 +874,7 @@
             {
                 e.preventDefault();
             }
+
         });
         function validationOnKeyUp(clickInput)
         {

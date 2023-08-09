@@ -548,6 +548,12 @@ class AddonController extends Controller
         {
             $addon_details->part_number = NULL;
         }
+
+        if($request->description != null) {
+            $request->description = $request->description;
+        }elseif ($request->description_text != null) {
+            $request->description = $request->description_text;
+        }
         $addon_details->update();
         $deleteAddonTypes = [];
         $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
@@ -1407,7 +1413,6 @@ class AddonController extends Controller
         {
             if(count($request->filteredArray) > 0)
             {
-                info($request->filteredArray);
                 $data = $data->whereNotIn('id',$request->filteredArray);
             }
         }
@@ -1417,7 +1422,6 @@ class AddonController extends Controller
             $data = $data->whereNotIn('id', $alreadyAddedModelLines);
         }
         $data = $data->get();
-        info($data);
         return response()->json($data);
 
     }
@@ -1471,8 +1475,7 @@ class AddonController extends Controller
                 $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
             }
             $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
-            info("existinga ddon detail Ids");
-            info($existingAddonDetailIds);
+
             $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
                                 ->where('brand_id', $request->brand);
 
@@ -1482,7 +1485,6 @@ class AddonController extends Controller
                 $isExisting = $isExisting->where('model_id',$request->model_line);
             }
         }
-        info($isExisting->first());
 
         $isExisting = $isExisting->count();
 

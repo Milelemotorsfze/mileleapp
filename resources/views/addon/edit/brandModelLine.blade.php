@@ -284,7 +284,7 @@
                     selectedAddonBrands.push(eachSelectedBrand);
                 }
             }
-
+            console.log(selectedAddonBrands);
             $.ajax({
                 url:"{{url('getBranchForWarranty')}}",
                 type: "POST",
