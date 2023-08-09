@@ -1378,7 +1378,7 @@ Clear Filters
                                         @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
                                         <td>{{ $vehicles->ppmmyyy }}</td>
                                         @else
-                                        <td class="editable-field ppmmyyy" data-is-date="true" data-type="date" contenteditable="false" data-field-name="ppmmyyy" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
+                                        <td class="editable-field ppmmyyy" data-is-date="true" data-type="month" contenteditable="false" data-field-name="ppmmyyy" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->ppmmyyy }}</td>
                                         @endif
                                         @else
                                       <td>{{ $vehicles->ppmmyyy }}</td>
@@ -1642,10 +1642,21 @@ function handleDateFields() {
   const dateFields = document.querySelectorAll('[data-is-date="true"]');
   dateFields.forEach(field => {
     const fieldValue = field.innerText.trim();
+    const fieldType = field.getAttribute('data-type');
     const inputField = document.createElement('input');
-    inputField.type = 'date';
+
+    if (fieldType === 'date') {
+      inputField.type = 'date';
+      inputField.value = fieldValue;
+    } else if (fieldType === 'month') {
+      inputField.type = 'month';
+
+      if (fieldValue) {
+        const [month, year] = fieldValue.split(' ');
+        inputField.value = `${year}-${month.padStart(2, '0')}`; // Ensure two-digit month
+      }
+    }
     inputField.name = field.getAttribute('data-field-name');
-    inputField.value = fieldValue;
     inputField.classList.add('form-control');
     field.innerHTML = '';
     field.appendChild(inputField);
@@ -1691,10 +1702,17 @@ updateBtn.addEventListener('click', () => {
       selectElement.setAttribute('disabled', 'disabled');
     }
 
-    const inputField = field.querySelector('input[type="date"]');
+    const inputField = field.querySelector('input[type="date"], input[type="month"]');
     if (inputField) {
       const fieldValue = inputField.value;
-      field.innerHTML = fieldValue;
+      if (inputField.type === 'date') {
+        field.innerHTML = fieldValue;
+      } else if (inputField.type === 'month') {
+        const [year, month] = fieldValue.split('-');
+        if (year && month) { // Check if both year and month are defined
+          field.innerHTML = `${month} ${year}`;
+        }
+      }
     }
   });
   updateData(); // Call the function to update the server with the edited data

@@ -1590,6 +1590,7 @@ class VehiclesController extends Controller
                     }
                 }
                 if (!empty($changes)) {
+                    info($fieldValue);
                     // Save approval log if the old value is null and the new value is not null
                     if ($fieldValue !== null) {
                         // Update the field in the 'Vehicles' table with the new value

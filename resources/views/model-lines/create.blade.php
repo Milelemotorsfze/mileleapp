@@ -51,7 +51,6 @@
                                </select>
                             </div>
                         </div>
-                        <input type="text" class="yearpicker form-control" value="" />
                         </br>
                         <div class="col-12 text-center">
                             <button type="submit" class="btn btn-dark ">Submit</button>
@@ -64,15 +63,6 @@
 {{--    @endif--}}
 @endsection
 @push('scripts')
-    <script>
-      $(document).ready(function() {
-        $(".yearpicker").yearpicker({
-          year: 2023,
-          startYear: 2022,
-          endYear: 2050
-        });
-      });
-    </script>
     <script>
         
         $('#brand_id').select2({
