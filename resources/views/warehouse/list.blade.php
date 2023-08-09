@@ -1,4 +1,5 @@
 @extends('layouts.table')
+
 @section('content')
     <div class="card-header">
         <h4 class="card-title">

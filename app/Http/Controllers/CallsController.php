@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calls;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -311,105 +312,125 @@ return view('calls.resultbrand', compact('data'));
         return view('calls.createbulk', compact('countries','LeadSource'));
     }
     public function uploadingbulk(Request $request)
-    {
-        $this->validate($request, [
-            'language' => 'required',
-            'type' => 'required',
-            'source' => 'required',
-        ]);   
-        if ($request->hasFile('file') && $request->file('file')->isValid()) {
-            $file = $request->file('file');
-            $extension = $file->getClientOriginalExtension();
-            // Check if the file is an Excel file
-            if (!in_array($extension, ['xls', 'xlsx'])) {
-                return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
-            }
-            $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
-            $headers = array_shift($rows);
-            foreach ($rows as $row) {
-                $call = new Calls();
-                $name = $row[0];
-                $phone = $row[1];
-                $email =  $row[2];
-                $language = $request->input('language');
-                $sales_persons = ModelHasRoles::where('role_id', 3)->get();
-                $sales_person_id = null;
-                $existing_email_count = null;
-                $existing_phone_count = null;
-                $existing_language_count = null;
-                foreach ($sales_persons as $sales_person) {
-                    if($language == "English") {
-                        $existing_email_count = Calls::where('email', $email)
-                                                     ->where('sales_person', $sales_person->model_id)
-                                                     ->whereNotNull('email')
-                                                     ->count();
-                        $existing_phone_count = Calls::where('phone', $phone)
-                                                     ->where('sales_person', $sales_person->model_id)
-                                                     ->whereNotNull('phone')
-                                                     ->count();
-                        if($existing_email_count != 0 || $existing_phone_count != 0) {
-                            $sales_person_id = $sales_person->model_id;
-                            break;
-                        } 
-                        else {
-                            $new_calls_count = Calls::where('status', 'New')
-                                                     ->where('sales_person', $sales_person->model_id)
-                                                     ->count();
-                            if ($new_calls_count < 5) {
-                                $sales_person_id = $sales_person->model_id;
-                                break;
-                            }
-                        }
-                    } else {
-                        $existing_language_count = SalesPersonLaugauges::where('language', $language)
+{
+    if ($request->hasFile('file') && $request->file('file')->isValid()) {
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
+        // Check if the file is an Excel file
+        if (!in_array($extension, ['xls', 'xlsx'])) {
+            return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
+        }
+        $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
+        $headers = array_shift($rows);
+        foreach ($rows as $row) {
+            $call = new Calls();
+            $name = $row[0];
+            $phone = $row[1];
+            $email = $row[2];
+            $sales_person = $row[3];
+            $source_name = $row[4];
+            $language = $row[5];
+            $location = $row[6];
+			$brand =  $row[7];
+			$model_line_name = $row[8];
+            $custom_brand_model = $row[9];
+            $remarks = $row[10];
+            if ($sales_person === null) {
+			                $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+                            $sales_person_id = null;
+                            $existing_email_count = null;
+                            $existing_phone_count = null;
+                            $existing_language_count = null;
+                            foreach ($sales_persons as $sales_person) {
+                                                                        if($language == "English") {
+                                                                         $existing_email_count = Calls::where('email', $email)
                                                                         ->where('sales_person', $sales_person->model_id)
-                                                                        ->count(); 
-                        if($existing_language_count != 0){
-                            $sales_person_id = $sales_person->model_id;
-                            break;
-                        } else {
-                            $new_calls_count = Calls::where('status', 'New')
-                                                     ->where('sales_person', $sales_person->model_id)
-                                                     ->count();
-                            if ($new_calls_count < 5) {
-                                $sales_person_id = $sales_person->model_id;
-                                break;
-                            }
-                        }
-                    }
+                                                                        ->whereNotNull('email')
+                                                                        ->count();
+                                                                        $existing_phone_count = Calls::where('phone', $phone)
+                                                                        ->where('sales_person', $sales_person->model_id)
+                                                                        ->whereNotNull('phone')
+                                                                        ->count();
+                                                                        if($existing_email_count != 0 || $existing_phone_count != 0) {
+                                                                        $sales_person_id = $sales_person->model_id;
+                                                                        break;
+                                                                         } else {
+                                                                                 $new_calls_count = Calls::where('status', 'New')
+                                                                                 ->where('sales_person', $sales_person->model_id)
+                                                                                 ->count();
+                                                                                 if ($new_calls_count < 5) {
+                                                                                 $sales_person_id = $sales_person->model_id;
+                                                                                 break;
+                                                                                 }
+                                                                                }
+					                                                        } else{
+					                                                              $existing_language_count = SalesPersonLaugauges::where('language', $language)
+                                                                                  ->where('sales_person', $sales_person->model_id)
+                                                                                  ->count(); 
+                                                                                  if($existing_language_count != 0){
+                                                                                  $sales_person_id = $sales_person->model_id;
+                                                                                  break;
+                                                                                  } else {
+                                                                                  $new_calls_count = Calls::where('status', 'New')
+                                                                                  ->where('sales_person', $sales_person->model_id)
+                                                                                  ->count();
+                                                                                  if ($new_calls_count < 5) {
+                                                                                  $sales_person_id = $sales_person->model_id;
+                                                                                  break;
+                                                                                             }
+                                                                                        }	
+					                                                             }
+                                                                     }
+                                            }
+             else {
+                $salesPerson = User::where('name', $sales_person)->first();
+                    $sales_person_id = $salesPerson->id;
+            }
+            if ($source_name !== null) {
+                $leadSource = LeadSource::where('source_name', $source_name)->first();
+                if ($leadSource) {
+                    $lead_source_id = $leadSource->id;
+                } else {
+                    $lead_source_id = 1;
                 }
-                if ($sales_person_id == null) {
-                    $sales_person_id = Calls::select('sales_person', DB::raw('COUNT(*) as count'))
-                                             ->where('status', 'New')
-                                             ->groupBy('sales_person')
-                                             ->orderBy('count', 'ASC')
-                                             ->first()
-                                             ->sales_person;
-                } 
-                $date = Carbon::now();
+            } 
+			else {
+                $lead_source_id = 1;
+            }
+            $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 $call->name = $row[0];
                 $call->phone = $row[1];
                 $call->email = $row[2];
-                $call->custom_brand_model = $row[3];
-                $call->remarks = $row[4];
-                $call->source = $request->input('source');
-                $call->language = $request->input('language');
-                $call->type = $request->input('type');
+                $call->custom_brand_model = $row[9];
+                $call->remarks = $row[10];
+                $call->source = $lead_source_id;
+                $call->language = $row[5];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
                 $call->created_by = Auth::id();
                 $call->status = "New";
-                $call->location = "Location Not Mentioned";
+                $call->location = $row[6];
                 $call->save();
-            }
-            return redirect()->route('calls.index')
-            ->with('success','Data uploaded successfully!');
-        } else {
-            return back()->with('error', 'Please Select The Correct File for Uploading');
+                if ($model_line_name !== null) {
+                    $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
+                    if ($modelLine) {
+                        $model_line_id = $modelLine->id;
+                        // Create and save the CallsRequirement record
+                        $callsRequirement = new CallsRequirement();
+                        $callsRequirement->lead_id = $call->id;
+                        $callsRequirement->model_line_id = $model_line_id;
+                        $callsRequirement->save();
+                    } 
+                }
         }
+        return redirect()->route('calls.index')
+            ->with('success', 'Data uploaded successfully!');
+    } else {
+        return back()->with('error', 'Please Select The Correct File for Uploading');
     }
+}
     public function checkExistence(Request $request)
 {
     $emailCount = 0;

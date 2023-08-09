@@ -78,40 +78,6 @@
             @csrf
                 <div class="row"> 
                     <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Source : </label>
-                        <select name="source" id="source" class="form-control mb-1">
-                                @foreach ($LeadSource as $LeadSource)
-                                    <option value="{{ $LeadSource->id }}">{{ $LeadSource->source_name }}</option>
-                                @endforeach
-                                </select>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Preferred Language : </label>
-                        {{ Form::select('language', [
-                        'English' => 'English',
-                        'Arabic' => 'Arabic',
-                        'Russian' => 'Russian',
-                        'Urdu' => 'Urdu',
-                        'Hindi' => 'Hindi',
-						'Kannada' => 'Kannada',
-                        'French' => 'French',
-                        'Malayalam' => 'Malayalam',
-                        'Tamil' => 'Tamil',
-                        'spanish' => 'Spanish',
-                        'portuguese' => 'Portuguese',
-                        'shona' => 'Shona',
-                        ], null, ['class' => 'form-control', 'id' => 'language']) }}
-                    </div>
-                <div class="col-lg-4 col-md-6">
-                        <label for="basicpill-firstname-input" class="form-label">Type : </label>
-                        {{ Form::select('type', [
-                        'Not Mentioned' => 'Not Mentioned',
-                        'Export' => 'Export',
-                        'Local' => 'Local',
-                        'Other' => 'Other',
-                        ], null, ['class' => 'form-control', 'id' => 'type']) }}
-                    </div>
-                    <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Upload File : </label>
                         <input type="file" name="file" class="form-control" >
                     </div>

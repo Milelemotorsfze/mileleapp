@@ -66,7 +66,7 @@ body[data-layout-mode=dark] .glightbox-clean .gslide-title, body[data-layout-mod
     color: inherit!important;
 }
 .header-item, .header-item:hover, .noti-icon i, body[data-layout-mode=dark][data-topbar=light] .header-item, body[data-layout-mode=dark][data-topbar=light] .header-item:hover, body[data-layout-mode=dark][data-topbar=light] .noti-icon i, body[data-sidebar=brand][data-sidebar-size=sm] #vertical-menu-btn, body[data-sidebar=dark][data-sidebar-size=sm] #vertical-menu-btn {
-    color: #555b6d;
+    color: #ffffff;
 }
 .card-radio-input, .layout-mode-light, .logo .logo-sm, .logo-light, .metismenu .mm-collapse, .metismenu .mm-collapse:not(.mm-show), body[data-layout-mode=dark] .layout-mode-dark, body[data-layout-mode=dark][data-topbar=light] .logo-light, body[data-layout=horizontal][data-topbar=colored] .logo-dark, body[data-sidebar-size=sm] .logo span.logo-lg, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li>a.has-arrow:after, body[data-sidebar=brand] .navbar-brand-box .logo-dark, body[data-sidebar=dark] .logo-dark, body[data-topbar=dark] .logo-dark {
     display: none;
@@ -280,7 +280,7 @@ body[data-layout-mode=dark][data-topbar=light] .app-search .form-control {
     padding: 20px calc(20px / 2);
     position: absolute;
     right: 0;
-    color: #74788d;
+    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
     left: 250px;
     height: 60px;
     background-color: #fff;
@@ -421,10 +421,10 @@ body[data-layout-mode=dark] .alertify .ajs-dialog, body[data-layout-mode=dark] .
     margin-right: 10px;
 }
 #sidebar-menu ul li a:hover, #sidebar-menu ul li a:hover i, #sidebar-menu ul li ul.sub-menu li a:hover, .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok, .pricing-tab-box .nav-link.active h1, .pricing-tab-box .nav-link.active i, .sidebar-alert .alertcard-title, .topnav .navbar-nav .dropdown-item.active, .topnav .navbar-nav .dropdown-item:hover, .topnav .navbar-nav .nav-item .nav-link.active, body[data-layout-mode=dark] .alertify .ajs-footer .ajs-buttons .ajs-button.ajs-ok, body[data-layout-mode=dark][data-sidebar=light] .sidebar-alert .alertcard-title, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li:hover>a i, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li:hover>ul a:hover, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li>a:active, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li>a:focus, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li>a:hover, body[data-sidebar=brand][data-sidebar-size=sm] .vertical-menu #sidebar-menu ul li ul.sub-menu li a:hover {
-    color: #5156be;
+    color: #00c3ff;
 }
 #sidebar-menu ul li a:hover svg, .topnav .navbar-nav .dropdown.active>a svg, .topnav .navbar-nav .nav-item .nav-link.active svg, .topnav .navbar-nav .nav-link:focus svg, .topnav .navbar-nav .nav-link:hover svg, body[data-sidebar-size=sm] .vertical-menu #sidebar-menu>ul>li:hover>a svg {
-    color: #5156be;
+    color: #00c3ff;
     fill: rgba(81, 86, 190, 0.2);
 }
 #sidebar-menu ul li .badge {
@@ -712,18 +712,18 @@ body[data-layout-mode=dark][data-sidebar=light] .sidebar-alert {
     font-size: 14.4px;
     position: relative;
     padding: 1rem 1.3rem;
-    color: #545a6d;
+    color: #fff;
     font-weight: 500;
 }
 .topnav .navbar-nav .nav-link i {
     font-size: 15px;
 }
 .topnav .navbar-nav .nav-link svg {
-    color: #545a6d;
+    color: #00c3ff;
     margin-right: 7px;
 }
 .topnav .navbar-nav .dropdown.active>a, .topnav .navbar-nav .nav-link:focus, .topnav .navbar-nav .nav-link:hover {
-    color: #5156be;
+    color: #00c3ff;
     background-color: transparent;
 }
 .topnav .navbar-nav .dropdown-item {
@@ -752,7 +752,6 @@ body[data-layout-mode=dark][data-sidebar=light] .sidebar-alert {
 }
 @media (max-width:1199.98px) {
     .topnav-menu .navbar-nav li: last-of-type .dropdown .dropdown-menu {
-    right: 100%;
     left: auto;
 }
 }@media (max-width:991.98px) {
@@ -781,6 +780,7 @@ body[data-layout-mode=dark][data-sidebar=light] .sidebar-alert {
 }
 .topnav .navbar-nav .nav-link {
     padding: .75rem 1.1rem;
+    color: #212529;
 }
 .topnav .dropdown .dropdown-menu {
     background-color: #fff;
@@ -795,7 +795,7 @@ body[data-layout-mode=dark][data-sidebar=light] .sidebar-alert {
     background-color: transparent;
 }
 .topnav .dropdown .dropdown-item.active, .topnav .dropdown .dropdown-item:active {
-    color: #5156be;
+    color: #00c3ff;
 }
 .topnav .arrow-down::after {
     right: 15px;
@@ -3042,7 +3042,7 @@ body[data-sidebar=brand] #vertical-menu-btn, body[data-sidebar=dark] #vertical-m
     color: #e9ecef;
 }
 .topnav {
-    background: #fbfaff;
+    background-image: linear-gradient(to right,#0065ac,#090e22,#0065ac);
 }
 .topnav .navbar-nav .nav-item:first-of-type .nav-link {
     padding-left: 0;
