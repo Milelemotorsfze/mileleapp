@@ -215,7 +215,7 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row mb-3" hidden id="addon-description">
+                    <div class="row mb-3" >
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -540,11 +540,7 @@
 
             $("#addon_type").change(function () {
                 var addonType = $(this).val();
-                if (addonType == 'P') {
-                    $('#addon-description').attr('hidden', false);
-                } else {
-                    $('#addon-description').attr('hidden', true);
-                }
+                $('#description').empty();
                 let url = '{{ url('supplier-change-addon-type') }}';
                 $.ajax({
                     type: "GET",
@@ -669,11 +665,6 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
-                            if (data.addon_type.addon_type == 'P') {
-                                $('#addon-description').attr('hidden', false);
-                            } else {
-                                $('#addon-description').attr('hidden', true);
-                            }
                             $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
