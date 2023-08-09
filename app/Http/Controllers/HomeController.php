@@ -91,7 +91,7 @@ class HomeController extends Controller
     // Fetch the data from the database
 $last30Days = Carbon::now()->subDays(30);
 $last7Days = Carbon::now()->subDays(7);
-$todayl = Carbon::now();
+$todayl = Carbon::now()->subDays(1);
 $variantsdays = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
               ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
