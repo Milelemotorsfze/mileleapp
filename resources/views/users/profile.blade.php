@@ -99,7 +99,7 @@ input[type=number]::-webkit-outer-spin-button {
   <div class="card mt-3 d-flex justify-content-center align-items-center">
     <div class="card-overlay">
       @if ($emp_profile->image_path)
-      <img src="{{ asset('storage/' . $emp_profile->image_path) }}" class="card-img-top" alt="User">
+      <img src="{{ asset($emp_profile->image_path) }}" class="card-img-top" alt="User">
       @else
         <div class="rounded-circle bg-primary text-white text-center" style="width: 300px; height: 300px; font-size: 100px; display: flex; align-items: center; justify-content: center;">
           {{ strtoupper(substr($emp_profile->first_name, 0, 1) . substr($emp_profile->last_name, 0, 1)) }}

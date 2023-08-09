@@ -378,7 +378,7 @@
                      <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('vehicle-pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
-                            <span data-key="t-extra-pages">Vehicle Pictures</span>
+                            <span data-key="t-extra-pages">QC Pictures Upload</span>
                         </a>
                     </li>
                     @endif

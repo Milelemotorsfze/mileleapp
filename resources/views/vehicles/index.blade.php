@@ -1,6 +1,14 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+  div.dataTables_wrapper div.dataTables_info {
+  padding-top: 0px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+  padding: 4px 8px 4px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
   .editing {
     background-color: white !important;
     border: 1px solid black  !important;
@@ -20,11 +28,6 @@
   #dtBasicExample1_length {
     display: none;
   }
-  div.dataTables_wrapper div.dataTables_info {
-    display: none;
-  }
-    /* Custom pagination container styles */
-/* Your custom CSS styles for pagination */
 .pagination {
     display: flex;
     justify-content: center;
@@ -85,10 +88,11 @@
     }
     #dtBasicSupplierInventory {
       width: 100%;
-      font-size: 14px;
+      font-size: 12px;
     }
     th.nowrap-td {
       white-space: nowrap;
+      height: 10px;
     }
     .nowrap-td {
         white-space: nowrap;
@@ -148,7 +152,7 @@
                      'document-edit','edit-so','edit-reservation']);
                 @endphp
                 @if ($hasPermission)
-                <h4 class="card-title">Pending Vehicles Updates</h4>
+                <!-- <h4 class="card-title">Pending Vehicles Updates</h4> -->
                 @endif
                 @php
                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-payment-details');
@@ -158,7 +162,7 @@
                 @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
-                @php
+                <!-- @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
                 @endphp
                 @if ($hasPermission)
@@ -181,7 +185,7 @@
                         </tbody>
                     </table>
                 </div>
-                @endif
+                @endif -->
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
                 @endphp
@@ -272,32 +276,25 @@ $countpendingsinspectionso = DB::table('vehicles')
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('document-edit');
                 @endphp
                 @if ($hasPermission)
-  <div class="col-lg-12 col-md-12 col-sm-12 table-responsive">
-  <table class="table table-editable table-edits table-bordered">
-    <thead>
-      <tr>
-        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
-        <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
-      </tr>
-      <tr>
-      @foreach ($warehouses as $warehouses)
-        <th style="font-size: 12px;">{{$warehouses->name}}</th>
-       @endforeach
-      </tr>
-    </thead>
-    <tbody>
-    @php
+                <div class="col-lg-3 col-md-3 col-sm-12 table-responsive">
+                    <table class="table table-striped table-editable table-edits table table-bordered">
+                        <thead>
+                            <th style="font-size: 12px;">Vehicle Status</th>
+                            <th style="font-size: 12px;">Vehicle Quantity</th>
+                        </thead>
+                        <tbody>
+						@php
     $incomingvehicless = DB::table('vehicles')->where('payment_status', 'Incoming Stock')->whereNull('grn_id')->count();
     @endphp
-	<tr>
-        <td style="font-size: 12px;">
-            Incoming Stock
-        </td>
-        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
-    </tr>
-    </tbody>
-  </table>
-</div>
+                            <tr  onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'">
+                                <td style="font-size: 12px;">
+                                        Incoming Stock
+                                </td>
+                                <td style="font-size: 12px;">{{$incomingvehicless}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 @endif
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehouse-edit');
@@ -307,7 +304,7 @@ $countpendingsinspectionso = DB::table('vehicles')
   <table class="table table-editable table-edits table-bordered">
     <thead>
       <tr>
-        <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
+      <th rowspan="2" style="font-size: 12px; vertical-align: middle;">Vehicle Status</th>
         <th colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">Vehicle Quantity</th>
       </tr>
       <tr>
@@ -324,7 +321,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         <td style="font-size: 12px;">
             Incoming Stock
         </td>
-        <td onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" colspan="{{$countwarehouse}}" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
+        <td colspan="{{$countwarehouse}}" onclick="window.location.href = '{{ route('vehiclesincoming.stock') }}'" style="font-size: 12px; text-align: center;">{{$incomingvehicless}}</td>
     </tr>
 	   <tr>
         <td style="font-size: 12px;">
@@ -631,7 +628,7 @@ Clear Filters
                             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
                             <thead class="bg-soft-secondary">
                                <tr>
-                                <th id="vehicle_id">Ref No</th>
+                                <th style="width:205px;" id="vehicle_id">Ref No</th>
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-po');
                                     @endphp
@@ -708,7 +705,7 @@ Clear Filters
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
                                 @endphp
                                 @if ($hasPermission)
-                                    <th id="gdn_number" class="nowrap-td">GDN</th>
+                                    <th id="gdn_number" class="nowrap-td">GDN Number</th>
                                     <th id="gdn_date" class="nowrap-td">GDN Date</th>
                                 @endif
                                 @php
@@ -718,7 +715,7 @@ Clear Filters
                                     <th id="brand" class="nowrap-td">Brand</th>
                                     <th id="model_line" class="nowrap-td">Model Line</th>
                                     <th id="model_description" class="nowrap-td">Model Description</th>
-                                    <th id="variant" id="variant" style="vertical-align: middle;" class="nowrap-td">Variant</th>
+                                    <th id="variant" id="variant" style="vertical-align: middle;" class="nowrap-td">Variant Name</th>
                                     <th id="variant_details" class="nowrap-td">Variant Detail</th>
                                 @endif
                                 @php
@@ -1569,7 +1566,7 @@ Clear Filters
                                         </td>
                                         @endif
                                         @endif
-                                        <td><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Details</a></td>
+                                        <td style="display: flex; white-space: nowrap;"><a title="Vehicles Log Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('vehicleslog.viewdetails', $vehicles->id) }}" onclick="event.stopPropagation();"></i> View Details</a></td>
                                       </tr>
                                 @endforeach
                             </tbody>

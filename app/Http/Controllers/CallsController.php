@@ -225,8 +225,6 @@ return view('calls.resultbrand', compact('data'));
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',
-            'model_line_ids' => 'array',
-            'model_line_ids.*' => 'distinct',
             'language' => 'required',
             'type' => 'required',
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
