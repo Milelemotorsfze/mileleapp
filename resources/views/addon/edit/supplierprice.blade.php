@@ -11,7 +11,7 @@
                                     @foreach($supplierAddons as $supplierAddon)
                                         <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
                                         <div class="row supplierWithoutKitApendHere" id="row-{{$i}}" >
-                                            <div class="col-xxl-5 col-lg-6 col-md-12">
+                                            <div class="col-xxl-3 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                                 <select class="addonClass suppliers" data-index="{{$i}}"  id="suppliers{{$i}}" name="supplierAndPrice[{{$i}}][supplier_id][]"
                                                 multiple="true" style="width: 100%;" required>
@@ -28,7 +28,42 @@
                                                     </span>
                                                 @enderror
                                                 </div>
-                                                <div class="col-xxl-3 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_{{$i}}">
+
+                                                <div class="col-xxl-2 col-lg-6 col-md-12">
+                                                    <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">Min</span>
+                                                        </div>
+                                                        <input id="lead_time_{{$i}}" aria-label="measurement" aria-describedby="basic-addon2"
+                                                        class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                        name="supplierAndPrice[{{$i}}][lead_time]" maxlength="3"
+                                                        value="{{ $supplierAddon->lead_time_min }}"  autocomplete="lead_time" oninput="checkGreater(this, {{$i}})">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                        </div>
+                                                    </div>
+                                                    <span id="minLeadTimeError_{{$i}}" class="minLeadTimeError invalid-feedback-lead"></span>                                                   
+                                                </div>
+
+                                                <div class="col-xxl-2 col-lg-6 col-md-12">
+                                                    <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>                                               
+                                                    <div class="input-group">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                                        </div>
+                                                        <input id="lead_time_max_{{$i}}" aria-label="measurement" aria-describedby="basic-addon2"
+                                                        class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                                        name="supplierAndPrice[{{$i}}][lead_time_max]" oninput="checkGreater(this, {{$i}})"
+                                                        value="{{ $supplierAddon->lead_time_max }}"  autocomplete="lead_time_max" maxlength="3">
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                        </div>
+                                                    </div>
+                                                    <span id="maxLeadTimeError_{{$i}}" class="maxLeadTimeError invalid-feedback-lead"></span>
+                                                </div>
+
+                                                <div class="col-xxl-2 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_{{$i}}">
                                                 <label for="choices-single-default" class="form-label font-size-13">Purchase Price In AED</label>
                                                 <div class="input-group">
                                                 <input name="supplierAndPrice[{{$i}}][addon_purchase_price_in_aed]" id="addon_purchase_price_{{$i}}" oninput="inputNumberAbs(this)"
@@ -40,7 +75,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-xxl-3 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_{{$i}}">
+                                            <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_{{$i}}">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                 <div class="input-group">
                                                 <input name="supplierAndPrice[{{$i}}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_{{$i}}"
@@ -167,6 +202,17 @@
                     $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
                     $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
                     $(this).find('a').attr('data-index', index);
+
+                        $(this).find('.lead_time').attr('id','lead_time_'+ index);
+                        $(this).find('.lead_time').attr('name','supplierAndPrice['+index+'][lead_time]');
+                        $(this).find('.lead_time').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.minLeadTimeError').attr('id','minLeadTimeError_'+index);
+                        
+                        $(this).find('.lead_time_max').attr('id','lead_time_max_'+ index);
+                        $(this).find('.lead_time_max').attr('name','supplierAndPrice['+index+'][lead_time_max]');
+                        $(this).find('.lead_time_max').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.maxLeadTimeError').attr('id','maxLeadTimeError_'+index);
+
                     $('#suppliers'+index).select2
                     ({
                         placeholder:"Choose  Vendors....     Or     Type Here To Search....",
@@ -217,7 +263,7 @@
                 {
                     $(".supplierWithoutKit").append(`
                         <div class="row supplierWithoutKitApendHere" id="row-${index}" >
-                            <div class="col-xxl-5 col-lg-6 col-md-12">
+                            <div class="col-xxl-3 col-lg-6 col-md-12">
                                 <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                 <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
                                  multiple="true" style="width: 100%;" required>
@@ -228,7 +274,41 @@
                                     </span>
                                 @enderror
                                 </div>
-                                <div class="col-xxl-3 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_${index}">
+
+                                <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
+                                                </div>
+                                                <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2" maxlength="3"
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" name="supplierAndPrice[${index}][lead_time]"
+                                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
+                                            
+                                        </div>
+                                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
+                                           
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                                </div>
+                                                <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2" maxlength="3"
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" name="supplierAndPrice[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
+                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" >
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="maxLeadTimeError_${index}" class="maxLeadTimeError invalid-feedback-lead"></span>
+                                        </div>
+
+                                <div class="col-xxl-2 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_${index}">
                                 <label for="choices-single-default" class="form-label font-size-13">Purchase Price In AED</label>
                                 <div class="input-group">
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_aed]" id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
@@ -240,7 +320,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-xxl-3 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
+                            <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                 <div class="input-group">
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}"

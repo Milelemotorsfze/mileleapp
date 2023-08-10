@@ -493,8 +493,8 @@ class AddonController extends Controller
         $supplierAddons = SupplierAddons::where([
                                             ['addon_details_id', '=', $addonDetails->id],
                                             ['status', '=', 'active'],
-                                        ])->groupBy(['purchase_price_aed','purchase_price_usd'])
-                                        ->select('id','purchase_price_aed','purchase_price_usd','addon_details_id','status')
+                                        ])->groupBy(['purchase_price_aed','purchase_price_usd','lead_time_min','lead_time_max'])
+                                        ->select('id','purchase_price_aed','purchase_price_usd','addon_details_id','status','lead_time_min','lead_time_max')
                                         ->get();
         foreach($supplierAddons as $supplierAddon)
         {
@@ -502,6 +502,8 @@ class AddonController extends Controller
             $supplierId = SupplierAddons::where([
                                             ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
                                             ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
+                                            ['lead_time_min', '=', $supplierAddon->lead_time_min],
+                                            ['lead_time_max', '=', $supplierAddon->lead_time_max],
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
@@ -526,7 +528,6 @@ class AddonController extends Controller
         $addon_details->addon_type_name = $request->addon_type_hiden;
         $addon_details->addon_code = $request->addon_code;
         $addon_details->payment_condition = $request->payment_condition;
-        $addon_details->lead_time = $request->lead_time;
         $addon_details->additional_remarks = $request->additional_remarks;
         $addon_details->is_all_brands = $request->additional_remarks;
         $addon_details->fixing_charges_included = $request->fixing_charges_included;
@@ -692,41 +693,6 @@ class AddonController extends Controller
                     }
                 }
             }
-            // if($request->addon_type == 'K')
-            // {
-            //     if($request->kitSupplierAndPrice)
-            //     {
-            //         if(count($request->kitSupplierAndPrice) > 0 )
-            //         {
-            //             $supPriInput['created_by'] = $authId;
-            //             foreach($request->kitSupplierAndPrice as $kitSupplierAndPriceData)
-            //             {
-            //                 $supPriInput['supplier_id'] = $kitSupplierAndPriceData['supplier_id'];
-            //                 $supPriInput['addon_details_id'] = $addon_details->id;
-            //                 $supPriInput['purchase_price_aed'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_aed'];
-            //                 $supPriInput['purchase_price_usd'] = $kitSupplierAndPriceData['supplier_addon_purchase_price_in_usd'];
-            //                 $CreateSupAddPri = SupplierAddons::create($supPriInput);
-            //                 $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;
-            //                 $createHistrory = PurchasePriceHistory::create($supPriInput);
-            //                 if(count($kitSupplierAndPriceData['item']) > 0)
-            //                 {
-            //                     $createkit['created_by'] = $authId;
-            //                     $createkit['supplier_addon_id'] = $CreateSupAddPri->id;
-            //                     foreach($kitSupplierAndPriceData['item'] as $kitItemData)
-            //                     {
-            //                         $createkit['addon_details_id'] = $kitItemData['kit_item_id'];
-            //                         $createkit['quantity'] = $kitItemData['quantity'];
-            //                         $createkit['unit_price_in_aed'] = $kitItemData['unit_price_in_aed'];
-            //                         $createkit['total_price_in_aed'] = $kitItemData['total_price_in_aed'];
-            //                         $createkit['unit_price_in_usd'] = $kitItemData['unit_price_in_usd'];
-            //                         $createkit['total_price_in_usd'] = $kitItemData['total_price_in_usd'];
-            //                         $CreateSupAddPri = KitItems::create($createkit);
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
             if($request->addon_type == 'K')
             {
                 if($request->mainItem)
@@ -910,6 +876,25 @@ class AddonController extends Controller
                                             $update->supplier_id = $suppl1;
                                             $update->purchase_price_aed =  $supplierAndPrice1['addon_purchase_price_in_aed'];
                                             $update->purchase_price_usd =  $supplierAndPrice1['addon_purchase_price_in_usd'];
+
+                                            if($supplierAndPrice1['lead_time'] != '' && $supplierAndPrice1['lead_time_max'] != '')
+                                            {
+                                                if(intval($supplierAndPrice1['lead_time']) == intval($supplierAndPrice1['lead_time_max']))
+                                                {
+                                                    $update->lead_time_min = $supplierAndPrice1['lead_time'];
+                                                    $update->lead_time_max = NULL;
+                                                }
+                                                elseif(intval($supplierAndPrice1['lead_time']) < intval($supplierAndPrice1['lead_time_max']))
+                                                {
+                                                    $update->lead_time_min = $supplierAndPrice1['lead_time'];
+                                                    $update->lead_time_max = $supplierAndPrice1['lead_time_max'];
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $update->lead_time_min = $supplierAndPrice1['lead_time'];
+                                                $update->lead_time_max = $supplierAndPrice1['lead_time_max'];
+                                            }
                                             $update->update();
                                             if($oldPrice != $update->purchase_price_aed)
                                             {
@@ -930,6 +915,24 @@ class AddonController extends Controller
                                             $supPriInput['addon_details_id'] = $addon_details->id;
                                             $supPriInput['purchase_price_aed'] = $supplierAndPrice1['addon_purchase_price_in_aed'];
                                             $supPriInput['purchase_price_usd'] = $supplierAndPrice1['addon_purchase_price_in_usd'];
+                                            if($supplierAndPrice1['lead_time'] != '' && $supplierAndPrice1['lead_time_max'] != '')
+                                            {
+                                                if(intval($supplierAndPrice1['lead_time']) == intval($supplierAndPrice1['lead_time_max']))
+                                                {
+                                                    $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
+                                                    $supPriInput['lead_time_max'] = NULL;
+                                                }
+                                                elseif(intval($supplierAndPrice1['lead_time']) < intval($supplierAndPrice1['lead_time_max']))
+                                                {
+                                                    $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
+                                                    $supPriInput['lead_time_max'] = $supplierAndPrice1['lead_time_max'];
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
+                                                $supPriInput['lead_time_max'] = $supplierAndPrice1['lead_time_max'];
+                                            }
                                             $supPriInput['created_by'] = $authId;
                                             $supPriInput['supplier_id'] = $suppl1;
                                             $CreateSupAddPri = SupplierAddons::create($supPriInput);

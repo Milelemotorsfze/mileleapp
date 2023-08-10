@@ -35,7 +35,8 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_1" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" name="supplierAndPrice[1][lead_time]"
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                name="supplierAndPrice[1][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, 1)">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Days</span>
@@ -52,8 +53,9 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
                                                 </div>
                                                 <input id="lead_time_max_1" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" name="supplierAndPrice[1][lead_time_max]" oninput="checkGreater(this, 1)"
-                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" >
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror"
+                                                 name="supplierAndPrice[1][lead_time_max]" oninput="checkGreater(this, 1)"
+                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Days</span>
                                                 </div>
@@ -287,7 +289,8 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" name="supplierAndPrice[${index}][lead_time]"
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                name="supplierAndPrice[${index}][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Days</span>
@@ -304,8 +307,9 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
                                                 </div>
                                                 <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" name="supplierAndPrice[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
-                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" >
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                                name="supplierAndPrice[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
+                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Days</span>
                                                 </div>

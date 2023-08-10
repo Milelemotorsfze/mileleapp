@@ -310,56 +310,6 @@
                     </div>
                     </br>
                     <div class="row">
-                        <!-- <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div> -->
-                        <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
-
-
-                        <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2" oninput="inputNumberAbsLeadTime(this)"
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
-                        value="{{ old('lead_time') }}"  autocomplete="lead_time">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>
-                                                </div>
-                            @error('lead_time')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div> -->
-                        <!-- <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <div class="input-group">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
-                                </div>
-                                <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2"
-                                class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time"
-                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                </div>
-                            </div>
-                            <span id="minLeadTimeError" class="invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <div class="input-group">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
-                                </div>
-                                <input id="lead_time_max" aria-label="measurement" aria-describedby="basic-addon2"
-                                class="form-control widthinput @error('lead_time_max') is-invalid @enderror" name="lead_time_max" oninput="checkGreater(this)"
-                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                </div>
-                            </div>
-                            <span id="maxLeadTimeError" class="invalid-feedback-lead"></span>
-                        </div> -->
-
-
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
