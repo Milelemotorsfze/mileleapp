@@ -1403,6 +1403,17 @@ input {
                         $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
                         $(this).find('a').attr('data-index', index);
                         $(this).find('a').attr('id','remove-'+ index);
+
+                        $(this).find('.lead_time').attr('id','lead_time_'+ index);
+                        $(this).find('.lead_time').attr('name','supplierAndPrice['+index+'][lead_time]');
+                        $(this).find('.lead_time').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.minLeadTimeError').attr('id','minLeadTimeError_'+index);
+                        
+                        $(this).find('.lead_time_max').attr('id','lead_time_max_'+ index);
+                        $(this).find('.lead_time_max').attr('name','supplierAndPrice['+index+'][lead_time_max]');
+                        $(this).find('.lead_time_max').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.maxLeadTimeError').attr('id','maxLeadTimeError_'+index);
+                        
                         $('#addon_'+index).select2
                         ({
                             placeholder:"Choose Addon....     Or     Type Here To Search....",
