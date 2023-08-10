@@ -1156,9 +1156,9 @@ class SupplierController extends Controller
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
-                            if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                            if(isset($supAddon['addon_purchase_price_in_usd'] ) OR isset($supAddon['addon_purchase_price'] ))
                             {
-                                if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')
+                                if($supAddon['currency'] != '' AND isset($supAddon['addon_id']))
                                 {
                                     $supAdd['currency'] = $supAddon['currency'];
                                     if($supAddon['currency'] == 'AED')
@@ -1177,6 +1177,24 @@ class SupplierController extends Controller
                                             if(!in_array($addon_code, $addonAlredyExist))
                                             {
                                                 $supAdd['addon_details_id'] = $addon_code;
+                                                if($supAddon['lead_time'] != '' && $supAddon['lead_time_max'] != '')
+                                                {
+                                                    if(intval($supAddon['lead_time']) == intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = NULL;
+                                                    }
+                                                    elseif(intval($supAddon['lead_time']) < intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                    $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                }
                                                 $suppliers = SupplierAddons::create($supAdd);
                                                 $supAdd['supplier_addon_id'] = $suppliers->id;
                                                 $createHistory = PurchasePriceHistory::create($supAdd);
