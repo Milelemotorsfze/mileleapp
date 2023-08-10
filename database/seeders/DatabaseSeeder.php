@@ -18,17 +18,20 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        $this->call(PermissionTableSeeder::class);
-        $this->call(CreateAdminUserSeeder::class);
-        $this->call(AddonTableSeeder::class);
-        $this->call(BrandsTableSeeder::class);
-        // $this->call(AddonDetailsTableSeeder::class);
-        $this->call(PaymentMethodsMasterTableSeeder::class);
-        $this->call(ModelDescriptionMasterTableSeeder::class);
-        $this->call(WarrantyMasterDataSeeder::class);
-        $this->call(StrategySeeder::class);
-        $this->call(KitSeeder::class);
-        $this->call(BrandRegionsSeeder::class);
+
+
+        
+        // $this->call(PermissionTableSeeder::class);
+        // $this->call(CreateAdminUserSeeder::class);
+        // $this->call(AddonTableSeeder::class);
+        // $this->call(BrandsTableSeeder::class);
+        // // $this->call(AddonDetailsTableSeeder::class);
+        // $this->call(PaymentMethodsMasterTableSeeder::class);
+        // $this->call(ModelDescriptionMasterTableSeeder::class);
+        // $this->call(WarrantyMasterDataSeeder::class);
+        // $this->call(StrategySeeder::class);
+        // $this->call(KitSeeder::class);
+        // $this->call(BrandRegionsSeeder::class);
         
         
         

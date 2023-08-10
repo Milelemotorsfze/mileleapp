@@ -15,7 +15,9 @@ class SupplierAddonTempExport implements FromCollection,WithHeadings
         return[
             'addon_code',
             'currency',
-            'purchase_price'
+            'purchase_price',
+            'lead_time_min',
+            'lead_time_max'
         ];
     } 
     public function collection()
