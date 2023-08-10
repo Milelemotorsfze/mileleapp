@@ -310,9 +310,9 @@
                     </div>
                     </br>
                     <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                        <!-- <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div>
+                        </div> -->
                         <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
 
@@ -330,7 +330,7 @@
                                 </span>
                             @enderror
                         </div> -->
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                        <!-- <div class="col-xxl-2 col-lg-6 col-md-12">
                             <div class="input-group">
                                 <div class="input-group-append">
                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
@@ -357,7 +357,7 @@
                                 </div>
                             </div>
                             <span id="maxLeadTimeError" class="invalid-feedback-lead"></span>
-                        </div>
+                        </div> -->
 
 
                         <div class="col-xxl-3 col-lg-2 col-md-4">
@@ -1716,7 +1716,7 @@
             $('#kitSupplierButtonToHideandshow').hide();
         }
         function checkGreaterYear(CurrentInput)
-        {   alert('hi') ;
+        { 
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
@@ -1768,15 +1768,23 @@
             document.getElementById('model_year_end').classList.remove("is-invalid");
             document.getElementById('modelYearEndError').classList.remove("paragraph-class");
         }  
-        function checkGreater(CurrentInput)
+        function checkGreater(CurrentInput, row)
         {
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d]/g, '');
             input.value = val;
-            var minLeadTime = $('#lead_time').val();
-            var maxLeadTime = $('#lead_time_max').val();
+            var minLeadTime = $('#lead_time_'+row).val();
+            var maxLeadTime = $('#lead_time_max_'+row).val();
+            // if(minLeadTime != '')
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = false;
+            // }
+            // else
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = true;
+            // }
             if(minLeadTime != '' && maxLeadTime != '')
             {
                 if(Number(minLeadTime) > Number(maxLeadTime))
@@ -1784,50 +1792,50 @@
                     var id = CurrentInput.id;
                     if(id == 'lead_time')
                     {
-                        showMinLeadTimeError();
-                        removeMaxLeadTimeError();
+                        showMinLeadTimeError(row);
+                        removeMaxLeadTimeError(row);
                     }
                     else
                     {
-                        showMaxLeadTimeError();
-                        removeMinLeadTimeError();
+                        showMaxLeadTimeError(row);
+                        removeMinLeadTimeError(row);
                     }
                 }
                 else
                 {
-                    removeMinLeadTimeError();
-                    removeMaxLeadTimeError();
+                    removeMinLeadTimeError(row);
+                    removeMaxLeadTimeError(row);
                 }
             }
             else
             {
-                removeMinLeadTimeError();
-                removeMaxLeadTimeError();
+                removeMinLeadTimeError(row);
+                removeMaxLeadTimeError(row);
             }
         }
-        function showMinLeadTimeError()
+        function showMinLeadTimeError(row)
         {
-            document.getElementById('minLeadTimeError').textContent="Enter smaller value than max leadtime";
-            document.getElementById('lead_time').classList.add("is-invalid");
-            document.getElementById('minLeadTimeError').classList.add("paragraph-class");
+            document.getElementById('minLeadTimeError_'+row).textContent="Enter smaller value than max leadtime";
+            document.getElementById('lead_time_'+row).classList.add("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.add("paragraph-class");
         }
-        function showMaxLeadTimeError()
+        function showMaxLeadTimeError(row)
         {
-            document.getElementById('maxLeadTimeError').textContent="Enter higher value than min leadtime";
-            document.getElementById('lead_time_max').classList.add("is-invalid");
-            document.getElementById('maxLeadTimeError').classList.add("paragraph-class");
+            document.getElementById('maxLeadTimeError_'+row).textContent="Enter higher value than min leadtime";
+            document.getElementById('lead_time_max_'+row).classList.add("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.add("paragraph-class");
         }
-        function removeMinLeadTimeError()
+        function removeMinLeadTimeError(row)
         {
-            document.getElementById('minLeadTimeError').textContent="";
-            document.getElementById('lead_time').classList.remove("is-invalid");
-            document.getElementById('minLeadTimeError').classList.remove("paragraph-class");
+            document.getElementById('minLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_'+row).classList.remove("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.remove("paragraph-class");
         }
-        function removeMaxLeadTimeError()
+        function removeMaxLeadTimeError(row)
         {
-            document.getElementById('maxLeadTimeError').textContent="";
-            document.getElementById('lead_time_max').classList.remove("is-invalid");
-            document.getElementById('maxLeadTimeError').classList.remove("paragraph-class");
+            document.getElementById('maxLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_max_'+row).classList.remove("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.remove("paragraph-class");
         }
         function inputNumberAbs(currentPriceInput)
         {
