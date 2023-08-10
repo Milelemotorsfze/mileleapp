@@ -1009,7 +1009,7 @@ input {
                                 <div class="col-md-12 p-0">
                                     <div class="col-md-12 form_field_outer p-0">
                                         <div class="row form_field_outer_row" id="row-1">
-                                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                            <div class="col-xxl-2 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
                                                 <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1[addon_id][]"  multiple="true" style="width: 100%;">
                                                     <!-- @foreach($addons as $addon)
@@ -1022,6 +1022,42 @@ input {
                                                     </span>
                                                 @enderror
                                             </div>
+
+                                            <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
+                                                </div>
+                                                <input id="lead_time_1" aria-label="measurement" aria-describedby="basic-addon2"
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                name="supplierAddon[1][lead_time]" maxlength="3"
+                                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, 1)">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="minLeadTimeError_1" class="minLeadTimeError invalid-feedback-lead"></span>
+                                            
+                                        </div>
+                                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
+                                           
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                                </div>
+                                                <input id="lead_time_max_1" aria-label="measurement" aria-describedby="basic-addon2"
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror"
+                                                 name="supplierAddon[1][lead_time_max]" oninput="checkGreater(this, 1)"
+                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="maxLeadTimeError_1" class="maxLeadTimeError invalid-feedback-lead"></span>
+                                        </div>
+
                                             <div class="col-xxl-1 col-lg-1 col-md-1">
                                                 <label for="choices-single-default" class="form-label font-size-13">Currency</label>
                                                 <select name="supplierAddon[1][currency]" id="currency_1" class="widthinput form-control" onchange="changeCurrency(1)">
@@ -1367,6 +1403,17 @@ input {
                         $(this).find('.addon-purchase-price').attr('name', 'supplierAddon['+ index +'][addon_purchase_price]');
                         $(this).find('a').attr('data-index', index);
                         $(this).find('a').attr('id','remove-'+ index);
+
+                        $(this).find('.lead_time').attr('id','lead_time_'+ index);
+                        $(this).find('.lead_time').attr('name','supplierAndPrice['+index+'][lead_time]');
+                        $(this).find('.lead_time').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.minLeadTimeError').attr('id','minLeadTimeError_'+index);
+                        
+                        $(this).find('.lead_time_max').attr('id','lead_time_max_'+ index);
+                        $(this).find('.lead_time_max').attr('name','supplierAndPrice['+index+'][lead_time_max]');
+                        $(this).find('.lead_time_max').attr('oninput','checkGreater(this, '+index+')');
+                        $(this).find('.maxLeadTimeError').attr('id','maxLeadTimeError_'+index);
+                        
                         $('#addon_'+index).select2
                         ({
                             placeholder:"Choose Addon....     Or     Type Here To Search....",
@@ -1423,11 +1470,13 @@ input {
                     {
                         $(".form_field_outer").append(`
                             <div class="row form_field_outer_row" id="row-${index}">
-                                <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="col-xxl-2 col-lg-6 col-md-12">
                                     <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                    <select class="addons"  id="addon_${index}" data-index="${index}" name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;">
+                                    <select class="addons"  id="addon_${index}" data-index="${index}" 
+                                    name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;">
                                     @foreach($addons as $addon)
-                                <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
+                                <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" 
+                                value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                         @endforeach
                                 </select>
                                     @error('is_primary_payment_method')
@@ -1436,9 +1485,44 @@ input {
                                         </span>
                                     @enderror
                                 </div>
+                                <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
+                                                </div>
+                                                <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                name="supplierAddon[${index}][lead_time]" maxlength="3"
+                                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
+                                            
+                                        </div>
+                                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                                            <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
+                                           
+                                            <div class="input-group">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                                </div>
+                                                <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                                name="supplierAddon[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
+                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                                </div>
+                                            </div>
+                                            <span id="maxLeadTimeError_${index}" class="maxLeadTimeError invalid-feedback-lead"></span>
+                                        </div>
                                 <div class="col-xxl-1 col-lg-1 col-md-1">
                                     <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                                    <select name="supplierAddon[${index}][currency]"  id="currency_${index}" class="widthinput form-control currency" onchange="changeCurrency(${index})">
+                                    <select name="supplierAddon[${index}][currency]"  id="currency_${index}" class="widthinput form-control currency" 
+                                    onchange="changeCurrency(${index})">
                                         <option value="AED">AED</option>
                                         <option value="USD">USD</option>
                                     </select>
@@ -1447,7 +1531,8 @@ input {
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                     <div class="input-group">
                                     <input id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)" class="widthinput
-                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" name="supplierAddon[${index}][addon_purchase_price]"
+                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" 
+                                    name="supplierAddon[${index}][addon_purchase_price]"
                                     placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus >
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
@@ -1458,9 +1543,12 @@ input {
                                 <div class="col-xxl-2 col-lg-3 col-md-3 usd-price-div" id="div_price_in_usd_${index}" hidden>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                     <div class="input-group">
-                                    <input id="addon_purchase_price_in_usd_${index}" oninput="inputNumberAbs(this)" class="widthinput form-control purchase_price_in_USD
-                                     @error('addon_purchase_price_in_usd') is-invalid @enderror" name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD"
-                                      value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
+                                    <input id="addon_purchase_price_in_usd_${index}" oninput="inputNumberAbs(this)" 
+                                    class="widthinput form-control purchase_price_in_USD
+                                     @error('addon_purchase_price_in_usd') is-invalid @enderror" 
+                                     name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD"
+                                      value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus 
+                                      onkeyup="calculateAED(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                     </div>
@@ -1675,7 +1763,9 @@ input {
                                 '<td>'+ value.addon_code + '</td>' +
                                 '<td>'+ value.currency + '</td>' +
                                 '<td>'+ value.purchase_price + '</td>' +
-                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
+                                '<td>'+ value.lead_time_max + '</td>' +
+                                '<td>'+ value.lead_time_min + '</td>' +
+                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</br>'+value.minLeadTimeErrror+'</br>'+value.maxLeadTimeErrror+'</td>' +
                                 '</tr>');
                             });
                         }
@@ -2244,6 +2334,75 @@ input {
         {
             var confirm = alertify.confirm('You are not able to edit this field while any Addon is in selection',function (e) {
                    }).set({title:"Remove Addons And Prices"})
+        }
+        function checkGreater(CurrentInput, row)
+        {
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');
+            input.value = val;
+            var minLeadTime = $('#lead_time_'+row).val();
+            var maxLeadTime = $('#lead_time_max_'+row).val();
+            // if(minLeadTime != '')
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = false;
+            // }
+            // else
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = true;
+            // }
+            if(minLeadTime != '' && maxLeadTime != '')
+            {
+                if(Number(minLeadTime) > Number(maxLeadTime))
+                {
+                    var id = CurrentInput.id;
+                    if(id == 'lead_time')
+                    {
+                        showMinLeadTimeError(row);
+                        removeMaxLeadTimeError(row);
+                    }
+                    else
+                    {
+                        showMaxLeadTimeError(row);
+                        removeMinLeadTimeError(row);
+                    }
+                }
+                else
+                {
+                    removeMinLeadTimeError(row);
+                    removeMaxLeadTimeError(row);
+                }
+            }
+            else
+            {
+                removeMinLeadTimeError(row);
+                removeMaxLeadTimeError(row);
+            }
+        }
+        function showMinLeadTimeError(row)
+        {
+            document.getElementById('minLeadTimeError_'+row).textContent="Enter smaller value than max leadtime";
+            document.getElementById('lead_time_'+row).classList.add("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.add("paragraph-class");
+        }
+        function showMaxLeadTimeError(row)
+        {
+            document.getElementById('maxLeadTimeError_'+row).textContent="Enter higher value than min leadtime";
+            document.getElementById('lead_time_max_'+row).classList.add("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.add("paragraph-class");
+        }
+        function removeMinLeadTimeError(row)
+        {
+            document.getElementById('minLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_'+row).classList.remove("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.remove("paragraph-class");
+        }
+        function removeMaxLeadTimeError(row)
+        {
+            document.getElementById('maxLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_max_'+row).classList.remove("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.remove("paragraph-class");
         }
     </script>
 @endsection

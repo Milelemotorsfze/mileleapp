@@ -215,8 +215,28 @@
                         </div>
                     </div>
                     </br>
-
-                    <div class="row " >
+                    <div class="row" hidden id="model_year">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                        <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
+                            oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
+                        </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                        <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
+                            oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
+                        </div>
+                    </div>
+                    <br hidden id="model_year_br">
+                    <div class="row mb-3" hidden id="addon-description">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -312,56 +332,6 @@
                     </div>
                     </br>
                     <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div>
-                        <!-- <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
-
-
-                        <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2" oninput="inputNumberAbsLeadTime(this)"
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
-                        value="{{ old('lead_time') }}"  autocomplete="lead_time">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>
-                                                </div>
-                            @error('lead_time')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div> -->
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <div class="input-group">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
-                                </div>
-                                <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2"
-                                class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time"
-                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this)">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                </div>
-                            </div>
-                            <span id="minLeadTimeError" class="invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <div class="input-group">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
-                                </div>
-                                <input id="lead_time_max" aria-label="measurement" aria-describedby="basic-addon2"
-                                class="form-control widthinput @error('lead_time_max') is-invalid @enderror" name="lead_time_max" oninput="checkGreater(this)"
-                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                </div>
-                            </div>
-                            <span id="maxLeadTimeError" class="invalid-feedback-lead"></span>
-                        </div>
-
-
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
@@ -685,6 +655,11 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
+                            if (data.addon_type.addon_type == 'P') {
+                                $('#addon-description').attr('hidden', false);
+                            } else {
+                                $('#addon-description').attr('hidden', true);
+                            }
                             $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
@@ -1731,7 +1706,7 @@
             $('#kitSupplierButtonToHideandshow').hide();
         }
         function checkGreaterYear(CurrentInput)
-        {   alert('hi') ;
+        {
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
@@ -1783,15 +1758,23 @@
             document.getElementById('model_year_end').classList.remove("is-invalid");
             document.getElementById('modelYearEndError').classList.remove("paragraph-class");
         }
-        function checkGreater(CurrentInput)
+        function checkGreater(CurrentInput, row)
         {
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
             val = val.replace(/^0+|[^\d]/g, '');
             input.value = val;
-            var minLeadTime = $('#lead_time').val();
-            var maxLeadTime = $('#lead_time_max').val();
+            var minLeadTime = $('#lead_time_'+row).val();
+            var maxLeadTime = $('#lead_time_max_'+row).val();
+            // if(minLeadTime != '')
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = false;
+            // }
+            // else
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = true;
+            // }
             if(minLeadTime != '' && maxLeadTime != '')
             {
                 if(Number(minLeadTime) > Number(maxLeadTime))
@@ -1799,50 +1782,50 @@
                     var id = CurrentInput.id;
                     if(id == 'lead_time')
                     {
-                        showMinLeadTimeError();
-                        removeMaxLeadTimeError();
+                        showMinLeadTimeError(row);
+                        removeMaxLeadTimeError(row);
                     }
                     else
                     {
-                        showMaxLeadTimeError();
-                        removeMinLeadTimeError();
+                        showMaxLeadTimeError(row);
+                        removeMinLeadTimeError(row);
                     }
                 }
                 else
                 {
-                    removeMinLeadTimeError();
-                    removeMaxLeadTimeError();
+                    removeMinLeadTimeError(row);
+                    removeMaxLeadTimeError(row);
                 }
             }
             else
             {
-                removeMinLeadTimeError();
-                removeMaxLeadTimeError();
+                removeMinLeadTimeError(row);
+                removeMaxLeadTimeError(row);
             }
         }
-        function showMinLeadTimeError()
+        function showMinLeadTimeError(row)
         {
-            document.getElementById('minLeadTimeError').textContent="Enter smaller value than max leadtime";
-            document.getElementById('lead_time').classList.add("is-invalid");
-            document.getElementById('minLeadTimeError').classList.add("paragraph-class");
+            document.getElementById('minLeadTimeError_'+row).textContent="Enter smaller value than max leadtime";
+            document.getElementById('lead_time_'+row).classList.add("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.add("paragraph-class");
         }
-        function showMaxLeadTimeError()
+        function showMaxLeadTimeError(row)
         {
-            document.getElementById('maxLeadTimeError').textContent="Enter higher value than min leadtime";
-            document.getElementById('lead_time_max').classList.add("is-invalid");
-            document.getElementById('maxLeadTimeError').classList.add("paragraph-class");
+            document.getElementById('maxLeadTimeError_'+row).textContent="Enter higher value than min leadtime";
+            document.getElementById('lead_time_max_'+row).classList.add("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.add("paragraph-class");
         }
-        function removeMinLeadTimeError()
+        function removeMinLeadTimeError(row)
         {
-            document.getElementById('minLeadTimeError').textContent="";
-            document.getElementById('lead_time').classList.remove("is-invalid");
-            document.getElementById('minLeadTimeError').classList.remove("paragraph-class");
+            document.getElementById('minLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_'+row).classList.remove("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.remove("paragraph-class");
         }
-        function removeMaxLeadTimeError()
+        function removeMaxLeadTimeError(row)
         {
-            document.getElementById('maxLeadTimeError').textContent="";
-            document.getElementById('lead_time_max').classList.remove("is-invalid");
-            document.getElementById('maxLeadTimeError').classList.remove("paragraph-class");
+            document.getElementById('maxLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_max_'+row).classList.remove("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.remove("paragraph-class");
         }
         function inputNumberAbs(currentPriceInput)
         {

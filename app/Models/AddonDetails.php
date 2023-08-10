@@ -16,8 +16,6 @@ class AddonDetails extends Model
         'addon_type_name',
         'part_number',
         'payment_condition',
-        'lead_time',
-        'lead_time_max',
         'model_year_start',
         'model_year_end',
         'additional_remarks',

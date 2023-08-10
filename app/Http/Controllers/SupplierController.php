@@ -380,6 +380,7 @@ class SupplierController extends Controller
     }
     public function store(Request $request)
     {
+        // dd($request->all());
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
@@ -411,7 +412,8 @@ class SupplierController extends Controller
                     {
                         foreach($headings[0] as $heading)
                         {
-                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading)
+                            && in_array('lead_time_min', $heading) && in_array('lead_time_max', $heading))
                             {
                                 Excel::import(new SupplierAddonImport,request()->file('file'));
                                 $dataError = [];
@@ -419,8 +421,8 @@ class SupplierController extends Controller
                                 $existingAddon = [];
                                 for ($i=0; $i< count($rows); $i++)
                                 {
-                                    $currencyError = $priceErrror = $addonError = '';
-                                    if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
+                                    $currencyError = $priceErrror = $addonError = $minLeadTime = $maxLeadTime ='';
+                                    if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'] OR $rows[$i]['lead_time_min'] OR $rows[$i]['lead_time_max'])
                                     {
                                         if($rows[$i]['currency'] == '')
                                         {
@@ -430,6 +432,7 @@ class SupplierController extends Controller
                                         {
                                             $currencyError = "currency should be  AED or USD";
                                         }
+
                                         if($rows[$i]['purchase_price'] == '')
                                         {
                                             $priceErrror = "Purchase price field is required";
@@ -477,9 +480,30 @@ class SupplierController extends Controller
                                                 }
                                             }
                                         }
-                                        if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
+                                        if($rows[$i]['lead_time_min'] != '' && !is_numeric($rows[$i]['lead_time_min']) && strlen($rows[$i]['lead_time_min']) > 3)
+                                        { 
+                                            $minLeadTime = "Number with maximum 3 digits expected as Minimum Lead Time ";
+                                        }
+                                        if($rows[$i]['lead_time_max'] != ''  && !is_numeric($rows[$i]['lead_time_max']) && strlen($rows[$i]['lead_time_max']) > 3)
                                         {
-                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]);
+                                            $maxLeadTime = "Number with maximum 3 digits expected as Maximum Lead Time ";
+                                        }
+                                        if($rows[$i]['lead_time_min'] != '' && is_numeric($rows[$i]['lead_time_min']) && strlen($rows[$i]['lead_time_min']) <= 3
+                                        && $rows[$i]['lead_time_max'] != '' && is_numeric($rows[$i]['lead_time_max']) && strlen($rows[$i]['lead_time_max']) <= 3)
+                                        {
+                                            if(intval($rows[$i]['lead_time_max']) > $rows[$i]['lead_time_min'])
+                                            {
+                                                $maxLeadTime = "Greater than minimum leadtime expected";
+                                            }
+                                        }
+                                        if($currencyError != '' OR $priceErrror != '' OR $addonError != '' OR $minLeadTime != '' OR $maxLeadTime != '')
+                                        {
+                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,
+                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError, 
+                                                                    "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror,
+                                                                    "lead_time_min" => $rows[$i]['lead_time_min'], "minLeadTimeErrror" => $minLeadTime,
+                                                                    "lead_time_max" => $rows[$i]['lead_time_max'], "maxLeadTimeErrror" => $maxLeadTime,
+                                                                ]);
                                         }
                                         $rows[$i]->delete();
                                     }
@@ -560,7 +584,7 @@ class SupplierController extends Controller
                             }
                             else
                             {
-                                $data['headingError'] = "Uploading excel headings should be addon_code , currency and purchase_price";
+                                $data['headingError'] = "Uploading excel headings should be addon_code , currency , purchase_price , lead_time_min and lead_time_max";
                                 return response()->json(['success' => true,'data' => $data], 200);;
                             }
                         }
@@ -597,7 +621,8 @@ class SupplierController extends Controller
                             {
                                 foreach($headings[0] as $heading)
                                 {
-                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading)
+                                    && in_array('lead_time_min', $heading) && in_array('lead_time_max', $heading))
                                     {
                                         Excel::import(new SupplierAddonImport,request()->file('file'));
                                         $supplierAddons = SupplierAddonTemp::all();
@@ -613,6 +638,24 @@ class SupplierController extends Controller
                                             {
                                                 $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                            }
+                                            if($supplierAddon->lead_time != '' && $supplierAddon->lead_time_max != '')
+                                            {
+                                                if(intval($supplierAddon->lead_time) == intval($supplierAddon->lead_time_max))
+                                                {
+                                                    $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                    $supAdd['lead_time_max'] = NULL;
+                                                }
+                                                elseif(intval($supplierAddon->lead_time) < intval($supplierAddon->lead_time_max))
+                                                {
+                                                    $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                    $supAdd['lead_time_max'] = $supplierAddon->lead_time_max;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                $supAdd['lead_time_max'] = $supplierAddon->lead_time_max;
                                             }
                                             $suppliers = SupplierAddons::create($supAdd);
                                             $supAdd['supplier_addon_id'] = $suppliers->id;
@@ -643,14 +686,14 @@ class SupplierController extends Controller
                 {
                     if(count($request->supplierAddon) > 0)
                     {
-                        info($request->supplierAddon);
+                        // info($request->supplierAddon);
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
 
-                            if($supAddon['addon_purchase_price_in_usd'] != NULL || $supAddon['addon_purchase_price'] != NULL)
+                            if(isset($supAddon['addon_purchase_price_in_usd']) || isset($supAddon['addon_purchase_price']))
                             {
-                                if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')
+                                if($supAddon['currency'] != '' AND isset($supAddon['addon_id']))
                                 {
                                     $supAdd['currency'] = $supAddon['currency'];
                                     if($supAddon['currency'] == 'AED')
@@ -669,6 +712,24 @@ class SupplierController extends Controller
                                             if(!in_array($addon_code, $addonAlredyExist))
                                             {
                                                 $supAdd['addon_details_id'] = $addon_code;
+                                                if($supAddon['lead_time'] != '' && $supAddon['lead_time_max'] != '')
+                                                {
+                                                    if(intval($supAddon['lead_time']) == intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = NULL;
+                                                    }
+                                                    elseif(intval($supAddon['lead_time']) < intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                    $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                }
                                                 $suppliers = SupplierAddons::create($supAdd);
                                                 $supAdd['supplier_addon_id'] = $suppliers->id;
                                                 $createHistory = PurchasePriceHistory::create($supAdd);
@@ -882,7 +943,8 @@ class SupplierController extends Controller
                     {
                         foreach($headings[0] as $heading)
                         {
-                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                            if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading)
+                            && in_array('lead_time_min', $heading) && in_array('lead_time_max', $heading))
                             {
                                 Excel::import(new SupplierAddonImport,request()->file('file'));
                                 $dataError = [];
@@ -890,8 +952,8 @@ class SupplierController extends Controller
                                 $existingAddon = [];
                                 for ($i=0; $i< count($rows); $i++)
                                 {
-                                    $currencyError = $priceErrror = $addonError = '';
-                                    if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'])
+                                    $currencyError = $priceErrror = $addonError = $minLeadTime = $maxLeadTime ='';
+                                    if($rows[$i]['currency'] OR $rows[$i]['purchase_price'] OR $rows[$i]['addon_code'] OR $rows[$i]['lead_time_min'] OR $rows[$i]['lead_time_max'])
                                     {
                                         if($rows[$i]['currency'] == '')
                                         {
@@ -956,9 +1018,30 @@ class SupplierController extends Controller
                                                 }
                                             }
                                         }
-                                        if($currencyError != '' OR $priceErrror != '' OR $addonError != '')
+                                        if($rows[$i]['lead_time_min'] != '' && !is_numeric($rows[$i]['lead_time_min']) && strlen($rows[$i]['lead_time_min']) > 3)
                                         {
-                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,"currency" => $rows[$i]['currency'], "currencyError" => $currencyError, "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror]);
+                                            $minLeadTime = "Number with maximum 3 digits expected as Minimum Lead Time ";
+                                        }
+                                        if($rows[$i]['lead_time_max'] != '' && !is_numeric($rows[$i]['lead_time_max']) && strlen($rows[$i]['lead_time_min']) > 3)
+                                        {
+                                            $maxLeadTime = "Number with maximum 3 digits expected as Minimum Lead Time ";
+                                        }
+                                        if($rows[$i]['lead_time_min'] != '' && is_numeric($rows[$i]['lead_time_min']) && strlen($rows[$i]['lead_time_min']) <= 3
+                                        && $rows[$i]['lead_time_max'] != '' && is_numeric($rows[$i]['lead_time_max']) && strlen($rows[$i]['lead_time_min']) <= 3)
+                                        {
+                                            if(intval($rows[$i]['lead_time_max']) > $rows[$i]['lead_time_min'])
+                                            {
+                                                $maxLeadTime = "Greater than minimum leadtime expected";
+                                            }
+                                        }
+                                        if($currencyError != '' OR $priceErrror != '' OR $addonError != '' OR $minLeadTime != '' OR $maxLeadTime != '')
+                                        {
+                                            array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,
+                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError, 
+                                                                    "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror,
+                                                                    "lead_time_min" => $rows[$i]['lead_time_min'], "minLeadTimeErrror" => $minLeadTime,
+                                                                    "lead_time_max" => $rows[$i]['lead_time_max'], "maxLeadTimeErrror" => $maxLeadTime,
+                                                                ]);
                                         }
                                         $rows[$i]->delete();
                                     }
@@ -1076,7 +1159,8 @@ class SupplierController extends Controller
                             {
                                 foreach($headings[0] as $heading)
                                 {
-                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading))
+                                    if(in_array('addon_code', $heading) && in_array('currency', $heading) && in_array('purchase_price', $heading)
+                                    && in_array('lead_time_min', $heading) && in_array('lead_time_max', $heading))
                                     {
                                         Excel::import(new SupplierAddonImport,request()->file('file'));
                                         $supplierAddons = SupplierAddonTemp::all();
@@ -1092,6 +1176,24 @@ class SupplierController extends Controller
                                             {
                                                 $supAdd['purchase_price_usd'] = $supplierAddon->purchase_price;
                                                 $supAdd['purchase_price_aed'] = $supplierAddon->purchase_price * 3.6725;
+                                            }
+                                            if($supplierAddon->lead_time != '' && $supplierAddon->lead_time_max != '')
+                                            {
+                                                if(intval($supplierAddon->lead_time) == intval($supplierAddon->lead_time_max))
+                                                {
+                                                    $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                    $supAdd['lead_time_max'] = NULL;
+                                                }
+                                                elseif(intval($supplierAddon->lead_time) < intval($supplierAddon->lead_time_max))
+                                                {
+                                                    $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                    $supAdd['lead_time_max'] = $supplierAddon->lead_time_max;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                $supAdd['lead_time_min'] = $supplierAddon->lead_time;
+                                                $supAdd['lead_time_max'] = $supplierAddon->lead_time_max;
                                             }
                                             $suppliers = SupplierAddons::create($supAdd);
                                             $supAdd['supplier_addon_id'] = $suppliers->id;
@@ -1137,9 +1239,9 @@ class SupplierController extends Controller
                         $addonAlredyExist = [];
                         foreach($request->supplierAddon as $supAddon)
                         {
-                            if($supAddon['addon_purchase_price_in_usd'] != '' OR $supAddon['addon_purchase_price'] != '')
+                            if(isset($supAddon['addon_purchase_price_in_usd'] ) OR isset($supAddon['addon_purchase_price'] ))
                             {
-                                if($supAddon['currency'] != '' AND $supAddon['addon_id'] != '')
+                                if($supAddon['currency'] != '' AND isset($supAddon['addon_id']))
                                 {
                                     $supAdd['currency'] = $supAddon['currency'];
                                     if($supAddon['currency'] == 'AED')
@@ -1158,6 +1260,24 @@ class SupplierController extends Controller
                                             if(!in_array($addon_code, $addonAlredyExist))
                                             {
                                                 $supAdd['addon_details_id'] = $addon_code;
+                                                if($supAddon['lead_time'] != '' && $supAddon['lead_time_max'] != '')
+                                                {
+                                                    if(intval($supAddon['lead_time']) == intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = NULL;
+                                                    }
+                                                    elseif(intval($supAddon['lead_time']) < intval($supAddon['lead_time_max']))
+                                                    {
+                                                        $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                        $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    $supAdd['lead_time_min'] = $supAddon['lead_time'];
+                                                    $supAdd['lead_time_max'] = $supAddon['lead_time_max'];
+                                                }
                                                 $suppliers = SupplierAddons::create($supAdd);
                                                 $supAdd['supplier_addon_id'] = $suppliers->id;
                                                 $createHistory = PurchasePriceHistory::create($supAdd);

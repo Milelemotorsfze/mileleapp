@@ -57,6 +57,7 @@
                                 <th>Model Line</th>
                                 <th>Model Description</th>
                                 <th>Lead Time</th>
+                                <th>Model Year</th>
                                 <th>Additional Remarks</th>
                                 @if($content == '')
                                     @can('supplier-addon-purchase-price-view')
@@ -112,6 +113,7 @@
                                         <td>All Model Lines</td>
                                         <td></td>
                                         <td>{{$addonsdata->lead_time}} Days</td>
+                                        <td>{{$addonsdata->model_year_start}} @if($addonsdata->model_year_end != '') - {{$addonsdata->model_year_end}} @endif</td>
                                         <td>{{$addonsdata->additional_remarks}}</td>
                                         @if($content == '')
                                             @can('supplier-addon-purchase-price-view')
@@ -207,6 +209,7 @@
                                             </td>
                                             <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>
                                             <td>{{$addonsdata->lead_time}} Days</td>
+                                            <td>{{$addonsdata->model_year_start}} @if($addonsdata->model_year_end != '') - {{$addonsdata->model_year_end}} @endif</td>
                                             <td>{{$addonsdata->additional_remarks}}</td>
                                             @if($content == '')
                                                 @can('supplier-addon-purchase-price-view')

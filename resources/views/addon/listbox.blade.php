@@ -266,6 +266,14 @@
                       {{$addonsdata->lead_time}} Days
                     </div>
                   @endif
+                  @if($addonsdata->model_year_start OR $addonsdata->model_year_end)
+                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                      Model Year
+                    </div>
+                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                    {{$addonsdata->model_year_start}} @if($addonsdata->model_year_end != '') - {{$addonsdata->model_year_end}} @endif
+                    </div>
+                  @endif
                   @if($addonsdata->part_number)
                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                       Part Number

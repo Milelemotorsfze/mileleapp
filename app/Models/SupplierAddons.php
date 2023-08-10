@@ -16,6 +16,8 @@ class SupplierAddons extends Model
         'purchase_price_aed',
         'purchase_price_usd',
         'status',
+        'lead_time_min',
+        'lead_time_max',
         'created_by',
         'updated_by',
         'deleted_by'

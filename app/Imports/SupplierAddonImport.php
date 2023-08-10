@@ -97,6 +97,8 @@ class SupplierAddonImport implements ToCollection, WithHeadingRow
                 'addon_code' => $row['addon_code'],
                 'currency' => $row['currency'],
                 'purchase_price' => $row['purchase_price'],
+                'lead_time_min' => $row['lead_time_min'],
+                'lead_time_max' => $row['lead_time_max'],
             ]);
         }  
     }

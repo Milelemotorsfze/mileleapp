@@ -296,26 +296,6 @@
                     </br>
 
                     <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
-
-
-                        <input id="lead_time" aria-label="measurement" aria-describedby="basic-addon2" oninput="inputNumberAbsLeadTime(this)"
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
-                        value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>
-                                                </div>
-                            @error('lead_time')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
                         <div class="col-xxl-3 col-lg-2 col-md-4">
                             <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
                         </div>
@@ -1656,6 +1636,75 @@
                 val =val.replace(/\-+$/,"");
             }
             input.value = val;
+        }
+        function checkGreater(CurrentInput, row)
+        {
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');
+            input.value = val;
+            var minLeadTime = $('#lead_time_'+row).val();
+            var maxLeadTime = $('#lead_time_max_'+row).val();
+            // if(minLeadTime != '')
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = false;
+            // }
+            // else
+            // {
+            //     document.getElementById('lead_time_max_'+row).readOnly = true;
+            // }
+            if(minLeadTime != '' && maxLeadTime != '')
+            {
+                if(Number(minLeadTime) > Number(maxLeadTime))
+                {
+                    var id = CurrentInput.id;
+                    if(id == 'lead_time')
+                    {
+                        showMinLeadTimeError(row);
+                        removeMaxLeadTimeError(row);
+                    }
+                    else
+                    {
+                        showMaxLeadTimeError(row);
+                        removeMinLeadTimeError(row);
+                    }
+                }
+                else
+                {
+                    removeMinLeadTimeError(row);
+                    removeMaxLeadTimeError(row);
+                }
+            }
+            else
+            {
+                removeMinLeadTimeError(row);
+                removeMaxLeadTimeError(row);
+            }
+        }
+        function showMinLeadTimeError(row)
+        {
+            document.getElementById('minLeadTimeError_'+row).textContent="Enter smaller value than max leadtime";
+            document.getElementById('lead_time_'+row).classList.add("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.add("paragraph-class");
+        }
+        function showMaxLeadTimeError(row)
+        {
+            document.getElementById('maxLeadTimeError_'+row).textContent="Enter higher value than min leadtime";
+            document.getElementById('lead_time_max_'+row).classList.add("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.add("paragraph-class");
+        }
+        function removeMinLeadTimeError(row)
+        {
+            document.getElementById('minLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_'+row).classList.remove("is-invalid");
+            document.getElementById('minLeadTimeError_'+row).classList.remove("paragraph-class");
+        }
+        function removeMaxLeadTimeError(row)
+        {
+            document.getElementById('maxLeadTimeError_'+row).textContent="";
+            document.getElementById('lead_time_max_'+row).classList.remove("is-invalid");
+            document.getElementById('maxLeadTimeError_'+row).classList.remove("paragraph-class");
         }
 </script>
 @endsection
