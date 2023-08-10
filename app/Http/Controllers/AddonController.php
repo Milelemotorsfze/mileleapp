@@ -153,6 +153,24 @@ class AddonController extends Controller
             }elseif ($request->description_text != null) {
                 $input['description'] = $request->description_text;
             }
+            if($request->model_year_start != '' && $request->model_year_end != '')
+            {
+                if(intval($request->model_year_start) < intval($request->model_year_end))
+                {
+                    $input['model_year_start'] = $request->model_year_start;
+                    $input['model_year_end'] = $request->model_year_end;
+                }
+                else if(intval($request->model_year_start) == intval($request->model_year_end))
+                {
+                    $input['model_year_start'] = $request->model_year_start;
+                    $input['model_year_end'] = NULL;
+                }
+                else
+                {
+                    $input['model_year_start'] = NULL;
+                    $input['model_year_end'] = NULL;
+                }
+            }
             $addon_details = AddonDetails::create($input);
             if($request->selling_price != '')
             {
