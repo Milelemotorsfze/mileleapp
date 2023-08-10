@@ -215,28 +215,8 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row" hidden id="model_year">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
-                        </div>
-                    </div>
-                    <br hidden id="model_year_br">
-                    <div class="row mb-3" hidden id="addon-description">
+
+                    <div class="row " >
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -270,6 +250,28 @@
 {{--                            @endcan--}}
                         </div>
                     </div>
+                    <br>
+                    <div class="row" hidden id="model_year">
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
+                        </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <span class="error">* </span>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
+                        </div>
+                        <div class="col-xxl-4 col-lg-5 col-md-11">
+                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
+                        </div>
+                    </div>
+                    <br hidden id="model_year_br">
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price') }}</label>
@@ -532,7 +534,7 @@
         var i=1;
         var fixingCharge = 'yes';
         var sub ='1';
-        var formInputError = false;
+        // var formInputError = false;
 
         $(document).ready(function () {
 
@@ -551,7 +553,19 @@
 
             });
             $('#description').change(function () {
-                uniqueCheckAccessories();
+                var addonType = $('#addon_type').val();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
+            })
+            $('#part_number').keyup(function () {
+                var addonType =  $('#addon_type').val();
+                if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
             })
             $("#descr-dropdown-button").click(function () {
                 $('#description-text').attr('hidden', true);
@@ -630,37 +644,16 @@
                 addonDescriptionUniqueCheck();
             });
 
-            function addonDescriptionUniqueCheck() {
-                var id = $('#addon_id').val();
-                var description = $('#description-text').val();
-                let url = '{{ route('addon.getUniqueAddonDescription') }}';
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        addon_id: id,
-                        description: description
-
-                    },
-                    success: function (data) {
-                        if (data > 0) {
-                            var msg = "This Description is already existing"
-                            showAddonDescriptionError(msg);
-                            formInputError = true;
-                        } else {
-                            var msg = "";
-                            removeAddonDescriptionError();
-                            formInputError = false;
-                        }
-                    }
-                })
-            }
-
             $('#addon_id').change(function () {
                 var id = $('#addon_id').val();
                 var addonType = $('#addon_type').val();
                 addonDescriptionUniqueCheck();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
                 let url = '{{ route('addon.getAddonDescription') }}';
                 $.ajax({
                     type: "GET",
@@ -668,6 +661,7 @@
                     dataType: "json",
                     data: {
                         addon_id: id,
+                        addonType:addonType
                     },
                     success: function (data) {
                         $('#description').empty();
@@ -725,11 +719,40 @@
                 }
             });
 
+        function addonDescriptionUniqueCheck() {
+            var id = $('#addon_id').val();
+            var description = $('#description-text').val();
+            var addonType = $('#addon_type').val();
 
+            let url = '{{ route('addon.getUniqueAddonDescription') }}';
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: "json",
+                data: {
+                    addon_id: id,
+                    description: description,
+                    addonType:addonType
+
+                },
+                success: function (data) {
+                    if (data > 0) {
+                        var msg = "This Description is already existing"
+                        showAddonDescriptionError(msg);
+                        formInputError = true;
+                    } else {
+                        var msg = "";
+                        removeAddonDescriptionError();
+                        formInputError = false;
+                    }
+                }
+            })
+        }
         function uniqueCheckAccessories() {
             var addon_id = $('#addon_id').val();
             var description = $('#description').val();
             var newDescription = $('#description-text').val();
+            var addonType = $('#addon_type').val();
             var uniqueCounts = [];
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
@@ -747,12 +770,17 @@
                             newDescription:newDescription,
                             brand:brand[0],
                             index:i,
-                            model_line:modelLine[0]
+                            model_line:modelLine,
+                            addonType:addonType
                         },
                     dataType: 'json',
                     success: function (data) {
                         if(data.count > 0 ) {
-                            $msg = "This Addon,Description,Brand and model line Combination is existing";
+                            var modelLine = "";
+                            if(data.model_line) {
+                              var  modelLine = data.model_line;
+                            }
+                            $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
                             showBrandError($msg,data.index);
                             var count = data.count;
                             uniqueCounts.push(count);
@@ -774,13 +802,87 @@
                 formInputError = false;
             }
         }
+        function uniqueCheckSpareParts(){
+            var addon_id = $('#addon_id').val();
+            var description = $('#description').val();
+            var newDescription = $('#description-text').val();
+            var addonType = $('#addon_type').val();
+            var partNumber = $('#part_number').val();
+
+            var isExistingUniqueCounts = [];
+            var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+            for (var i = 1; i <= indexValue; i++) {
+                var brand =  $('#selectBrandMo'+i).val();
+                var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                for(let j=1; j<=index; j++)
+                {
+                    var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
+                    var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                    $.ajax({
+                        url: "{{url('getUniqueSpareParts')}}",
+                        type: "GET",
+                        async: false,
+                        cache: false,
+                        data:
+                            {
+                                addon_id: addon_id[0],
+                                description:description[0],
+                                newDescription:newDescription,
+                                part_number:partNumber,
+                                brand:brand[0],
+                                i:i,
+                                j:j,
+                                model_line:modelLine[0],
+                                model_number:modelNumber,
+                                addonType:addonType
+                            },
+                        dataType: 'json',
+                        success: function (data) {
+                            if(data.count > 0 ) {
+                                var modelNumber = "";
+                                if(data.model_number) {
+                                    var modelNumber = data.model_number;
+                                }
+                                $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                                showSPModelLineError($msg,data.i,data.j);
+                                var count = data.count;
+                                isExistingUniqueCounts.push(count);
+                                // alert(formInputError);
+
+                            }else{
+
+                                removeSPModelLineError(data.i,data.j);
+                                isExistingUniqueCounts.pop();
+                            }
+                        }
+                    });
+                }
+
+            }
+
+            var uniqueValueCount = isExistingUniqueCounts.length;
+            if(uniqueValueCount > 0) {
+                formInputError = true;
+            }else{
+                formInputError = false;
+            }
+        }
 
         $('form').on('submit', function (e)
         {
-            removeModelYearEndError();
             sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
+            formInputError = false;
+            removeModelYearEndError();
+            if(inputAddonType == 'P') {
+                uniqueCheckAccessories();
+
+            }else if(inputAddonType == 'SP') {
+                uniqueCheckSpareParts();
+            }
+            addonDescriptionUniqueCheck();
+
             // var inputBrand = $('#selectBrand1').val();
             // var inputsupplierId = $('#itemArr1').val();
             // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
@@ -810,7 +912,7 @@
             // {
             //     $msg = "Brand is required";
             //     showBrandError($msg);
-            //     formInputError = true;
+
             // }
             if(inputAddonType == '')
             {
@@ -820,6 +922,7 @@
             }
             else
             {
+
                 if(inputAddonType == 'SP')
                 {
                     var inputPartNumber = $('#part_number').val();
@@ -912,6 +1015,7 @@
                 showAddonNameError($msg);
                 formInputError = true;
             }
+
             if(fixingCharge == 'no')
             {
                 var inputFixingChargeAmount = $('#fixing_charge_amount').val();
@@ -922,6 +1026,7 @@
                     formInputError = true;
                 }
             }
+
             if(formInputError == true)
             {
                 e.preventDefault();
@@ -1041,87 +1146,6 @@
             document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.remove("paragraph-class");
         }
 
-        function showkitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
-            document.getElementById("kitSupplierDropdown1").classList.add("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.add("paragraph-class");
-        }
-        function removekitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent="";
-            document.getElementById("kitSupplierDropdown1").classList.remove("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.remove("paragraph-class");
-        }
-        function showkitSupplier1Item1Error($msg)
-        {
-            document.getElementById("kitSupplier1Item1Error").textContent=$msg;
-            document.getElementById("kitSupplier1Item1").classList.add("is-invalid");
-            document.getElementById("kitSupplier1Item1Error").classList.add("paragraph-class");
-        }
-        function removekitSupplier1Item1Error($msg)
-        {
-        }
-        function showSupplier1Kit1QuantityError($msg)
-        {
-            document.getElementById("Supplier1Kit1QuantityError").textContent=$msg;
-            document.getElementById("Supplier1Kit1Quantity").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1QuantityError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1QuantityError($msg)
-        {
-            document.getElementById("Supplier1Kit1QuantityError").textContent="";
-            document.getElementById("Supplier1Kit1Quantity").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1QuantityError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.remove("paragraph-class");
-        }
         function showSupplierError($msg)
         {
             document.getElementById("supplierError").textContent=$msg;

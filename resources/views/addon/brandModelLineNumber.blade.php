@@ -130,12 +130,16 @@
                 $('#selectModelNumberDiscri'+index+'Des'+i).empty();
             }
             hideOption(index,value);
+            uniqueCheckSpareParts();
+
         });
 
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
+            uniqueCheckSpareParts();
+
         });
 
         function hideOption(index,value) {
@@ -157,18 +161,28 @@
             // sortDropDownListByText();
         }
 
-        $(document.body).on('select2:select', ".spare-parts-model-lines", function (e) { 
+        $(document.body).on('select2:select', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
+            uniqueCheckSpareParts();
+
         });
+        $(document.body).on('select2:select', ".model-descriptions", function (e) {
+            uniqueCheckSpareParts();
+        });
+        $(document.body).on('select2:unselect', ".model-descriptions", function (e) {
+            uniqueCheckSpareParts();
+        });
+
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
             var index = $(this).attr('data-index');
             var modelIndex = $(this).attr('data-model-index');
             var id = e.params.data.id;
             var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text);
+            uniqueCheckSpareParts();
         });
 
         function modelLineDataHide(index,modelIndex,value) {
@@ -203,7 +217,7 @@
             // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
             //     if (e) {
                     var countRow = 0;
-                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; 
+                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                     // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
                     if (countRow > 1) {
                         var indexNumber = $(this).attr('data-index');
@@ -289,7 +303,7 @@
            //      if (e) {
                     var indexNumber = $(this).attr('data-index');
                     var countRow = 0;
-                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;  
+                    var countRow = $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber).length;
                     if (countRow > 1) {
                         var modelIndex = $(this).attr('data-model-index');
                         if (modelIndex == 1) {
@@ -327,7 +341,7 @@
                             $(this).find('.removeButtonModelItem').attr('data-index', indexNumber);
                             $(this).find('.removeButtonModelItem').attr('data-model-index', modelIndex);
                             $(this).find('.removeButtonModelItem').attr('id', 'removeModelNumberdrop'+indexNumber+'Des'+modelIndex);
-                            
+
 
                             $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
                             $(this).find('.ModelDescriptionError').attr('id','ModelDescriptionError_'+indexNumber+'_'+modelIndex);
@@ -591,8 +605,8 @@
     function selectBrandDisp(id,row)
     {
         var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-
-
+        console.log(indexValue);
+        console.log(row);
         var value =$('#selectBrandMo'+id).val();
         var brandId = value;
         if(brandId != '')
@@ -687,10 +701,13 @@
             }
         }
 
-        let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropDr.hidden = false
-        let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
-        showDel.hidden = false
+        // let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
+        // showDivdropDr.hidden = false
+        $('#showDivdropDr'+id+'Des'+row).attr('hidden', false);
+        // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
+        // showDel.hidden = false
+        $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+
         let showaddtrimDis = document.getElementById('showaddtrimDis');
         showaddtrimDis.hidden = false
         $.ajax
@@ -769,7 +786,7 @@
         }
     }
     function showModelNumberDropdown(id,row)
-    { 
+    {
         $('showModelNumberdrop'+id+'Des'+row).attr('hidden', false);
         let showPartNumber1 = document.getElementById('showaddtrd'+id);
         showPartNumber1.hidden = false

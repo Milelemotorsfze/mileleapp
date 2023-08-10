@@ -96,6 +96,7 @@
             var currentId = 'selectModelLine'+index;
             var data = e.params.data.id;
             optionEnable(currentId,data);
+            uniqueCheckAccessories()
 
         });
          function optionEnable(currentId,data) {
@@ -205,6 +206,7 @@
 
 
         })
+
         $("#add").on("click", function ()
         {
             // $('#allbrands').prop('disabled',true);

@@ -43,25 +43,18 @@
                                 @endforeach
                             </select>
                             <span id="ModelLineError_{{$i}}_1" class="ModelLineError invalid-feedback"></span>
-                            @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+
                         </div>
                         <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop{{$i}}Des1" hidden>
                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                             <select class="compare-tag1 model-descriptions" name="brand[{{$i}}][model][1][model_number][]" id="selectModelNumberDiscri{{$i}}Des1"
-                                    multiple="true" style="width: 100%;">
+                                    multiple="true" style="width: 100%;"   onchange=selectModelDescipt({{$i}},1)>
                                 @foreach($modelLines as $modelLine)
                                     <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
                                 @endforeach
                             </select>
-                            @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                            <span id="ModelDescriptionError_{{$i}}_1" class="ModelDescriptionError invalid-feedback"></span>
+
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">
@@ -137,16 +130,12 @@
                                     @endforeach
                             </select>
                             <span id="ModelLineError_{{$i}}_{{$j}}" class="ModelLineError invalid-feedback"></span>
-                            @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+
                         </div>
                         <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop{{$i}}Des{{$j}}" @if($ModelLine->is_all_model_lines == 'yes') hidden @endif >
                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                             <select class="compare-tag1 model-descriptions" name="brand[{{$i}}][model][{{$j}}][model_number][]" id="selectModelNumberDiscri{{$i}}Des{{$j}}"
-                                    multiple="true" style="width: 100%;">
+                                    multiple="true" style="width: 100%;"   onchange=selectModelDescipt({{$i}},{{$j}})>
                                     @if(isset($ModelLine->allDes))
                                 @foreach($ModelLine->allDes as $allDes)
                                     <option class="{{$ModelLine->brand_id}}" value="{{$allDes->id}}" @if(in_array(" $allDes->id ", $ModelLine->modeldes)) selected @endif
@@ -154,11 +143,8 @@
                                 @endforeach
                                 @endif
                             </select>
-                            @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                            <span id="ModelDescriptionError_{{$i}}_{{$j}}" class="ModelDescriptionError invalid-feedback"></span>
+
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="{{$i}}"  data-model-index="{{$j}}" id="removeModelNumberdrop{{$i}}Des{{$j}}">
@@ -228,11 +214,15 @@
             }
 
             hideOption(index,value);
+            uniqueCheckSpareParts();
+
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
+            uniqueCheckSpareParts();
+
         });
 
         function hideOption(index,value) {
@@ -258,6 +248,7 @@
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
+            uniqueCheckSpareParts();
         });
 
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
@@ -265,9 +256,15 @@
             var modelIndex = $(this).attr('data-model-index');
             var id = e.params.data.id;
             var text = e.params.data.text;
-            modelLineDataAppend(index,modelIndex,id,text)
+            modelLineDataAppend(index,modelIndex,id,text);
+            uniqueCheckSpareParts();
         });
-
+        $(document.body).on('select2:select', ".model-descriptions", function (e) {
+            uniqueCheckSpareParts();
+        });
+        $(document.body).on('select2:unselect', ".model-descriptions", function (e) {
+            uniqueCheckSpareParts();
+        });
         function modelLineDataHide(index,modelIndex,value) {
             var indexValue = $(".MoDes"+index).find(".MoDesApndHere"+index).length;
 
@@ -354,12 +351,17 @@
                         $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
                         $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
                         $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);
+                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('onchange','selectModelNumberDiscri('+ index +','+i+')');
                         $("#selectModelNumberDiscri"+index+"Des"+i).select2
                         ({
                             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
                             allowClear: true,
                         });
-                        $(this).find('#removeModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'removeModelNumberdrop'+ index +'Des'+i);
+
+                        $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
+                        $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
+                        $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
+                        $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
 
                     }
                     $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
@@ -407,6 +409,10 @@
 
                     $(this).find('.model-descriptions').attr('name', 'brand['+ indexNumber +'][model]['+ modelIndex +'][model_number][]');
                     $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri'+ indexNumber +'Des'+ modelIndex);
+                    $(this).find('.model-descriptions').attr('onchange','selectModelNumberDiscri('+ indexNumber +','+modelIndex+')');
+
+                    $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
+                    $(this).find('.ModelDescriptionError').attr('id','ModelDescriptionError_'+indexNumber+'_'+modelIndex);
                     ////////////// end ////////////////
 
                     $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
@@ -509,23 +515,16 @@
 
                                             </select>
                                             <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
-                                             @error('is_primary_payment_method')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                             @enderror
+
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                             <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
-                                                multiple="true" style="width: 100%;">
+                                                multiple="true" style="width: 100%;"   onchange=selectModelDescipt(${index},1)>
 
                                             </select>
-                                            @error('is_primary_payment_method')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
+                                              <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>
+
                                         </div>
                                         <div class="col-xxl-1 col-lg-1 col-md-12">
                                             <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">
@@ -584,23 +583,16 @@
         {{--                        @endforeach--}}
                     </select>
                     <span id="ModelLineError_${supplier}_${index}" class="ModelLineError invalid-feedback"></span>
-                        @error('is_primary_payment_method')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                         </span>
-                         @enderror
+
                 </div>
                 <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                     <select class="compare-tag1 model-descriptions" name="brand[${supplier}][model][${index}][model_number][]" id="selectModelNumberDiscri${supplier}Des${index}"
-                        multiple="true" style="width: 100%;">
+                        multiple="true" style="width: 100%;"  onchange=selectModelDescipt(${supplier},${index})>
 
                     </select>
-                    @error('is_primary_payment_method')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
+                      <span id="ModelDescriptionError_${supplier}_${index}" class="ModelDescriptionError invalid-feedback"></span>
+
                 </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
                     <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" id="removeModelNumberdrop${supplier}Des${index}">
@@ -611,7 +603,7 @@
             </div>
          `);
 
-        selectBrandDisp(supplier);
+        selectBrandDisp(supplier,index);
         $("#selectModelNumberDiscri"+supplier+"Des"+index).select2
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
@@ -620,11 +612,7 @@
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
 
-    function selectModelLineDescipt(id,row)
-    {
-        ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
-        showModelNumberDropdown(id,row);
-    }
+
     function showBrandModelLines(id,row) {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
 
@@ -665,26 +653,26 @@
 
         }
     }
-    function selectBrandDisp(id) {
-        // var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-        // if(indexValue == row) {
-        //     showBrandModelLines(id,row);
+    function selectBrandDisp(id,row)
+    {
+        var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
+        console.log(indexValue);
+        console.log(row);
 
-        // }else {
-        //     for(var i = 1;i<=indexValue;i++) {
-        //         showBrandModelLines(id,i);
-        //     }
-        // }
-        var value =$('#selectBrandMo'+id).val();
+        var value = $('#selectBrandMo'+id).val();
         var brandId = value;
         if(brandId != '')
         {
             $msg = "";
             removeSPBrandError($msg,id);
-            var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-            for(var i = 1;i<=indexValue;i++)
-            {
-                showBrandModelLines(id,i);
+            if(indexValue == row) {
+                showBrandModelLines(id,row);
+
+            }else {
+                for(var i = 1;i<=indexValue;i++) {
+                    // $('#selectModelLineNum'+index+'Des'+i).empty();
+                    showBrandModelLines(id,i);
+                }
             }
         }
         else
@@ -763,11 +751,10 @@
                 selectedModelLines.push(eachSelectedModelLine);
             }
         }
-        let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
-        showDivdropDr.hidden = false
+        $('#showDivdropDr'+id+'Des'+row).attr('hidden', false);
         // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
         // showDel.hidden = false
-        $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+        $('#removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
 
         let showaddtrimDis = document.getElementById('showaddtrimDis');
         showaddtrimDis.hidden = false
@@ -816,6 +803,34 @@
             }
         });
     }
+    function selectModelLineDescipt(id,row)
+    {
+        ifModelLineExist = $("#selectModelLineNum"+id+"Des"+row).val();
+        if(ifModelLineExist == '')
+        {
+            $msg="Model line is required";
+            showSPModelLineError($msg,id,row);
+        }
+        else
+        {
+            showModelNumberDropdown(id,row);
+            removeSPModelLineError(id,row);
+        }
+    }
+    function selectModelDescipt(id,row)
+    {
+        ifModelDiscExist = $("#selectModelNumberDiscri"+id+"Des"+row).val();
+        if(ifModelDiscExist == '')
+        {
+            $msg="Model Description is required";
+            showSPModelDescriptionError($msg,id,row);
+        }
+        else
+        {
+            removeSPModelDescriptionError(id,row);
+        }
+    }
+
     function showModelNumberDropdown(id,row)
     {
         $('showModelNumberdrop'+id+'Des'+row).attr('hidden', false);

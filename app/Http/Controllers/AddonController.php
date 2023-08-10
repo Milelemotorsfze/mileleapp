@@ -507,7 +507,13 @@ class AddonController extends Controller
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
-        return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons','existingBrandModel'));
+        $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
+            ->where('addon_id', $addonDetails->addon_id)
+            ->whereNotNull('description')->select('id','description')
+            ->groupBy('description')->get();
+
+        return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
+            'kitItemDropdown','supplierAddons','existingBrandModel','descriptions'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
@@ -1445,7 +1451,7 @@ class AddonController extends Controller
 
     }
     public function getAddonDescription(Request $request) {
-        $descriptions = AddonDetails::where('addon_type_name', 'P')
+        $descriptions = AddonDetails::where('addon_type_name', $request->addonType)
             ->where('addon_id', $request->addon_id)
             ->whereNotNull('description')->select('id','description')
             ->groupBy('description')->get();
@@ -1453,9 +1459,8 @@ class AddonController extends Controller
         return response($descriptions);
 
     }
-
     public function getUniqueAccessories(Request $request) {
-
+        info($request->all());
         $description = null;
         if($request->description != null) {
             $description = $request->description;
@@ -1466,11 +1471,14 @@ class AddonController extends Controller
         if($request->brand == 'allbrands') {
             $isExisting = AddonDetails::where('is_all_brands', 'yes')
                 ->where('addon_id', $request->addon_id)
-                ->where('description', $description);
+                ->where('description', $description)
+                ->where('addon_type_name', $request->addonType);
         }else{
 
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
-                ->where('description', $description);
+                                    ->where('description', $description)
+                                    ->where('addon_type_name', $request->addonType);
+
             if($request->id) {
                 $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
             }
@@ -1478,34 +1486,99 @@ class AddonController extends Controller
 
             $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
                                 ->where('brand_id', $request->brand);
-
-            if($request->model_line == 'allmodellines') {
-                $isExisting = $isExisting->where('is_all_model_lines','yes');
-            }else{
-                $isExisting = $isExisting->where('model_id',$request->model_line);
+            if($isExisting) {
+                if($request->model_line == 'allmodellines') {
+                    $isExisting = $isExisting->where('is_all_model_lines','yes');
+                }else{
+                    $modelLineArray = [];
+                    if($request->model_line != null) {
+                        $modelLineArray = $request->model_line;
+                    }
+                    $isExisting = $isExisting->whereIn('model_id',$modelLineArray);
+                    if($isExisting && $request->addonType == 'P') {
+                        $modelLines = $isExisting->get();
+                        $models = [];
+                        foreach ($modelLines as $modelLine) {
+                            $models[] = $modelLine->modelLines->model_line ?? '';
+                        }
+                        $data['model_line'] = implode(",", $models);
+                    }
+                }
             }
         }
-
-        $isExisting = $isExisting->count();
-
-        if($isExisting > 0) {
-            $data['count'] = $isExisting;
+        if($isExisting) {
+            info("existing");
+            $data['count'] = $isExisting->count();
         }else{
             $data['count'] = 0;
         }
+
         $data['index'] = $request->index;
         return response($data);
 
     }
+    public function getUniqueSpareParts(Request $request) {
+            info($request->all());
+            $description = null;
+            if($request->description != null) {
+                $description = $request->description;
+            }elseif ($request->description_text != null) {
+                $description = $request->description_text;
+            }
+
+            $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
+                ->where('description', $description)
+                ->where('part_number', $request->part_number)
+                ->where('addon_type_name', $request->addonType);
+
+            if($request->id) {
+                $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
+            }
+            $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
+
+            $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
+                                ->where('brand_id', $request->brand);
+            if($isExisting) {
+                $isExisting = $isExisting->where('model_id', $request->model_line);
+                if($isExisting ) {
+                    $modelNumber = [];
+                    if($request->model_number != null) {
+                        $modelNumber = $request->model_number;
+                    }
+                    $isExisting = $isExisting->whereIn('model_number', $modelNumber);
+                    $modelNumbers = $isExisting->get();
+                    $models = [];
+                    foreach ($modelNumbers as $modelNumber) {
+                        $models[] = $modelNumber->modelDescription->model_description ?? '';
+                    }
+                    $data['model_number'] = implode(",", $models);
+                }
+            }
+
+        if($isExisting) {
+            info("existing");
+            info($isExisting->get());
+            $data['count'] = $isExisting->count();
+        }else{
+            $data['count'] = 0;
+        }
+
+        $data['i'] = $request->i;
+        $data['j'] = $request->j;
+
+        return response($data);
+
+    }
     public function getUniqueAddonDescription(Request $request) {
-        $descriptions = AddonDetails::where('addon_type_name', 'P')
-            ->where('addon_id', $request->addon_id)
-            ->whereNotNull('description')
-            ->groupBy('description')->pluck('description');
-        $isExist = AddonDetails::where('addon_type_name', 'P')
-            ->where('addon_id', $request->addon_id)
-            ->where('description',$request->description)
-            ->count();
+        if($request->description) {
+            $isExist = AddonDetails::where('addon_type_name', $request->addonType)
+                ->where('addon_id', $request->addon_id)
+                ->where('description', $request->description)
+                ->count();
+        }else{
+            $isExist = 0;
+        }
+
 
         return response($isExist);
 

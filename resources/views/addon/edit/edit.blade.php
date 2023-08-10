@@ -215,6 +215,10 @@
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <div id="select-description">
                                 <select name="description" id="description" multiple="true" style="width: 100%;" >
+                                    @foreach($descriptions as $description)
+                                        <option value="{{$description->description}}"
+                                            {{ $description->description == $addonDetails->description ? 'selected' : ''}}> {{ $description->description }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <input type="text" hidden name="description_text" id="description-text" placeholder="Enter Addon Description"
@@ -508,7 +512,6 @@
         $(document).ready(function ()
         {
             currentAddonType =  $('#addon_type').val();
-            showDescriptions()
 
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
@@ -520,7 +523,19 @@
 
             });
             $('#description').change(function () {
-                uniqueCheckAccessories();
+                var addonType =  $('#addon_type').val();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
+            })
+            $('#part_number').keyup(function () {
+                var addonType =  $('#addon_type').val();
+                if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
             })
             $("#descr-dropdown-button").click(function () {
                 $('#description-text').attr('hidden', true);
@@ -538,40 +553,7 @@
                 addonDescriptionUniqueCheck();
             });
 
-            function addonDescriptionUniqueCheck() {
-                var id = $('#addon_id').val();
-                var description = $('#description-text').val();
-                let url = '{{ route('addon.getUniqueAddonDescription') }}';
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        addon_id: id,
-                        description: description
-                    },
-                    success: function (data) {
-                        if (data > 0) {
-                            var msg = "This Description is already existing"
-                            showAddonDescriptionError(msg);
-                            formInputError = true;
-
-                        } else {
-                            var msg = "";
-                            removeAddonDescriptionError();
-                            formInputError = false;
-                        }
-                    }
-                })
-            }
-
             //////////////// end /////////////
-
-            if (currentAddonType == 'P') {
-                $('#addon-description').attr('hidden', false);
-            } else {
-                $('#addon-description').attr('hidden', true);
-            }
 
             if(data.fixing_charges_included == 'no')
             {
@@ -632,7 +614,8 @@
              // $("#supplierArray1").select2();
             function showDescriptions() {
                 var id = $('#addon_id').val();
-                var description = '{{ $addonDetails->description }}'
+                var description = '{{ $addonDetails->description }}';
+                var addonType = $('#addon_type').val();
 
                 let url = '{{ route('addon.getAddonDescription') }}';
                 $.ajax({
@@ -641,6 +624,7 @@
                     dataType: "json",
                     data: {
                         addon_id: id,
+                        addonType:addonType
                     },
                     success: function (data) {
                         $('#description').empty();
@@ -658,9 +642,16 @@
             {
                 // fetch addon existing detils
                 var id = $('#addon_id').val();
+                var addonType = $('#addon_type').val();
+
                 addonDescriptionUniqueCheck();
                 showDescriptions();
-                uniqueCheckAccessories();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
                 if(id != '')
                 {
                     $('#addnewAddonButton').hide();
@@ -711,10 +702,42 @@
             });
         });
 
+        function addonDescriptionUniqueCheck() {
+         var id = $('#addon_id').val();
+         var description = $('#description-text').val();
+         var addonType = $('#addon_type').val();
+
+         let url = '{{ route('addon.getUniqueAddonDescription') }}';
+         $.ajax({
+             type: "GET",
+             url: url,
+             dataType: "json",
+             data: {
+                 addon_id: id,
+                 description: description,
+                 addonType:addonType
+             },
+             success: function (data) {
+                 if (data > 0) {
+                     var msg = "This Description is already existing"
+                     showAddonDescriptionError(msg);
+                     formInputError = true;
+
+                 } else {
+                     var msg = "";
+                     removeAddonDescriptionError();
+                     formInputError = false;
+                 }
+             }
+         })
+     }
         function uniqueCheckAccessories() {
           var addon_id = $('#addon_id').val();
           var description = $('#description').val();
           var newDescription = $('#description-text').val();
+          var addonType = $('#addon_type').val();
+          var addonType = $('#addon_type').val();
+
           var uniqueCounts = [];
           var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
@@ -732,13 +755,18 @@
                          newDescription:newDescription,
                          brand:brand[0],
                          index:i,
-                         model_line:modelLine[0],
-                         id: {{ $addonDetails->id }}
+                         model_line:modelLine,
+                         id: {{ $addonDetails->id }},
+                         addonType:addonType
                      },
                  dataType: 'json',
                  success: function (data) {
                      if(data.count > 0 ) {
-                         $msg = "This Addon,Description,Brand and model line Combination is existing";
+                         var modelLine = "";
+                         if(data.model_line) {
+                             var  modelLine = data.model_line;
+                         }
+                         $msg = "This Addon,Description,Brand and model line ("+modelLine+") Combination is existing";
                          showBrandError($msg,data.index);
                          var count = data.count;
                          uniqueCounts.push(count);
@@ -760,6 +788,72 @@
                  formInputError = false;
              }
         }
+        function uniqueCheckSpareParts(){
+         var addon_id = $('#addon_id').val();
+         var description = $('#description').val();
+         var newDescription = $('#description-text').val();
+         var addonType = $('#addon_type').val();
+         var partNumber = $('#part_number').val();
+
+         var isExistingUniqueCounts = [];
+         var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+         for (var i = 1; i <= indexValue; i++) {
+             var brand =  $('#selectBrandMo'+i).val();
+             var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+             for(let j=1; j<=index; j++)
+             {
+                 var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
+                 var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                 $.ajax({
+                     url: "{{url('getUniqueSpareParts')}}",
+                     type: "GET",
+                     async: false,
+                     cache: false,
+                     data:
+                         {
+                             addon_id: addon_id[0],
+                             description:description[0],
+                             newDescription:newDescription,
+                             part_number:partNumber,
+                             brand:brand[0],
+                             i:i,
+                             j:j,
+                             id: {{ $addonDetails->id }},
+                             model_line:modelLine[0],
+                             model_number:modelNumber,
+                             addonType:addonType
+                         },
+                     dataType: 'json',
+                     success: function (data) {
+                         if(data.count > 0 ) {
+                             var modelNumber = "";
+                             if(data.model_number) {
+                                 var modelNumber = data.model_number;
+                             }
+                             $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                             showSPModelLineError($msg,data.i,data.j);
+                             var count = data.count;
+                             isExistingUniqueCounts.push(count);
+                             // alert(formInputError);
+
+                         }else{
+
+                             removeSPModelLineError(data.i,data.j);
+                             isExistingUniqueCounts.pop();
+                         }
+                     }
+                 });
+             }
+
+         }
+
+         var uniqueValueCount = isExistingUniqueCounts.length;
+         if(uniqueValueCount > 0) {
+             formInputError = true;
+         }else{
+             formInputError = false;
+         }
+     }
 
      $('form').on('submit', function (e)
         {
@@ -770,7 +864,14 @@
             // var inputsupplierId = $('#itemArr1').val();
             // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
             // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
-            // var formInputError = false;
+            var formInputError = false;
+            if(inputAddonType == 'P') {
+                uniqueCheckAccessories();
+
+            }else if(inputAddonType == 'SP') {
+                uniqueCheckSpareParts();
+            }
+            addonDescriptionUniqueCheck();
             // if(inputsupplierId == '')
             // {
             //     $msg = "Supplier is required";
@@ -822,6 +923,31 @@
                             $msg = "Brand is required";
                             showSPBrandError($msg,i);
                             formInputError = true;
+                        } else if(inputSPBrand != 'allbrands')
+                        {
+                            var countModelDescriptionRow = 0;
+                            countModelDescriptionRow = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                            for (let j = 1; j <= countModelDescriptionRow; j++)
+                            {
+                                var inputSPModelLine = $('#selectModelLineNum'+i+'Des'+j).val();
+                                if(inputSPModelLine == '')
+                                {
+                                    $msg = "Model line is required";
+                                    showSPModelLineError($msg,i,j);
+                                    formInputError = true;
+                                }
+                                else if(inputSPModelLine != 'allmodellines')
+                                {
+                                    var inputSPModelDescription = $('#selectModelNumberDiscri'+i+'Des'+j).val();
+                                    if(inputSPModelDescription == '')
+                                    {
+                                        $msg = "Model Description is required";
+                                        showSPModelDescriptionError($msg,i,j);
+                                        formInputError = true;
+                                    }
+                                }
+
+                            }
                         }
                     }
 
@@ -956,90 +1082,33 @@
             document.getElementById("selectBrandMo"+i).classList.remove("is-invalid");
             document.getElementById("mobrandError"+i).classList.remove("paragraph-class");
         }
-        function showkitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
-            document.getElementById("kitSupplierDropdown1").classList.add("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.add("paragraph-class");
-        }
-        function removekitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent="";
-            document.getElementById("kitSupplierDropdown1").classList.remove("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.remove("paragraph-class");
-        }
-        function showkitSupplier1Item1Error($msg)
-        {
-            document.getElementById("kitSupplier1Item1Error").textContent=$msg;
-            document.getElementById("kitSupplier1Item1").classList.add("is-invalid");
-            document.getElementById("kitSupplier1Item1Error").classList.add("paragraph-class");
-        }
-        function removekitSupplier1Item1Error($msg)
-        {
-            document.getElementById("kitSupplier1Item1Error").textContent="";
-            document.getElementById("kitSupplier1Item1").classList.remove("is-invalid");
-            document.getElementById("kitSupplier1Item1Error").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1QuantityError($msg)
-        {
-            document.getElementById("Supplier1Kit1QuantityError").textContent=$msg;
-            document.getElementById("Supplier1Kit1Quantity").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1QuantityError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1QuantityError($msg)
-        {
-            document.getElementById("Supplier1Kit1QuantityError").textContent="";
-            document.getElementById("Supplier1Kit1Quantity").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1QuantityError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.remove("paragraph-class");
-        }
+        /////////////////////
+         function showSPModelLineError($msg,i,j)
+         {
+             document.getElementById('ModelLineError_'+i+'_'+j).textContent=$msg;
+             document.getElementById('selectModelLineNum'+i+'Des'+j).classList.add("is-invalid");
+             document.getElementById('ModelLineError_'+i+'_'+j).classList.add("paragraph-class");
+         }
+         function removeSPModelLineError(i,j)
+         {
+             document.getElementById('ModelLineError_'+i+'_'+j).textContent="";
+             document.getElementById('selectModelLineNum'+i+'Des'+j).classList.remove("is-invalid");
+             document.getElementById('ModelLineError_'+i+'_'+j).classList.remove("paragraph-class");
+         }
+         function showSPModelDescriptionError($msg,i,j)
+         {
+             document.getElementById('ModelDescriptionError_'+i+'_'+j).textContent=$msg;
+             document.getElementById('selectModelNumberDiscri'+i+'Des'+j).classList.add("is-invalid");
+             document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.add("paragraph-class");
+         }
+         function removeSPModelDescriptionError(i,j)
+         {
+             document.getElementById('ModelDescriptionError_'+i+'_'+j).textContent="";
+             document.getElementById('selectModelNumberDiscri'+i+'Des'+j).classList.remove("is-invalid");
+             document.getElementById('ModelDescriptionError_'+i+'_'+j).classList.remove("paragraph-class");
+         }
+
+     ////////////////////////////
         function showSupplierError($msg)
         {
             document.getElementById("supplierError").textContent=$msg;
