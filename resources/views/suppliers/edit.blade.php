@@ -1796,7 +1796,9 @@
                                 '<td>'+ value.addon_code + '</td>' +
                                 '<td>'+ value.currency + '</td>' +
                                 '<td>'+ value.purchase_price + '</td>' +
-                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</td>' +
+                                '<td>'+ value.lead_time_max + '</td>' +
+                                '<td>'+ value.lead_time_min + '</td>' +
+                                '<td>'+ value.addonError + '</br>'+value.currencyError+'</br>'+value.priceErrror+'</br>'+value.minLeadTimeErrror+'</br>'+value.maxLeadTimeErrror+'</td>' +
                                 '</tr>');
                             });
                         }

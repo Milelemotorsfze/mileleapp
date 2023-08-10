@@ -15,6 +15,8 @@
                                 <th>Addon Code</th>
                                 <th>Currency</th>
                                 <th>Purchase Price</th>
+                                <th>Minimim Lead Time</th>
+                                <th>Maximum Lead Time</th>
                                 <th>Data Error</th>
                             </tr>
                         </thead>

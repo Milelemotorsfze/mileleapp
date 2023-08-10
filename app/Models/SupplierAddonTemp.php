@@ -12,6 +12,8 @@ class SupplierAddonTemp extends Model
     protected $fillable = [
         'addon_code',
         'currency',
-        'purchase_price'
+        'purchase_price',
+        'lead_time_min',
+        'lead_time_max'
     ];
 }
