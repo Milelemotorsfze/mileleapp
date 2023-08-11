@@ -1479,95 +1479,70 @@
         function calculateAED(i)
         {
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
-            var aed = usd * 3.6725;
-            var aed = aed.toFixed(4);
-            aed = parseFloat(aed);
-            if(aed == 0)
+            if(usd == '')
             {
                 document.getElementById('addon_purchase_price_'+i).value = "";
+                $msg = "Purchase price is required";
+                showPurchasePriceUSDError($msg,i);
+                showPurchasePriceAEDError($msg,i);
                 setLeastAEDPrice();
             }
             else
             {
-                document.getElementById('addon_purchase_price_'+i).value = aed;
+                removePurchasePriceAEDError(i);
+                removePurchasePriceUSDError(i);
+                var aed = usd * 3.6725;
+                var aed = aed.toFixed(4);
+                aed = parseFloat(aed);
+                if(aed == 0)
+                {
+                    document.getElementById('addon_purchase_price_'+i).value = "";
+                    $msg = "Purchase price is required";
+                    showPurchasePriceAEDError($msg,i);
+                    showPurchasePriceUSDError($msg,i);
+                }
+                else
+                {
+                    document.getElementById('addon_purchase_price_'+i).value = aed;
+                    removePurchasePriceAEDError(i);
+                    removePurchasePriceUSDError(i);    
+                }
                 setLeastAEDPrice();
             }
         }
         function calculateUSD(i)
         {
             var aed = $("#addon_purchase_price_"+i).val();
-            var usd = aed / 3.6725;
-            var usd = usd.toFixed(4);
-            if(usd == 0)
-            {
+            if(aed == '')
+            {              
                 document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+                $msg = "Purchase price is required";
+                showPurchasePriceAEDError($msg,i);
+                showPurchasePriceUSDError($msg,i);
+                setLeastAEDPrice();
             }
             else
             {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+                removePurchasePriceAEDError(i);
+                removePurchasePriceUSDError(i);
+                var usd = aed / 3.6725;
+                var usd = usd.toFixed(4);
+                if(usd == 0)
+                {
+                    document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+                    $msg = "Purchase price is required";
+                    showPurchasePriceAEDError($msg,i);
+                    showPurchasePriceUSDError($msg,i);
+                }
+                else
+                {
+                    document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+                    removePurchasePriceAEDError(i);
+                    removePurchasePriceUSDError(i);
+                }
+                setLeastAEDPrice();
             }
-            setLeastAEDPrice();
         }
-        // function calculateAED(i)
-        // {
-        //     var usd = $("#addon_purchase_price_in_usd_"+i).val();
-        //     if(usd == '')
-        //     {
-        //         document.getElementById('addon_purchase_price_'+i).value = "";
-        //         $msg = "Purchase price is required";
-        //         showPurchasePriceUSDError($msg,i);
-        //         showPurchasePriceAEDError($msg,i);
-        //         setLeastAEDPrice();
-        //     }
-        //     else
-        //     {
-        //         var aed = usd * 3.6725;
-        //         var aed = aed.toFixed(4);
-        //         aed = parseFloat(aed);
-        //         if(aed == 0)
-        //         {
-        //             document.getElementById('addon_purchase_price_'+i).value = "";
-        //             $msg = "Purchase price is required";
-        //             showPurchasePriceAEDError($msg,i);
-        //         }
-        //         else
-        //         {
-        //             document.getElementById('addon_purchase_price_'+i).value = aed;
-        //             removePurchasePriceAEDError(i);
-        //         }
-        //         setLeastAEDPrice();
-        //     }
-        // }
-        // function calculateUSD(i)
-        // {
-        //     var aed = $("#addon_purchase_price_"+i).val(); 
-        //     if(aed == '')
-        //     {              
-        //         document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
-        //         $msg = "Purchase price is required";
-        //         showPurchasePriceAEDError($msg,i);
-        //         showPurchasePriceUSDError($msg,i);
-        //         setLeastAEDPrice();
-        //     }
-        //     else
-        //     {
-        //         removePurchasePriceAEDError(i);
-        //         var usd = aed / 3.6725;
-        //         var usd = usd.toFixed(4);
-        //         if(usd == 0)
-        //         {
-        //             document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
-        //             $msg = "Purchase price is required";
-        //             showPurchasePriceUSDError($msg,i);
-        //         }
-        //         else
-        //         {
-        //             document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
-        //             removePurchasePriceUSDError(i);
-        //         }
-        //         setLeastAEDPrice();
-        //     }
-        // }
         function disableDropdown()
         {
             document.getElementById("addon_type").hidden=true;
@@ -1668,7 +1643,7 @@
         function setLeastAEDPrice()
         {
             const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
-            if(values != '')
+            if(values != '' || values !=',')
             {
                 var arrayOfNumbers = [];
                 values.forEach(v => {
@@ -1690,6 +1665,11 @@
                     $("#purchase_price").val("");
                     enableDropdown();
                 }
+            }
+            else if(values ==',')
+            {
+                $("#purchase_price").val("");
+                enableDropdown();
             }
         }
         function showkitSupplier()
