@@ -190,15 +190,15 @@
                             <span id="addonNameError" class="invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
-{{--                            @can('master-kit-create')--}}
-{{--                            @php--}}
-{{--                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-create']);--}}
-{{--                            @endphp--}}
-{{--                            @if ($hasPermission)--}}
+                            @can('master-kit-create')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-create']);
+                            @endphp
+                            @if ($hasPermission)
                             <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;"
                             class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
-{{--                            @endif--}}
-{{--                        @endcan--}}
+                            @endif
+                        @endcan
                         </div>
                     </div>
                     </br>
@@ -208,8 +208,6 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                         <div class="input-group">
-
-
                         <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"
                         class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
                         value="{{ old('lead_time') }}"  autocomplete="lead_time">
