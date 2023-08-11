@@ -80,8 +80,12 @@
             var index = $(this).attr('data-index');
             optionDisable(index, value);
             uniqueCheckAccessories();
-
         });
+
+        $('#description-text').keyup('keyup, change', function () {
+            addonDescriptionUniqueCheck();
+        });
+
          function optionDisable(index, value){
              var currentId = 'selectModelLine'+index;
              if(value == 'allmodellines') {
@@ -99,6 +103,7 @@
             uniqueCheckAccessories()
 
         });
+
          function optionEnable(currentId,data) {
              if(data == 'allmodellines') {
                  $('#' + currentId + ' option').prop('disabled', false);

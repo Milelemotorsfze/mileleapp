@@ -8,7 +8,7 @@
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrandDisp(1) name="brand[1][brand_id]" id="selectBrandMo1" data-index="1"
                             class="brandRows" multiple="true" style="width: 100%;">
-                        <option id="allbrandsMo" class="allbrands" value="allbrands">ALL BRANDS</option>
+{{--                        <option id="allbrandsMo" class="allbrands" value="allbrands">ALL BRANDS</option>--}}
                         @foreach($brands as $brand)
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
@@ -130,7 +130,6 @@
                 $('#selectModelNumberDiscri'+index+'Des'+i).empty();
             }
             hideOption(index,value);
-            uniqueCheckSpareParts();
 
         });
 
@@ -138,7 +137,6 @@
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
-            uniqueCheckSpareParts();
 
         });
 
@@ -166,7 +164,6 @@
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
-            uniqueCheckSpareParts();
 
         });
         $(document.body).on('select2:select', ".model-descriptions", function (e) {
@@ -182,7 +179,6 @@
             var id = e.params.data.id;
             var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text);
-            uniqueCheckSpareParts();
         });
 
         function modelLineDataHide(index,modelIndex,value) {
@@ -376,7 +372,7 @@
 
         $("#addDis").on("click", function ()
         {
-            $('.allbrandsMo').prop('disabled',true);
+            // $('.allbrandsMo').prop('disabled',true);
             var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
 
             $('#indexValue').val(index);
@@ -605,8 +601,7 @@
     function selectBrandDisp(id,row)
     {
         var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-        console.log(indexValue);
-        console.log(row);
+
         var value =$('#selectBrandMo'+id).val();
         var brandId = value;
         if(brandId != '')
@@ -723,13 +718,13 @@
             {
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
-                if(row == 1) {
-                    BrandModelLine.push
-                    ({
-                        id: 'allmodellines',
-                        text: 'All Model Lines'
-                    });
-                }
+                // if(row == 1) {
+                //     BrandModelLine.push
+                //     ({
+                //         id: 'allmodellines',
+                //         text: 'All Model Lines'
+                //     });
+                // }
 
                 $.each(data,function(key,value)
                 {
