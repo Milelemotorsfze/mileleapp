@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PaymentMethods;
 use App\Models\Supplier;
+use App\Models\User;
 use App\Models\VendorCategory;
 use App\Models\VendorDocument;
 use Illuminate\Http\Request;
@@ -71,7 +72,8 @@ class SupplierController extends Controller
         {
             return view('demand_planning_suppliers.create');
         }
-        return view('suppliers.create',compact('paymentMethods','addons'));
+        $users = User::select('id','name')->get();
+        return view('suppliers.create',compact('paymentMethods','addons','users'));
     }
 
     /**
@@ -297,9 +299,11 @@ class SupplierController extends Controller
 
         $addons = AddonDetails::whereIn('addon_type_name',$supTyp)->whereNotIn('id',$supplierAddons)
             ->select('id','addon_code','addon_id')->with('AddonName')->get();
+        $users = User::select('id','name')->get();
+
         return view('suppliers.edit',compact('supplier','primaryPaymentMethod','otherPaymentMethods',
             'addons','paymentMethods','array','supplierTypes','supAddTypesName','supplierAddons','vendorCategories',
-            'vendorSubCategories','vendorPaymentMethods','nonRemovableVendorCategories'));
+            'vendorSubCategories','vendorPaymentMethods','nonRemovableVendorCategories','users'));
     }
     public function destroy($id)
     {
@@ -481,7 +485,7 @@ class SupplierController extends Controller
                                             }
                                         }
                                         if($rows[$i]['lead_time_min'] != '' && !is_numeric($rows[$i]['lead_time_min']) && strlen($rows[$i]['lead_time_min']) > 3)
-                                        { 
+                                        {
                                             $minLeadTime = "Number with maximum 3 digits expected as Minimum Lead Time ";
                                         }
                                         if($rows[$i]['lead_time_max'] != ''  && !is_numeric($rows[$i]['lead_time_max']) && strlen($rows[$i]['lead_time_max']) > 3)
@@ -499,7 +503,7 @@ class SupplierController extends Controller
                                         if($currencyError != '' OR $priceErrror != '' OR $addonError != '' OR $minLeadTime != '' OR $maxLeadTime != '')
                                         {
                                             array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,
-                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError, 
+                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError,
                                                                     "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror,
                                                                     "lead_time_min" => $rows[$i]['lead_time_min'], "minLeadTimeErrror" => $minLeadTime,
                                                                     "lead_time_max" => $rows[$i]['lead_time_max'], "maxLeadTimeErrror" => $maxLeadTime,
@@ -751,9 +755,13 @@ class SupplierController extends Controller
     }
     public function createSupplier(Request $request)
     {
+
         $input = $request->all();
+
         $input['contact_number'] = $request->contact_number['full'];
         $input['alternative_contact_number'] = $request->alternative_contact_number['full'];
+        $input['phone'] = $request->phone['full'];
+        $input['office_phone'] = $request->office_phone['full'];
         $input['created_by'] = Auth::id();
         $input['is_communication_fax'] = $request->is_communication_fax ? true : false;
         $input['is_communication_mobile'] = $request->is_communication_mobile ? true : false;
@@ -762,13 +770,10 @@ class SupplierController extends Controller
         $input['is_communication_any'] = $request->is_communication_any ? true : false;
 
         if($request->form_action == 'UPDATE') {
-        info($request->deletedDocuments);
 
         if($request->deletedDocuments[0] !== NULL) {
             foreach ($request->deletedDocuments as $deletedDocument) {
-                info($deletedDocument);
                 $document = VendorDocument::find($deletedDocument);
-                info($document);
                 $document->delete();
             }
         }
@@ -1037,7 +1042,7 @@ class SupplierController extends Controller
                                         if($currencyError != '' OR $priceErrror != '' OR $addonError != '' OR $minLeadTime != '' OR $maxLeadTime != '')
                                         {
                                             array_push($dataError, ["addon_code" => $rows[$i]['addon_code'], "addonError" => $addonError,
-                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError, 
+                                                                    "currency" => $rows[$i]['currency'], "currencyError" => $currencyError,
                                                                     "purchase_price" => $rows[$i]['purchase_price'], "priceErrror" => $priceErrror,
                                                                     "lead_time_min" => $rows[$i]['lead_time_min'], "minLeadTimeErrror" => $minLeadTime,
                                                                     "lead_time_max" => $rows[$i]['lead_time_max'], "maxLeadTimeErrror" => $maxLeadTime,

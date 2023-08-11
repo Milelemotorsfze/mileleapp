@@ -426,36 +426,36 @@ input {
                             </div>
                             </br>
                         </div>
-{{--                        <div class="col-xxl-6 col-lg-6 col-md-12">--}}
-{{--                            <div class="row">--}}
-{{--                                <div class="col-xxl-3 col-lg-6 col-md-12">--}}
-{{--                                    <label for="phone" class="col-form-label text-md-end">{{ __('Phone') }}</label>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-xxl-9 col-lg-6 col-md-12">--}}
-{{--                                    <input id="phone" type="number"--}}
-{{--                                           class="widthinput form-control @error('phone[full]') is-invalid @enderror"--}}
-{{--                                           name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]') }}"--}}
-{{--                                           autocomplete="phone[full]" autofocus onkeyup="validationOnKeyUp(this)">--}}
-{{--                                     <span id="phoneRequired" class="phone required-class"></span>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                            </br>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-6 col-lg-6 col-md-12">--}}
-{{--                            <div class="row">--}}
-{{--                                <div class="col-xxl-3 col-lg-6 col-md-12">--}}
-{{--                                    <label for="office_phone" class="col-form-label text-md-end">{{ __('Office Contact Number') }}</label>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-xxl-9 col-lg-6 col-md-12">--}}
-{{--                                    <input id="office_phone" type="number"--}}
-{{--                                           class="widthinput form-control @error('office_phone[full]') is-invalid @enderror" name="office_phone[main]"--}}
-{{--                                           placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]') }}"--}}
-{{--                                           autocomplete="office_phone[full]" autofocus onkeyup="validationOnKeyUp(this)">--}}
-{{--                                    <span id="phoneRequired" class="phone required-class"></span>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                            </br>--}}
-{{--                        </div>--}}
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="phone" class="col-form-label text-md-end">{{ __('Phone') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="phone" type="number"
+                                           class="widthinput form-control @error('phone[full]') is-invalid @enderror"
+                                           name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]') }}"
+                                           autocomplete="phone[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                                     <span id="phoneRequired" class="phone required-class"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                        <div class="col-xxl-6 col-lg-6 col-md-12">
+                            <div class="row">
+                                <div class="col-xxl-3 col-lg-6 col-md-12">
+                                    <label for="office_phone" class="col-form-label text-md-end">{{ __('Office Contact Number') }}</label>
+                                </div>
+                                <div class="col-xxl-9 col-lg-6 col-md-12">
+                                    <input id="office_phone" type="number"
+                                           class="widthinput form-control @error('office_phone[full]') is-invalid @enderror" name="office_phone[main]"
+                                           placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]') }}"
+                                           autocomplete="office_phone[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                                    <span id="officePhoneRequired" class="office_phone required-class"></span>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
                         <div class="col-xxl-6 col-lg-6 col-md-12">
                             <div class="row">
                                 <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -482,14 +482,12 @@ input {
                                     <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
-                                    <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by') is-invalid @enderror"
-                                           name="person_contact_by" placeholder="Enter Person Contact By" value="{{ old('person_contact_by') }}"
-                                           autocomplete="person_contact_by" autofocus>
-                                    @error('person_contact_by')
-                                    <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                                    @enderror
+                                    <select class="form-control widthinput" name="person_contact_by" id="person_contact_by" autofocus>
+                                        <option></option>
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             </br>
@@ -549,7 +547,6 @@ input {
                             </div>
                             </br>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -1030,7 +1027,7 @@ input {
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_1" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror"
                                                 name="supplierAddon[1][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, 1)">
                                                 <div class="input-group-append">
@@ -1038,11 +1035,11 @@ input {
                                                 </div>
                                             </div>
                                             <span id="minLeadTimeError_1" class="minLeadTimeError invalid-feedback-lead"></span>
-                                            
+
                                         </div>
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
-                                           
+
                                             <div class="input-group">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
@@ -1266,9 +1263,12 @@ input {
             });
 
             $('#nationality').select2({
-
                 placeholder:"Choose Nationality",
             });
+            $('#person_contact_by').select2({
+                placeholder:"Choose Person Contacted By",
+            });
+
             $('#type').select2({
                 minimumResultsForSearch: -1,
                 placeholder:"Choose Vendor Type",
@@ -1408,12 +1408,12 @@ input {
                         $(this).find('.lead_time').attr('name','supplierAndPrice['+index+'][lead_time]');
                         $(this).find('.lead_time').attr('oninput','checkGreater(this, '+index+')');
                         $(this).find('.minLeadTimeError').attr('id','minLeadTimeError_'+index);
-                        
+
                         $(this).find('.lead_time_max').attr('id','lead_time_max_'+ index);
                         $(this).find('.lead_time_max').attr('name','supplierAndPrice['+index+'][lead_time_max]');
                         $(this).find('.lead_time_max').attr('oninput','checkGreater(this, '+index+')');
                         $(this).find('.maxLeadTimeError').attr('id','maxLeadTimeError_'+index);
-                        
+
                         $('#addon_'+index).select2
                         ({
                             placeholder:"Choose Addon....     Or     Type Here To Search....",
@@ -1472,10 +1472,10 @@ input {
                             <div class="row form_field_outer_row" id="row-${index}">
                                 <div class="col-xxl-2 col-lg-6 col-md-12">
                                     <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
-                                    <select class="addons"  id="addon_${index}" data-index="${index}" 
+                                    <select class="addons"  id="addon_${index}" data-index="${index}"
                                     name="supplierAddon[${index}][addon_id][]" multiple="true" style="width: 100%;">
                                     @foreach($addons as $addon)
-                                <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" 
+                                <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}"
                                 value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                         @endforeach
                                 </select>
@@ -1492,7 +1492,7 @@ input {
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror"
                                                 name="supplierAddon[${index}][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
                                                 <div class="input-group-append">
@@ -1500,17 +1500,17 @@ input {
                                                 </div>
                                             </div>
                                             <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
-                                            
+
                                         </div>
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
-                                           
+
                                             <div class="input-group">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
                                                 </div>
                                                 <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror"
                                                 name="supplierAddon[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
                                                 value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
                                                 <div class="input-group-append">
@@ -1521,7 +1521,7 @@ input {
                                         </div>
                                 <div class="col-xxl-1 col-lg-1 col-md-1">
                                     <label for="choices-single-default" class="form-label font-size-13">Currency</label>
-                                    <select name="supplierAddon[${index}][currency]"  id="currency_${index}" class="widthinput form-control currency" 
+                                    <select name="supplierAddon[${index}][currency]"  id="currency_${index}" class="widthinput form-control currency"
                                     onchange="changeCurrency(${index})">
                                         <option value="AED">AED</option>
                                         <option value="USD">USD</option>
@@ -1531,7 +1531,7 @@ input {
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                     <div class="input-group">
                                     <input id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)" class="widthinput
-                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED" 
+                                    form-control @error('addon_purchase_price') is-invalid @enderror purchase_price_in_AED"
                                     name="supplierAddon[${index}][addon_purchase_price]"
                                     placeholder="1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus >
                                     <div class="input-group-append">
@@ -1543,11 +1543,11 @@ input {
                                 <div class="col-xxl-2 col-lg-3 col-md-3 usd-price-div" id="div_price_in_usd_${index}" hidden>
                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                     <div class="input-group">
-                                    <input id="addon_purchase_price_in_usd_${index}" oninput="inputNumberAbs(this)" 
+                                    <input id="addon_purchase_price_in_usd_${index}" oninput="inputNumberAbs(this)"
                                     class="widthinput form-control purchase_price_in_USD
-                                     @error('addon_purchase_price_in_usd') is-invalid @enderror" 
+                                     @error('addon_purchase_price_in_usd') is-invalid @enderror"
                                      name="supplierAddon[${index}][addon_purchase_price_in_usd]" placeholder="Enter Addons Purchase Price In USD"
-                                      value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus 
+                                      value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus
                                       onkeyup="calculateAED(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
@@ -1620,20 +1620,20 @@ input {
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-        // var phone = window.intlTelInput(document.querySelector("#phone"),
-        //     {
-        //         separateDialCode: true,
-        //         preferredCountries:["ae"],
-        //         hiddenInput: "full",
-        //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-        //     });
-        // var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
-        //     {
-        //         separateDialCode: true,
-        //         preferredCountries:["ae"],
-        //         hiddenInput: "full",
-        //         utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
-        //     });
+        var phone = window.intlTelInput(document.querySelector("#phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
@@ -1641,11 +1641,73 @@ input {
             var inputSupplier = $('#supplier').val();
             var inputSupplierType = $('#supplier_type').val();
             var inputSupplierCatgeory = $('#category').val();
+            var inputPhone = $('#phone').val();
+            var inputOfficePhone = $('#office_phone').val();
+
             var inputPaymentMethodsId = $('#is_primary_payment_method').val();
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
+
             var formInputError = false;
+
+            if(inputPhone != '') {
+                if (inputPhone.length < 5 && inputPhone.length != 0) {
+
+                    $msg = "Minimum 5 digits required";
+                    showPhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+
+                } else if (inputPhone.length > 15) {
+
+                    $msg = "Maximum 15 digits allowed";
+                    showPhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+
+                } else {
+                    removePhoneError();
+                    formInputError = false;
+                }
+            }
+            if(inputOfficePhone != '') {
+
+                if (inputOfficePhone.length < 5 && inputOfficePhone.length != 0) {
+                    console.log("less tahn 5");
+                    $msg = "Minimum 5 digits required";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+                } else if (inputOfficePhone.length > 15) {
+                    console.log("more tahn 5");
+                    $msg = "Maximum 15 digits allowed";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+
+                } else {
+                    removeOfficePhoneError();
+                    formInputError = false;
+                }
+            }
+            // if(inputAlternativeContactNumber != '') {
+            //
+            //     if (inputAlternativeContactNumber.length != 0) {
+            //         if (inputAlternativeContactNumber.length < 5) {
+            //             $msg = "Minimum 5 digits required";
+            //             showAlternativeContactNumberError($msg);
+            //             formInputError = true;
+            //         } else if (inputAlternativeContactNumber.length > 15) {
+            //             $msg = "Maximum 15 digits allowed";
+            //             showAlternativeContactNumberError($msg);
+            //             formInputError = true;
+            //
+            //         } else {
+            //             removeAlternativeContactNumberError();
+            //             formInputError = false;
+            //         }
+            //     }
+            // }
+
             if(inputSupplier == '')
             {
                 $msg = "Supplier field is required";
@@ -1683,6 +1745,22 @@ input {
                 formInputError = true;
                 e.preventDefault();
             }else{
+
+                // if (inputContactNumber.length != 0) {
+                //     if (inputContactNumber.length < 5) {
+                //         $msg = "Minimum 5 digits required";
+                //         showContactNumberError($msg);
+                //         formInputError = true;
+                //
+                //     } else if (inputContactNumber.length > 15) {
+                //         $msg = "Maximum 15 digits allowed";
+                //         showContactNumberError($msg);
+                //         formInputError = true;
+                //     } else {
+                //         removeContactNumberError();
+                //         formInputError = false;
+                //     }
+                // }
                 var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
@@ -1855,7 +1933,7 @@ input {
                 var value = clickInput.value;
                 if(value == '')
                 {
-                    if(value.legth != 0)
+                    if(value.length != 0)
                     {
                         $msg = "Supplier Type is required";
                         showSupplierTypeError($msg);
@@ -1882,7 +1960,7 @@ input {
                 var value = clickInput.value;
                 if(value == '')
                 {
-                    if(value.legth != 0)
+                    if(value.length != 0)
                     {
                         $msg = "Supplier Category is required";
                         showSupplierCategoryError($msg);
@@ -1893,23 +1971,40 @@ input {
                     removeSupplierCategoryError();
                 }
             }
+            if(clickInput.id == 'phone') {
+                var value = clickInput.value;
+                if (value != '') {
+                    if (value.length != 0) {
+                        if (value.length < 5) {
+                            $msg = "Minimum 5 digits required";
+                            showPhoneError($msg);
 
-            // if(clickInput.id == 'is_primary_payment_method')
-            // {
-            //     var value = clickInput.value;
-            //     if(value == '')
-            //     {
-            //         if(value.legth != 0)
-            //         {
-            //             $msg = "Primary payment method is required";
-            //             showPaymentMethodsError($msg);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         removePaymentMethodsError();
-            //     }
-            // }
+                        } else if (value.length > 15) {
+                            $msg = "Maximum 15 digits allowed";
+                            showPhoneError($msg);
+                        } else {
+                            removePhoneError();
+                        }
+                    }
+                }
+            }
+            if(clickInput.id == 'office_phone') {
+                var value = clickInput.value;
+                if (value != '') {
+                    if (value.length != 0) {
+                        if (value.length < 5) {
+                            $msg = "Minimum 5 digits required";
+                            showOfficePhoneError($msg);
+
+                        } else if (value.length > 15) {
+                            $msg = "Maximum 15 digits allowed";
+                            showOfficePhoneError($msg);
+                        } else {
+                            removeOfficePhoneError();
+                        }
+                    }
+                }
+            }
             if(clickInput.id == 'supplier')
             {
                 var value = clickInput.value;
@@ -1931,71 +2026,17 @@ input {
                 var value = clickInput.value;
                 if(value != '')
                 {
-                    if(value.legth != 0)
-                    {
-//                         var inputField = document.querySelector('#contact_number');
+                    if (value.length != 0) {
+                        if (value.length < 5) {
+                            $msg = "Minimum 5 digits required";
+                            showContactNumberError($msg);
 
-// inputField.onkeydown = function(event) {
-//   // Only allow if the e.key value is a number or if it's 'Backspace'
-//   if(isNaN(event.key) && event.key !== 'Backspace') {
-//     $msg = "Only Numbers Allowed";
-//                             showContactNumberError($msg);
-//     event.preventDefault();
-//   }
-//   else{
-//     if(value.length < 5)
-//                             {
-//                                 $msg = "Minimum 5 digits required";
-//                                 showContactNumberError($msg);
-//                             }
-//                             else if(value.length > 15 )
-//                             {
-//                                 $msg = "Maximum 15 digits allowed";
-//                                 showContactNumberError($msg);
-//                             }
-//                             else
-//                             {
-//                                 removeContactNumberError();
-//                             }
-//                             removeEmailError();
-//                             removeAlternativeContactNumberError();
-//   }
-// };
-
-
-
-
-                        // if(!value.match('[0-9]'))
-                        // {
-                        //     $msg = "Only Numbers Allowed";
-                        //     showContactNumberError($msg);
-                        // }
-                        // else
-                        // {
-                            // if(value === parseInt(value))
-                            // {
-                                if(value.length < 5)
-                                {
-                                    $msg = "Minimum 5 digits required";
-                                    showContactNumberError($msg);
-                                }
-                                else if(value.length > 15 )
-                                {
-                                    $msg = "Maximum 15 digits allowed";
-                                    showContactNumberError($msg);
-                                }
-                                else
-                                {
-                                    removeContactNumberError();
-                                }
-                                removeEmailError();
-                                removeAlternativeContactNumberError();
-                            // }
-                            // else{
-                            //     alert('lppl')
-                            // }
-
-                        // }
+                        } else if (value.length > 15) {
+                            $msg = "Maximum 15 digits allowed";
+                            showContactNumberError($msg);
+                        } else {
+                            removeContactNumberError();
+                        }
                     }
                 }
                 else
@@ -2004,8 +2045,6 @@ input {
                     {
                         $msg ="Contact number is required";
                         showContactNumberError($msg);
-                        // showEmailError($msg);
-                        // showAlternativeContactNumberError($msg);
                     }
                     else
                     {
@@ -2014,60 +2053,31 @@ input {
                 }
             }
             else if(clickInput.id == 'alternative_contact_number')
-            {
+                {
                 var value = clickInput.value;
                 if(value != '')
                 {
-                    if(value.legth != 0)
-                    {
-                        // if(!value.match('[0-9]'))
-                        // {
-                        //     $msg = "Only Numbers Allowed";
-                        //     showContactNumberError($msg);
-                        // }
-                        // else
-                        // {
+                    if (value.length != 0) {
+                        if (value.length < 5) {
+                            $msg = "Minimum 5 digits required";
+                            showAlternativeContactNumberError($msg);
 
-                            if(value.length < 5)
-                            {
-                                $msg = "Minimum 5 digits required";
-                                showAlternativeContactNumberError($msg);
-                            }
-                            else if(value.length > 15 )
-                            {
-                                $msg = "Maximum 15 digits allowed";
-                                showAlternativeContactNumberError($msg);
-                            }
-                            else
-                            {
-                                removeAlternativeContactNumberError();
-                            }
-                            removeEmailError();
-                            removeContactNumberError();
-                        // }
+                        } else if (value.length > 15) {
+                            $msg = "Maximum 15 digits allowed";
+                            showAlternativeContactNumberError($msg);
+                        } else {
+                            removeAlternativeContactNumberError();
+                        }
                     }
                 }
-                else
-                {
-                    if(sub == '2')
-                    {
-                        $msg ="One among contact number or alternative contact number or email is required";
-                        showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
-                    }
-                    else
-                    {
-                        removeAlternativeContactNumberError();
-                    }
-                }
+
             }
             else if(clickInput.id == 'email')
             {
                 var value = clickInput.value;
                 if(value != '')
                 {
-                    if(value.legth != 0)
+                    if(value.length != 0)
                     {
                         const validateEmail = (email) => {
                         return email.match(
@@ -2082,8 +2092,8 @@ input {
                         if(validateEmail(email))
                         {
                             removeEmailError();
-                            removeAlternativeContactNumberError();
-                            removeContactNumberError();
+                        //     removeAlternativeContactNumberError();
+                        //     removeContactNumberError();
                         }
                         else
                         {
@@ -2095,20 +2105,7 @@ input {
                         $('#email').on('input', validate);
                     }
                 }
-                else
-                {
-                    if(sub == '2')
-                    {
-                        $msg ="One among contact number or alternative contact number or email is required";
-                        showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
-                    }
-                    else
-                    {
-                        removeEmailError();
-                    }
-                }
+
             }
         }
         function showContactNumberError($msg)
@@ -2123,6 +2120,32 @@ input {
             document.getElementById("contactRequired").textContent="";
             document.getElementById("contactRequired").classList.remove("paragraph-class");
             document.getElementById("contact_number").classList.remove("is-invalid");
+        }
+        function showPhoneError($msg)
+        {
+            document.getElementById("phoneRequired").textContent=$msg;
+            document.getElementById("phoneRequired").classList.remove("requiredOne");
+            document.getElementById("phoneRequired").classList.add("paragraph-class");
+            document.getElementById("phone").classList.add("is-invalid");
+        }
+        function removePhoneError()
+        {
+            document.getElementById("phoneRequired").textContent="";
+            document.getElementById("phoneRequired").classList.remove("paragraph-class");
+            document.getElementById("phone").classList.remove("is-invalid");
+        }
+        function showOfficePhoneError($msg)
+        {
+            document.getElementById("officePhoneRequired").textContent=$msg;
+            document.getElementById("officePhoneRequired").classList.remove("requiredOne");
+            document.getElementById("officePhoneRequired").classList.add("paragraph-class");
+            document.getElementById("office_phone").classList.add("is-invalid");
+        }
+        function removeOfficePhoneError()
+        {
+            document.getElementById("officePhoneRequired").textContent="";
+            document.getElementById("officePhoneRequired").classList.remove("paragraph-class");
+            document.getElementById("office_phone").classList.remove("is-invalid");
         }
         function showAlternativeContactNumberError($msg)
         {

@@ -425,14 +425,12 @@
                                         <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="person_contact_by" type="text" class="widthinput form-control @error('person_contact_by')
-                                            is-invalid @enderror" name="person_contact_by" placeholder="Enter Person Contact By" value="{{ $supplier->person_contact_by }}"
-                                               autocomplete="person_contact_by" autofocus>
-                                        @error('person_contact_by')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
+                                        <select class="form-control widthinput" name="person_contact_by" id="person_contact_by" autofocus>
+                                            <option></option>
+                                            @foreach($users as $user)
+                                                <option value="{{ $user->id }}" {{ $user->id == $supplier->person_contact_by ? 'selected' : '' }}>{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 </br>
@@ -1040,7 +1038,7 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_1" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror"
                                                 name="supplierAddon[1][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, 1)">
                                                 <div class="input-group-append">
@@ -1048,11 +1046,11 @@
                                                 </div>
                                             </div>
                                             <span id="minLeadTimeError_1" class="minLeadTimeError invalid-feedback-lead"></span>
-                                            
+
                                         </div>
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
-                                           
+
                                             <div class="input-group">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
@@ -1302,6 +1300,9 @@
                 minimumResultsForSearch: -1,
                 placeholder:"Choose Category",
             });
+            $('#person_contact_by').select2({
+                placeholder:"Choose Person Contacted By",
+            });
 
             $('#nationality').select2({
 
@@ -1472,7 +1473,7 @@
                         $(this).find('.lead_time').attr('name','supplierAndPrice['+index+'][lead_time]');
                         $(this).find('.lead_time').attr('oninput','checkGreater(this, '+index+')');
                         $(this).find('.minLeadTimeError').attr('id','minLeadTimeError_'+index);
-                        
+
                         $(this).find('.lead_time_max').attr('id','lead_time_max_'+ index);
                         $(this).find('.lead_time_max').attr('name','supplierAndPrice['+index+'][lead_time_max]');
                         $(this).find('.lead_time_max').attr('oninput','checkGreater(this, '+index+')');
@@ -1550,7 +1551,7 @@
                                                     <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                                 </div>
                                                 <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror"
                                                 name="supplierAddon[${index}][lead_time]" maxlength="3"
                                                 value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
                                                 <div class="input-group-append">
@@ -1558,17 +1559,17 @@
                                                 </div>
                                             </div>
                                             <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
-                                            
+
                                         </div>
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
-                                           
+
                                             <div class="input-group">
                                                 <div class="input-group-append">
                                                     <span class="input-group-text widthinput" id="basic-addon2">Max</span>
                                                 </div>
                                                 <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror"
                                                 name="supplierAddon[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
                                                 value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
                                                 <div class="input-group-append">
