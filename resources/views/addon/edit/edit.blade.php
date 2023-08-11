@@ -511,16 +511,18 @@
         var i=1;
         var fixingCharge = 'yes';
         var formInputError = false;
-
+        var startYear = Number(data.model_year_start);
+        var endYear = Number(data.model_year_end);
         $(document).ready(function ()
         {
+
             $("#model_year_start").yearpicker({
-                year: data.model_year_start,
+                year: startYear,
                 startYear: 2019,
                 endYear: 2050,
             });
             $("#model_year_end").yearpicker({
-                year: data.model_year_end,
+                year: endYear,
                 startYear: 2019,
                 endYear: 2050,
             });
@@ -926,6 +928,33 @@
                         showPartNumberError($msg);
                         formInputError = true;
                     }
+                    var inputModelYearStart = $('#model_year_start').val();
+                    var inputModelYearEnd = $('#model_year_end').val();
+                    if(inputModelYearStart == '')
+                    {
+                        $msg = "Model Year is required"
+                        showModelYearStartError($msg);
+                        formInputError = true;
+                    }
+                    else if(inputModelYearStart.length != 4)
+                    {
+                        $msg = "Model Year required 4 digits number"
+                        showModelYearStartError($msg);
+                        formInputError = true;
+                    }
+                    else if(inputModelYearEnd != '' && inputModelYearStart != '')
+                    {
+                        if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                        { 
+                            removeModelYearStartError();
+                            showModelYearEndError();
+                            formInputError = true;
+                        }
+                    }
+                    else
+                    {
+                        removeModelYearStartError();
+                    }
                     var countBrandRow = 0;
                     countBrandRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                     for (let i = 1; i <= countBrandRow; i++)
@@ -1034,7 +1063,63 @@
                 }
             }
         }
-
+        function checkGreaterYear(CurrentInput)
+        {
+            removeModelYearStartError();
+            removeModelYearEndError();
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');
+            input.value = val;
+            var modelYearStart = $('#model_year_start').val();
+            var modelYearEnd = $('#model_year_end').val();
+            if(id == 'model_year_start')
+            {
+                if(modelYearStart == '')
+                {
+                    $msg = "Model year is Required";
+                    showModelYearStartError($msg);
+                }
+                else if(modelYearStart.length != 4)
+                {
+                    $msg = "Model Year required 4 digits number";
+                    showModelYearStartError($msg);
+                }
+            }
+            else if(id == 'model_year_end')
+            {
+                if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                { 
+                    showModelYearEndError();
+                    formInputError = true;
+                }
+            }
+        }
+        function showModelYearStartError($msg)
+        {
+            document.getElementById('modelYearStartError').textContent=$msg;
+            document.getElementById('model_year_start').classList.add("is-invalid");
+            document.getElementById('modelYearStartError').classList.add("paragraph-class");
+        }
+        function showModelYearEndError()
+        {
+            document.getElementById('modelYearEndError').textContent="Enter higher value than min leadtime";
+            document.getElementById('model_year_end').classList.add("is-invalid");
+            document.getElementById('modelYearEndError').classList.add("paragraph-class");
+        }
+        function removeModelYearStartError()
+        {
+            document.getElementById('modelYearStartError').textContent="";
+            document.getElementById('model_year_start').classList.remove("is-invalid");
+            document.getElementById('modelYearStartError').classList.remove("paragraph-class");
+        }
+        function removeModelYearEndError()
+        {
+            document.getElementById('modelYearEndError').textContent="";
+            document.getElementById('model_year_end').classList.remove("is-invalid");
+            document.getElementById('modelYearEndError').classList.remove("paragraph-class");
+        }
      function showAddonUniqueError($msg)
      {
          document.getElementById("addonNameUniqueError").textContent=$msg;

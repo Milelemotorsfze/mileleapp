@@ -185,6 +185,22 @@
                       Spare Parts
                     @endif
                   </div>
+
+                  @if($content == '')@if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
+                          <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            Lead Time
+                          </div>
+                          <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                            {{$addonsdata->PurchasePrices->lead_time_min}} 
+                            @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
+                            - {{$addonsdata->PurchasePrices->lead_time_max}} 
+                            @endif
+                            
+                            Days
+                            
+                          </div>@endif
+                  @endif
+
                   @if($content == '')
                     @if($addonsdata->PurchasePrices!= null)
                       @if($addonsdata->PurchasePrices->purchase_price_aed != '')
@@ -271,7 +287,8 @@
                       Model Year
                     </div>
                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                    {{$addonsdata->model_year_start}} @if($addonsdata->model_year_end != '') - {{$addonsdata->model_year_end}} @endif
+                    {{$addonsdata->model_year_start}} 
+                    @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                     </div>
                   @endif
                   @if($addonsdata->part_number)
