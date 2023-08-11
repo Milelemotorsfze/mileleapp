@@ -340,23 +340,31 @@ class AddonController extends Controller
                                         $supPriInput['supplier_id'] = $suppl1;
                                         if($supPriInput['purchase_price_aed'] != '')
                                         {
-                                            if($supplierAndPrice1['lead_time'] != '' && $supplierAndPrice1['lead_time_max'] != '')
+                                            if(isset($supplierAndPrice1['lead_time']) && $supplierAndPrice1['lead_time_max'])
                                             {
-                                                if(intval($supplierAndPrice1['lead_time']) == intval($supplierAndPrice1['lead_time_max']))
+                                                if($supplierAndPrice1['lead_time'] != '' && $supplierAndPrice1['lead_time_max'] != '')
+                                                {
+                                                    if(intval($supplierAndPrice1['lead_time']) == intval($supplierAndPrice1['lead_time_max']))
+                                                    {
+                                                        $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
+                                                        $supPriInput['lead_time_max'] = NULL;
+                                                    }
+                                                    elseif(intval($supplierAndPrice1['lead_time']) < intval($supplierAndPrice1['lead_time_max']))
+                                                    {
+                                                        $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
+                                                        $supPriInput['lead_time_max'] = $supplierAndPrice1['lead_time_max'];
+                                                    }
+                                                }
+                                                elseif($supplierAndPrice1['lead_time'] != '' && $supplierAndPrice1['lead_time_max'] == '')
                                                 {
                                                     $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
                                                     $supPriInput['lead_time_max'] = NULL;
                                                 }
-                                                elseif(intval($supplierAndPrice1['lead_time']) < intval($supplierAndPrice1['lead_time_max']))
+                                                else
                                                 {
-                                                    $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
-                                                    $supPriInput['lead_time_max'] = $supplierAndPrice1['lead_time_max'];
+                                                    $supPriInput['lead_time_min'] = NULL;
+                                                    $supPriInput['lead_time_max'] = NULL;
                                                 }
-                                            }
-                                            else
-                                            {
-                                                $supPriInput['lead_time_min'] = $supplierAndPrice1['lead_time'];
-                                                $supPriInput['lead_time_max'] = $supplierAndPrice1['lead_time_max'];
                                             }
                                             $CreateSupAddPri = SupplierAddons::create($supPriInput);
                                             $supPriInput['supplier_addon_id'] = $CreateSupAddPri->id;

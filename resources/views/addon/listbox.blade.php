@@ -279,7 +279,20 @@
                       Lead Time
                     </div>
                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                      {{$addonsdata->lead_time}} Days
+                    @if($content == '')@if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
+                          <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            Lead Time
+                          </div>
+                          <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                            {{$addonsdata->PurchasePrices->lead_time_min}} 
+                            @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
+                            - {{$addonsdata->PurchasePrices->lead_time_max}} 
+                            @endif
+                            
+                            Days
+                            
+                          </div>@endif
+                  @endif
                     </div>
                   @endif
                   @if($addonsdata->model_year_start OR $addonsdata->model_year_end)
