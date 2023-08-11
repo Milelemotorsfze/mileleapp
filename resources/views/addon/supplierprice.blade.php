@@ -16,17 +16,9 @@
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                             <select name="supplierAndPrice[1][supplier_id][]" data-index="1" id="suppliers1" multiple="true" style="width: 100%;"
-                                                    onchange="validationOnKeyUp(this)" class="suppliers" required>
-{{--                                                @foreach($suppliers as $supplier)--}}
-{{--                                                    <option class="{{$supplier->id}}" value="{{$supplier->id}}">{{$supplier->supplier}}</option>--}}
-{{--                                                @endforeach--}}
+                                                    onchange="validationOnKeyUp(this,1)" class="suppliers">
                                             </select>
-                                            @error('supplier_id')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                            <span id="supplierError" class="invalid-feedback"></span>
+                                            <span id="supplierError_1" class=" supplierError invalid-feedback"></span>
                                         </div>
                                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
@@ -72,12 +64,12 @@
                                                      widthinput @error('addon_purchase_price') is-invalid @enderror"
                                                     placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED"
                                                     value="{{ old('supplierAndPrice[1][addon_purchase_price_in_aed]') }}"  autocomplete="addon_purchase_price"
-                                                    autofocus onkeyup="calculateUSD(1)" required>
+                                                    autofocus onkeyup="calculateUSD(1)">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
                                                 </div>
-                                            <span id="purchasePriceAEDError_1" class="invalid-feedback"></span>
+                                            <span id="purchasePriceAEDError_1" class="purchasePriceAEDError"></span>
                                         </div>
                                         <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                             <span class="error">* </span>
@@ -87,12 +79,12 @@
                                             oninput="inputNumberAbs(this)" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror
                                                     purchase_price_USD" placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED"
                                                     value="{{ old('supplierAndPrice[1][addon_purchase_price_in_usd]') }}"  autocomplete="addon_purchase_price_in_usd"
-                                                    autofocus onkeyup="calculateAED(1)" required>
+                                                    autofocus onkeyup="calculateAED(1)">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                                     </div>
                                                 </div>
-                                            <span id="purchasePriceUSDError_1" class="invalid-feedback"></span>
+                                            <span id="purchasePriceUSDError_1" class="purchasePriceUSDError"></span>
                                         </div>
                                         <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                             <a class="btn_round removeButton" data-index="1" >
@@ -198,16 +190,19 @@
                         $(this).find('select').attr('data-index', index);
                         $(this).find('select').attr('id','suppliers'+ index);
                         $(this).find('select').attr('name','supplierAndPrice['+ index +'][supplier_id][]');
+                        $(this).find('select').attr('onchange','validationOnKeyUp(this,'+index+')');
+                        $(this).find('.supplierError').attr('id','supplierError_'+index);
                         $(this).find('.AED_price').attr('id','div_price_in_aed_'+ index);
                         $(this).find('.purchase_price_AED').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_aed]');
                         $(this).find('.purchase_price_AED').attr('id','addon_purchase_price_'+index);
                         $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
-
+                        $(this).find('.purchasePriceAEDError').attr('id','purchasePriceAEDError_'+index);
                         $(this).find('.USD_price').attr('id','div_price_in_usd_'+ index);
                         $(this).find('.purchase_price_USD').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_usd]');
                         $(this).find('.purchase_price_USD').attr('onkeyup','calculateAED('+ index +')');
                         $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
                         $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
+                        $(this).find('.purchasePriceUSDError').attr('id','purchasePriceUSDError_'+index);
                         $(this).find('a').attr('data-index', index);
 
                         $(this).find('.lead_time').attr('id','lead_time_'+ index);
@@ -273,13 +268,9 @@
                             <span class="error">* </span>
                                 <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                 <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
-                                 multiple="true" style="width: 100%;" required>
+                                 multiple="true" style="width: 100%;" onchange="validationOnKeyUp(this,${index})">
                                 </select>
-                                @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                <span id="supplierError_${index}" class="supplierError invalid-feedback"></span>
                                 </div>
 
                                 <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -324,11 +315,12 @@
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_aed]" id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
                                 class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice purchase_price_AED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
                                  placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"
-                                  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})" required>
+                                  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
                                 </div>
+                                <span id="purchasePriceAEDError_${index}" class="purchasePriceAEDError"></span>
                             </div>
                             <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
                             <span class="error">* </span>
@@ -337,11 +329,12 @@
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}"
                                 oninput="inputNumberAbs(this)" class=" form-control purchase_price_USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
                                  placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
-                                   autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})" required>
+                                   autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                     </div>
                                 </div>
+                                <span id="purchasePriceUSDError_${index}" class="purchasePriceUSDError"></span>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                 <a class="btn_round removeButton" data-index="${index}" >
