@@ -182,12 +182,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-        @if($supplierAddonDetails->addon_type_name == 'K')
-            Kit
+            @if($supplierAddonDetails->addon_type_name == "K")
+                Kit
             @else
-            Addon
+                Addon
             @endif
-             Details</h4>
+                Details</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
@@ -196,14 +196,16 @@ body {font-family: Arial, Helvetica, sans-serif;}
             <div class="col-xxl-4 col-lg-4 col-md-4">
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> Kit Name :</label>
+                        <label for="choices-single-default" class="form-label"> 
+                            @if($supplierAddonDetails->addon_type_name == "K") Kit @else Addon @endif Name :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->AddonName->name}}</span>
                     </div>
 
                     <div class="col-lg-6 col-md-6 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> Kit Code :</label>
+                        <label for="choices-single-default" class="form-label"> 
+                            @if($supplierAddonDetails->addon_type_name == "K") Kit @else Addon @endif Code :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->addon_code}}</span>
@@ -397,6 +399,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         <span>{{ $AddonSuppliers->purchase_price_aed}} AED</span>
                     </div>
 
+                    <div class="col-lg-2 col-md-3 col-sm-12">
+                        <label for="choices-single-default" class="form-label">Purchase Price In USD :</label>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-12">
+                        <span>{{ $AddonSuppliers->purchase_price_usd}} USD</span>
+                    </div>
+
+                    
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label">Purchase Price In USD :</label>
                     </div>

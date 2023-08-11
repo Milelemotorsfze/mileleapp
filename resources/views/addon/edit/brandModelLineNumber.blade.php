@@ -113,10 +113,11 @@
                         </a>
                     </div>
                 </div>
+                <div class="MoDes{{$i}}" id="model-line-first-row">
                 <div hidden>{{$j=0;}}</div>
                 @foreach($existingBrand->ModelLine as $ModelLine)
                 <div id="rowDesCount{{$i}}" hidden value="{{$j+1}}">{{$j=$j+1;}}</div>
-                <div class="MoDes{{$i}}" id="model-line-first-row">
+                
                     <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-{{$j}}">
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                         </div>
@@ -152,8 +153,9 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                
                 @endforeach
+                </div>
                 <div class="row">
                     <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel{{$i}}" class="delete-model-line-row" >
                         <div id="showaddtrd{{$i}}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" >
@@ -568,7 +570,7 @@
     {
         var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1;
 
-
+// alert(".MoDes" + supplier);
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
                 <div class="col-xxl-1 col-lg-1 col-md-12">
@@ -656,8 +658,8 @@
     function selectBrandDisp(id,row)
     {
         var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
-        console.log(indexValue);
-        console.log(row);
+        // console.log(indexValue);
+        // console.log(row);
 
         var value = $('#selectBrandMo'+id).val();
         var brandId = value;
