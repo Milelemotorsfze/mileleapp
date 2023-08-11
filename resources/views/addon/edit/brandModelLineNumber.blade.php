@@ -10,7 +10,7 @@
                         <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                         <select onchange=selectBrandDisp({{$i}}) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"
                                 multiple="true" style="width: 100%;" class="brandRows">
-                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+{{--                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
                             @foreach($brands as $brand)
                                 <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                             @endforeach
@@ -91,7 +91,7 @@
 {{--                        </select> -->--}}
                         <select disabled onchange=selectBrandDisp({{$i}})  id="selectBrandMo{{$i}}" data-index="{{$i}}"
                                 multiple="true" style="width: 100%;" class="brandRows">
-                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
+{{--                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
                                 <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
                                 @foreach($brands as $brand)
                                     <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
@@ -117,7 +117,7 @@
                 <div hidden>{{$j=0;}}</div>
                 @foreach($existingBrand->ModelLine as $ModelLine)
                 <div id="rowDesCount{{$i}}" hidden value="{{$j+1}}">{{$j=$j+1;}}</div>
-                
+
                     <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-{{$j}}">
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                         </div>
@@ -125,7 +125,7 @@
                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line </label>
                             <select class="compare-tag1 spare-parts-model-lines" name="brand[{{$i}}][model][{{$j}}][model_id]" onchange=selectModelLineDescipt({{$i}},{{$j}})
                                     id="selectModelLineNum{{$i}}Des{{$j}}" multiple="true" style="width: 100%;"  data-index="{{$i}}" data-model-index="{{$j}}">
-                                    <option value="allmodellines" {{"yes" == $ModelLine->is_all_model_lines  ? 'selected' : ''}}>All Model Lines</option>
+{{--                                    <option value="allmodellines" {{"yes" == $ModelLine->is_all_model_lines  ? 'selected' : ''}}>All Model Lines</option>--}}
                                     @foreach($existingBrand->ModalLines as $drop)
                                     <option value="{{$drop->id}}" @if($drop->id == $ModelLine->model_id) selected @endif>{{$drop->model_line}}</option>
                                     @endforeach
@@ -153,7 +153,7 @@
                             </a>
                         </div>
                     </div>
-                
+
                 @endforeach
                 </div>
                 <div class="row">
@@ -216,14 +216,12 @@
             }
 
             hideOption(index,value);
-            uniqueCheckSpareParts();
 
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
-            uniqueCheckSpareParts();
 
         });
 
@@ -250,7 +248,7 @@
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
-            uniqueCheckSpareParts();
+
         });
 
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
@@ -259,7 +257,7 @@
             var id = e.params.data.id;
             var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text);
-            uniqueCheckSpareParts();
+
         });
         $(document.body).on('select2:select', ".model-descriptions", function (e) {
             uniqueCheckSpareParts();
@@ -301,9 +299,9 @@
             if(countRow > 1)
             {
                 var indexNumber = $(this).attr('data-index');
-                if(indexNumber == 1) {
-                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
-                    }
+                // if(indexNumber == 1) {
+                //         $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+                //     }
                 $(this).closest('#row-addon-brand-'+indexNumber).find("option:selected").each(function() {
                     var id = (this.value);
                     var text = (this.text);
@@ -383,9 +381,9 @@
             if(countRow > 1)
             {
                 var modelIndex = $(this).attr('data-model-index');
-                if(modelIndex == 1) {
-                        $('<option value="allmodellines"> All Model Lines </option>').prependTo('#selectModelLineNum'+indexNumber+'Des2');
-                    }
+                // if(modelIndex == 1) {
+                //         $('<option value="allmodellines"> All Model Lines </option>').prependTo('#selectModelLineNum'+indexNumber+'Des2');
+                //     }
                 $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
                     var id = (this.value);
                     var text = (this.text);
@@ -451,7 +449,7 @@
 
         $("#addDis").on("click", function ()
         {
-            $('.allbrandsMo').prop('disabled',true);
+            // $('.allbrandsMo').prop('disabled',true);
             var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
 
             $('#indexValue').val(index);
@@ -522,7 +520,7 @@
                                         <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                                             <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
-                                                multiple="true" style="width: 100%;"   onchange=selectModelDescipt(${index},1)>
+                                                multiple="true" style="width: 100%;"  onchange=selectModelDescipt(${index},1)>
 
                                             </select>
                                               <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>
@@ -773,13 +771,13 @@
             {
                 $("#selectModelLineNum"+id+"Des"+row).html("");
                 let BrandModelLine   = [];
-                if(row == 1) {
-                BrandModelLine.push
-                    ({
-                        id: 'allmodellines',
-                        text: 'All Model Lines'
-                    });
-                }
+                // if(row == 1) {
+                // BrandModelLine.push
+                //     ({
+                //         id: 'allmodellines',
+                //         text: 'All Model Lines'
+                //     });
+                // }
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push
@@ -815,12 +813,14 @@
         }
         else
         {
+
             showModelNumberDropdown(id,row);
             removeSPModelLineError(id,row);
         }
     }
     function selectModelDescipt(id,row)
     {
+
         ifModelDiscExist = $("#selectModelNumberDiscri"+id+"Des"+row).val();
         if(ifModelDiscExist == '')
         {
@@ -874,7 +874,7 @@
                                 text: value.model_description
                             });
                         });
-                        $("#selectModelNumberDiscri"+id+"Des"+row).html("").trigger("change");
+                        $("#selectModelNumberDiscri"+id+"Des"+row).html("");
                         $("#selectModelNumberDiscri"+id+"Des"+row).select2
                         ({
                             placeholder: 'Choose Model Number....     Or     Type Here To Search....',

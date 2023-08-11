@@ -50,7 +50,7 @@ class KitSeeder extends Seeder
             //  ['10','Supplier Active','supplier-active-inactive', 'To Activate and Inactivate the Supplier'],
 
 
-           
+
 
             //Addon Purchase Prices
             // ['15','Addons Purchase Price','addon-purchase-price', 'To View Addon Purchase Price'],
@@ -71,8 +71,9 @@ class KitSeeder extends Seeder
             // ['17','View Supplier Addon Purchase Price History','supplier-addon-purchase-price-history', 'To View Supplier Addon Purchase Price History'],
             // ['17','View Supplier Addon Purchase Price','supplier-addon-purchase-price-view', 'To View Supplier Addon Purchase Price'],
 
+            // Master Addon
 
-
+             ['12','Create addon Description','create-master-addon-description', 'To Create addon Description'],
 
             // Brand
             ['22','View Master Brand List','view-brand-list', 'To View List of Master Brands'],
@@ -83,6 +84,7 @@ class KitSeeder extends Seeder
             ['23','View Master Model Lines List','view-model-lines-list', 'To View List of Master Model Lines'],
             ['23','Create Master Model Lines','master-model-lines-create', 'To Create Master Model Lines'],
             ['23','Edit Master Model Lines','master-model-lines-edit', 'To Edit Master Model Lines'],
+            //
             ];
         foreach ($Permissions as $key => $value):
         $permission[] = [

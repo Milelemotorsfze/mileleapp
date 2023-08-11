@@ -208,7 +208,7 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row mb-3"  id="addon-description">
+                    <div class="row mb-3" >
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -232,17 +232,17 @@
                             <span id="addonDescriptionError" class="invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
-                            {{--                            @can('master-addon-description-create')--}}
-                            {{--                                @php--}}
-                            {{--                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-description-create']);--}}
-                            {{--                                @endphp--}}
-                            {{--                                @if ($hasPermission)--}}
-                            <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
-                                    class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
-                            <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
-                                    class="btn btn-sm btn-info" >Choose From List</a>
-                            {{--                                @endif--}}
-                            {{--                            @endcan--}}
+{{--                        @can('create-master-addon-description')--}}
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-master-addon-description']);
+                            @endphp
+                            @if ($hasPermission)
+                                <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
+                                        class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
+                                <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
+                                        class="btn btn-sm btn-info" >Choose From List</a>
+                            @endif
+{{--                            @endcan--}}
                         </div>
                     </div>
                     @if($addonDetails->addon_type_name == 'SP')
@@ -562,7 +562,7 @@
             });
 
         ////////description section jquery //////////////////
-            $('#description-text').change(function () {
+            $('#description-text').keyup('keyup, change', function () {
                 addonDescriptionUniqueCheck();
             });
 

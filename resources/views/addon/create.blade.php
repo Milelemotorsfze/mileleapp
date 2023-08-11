@@ -215,8 +215,7 @@
                         </div>
                     </div>
                     </br>
-                 
-                    <div class="row mb-3" hidden id="addon-description">
+                    <div class="row" >
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Description') }}</label>
                         </div>
@@ -238,36 +237,36 @@
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
 {{--                            @can('master-addon-description-create')--}}
-{{--                                @php--}}
-{{--                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-description-create']);--}}
-{{--                                @endphp--}}
-{{--                                @if ($hasPermission)--}}
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-master-addon-description']);
+                                @endphp
+                                @if ($hasPermission)
                                     <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                        class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                                     <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                     class="btn btn-sm btn-info" >Choose From List</a>
-{{--                                @endif--}}
+                                @endif
 {{--                            @endcan--}}
                         </div>
                     </div>
                     <br>
                     <div class="row" hidden id="model_year">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                        <span class="error">* </span>
+                            <span class="error">* </span>
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-5 col-md-11">
                             <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
-                            oninput="checkGreaterYear(this)" maxlength="4" value=""/>
+                                   oninput="checkGreaterYear(this)" value=""/>
                             <span id="modelYearStartError" class="invalid-feedback-lead"></span>
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                        <span class="error">* </span>
+                            <span class="error">* </span>
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-5 col-md-11">
                             <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
-                            oninput="checkGreaterYear(this)" maxlength="4" value=""/>
+                                   oninput="checkGreaterYear(this)" value=""/>
                             <span id="modelYearEndError" class="invalid-feedback-lead"></span>
                         </div>
                     </div>
@@ -500,7 +499,6 @@
                 $('#addnewDescriptionButton').attr('hidden', true);
                 $("#description option:selected").prop("selected", false);
                 $("#description").trigger('change');
-
             });
             $('#description').change(function () {
                 var addonType = $('#addon_type').val();
@@ -511,12 +509,17 @@
                     uniqueCheckSpareParts();
                 }
             })
+
             $('#part_number').keyup(function () {
                 var addonType =  $('#addon_type').val();
                 if(addonType == 'SP') {
                     uniqueCheckSpareParts();
                 }
             })
+            $('#description-text').keyup('keyup, change', function () {
+                addonDescriptionUniqueCheck();
+            });
+
             $("#descr-dropdown-button").click(function () {
                 $('#description-text').attr('hidden', true);
                 $('#select-description').attr('hidden', false);
@@ -590,10 +593,6 @@
             // $("#supplierArray1").select2();
 
 
-            $('#description-text').change(function () {
-                addonDescriptionUniqueCheck();
-            });
-
             $('#addon_id').change(function () {
                 var id = $('#addon_id').val();
                 var addonType = $('#addon_type').val();
@@ -635,11 +634,7 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
-                            if (data.addon_type.addon_type == 'P') {
-                                $('#addon-description').attr('hidden', false);
-                            } else {
-                                $('#addon-description').attr('hidden', true);
-                            }
+
                             $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
@@ -895,7 +890,7 @@
                         showModelYearStartError($msg);
                     }
                     else if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                    { 
+                    {
                         removeModelYearStartError();
                         showModelYearEndError();
                         formInputError = true;
@@ -1696,7 +1691,7 @@
             $('#kitSupplierButtonToHideandshow').hide();
         }
         function checkGreaterYear(CurrentInput)
-        {alert(CurrentInput);
+        {
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
