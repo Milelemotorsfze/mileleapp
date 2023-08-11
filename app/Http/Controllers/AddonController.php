@@ -162,21 +162,21 @@ class AddonController extends Controller
             {
                 if($request->model_year_start != '' && $request->model_year_end != '')
                 {
-                    if(intval($request->model_year_start) < intval($request->model_year_end))
+                    if(intval($request->model_year_start) <= intval($request->model_year_end))
                     {
                         $input['model_year_start'] = $request->model_year_start;
                         $input['model_year_end'] = $request->model_year_end;
-                    }
-                    else if(intval($request->model_year_start) == intval($request->model_year_end))
-                    {
-                        $input['model_year_start'] = $request->model_year_start;
-                        $input['model_year_end'] = NULL;
                     }
                     else
                     {
                         $input['model_year_start'] = NULL;
                         $input['model_year_end'] = NULL;
                     }
+                }
+                elseif($request->model_year_start != '' && $request->model_year_end == '')
+                {
+                    $input['model_year_start'] = $request->model_year_start;
+                    $input['model_year_end'] = $request->model_year_start;
                 }
             }       
             $addon_details = AddonDetails::create($input);
@@ -525,7 +525,7 @@ class AddonController extends Controller
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        // dd($request->all());
+        // dd($request->addon_type_hiden);
         $request->addon_type = $request->addon_type_hiden;
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
@@ -567,6 +567,32 @@ class AddonController extends Controller
         }elseif ($request->description_text != null) {
             $request->description = $request->description_text;
         }
+        if($request->addon_type_hiden == 'P' OR $request->addon_type_hiden == 'K')
+            {
+                $addon_details->model_year_start = NULL;
+                $addon_details->model_year_end = NULL;
+            }
+            else
+            {
+                if($request->model_year_start != '' && $request->model_year_end != '')
+                {
+                    if(intval($request->model_year_start) <= intval($request->model_year_end))
+                    {
+                        $addon_details->model_year_start = $request->model_year_start;
+                        $addon_details->model_year_end = $request->model_year_end;
+                    }
+                    else
+                    {
+                        $addon_details->model_year_start = NULL;
+                        $addon_details->model_year_end = NULL;
+                    }
+                }
+                elseif($request->model_year_start != '' && $request->model_year_end == '')
+                {
+                    $addon_details->model_year_start = $request->model_year_start;
+                    $addon_details->model_year_end = $request->model_year_start;
+                }
+            }    
         $addon_details->update();
         $deleteAddonTypes = [];
         $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();

@@ -262,7 +262,6 @@
                             <span id="modelYearStartError" class="invalid-feedback-lead"></span>
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                        <span class="error">* </span>
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
                         </div>
                         <div class="col-xxl-4 col-lg-5 col-md-11">
@@ -893,12 +892,22 @@
                     {
                         $msg = "Model Year is required"
                         showModelYearStartError($msg);
-                    }
-                    else if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                    { 
-                        removeModelYearStartError();
-                        showModelYearEndError();
                         formInputError = true;
+                    }
+                    else if(inputModelYearStart.length != 4)
+                    {
+                        $msg = "Model Year required 4 digits number"
+                        showModelYearStartError($msg);
+                        formInputError = true;
+                    }
+                    else if(inputModelYearEnd != '' && inputModelYearStart != '')
+                    {
+                        if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                        { 
+                            removeModelYearStartError();
+                            showModelYearEndError();
+                            formInputError = true;
+                        }
                     }
                     else
                     {
@@ -1696,7 +1705,9 @@
             $('#kitSupplierButtonToHideandshow').hide();
         }
         function checkGreaterYear(CurrentInput)
-        {alert(CurrentInput);
+        {
+            removeModelYearStartError();
+            removeModelYearEndError();
             var id = CurrentInput.id
             var input = document.getElementById(id);
             var val = input.value;
@@ -1704,25 +1715,27 @@
             input.value = val;
             var modelYearStart = $('#model_year_start').val();
             var modelYearEnd = $('#model_year_end').val();
-                // if(Number(modelYearStart) > Number(modelYearEnd))
-                // {
-                //     var id = CurrentInput.id;
-                //     if(id == 'model_year_start')
-                //     {
-                //         showModelYearStartError();
-                //         removeModelYearEndError();
-                //     }
-                //     else
-                //     {
-                //         showModelYearEndError();
-                //         removeModelYearStartError();
-                //     }
-                // }
-                // else
-                // {
-                //     removeModelYearStartError();
-                //     removeModelYearEndError();
-                // }
+            if(id == 'model_year_start')
+            {
+                if(modelYearStart == '')
+                {
+                    $msg = "Model year is Required";
+                    showModelYearStartError($msg);
+                }
+                else if(modelYearStart.length != 4)
+                {
+                    $msg = "Model Year required 4 digits number";
+                    showModelYearStartError($msg);
+                }
+            }
+            else if(id == 'model_year_end')
+            {
+                if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                { 
+                    showModelYearEndError();
+                    formInputError = true;
+                }
+            }
         }
         function showModelYearStartError($msg)
         {
@@ -1864,6 +1877,10 @@
         {
             var confirm = alertify.confirm('You are not able to edit this field while any Vendor is in selection',function (e) {
                    }).set({title:"Remove Brands and Vendors"})
+        }
+        function fff()
+        {
+            alert('hlo');
         }
 </script>
 @endsection

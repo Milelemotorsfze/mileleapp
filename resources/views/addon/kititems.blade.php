@@ -184,8 +184,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <h4 class="card-title">
             @if($supplierAddonDetails->addon_type_name == "K")
                 Kit
-            @else
-                Addon
+            @elseif($supplierAddonDetails->addon_type_name == "P")
+                Accessories
+            @elseif($supplierAddonDetails->addon_type_name == "SP")
+                Spare Parts
             @endif
                 Details</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -197,7 +199,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> 
-                            @if($supplierAddonDetails->addon_type_name == "K") Kit @else Addon @endif Name :</label>
+                            @if($supplierAddonDetails->addon_type_name == "K") 
+                                Kit 
+                            @elseif($supplierAddonDetails->addon_type_name == "P")
+                                Accessories
+                            @elseif($supplierAddonDetails->addon_type_name == "SP")
+                                Spare Parts
+                            @endif 
+                           Name :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->AddonName->name}}</span>
@@ -205,7 +214,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> 
-                            @if($supplierAddonDetails->addon_type_name == "K") Kit @else Addon @endif Code :</label>
+                            @if($supplierAddonDetails->addon_type_name == "K") 
+                                Kit 
+                            @elseif($supplierAddonDetails->addon_type_name == "P")
+                                Accessories
+                            @elseif($supplierAddonDetails->addon_type_name == "SP")
+                                Spare Parts
+                            @endif  Code :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->addon_code}}</span>
@@ -290,6 +305,20 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     @endif
                     @endcan
                     @endif
+
+                    @if($supplierAddonDetails->addon_type_name == "SP")
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <label for="choices-single-default" class="form-label"> Model Year :</label>
+                    </div>
+                    <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span>{{ $supplierAddonDetails->model_year_start}} 
+                            @if($supplierAddonDetails->model_year_start != '' && $supplierAddonDetails->model_year_start < $supplierAddonDetails->model_year_end)
+                                - {{$supplierAddonDetails->model_year_end}}
+                            @endif
+                        </span>
+                    </div>
+                    @endif
+
                 </div>
             </div>
             <div class="col-xxl-5 col-lg-5 col-md-5">
@@ -408,10 +437,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                     
                     <div class="col-lg-2 col-md-3 col-sm-12">
-                        <label for="choices-single-default" class="form-label">Purchase Price In USD :</label>
+                        <label for="choices-single-default" class="form-label">Lead Time :</label>
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
-                        <span>{{ $AddonSuppliers->purchase_price_usd}} USD</span>
+                        <span>{{ $AddonSuppliers->lead_time_min}} 
+                            @if($AddonSuppliers->lead_time_max != '' && $AddonSuppliers->lead_time_min < $AddonSuppliers->lead_time_max) 
+                            - {{$AddonSuppliers->lead_time_max}} 
+                            @endif Days</span>
                     </div>
 
                     @if($AddonSuppliers->Suppliers->contact_number != '')
