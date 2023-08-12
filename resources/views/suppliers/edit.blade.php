@@ -224,9 +224,6 @@
         @endif -->
 
         <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST">
-        <!-- action="{{ route('suppliers.store') }}" -->
-        <!-- method="POST" enctype="multipart/form-data" -->
-        <!-- action="{{ route('suppliers.store') }}" method="POST"  -->
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -331,20 +328,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
-                                        <label for="sub category" class="col-form-label text-md-end">{{ __('Comment') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment"
-                                                  id="comment" autofocus>{{ $supplier->comment }}</textarea>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -354,66 +337,6 @@
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
                                         <input class="widthinput form-control" name="web_address" id="web_address"
                                                placeholder="Web Address" autofocus value="{{ old('web_address', $supplier->web_address) }}">
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Contact Details</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                             <span class="error">* </span>
-                                        <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="contact_number" type="tel" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                               name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"
-                                               autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
-
-                                         <span id="contactRequired" class="email-phone required-class"></span>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="alternative_contact_number" type="tel" class="widthinput form-control @error('alternative_contact_number[full]')
-                                            is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number"
-                                               value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus
-                                               onkeyup="validationOnKeyUp(this)">
-
-                                        <span id="alternativeContactRequired" class="email-phone required-class"></span>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
-                                        <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email"
-                                               placeholder="Enter Email" value="{{ $supplier->email }}" autofocus onkeyup="validationOnKeyUp(this)">
-                                        <!-- @error('email')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                            @enderror -->
-                                        <span id="emailRequired" class="email-phone required-class"></span>
                                     </div>
                                 </div>
                                 </br>
@@ -439,17 +362,102 @@
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
                                         <!-- <span class="error">* </span> -->
-                                        <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
+                                        <label for="sub category" class="col-form-label text-md-end">{{ __('Comment') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
-                                               placeholder="Enter Contact Person" value="{{ old('contact_person', $supplier->contact_person) }}"  autocomplete="contact_person" autofocus>
-                                        @error('contact_person')
+                                        <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment"
+                                                  id="comment" autofocus>{{ $supplier->comment }}</textarea>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Contact Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                             <span class="error">* </span>
+                                        <label for="contact_number" class="col-form-label text-md-end">{{ __('Contact Number') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="contact_number" type="tel" class="widthinput contact form-control @error('contact_number[full]') is-invalid @enderror"
+                                               name="contact_number[main]" placeholder="Enter Contact Number" value="{{$supplier->contact_number}}"
+                                               autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                                         <span id="contactRequired" class="email-phone required-class"></span>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Alternative Contact Number') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="alternative_contact_number" type="tel" class="widthinput contact form-control @error('alternative_contact_number[full]')
+                                            is-invalid @enderror" name="alternative_contact_number[main]" placeholder="Enter Alternative Contact Number"
+                                               value="{{ $supplier->alternative_contact_number }}" autocomplete="alternative_contact_number[full]" autofocus
+                                               onkeyup="validationOnKeyUp(this)">
+
+                                        <span id="alternativeContactRequired" class="email-phone required-class"></span>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <label for="phone" class="col-form-label text-md-end">{{ __('Phone') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="phone" type="tel"
+                                               class="widthinput contact form-control @error('phone[full]') is-invalid @enderror" maxlength="15"
+                                               minlength="5" name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]', $supplier->phone) }}"
+                                               autocomplete="phone[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                                        <span id="phoneRequired" class="phone required-class"></span>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <label for="alternative_contact_number" class="col-form-label text-md-end">{{ __('Office Contact Number') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="office_phone" type="tel"
+                                               class="widthinput contact form-control @error('office_phone[full]') is-invalid @enderror" name="office_phone[main]"
+                                               placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]', $supplier->office_phone) }}"
+                                               minlength="5" maxlength="15" autocomplete="office_phone[full]" autofocus onkeyup="validationOnKeyUp(this)">
+                                        <span id="officePhoneRequired" class="office_phone required-class"></span>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <!-- <span class="error">* </span> -->
+                                        <label for="email" class="col-form-label text-md-end">{{ __('Email') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email"
+                                               placeholder="Enter Email" value="{{ $supplier->email }}" autofocus onkeyup="validationOnKeyUp(this)">
+                                        <!-- @error('email')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
-                                        @enderror
-
+                                            @enderror -->
+                                        <span id="emailRequired" class="email-phone required-class"></span>
                                     </div>
                                 </div>
                                 </br>
@@ -487,6 +495,25 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                         @enderror
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <!-- <span class="error">* </span> -->
+                                        <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
+                                               placeholder="Enter Contact Person" value="{{ old('contact_person', $supplier->contact_person) }}"  autocomplete="contact_person" autofocus>
+                                        @error('contact_person')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+
                                     </div>
                                 </div>
                                 </br>
@@ -1159,6 +1186,10 @@
         // var previousremoveChecked = '';
         // globalThis.selectedAddons .push(brandId);
       var sub ='1';
+
+        $(document).on("input", ".contact", function() {
+            this.value = this.value.replace(/\D/g,'');
+        });
       var SupplierTypesVal = {!! json_encode($supplierTypes) !!};
       var supplierAddons = {!! json_encode($supplierAddons) !!};
         const file1InputLicense = document.querySelector("#passport-upload");
@@ -1389,13 +1420,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
-
-            // // $msg ="One among contact number or alternative contact number or email is required";
-            // // emailContactError($msg);
-            // $("#adoon_1").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
-            // $("#adoon_1").select2();
-            // $("#supplier_type").attr("data-placeholder","Choose Supplier Type....     Or     Type Here To Search....");
-            // $("#supplier_type").select2();
 
             $('#addon_1').select2({
                 allowClear: true,
@@ -1669,8 +1693,20 @@
             hiddenInput: "full",
             utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
         });
-
-
+        var phone = window.intlTelInput(document.querySelector("#phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
+        var office_phone = window.intlTelInput(document.querySelector("#office_phone"),
+            {
+                separateDialCode: true,
+                preferredCountries:["ae"],
+                hiddenInput: "full",
+                utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js"
+            });
         // $("form").submit(function(e)
         $('body').on('submit', '#createSupplierForm', function (e)
         {
@@ -1682,6 +1718,9 @@
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
+            var inputPhone = $('#phone').val();
+            var inputOfficePhone = $('#office_phone').val();
+
             var formInputError = false;
             if(inputSupplier == '')
             {
@@ -1710,6 +1749,42 @@
                 formInputError = true;
                 e.preventDefault();
             }
+            if(inputOfficePhone != '') {
+                if (inputOfficePhone.length < 5 ) {
+                    console.log("less tahn 5");
+                    $msg = "Minimum 5 digits required";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+                } else if (inputOfficePhone.length > 15) {
+                    console.log("more tahn 5");
+                    $msg = "Maximum 15 digits allowed";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+
+                } else {
+                    removeOfficePhoneError();
+                    formInputError = false;
+                }
+            }
+            if(inputAlternativeContactNumber != '') {
+               if(inputAlternativeContactNumber.length > 15) {
+                   $msg = "Maximum 15 digits allowed";
+                   showAlternativeContactNumberError($msg);
+                   formInputError = true;
+                   e.preventDefault();
+               }else if(inputAlternativeContactNumber.length < 5 && inputAlternativeContactNumber.length > 0) {
+
+                   $msg = "Minimum 5 digits required";
+                   showAlternativeContactNumberError($msg);
+                   formInputError = true;
+                   e.preventDefault();
+               }else {
+                   removeAlternativeContactNumberError();
+                   formInputError = false;
+               }
+            }
             if(inputContactNumber == '')
             {
                 $msg ="Contact number is required";
@@ -1718,6 +1793,23 @@
                 e.preventDefault();
             } else{
                 // alert("ok");
+                if(inputContactNumber != '') {
+                    if(inputContactNumber.length > 15) {
+                        $msg = "Maximum 15 digits allowed";
+                        showContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else if(inputContactNumber.length < 5 ) {
+
+                        $msg = "Minimum 5 digits required";
+                        showContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else {
+                        removeContactNumberError();
+                        formInputError = false;
+                    }
+                }
                 var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
@@ -2161,7 +2253,32 @@
             document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
             document.getElementById("alternative_contact_number").classList.remove("is-invalid");
         }
-
+        function showPhoneError($msg)
+        {
+            document.getElementById("phoneRequired").textContent=$msg;
+            document.getElementById("phoneRequired").classList.remove("requiredOne");
+            document.getElementById("phoneRequired").classList.add("paragraph-class");
+            document.getElementById("phone").classList.add("is-invalid");
+        }
+        function removePhoneError()
+        {
+            document.getElementById("phoneRequired").textContent="";
+            document.getElementById("phoneRequired").classList.remove("paragraph-class");
+            document.getElementById("phone").classList.remove("is-invalid");
+        }
+        function showOfficePhoneError($msg)
+        {
+            document.getElementById("officePhoneRequired").textContent=$msg;
+            document.getElementById("officePhoneRequired").classList.remove("requiredOne");
+            document.getElementById("officePhoneRequired").classList.add("paragraph-class");
+            document.getElementById("office_phone").classList.add("is-invalid");
+        }
+        function removeOfficePhoneError()
+        {
+            document.getElementById("officePhoneRequired").textContent="";
+            document.getElementById("officePhoneRequired").classList.remove("paragraph-class");
+            document.getElementById("office_phone").classList.remove("is-invalid");
+        }
         function showEmailError($msg)
         {
             document.getElementById("emailRequired").textContent=$msg;

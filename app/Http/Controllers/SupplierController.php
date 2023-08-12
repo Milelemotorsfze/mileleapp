@@ -755,7 +755,6 @@ class SupplierController extends Controller
     }
     public function createSupplier(Request $request)
     {
-
         $input = $request->all();
 
         $input['contact_number'] = $request->contact_number['full'];

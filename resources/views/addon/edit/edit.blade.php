@@ -565,7 +565,35 @@
 
         ////////description section jquery //////////////////
             $('#description-text').keyup('keyup, change', function () {
+                var value = $(this).val();
                 addonDescriptionUniqueCheck();
+                var addonType = $('#addon_type').val();
+                if(addonType == 'P') {
+                    if(!value) {
+                        uniqueCheckAccessories();
+                    }else {
+
+                        var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                        for(var i=1;i<=indexValue;i++){
+                            var $msg = "";
+                            removeBrandError($msg,i);
+                        }
+                    }
+
+                }else if(addonType == 'SP') {
+                    if(!value) {
+                        uniqueCheckSpareParts();
+                    }else{
+                        var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                        for(var i=0;i<=indexValue;i++){
+                            var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                            for(let j=1; j<=index; j++)
+                            {
+                                removeSPModelLineError(i,j);
+                            }
+                        }
+                    }
+                }
             });
 
             //////////////// end /////////////
@@ -974,7 +1002,7 @@
                     else if(inputModelYearEnd != '' && inputModelYearStart != '')
                     {
                         if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                        { 
+                        {
                             removeModelYearStartError();
                             showModelYearEndError();
                             formInputError = true;
@@ -1116,7 +1144,7 @@
             else if(id == 'model_year_end')
             {
                 if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                { 
+                {
                     showModelYearEndError();
                     formInputError = true;
                 }
@@ -1591,7 +1619,7 @@
                 {
                     document.getElementById('addon_purchase_price_'+i).value = aed;
                     removePurchasePriceAEDError(i);
-                    removePurchasePriceUSDError(i);    
+                    removePurchasePriceUSDError(i);
                 }
                 setLeastAEDPrice();
             }
@@ -1600,7 +1628,7 @@
         {
             var aed = $("#addon_purchase_price_"+i).val();
             if(aed == '')
-            {              
+            {
                 document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
                 $msg = "Purchase price is required";
                 showPurchasePriceAEDError($msg,i);
