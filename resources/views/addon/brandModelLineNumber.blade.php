@@ -218,9 +218,9 @@
                     if (countRow > 1) {
                         var indexNumber = $(this).attr('data-index');
 
-                        if (indexNumber == 1) {
-                            $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
-                        }
+                        // if (indexNumber == 1) {
+                        //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+                        // }
 
                         $(this).closest('#row-addon-brand-' + indexNumber).find("option:selected").each(function () {
                             var id = (this.value);
@@ -602,7 +602,7 @@
     {
         var indexValue = $(".MoDes"+id).find(".MoDesApndHere"+id).length;
 
-        var value =$('#selectBrandMo'+id).val();
+        var value = $('#selectBrandMo'+id).val();
         var brandId = value;
         if(brandId != '')
         {
@@ -699,9 +699,10 @@
         // let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         // showDivdropDr.hidden = false
         $('#showDivdropDr'+id+'Des'+row).attr('hidden', false);
-        // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
-        // showDel.hidden = false
-        $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
+
+        let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
+        showDel.hidden = false
+        // $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
 
         let showaddtrimDis = document.getElementById('showaddtrimDis');
         showaddtrimDis.hidden = false

@@ -1599,8 +1599,7 @@ class AddonController extends Controller
             }
 
         if($isExisting) {
-            info("existing");
-            info($isExisting->get());
+
             $data['count'] = $isExisting->count();
         }else{
             $data['count'] = 0;
@@ -1621,7 +1620,6 @@ class AddonController extends Controller
         }else{
             $isExist = 0;
         }
-
 
         return response($isExist);
 

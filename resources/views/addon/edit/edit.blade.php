@@ -563,7 +563,7 @@
                 formInputError = false;
             });
 
-        ////////description section jquery //////////////////
+            ////////description section jquery //////////////////
             $('#description-text').keyup('keyup, change', function () {
                 var value = $(this).val();
                 addonDescriptionUniqueCheck();
@@ -914,7 +914,7 @@
              formInputError = false;
          }
      }
-     function checkValidation()
+        function checkValidation()
         {
             var value = $('#new_addon_name').val();
             if(value == '')

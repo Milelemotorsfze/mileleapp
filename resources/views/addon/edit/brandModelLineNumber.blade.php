@@ -57,7 +57,7 @@
 
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-12">
-                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">
+                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" hidden data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">
                                 <i class="fas fa-trash-alt"></i>
                             </a>
                         </div>
@@ -567,7 +567,6 @@
     {
         var index = $(".MoDes"+supplier).find(".MoDesApndHere"+supplier).length + 1;
 
-// alert(".MoDes" + supplier);
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
                 <div class="col-xxl-1 col-lg-1 col-md-12">
