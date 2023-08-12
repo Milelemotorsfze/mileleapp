@@ -974,6 +974,16 @@
                             showPurchasePriceUSDError($msg,j);
                             formInputError = true;
                         }
+                        var minLeadTime = $('#lead_time_'+j).val();
+                        var maxLeadTime = $('#lead_time_max_'+j).val();
+                        if(minLeadTime != '' && maxLeadTime != '')
+                        {
+                            if(Number(minLeadTime) > Number(maxLeadTime))
+                            {
+                                showMaxLeadTimeError(j);
+                                formInputError = true;
+                            }
+                        }
                     }
                 }
                 if(inputAddonType == 'SP')
