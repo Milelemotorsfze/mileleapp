@@ -516,7 +516,15 @@
                 }
             })
             $('#description-text').keyup('keyup, change', function () {
+
                 addonDescriptionUniqueCheck();
+                var addonType = $('#addon_type').val();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
             });
 
             $("#descr-dropdown-button").click(function () {
@@ -890,7 +898,7 @@
                     else if(inputModelYearEnd != '' && inputModelYearStart != '')
                     {
                         if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                        { 
+                        {
                             removeModelYearStartError();
                             showModelYearEndError();
                             formInputError = true;
@@ -1505,7 +1513,7 @@
                 {
                     document.getElementById('addon_purchase_price_'+i).value = aed;
                     removePurchasePriceAEDError(i);
-                    removePurchasePriceUSDError(i);    
+                    removePurchasePriceUSDError(i);
                 }
                 setLeastAEDPrice();
             }
@@ -1514,7 +1522,7 @@
         {
             var aed = $("#addon_purchase_price_"+i).val();
             if(aed == '')
-            {              
+            {
                 document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
                 $msg = "Purchase price is required";
                 showPurchasePriceAEDError($msg,i);
@@ -1717,7 +1725,7 @@
             else if(id == 'model_year_end')
             {
                 if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                { 
+                {
                     showModelYearEndError();
                     formInputError = true;
                 }
