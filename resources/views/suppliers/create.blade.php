@@ -1985,7 +1985,7 @@
                     }
                 }
             }
-            else if(clickInput.id == 'alternative_contact_number')
+             if(clickInput.id == 'alternative_contact_number')
                 {
                 var value = clickInput.value;
                 if(value != '')
@@ -2005,7 +2005,7 @@
                 }
 
             }
-            else if(clickInput.id == 'email')
+             if(clickInput.id == 'email')
             {
                 var value = clickInput.value;
                 if(value != '')

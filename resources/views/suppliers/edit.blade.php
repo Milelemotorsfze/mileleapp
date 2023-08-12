@@ -1052,11 +1052,6 @@
                                                         <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                     @endforeach
                                                 </select>
-                                                @error('is_primary_payment_method')
-                                                <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
                                             </div>
                                             <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
@@ -1406,13 +1401,6 @@
             {
                 hideDynamic();
             }
-            // var PreviousHidden = '';
-            // PreviousHidden = $('#is_primary_payment_method').val();
-            // // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
-            // // uncheckedPaymentMethod.checked = false;
-            // let addonTable = document.getElementById(PreviousHidden);
-            // addonTable.hidden = true
-
             $.ajaxSetup
             ({
                 headers:
@@ -1562,11 +1550,6 @@
                                         <option class="{{$addon->id}}" id="addon_${index}_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
                                                         @endforeach
                                         </select>
-                                    @error('is_primary_payment_method')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                                        </span>
-                                    @enderror
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                                             <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
@@ -1714,7 +1697,6 @@
             var inputSupplier = $('#supplier').val();
             var inputSupplierType = $('#supplier_type').val();
             var inputSupplierCatgeory = $('#category').val();
-            var inputPaymentMethodsId = $('#is_primary_payment_method').val();
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
@@ -1729,6 +1711,9 @@
                 formInputError = true;
                 e.preventDefault();
             }
+            else{
+                removeSupplierError();
+            }
             if(inputSupplierType == '')
             {
                 $msg = "Supplier type is required";
@@ -1736,18 +1721,16 @@
                 formInputError = true;
                 e.preventDefault();
             }
+            else{
+                removeSupplierTypeError();
+            }
             if(inputSupplierCatgeory == '') {
                 $msg = "Supplier Category is required";
                 showSupplierCategoryError($msg);
                 formInputError = true;
                 e.preventDefault();
-            }
-            if(inputPaymentMethodsId == '')
-            {
-                $msg = "Primary Payment method is required";
-                showPaymentMethodsError($msg)
-                formInputError = true;
-                e.preventDefault();
+            }else{
+                removeSupplierCategoryError();
             }
             if(inputOfficePhone != '') {
                 if (inputOfficePhone.length < 5 ) {
@@ -1765,8 +1748,9 @@
 
                 } else {
                     removeOfficePhoneError();
-                    formInputError = false;
                 }
+            }else{
+                removeOfficePhoneError();
             }
             if(inputAlternativeContactNumber != '') {
                if(inputAlternativeContactNumber.length > 15) {
@@ -1782,9 +1766,10 @@
                    e.preventDefault();
                }else {
                    removeAlternativeContactNumberError();
-                   formInputError = false;
                }
-            }
+            }else {
+                   removeAlternativeContactNumberError();
+               }
             if(inputContactNumber == '')
             {
                 $msg ="Contact number is required";
@@ -1792,7 +1777,6 @@
                 formInputError = true;
                 e.preventDefault();
             } else{
-                // alert("ok");
                 if(inputContactNumber != '') {
                     if(inputContactNumber.length > 15) {
                         $msg = "Maximum 15 digits allowed";
@@ -1806,38 +1790,36 @@
                         formInputError = true;
                         e.preventDefault();
                     }else {
-                        removeContactNumberError();
-                        formInputError = false;
+                        var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+                        var name = $('#supplier').val();
+                        var url = '{{ route('vendor.vendorUniqueCheck') }}';
+                        e.preventDefault();
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                contact_number: contactNumber,
+                                name: name,
+                                id: '{{ $supplier->id }}'
+                            },
+                            success:function (data) {
+                                if(data.error) {
+                                formInputError = true;
+                                $('#submit').html('Save');
+                                    $('.overlay').hide();
+                                    showContactNumberError(data.error);
+                                }else{
+                                    removeContactNumberError();
+                                    if(formInputError == false )
+                                    {
+                                        submitForm(e);
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
-                var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-                var name = $('#supplier').val();
-                var url = '{{ route('vendor.vendorUniqueCheck') }}';
-                e.preventDefault();
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        contact_number: contactNumber,
-                        name: name,
-                        id: '{{ $supplier->id }}'
-                    },
-                    success:function (data) {
-                        if(data.error) {
-                        formInputError = true;
-                        $('#submit').html('Save');
-                            $('.overlay').hide();
-                            showContactNumberError(data.error);
-                        }else{
-                            removeContactNumberError();
-                            if(formInputError == false )
-                            {
-                                submitForm(e);
-                            }
-                        }
-                    }
-                });
             }
         });
         function submitForm(e)
@@ -1915,39 +1897,7 @@
           $("body").on("click", ".remove_node_btn_frm_field", function ()
         {
             $(this).closest(".form_field_outer_row").remove();
-                // addonDropdownCount = addonDropdownCount-1;
         });
-        // function secondaryPaymentMethods(changePayment)
-        // {
-        //     var e = document.getElementById("is_primary_payment_method");
-        //     var value = e.value;
-        //     // alert(value);
-        //     if(value != '')
-        //     {
-        //         if(PreviousHidden != '')
-        //         {
-        //             let addonTable = document.getElementById(PreviousHidden);
-        //             addonTable.hidden = false
-        //             // let uncheckedPaymentMethod = document.getElementById("payment_methods_id_"+PreviousHidden);
-        //             // uncheckedPaymentMethod.checked = false;
-        //
-        //         }
-        //         validationOnKeyUp(changePayment);
-        //
-        //         let addonTable = document.getElementById('secondaryPayments');
-        //         addonTable.hidden = false
-        //         let primaryPaymentMethod = document.getElementById(value);
-        //         primaryPaymentMethod.hidden = true
-        //         PreviousHidden = value;
-        //     }
-        //     else
-        //     {
-        //         let addonTable = document.getElementById('secondaryPayments');
-        //         addonTable.hidden = true
-        //         $msg = "Primary payment method required"
-        //         showPaymentMethodsError($msg);
-        //     }
-        // }
         function changeCurrency(i)
         {
             var e = document.getElementById("currency_"+i);
@@ -2037,22 +1987,6 @@
                     }
                 }
             }
-            // if(clickInput.id == 'is_primary_payment_method')
-            // {
-            //     var value = clickInput.value;
-            //     if(value == '')
-            //     {
-            //         if(value.legth != 0)
-            //         {
-            //             $msg = "Primary payment method is required";
-            //             showPaymentMethodsError($msg);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         removePaymentMethodsError();
-            //     }
-            // }
             if(clickInput.id == 'supplier')
             {
                 var value = clickInput.value;
@@ -2114,10 +2048,10 @@
                 {
                     if(sub == '2')
                     {
-                        $msg ="One among contact number or alternative contact number or email is required";
+                        $msg ="Contact number is required";
                         showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
+                    //     showEmailError($msg);
+                    //     showAlternativeContactNumberError($msg);
                     }
                     else
                     {
@@ -2125,7 +2059,7 @@
                     }
                 }
             }
-            else if(clickInput.id == 'alternative_contact_number')
+             if(clickInput.id == 'alternative_contact_number')
             {
                 var value = clickInput.value;
                 if(value != '')
@@ -2152,20 +2086,66 @@
                 }
                 else
                 {
-                    if(sub == '2')
-                    {
-                        $msg ="One among contact number or alternative contact number or email is required";
-                        showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
-                    }
-                    else
-                    {
                         removeAlternativeContactNumberError();
-                    }
                 }
             }
-            else if(clickInput.id == 'email')
+            if(clickInput.id == 'office_phone')
+            {
+                var value = clickInput.value;
+                if(value != '')
+                {
+                    if(value.legth != 0)
+                    {
+                        if(value.length < 5)
+                        {
+                            $msg = "Minimum 5 digits required";
+                            showOfficePhoneError($msg);
+                        }
+                        else if(value.length > 15 )
+                        {
+                            $msg = "Maximum 15 digits allowed";
+                            showOfficePhoneError($msg);
+                        }
+                        else
+                        {
+                            removeOfficePhoneError();
+                        }
+                    }
+                }
+                else
+                {
+                    removeOfficePhoneError();
+                }
+            }
+            if(clickInput.id == 'phone')
+            {
+                var value = clickInput.value;
+                if(value != '')
+                {
+                    if(value.legth != 0)
+                    {
+                        if(value.length < 5)
+                        {
+                            $msg = "Minimum 5 digits required";
+                            showPhoneError($msg);
+                        }
+                        else if(value.length > 15 )
+                        {
+                            $msg = "Maximum 15 digits allowed";
+                            showPhoneError($msg);
+                        }
+                        else
+                        {
+                            removePhoneError();
+                        }
+                    }
+                }
+                else
+                {
+                    removePhoneError();
+                }
+            }
+             if(clickInput.id == 'email')
             {
                 var value = clickInput.value;
                 if(value != '')
@@ -2200,17 +2180,17 @@
                 }
                 else
                 {
-                    if(sub == '2')
-                    {
-                        $msg ="One among contact number or alternative contact number or email is required";
-                        showContactNumberError($msg);
-                        showEmailError($msg);
-                        showAlternativeContactNumberError($msg);
-                    }
-                    else
-                    {
+                    // if(sub == '2')
+                    // {
+                    //     $msg ="One among contact number or alternative contact number or email is required";
+                    //     showContactNumberError($msg);
+                    //     showEmailError($msg);
+                    //     showAlternativeContactNumberError($msg);
+                    // }
+                    // else
+                    // {
                         removeEmailError();
-                    }
+                    // }
                 }
             }
         }
@@ -2304,27 +2284,11 @@
             document.getElementById("supplier").classList.remove("is-invalid");
             document.getElementById("supplierError").classList.remove("paragraph-class");
         }
-        function showPaymentMethodsError($msg)
-        {
-            document.getElementById("paymentMethodsError").textContent=$msg;
-            document.getElementById("is_primary_payment_method").classList.add("is-invalid");
-            document.getElementById("paymentMethodsError").classList.add("paragraph-class");
-        }
-        function removePaymentMethodsError()
-        {
-            document.getElementById("paymentMethodsError").textContent="";
-            document.getElementById("is_primary_payment_method").classList.remove("is-invalid");
-            document.getElementById("paymentMethodsError").classList.remove("paragraph-class");
-        }
         function showSupplierTypeError($msg)
         {
             document.getElementById("supplierTypeError").textContent=$msg;
             document.getElementById("supplier_type").classList.add("is-invalid");
             document.getElementById("supplierTypeError").classList.add("paragraph-class");
-            // $("#supplier_type").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
-            // $("#supplier_type").select2({
-            //     containerCssClass : "form-control is-invalid"
-            // });
         }
         function removeSupplierTypeError()
         {
@@ -2332,18 +2296,6 @@
             document.getElementById("supplier_type").classList.remove("is-invalid");
             document.getElementById("supplierTypeError").classList.remove("paragraph-class");
         }
-        // function emailContactError()
-        // {
-        //     document.getElementById("contactRequired").textContent=$msg;
-        //     document.getElementById("contactRequired").classList.remove("paragraph-class");
-        //     document.getElementById("contactRequired").classList.add("requiredOne");
-        //     document.getElementById("alternativeContactRequired").textContent=$msg;
-        //     document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
-        //     document.getElementById("alternativeContactRequired").classList.add("requiredOne");
-        //     document.getElementById("emailRequired").textContent=$msg;
-        //     document.getElementById("emailRequired").classList.remove("paragraph-class");
-        //     document.getElementById("emailRequired").classList.add("requiredOne");
-        // }
     </script>
      <script>
        $(function() {
