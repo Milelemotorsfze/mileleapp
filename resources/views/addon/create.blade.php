@@ -192,7 +192,7 @@
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;" autofocus>
                                 @foreach($addons as $addon)
-                                    <option value="{{$addon->id}}">{{$addon->name}}</option>
+                                    <option class="{{$addon->addon_type}}" value="{{$addon->id}}">{{$addon->name}}</option>
                                 @endforeach
                             </select>
                             @error('addon_id')
@@ -592,34 +592,10 @@
             // $("#supplierArray1").select2();
 
 
-            $('#addon_id').change(function () {
-                var id = $('#addon_id').val();
-                var addonType = $('#addon_type').val();
-                addonDescriptionUniqueCheck();
-                if(addonType == 'P') {
-                    uniqueCheckAccessories();
-
-                }else if(addonType == 'SP') {
-                    uniqueCheckSpareParts();
-                }
-                let url = '{{ route('addon.getAddonDescription') }}';
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        addon_id: id,
-                        addonType:addonType
-                    },
-                    success: function (data) {
-                        $('#description').empty();
-                        jQuery.each(data, function (key, value) {
-                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
-                        });
-                    }
-                });
+            $('#addon_id').change(function () { 
+                var id = $('#addon_id').val(); 
                 // fetch addon existing detils
-
+               
                 if (id != '') {
                     $('#addnewAddonButton').hide();
                     $.ajax
@@ -633,7 +609,13 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
-
+                            var value = data.addon_type.addon_type;
+                            currentAddonType = value;
+                            if(value != '')
+                            {
+                                showAddonTypeDependsData(value);
+                                uniqueCheck(value,id);
+                            }
                             $("#selectBrand1").removeAttr('disabled');
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
@@ -667,7 +649,32 @@
                     $('#' + modalId).removeClass('modalhide');
                 }
             });
+            function uniqueCheck(addonType,id)
+            {
+                addonDescriptionUniqueCheck();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
 
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
+                let url = '{{ route('addon.getAddonDescription') }}';
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    data: {
+                        addon_id: id,
+                        addonType:addonType
+                    },
+                    success: function (data) {
+                        $('#description').empty();
+                        jQuery.each(data, function (key, value) {
+                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
+                        });
+                    }
+                });
+            }
         function addonDescriptionUniqueCheck() {
             var id = $('#addon_id').val();
             var description = $('#description-text').val();
@@ -1217,61 +1224,10 @@
                 document.getElementById("addon_type_required").textContent="";
                 $msg = "";
                 removeAddonTypeError($msg);
-                if(currentAddonType == 'SP' && ifModelLineExist != '')
-                {
-                }
-                else
-                {
-                }
-                if(value == 'SP' )
-                {
-                    $("#brandModelLineId").hide();
-                    $("#brandModelNumberId").show();
-                    document.getElementById("brandModelNumberId").hidden = false;
-                    $("#showaddtrim").hide();
-                    $("#showaddtrimDis").show();
-                    let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = false
-                    let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = false
-                    let showModelYear = document.getElementById('model_year');
-                    showModelYear.hidden = false
-                    let showModelYearBr = document.getElementById('model_year_br');
-                    showModelYearBr.hidden = false
-                }
-                else
-                {
-                    let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = true
-                    let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = true
-                    let showModelYear = document.getElementById('model_year');
-                    showModelYear.hidden = true
-                    let showModelYearBr = document.getElementById('model_year_br');
-                    showModelYearBr.hidden = true
-                    $("#brandModelLineId").show();
-                    $("#brandModelNumberId").hide();
-                    $("#showaddtrim").show();
-                    $("#showaddtrimDis").hide();
-                }
+                showAddonTypeDependsData(value);
                 $("#purchase_price").val('');
-                if(value == 'K')
-                {
-                    $('#kitSupplier').show();
-                    $('#branModaDiv').show();
-                    hidenotKitSupplier();
-                    showkitSupplier();
-                    setLeastPurchasePriceAED();
-                    addItemForSupplier();
-                }
-                else
-                {
-                    $('#kitSupplier').show();
-                    $('#branModaDiv').show();
-                    hidekitSupplier();
-                    shownotKitSupplier();
-                    setLeastAEDPrice();
-                }
+                
+                    
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
@@ -1344,6 +1300,38 @@
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
             }
+        }
+        function showAddonTypeDependsData(value)
+        {
+            if(value == 'SP')
+                {
+                    $("#brandModelLineId").hide();
+                    $("#brandModelNumberId").show();
+                    document.getElementById("brandModelNumberId").hidden = false;
+                    $("#showaddtrim").hide();
+                    $("#showaddtrimDis").show();
+                    let showPartNumber = document.getElementById('partNumberDiv');
+                    showPartNumber.hidden = false
+                    let showPartNumberBr = document.getElementById('partNumberDivBr');
+                    showPartNumberBr.hidden = false
+                }
+                else if(value == 'P')
+                {
+                    let showPartNumber = document.getElementById('partNumberDiv');
+                    showPartNumber.hidden = true
+                    let showPartNumberBr = document.getElementById('partNumberDivBr');
+                    showPartNumberBr.hidden = true
+                    $("#brandModelLineId").show();
+                    $("#brandModelNumberId").hide();
+                    // document.getElementById("brandModelNumberId").hidden = true;
+                    $("#showaddtrim").show();
+                    $("#showaddtrimDis").hide();
+                }
+                $('#kitSupplier').show();
+                    $('#branModaDiv').show();
+                    hidekitSupplier();
+                    shownotKitSupplier();
+                    setLeastAEDPrice();
         }
         function checkValidation()
         {
@@ -1569,14 +1557,14 @@
             if(currentAddonType == 'P')
             {
                 document.getElementById("addon_type_show").value="Accessories";
-            }
-            else if(currentAddonType == 'K')
-            {
-                document.getElementById("addon_type_show").value="Kit";
+                $("#addon_id>option[class='SP']").attr('disabled','disabled');
+                $("#addon_id>option[class='P']").removeAttr('disabled');
             }
             else if(currentAddonType == 'SP')
             {
                 document.getElementById("addon_type_show").value="Spare Parts";
+                $("#addon_id>option[class='P']").attr('disabled','disabled');
+                $("#addon_id>option[class='SP']").removeAttr('disabled');
             }
             document.getElementById("addon_type_show").hidden=false;
         }
@@ -1594,32 +1582,7 @@
                     }
                 }
             }
-            else if(canEnableDropdown == 'yes' && currentAddonType == 'K')
-            {
-                var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
-                for (let i = 1; i <= countKitSuplr; i++)
-                {
-                    if($('#kitSupplierDropdown'+i).val() != '' || $('#Supplier'+i+'TotalPriceAED').val() != '' || $('#Supplier'+i+'TotalPriceUSD').val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                    else
-                    {
-                        var countKitSuplrItem = '';
-                        var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
-                        for (let j = 1; j <= countKitSuplrItem; j++)
-                        {
-                            if($('#kitSupplier'+i+'Item'+j).val() != '' || $('Supplier'+i+'Kit'+j+'Quantity').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() != '' )
-                            {
-                                canEnableDropdown = 'no';
-                            }
-                        }
-                    }
-                }
-            }
-            if(canEnableDropdown == 'yes' && currentAddonType == 'P' || canEnableDropdown == 'yes' && currentAddonType == 'K')
+            if(canEnableDropdown == 'yes' && currentAddonType == 'P')
             {
                 var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandModal; i++)
@@ -1632,7 +1595,7 @@
             }
             else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
             {
-                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; 
                 for (let i = 1; i <= countModel; i++)
                 {
                     if($('#selectBrandMo'+i).val() != '')
@@ -1645,7 +1608,7 @@
                         var countModelDesc = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
                         for (let j = 1; j <= countModelDesc; j++)
                         {
-                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('selectModelNumberDiscri'+i+'Des'+j).val() != '')
+                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('#selectModelNumberDiscri'+i+'Des'+j).val() != '')
                             {
                                 canEnableDropdown = 'no';
                             }
@@ -1659,6 +1622,8 @@
                 document.getElementById("addon_type_show").value='';
                 document.getElementById("addon_type_show").hidden=true;
             }
+            $("#addon_id>option[class='P']").removeAttr('disabled');
+            $("#addon_id>option[class='SP']").removeAttr('disabled');
         }
         function setLeastAEDPrice()
         {

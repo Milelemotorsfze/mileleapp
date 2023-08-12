@@ -14,7 +14,7 @@
                                             <div class="col-xxl-3 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                                 <select class="addonClass suppliers" data-index="{{$i}}"  id="suppliers{{$i}}" name="supplierAndPrice[{{$i}}][supplier_id][]"
-                                                multiple="true" style="width: 100%;" required>
+                                                multiple="true" style="width: 100%;">
                                                 @foreach($supplierAddon->suppliers as $supplier)
                                                 <option value="{{$supplier->id}}" selected>{{$supplier->supplier}}</option>
                                                 @endforeach
@@ -65,7 +65,7 @@
                                                 <input name="supplierAndPrice[{{$i}}][addon_purchase_price_in_aed]" id="addon_purchase_price_{{$i}}" oninput="inputNumberAbs(this)"
                                                 class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice purchase_price_AED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
                                                 placeholder="Enter Addons Purchase Price In AED" value="{{ $supplierAddon->purchase_price_aed }}"
-                                                autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD({{$i}})" required>
+                                                autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD({{$i}})">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
@@ -78,7 +78,7 @@
                                                 <input name="supplierAndPrice[{{$i}}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_{{$i}}"
                                                 oninput="inputNumberAbs(this)" class=" form-control purchase_price_USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
                                                 placeholder="Enter Addons Purchase Price In USD" value="{{ $supplierAddon->purchase_price_usd }}"
-                                                autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED({{$i}})" required>
+                                                autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED({{$i}})">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                                     </div>
@@ -265,7 +265,7 @@
                             <div class="col-xxl-3 col-lg-6 col-md-12">
                                 <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                 <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
-                                 multiple="true" style="width: 100%;" required>
+                                 multiple="true" style="width: 100%;">
                                 </select>
                                 <span id="supplierError_${index}" class="supplierError invalid-feedback"></span>
                                 </div>
@@ -309,7 +309,7 @@
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_aed]" id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
                                 class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice purchase_price_AED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
                                  placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"
-                                  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})" required>
+                                  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
@@ -322,7 +322,7 @@
                                 <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}"
                                 oninput="inputNumberAbs(this)" class=" form-control purchase_price_USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
                                  placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
-                                   autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})" required>
+                                   autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
                                     <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                     </div>

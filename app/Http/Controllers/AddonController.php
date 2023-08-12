@@ -57,7 +57,7 @@ class AddonController extends Controller
     {
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
-        $addons = Addon::whereIn('addon_type',['P','SP','K','W'])->select('id','name')->orderBy('name', 'ASC')->get();
+        $addons = Addon::whereIn('addon_type',['P','SP','K','W'])->select('id','name','addon_type')->orderBy('name', 'ASC')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
@@ -445,7 +445,7 @@ class AddonController extends Controller
         $price = '';
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
         $addonDetails->LeastPurchasePrices = $price;
-        $addons = Addon::select('id','name')->get();
+        $addons = Addon::select('id','name','addon_type')->get();
         $existingBrandId = [];
         $existingBrandModel = [];
         if($addonDetails->is_all_brands == 'no')

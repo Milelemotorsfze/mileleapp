@@ -185,7 +185,7 @@
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
                                 @foreach($addons as $addon)
-                                    <option value="{{$addon->id}}" {{ $addon->id == $addonDetails->addon_id  ? 'selected' : ''}}>{{$addon->name}}</option>
+                                    <option class="{{$addon->addon_type}}" value="{{$addon->id}}" {{ $addon->id == $addonDetails->addon_id  ? 'selected' : ''}}>{{$addon->name}}</option>
                                 @endforeach
                             </select>
                             @error('addon_id')
@@ -682,6 +682,12 @@
                             removeAddonNameError($msg);
                             $('#addon_code').val(data.newAddonCode);
                             $("#addon_type").val(data.addon_type.addon_type);
+                            var value = data.addon_type.addon_type;
+                            currentAddonType = value;
+                            if(value != '')
+                            {
+                                uniqueCheck(value,id);
+                            }
                             $("#selectBrandMo1").removeAttr('disabled');
                         }
                     });
@@ -691,6 +697,17 @@
                     $('#addnewAddonButton').show();
                 }
             });
+            function uniqueCheck(addonType,id)
+            {
+                addonDescriptionUniqueCheck();
+                showDescriptions();
+                if(addonType == 'P') {
+                    uniqueCheckAccessories();
+
+                }else if(addonType == 'SP') {
+                    uniqueCheckSpareParts();
+                }
+            }
            $(document).on('click', '.btn_remove', function()
             {
                 var button_id = $(this).attr("id");
@@ -1374,56 +1391,47 @@
                     $("#showaddtrimDis").hide();
                 }
                 $("#purchase_price").val('');
-                if(value == 'K')
-                {
-                    hidenotKitSupplier();
-                    showkitSupplier();
-                    setLeastPurchasePriceAED();
-                }
-                else
-                {
                     hidekitSupplier();
                     shownotKitSupplier();
                     setLeastAEDPrice();
-                }
-                $.ajax
-                ({
-                    url:"{{url('getAddonCodeAndDropdown')}}",
-                    type: "POST",
-                    data:
-                    {
-                        addon_type: value,
-                        _token: '{{csrf_token()}}'
-                    },
-                    dataType : 'json',
-                    success: function(data)
-                    {
-                        $('#addon_type').val(currentAddonType);
-                        $('#addon_code').val(data.newAddonCode);
-                        $("#addon_id").html("");
-                        myarray = data.addonMasters;
-                        var size= myarray.length;
-                        if(size >= 1)
+                    $.ajax
+                    ({
+                        url:"{{url('getAddonCodeAndDropdown')}}",
+                        type: "POST",
+                        data:
                         {
-                            let AddonDropdownData   = [];
-                            $.each(data.addonMasters,function(key,value)
+                            addon_type: value,
+                            _token: '{{csrf_token()}}'
+                        },
+                        dataType : 'json',
+                        success: function(data)
+                        {
+                            $('#addon_type').val(currentAddonType);
+                            $('#addon_code').val(data.newAddonCode);
+                            $("#addon_id").html("");
+                            myarray = data.addonMasters;
+                            var size= myarray.length;
+                            if(size >= 1)
                             {
-                                AddonDropdownData.push
-                                ({
-                                    id: value.id,
-                                    text: value.name
+                                let AddonDropdownData   = [];
+                                $.each(data.addonMasters,function(key,value)
+                                {
+                                    AddonDropdownData.push
+                                    ({
+                                        id: value.id,
+                                        text: value.name
+                                    });
                                 });
-                            });
-                            $('#addon_id').select2
-                            ({
-                                placeholder: 'Select value',
-                                allowClear: true,
-                                data: AddonDropdownData,
-                                maximumSelectionLength: 1,
-                            });
+                                $('#addon_id').select2
+                                ({
+                                    placeholder: 'Select value',
+                                    allowClear: true,
+                                    data: AddonDropdownData,
+                                    maximumSelectionLength: 1,
+                                });
+                            }
                         }
-                    }
-                });
+                    });
             }
             else
             {
@@ -1710,10 +1718,6 @@
             {
                 document.getElementById("addon_type_show").value="Accessories";
             }
-            else if(currentAddonType == 'K')
-            {
-                document.getElementById("addon_type_show").value="Kit";
-            }
             else if(currentAddonType == 'SP')
             {
                 document.getElementById("addon_type_show").value="Spare Parts";
@@ -1734,32 +1738,7 @@
                     }
                 }
             }
-            else if(canEnableDropdown == 'yes' && currentAddonType == 'K')
-            {
-                var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
-                for (let i = 1; i <= countKitSuplr; i++)
-                {
-                    if($('#kitSupplierDropdown'+i).val() != '' || $('#Supplier'+i+'TotalPriceAED').val() != '' || $('#Supplier'+i+'TotalPriceUSD').val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                    else
-                    {
-                        var countKitSuplrItem = '';
-                        var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
-                        for (let j = 1; j <= countKitSuplrItem; j++)
-                        {
-                            if($('#kitSupplier'+i+'Item'+j).val() != '' || $('Supplier'+i+'Kit'+j+'Quantity').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() != '' )
-                            {
-                                canEnableDropdown = 'no';
-                            }
-                        }
-                    }
-                }
-            }
-            if(canEnableDropdown == 'yes' && currentAddonType == 'P' || canEnableDropdown == 'yes' && currentAddonType == 'K')
+            if(canEnableDropdown == 'yes' && currentAddonType == 'P')
             {
                 var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandModal; i++)
@@ -1785,7 +1764,7 @@
                         var countModelDesc = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
                         for (let j = 1; j <= countModelDesc; j++)
                         {
-                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('selectModelNumberDiscri'+i+'Des'+j).val() != '')
+                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('#selectModelNumberDiscri'+i+'Des'+j).val() != '')
                             {
                                 canEnableDropdown = 'no';
                             }

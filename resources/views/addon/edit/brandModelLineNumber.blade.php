@@ -214,15 +214,14 @@
                 $('#selectModelLineNum'+index+'Des'+i).empty();
                 $('#selectModelNumberDiscri'+index+'Des'+i).empty();
             }
-
             hideOption(index,value);
-
+            disableDropdown();
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
-
+            enableDropdown();
         });
 
         function hideOption(index,value) {
