@@ -132,6 +132,7 @@ class SupplierController extends Controller
             {
                 $existibgData->updated_by = $authId;
                 $existibgData->purchase_price_aed = $request->name;
+                $existibgData->purchase_price_usd = $request->name / 3.6725;
                 $existibgData->update();
                 $existingHistory = PurchasePriceHistory::where('supplier_addon_id',$existibgData->id)->where('status','active')->first();
                 if($existingHistory)
@@ -141,6 +142,7 @@ class SupplierController extends Controller
                 }
                 $input['supplier_addon_id'] = $existibgData->id;
                 $input['purchase_price_aed'] = $request->name;
+                $input['purchase_price_usd'] = $request->name / 3.6725;
                 $input['created_by'] = $authId;
                 $addons = PurchasePriceHistory::create($input);
                 // $addons = SupplierAddons::where('id',$addons->id)->first();
