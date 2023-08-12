@@ -399,8 +399,8 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"
-                                           autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}" minlength="5"
+                                           maxlength="15" autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                                     <!-- @error('contact_number')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -418,7 +418,8 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="alternative_contact_number" type="number"
-                                           class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" name="alternative_contact_number[main]"
+                                           class="widthinput form-control @error('alternative_contact_number[full]') is-invalid @enderror" maxlength="15"
+                                           minlength="5" name="alternative_contact_number[main]"
                                            placeholder="Enter Alternative Contact Number" value="{{ old('alternative_contact_number[full]') }}"
                                            autocomplete="alternative_contact_number[full]" autofocus onkeyup="validationOnKeyUp(this)">
                                     <span id="alternativeContactRequired" class="email-phone required-class"></span>
@@ -433,8 +434,8 @@ input {
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="phone" type="number"
-                                           class="widthinput form-control @error('phone[full]') is-invalid @enderror"
-                                           name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]') }}"
+                                           class="widthinput form-control @error('phone[full]') is-invalid @enderror" maxlength="15"
+                                           minlength="5" name="phone[main]" placeholder="Enter Phone" value="{{ old('phone[full]') }}"
                                            autocomplete="phone[full]" autofocus onkeyup="validationOnKeyUp(this)">
                                      <span id="phoneRequired" class="phone required-class"></span>
                                 </div>
@@ -449,7 +450,7 @@ input {
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="office_phone" type="number"
                                            class="widthinput form-control @error('office_phone[full]') is-invalid @enderror" name="office_phone[main]"
-                                           placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]') }}"
+                                           placeholder="Enter Office Contact Number" value="{{ old('office_phone[full]') }}" minlength="5" maxlength="15"
                                            autocomplete="office_phone[full]" autofocus onkeyup="validationOnKeyUp(this)">
                                     <span id="officePhoneRequired" class="office_phone required-class"></span>
                                 </div>
