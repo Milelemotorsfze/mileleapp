@@ -37,6 +37,16 @@ class VehiclesController extends Controller
         if ($hasPermission) {
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss);
+            $data = $data->where(function ($query) {
+                $query->whereNull('gdn_id')
+                      ->orWhere(function ($subQuery) {
+                          $subQuery->whereNotNull('gdn_id')
+                                   ->whereHas('gdn', function ($gdnQuery) {
+                                       $sixMonthsAgo = now()->subMonths(6);
+                                       $gdnQuery->where('date', '>', $sixMonthsAgo);
+                                   });
+                      });
+            });
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {

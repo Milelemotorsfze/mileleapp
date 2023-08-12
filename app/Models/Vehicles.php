@@ -68,6 +68,10 @@ class Vehicles extends Model
     {
         return $this->belongsTo(So::class, 'so_id');
     }
+    public function gdn()
+    {
+        return $this->belongsTo(Gdn::class, 'gdn_id');
+    }
     public function getSimilarVehiclesWithInactiveStockAttribute()
     {
         $vehicles = Vehicles::whereNotNull('gdn_id')
