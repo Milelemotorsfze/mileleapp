@@ -565,13 +565,34 @@
 
         ////////description section jquery //////////////////
             $('#description-text').keyup('keyup, change', function () {
+                var value = $(this).val();
                 addonDescriptionUniqueCheck();
                 var addonType = $('#addon_type').val();
                 if(addonType == 'P') {
-                    uniqueCheckAccessories();
+                    if(!value) {
+                        uniqueCheckAccessories();
+                    }else {
+
+                        var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                        for(var i=1;i<=indexValue;i++){
+                            var $msg = "";
+                            removeBrandError($msg,i);
+                        }
+                    }
 
                 }else if(addonType == 'SP') {
-                    uniqueCheckSpareParts();
+                    if(!value) {
+                        uniqueCheckSpareParts();
+                    }else{
+                        var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                        for(var i=0;i<=indexValue;i++){
+                            var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                            for(let j=1; j<=index; j++)
+                            {
+                                removeSPModelLineError(i,j);
+                            }
+                        }
+                    }
                 }
             });
 
