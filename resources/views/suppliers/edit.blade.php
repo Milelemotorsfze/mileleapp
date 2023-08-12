@@ -2332,18 +2332,18 @@
             document.getElementById("supplier_type").classList.remove("is-invalid");
             document.getElementById("supplierTypeError").classList.remove("paragraph-class");
         }
-        function emailContactError()
-        {
-            document.getElementById("contactRequired").textContent=$msg;
-            document.getElementById("contactRequired").classList.remove("paragraph-class");
-            document.getElementById("contactRequired").classList.add("requiredOne");
-            document.getElementById("alternativeContactRequired").textContent=$msg;
-            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
-            document.getElementById("alternativeContactRequired").classList.add("requiredOne");
-            document.getElementById("emailRequired").textContent=$msg;
-            document.getElementById("emailRequired").classList.remove("paragraph-class");
-            document.getElementById("emailRequired").classList.add("requiredOne");
-        }
+        // function emailContactError()
+        // {
+        //     document.getElementById("contactRequired").textContent=$msg;
+        //     document.getElementById("contactRequired").classList.remove("paragraph-class");
+        //     document.getElementById("contactRequired").classList.add("requiredOne");
+        //     document.getElementById("alternativeContactRequired").textContent=$msg;
+        //     document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
+        //     document.getElementById("alternativeContactRequired").classList.add("requiredOne");
+        //     document.getElementById("emailRequired").textContent=$msg;
+        //     document.getElementById("emailRequired").classList.remove("paragraph-class");
+        //     document.getElementById("emailRequired").classList.add("requiredOne");
+        // }
     </script>
      <script>
        $(function() {

@@ -1,40 +1,7 @@
 @extends('layouts.main')
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous" /> -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css" rel="stylesheet"/>
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous" /> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
-<!-- <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script> -->
-
-
-
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script> -->
-
 <style>
-    /* html, body {
-  background: #2c1238;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-input {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  background: #ffde91;
-  color: #422a4c;
-  font-size: 20px;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  outline: none;
-  text-align: center;
-}
-
-::placeholder {
-  color: #422a4c;
-} */
 .spanSub
 {
     background-color: #e4e4e4;
@@ -65,7 +32,6 @@ input {
         width: 30px;
         height: 30px;
         display: inline-block;
-        /* border-radius: 50%; */
         text-align: center;
         line-height: 35px;
         margin-left: 10px;
@@ -199,12 +165,6 @@ input {
         margin-top: .25rem;
         font-size: 80%;
         color: #fd625e;
-    }
-    .requiredOne
-    {
-        margin-top: .25rem;
-        font-size: 80%;
-        color: gray;
     }
     .overlay
     {
@@ -416,11 +376,6 @@ input {
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
                                            name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
-                                    <!-- @error('contact_number')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
                                     <span id="contactRequired" class="contact_number required-class"></span>
                                 </div>
                             </div>
@@ -481,11 +436,6 @@ input {
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="email" type="email" class="widthinput form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Email"
                                            value="{{ old('email') }}" autofocus onkeyup="validationOnKeyUp(this)">
-                                    <!-- @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror -->
                                     <span id="emailRequired" class="email-phone required-class"></span>
                                 </div>
                             </div>
@@ -1008,9 +958,6 @@ input {
                                             <div class="col-xxl-2 col-lg-6 col-md-12">
                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Addons</label>
                                                 <select class="addons" id="addon_1" data-index="1" name="supplierAddon[1[addon_id][]"  multiple="true" style="width: 100%;">
-                                                    <!-- @foreach($addons as $addon)
-                                                        <option class="{{$addon->id}}" id="addon_1_{{$addon->id}}" value="{{$addon->id}}">{{$addon->addon_code}} - ( {{ $addon->AddonName->name }} )</option>
-                                                    @endforeach -->
                                                 </select>
                                                 @error('is_primary_payment_method')
                                                     <span class="invalid-feedback" role="alert">
@@ -1141,14 +1088,11 @@ input {
     <div class="overlay"></div>
     @endif
     @endcan
-    <!-- <input id="numbers-only" type="text" placeholder="Numbers Only" /> -->
     <script type="text/javascript">
         var activeTab = '';
         var PreviousHidden = '';
-        // var selectedAddons = [];
         var filteredArray = [];
         var addonDropdownCount = 1;
-        // globalThis.selectedAddons .push(brandId);
       var sub ='1';
         const file1InputLicense = document.querySelector("#passport-upload");
         const file2InputLicense = document.querySelector("#trade-licence-upload");
@@ -1232,9 +1176,6 @@ input {
             $('.preview-div').attr('hidden', false);
 
             const files = event.target.files;
-            // while (previewFile4.firstChild) {
-            //     previewFile4.removeChild(previewFile4.firstChild);
-            // }
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (file.type.match("application/pdf")) {
@@ -1306,7 +1247,6 @@ input {
             function removeSubCategoryVehicle() {
                 $("#supplier_type option[value='Bulk']").remove();
                 $("#supplier_type option[value='Small Segment']").remove();
-
             }
             function appendSubCategoryParts() {
                 $('#supplier_type').append($('<option>', { value: 'accessories', text: 'Accessories' }));
@@ -1314,8 +1254,6 @@ input {
                 $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
                 $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
                 $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
-                // $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
-
             }
             function removeSubCategoryParts() {
 
@@ -1324,8 +1262,6 @@ input {
                 $("#supplier_type option[value='garage']").remove();
                 $("#supplier_type option[value='spare_parts']").remove();
                 $("#supplier_type option[value='warranty']").remove();
-                // $("#supplier_type option[value='demand_planning']").remove();
-
             }
             $('#addon_1').select2({
                 allowClear: true,
@@ -1667,8 +1603,11 @@ input {
 
                 } else {
                     removePhoneError();
-                    formInputError = false;
                 }
+            }
+            else
+            {
+                removePhoneError();
             }
             if(inputOfficePhone != '') {
 
@@ -1687,8 +1626,10 @@ input {
 
                 } else {
                     removeOfficePhoneError();
-                    formInputError = false;
                 }
+            }
+            else{
+                removeOfficePhoneError();
             }
             if(inputAlternativeContactNumber != '') {
                 if(inputAlternativeContactNumber.length > 15) {
@@ -1704,8 +1645,10 @@ input {
                     e.preventDefault();
                 }else {
                     removeAlternativeContactNumberError();
-                    formInputError = false;
                 }
+            }
+            else{
+                removeAlternativeContactNumberError();
             }
             if(inputSupplier == '')
             {
@@ -1740,62 +1683,51 @@ input {
             {
                 $msg ="Contact number is required";
                 showContactNumberError($msg);
-
                 formInputError = true;
                 e.preventDefault();
-            }else{
-                if (inputContactNumber.length != 0) {
+            }
+            else
+            {
+                if(inputContactNumber.length != 0) {
                     if (inputContactNumber.length < 5) {
-                        console.log(inputContactNumber.length);
-                        $msg = "Minimum 5 digits required";
+                        $msg ="Minimum 5 digits required";
                         showContactNumberError($msg);
                         formInputError = true;
                         e.preventDefault();
 
-                    } else if (inputContactNumber.length > 15) {
-                        $msg = "Maximum 15 digits allowed";
+                    } else if(inputContactNumber.length > 15) {
+                        $msg ="Maximum 15 digits allowed";
                         showContactNumberError($msg);
                         formInputError = true;
                         e.preventDefault();
                     } else {
-                        removeContactNumberError();
-                        formInputError = false;
+                        var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
+                        var name = $('#supplier').val();
+                        var url = '{{ route('vendor.vendorUniqueCheck') }}';
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                contact_number: contactNumber,
+                                name: name
+                            },
+                            success:function (data) {
+                                if(data.error) {
+                                    showContactNumberError(data.error);
+                                    formInputError == true;
+                                    e.preventDefault();
+                                    $('#submit').html('Save');
+                                    $('.overlay').hide();
+                                }else{
+                                    removeContactNumberError(); 
+                                }
+                            }
+                        });
                     }
                 }
-                var contactNumber =  contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
-                var name = $('#supplier').val();
-                var url = '{{ route('vendor.vendorUniqueCheck') }}';
-                // alert(contactNumber);
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    data: {
-                        contact_number: contactNumber,
-                        name: name
-                    },
-                    success:function (data) {
-                        if(data.error) {
-                            showContactNumberError(data.error);
-                            formInputError == true;
-                            e.preventDefault();
-                            $('#submit').html('Save');
-                            $('.overlay').hide();
-                        }else{
-                            removeContactNumberError();
-                        }
-                    }
-                });
+               
             }
-            // if(inputContactNumber == '' && inputAlternativeContactNumber == '' && inputEmail == '')
-            // {
-            //     $msg ="One among contact number or alternative contact number or email is required";
-            //     showContactNumberError($msg);
-            //     showAlternativeContactNumberError($msg);
-            //     showEmailError($msg);
-            //     formInputError = true;
-            //     e.preventDefault();
-            // }
             if(formInputError == false)
             {
                 var full_number = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
@@ -2093,8 +2025,6 @@ input {
                         if(validateEmail(email))
                         {
                             removeEmailError();
-                        //     removeAlternativeContactNumberError();
-                        //     removeContactNumberError();
                         }
                         else
                         {
@@ -2112,7 +2042,6 @@ input {
         function showContactNumberError($msg)
         {
             document.getElementById("contactRequired").textContent=$msg;
-            document.getElementById("contactRequired").classList.remove("requiredOne");
             document.getElementById("contactRequired").classList.add("paragraph-class");
             document.getElementById("contact_number").classList.add("is-invalid");
         }
@@ -2125,7 +2054,6 @@ input {
         function showPhoneError($msg)
         {
             document.getElementById("phoneRequired").textContent=$msg;
-            document.getElementById("phoneRequired").classList.remove("requiredOne");
             document.getElementById("phoneRequired").classList.add("paragraph-class");
             document.getElementById("phone").classList.add("is-invalid");
         }
@@ -2138,7 +2066,6 @@ input {
         function showOfficePhoneError($msg)
         {
             document.getElementById("officePhoneRequired").textContent=$msg;
-            document.getElementById("officePhoneRequired").classList.remove("requiredOne");
             document.getElementById("officePhoneRequired").classList.add("paragraph-class");
             document.getElementById("office_phone").classList.add("is-invalid");
         }
@@ -2151,7 +2078,6 @@ input {
         function showAlternativeContactNumberError($msg)
         {
             document.getElementById("alternativeContactRequired").textContent=$msg;
-            document.getElementById("alternativeContactRequired").classList.remove("requiredOne");
             document.getElementById("alternativeContactRequired").classList.add("paragraph-class");
             document.getElementById("alternative_contact_number").classList.add("is-invalid");
         }
@@ -2165,7 +2091,6 @@ input {
         {
             document.getElementById("emailRequired").textContent=$msg;
             document.getElementById("email").classList.add("is-invalid");
-            document.getElementById("emailRequired").classList.remove("requiredOne");
             document.getElementById("emailRequired").classList.add("paragraph-class");
         }
         function removeEmailError()
@@ -2223,19 +2148,6 @@ input {
             document.getElementById("supplierTypeError").textContent="";
             document.getElementById("supplier_type").classList.remove("is-invalid");
             document.getElementById("supplierTypeError").classList.remove("paragraph-class");
-        }
-
-        function emailContactError()
-        {
-            document.getElementById("contactRequired").textContent=$msg;
-            document.getElementById("contactRequired").classList.remove("paragraph-class");
-            document.getElementById("contactRequired").classList.add("requiredOne");
-            document.getElementById("alternativeContactRequired").textContent=$msg;
-            document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
-            document.getElementById("alternativeContactRequired").classList.add("requiredOne");
-            document.getElementById("emailRequired").textContent=$msg;
-            document.getElementById("emailRequired").classList.remove("paragraph-class");
-            document.getElementById("emailRequired").classList.add("requiredOne");
         }
         function inputNumberAbs(currentPriceInput)
         {
