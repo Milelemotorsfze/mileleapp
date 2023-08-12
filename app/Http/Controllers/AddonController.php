@@ -178,7 +178,7 @@ class AddonController extends Controller
                     $input['model_year_start'] = $request->model_year_start;
                     $input['model_year_end'] = $request->model_year_start;
                 }
-            }       
+            }
             $addon_details = AddonDetails::create($input);
             if($request->selling_price != '')
             {
@@ -600,7 +600,7 @@ class AddonController extends Controller
                     $addon_details->model_year_start = $request->model_year_start;
                     $addon_details->model_year_end = $request->model_year_start;
                 }
-            }    
+            }
         $addon_details->update();
         $deleteAddonTypes = [];
         $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
@@ -1503,21 +1503,22 @@ class AddonController extends Controller
 
     }
     public function getUniqueAccessories(Request $request) {
-        info($request->all());
+
         $description = null;
         if($request->description != null) {
             $description = $request->description;
-        }elseif ($request->description_text != null) {
-            $description = $request->description_text;
+        }elseif ($request->newDescription != null) {
+            $description = $request->newDescription;
         }
 
         if($request->brand == 'allbrands') {
+
             $isExisting = AddonDetails::where('is_all_brands', 'yes')
                 ->where('addon_id', $request->addon_id)
                 ->where('description', $description)
                 ->where('addon_type_name', $request->addonType);
         }else{
-
+            info("not all brands");
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
                                     ->where('description', $description)
                                     ->where('addon_type_name', $request->addonType);
@@ -1550,7 +1551,6 @@ class AddonController extends Controller
             }
         }
         if($isExisting) {
-            info("existing");
             $data['count'] = $isExisting->count();
         }else{
             $data['count'] = 0;
@@ -1561,12 +1561,12 @@ class AddonController extends Controller
 
     }
     public function getUniqueSpareParts(Request $request) {
-            info($request->all());
+
             $description = null;
             if($request->description != null) {
                 $description = $request->description;
-            }elseif ($request->description_text != null) {
-                $description = $request->description_text;
+            }elseif ($request->newDescription != null) {
+                $description = $request->newDescription;
             }
 
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
