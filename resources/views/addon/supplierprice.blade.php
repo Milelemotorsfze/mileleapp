@@ -201,7 +201,6 @@
                         $(this).find('.purchase_price_USD').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_usd]');
                         $(this).find('.purchase_price_USD').attr('onkeyup','calculateAED('+ index +')');
                         $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
-                        $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
                         $(this).find('.purchasePriceUSDError').attr('id','purchasePriceUSDError_'+index);
                         $(this).find('a').attr('data-index', index);
 

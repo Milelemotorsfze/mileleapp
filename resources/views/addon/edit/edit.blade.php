@@ -872,13 +872,8 @@
 
      $('form').on('submit', function (e)
         {
-            // alert(false);
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            // var inputBrand = $('#selectBrand1').val();
-            // var inputsupplierId = $('#itemArr1').val();
-            // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-            // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
             var formInputError = false;
             if(inputAddonType == 'P') {
                 uniqueCheckAccessories();
@@ -887,30 +882,6 @@
                 uniqueCheckSpareParts();
             }
             addonDescriptionUniqueCheck();
-            // if(inputsupplierId == '')
-            // {
-            //     $msg = "Supplier is required";
-            //     showSupplierError($msg);
-            //     formInputError = true;
-            // }
-            // if(inputPurchasePriceAED == '')
-            // {
-            //     $msg = "Purchase price is required";
-            //     showPurchasePriceAEDError($msg);
-            //     formInputError = true;
-            // }
-            // if(inputPurchasePriceUSD == '')
-            // {
-            //     $msg = "Purchase price is required";
-            //     showPurchasePriceUSDError($msg);
-            //     formInputError = true;
-            // }
-            // if(inputBrand == '')
-            // {
-            //     $msg = "Brand is required";
-            //     showBrandError($msg);
-            //     formInputError = true;
-            // }
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
@@ -919,6 +890,35 @@
             }
             else
             {
+                if(inputAddonType == 'SP' || inputAddonType == 'P')
+                {
+                    var countVendorPriceRow = 0;
+                    countVendorPriceRow = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
+                    for (let j = 1; j <= countVendorPriceRow; j++)
+                    {
+                        var inputsupplierId = $('#suppliers'+j).val();
+                        var inputPurchasePriceAED = $('#addon_purchase_price_'+j).val();
+                        var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_'+j).val();
+                        if(inputsupplierId == '')
+                        {
+                            $msg = "Vendor is required";
+                            showSupplierError($msg,j);
+                            formInputError = true;
+                        }
+                        if(inputPurchasePriceAED == '')
+                        {
+                            $msg = "Purchase price is required";
+                            showPurchasePriceAEDError($msg,j);
+                            formInputError = true;
+                        }
+                        if(inputPurchasePriceUSD == '')
+                        {
+                            $msg = "Purchase price is required";
+                            showPurchasePriceUSDError($msg,j);
+                            formInputError = true;
+                        }
+                    }
+                }
                 if(inputAddonType == 'SP')
                 {
                     var inputPartNumber = $('#part_number').val();
@@ -1044,23 +1044,20 @@
             }
 
         });
-        function validationOnKeyUp(clickInput)
+        function validationOnKeyUp(clickInput,row)
         {
-            if(clickInput.id == 'itemArr1')
+            var value = clickInput.value;
+            if(value == '')
             {
-                var value = clickInput.value;
-                if(value == '')
+                if(value.legth != 0)
                 {
-                    if(value.legth != 0)
-                    {
-                        $msg = "Supplier Type is required";
-                        showSupplierTypeError($msg);
-                    }
+                    $msg = "Vendor is required";
+                    showSupplierError($msg,row);
                 }
-                else
-                {
-                    removeSupplierTypeError();
-                }
+            }
+            else
+            {
+                removeSupplierError(row);
             }
         }
         function checkGreaterYear(CurrentInput)
@@ -1207,41 +1204,41 @@
          }
 
      ////////////////////////////
-        function showSupplierError($msg)
+     function showSupplierError($msg,j)
         {
-            document.getElementById("supplierError").textContent=$msg;
-            document.getElementById("itemArr1").classList.add("is-invalid");
-            document.getElementById("supplierError").classList.add("paragraph-class");
+            document.getElementById("supplierError_"+j).textContent=$msg;
+            document.getElementById("suppliers"+j).classList.add("is-invalid");
+            document.getElementById("supplierError_"+j).classList.add("paragraph-class");
         }
-        function removeSupplierError($msg)
+        function removeSupplierError(j)
         {
-            document.getElementById("supplierError").textContent="";
-            document.getElementById("itemArr1").classList.remove("is-invalid");
-            document.getElementById("supplierError").classList.remove("paragraph-class");
+            document.getElementById("supplierError_"+j).textContent="";
+            document.getElementById("suppliers"+j).classList.remove("is-invalid");
+            document.getElementById("supplierError_"+j).classList.remove("paragraph-class");
         }
-        function showPurchasePriceAEDError($msg)
+        function showPurchasePriceAEDError($msg,j)
         {
-            document.getElementById("purchasePriceAEDError").textContent=$msg;
-            document.getElementById("addon_purchase_price_1").classList.add("is-invalid");
-            document.getElementById("purchasePriceAEDError").classList.add("paragraph-class");
+            document.getElementById("purchasePriceAEDError_"+j).textContent=$msg;
+            document.getElementById("addon_purchase_price_"+j).classList.add("is-invalid");
+            document.getElementById("purchasePriceAEDError_"+j).classList.add("paragraph-class");
         }
-        function removePurchasePriceAEDError($msg)
+        function removePurchasePriceAEDError(j)
         {
-            document.getElementById("purchasePriceAEDError").textContent="";
-            document.getElementById("addon_purchase_price_1").classList.remove("is-invalid");
-            document.getElementById("purchasePriceAEDError").classList.remove("paragraph-class");
+            document.getElementById("purchasePriceAEDError_"+j).textContent="";
+            document.getElementById("addon_purchase_price_"+j).classList.remove("is-invalid");
+            document.getElementById("purchasePriceAEDError_"+j).classList.remove("paragraph-class");
         }
-        function showPurchasePriceUSDError($msg)
+        function showPurchasePriceUSDError($msg,j)
         {
-            document.getElementById("purchasePriceUSDError").textContent=$msg;
-            document.getElementById("addon_purchase_price_in_usd_1").classList.add("is-invalid");
-            document.getElementById("purchasePriceUSDError").classList.add("paragraph-class");
+            document.getElementById("purchasePriceUSDError_"+j).textContent=$msg;
+            document.getElementById("addon_purchase_price_in_usd_"+j).classList.add("is-invalid");
+            document.getElementById("purchasePriceUSDError_"+j).classList.add("paragraph-class");
         }
-        function removePurchasePriceUSDError($msg)
+        function removePurchasePriceUSDError(j)
         {
-            document.getElementById("purchasePriceUSDError").textContent="";
-            document.getElementById("addon_purchase_price_in_usd_1").classList.remove("is-invalid");
-            document.getElementById("purchasePriceUSDError").classList.remove("paragraph-class");
+            document.getElementById("purchasePriceUSDError_"+j).textContent="";
+            document.getElementById("addon_purchase_price_in_usd_"+j).classList.remove("is-invalid");
+            document.getElementById("purchasePriceUSDError_"+j).classList.remove("paragraph-class");
         }
         function showAddonTypeError($msg)
         {
@@ -1545,39 +1542,74 @@
         function calculateAED(i)
         {
             var usd = $("#addon_purchase_price_in_usd_"+i).val();
-            var aed = usd * 3.6725;
-            var aed = aed.toFixed(4);
-            aed = parseFloat(aed);
-            if(aed == 0)
+            if(usd == '')
             {
                 document.getElementById('addon_purchase_price_'+i).value = "";
+                $msg = "Purchase price is required";
+                showPurchasePriceUSDError($msg,i);
+                showPurchasePriceAEDError($msg,i);
                 setLeastAEDPrice();
             }
             else
             {
-                document.getElementById('addon_purchase_price_'+i).value = aed;
+                removePurchasePriceAEDError(i);
+                removePurchasePriceUSDError(i);
+                var aed = usd * 3.6725;
+                var aed = aed.toFixed(4);
+                aed = parseFloat(aed);
+                if(aed == 0)
+                {
+                    document.getElementById('addon_purchase_price_'+i).value = "";
+                    $msg = "Purchase price is required";
+                    showPurchasePriceAEDError($msg,i);
+                    showPurchasePriceUSDError($msg,i);
+                }
+                else
+                {
+                    document.getElementById('addon_purchase_price_'+i).value = aed;
+                    removePurchasePriceAEDError(i);
+                    removePurchasePriceUSDError(i);    
+                }
                 setLeastAEDPrice();
             }
         }
         function calculateUSD(i)
         {
             var aed = $("#addon_purchase_price_"+i).val();
-            var usd = aed / 3.6725;
-            var usd = usd.toFixed(4);
-            if(usd == 0)
-            {
+            if(aed == '')
+            {              
                 document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+                $msg = "Purchase price is required";
+                showPurchasePriceAEDError($msg,i);
+                showPurchasePriceUSDError($msg,i);
+                setLeastAEDPrice();
             }
             else
             {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+                removePurchasePriceAEDError(i);
+                removePurchasePriceUSDError(i);
+                var usd = aed / 3.6725;
+                var usd = usd.toFixed(4);
+                if(usd == 0)
+                {
+                    document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+                    $msg = "Purchase price is required";
+                    showPurchasePriceAEDError($msg,i);
+                    showPurchasePriceUSDError($msg,i);
+                }
+                else
+                {
+                    document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+                    removePurchasePriceAEDError(i);
+                    removePurchasePriceUSDError(i);
+                }
+                setLeastAEDPrice();
             }
-            setLeastAEDPrice();
         }
         function setLeastAEDPrice()
         {
             const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
-            if(values != '')
+            if(values != '' || values !=',')
             {
                 var arrayOfNumbers = [];
                 values.forEach(v => {
@@ -1592,7 +1624,18 @@
                     var arrayOfNumbers = arrayOfNumbers.map(Number);
                     const minOfPrice = Math.min(...arrayOfNumbers);
                     $("#purchase_price").val(minOfPrice);
+                    disableDropdown();
                 }
+                else
+                {
+                    $("#purchase_price").val("");
+                    enableDropdown();
+                }
+            }
+            else if(values ==',')
+            {
+                $("#purchase_price").val("");
+                enableDropdown();
             }
         }
         function showkitSupplier()
