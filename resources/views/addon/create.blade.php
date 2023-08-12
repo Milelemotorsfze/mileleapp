@@ -1846,7 +1846,6 @@
         }
         function inputNumberAbsLeadTime(currentPriceInput)
         {
-
             var id = currentPriceInput.id
             var input = document.getElementById(id);
             var val = input.value;

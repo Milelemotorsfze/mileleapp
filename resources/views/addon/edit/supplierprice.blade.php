@@ -22,11 +22,7 @@
                                                 <option value="{{$supplier->id}}">{{$supplier->supplier}}</option>
                                                 @endforeach
                                                 </select>
-                                                @error('is_primary_payment_method')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
+                                                <span id="supplierError_{{$i}}" class=" supplierError invalid-feedback"></span>
                                                 </div>
 
                                                 <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -74,6 +70,7 @@
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
                                                 </div>
+                                                <span id="purchasePriceAEDError_{{$i}}" class="purchasePriceAEDError"></span>
                                             </div>
                                             <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_{{$i}}">
                                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
@@ -86,6 +83,7 @@
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                                     </div>
                                                 </div>
+                                                <span id="purchasePriceUSDError_{{$i}}" class="purchasePriceUSDError"></span>
                                             </div>
                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                 <a class="btn_round removeButton" data-index="{{$i}}" >
@@ -191,16 +189,17 @@
                     $(this).find('select').attr('data-index', index);
                     $(this).find('select').attr('id','suppliers'+ index);
                     $(this).find('select').attr('name','supplierAndPrice['+ index +'][supplier_id][]');
+                    $(this).find('.supplierError').attr('id','supplierError_'+index);
                     $(this).find('.AED_price').attr('id','div_price_in_aed_'+ index);
                     $(this).find('.purchase_price_AED').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_aed]');
                     $(this).find('.purchase_price_AED').attr('id','addon_purchase_price_'+index);
                     $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
-
+                    $(this).find('.purchasePriceAEDError').attr('id','purchasePriceAEDError_'+index);
                     $(this).find('.USD_price').attr('id','div_price_in_usd_'+ index);
                     $(this).find('.purchase_price_USD').attr('name','supplierAndPrice['+ index +'][addon_purchase_price_in_usd]');
                     $(this).find('.purchase_price_USD').attr('onkeyup','calculateAED('+ index +')');
                     $(this).find('.purchase_price_USD').attr('id','addon_purchase_price_in_usd_'+index);
-                    $(this).find('.purchase_price_AED').attr('onkeyup','calculateUSD('+ index +')');
+                    $(this).find('.purchasePriceUSDError').attr('id','purchasePriceUSDError_'+index);
                     $(this).find('a').attr('data-index', index);
 
                         $(this).find('.lead_time').attr('id','lead_time_'+ index);
@@ -268,11 +267,7 @@
                                 <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
                                  multiple="true" style="width: 100%;" required>
                                 </select>
-                                @error('is_primary_payment_method')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                                <span id="supplierError_${index}" class="supplierError invalid-feedback"></span>
                                 </div>
 
                                 <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -319,6 +314,7 @@
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                     </div>
                                 </div>
+                                <span id="purchasePriceAEDError_${index}" class="purchasePriceAEDError"></span>
                             </div>
                             <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
                                 <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
@@ -331,6 +327,7 @@
                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                     </div>
                                 </div>
+                                <span id="purchasePriceUSDError_${index}" class="purchasePriceUSDError"></span>
                             </div>
                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                 <a class="btn_round removeButton" data-index="${index}" >
