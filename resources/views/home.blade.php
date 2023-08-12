@@ -25,18 +25,11 @@
                                 <!-- card body -->
                                 <div class="card-body">
                                     <div class="row align-items-center">
-                                        <div class="col-6">
-                                            <span class="my-text">Leads</span><br><br>
-                                            <h5 class="mb-3">
-                                            Last 30 Days :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span><br><br>
-                                            Last 7 Days  :  <span class="counter-value" data-target="{{ $totalleadscount7days }}">0</span><br><br>
-                                            Today      :  <span class="counter-value" data-target="{{ $totalleadscounttoday }}">0</span>
-                                            </h4>
-                                        </div>
-
-                                        <div class="col-6">
-                                        <canvas id="totalleads"></canvas>
-                                        </div>
+                                    <div style="text-align: center;">
+        <h3>Daily Calls & Messages Leads</h3>
+    </div>
+        <canvas id="barChart"></canvas>
+                                        
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -102,16 +95,29 @@
                     </div>
 @endif -->
               <div class="row">
-              <div class="col-xl-8">
+              <div class="col-xl-4">
                 
-              <div class="card">
-              <div style="text-align: center;">
-        <h3>Daily Calls & Messages Leads</h3>
-    </div>
-        <canvas id="barChart"></canvas>
+              <div class="card card-h-100">
+                                <!-- card body -->
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+              <div class="col-6">
+                                            <span class="my-text">Leads</span><br><br>
+                                            <h5 class="mb-3">
+                                            Last 30 Days :  <span class="counter-value" data-target="{{ $totalleadscount }}">0</span><br><br>
+                                            Last 7 Days  :  <span class="counter-value" data-target="{{ $totalleadscount7days }}">0</span><br><br>
+                                            Today      :  <span class="counter-value" data-target="{{ $totalleadscounttoday }}">0</span>
+                                            </h4>
+                                        </div>
+
+                                        <div class="col-6">
+                                        <canvas id="totalleads"></canvas>
+                                        </div>
 </div>
 </div>
-                            <div class="col-xl-4">
+</div>
+</div>
+                            <div class="col-xl-8">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Most Inquiry Model Line</h4>

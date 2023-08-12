@@ -655,7 +655,7 @@ Clear Filters
                                 <th id="grn_number" class="nowrap-td">GRN</th>
                                 <th id="grn_date" class="nowrap-td">GRN Date</th>
                                 <th id="netsuit_grn_number" class="nowrap-td">Netsuit GRN Number</th>
-                                <th id="netsuit_grn_date" class="nowrap-td">Netsuit GDN Date</th>
+                                <th id="netsuit_grn_date" class="nowrap-td">Netsuit GRN Date</th>
                                 @endif
                                 @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -668,7 +668,7 @@ Clear Filters
                                 @endphp
                                 @if ($hasPermission)
                                 <th id="inspection_date" class="nowrap-td">GRN Inspection Date</th>
-                                <th id="grn_remark" class="nowrap-td">GRN Remarks</th>
+                                <th id="grn_remark" class="nowrap-td">Inspection Remarks</th>
                                 <th id="qc_remarks" class="nowrap-td">QC Remarks</th>
                                 @endif
                                 @php
@@ -950,7 +950,13 @@ Clear Filters
                                       <td class="editable-field netsuit_grn_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="netsuit_grn_date">{{ $vehicles->netsuit_grn_date }}</td>
                                       @else
                                       <td>{{ $vehicles->netsuit_grn_number }}</td>
-                                      <td>{{ $vehicles->netsuit_grn_date }}</td>
+                                      <td>
+                                        @if($vehicles->netsuit_grn_date)
+                                        {{ date('d-M-Y', strtotime($vehicles->netsuit_grn_date)) }}
+                                      @else
+                                      {{$vehicles->netsuit_grn_date}}
+                                      @endif
+                                      </td>
                                       @endif
                                  @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-status-view');
@@ -1053,10 +1059,19 @@ Clear Filters
                                     @endphp
                                     @if ($hasPermission)
                                      <td class="editable-field so_number" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $so_number }}</td>
-                                     <td class="editable-field so_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="so_date">{{ $so_date }}</td>
+                                     <td class="editable-field so_date" data-is-date="true" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}" data-type="date" data-field-name="so_date">@if ($so_date)
+                                        {{ date('d-M-Y', strtotime($so_date)) }}
+                                        @else
+                                        {{$so_date}}
+                                        @endif</td>
 									                    @else
 									                    <td>{{ $so_number }}</td>
-                                     <td>{{ $so_date }}</td>
+                                      <td>@if ($so_date)
+                                        {{ date('d-M-Y', strtotime($so_date)) }}
+                                        @else
+                                        {{$so_date}}
+                                        @endif
+                                      </td>
                                      @endif
 									                  @endif
                                      @php
@@ -1093,12 +1108,22 @@ Clear Filters
                                     {{ $vehicles->reservation_start_date }}</td>
                                     <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
                                     {{ $vehicles->reservation_end_date }}</td>
-									 @else
-								    <td>
-                                    {{ $vehicles->reservation_start_date }}</td>
+									                 @else
+								                    <td>
+                                      @if($vehicles->reservation_start_date)
+                                      {{ $vehicles->reservation_start_date }}
+                                      @else
+                                    date('d-M-Y', strtotime($vehicles->reservation_start_date))
+                                    @endif
+                                    </td>
                                     <td>
-                                    {{ $vehicles->reservation_end_date }}</td>
-									@endif
+                                      @if($vehicles->reservation_end_date)
+                                    {{ $vehicles->reservation_end_date }}
+                                  @else
+                                  date('d-M-Y', strtotime($vehicles->reservation_end_date))
+                                  @endif
+                                  </td>
+									                  @endif
                                     @endif
                                      @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('so-remarks');
@@ -1164,13 +1189,13 @@ Clear Filters
                                     @endphp
                                     @if ($hasPermission)
                                      <td class="nowrap-td brand" id="brand-{{$vehicles->id}}">
-                                        {{ $vehicles->variant->brand->brand_name ?? ''}}
+                                        {{ ucfirst(strtolower($vehicles->variant->brand->brand_name ?? '')) }}
                                      </td>
                                      <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
-                                           {{$vehicles->variant->master_model_lines->model_line ?? ''}}
+                                     {{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line ?? '')) }}
                                      </td>
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
-                                             {{ $vehicles->variant->model_detail ?? '' }}
+                                     {{ ucfirst(strtolower($vehicles->variant->model_detail ?? '')) }}
                                      </td>
                                      @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
                                      <td>
@@ -1195,18 +1220,17 @@ Clear Filters
                                     </td>
                                     @endif
                                      <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
-                                             {{ $vehicles->detail ?? '' }}
+                                     {{ ucfirst(strtolower($vehicles->detail ?? '' )) }}
                                      </td>
                                     @else
                                       <td class="nowrap-td brand" id="brand-{{$vehicles->id}}">
-                                    {{ $vehicles->variant->brand->brand_name ?? ''}}
+                                      {{ ucfirst(strtolower($vehicles->variant->brand->brand_name ?? '')) }}
                                      </td>
                                      <td class="nowrap-td" id="model-line-{{$vehicles->id}}">
-
-                                           {{$vehicles->variant->master_model_lines->model_line ?? ''}}
+                                     {{ ucfirst(strtolower($vehicles->variant->master_model_lines->model_line ?? '')) }}
                                      </td>
                                      <td class="nowrap-td" id="model-description-{{$vehicles->id}}">
-                                             {{ $vehicles->variant->model_detail ?? '' }}
+                                     {{ ucfirst(strtolower($vehicles->variant->model_detail ?? '')) }}
                                      </td>
                                      <td>
                                     <select name="varaints_id" class="form-control" placeholder="varaints_id" disabled>
@@ -1217,7 +1241,7 @@ Clear Filters
                                     </select>
                                     </td>
                                      <td class="nowrap-td" id="variant-detail-{{ $vehicles->id }}">
-                                             {{ $vehicles->detail ?? '' }}
+                                     {{ ucfirst(strtolower($vehicles->detail ?? '' )) }}
                                      </td>
                                      @endif
 									                  @endif
@@ -1235,9 +1259,10 @@ Clear Filters
                                       $hasPermission = Auth::user()->hasPermissionForSelectedRole('conversion-edit');
                                       @endphp
                                       @if ($hasPermission)
-                                      <td class="editable-field conversion" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->conversion }}</td>
+                                      <td class="editable-field conversion" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->conversion)) }}</td>
                                       @else
-                                      <td>{{ $vehicles->conversion }}</td>
+                                      <td>
+                                      {{ ucfirst(strtolower($vehicles->conversion)) }}</td>
                                       @endif
                                       @endif
                                       @php
@@ -1266,19 +1291,19 @@ Clear Filters
                                     @endphp
                                     @if ($hasPermission)
                                      <td class="nowrap-td" id="my-{{ $vehicles->id }}">
-                                             {{ $vehicles->variant->my }}
+                                        {{ $vehicles->variant->my ?? 'null' }}
                                          </td>
                                         <td class="nowrap-td" id="steering-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->steering }}
+                                            {{ $vehicles->variant->steering ?? 'null'  }}
                                         </td>
                                         <td class="nowrap-td" id="seat-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->seat }}
+                                            {{ $vehicles->variant->seat ?? 'null'  }}
                                         </td>
                                         <td class="nowrap-td" id="fuel-type-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->fuel_type }}
+                                        {{ ucfirst(strtolower($vehicles->variant->fuel_type ?? 'null' )) }}
                                         </td>
                                         <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->gearbox }}
+                                        {{ ucfirst(strtolower($vehicles->variant->gearbox ?? 'null' )) }}
                                         </td>
                                         @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
                                         <td>
@@ -1320,28 +1345,28 @@ Clear Filters
                                         </td>
                                         @endif
                                         <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
-                                        {{ $vehicles->variant->upholestry ?? '' }}
+                                        {{ ucfirst(strtolower($vehicles->variant->upholestry ?? '' )) }}
                                         </td>
                                         @if($vehicles->grn_id === null || $vehicles->gdn_id !== null)
-                                        <td class="nowrap-td">{{ $vehicles->extra_features }}</td>
+                                        <td class="nowrap-td">{{ ucfirst(strtolower($vehicles->extra_features)) }}</td>
                                         @else
-                                        <td class="editable-field extra_features" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ $vehicles->extra_features }}</td>
+                                        <td class="editable-field extra_features" contenteditable="false" data-vehicle-id="{{ $vehicles->id }}">{{ ucfirst(strtolower($vehicles->extra_features)) }}</td>
 										                    @endif
                                         @else
 										                    <td class="nowrap-td" id="my-{{ $vehicles->id }}">
-                                        {{ $vehicles->variant->my }}
+                                        {{ $vehicles->variant->my ?? 'null'  }}
                                          </td>
                                         <td class="nowrap-td" id="steering-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->steering }}
+                                            {{ $vehicles->variant->steering ?? 'null'  }}
                                         </td>
                                         <td class="nowrap-td" id="seat-{{ $vehicles->id }}">
-                                        {{ $vehicles->variant->seat }}
+                                        {{ $vehicles->variant->seat ?? 'null'  }}
                                         </td>
                                         <td class="nowrap-td" id="fuel-type-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->fuel_type }}
+                                        {{ ucfirst(strtolower($vehicles->variant->fuel_type ?? 'null' )) }}
                                         </td>
                                         <td class="nowrap-td" id="gearbox-{{ $vehicles->id }}">
-                                            {{ $vehicles->variant->gearbox }}
+                                        {{ ucfirst(strtolower($vehicles->variant->gearbox ?? 'null' )) }}
                                         </td>
                                         <td>
                                         <select name="ex_colour" class="form-control" placeholder="ex_colour" disabled>
@@ -1362,9 +1387,9 @@ Clear Filters
                                             </select>
                                         </td>
                                         <td class="nowrap-td Upholestry" id="upholestry-{{ $vehicles->id }}">
-                                        {{ $vehicles->variant->upholestry ?? '' }}
+                                        {{ ucfirst(strtolower($vehicles->variant->upholestry ?? '' )) }}
                                         </td>
-                                        <td class="nowrap-td">{{ $vehicles->extra_features }}</td>
+                                        <td class="nowrap-td">{{ ucfirst(strtolower($vehicles->extra_features )) }}</td>
                                         @endif
 										                    @endif
                                         @php
@@ -1388,14 +1413,20 @@ Clear Filters
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('territory-view');
                                         @endphp
                                         @if ($hasPermission)
-                                        <td class="nowrap-td Territory">{{ $vehicles->territory }}</td>
+                                        <td class="nowrap-td Territory">{{ ucfirst(strtolower($vehicles->territory )) }}</td>
                                         @endif
                                         @php
                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('warehousest-view');
                                         @endphp
                                         @if ($hasPermission)
                                         @if ($warehouses === null)
+                                        @if($vehicles->grn_id === null)
                                         <td class="nowrap-td">Supplier</td>
+                                        @elseif($vehicles->gdn_id !== null)
+                                        <td class="nowrap-td">Customer</td>
+                                        @else
+                                        <td class="nowrap-td">Supplier</td>
+                                        @endif
                                         @else
                                         <td class="nowrap-td">{{ $warehouses }}</td>
                                         @endif
