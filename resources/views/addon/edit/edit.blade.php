@@ -455,7 +455,7 @@
                                     </div>
                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                         <textarea rows="3" id="new_addon_name" type="text" class="form-control @error('name') is-invalid @enderror" name="name"
-                                        placeholder="Enter Addon Name" value="{{ old('name') }}"  autofocus></textarea>
+                                        placeholder="Enter Addon Name" value="{{ old('name') }}" oninput="checkValidation()" autofocus></textarea>
                                         <span id="newAddonError" class="required-class paragraph-class"></span>
                                         @error('name')
                                             <span class="invalid-feedback" role="alert">
@@ -479,7 +479,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalCenteredLabel" style="text-align:center;"> Addon Image </h5>
-                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closemodal()">
+                            <button type="button" class="btn btn-secondary btn-sm close form-control" data-dismiss="modal" aria-label="Close" onclick="closeImage()">
                                 <span aria-hidden="true">X</span>
                             </button>
                         </div>
@@ -869,7 +869,19 @@
              formInputError = false;
          }
      }
-
+     function checkValidation()
+        {
+            var value = $('#new_addon_name').val();
+            if(value == '')
+            {
+                $msg = 'Addon Name is Required';
+                showNewAddonError($msg);
+            }
+            else
+            {
+                removeNewAddonError();
+            }
+        }
      $('form').on('submit', function (e)
         {
             var inputAddonType = $('#addon_type').val();
@@ -1426,7 +1438,8 @@
             var value = $('#new_addon_name').val();
             if(value == '')
             {
-                document.getElementById("newAddonError").textContent='Addon Name is Required';
+                $msg = 'Addon Name is Required';
+                showNewAddonError($msg);
             }
             else
             {
@@ -1457,7 +1470,6 @@
                             resetSelectedSuppliers(selectedValues);
                             $('#addnewAddonButton').hide();
                             $('#new_addon_name').val("");
-                            document.getElementById("newAddonError").textContent='';
                             $msg = "";
                             removeAddonNameError($msg);
                             removeNewAddonError();
@@ -1466,16 +1478,19 @@
                 });
             }
         });
-        function setPartNumber(partNum)
+        function closeImage()
         {
-            $('#part_number').val(partNum.value);
-            $('#part_numberRaw').val(partNum.value);
+            $('.overlay').hide();
+            $('.modal').removeClass('modalshow');
+            $('.modal').addClass('modalhide');
         }
         function closemodal()
         {
             $('.overlay').hide();
             $('.modal').removeClass('modalshow');
             $('.modal').addClass('modalhide');
+            $('#new_addon_name').val("");
+            removeNewAddonError();
         }
         function resetSelectedSuppliers(selectedValues)
         {
