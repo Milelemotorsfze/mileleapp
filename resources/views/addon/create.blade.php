@@ -897,6 +897,16 @@
                             showPurchasePriceUSDError($msg,j);
                             formInputError = true;
                         }
+                        var minLeadTime = $('#lead_time_'+j).val();
+                        var maxLeadTime = $('#lead_time_max_'+j).val();
+                        if(minLeadTime != '' && maxLeadTime != '')
+                        {
+                            if(Number(minLeadTime) > Number(maxLeadTime))
+                            {
+                                showMaxLeadTimeError(j);
+                                formInputError = true;
+                            }
+                        }
                     }
                 }
                 if(inputAddonType == 'SP')
@@ -1769,14 +1779,6 @@
             input.value = val;
             var minLeadTime = $('#lead_time_'+row).val();
             var maxLeadTime = $('#lead_time_max_'+row).val();
-            // if(minLeadTime != '')
-            // {
-            //     document.getElementById('lead_time_max_'+row).readOnly = false;
-            // }
-            // else
-            // {
-            //     document.getElementById('lead_time_max_'+row).readOnly = true;
-            // }
             if(minLeadTime != '' && maxLeadTime != '')
             {
                 if(Number(minLeadTime) > Number(maxLeadTime))
