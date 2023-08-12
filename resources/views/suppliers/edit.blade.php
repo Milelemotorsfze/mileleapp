@@ -328,20 +328,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
-                                        <label for="sub category" class="col-form-label text-md-end">{{ __('Comment') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment"
-                                                  id="comment" autofocus>{{ $supplier->comment }}</textarea>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
                             <div class="col-xxl-6 col-lg-6 col-md-12">
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
@@ -351,6 +337,36 @@
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
                                         <input class="widthinput form-control" name="web_address" id="web_address"
                                                placeholder="Web Address" autofocus value="{{ old('web_address', $supplier->web_address) }}">
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <!-- <span class="error">* </span> -->
+                                        <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <select class="form-control widthinput" name="person_contact_by" id="person_contact_by" autofocus>
+                                            <option></option>
+                                            @foreach($users as $user)
+                                                <option value="{{ $user->id }}" {{ $user->id == $supplier->person_contact_by ? 'selected' : '' }}>{{ $user->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <!-- <span class="error">* </span> -->
+                                        <label for="sub category" class="col-form-label text-md-end">{{ __('Comment') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <textarea cols="25" rows="5" class=" form-control" name="comment" placeholder="Comment"
+                                                  id="comment" autofocus>{{ $supplier->comment }}</textarea>
                                     </div>
                                 </div>
                                 </br>
@@ -450,42 +466,6 @@
                                 <div class="row">
                                     <div class="col-xxl-3 col-lg-6 col-md-12">
                                         <!-- <span class="error">* </span> -->
-                                        <label for="person_contact_by" class="col-form-label text-md-end">{{ __('Person Contact By') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <select class="form-control widthinput" name="person_contact_by" id="person_contact_by" autofocus>
-                                            <option></option>
-                                            @foreach($users as $user)
-                                                <option value="{{ $user->id }}" {{ $user->id == $supplier->person_contact_by ? 'selected' : '' }}>{{ $user->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
-                                        <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
-                                    </div>
-                                    <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
-                                               placeholder="Enter Contact Person" value="{{ old('contact_person', $supplier->contact_person) }}"  autocomplete="contact_person" autofocus>
-                                        @error('contact_person')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-
-                                    </div>
-                                </div>
-                                </br>
-                            </div>
-                            <div class="col-xxl-6 col-lg-6 col-md-12">
-                                <div class="row">
-                                    <div class="col-xxl-3 col-lg-6 col-md-12">
-                                        <!-- <span class="error">* </span> -->
                                         <label for="fax" class="col-form-label widthinput">{{ __('Fax') }}</label>
                                     </div>
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -515,6 +495,25 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                         @enderror
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                            <div class="col-xxl-6 col-lg-6 col-md-12">
+                                <div class="row">
+                                    <div class="col-xxl-3 col-lg-6 col-md-12">
+                                        <!-- <span class="error">* </span> -->
+                                        <label for="contact_person" class="col-form-label text-md-end">{{ __('Contact Person') }}</label>
+                                    </div>
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="contact_person" type="text" class="widthinput form-control @error('contact_person') is-invalid @enderror" name="contact_person"
+                                               placeholder="Enter Contact Person" value="{{ old('contact_person', $supplier->contact_person) }}"  autocomplete="contact_person" autofocus>
+                                        @error('contact_person')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+
                                     </div>
                                 </div>
                                 </br>
@@ -1719,6 +1718,9 @@
             var inputContactNumber = $('#contact_number').val();
             var inputAlternativeContactNumber = $('#alternative_contact_number').val();
             var inputEmail  = $('#email').val();
+            var inputPhone = $('#phone').val();
+            var inputOfficePhone = $('#office_phone').val();
+
             var formInputError = false;
             if(inputSupplier == '')
             {
@@ -1747,9 +1749,42 @@
                 formInputError = true;
                 e.preventDefault();
             }
-            // if(inputAlternativeContactNumber != '') {
-            //
-            // }
+            if(inputOfficePhone != '') {
+                if (inputOfficePhone.length < 5 ) {
+                    console.log("less tahn 5");
+                    $msg = "Minimum 5 digits required";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+                } else if (inputOfficePhone.length > 15) {
+                    console.log("more tahn 5");
+                    $msg = "Maximum 15 digits allowed";
+                    showOfficePhoneError($msg);
+                    formInputError = true;
+                    e.preventDefault();
+
+                } else {
+                    removeOfficePhoneError();
+                    formInputError = false;
+                }
+            }
+            if(inputAlternativeContactNumber != '') {
+               if(inputAlternativeContactNumber.length > 15) {
+                   $msg = "Maximum 15 digits allowed";
+                   showAlternativeContactNumberError($msg);
+                   formInputError = true;
+                   e.preventDefault();
+               }else if(inputAlternativeContactNumber.length < 5 && inputAlternativeContactNumber.length > 0) {
+
+                   $msg = "Minimum 5 digits required";
+                   showAlternativeContactNumberError($msg);
+                   formInputError = true;
+                   e.preventDefault();
+               }else {
+                   removeAlternativeContactNumberError();
+                   formInputError = false;
+               }
+            }
             if(inputContactNumber == '')
             {
                 $msg ="Contact number is required";
@@ -1758,6 +1793,23 @@
                 e.preventDefault();
             } else{
                 // alert("ok");
+                if(inputContactNumber != '') {
+                    if(inputContactNumber.length > 15) {
+                        $msg = "Maximum 15 digits allowed";
+                        showContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else if(inputContactNumber.length < 5 ) {
+
+                        $msg = "Minimum 5 digits required";
+                        showContactNumberError($msg);
+                        formInputError = true;
+                        e.preventDefault();
+                    }else {
+                        removeContactNumberError();
+                        formInputError = false;
+                    }
+                }
                 var contactNumber = contact_number.getNumber(intlTelInputUtils.numberFormat.E164);
                 var name = $('#supplier').val();
                 var url = '{{ route('vendor.vendorUniqueCheck') }}';
@@ -2201,7 +2253,32 @@
             document.getElementById("alternativeContactRequired").classList.remove("paragraph-class");
             document.getElementById("alternative_contact_number").classList.remove("is-invalid");
         }
-
+        function showPhoneError($msg)
+        {
+            document.getElementById("phoneRequired").textContent=$msg;
+            document.getElementById("phoneRequired").classList.remove("requiredOne");
+            document.getElementById("phoneRequired").classList.add("paragraph-class");
+            document.getElementById("phone").classList.add("is-invalid");
+        }
+        function removePhoneError()
+        {
+            document.getElementById("phoneRequired").textContent="";
+            document.getElementById("phoneRequired").classList.remove("paragraph-class");
+            document.getElementById("phone").classList.remove("is-invalid");
+        }
+        function showOfficePhoneError($msg)
+        {
+            document.getElementById("officePhoneRequired").textContent=$msg;
+            document.getElementById("officePhoneRequired").classList.remove("requiredOne");
+            document.getElementById("officePhoneRequired").classList.add("paragraph-class");
+            document.getElementById("office_phone").classList.add("is-invalid");
+        }
+        function removeOfficePhoneError()
+        {
+            document.getElementById("officePhoneRequired").textContent="";
+            document.getElementById("officePhoneRequired").classList.remove("paragraph-class");
+            document.getElementById("office_phone").classList.remove("is-invalid");
+        }
         function showEmailError($msg)
         {
             document.getElementById("emailRequired").textContent=$msg;
