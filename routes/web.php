@@ -353,6 +353,7 @@ Route::get('/d', function () {
     Route::get('/vehiclependinggrnnetsuilt', [VehiclesController::class, 'pendinggrnnetsuilt'])->name('vehiclesincoming.pendinggrnnetsuilt');
     Route::get('/vehiclebookedstocked', [VehiclesController::class, 'bookedstocked'])->name('vehiclesincoming.bookedstocked');
     Route::get('/vehiclependingapprovalssales', [VehiclesController::class, 'pendingapprovalssales'])->name('vehicleinspectionpending.pendingapprovalssales');
+    Route::post('/marekting/update-charts', [HomeController::class, 'marketingupdatechart'])->name('homemarketing.update-charts');
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
