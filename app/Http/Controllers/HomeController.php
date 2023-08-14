@@ -173,5 +173,38 @@ $totalvariantss = [
     ]
 ]; 
        return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData', 'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days', 'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays', 'countpendingreels', 'countpendingreelsdays'));
-    }      
+    }  
+    public function marketingupdatechart(Request $request)
+    {
+        $startdate = $request->input('start_date');
+        $enddate = $request->input('end_date');
+        $calls = DB::table('calls')
+        ->select('calls.source', 'calls.location', 'lead_source.source_name')
+        ->join('lead_source', 'calls.source', '=', 'lead_source.id')
+        ->whereBetween('calls.created_at', [$startdate, $enddate])
+        ->get();
+        info($calls);
+        $chartData = [
+            'datasets' => []
+        ];
+        foreach ($calls as $call) {
+            $source = $call->source_name;
+            $location = $call->location;
+            $sourceIndex = array_search($source, array_column($chartData['datasets'], 'label'));
+            if ($sourceIndex === false) {
+                $chartData['datasets'][] = [
+                    'label' => $source,
+                    'fillColor' => "blue",
+                    'data' => [$location => 1]
+                ];
+            } else {
+                if (!isset($chartData['datasets'][$sourceIndex]['data'][$location])) {
+                    $chartData['datasets'][$sourceIndex]['data'][$location] = 1;
+                } else {
+                    $chartData['datasets'][$sourceIndex]['data'][$location]++;
+                }
+            }
+        }
+        return response()->json(['chartData' => $chartData]);
+    }    
 }
