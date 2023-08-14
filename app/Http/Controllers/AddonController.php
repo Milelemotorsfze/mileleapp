@@ -122,7 +122,7 @@ class AddonController extends Controller
             $masterAddonByType = Addon::where('addon_type',$request->addon_type)->pluck('id');
             if(count($masterAddonByType) > 0)
             {
-                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
+                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
@@ -421,7 +421,9 @@ class AddonController extends Controller
             }
             if($request->addon_type == 'K')
             {
-                return redirect()->route('kit.suppliers', $addon_details->id)
+                // return redirect()->route('kit.suppliers', $addon_details->id)
+                //                 ->with('success','Kit created successfully');
+                return redirect()->route('addon.kitItems', $addon_details->id)
                                 ->with('success','Kit created successfully');
             }
             else
@@ -1086,7 +1088,7 @@ class AddonController extends Controller
             $masterAddonByType = Addon::where('addon_type',$addonType)->pluck('id');
             if($masterAddonByType != '')
             {
-                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
+                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
@@ -1268,7 +1270,7 @@ class AddonController extends Controller
             $masterAddonByType = Addon::where('addon_type',$request->addon_type)->pluck('id');
             if($masterAddonByType != '')
             {
-                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
+                $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;

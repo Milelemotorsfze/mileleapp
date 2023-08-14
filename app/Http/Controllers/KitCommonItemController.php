@@ -40,7 +40,7 @@ class KitCommonItemController extends Controller
         $masterAddonByType = Addon::where('addon_type','K')->pluck('id');
         if($masterAddonByType != '')
         {
-            $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
+            $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
             if($lastAddonCode != '')
             {
                 $lastAddonCodeNo =  $lastAddonCode->addon_code;
@@ -375,5 +375,28 @@ class KitCommonItemController extends Controller
         $data = 'K';
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
+    }
+    public function kitItems($id)
+    {
+        $supplierAddonDetails = [];
+        // AddonSuppliersUsed
+        // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        'AddonSuppliers.Kit.addon.AddonName')->first();
+        
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $supplierAddonDetails->LeastPurchasePrices = $price;
+
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
+        // {
+        //     return $q->where('status','active')->min('purchase_price_aed');
+        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
+        // })->first();
+        // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
+        // dd($supplierAddonDetails);
+        return view('kit.kititems',compact('supplierAddonDetails'));
     }
 }
