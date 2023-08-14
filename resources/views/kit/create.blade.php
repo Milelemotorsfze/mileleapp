@@ -251,7 +251,7 @@
                                                             <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                 <span class="error">* </span>
                                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                                                <select onchange=selectBrand(this.id,1) name="brand" id="brand"
+                                                                <select onchange=selectBrand(this.id,1) name="brand_id" id="brand"
                                                                        class="brands" multiple="true" style="width: 100%;" >
                                                                     @foreach($brands as $brand)
                                                                         <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
@@ -270,7 +270,7 @@
                                                                         <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
                                                                             <span class="error">* </span>
                                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                                            <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1"
+                                                                            <select class="compare-tag1 model-lines" name="brandModel[1][model_line_id]" id="selectModelLine1"
                                                                                     data-index="1" multiple="true" style="width: 100%;" onchange=selectModelLineDescipt(1)>
                                                                             </select>
                                                                             <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
@@ -1392,16 +1392,17 @@
                         $(this).find('.model-lines').attr('id','selectModelLine'+index);
                         $(this).find('.model-lines').attr('data-index',index);
                         $(this).find('.model-lines').attr('onchange','selectModelLineDescipt('+index+')');
+                        $(this).find('.ModelLineError').attr('id','ModelLineError'+index);
+
                         $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
                         $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
                         $(this).find('.model-numbers').attr('data-index',index);
                         $(this).find('.model-numbers').attr('onchange','showValidationErrors('+index+')');
+                        $(this).find('.ModelNumberError').attr('id','ModelNumberError'+index);
 
                         $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
                         $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
                         $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
-
-                        $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
 
                         $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                         $("#selectModelLine"+index).select2();

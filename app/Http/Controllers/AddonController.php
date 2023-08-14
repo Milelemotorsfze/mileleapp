@@ -148,11 +148,13 @@ class AddonController extends Controller
             }
             $input['addon_type_name'] = $request->addon_type;
             $input['addon_id']= $request->addon_id;
+
             if($request->description != null) {
                 $input['description'] = $request->description;
             }elseif ($request->description_text != null) {
                 $input['description'] = $request->description_text;
             }
+
             if($request->addon_type == 'P' OR $request->addon_type == 'K')
             {
                 $input['model_year_start'] = NULL;
@@ -190,6 +192,7 @@ class AddonController extends Controller
             }
             if($request->addon_type == 'SP')
             {
+                info($request->all());
                 if($request->brand)
                 {
                     if(count($request->brand) > 0)
@@ -250,6 +253,45 @@ class AddonController extends Controller
                             }
                         }
                     }
+                }
+            }
+            elseif ($request->addon_type == 'K') {
+                if($request->brand_id)
+                {
+                    $brandId = $request->brand_id;
+                    $addon_details->is_all_brands = 'no';
+                    $addon_details->update();
+                    if(isset($request->brandModel))
+                    {
+                        if(count( $request->brandModel) > 0)
+                        {
+                            foreach($request->brandModel as $key => $brandModelData)
+                            {
+                                info("inside loop");
+                                foreach ($brandModelData['model_number'] as $modelNumber) {
+                                    $createAddType = [];
+                                    $createAddType['created_by'] = $authId;
+                                    $createAddType['addon_details_id'] = $addon_details->id;
+                                    $createAddType['brand_id'] = $brandId;
+                                    $createAddType['model_id'] = $brandModelData['model_line_id'];
+                                    $createAddType['is_all_model_lines'] = 'no';
+                                    $createAddType['model_number'] = $modelNumber;
+                                    $creBranModelDes = AddonTypes::create($createAddType);
+
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $createAddType = [];
+                        $createAddType['created_by'] = $authId;
+                        $createAddType['addon_details_id'] = $addon_details->id;
+                        $createAddType['brand_id'] = $brandId;
+                        $createAddType['is_all_model_lines'] = 'no';
+                        $creBranModelDes = AddonTypes::create($createAddType);
+                    }
+
                 }
             }
             else

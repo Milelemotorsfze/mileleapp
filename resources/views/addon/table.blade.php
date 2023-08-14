@@ -115,16 +115,17 @@
                                         <td>All Brands</td>
                                         <td>All Model Lines</td>
                                         <td></td>
-                                        <td>{{$addonsdata->LeastPurchasePrices->lead_time_min}} 
-                                            @if($addonsdata->LeastPurchasePrices->lead_time_max != '' 
-                                            && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max) 
-                                            - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif 
+                                        <td>
+                                            {{$addonsdata->LeastPurchasePrices->lead_time_min ?? ''}}
+                                            @if($addonsdata->LeastPurchasePrices->lead_time_max != ''
+                                            && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max)
+                                            - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif
                                             @if($addonsdata->LeastPurchasePrices->lead_time_min != '' OR $addonsdata->LeastPurchasePrices->lead_time_max != '')
                                             Days
                                             @endif
                                         </td>
                                         <td>
-                                            {{$addonsdata->model_year_start}} 
+                                            {{$addonsdata->model_year_start}}
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                                         </td>
                                         <td>{{$addonsdata->additional_remarks}}</td>
@@ -222,15 +223,15 @@
                                                 @endif
                                             </td>
                                             <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>
-                                            <td>{{$addonsdata->LeastPurchasePrices->lead_time_min}} 
-                                            @if($addonsdata->LeastPurchasePrices->lead_time_max != '' 
-                                            && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max) 
-                                            - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif 
+                                            <td>{{$addonsdata->LeastPurchasePrices->lead_time_min ?? ''}}
+                                            @if($addonsdata->LeastPurchasePrices->lead_time_max != ''
+                                            && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max)
+                                            - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif
                                             @if($addonsdata->LeastPurchasePrices->lead_time_min != '' OR $addonsdata->LeastPurchasePrices->lead_time_max != '')
                                             Days
                                             @endif
                                         </td>
-                                            <td>{{$addonsdata->model_year_start}} 
+                                            <td>{{$addonsdata->model_year_start}}
                                                 @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif</td>
                                             <td>{{$addonsdata->additional_remarks}}</td>
                                             @if($content == '')
