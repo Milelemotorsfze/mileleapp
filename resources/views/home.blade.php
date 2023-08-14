@@ -1,4 +1,5 @@
 @extends('layouts.table')
+<link rel="stylesheet" href="{{ asset('css/daterangepicker.css') }}">
 <style>
     .my-text {
       font-weight: bold;
@@ -28,6 +29,17 @@
                                     <div style="text-align: center;">
         <h3>Daily Calls & Messages Leads</h3>
     </div>
+    <div style="position: relative; width: 100%; height: 6vh;">
+    <div id="reportrange" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+        <i class="fa fa-calendar"></i>&nbsp;
+        <span></span> <i class="fa fa-caret-down"></i>
+    </div>
+</div>
+<form id="date-range-form" method="POST">
+    @csrf
+    <input type="hidden" name="start_date" id="start_date">
+    <input type="hidden" name="end_date" id="end_date">
+</form>
         <canvas id="barChart"></canvas>
                                         
                                     </div>
@@ -424,24 +436,89 @@
                         </div>
                         @endif -->
                         <!-- end col -->
-<script>
-var chartData = {!! json_encode($chartData) !!};
-var ctx = document.getElementById('barChart').getContext('2d');
-var barChart = new Chart(ctx, {
-    type: 'bar',
-    data: chartData,
-    options: {
-        scales: {
-            x: {
-                type: 'category',
-                stacked: true
-            },
-            y: {
-                stacked: true
-            }
-        }
+                        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
+    <script src="{{ asset('js/moment.min.js') }}"></script>
+    <script>
+$(function() {
+    function cb(start, end) {
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        $('#start_date').val(start.format('YYYY-MM-DD'));
+        $('#end_date').val(end.format('YYYY-MM-DD'));
+        updateCharts();
     }
+
+    var today = moment();
+    var yesterday = moment().subtract(1, 'days');
+    var last7Days = moment().subtract(6, 'days');
+    var last30Days = moment().subtract(29, 'days');
+    var thisMonthStart = moment().startOf('month');
+    var thisMonthEnd = moment().endOf('month');
+    var lastMonthStart = moment().subtract(1, 'month').startOf('month');
+    var lastMonthEnd = moment().subtract(1, 'month').endOf('month');
+
+    $('#reportrange').daterangepicker({
+        startDate: last7Days,
+        endDate: today,
+        ranges: {
+            'Today': [today, today],
+            'Yesterday': [yesterday, yesterday],
+            'Last 7 Days': [last7Days, today],
+            'Last 30 Days': [last30Days, today],
+            'This Month': [thisMonthStart, thisMonthEnd],
+            'Last Month': [lastMonthStart, lastMonthEnd]
+        }
+    }, cb);
+
+    cb(last7Days, today);
 });
+
+function updateCharts() {
+    var startDate = $('#start_date').val();
+    var endDate = $('#end_date').val();
+    $.ajax({
+        url: '{{ route('homemarketing.update-charts') }}', // Replace with the actual route
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            start_date: startDate,
+            end_date: endDate
+        },
+        success: function(response) {
+            var chartData = response.chartData;
+
+            // Destroy the existing bar chart instance if it exists
+            var existingBarChart = Chart.getChart('barChart');
+            if (existingBarChart) {
+                existingBarChart.destroy();
+            }
+
+            // Create a new bar chart
+            var ctx = document.getElementById('barChart').getContext('2d');
+            var barChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    scales: {
+                        x: {
+                            type: 'category',
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+            
+            // ... update other charts as needed ...
+        },
+        error: function(error) {
+            console.error(error);
+        }
+    });
+}
+</script>
+<script>
 var totalleads = {!! json_encode($totalleads) !!};
 var ctx = document.getElementById('totalleads').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -500,7 +577,6 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
             }
         }
     });
-    
     </script>
     @endif
     @endcan
