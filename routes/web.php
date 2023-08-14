@@ -123,6 +123,7 @@ Route::get('/d', function () {
     Route::get('kits/details/edit/{id}', [KitCommonItemController::class,'editAddonDetails'])->name('kit.editDetails');
     Route::post('kit/suppliers/update/{id}', [KitCommonItemController::class, 'updateKitSupplier'])->name('kit.updateKitSupplier');
     Route::get('kit/kitItems/{id}', [KitCommonItemController::class, 'kitItems'])->name('kit.kitItems');
+    Route::get('getCommonKitItems', [KitCommonItemController::class, 'getCommonKitItems'])->name('getCommonKitItems');
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);

@@ -383,7 +383,7 @@ class KitCommonItemController extends Controller
         // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
-        
+
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $supplierAddonDetails->LeastPurchasePrices = $price;
@@ -398,5 +398,53 @@ class KitCommonItemController extends Controller
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
         return view('kit.kititems',compact('supplierAddonDetails'));
+    }
+    public function getCommonKitItems(Request $request) {
+        info($request->all());
+//        $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
+//        $data = AddonDetails::select('id','addon_code','addon_id')
+//            ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
+//        if($request->filteredArray)
+//        {
+//            if(count($request->filteredArray) > 0)
+//            {
+//                $data = $data->whereNotIn('id', $request->filteredArray);
+//            }
+//        }
+//        //        if($request->id) {
+//        //            $id = $request->id;
+//        //            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
+//        //                $query->where('supplier_id', $id);
+//        //            })->pluck('addon_id');
+//        //            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+//        //        }
+//        $data = $data->get();
+//        return response()->json($data);
+        $data = [];
+
+        if($request->selectedAddonModelNumbers) {
+            if(count($request->selectedAddonModelNumbers) > 0)
+            {
+                $items = $request->selectedAddonModelNumbers;
+                $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
+                $availableModelNumbers = AddonTypes::pluck('model_number')->toArray();
+                $commonItems = array_intersect($request->selectedAddonModelNumbers, $availableModelNumbers);
+                info("commom items",$commonItems);
+                info("count of items as common");
+                info(count($commonItems));
+
+                if(count($commonItems) == $request->count) {
+                    info("eqal count");
+                    $addonDetailIds = AddonTypes::whereIn('model_number', $request->selectedAddonModelNumbers)
+                        ->groupBy('addon_details_id')->pluck('addon_details_id');
+                    $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
+                        ->whereIn('id', $addonDetailIds)
+                        ->get();
+                }
+            }
+        }
+
+
+        return response($data);
     }
 }
