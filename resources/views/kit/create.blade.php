@@ -211,81 +211,7 @@
                         </div>
                     </div>
                     </br>
-{{--                    <div class="row">--}}
-{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
-{{--                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
-{{--                        <div class="input-group">--}}
-{{--                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"--}}
-{{--                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"--}}
-{{--                        value="{{ old('lead_time') }}"  autocomplete="lead_time">--}}
-{{--                                                    <div class="input-group-append">--}}
-{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                            @error('lead_time')--}}
-{{--                                <span class="invalid-feedback" role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                            @enderror--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
-{{--                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
-{{--                        <div class="input-group">--}}
 
-{{--                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror"--}}
-{{--                        name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">--}}
-{{--                                                    <div class="input-group-append">--}}
-{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                            @error('selling_price')--}}
-{{--                                <span class="invalid-feedback" role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                            @enderror--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    </br>--}}
-{{--                    <div class="row">--}}
-
-{{--                        <div class="col-xxl-3 col-lg-2 col-md-4">--}}
-{{--                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-3 col-lg-3 col-md-6" id="">--}}
-{{--                                <fieldset>--}}
-{{--                                    <div class="some-class">--}}
-{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="yes" id="yes" checked />--}}
-{{--                                        <label for="yes">Yes</label>--}}
-{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="no" id="no" />--}}
-{{--                                        <label for="no">No</label>--}}
-{{--                                    </div>--}}
-{{--                                </fieldset>--}}
-{{--                                @error('fixing_charges_included')--}}
-{{--                                    <span class="invalid-feedback" role="alert">--}}
-{{--                                        <strong>{{ $message }}</strong>--}}
-{{--                                    </span>--}}
-{{--                                @enderror--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">--}}
-{{--                            <span class="error">* </span>--}}
-{{--                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">--}}
-{{--                            <div class="input-group">--}}
-{{--                                <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"--}}
-{{--                                    placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">--}}
-{{--                                <div class="input-group-append">--}}
-{{--                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
-{{--                                </div>--}}
-{{--                                <span id="fixingChargeAmountError1" class="invalid-feedback"></span>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    </br>--}}
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
@@ -325,8 +251,8 @@
                                                             <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                 <span class="error">* </span>
                                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                                                <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
-                                                                        data-index="1" class="brands" multiple="true" style="width: 100%;" >
+                                                                <select onchange=selectBrand(this.id,1) name="brand" id="selectBrand1"
+                                                                       class="brands" multiple="true" style="width: 100%;" >
                                                                     @foreach($brands as $brand)
                                                                         <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                                                                     @endforeach
@@ -702,22 +628,7 @@
         });
         function validationOnKeyUp(clickInput)
         {
-            // if(clickInput.id == 'fixing_charge_amount')
-            // {
-            //     var value = clickInput.value;
-            //     if(value == '')
-            //     {
-            //         if(value.legth != 0)
-            //         {
-            //             $msg = "Fixing Charge Amount is required";
-            //             showFixingChargeAmountError($msg);
-            //         }
-            //     }
-            //     else
-            //     {
-            //         removeFixingChargeAmountError();
-            //     }
-            // }
+
             if(clickInput.id == 'itemArr1')
             {
                 var value = clickInput.value;
@@ -957,18 +868,7 @@
             document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
             document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
         }
-        // function showNewAddonError($msg)
-        // {
-        //     document.getElementById("newAddonError").textContent=$msg;
-        //     document.getElementById("kit_year").classList.add("is-invalid");
-        //     document.getElementById("newAddonError").classList.add("paragraph-class");
-        // }
-        // function removeNewAddonError()
-        // {
-        //     document.getElementById("newAddonError").textContent="";
-        //     document.getElementById("kit_year").classList.remove("is-invalid");
-        //     document.getElementById("newAddonError").classList.remove("paragraph-class");
-        // }
+
         function showNewAddonYearError($msg)
         {
             document.getElementById("newAddonYearError").textContent=$msg;
@@ -1408,36 +1308,6 @@
 
         });
 
-        $(document.body).on('select2:select', "#selectBrand1", function (e) {
-            e.preventDefault();
-            var value = $(this).val();
-            if(value == "allbrands") {
-                var count = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                // check each item have data or not?
-                if(count > 1) {
-                    var isSubRowEmpty = [];
-                    for(let i=2; i<=count; i++)
-                    {
-                        var eachBrand = $('#selectBrand'+i).val();
-                        if(eachBrand != '') {
-                            // if any data then show alert.
-                            var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
-                                'Please remove those items to edit this field.',function (e) {
-                            }).set({title:"Remove Brands and ModelLines"})
-                            $("#selectBrand1 option:selected").prop("selected", false);
-                            $("#selectBrand1").trigger('change');
-                        }else{
-                            isSubRowEmpty.push(1);
-                        }
-                    }
-                    var subRowCount = count - 1;
-                    if(isSubRowEmpty.length == subRowCount ) {
-                        $(".brandModelLineDiscription").find(".dynamic-rows").remove();
-                    }
-                }
-            }
-        })
-
         var index = 1;
 
         $(document.body).on('select2:select', ".model-lines", function (e) {
@@ -1446,14 +1316,6 @@
             // optionDisable(index, value);
             hideOption(index,value);
         });
-         // function optionDisable(index, value){
-         //     var currentId = 'selectModelLine'+index;
-         //     if(value == 'allmodellines') {
-         //         $('#' + currentId +' option').not(':selected').attr('disabled', true);
-         //     }else{
-         //         $('#' + currentId + ' option[value=allmodellines]').prop('disabled', true)
-         //     }
-         // }
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
@@ -1461,27 +1323,7 @@
             // optionEnable(currentId,data);
             appendOption(index,data)
         });
-         // function optionEnable(currentId,data) {
-         //     if(data == 'allmodellines') {
-         //         $('#' + currentId + ' option').prop('disabled', false);
-         //     }else {
-         //        $values = '';
-         //        $values =  $('#'+currentId).val();
-         //        if($values == '')
-         //        {
-         //            $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false);
-         //        }
-         //     }
-         // }
 
-        // $(document.body).on('select2:select', ".brands", function (e) {
-        //
-        //     var index = $(this).attr('data-index');
-        //     var value = e.params.data.id;
-        //     hideOption(index,value);
-        //     // disableDropdown();
-        //
-        // });
         function hideOption(index,value) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
@@ -1491,12 +1333,7 @@
                 }
             }
         }
-        // $(document.body).on('select2:unselect', ".brands", function (e) {
-        //     var index = $(this).attr('data-index');
-        //     var data = e.params.data;
-        //     appendOption(index,data);
-        //     // enableDropdown();
-        // });
+
         function appendOption(index,data) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
@@ -1536,7 +1373,7 @@
                         var index = +i + +1;
                         $(this).attr('id','row-'+index);
                         $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');
-                        $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
+                        $(this).find('.brands').attr('name', 'brand');
                         $(this).find('.brands').attr('id', 'selectBrand'+index);
                         $(this).find('.brands').attr('data-index',index);
                         $(this).find('.model-line-div').attr('id','showDivdrop'+index);
@@ -1683,24 +1520,7 @@
         var value =$('#'+id).val();
         if(value != '')
         {
-            // if(brandId != 'allbrands')
-            // {
-            //     if(currentAddonType == '')
-            //     {
-            //             // document.getElementById("addon_type_required").classList.add("paragraph-class");
-            //             // .textContent="Please select any addon type";
-            //             // classList..add("paragraph-class");
-            //             // alert('please select any addon type');
-            //     }
-            //     else
-            //     {
-                    showRelatedModal(value,row);
-                // }
-            // }
-            // else
-            // {
-            //     hideRelatedModal(brandId,row);
-            // }
+           showRelatedModal(value,row);
             $msg = "";
             removeBrandError($msg,row);
         }
