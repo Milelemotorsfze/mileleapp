@@ -435,15 +435,32 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         <span>{{ $AddonSuppliers->purchase_price_usd}} USD</span>
                     </div>
 
+                    @if($supplierAddonDetails->addon_type_name == 'SP')
+                    <div class="col-lg-2 col-md-3 col-sm-12">
+                        <label for="choices-single-default" class="form-label">Quotation Date :</label>
+                    </div>
+                    <div class="col-lg-2 col-md-9 col-sm-12">
+                        @if($AddonSuppliers->updated_at != '')
+                        <span>{{ $AddonSuppliers->updated_at}} 
+                            </span>
+                            @else
+                            <label class="badge badge-soft-info">Not Added</label>
+                            @endif
+                    </div>
+                    @endif
                     
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label">Lead Time :</label>
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
+                        @if($AddonSuppliers->lead_time_max != '' || $AddonSuppliers->lead_time_min != '')
                         <span>{{ $AddonSuppliers->lead_time_min}} 
                             @if($AddonSuppliers->lead_time_max != '' && $AddonSuppliers->lead_time_min < $AddonSuppliers->lead_time_max) 
                             - {{$AddonSuppliers->lead_time_max}} 
                             @endif Days</span>
+                            @else
+                            <label class="badge badge-soft-info">Not Added</label>
+                            @endif
                     </div>
 
                     @if($AddonSuppliers->Suppliers->contact_number != '')

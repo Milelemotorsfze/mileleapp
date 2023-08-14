@@ -70,6 +70,7 @@
                                         <th>Purchase Price</th>
                                     @endif
                                     @endcan
+                                    <th>Quotation Date</th>
                                 @endif
                                 @can('addon-least-purchase-price-view')
                                 @php
@@ -136,6 +137,7 @@
                                                 <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
                                             @endif
                                             @endcan
+                                            <td>{{$addonsdata->PurchasePrices->updated_at}}</td>
                                         @endif
                                         @if($addonsdata->LeastPurchasePrices!= null)
                                             @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
@@ -240,6 +242,7 @@
                                                     <td>{{$addonsdata->PurchasePrices->purchase_price_aed}} AED</td>
                                                 @endif
                                                 @endcan
+                                                <td>{{$addonsdata->PurchasePrices->updated_at}}</td>
                                             @endif
                                             @can('addon-least-purchase-price-view')
                                             @php

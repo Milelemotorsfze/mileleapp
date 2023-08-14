@@ -199,76 +199,86 @@
                             @enderror
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
-
-
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
-                        value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>
-                                                </div>
-                            @error('lead_time')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    </br>
-
-                    <div class="row">
-                        <div class="col-xxl-3 col-lg-2 col-md-4">
-                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
-                        </div>
-                            <div class="col-xxl-3 col-lg-3 col-md-6" id="">
-                                <fieldset>
-                                    <div class="some-class">
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"
-                                        value="yes" id="yes" {{"yes" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
-                                        <label for="yes">Yes</label>
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"
-                                        value="no" id="no" {{"no" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />
-                                        <label for="no">No</label>
-                                    </div>
-                                </fieldset>
-                                @error('fixing_charges_included')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                            <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
                             <span class="error">* </span>
-                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
+                            <label for="addon_code" class="col-form-label text-md-end">{{ __('Choose Addon Image') }}</label>
                         </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                        <div class="input-group">
-                        <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"
-                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                            @error('fixing_charge_amount')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="fixingChargeAmountError" class="invalid-feedback"></span>
+                        <div class="col-xxl-3 col-lg-6 col-md-12">
+{{--                            <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>--}}
+                            <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
+                            <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
                         </div>
+{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
+{{--                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
+{{--                        <div class="input-group">--}}
+
+
+{{--                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"--}}
+{{--                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"--}}
+{{--                        value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">--}}
+{{--                                                    <div class="input-group-append">--}}
+{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                            @error('lead_time')--}}
+{{--                                <span class="invalid-feedback" role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                            @enderror--}}
+{{--                        </div>--}}
                     </div>
                     </br>
+
+{{--                    <div class="row">--}}
+
+{{--                        <div class="col-xxl-3 col-lg-2 col-md-4">--}}
+{{--                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>--}}
+{{--                        </div>--}}
+{{--                            <div class="col-xxl-3 col-lg-3 col-md-6" id="">--}}
+{{--                                <fieldset>--}}
+{{--                                    <div class="some-class">--}}
+{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"--}}
+{{--                                        value="yes" id="yes" {{"yes" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />--}}
+{{--                                        <label for="yes">Yes</label>--}}
+{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"--}}
+{{--                                        value="no" id="no" {{"no" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />--}}
+{{--                                        <label for="no">No</label>--}}
+{{--                                    </div>--}}
+{{--                                </fieldset>--}}
+{{--                                @error('fixing_charges_included')--}}
+{{--                                    <span class="invalid-feedback" role="alert">--}}
+{{--                                        <strong>{{ $message }}</strong>--}}
+{{--                                    </span>--}}
+{{--                                @enderror--}}
+{{--                            </div>--}}
+{{--                            <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">--}}
+{{--                            <span class="error">* </span>--}}
+{{--                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">--}}
+{{--                        <div class="input-group">--}}
+{{--                        <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"--}}
+{{--                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >--}}
+{{--                                                    <div class="input-group-append">--}}
+{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                            @error('fixing_charge_amount')--}}
+{{--                                <span class="invalid-feedback" role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                            @enderror--}}
+{{--                            <span id="fixingChargeAmountError" class="invalid-feedback"></span>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    </br>--}}
 
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
-                        <div class="col-xxl-10 col-lg-6 col-md-12">
+                        <div class="col-xxl-9 col-lg-6 col-md-12">
                             <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror"
                             name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ $addonDetails->additional_remarks }}"
                             autocomplete="additional_remarks" autofocus>{{ $addonDetails->additional_remarks }}</textarea>
@@ -282,11 +292,11 @@
                     </br>
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>
-                    <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
-                    <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
-                    </br>
-                    </br>
+{{--                    <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>--}}
+{{--                    <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />--}}
+{{--                    <span id="addonImageError" class="email-phone required-class paragraph-class"></span>--}}
+{{--                    </br>--}}
+{{--                    </br>--}}
                     <center>
                     <img id="blah" src="{{ asset('addon_image/' . $addonDetails->image) }}" alt="your image" class="contain" data-modal-id="showImageModal"
                     onclick="showImage()"/>

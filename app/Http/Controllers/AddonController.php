@@ -946,16 +946,12 @@ class AddonController extends Controller
                                             $update->update();
                                             if($oldPrice != $update->purchase_price_aed)
                                             {
-                                                $oldHistry = PurchasePriceHistory::Where([
-                                                    ['supplier_addon_id', '=', $update->id],
-                                                    ['status','=','active'],
-                                                ])->latest()->first();
-                                                if($oldHistry)
-                                                {
-                                                    $oldHistry->status = 'inactive';
-                                                    $oldHistry->updated_by = Auth::id();
-                                                    $oldHistry->update();
-                                                }
+                                                $createNewHistry['purchase_price_aed'] = $update->purchase_price_aed;
+                                                $createNewHistry['purchase_price_usd'] = $update->purchase_price_usd;
+                                                $createNewHistry['supplier_addon_id'] = $update->id;
+                                                $createNewHistry['status'] = 'active';
+                                                $createNewHistry['created_by'] = Auth::id();
+                                                $createNewHistry33 = PurchasePriceHistory::create($createNewHistry);
                                             }
                                         }
                                         else

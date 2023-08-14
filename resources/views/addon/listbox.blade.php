@@ -220,6 +220,22 @@
                       @endif
                     @endif
                   @endif
+
+                  @if($content == '')
+                  @if($addonsdata->addon_type_name == 'SP')
+                    @if($addonsdata->PurchasePrices!= null)
+                      @if($addonsdata->PurchasePrices->updated_at != '')
+                          <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            Quotation Date
+                          </div>
+                          <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                            {{$addonsdata->PurchasePrices->updated_at}}
+                          </div>
+                      @endif
+                    @endif
+                    @endif
+                  @endif
+
                   @if($addonsdata->LeastPurchasePrices!= null)
                     @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
                       @can('addon-least-purchase-price-view')

@@ -169,6 +169,15 @@
                                 </span>
                             @enderror
                         </div>
+                        <div class="col-xxl-2 col-lg-6 col-md-12">
+                            <span class="error">* </span>
+                            <label for="addon_code" class="col-form-label text-md-end">{{ __('Choose Kit Image') }}</label>
+                        </div>
+                        <div class="col-xxl-3 col-lg-6 col-md-12">
+{{--                            <label for="choices-single-default" class="form-label font-size-13">Choose Kit Image</label>--}}
+                            <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
+                            <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
+                        </div>
                     </div>
                     </br>
                     <div class="row">
@@ -202,86 +211,86 @@
                         </div>
                     </div>
                     </br>
-                    <div class="row">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
-                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"
-                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"
-                        value="{{ old('lead_time') }}"  autocomplete="lead_time">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                    </div>
-                                                </div>
-                            @error('lead_time')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                        <div class="input-group">
+{{--                    <div class="row">--}}
+{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
+{{--                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
+{{--                        <div class="input-group">--}}
+{{--                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"--}}
+{{--                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"--}}
+{{--                        value="{{ old('lead_time') }}"  autocomplete="lead_time">--}}
+{{--                                                    <div class="input-group-append">--}}
+{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                            @error('lead_time')--}}
+{{--                                <span class="invalid-feedback" role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                            @enderror--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
+{{--                            <label for="selling_price" class="col-form-label text-md-end">{{ __('Selling Price') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
+{{--                        <div class="input-group">--}}
 
-                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror"
-                        name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
-                            @error('selling_price')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                        </div>
-                    </div>
-                    </br>
-                    <div class="row">
+{{--                        <input id="selling_price" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror"--}}
+{{--                        name="selling_price" placeholder="Enter Selling Price" value="{{ old('selling_price') }}" autocomplete="selling_price">--}}
+{{--                                                    <div class="input-group-append">--}}
+{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                            @error('selling_price')--}}
+{{--                                <span class="invalid-feedback" role="alert">--}}
+{{--                                    <strong>{{ $message }}</strong>--}}
+{{--                                </span>--}}
+{{--                            @enderror--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    </br>--}}
+{{--                    <div class="row">--}}
 
-                        <div class="col-xxl-3 col-lg-2 col-md-4">
-                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>
-                        </div>
-                        <div class="col-xxl-3 col-lg-3 col-md-6" id="">
-                                <fieldset>
-                                    <div class="some-class">
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="yes" id="yes" checked />
-                                        <label for="yes">Yes</label>
-                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="no" id="no" />
-                                        <label for="no">No</label>
-                                    </div>
-                                </fieldset>
-                                @error('fixing_charges_included')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
-                            <span class="error">* </span>
-                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                            <div class="input-group">
-                                <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"
-                                    placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">
-                                <div class="input-group-append">
-                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                </div>
-                                <span id="fixingChargeAmountError1" class="invalid-feedback"></span>
-                            </div>
-                        </div>
-                    </div>
-                    </br>
+{{--                        <div class="col-xxl-3 col-lg-2 col-md-4">--}}
+{{--                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-3 col-lg-3 col-md-6" id="">--}}
+{{--                                <fieldset>--}}
+{{--                                    <div class="some-class">--}}
+{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="yes" id="yes" checked />--}}
+{{--                                        <label for="yes">Yes</label>--}}
+{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included" value="no" id="no" />--}}
+{{--                                        <label for="no">No</label>--}}
+{{--                                    </div>--}}
+{{--                                </fieldset>--}}
+{{--                                @error('fixing_charges_included')--}}
+{{--                                    <span class="invalid-feedback" role="alert">--}}
+{{--                                        <strong>{{ $message }}</strong>--}}
+{{--                                    </span>--}}
+{{--                                @enderror--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">--}}
+{{--                            <span class="error">* </span>--}}
+{{--                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">--}}
+{{--                            <div class="input-group">--}}
+{{--                                <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount"--}}
+{{--                                    placeholder="Fixing Charge Amount" value="{{ old('fixing_charge_amount') }}" autocomplete="fixing_charge_amount">--}}
+{{--                                <div class="input-group-append">--}}
+{{--                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
+{{--                                </div>--}}
+{{--                                <span id="fixingChargeAmountError1" class="invalid-feedback"></span>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                    </br>--}}
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
-                        <div class="col-xxl-10 col-lg-6 col-md-12">
+                        <div class="col-xxl-9 col-lg-6 col-md-12">
                             <textarea rows="5" id="additional_remarks" type="text" class="form-control @error('additional_remarks') is-invalid @enderror"
                             name="additional_remarks" placeholder="Enter Additional Remarks" value="{{ old('additional_remarks') }}"  autocomplete="additional_remarks"
                             autofocus></textarea>
@@ -295,66 +304,77 @@
                     </br>
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Kit Image</label>
-                    <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
-                    <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
-                    </br>
-                    </br>
                     <center>
                     <img id="blah" src="#" alt="your image" class="contain" data-modal-id="showImageModal" onclick="showImage()"/>
                     </center>
                 </div>
                 <div class="card" id="branModaDiv">
-    <div class="card-header">
-        <h4 class="card-title">Kit Brand and Model Lines</h4>
-    </div>
-    <div id="London" class="tabcontent">
-        <div class="row">
-            <div class="card-body">
-                <div class="row" >
-                    <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
-                        <div id="London" class="tabcontent">
-                            <div class="row">
-                                <div class="card-body">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                                        <div class="row">
-                                        <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
-    <div class="col-md-12 brandModelLineDiscription p-0">
-        <div class="row brandModelLineDiscriptionApendHere" id="row-1">
-            <div class="row">
-                <div class="col-xxl-4 col-lg-6 col-md-12">
-                    <span class="error">* </span>
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                    <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
-                            data-index="1" class="brands" multiple="true" style="width: 100%;">
-                        <option id="allbrands" class="allbrands" value="allbrands">ALL BRANDS</option>
-                        @foreach($brands as $brand)
-                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                        @endforeach
-                    </select>
-                    <span id="brandError1" class="brandError invalid-feedback"></span>
-                </div>
-                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
-                    <span class="error">* </span>
-                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                    <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1" data-index="1" multiple="true"
-                            style="width: 100%;" onchange=selectModelLine(this.id,1)>
-                    </select>
-                    <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
-                </div>
-                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                    <a class="btn_round removeButtonbrandModelLineDiscription" data-index="1" >
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
-        <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
-    </div>
-    <input type="hidden" value="" id="index">
-</div>
+                    <div class="card-header">
+                        <h4 class="card-title">Kit Brand and Model Lines</h4>
+                    </div>
+                    <div id="London" class="tabcontent">
+                        <div class="row">
+                            <div class="card-body">
+                                <div class="row" >
+                                    <div class="card" style="background-color:#fafaff; border-color:#e6e6ff;">
+                                        <div id="London" class="tabcontent">
+                                            <div class="row">
+                                                <div class="card-body">
+                                                    <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                        <div class="row">
+                                                        <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
+                                                            <div class="col-md-12 brandModelLineDiscription p-0">
+                                                                <div class="row brandModelLineDiscriptionApendHere" id="row-1">
+                                                                    <div class="row">
+                                                                        <div class="col-xxl-4 col-lg-6 col-md-12">
+                                                                            <span class="error">* </span>
+                                                                            <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+                                                                            <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
+                                                                                    data-index="1" class="brands" multiple="true" style="width: 100%;" >
+                                                                                @foreach($brands as $brand)
+                                                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                                                                @endforeach
+                                                                            </select>
+                                                                            <span id="brandError1" class="brandError invalid-feedback"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-xxl-1 col-lg-1 col-md-12">
+                                                                        </div>
+                                                                        <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
+                                                                            <span class="error">* </span>
+                                                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                                                                            <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1"
+                                                                                    data-index="1" multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,1)>
+                                                                            </select>
+                                                                            <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
+                                                                        </div>
+                                                                        <div class="col-xxl-4 col-lg-6 col-md-12 model-number-div" id="showDivModelNumber1" hidden>
+                                                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                                                                            <select class="compare-tag1 model-numbers" name="brandModel[1][model_number][]" data-index="1"
+                                                                                    id="selectModelNumber1"  multiple="true" style="width: 100%;"  >
+                                                                            </select>
+                                                                            <span id="ModelNumberError1" class="ModelNumberError invalid-feedback"></span>
+
+                                                                        </div>
+                                                                        <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                                                            <a class="btn_round removeButtonbrandModelLineDiscription" hidden data-index="1"
+                                                                               id="removeButton1" >
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
+                                                                <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
+                                                            </div>
+                                                            <input type="hidden" value="" id="index">
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -362,59 +382,55 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
                 <div class="card"  id="kitSupplier" >
                     <div id="London" class="tabcontent">
                         <div class="row">
                             <div class="card-body">
                             <div id="London" class="tabcontent">
-    <div class="row">
-        <div class="card-body">
-            <div class="col-xxl-12 col-lg-12 col-md-12">
-                <div class="row">
-                    <div class="col-md-12 p-0">
-                        <div class="col-md-12 apendNewaMainItemHere p-0">
-                            <div class="row kitMainItemRowForSupplier kititemdelete" id="item-1">
-                                <div class="col-xxl-10 col-lg-6 col-md-12">
-                                    <span class="error">* </span>
-                                    <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                    <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1"
-                                            multiple="true" style="width: 100%;" data-index="1" required>
-                                            @foreach($kitItemDropdown as $kitItemDropdownData)
-                                                <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
-                                            @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
-                                    <span class="error">* </span>
-                                    <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                                    <input name="mainItem[1][quantity]" id="mainQuantity1" placeholder="Enter Quantity" type="number" value="1" min="1"
-                                            class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus
-                                            oninput="validity.valid||(value='1');" required>
-                                </div>
-                                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <a id="removeMainItem1" class="btn_round removeMainItem" data-index="1">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
+                                <div class="row">
+                                    <div class="card-body">
+                                        <div class="col-xxl-12 col-lg-12 col-md-12">
+                                            <div class="row">
+                                                <div class="col-md-12 p-0">
+                                                    <div class="col-md-12 apendNewaMainItemHere p-0">
+                                                        <div class="row kitMainItemRowForSupplier kititemdelete" id="item-1">
+                                                            <div class="col-xxl-10 col-lg-6 col-md-12">
+                                                                <span class="error">* </span>
+                                                                <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
+                                                                <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1"
+                                                                        multiple="true" style="width: 100%;" data-index="1" required>
+                                                                        @foreach($kitItemDropdown as $kitItemDropdownData)
+                                                                            <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
+                                                                        @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                                                                <span class="error">* </span>
+                                                                <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
+                                                                <input name="mainItem[1][quantity]" id="mainQuantity1" placeholder="Enter Quantity" type="number" value="1" min="1"
+                                                                        class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus
+                                                                        oninput="validity.valid||(value='1');" required>
+                                                            </div>
+                                                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                                                            <a id="removeMainItem1" class="btn_round removeMainItem" data-index="1">
+                                                                <i class="fas fa-trash-alt"></i>
+                                                            </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-xxl-12 col-lg-12 col-md-12">
+                                                    <a id="addSupplier" style="float: right;" class="btn btn-sm btn-primary addItemForSupplier1" onclick="addItem()"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </br>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xxl-12 col-lg-12 col-md-12">
-                        <a id="addSupplier" style="float: right;" class="btn btn-sm btn-primary addItemForSupplier1" onclick="addItem()"><i class="fa fa-plus" aria-hidden="true"></i> Add Item</a>
-                    </div>
-                </div>
-            </div>
-            </br>
-        </div>
-    </div>
-</div>
-<input type="hidden" id="MainKitItemIndex" value="">
+                            <input type="hidden" id="MainKitItemIndex" value="">
                             </div>
                         </div>
                     </div>
@@ -542,11 +558,7 @@
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
-            // $('#addon_id').select2();
-            $("#supplierArray1").attr("data-placeholder","Choose Supplier....     Or     Type Here To Search....");
-            $("#supplierArray1").select2({
-                // maximumSelectionLength: 1,
-            });
+
             $('#brandModelNumberId').hide();
             $('.radioFixingCharge').click(function()
             {
@@ -1300,103 +1312,6 @@
             }
             setLeastAEDPrice();
         }
-        function disableDropdown()
-        {
-            document.getElementById("addon_type").hidden=true;
-            if(currentAddonType == 'P')
-            {
-                document.getElementById("addon_type_show").value="Accessories";
-            }
-            else if(currentAddonType == 'K')
-            {
-                document.getElementById("addon_type_show").value="Kit";
-            }
-            else if(currentAddonType == 'SP')
-            {
-                document.getElementById("addon_type_show").value="Spare Parts";
-            }
-            document.getElementById("addon_type_show").hidden=false;
-        }
-        function enableDropdown()
-        {
-            var canEnableDropdown = 'yes';
-            if(canEnableDropdown == 'yes' && currentAddonType == 'SP' || canEnableDropdown == 'yes' && currentAddonType == 'P')
-            {
-                var countNotKitSuplr = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
-                for (let i = 1; i <= countNotKitSuplr; i++)
-                {
-                    if($('#suppliers'+i).val() != '' || $('#addon_purchase_price_'+i).val() != '' || $('#addon_purchase_price_in_usd_'+i).val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                }
-            }
-            else if(canEnableDropdown == 'yes' && currentAddonType == 'K')
-            {
-                var countKitSuplr = $(".supplierAddForKit").find(".addSupplierForKitRow").length;
-                for (let i = 1; i <= countKitSuplr; i++)
-                {
-                    if($('#kitSupplierDropdown'+i).val() != '' || $('#Supplier'+i+'TotalPriceAED').val() != '' || $('#Supplier'+i+'TotalPriceUSD').val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                    else
-                    {
-                        var countKitSuplrItem = '';
-                        var countKitSuplrItem = $(".apendNewItemHere"+i).find(".kitItemRowForSupplier"+i).length;
-                        for (let j = 1; j <= countKitSuplrItem; j++)
-                        {
-                            if($('#kitSupplier'+i+'Item'+j).val() != '' || $('Supplier'+i+'Kit'+j+'Quantity').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceAED').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceAED').val() != ''
-                                || $('Supplier'+i+'Kit'+j+'UnitPriceUSD').val() != '' || $('Supplier'+i+'Kit'+j+'TotalPriceUSD').val() != '' )
-                            {
-                                canEnableDropdown = 'no';
-                            }
-                        }
-                    }
-                }
-            }
-            if(canEnableDropdown == 'yes' && currentAddonType == 'P' || canEnableDropdown == 'yes' && currentAddonType == 'K')
-            {
-                var countBrandModal = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                for (let i = 1; i <= countBrandModal; i++)
-                {
-                    if($('#selectBrand'+i).val() != '' || $('#selectModelLine'+i).val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                }
-            }
-            else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
-            {
-                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-                for (let i = 1; i <= countModel; i++)
-                {
-                    if($('#selectBrandMo'+i).val() != '')
-                    {
-                        canEnableDropdown = 'no';
-                    }
-                    else
-                    {
-                        var countModelDesc = '';
-                        var countModelDesc = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
-                        for (let j = 1; j <= countModelDesc; j++)
-                        {
-                            if($('#selectModelLineNum'+i+'Des'+j).val() != '' || $('selectModelNumberDiscri'+i+'Des'+j).val() != '')
-                            {
-                                canEnableDropdown = 'no';
-                            }
-                        }
-                    }
-                }
-            }
-            if(canEnableDropdown == 'yes')
-            {
-                // document.getElementById("addon_type").hidden=false;
-                // document.getElementById("addon_type_show").value='';
-                // document.getElementById("addon_type_show").hidden=true;
-            }
-        }
         function setLeastAEDPrice()
         {
             const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
@@ -1488,6 +1403,10 @@
         $("#selectBrand1").select2({
             maximumSelectionLength: 1,
         });
+        $("#selectModelNumber1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
+        $("#selectModelNumber1").select2({
+
+        });
 
         $(document.body).on('select2:select', "#selectBrand1", function (e) {
             e.preventDefault();
@@ -1524,66 +1443,66 @@
         $(document.body).on('select2:select', ".model-lines", function (e) {
             var value = $(this).val();
             var index = $(this).attr('data-index');
-            optionDisable(index, value);
-
+            // optionDisable(index, value);
+            hideOption(index,value);
         });
-         function optionDisable(index, value){
-             var currentId = 'selectModelLine'+index;
-             if(value == 'allmodellines') {
-                 $('#' + currentId +' option').not(':selected').attr('disabled', true);
-             }else{
-                 $('#' + currentId + ' option[value=allmodellines]').prop('disabled', true)
-             }
-         }
+         // function optionDisable(index, value){
+         //     var currentId = 'selectModelLine'+index;
+         //     if(value == 'allmodellines') {
+         //         $('#' + currentId +' option').not(':selected').attr('disabled', true);
+         //     }else{
+         //         $('#' + currentId + ' option[value=allmodellines]').prop('disabled', true)
+         //     }
+         // }
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
-            var currentId = 'selectModelLine'+index;
+            // var currentId = 'selectModelLine'+index;
             var data = e.params.data.id;
-            optionEnable(currentId,data);
-
+            // optionEnable(currentId,data);
+            appendOption(index,data)
         });
-         function optionEnable(currentId,data) {
-             if(data == 'allmodellines') {
-                 $('#' + currentId + ' option').prop('disabled', false);
-             }else {
-                $values = '';
-                $values =  $('#'+currentId).val();
-                if($values == '')
-                {
-                    $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false);
-                }
-             }
-         }
+         // function optionEnable(currentId,data) {
+         //     if(data == 'allmodellines') {
+         //         $('#' + currentId + ' option').prop('disabled', false);
+         //     }else {
+         //        $values = '';
+         //        $values =  $('#'+currentId).val();
+         //        if($values == '')
+         //        {
+         //            $('#' + currentId + ' option[value=allmodellines]').prop('disabled', false);
+         //        }
+         //     }
+         // }
 
-        $(document.body).on('select2:select', ".brands", function (e) {
-
-            var index = $(this).attr('data-index');
-            var value = e.params.data.id;
-            hideOption(index,value);
-            // disableDropdown();
-
-        });
+        // $(document.body).on('select2:select', ".brands", function (e) {
+        //
+        //     var index = $(this).attr('data-index');
+        //     var value = e.params.data.id;
+        //     hideOption(index,value);
+        //     // disableDropdown();
+        //
+        // });
         function hideOption(index,value) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != index) {
-                    var currentId = 'selectBrand' + i;
+                    var currentId = 'selectModelLine' + i;
                     $('#' + currentId + ' option[value=' + value + ']').detach();
                 }
             }
         }
-        $(document.body).on('select2:unselect', ".brands", function (e) {
-            var index = $(this).attr('data-index');
-            var data = e.params.data;
-            appendOption(index,data);
-            enableDropdown();
-        });
+        // $(document.body).on('select2:unselect', ".brands", function (e) {
+        //     var index = $(this).attr('data-index');
+        //     var data = e.params.data;
+        //     appendOption(index,data);
+        //     // enableDropdown();
+        // });
         function appendOption(index,data) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
                 if(i != index) {
-                    $('#selectBrand'+i).append($('<option>', {value: data.id, text : data.text}))
+                    $('#selectModelLine'+i).append($('<option>', {value: data.id, text : data.text}))
                 }
             }
         }
@@ -1625,20 +1544,24 @@
                         $(this).find('.model-lines').attr('id','selectModelLine'+index);
                         $(this).find('.model-lines').attr('data-index',index);
                         $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
+                        $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
+                        $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
+                        $(this).find('.model-numbers').attr('data-index',index);
+                        $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
                         $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                        $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
 
                         $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
                         $(this).find('.brandError').attr('id', 'brandError'+index);
 
-                        $('#selectBrand'+index).select2
-                        ({
-                            placeholder:"Choose Brands....     Or     Type Here To Search....",
-                            allowClear: true,
-                            maximumSelectionLength: 1,
-                            minimumResultsForSearch: -1,
-                        });
+
                         $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                         $("#selectModelLine"+index).select2();
+                        $('#selectModelNumber'+index).select2
+                        ({
+                            placeholder:"Choose Model Number....     Or     Type Here To Search....",
+                            allowClear: true,
+                        });
                     })
                     enableDropdown();
                 }
@@ -1656,24 +1579,25 @@
             // $('#allbrands').prop('disabled',true);
             var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1;
             $('#index').val(index);
-            var selectedAddonBrands = [];
+            var selectedAddonModelLines = [];
             for(let i=1; i<index; i++)
             {
-                var eachSelectedBrand = $('#selectBrand'+i).val();
-                if(eachSelectedBrand) {
-                    selectedAddonBrands.push(eachSelectedBrand);
+                var eachSelectedModelLines = $('#selectModelLine'+i).val();
+                if(eachSelectedModelLines) {
+                    selectedAddonModelLines.push(eachSelectedModelLines);
                 }
             }
-
+            var brand = $('#selectBrand1').val();
             $.ajax({
-                url:"{{url('getBranchForWarranty')}}",
+                url:"{{url('getModelDescriptionDropdown')}}",
                 type: "POST",
+                url: '/addons/brandModels/'+brand,
+                type: "GET",
                 data:
                     {
-                        filteredArray: selectedAddonBrands,
-                        _token: '{{csrf_token()}}'
+                        filteredArray: selectedAddonModelLines,
                     },
-                dataType : 'json',
+                dataType: "json",
                 success: function(data) {
                     myarray = data;
                     var size = myarray.length;
@@ -1681,26 +1605,25 @@
                         $(".brandModelLineDiscription").append(`
                             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
                                 <div class="row">
-                                    <div class="col-xxl-4 col-lg-6 col-md-12">
-                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
-                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
-                                            @foreach($brands as $brand)
-                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                            @endforeach
-                                    </select>
-                                    <span id="brandError${index}" class="brandError invalid-feedback"></span>
-                                </div>
-                                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
+                                     <div class="col-xxl-1 col-lg-1 col-md-12">
+                                     </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" >
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
                                         id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index}) >
                                         </select>
                                         <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
+                                    </div>
+                                     <div class="col-xxl-4 col-lg-6 col-md-12 model-number-div" id="showDivModelNumber${index}"  >
+                                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                                        <select class="compare-tag1 model-numbers" name="brandModel[${index}][model_number][]" data-index="${index}"
+                                        id="selectModelNumber${index}"  multiple="true" style="width: 100%;"  >
+                                        </select>
+                                        <span id="ModelNumberError${index}" class="ModelNumberError invalid-feedback"></span>
 
                                     </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
+                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" id="removeButton${index}">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -1708,59 +1631,77 @@
                             </div>
                         `);
 
-                        let brandDropdownData   = [];
+                        let modelLinesData   = [];
                         $.each(data,function(key,value)
                         {
-                            brandDropdownData.push
+                            modelLinesData.push
                             ({
-
                                 id: value.id,
-                                text: value.brand_name
+                                text: value.model_line
                             });
                         });
-                        $('#selectBrand'+index).html("");
-                        $('#selectBrand'+index).select2
+
+                        $("#selectModelLine"+index).select2
                         ({
-                            placeholder:"Choose Brands....     Or     Type Here To Search....",
+                            placeholder: 'Choose Model Line....     Or     Type Here To Search....',
                             allowClear: true,
-                            data: brandDropdownData,
+                            data: modelLinesData,
                             maximumSelectionLength: 1,
+                        });
+
+                        // $.each(data,function(key,value)
+                        // {
+                        //     brandDropdownData.push
+                        //     ({
+                        //
+                        //         id: value.id,
+                        //         text: value.brand_name
+                        //     });
+                        // });
+                        // $('#selectBrand'+index).html("");
+                        // $('#selectBrand'+index).select2
+                        // ({
+                        //     placeholder:"Choose Brands....     Or     Type Here To Search....",
+                        //     allowClear: true,
+                        //   //  data: brandDropdownData,
+                        //     maximumSelectionLength: 1,
+                        // });
+
+                        $('#selectModelNumber'+index).select2
+                        ({
+                            placeholder:"Choose Model Number....     Or     Type Here To Search....",
+                            allowClear: true,
                         });
                     }
                 }
             });
-
-            $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-            $("#selectModelLine"+index).select2();
         });
     });
+
 
     function selectBrand(id,row)
     {
         var value =$('#'+id).val();
-        var currentAddonType = $('#addon_type').val();
-        var brandId = value;
-        globalThis.selectedBrands .push(brandId);
-        if(brandId != '')
+        if(value != '')
         {
-            if(brandId != 'allbrands')
-            {
-                if(currentAddonType == '')
-                {
-                        // document.getElementById("addon_type_required").classList.add("paragraph-class");
-                        // .textContent="Please select any addon type";
-                        // classList..add("paragraph-class");
-                        // alert('please select any addon type');
-                }
-                else
-                {
-                    showRelatedModal(value,row,currentAddonType);
-                }
-            }
-            else
-            {
-                hideRelatedModal(brandId,row);
-            }
+            // if(brandId != 'allbrands')
+            // {
+            //     if(currentAddonType == '')
+            //     {
+            //             // document.getElementById("addon_type_required").classList.add("paragraph-class");
+            //             // .textContent="Please select any addon type";
+            //             // classList..add("paragraph-class");
+            //             // alert('please select any addon type');
+            //     }
+            //     else
+            //     {
+                    showRelatedModal(value,row);
+                // }
+            // }
+            // else
+            // {
+            //     hideRelatedModal(brandId,row);
+            // }
             $msg = "";
             removeBrandError($msg,row);
         }
@@ -1768,7 +1709,7 @@
         {
             $msg = "Brand is Required";
             showBrandError($msg,row);
-            hideRelatedModal(brandId,row);
+            hideRelatedModal(value,row);
         }
     }
     function selectModelLine(id,row)
@@ -1786,12 +1727,15 @@
             showModelLineError($msg,row);
         }
     }
-    function showRelatedModal(value,row,currentAddonType)
+    function showRelatedModal(value,row)
     {
-        // alert("div");
         let showDivdrop = document.getElementById('showDivdrop'+row);
+        showDivdrop.hidden = false;
+        let showDivModelNumber = document.getElementById('showDivModelNumber'+row);
+        showDivModelNumber.hidden = false;
+        let removeButton = document.getElementById('removeButton'+row);
+        removeButton.hidden = false;
 
-        showDivdrop.hidden = false
         let showaddtrim = document.getElementById('showaddtrim');
         showaddtrim.hidden = false
         $.ajax
@@ -1803,11 +1747,7 @@
             {
                 $("#selectModelLine"+row).html("");
                 let BrandModelLine   = [];
-                BrandModelLine.push
-                    ({
-                        id: 'allmodellines',
-                        text: 'All Model Lines'
-                    });
+
                 $.each(data,function(key,value)
                 {
                     BrandModelLine.push
@@ -1820,7 +1760,13 @@
                 ({
                     placeholder: 'Choose Model Line....     Or     Type Here To Search....',
                     allowClear: true,
-                    data: BrandModelLine
+                    data: BrandModelLine,
+                    maximumSelectionLength: 1,
+                });
+                $('#selectModelNumber'+row).select2
+                ({
+                    placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                    allowClear: true,
                 });
             }
         });
@@ -1830,6 +1776,11 @@
 
         let showDivdrop = document.getElementById('showDivdrop'+row);
         showDivdrop.hidden = true
+        let showDivModelNumber = document.getElementById('showDivModelNumber'+row);
+        showDivModelNumber.hidden = true
+        let removeButton = document.getElementById('removeButton'+row);
+        removeButton.hidden = true
+
         let showaddtrim = document.getElementById('showaddtrim');
         showaddtrim.hidden = true
     }
