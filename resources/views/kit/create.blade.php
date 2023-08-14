@@ -322,30 +322,30 @@
                                                 <div class="card-body">
                                                     <div class="col-xxl-12 col-lg-12 col-md-12">
                                                         <div class="row">
+                                                            <div class="col-xxl-4 col-lg-6 col-md-12">
+                                                                <span class="error">* </span>
+                                                                <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+                                                                <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
+                                                                        data-index="1" class="brands" multiple="true" style="width: 100%;" >
+                                                                    @foreach($brands as $brand)
+                                                                        <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                                <span id="brandError1" class="brandError invalid-feedback"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
                                                         <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
                                                             <div class="col-md-12 brandModelLineDiscription p-0">
-                                                                <div class="row brandModelLineDiscriptionApendHere" id="row-1">
-                                                                    <div class="row">
-                                                                        <div class="col-xxl-4 col-lg-6 col-md-12">
-                                                                            <span class="error">* </span>
-                                                                            <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                                                            <select onchange=selectBrand(this.id,1) name="brandModel[1][brand_id]" id="selectBrand1"
-                                                                                    data-index="1" class="brands" multiple="true" style="width: 100%;" >
-                                                                                @foreach($brands as $brand)
-                                                                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                            <span id="brandError1" class="brandError invalid-feedback"></span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="row">
+                                                                <div class="row brandModelLineDiscriptionApendHere" >
+                                                                    <div class="row" id="row-1">
                                                                         <div class="col-xxl-1 col-lg-1 col-md-12">
                                                                         </div>
                                                                         <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
                                                                             <span class="error">* </span>
                                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                             <select class="compare-tag1 model-lines" name="brandModel[1][modelline_id][]" id="selectModelLine1"
-                                                                                    data-index="1" multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,1)>
+                                                                                    data-index="1" multiple="true" style="width: 100%;" onchange=selectModelLineDescipt(1)>
                                                                             </select>
                                                                             <span id="ModelLineError1" class="ModelLineError invalid-feedback"></span>
                                                                         </div>
@@ -1457,8 +1457,7 @@
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
-            // var currentId = 'selectModelLine'+index;
-            var data = e.params.data.id;
+            var data = e.params.data;
             // optionEnable(currentId,data);
             appendOption(index,data)
         });
@@ -1519,12 +1518,13 @@
             {
                var countRow = 0;
                 var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                alert(countRow);
                 if(countRow > 1)
                 {
                     var indexNumber = $(this).attr('data-index');
-                    if(indexNumber == 1) {
-                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
-                    }
+                    // if(indexNumber == 1) {
+                    //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
+                    // }
                     $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
                         var id = (this.value);
                         var text = (this.text);
@@ -1540,10 +1540,10 @@
                         $(this).find('.brands').attr('id', 'selectBrand'+index);
                         $(this).find('.brands').attr('data-index',index);
                         $(this).find('.model-line-div').attr('id','showDivdrop'+index);
-                        $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
+                        $(this).find('.model-lines').attr('name','brandModel['+ index +'][model_line_id]');
                         $(this).find('.model-lines').attr('id','selectModelLine'+index);
                         $(this).find('.model-lines').attr('data-index',index);
-                        $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
+                        $(this).find('.model-lines').attr('onchange','selectModelLineDescipt('+index+')');
                         $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
                         $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
                         $(this).find('.model-numbers').attr('data-index',index);
@@ -1554,7 +1554,6 @@
                         $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
                         $(this).find('.brandError').attr('id', 'brandError'+index);
 
-
                         $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                         $("#selectModelLine"+index).select2();
                         $('#selectModelNumber'+index).select2
@@ -1563,11 +1562,11 @@
                             allowClear: true,
                         });
                     })
-                    enableDropdown();
+                    // enableDropdown();
                 }
                 else
                 {
-                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
+                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Model Line and model Number is Required',function (e) {
                    }).set({title:"Can't Remove Brand And Model Lines"})
                 }
 
@@ -1609,8 +1608,8 @@
                                      </div>
                                     <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" >
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                        <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index}) >
+                                        <select class="compare-tag1 model-lines" name="brandModel[${index}][model_line_id]" data-index="${index}"
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLineDescipt(${index}) >
                                         </select>
                                         <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
                                     </div>
@@ -1712,19 +1711,61 @@
             hideRelatedModal(value,row);
         }
     }
-    function selectModelLine(id,row)
+    function selectModelLineDescipt(index)
     {
-        var value =$('#'+id).val();
-        var ModelId = value;
-        if(ModelId != '')
+        var modelLine =$('#selectModelLine'+index).val();
+        if(modelLine != '')
         {
             $msg = "";
-            removeModelLineError($msg,row);
+            removeModelLineError($msg,index);
+            showModelNumberDropdown(index);
         }
         else
         {
             $msg = "Model Line is Required";
-            showModelLineError($msg,row);
+            showModelLineError($msg,index);
+        }
+    }
+    function showModelNumberDropdown(index)
+    {
+        var e = document.getElementById("addon_type");
+        var value = e.value;
+        var selectedModelLine = $("#selectModelLine"+index).val();
+        if(selectedModelLine != ''){
+            // $('#showModelNumDel'+id).attr('hidden',false);
+            // $('#showModelNumberdrop'+id+'Des'+row).attr('hidden',false);
+            $.ajax
+            ({
+                url:"{{url('getModelDescriptionDropdown')}}",
+                type: "POST",
+                data:
+                    {
+                        model_line_id: selectedModelLine,
+                        addon_type: value,
+                        _token: '{{csrf_token()}}'
+                    },
+                dataType : 'json',
+                success:function(data)
+                {
+                    let ModelLineModelDescription   = [];
+                    $.each(data.model_description,function(key,value)
+                    {
+                        ModelLineModelDescription.push
+                        ({
+                            id: value.id,
+                            text: value.model_description
+                        });
+                    });
+                    $("#selectModelNumber"+index).html("");
+                    $("#selectModelNumber"+index).select2
+                    ({
+                        placeholder: 'Choose Model Number....     Or     Type Here To Search....',
+                        allowClear: true,
+                        data: ModelLineModelDescription
+                    });
+                }
+            });
+
         }
     }
     function showRelatedModal(value,row)
@@ -1809,7 +1850,7 @@
             var index = $(this).attr('data-index');
             var data = e.params.data;
             MainKitItemAppendOption(index,data);
-            enableDropdown();
+            // enableDropdown();
         });
     });
         function MainKitItemHideOption(index,value) {
