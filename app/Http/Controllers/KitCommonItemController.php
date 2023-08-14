@@ -40,7 +40,7 @@ class KitCommonItemController extends Controller
         $masterAddonByType = Addon::where('addon_type','K')->pluck('id');
         if($masterAddonByType != '')
         {
-            $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->orderBy('id', 'desc')->first();
+            $lastAddonCode = AddonDetails::whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
             if($lastAddonCode != '')
             {
                 $lastAddonCodeNo =  $lastAddonCode->addon_code;
@@ -383,7 +383,7 @@ class KitCommonItemController extends Controller
         // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
-
+        
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $supplierAddonDetails->LeastPurchasePrices = $price;
