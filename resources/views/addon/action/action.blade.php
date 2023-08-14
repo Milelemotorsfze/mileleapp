@@ -1,13 +1,19 @@
-@can('addon-view')
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
-@endphp
-@if ($hasPermission)
-    <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$addonsdata->id) }}">
-        <i class="fa fa-eye" aria-hidden="true"></i>
+@if($addonsdata->addon_type_name == 'K')
+    <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$addonsdata->id) }}">
+            <i class="fa fa-eye" aria-hidden="true"></i>
     </a>
+@else
+    @can('addon-view')
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
+    @endphp
+    @if ($hasPermission)
+        <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$addonsdata->id) }}">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+        </a>
+    @endif
+    @endcan
 @endif
-@endcan
 
 @if($addonsdata->addon_type_name == 'K')
 
