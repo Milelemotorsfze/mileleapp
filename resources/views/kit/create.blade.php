@@ -263,8 +263,8 @@
                                                         <div class="row">
                                                         <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
                                                             <div class="col-md-12 brandModelLineDiscription p-0">
-                                                                <div class="row brandModelLineDiscriptionApendHere" >
-                                                                    <div class="row" id="row-1">
+                                                                <div class="row brandModelLineDiscriptionApendHere" id="row-1">
+                                                                    <div class="row" >
                                                                         <div class="col-xxl-1 col-lg-1 col-md-12">
                                                                         </div>
                                                                         <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop1" hidden>
@@ -565,46 +565,45 @@
             sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            // var inputBrand = $('#selectBrand1').val();
+            var inputBrand = $('#brand').val();
             var formInputError = false;
-            // if(inputBrand == '')
-            // {
-            //     $msg = "Brand is required";
-            //     showBrandError($msg);
-            //     formInputError = true;
-            // }
+
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
                 formInputError = true;
             }
-            else
+
+            if(inputBrand == '')
             {
+                $msg = "Brand is required";
+                showBrandError($msg);
+                formInputError = true;
+            }else{
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandRow; i++)
                 {
-                    var inputBrand = '';
-                    var inputBrand = $('#brand').val();
-                    if(inputBrand == '')
+                    var inputModelLines = '';
+                    var inputModelLines = $('#selectModelLine'+i).val();
+                    if(inputModelLines == '')
                     {
-                        $msg = "Brand is required";
-                        showBrandError($msg,i);
+                        $msg = "Model Line is required";
+                        showModelLineError($msg,i);
                         formInputError = true;
                     }
-                    else if(inputBrand != 'allbrands')
+                    var inputModelNumber = '';
+                    var inputModelNumber = $('#selectModelNumber'+i).val();
+                    if(inputModelNumber == '')
                     {
-                        var inputModelLines = '';
-                        var inputModelLines = $('#selectModelLine'+i).val();
-                        if(inputModelLines == '')
-                        {
-                            $msg = "Model Line is required";
-                            showModelLineError($msg,i);
-                            formInputError = true;
-                        }
+                        $msg = "Model Number is required";
+                        showModelNumberError($msg,i);
+                        formInputError = true;
                     }
                 }
             }
+
+
             if(inputAddonName == '')
             {
                 $msg = "Addon Name is required";
@@ -1420,8 +1419,6 @@
                    }).set({title:"Can't Remove Brand And Model Lines"})
                 }
 
-
-
         })
         $("#add").on("click", function ()
         {
@@ -1498,24 +1495,6 @@
                             maximumSelectionLength: 1,
                         });
 
-                        // $.each(data,function(key,value)
-                        // {
-                        //     brandDropdownData.push
-                        //     ({
-                        //
-                        //         id: value.id,
-                        //         text: value.brand_name
-                        //     });
-                        // });
-                        // $('#selectBrand'+index).html("");
-                        // $('#selectBrand'+index).select2
-                        // ({
-                        //     placeholder:"Choose Brands....     Or     Type Here To Search....",
-                        //     allowClear: true,
-                        //   //  data: brandDropdownData,
-                        //     maximumSelectionLength: 1,
-                        // });
-
                         $('#selectModelNumber'+index).select2
                         ({
                             placeholder:"Choose Model Number....     Or     Type Here To Search....",
@@ -1539,7 +1518,6 @@
 
             }else {
                 for(var i = 1;i<=index;i++) {
-                    // $('#selectModelLineNum'+index+'Des'+i).empty();
                     showRelatedModal(value,i);
                 }
             }
