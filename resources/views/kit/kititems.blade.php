@@ -205,16 +205,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     <div class="col-lg-6 col-md-9 col-sm-12">
                         <span>{{ $supplierAddonDetails->addon_code}}</span>
                     </div>
-
+                    @if($supplierAddonDetails->additional_remarks != '')
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Additional Remarks :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
-                        @if($supplierAddonDetails->additional_remarks != '')
-                            <span>
-                                {{ $supplierAddonDetails->additional_remarks}}</span> @else 'dd' @endif
+                            <span>{{ $supplierAddonDetails->additional_remarks}}</span>
                     </div>
-                    
+                    @endif
 
                     @can('addon-selling-price-view')
                     @php
@@ -240,9 +238,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         @endif
                     @endif
                     @endcan
-                    <label for="choices-single-default" class="form-label"> Purchase Price :</label>
-
+                    <label for="choices-single-default" class="form-label"> Current Purchase Price :</label>
                     <label for="choices-single-default" class="form-label"> Previous Purchase Price :</label>
+                    <label for="choices-single-default" class="form-label"> Selling Price :</label>
 
                 </div>
             </div>
