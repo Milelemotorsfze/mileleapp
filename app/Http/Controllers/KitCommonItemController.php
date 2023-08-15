@@ -379,14 +379,30 @@ class KitCommonItemController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        // AddonSuppliersUsed
-        // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
-        'AddonSuppliers.Kit.addon.AddonName')->first();
-
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice',
+        'KitItems.item.AddonName','KitItems.item.AddonSuppliers.Suppliers',
+        // old code start
+        'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        // old code end
+        ->first();
+        $totalPrice = 0;
+        foreach($supplierAddonDetails->KitItems as $oneItem)
+        {
+            $itemMinPrice= '';
+            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
+            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
+            $oneItem->allItemSuppliers = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                    ->orderBy('purchase_price_aed','ASC')->with('Suppliers')->get();
+            $oneItem->totalItemPrice = $itemMinPrice * $oneItem->quantity;
+            $totalPrice = $totalPrice + $oneItem->totalItemPrice;
+        }
+        $supplierAddonDetails->totalPrice = $totalPrice;
+                // old code start
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $supplierAddonDetails->LeastPurchasePrices = $price;
+                //old code end
 
         // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
