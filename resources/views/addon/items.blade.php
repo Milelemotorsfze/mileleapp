@@ -40,7 +40,7 @@
                                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                             <div class="input-group">
                                             <input readonly name="kitSupplierAndPrice[1][supplier_addon_purchase_price_in_usd]" id="Supplier1TotalPriceUSD" oninput="inputNumberAbs(this)" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="" value="{{ old('addon_purchase_price_in_usd') }}"  autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
-                                                    <div class="input-group-append"> 
+                                                    <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">USD</span>
                                                     </div>
                                                 </div>
@@ -87,9 +87,9 @@
                                         <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                                            <input  name="kitSupplierAndPrice[1][item][1][quantity]" id="Supplier1Kit1Quantity" 
-                                            class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity" 
-                                            type="number" value="1" min="1"  autocomplete="addon_purchase_price_in_usd" autofocus 
+                                            <input  name="kitSupplierAndPrice[1][item][1][quantity]" id="Supplier1Kit1Quantity"
+                                            class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" placeholder="Enter Quantity"
+                                            type="number" value="1" min="1"  autocomplete="addon_purchase_price_in_usd" autofocus
                                             onkeyup="calculateOtherValuesbyQuantity(1,1)" onchange="calculateOtherValuesbyQuantity(1,1)" oninput="validity.valid||(value='1');">
                                             <!-- {{ old('addon_purchase_price_in_usd') }} -->
                                             <span id="Supplier1Kit1QuantityError" class="invalid-feedback"></span>
@@ -230,7 +230,7 @@
             $(this).closest('#row-'+indexNumber).remove();
 
 
-            
+
             $('.addSupplierForKitRow').each(function(i){
                 var index = +i + +1;
                 $(this).attr('id','row-'+ index);
@@ -250,8 +250,8 @@
 
                 // $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
 
-                $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');       
-           
+                $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');
+
                 var oldIndex = '';
                 oldIndex = index+1;
                 itemcount = $(".apendNewItemHere"+oldIndex).find(".kitItemRowForSupplier"+oldIndex).length;
@@ -266,10 +266,10 @@
                         allowClear: true,
                         minimumResultsForSearch: -1,
                     });
-                    
+
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'Quantity').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+i+'][quantity]');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'Quantity').attr('onkeyup', 'calculateOtherValuesbyQuantity('+ index +','+i+')');
-                    $(this).find('#Supplier'+oldIndex+'Kit'+i+'Quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +','+i+')'); 
+                    $(this).find('#Supplier'+oldIndex+'Kit'+i+'Quantity').attr('onchange', 'calculateOtherValuesbyQuantity('+ index +','+i+')');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'Quantity').attr('id', 'Supplier'+ index +'Kit'+i+'Quantity');
 
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'UnitPriceAED').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+i+'][unit_price_in_aed]');
@@ -279,9 +279,9 @@
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceAED').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+i+'][total_price_in_aed]');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceAED').attr('onkeyup', 'calculateOtherValuesbyTotalPriceAED('+ index +','+i+')');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceAED').attr('class', 'Supplier'+ index +'TotalPriceInAED form-control widthinput @error('addon_purchase_price')
-                        is-invalid @enderror total-price-AED');                      
+                        is-invalid @enderror total-price-AED');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceAED').attr('id', 'Supplier'+ index +'Kit'+i+'TotalPriceAED');
-                    
+
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'UnitPriceUSD').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+i+'][unit_price_in_usd]');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'UnitPriceUSD').attr('id', 'Supplier'+ index +'Kit'+i+'UnitPriceUSD');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'UnitPriceUSD').attr('onkeyup', 'calculateOtherValuesbyUnitPriceUSD('+ index +','+i+')');
@@ -291,14 +291,14 @@
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('name', 'kitSupplierAndPrice['+ index +'][item]['+i+'][total_price_in_usd]');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('onkeyup', 'calculateOtherValuesbyTotalPriceUSD('+ index +','+i+')');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('class', 'total-price-USD form-control widthinput @error('addon_purchase_price_in_usd')
-                        is-invalid @enderror');                      
+                        is-invalid @enderror');
                     $(this).find('#Supplier'+oldIndex+'Kit'+i+'TotalPriceUSD').attr('id', 'Supplier'+ index +'Kit'+i+'TotalPriceUSD');
 
                     $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('data-supplier', index);
                     $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('data-index', i);
                     $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('class', 'btn_round removeKitItemForSupplier'+index+' removeKitItem');
                     $(this).find('#removeSupplier'+oldIndex+'Item'+i).attr('id', 'removeSupplier'+index+'Item'+i);
-            
+
                 }
                 $(this).find('.apendNewItemHere'+oldIndex).attr('class','apendNewItemHere'+index);
                 $(this).find('.kitItemRowForSupplier'+oldIndex).attr('class','row kititemdelete kitItemRowForSupplier'+index);
@@ -322,7 +322,7 @@
 // $(this).find('.purchase-price-USD').attr('name','kitSupplierAndPrice['+ index +'][supplier_addon_purchase_price_in_usd]');
 // $(this).find('.purchase-price-USD').attr('id','Supplier'+ index +'TotalPriceUSD');
 // $(this).find('.removeKitSupplier').attr('data-index', index);
-// $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');       
+// $(this).find('#addSupplier').attr('onclick', 'addItemForSupplier('+ index +')');
 // $(this).find('#kitItemRow').attr('class','col-md-12 p-0 apendNewItemHere'+index);
 // $(this).find('#kitItemSubRow').attr('class','row kititemdelete kitItemRowForSupplier'+index);
 
@@ -445,9 +445,9 @@
                                 <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                 <select name="kitSupplierAndPrice[${supplier}][item][${index}][kit_item_id]" id="kitSupplier${supplier}Item${index}" multiple="true"
                                  style="width: 100%;" class="KitSupplierItems" data-index="${index}" data-supplier="${supplier}">
-                                    @foreach($kitItemDropdown as $kitItemDropdownData)
-                                <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
-                                    @endforeach
+{{--                                    @foreach($kitItemDropdown as $kitItemDropdownData)--}}
+{{--                                    <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>--}}
+{{--                                    @endforeach--}}
                                 </select>
                                 @error('supplier_id')
                                 <span class="invalid-feedback" role="alert">

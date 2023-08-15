@@ -325,9 +325,9 @@
                                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                                                 <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1"
                                                                         multiple="true" style="width: 100%;" data-index="1" required>
-                                                                        @foreach($kitItemDropdown as $kitItemDropdownData)
-                                                                            <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
-                                                                        @endforeach
+{{--                                                                        @foreach($kitItemDropdown as $kitItemDropdownData)--}}
+{{--                                                                            <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>--}}
+{{--                                                                        @endforeach--}}
                                                                 </select>
                                                             </div>
                                                             <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
@@ -1326,6 +1326,12 @@
             var index = $(this).attr('data-index');
             // optionDisable(index, value);
             hideOption(index,value);
+
+        });
+        $(document.body).on('select2:select', ".model-numbers", function (e) {
+            e.preventDefault();
+            getItemsDropdown();
+
         });
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
@@ -1337,6 +1343,55 @@
             appendOption(index,data)
         });
 
+        function getItemsDropdown() {
+            // add an alert regarding change of data
+            // add option call this function and excepet the selected spare parts if function call from new add option
+            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+            var selectedAddonModelNumbers = [];
+            for(let i=1; i<=indexValue; i++)
+            {
+                var eachSelectedModelNumbers = $('#selectModelNumber'+i).val();
+                $.each(eachSelectedModelNumbers, function( ind, value )
+                {
+                    selectedAddonModelNumbers.push(value);
+                });
+
+            }
+            $.ajax({
+                url: "{{url('getCommonKitItems')}}",
+                type: "GET",
+                data:
+                    {
+                        selectedAddonModelNumbers: selectedAddonModelNumbers,
+                        count:selectedAddonModelNumbers.length
+                    },
+                dataType: "json",
+                success: function (data) {
+                    $('.MainItemsClass').empty();
+                    let addonDropdownData   = [];
+                    $.each(data,function(key,value)
+                    {
+                        addonDropdownData.push
+                        ({
+
+                            id: value.id,
+                            text: value.addon_code +' ('+value.addon_name.name +')'
+                        });
+                    });
+                    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+                    for(let i=1; i<= countRow; i++)
+                    {
+                        $('#mainItem'+i).select2
+                        ({
+                            placeholder:"Choose Items....     Or     Type Here To Search....",
+                            allowClear: true,
+                            data: addonDropdownData,
+                            maximumSelectionLength: 1,
+                        });
+                    }
+                }
+            })
+        }
         function hideOption(index,value) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
@@ -1787,9 +1842,9 @@
                                 <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                 <select class="mainItem MainItemsClass" name="mainItem[${index}][item]" id="mainItem${index}" multiple="true"
                                  style="width: 100%;" data-index="${index}" required>
-                                    @foreach($kitItemDropdown as $kitItemDropdownData)
-                                <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>
-                                    @endforeach
+{{--                                    @foreach($kitItemDropdown as $kitItemDropdownData)--}}
+{{--                                <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>--}}
+{{--                                    @endforeach--}}
                                 </select>
                                 </div>
                                 <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
@@ -1821,7 +1876,7 @@
                     ({
                         placeholder:"Choose Items....     Or     Type Here To Search....",
                         allowClear: true,
-                        data: addonDropdownData,
+                        // data: addonDropdownData,
                         maximumSelectionLength: 1,
                     });
                 }

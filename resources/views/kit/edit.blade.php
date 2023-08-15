@@ -322,36 +322,6 @@
                                                             <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
                                                                 <div class="col-md-12 brandModelLineDiscription p-0">
                                                                     <div hidden>{{$i=0;}}</div>
-                                                                    @if($addonDetails->is_all_brands == "yes")
-                                                                        <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
-                                                                        <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
-                                                                            <div class="row">
-                                                                                <div class="col-xxl-4 col-lg-6 col-md-12">
-                                                                                    <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                                                                    <select onchange=selectBrand(this.id,{{$i}}) name="brandModel[{{$i}}][brand_id]" class="brands" data-index="{{$i}}" id="selectBrand{{$i}}"
-                                                                                        multiple="true" style="width: 100%;">
-                                                                                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                                                                                            @foreach($brands as $brand)
-                                                                                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                                                            @endforeach
-                                                                                    </select>
-                                                                                    <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
-                                                                                </div>
-                                                                                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}" hidden>
-                                                                                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                                                    <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true"
-                                                                                        style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
-                                                                                    </select>
-                                                                                    <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
-                                                                                </div>
-                                                                                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                                                                    <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
-                                                                                        <i class="fas fa-trash-alt"></i>
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    @else
                                                                     @foreach($existingBrandModel as $existingBrand)
                                                                         <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
                                                                         <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
@@ -370,6 +340,7 @@
                                                                                     <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">
                                                                                     <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
                                                                                 </div>
+
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                                                                     <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true"
@@ -392,7 +363,6 @@
                                                                             </div>
                                                                         </div>
                                                                     @endforeach
-                                                                @endif
                                                                 </div>
                                                                 <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
                                                                     <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
@@ -1755,17 +1725,9 @@
                         $(".brandModelLineDiscription").append(`
                             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
                                 <div class="row">
-                                    <div class="col-xxl-4 col-lg-6 col-md-12">
-                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrand(this.id,${index}) name="brandModel[${index}][brand_id]" class="brands"
-                                          data-index="${index}" id="selectBrand${index}" multiple="true" style="width: 100%;">
-                                            @foreach($brands as $brand)
-                                    <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                            @endforeach
-                                    </select>
-                                    <span id="brandError${index}" class="brandError invalid-feedback"></span>
-                                </div>
-                                <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
+                                    <div class="col-xxl-1 col-lg-1 col-md-12">
+                                   </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                                         <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
                                         id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>

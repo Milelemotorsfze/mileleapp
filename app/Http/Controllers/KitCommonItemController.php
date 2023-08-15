@@ -415,4 +415,52 @@ class KitCommonItemController extends Controller
         // dd($supplierAddonDetails);
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
+    public function getCommonKitItems(Request $request) {
+        info($request->all());
+//        $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
+//        $data = AddonDetails::select('id','addon_code','addon_id')
+//            ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
+//        if($request->filteredArray)
+//        {
+//            if(count($request->filteredArray) > 0)
+//            {
+//                $data = $data->whereNotIn('id', $request->filteredArray);
+//            }
+//        }
+//        //        if($request->id) {
+//        //            $id = $request->id;
+//        //            $alreadyAddedAddonIds = SupplierAddons::whereHas('AddonSuppliers', function ($query) use($id) {
+//        //                $query->where('supplier_id', $id);
+//        //            })->pluck('addon_id');
+//        //            $data = $data->whereNotIn('id', $alreadyAddedAddonIds);
+//        //        }
+//        $data = $data->get();
+//        return response()->json($data);
+        $data = [];
+
+        if($request->selectedAddonModelNumbers) {
+            if(count($request->selectedAddonModelNumbers) > 0)
+            {
+                $items = $request->selectedAddonModelNumbers;
+                $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
+                $availableModelNumbers = AddonTypes::pluck('model_number')->toArray();
+                $commonItems = array_intersect($request->selectedAddonModelNumbers, $availableModelNumbers);
+                info("commom items",$commonItems);
+                info("count of items as common");
+                info(count($commonItems));
+
+                if(count($commonItems) == $request->count) {
+                    info("eqal count");
+                    $addonDetailIds = AddonTypes::whereIn('model_number', $request->selectedAddonModelNumbers)
+                        ->groupBy('addon_details_id')->pluck('addon_details_id');
+                    $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
+                        ->whereIn('id', $addonDetailIds)
+                        ->get();
+                }
+            }
+        }
+
+
+        return response($data);
+    }
 }
