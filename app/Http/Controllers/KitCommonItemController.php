@@ -421,20 +421,31 @@ class KitCommonItemController extends Controller
         if($request->selectedAddonModelNumbers) {
             if(count($request->selectedAddonModelNumbers) > 0)
             {
-                $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
-                $availableModelNumbers = AddonTypes::pluck('model_number')->toArray();
-                $commonItems = array_intersect($request->selectedAddonModelNumbers, $availableModelNumbers);
-
-                if(count($commonItems) == $request->count) {
-                    $addonDetailIds = AddonTypes::whereIn('model_number', $request->selectedAddonModelNumbers)
-                        ->groupBy('addon_details_id')->pluck('addon_details_id');
-                    $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
-                        ->whereIn('id', $addonDetailIds)
-                        ->get();
+                $kitItemDropdown = Addon::whereIn('addon_type', ['SP'])->pluck('id');
+                // get each model description rows
+                $Items = [];
+                foreach($request->selectedAddonModelNumbers as $key => $modelNumber) {
+                    $commonItems[$key] = [];
+                    $addonDetailIds = AddonTypes::where('model_number', $modelNumber)->pluck('addon_details_id')->toArray();
+                        foreach ($addonDetailIds as $addonDetail) {
+                            array_push($commonItems[$key], $addonDetail);
+                        }
+                    $Items[] = $commonItems[$key];
                 }
+
+                $result = call_user_func_array('array_intersect', $Items);
+                $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
+                    ->whereIn('id', $result);
+
+                if($request->type == 'ADD_ITEM') {
+                    if($request->selectedItems) {
+
+                        $data = $data->whereNotIn('id', $request->selectedItems);
+                    }
+                }
+                $data = $data->get();
             }
         }
-
         return response($data);
     }
 }

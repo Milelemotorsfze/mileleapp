@@ -1330,6 +1330,7 @@
         });
         $(document.body).on('select2:select', ".model-numbers", function (e) {
             e.preventDefault();
+            var type = 'MODEL_NUMBER';
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
             for(let i=1; i<=countRow; i++)
@@ -1339,17 +1340,19 @@
                     KitItems.push(kitItem);
                 }
             }
-            console.log(KitItems);
+            // console.log(KitItems);
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
-                    getItemsDropdown();
+                    getItemsDropdown(type);
                 }
             }else{
-                getItemsDropdown();
+                getItemsDropdown(type);
             }
         });
         $(document.body).on('select2:unselect', ".model-numbers", function (e) {
             e.preventDefault();
+            var type = 'MODEL_NUMBER';
+
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
             for(let i=1; i<=countRow; i++)
@@ -1361,13 +1364,12 @@
             }
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
-                    getItemsDropdown();
+                    getItemsDropdown(type);
                 }
             }else{
-                getItemsDropdown();
+                getItemsDropdown(type);
             }
         });
-
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
@@ -1376,53 +1378,6 @@
             appendOption(index,data)
         });
 
-        function getItemsDropdown() {
-            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            var selectedAddonModelNumbers = [];
-            for(let i=1; i<=indexValue; i++)
-            {
-                var eachSelectedModelNumbers = $('#selectModelNumber'+i).val();
-                $.each(eachSelectedModelNumbers, function( ind, value )
-                {
-                    selectedAddonModelNumbers.push(value);
-                });
-
-            }
-            $.ajax({
-                url: "{{url('getCommonKitItems')}}",
-                type: "GET",
-                data:
-                    {
-                        selectedAddonModelNumbers: selectedAddonModelNumbers,
-                        count:selectedAddonModelNumbers.length
-                    },
-                dataType: "json",
-                success: function (data) {
-                    $('.MainItemsClass').empty();
-                    let addonDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        addonDropdownData.push
-                        ({
-
-                            id: value.id,
-                            text: value.addon_code +' ('+value.addon_name.name +')'
-                        });
-                    });
-                    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-                    for(let i=1; i<= countRow; i++)
-                    {
-                        $('#mainItem'+i).select2
-                        ({
-                            placeholder:"Choose Items....     Or     Type Here To Search....",
-                            allowClear: true,
-                            data: addonDropdownData,
-                            maximumSelectionLength: 1,
-                        });
-                    }
-                }
-            })
-        }
         function hideOption(index,value) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for (var i = 1; i <= indexValue; i++) {
@@ -1432,7 +1387,6 @@
                 }
             }
         }
-
         function appendOption(index,data) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
@@ -1450,62 +1404,12 @@
         // Remove Brand and Model Lines
         //===== delete the form fieed row
         $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
-            // $("body").on("click", ".", function ()
             {
-               var countRow = 0;
-                var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                if(countRow > 1)
-                {
-                    var indexNumber = $(this).attr('data-index');
-                    // if(indexNumber == 1) {
-                    //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
-                    // }
-                    $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
-                        var id = (this.value);
-                        var text = (this.text);
-                        addOption(id,text)
-                    });
-                    $(this).closest('#row-'+indexNumber).remove();
-                    // model-lines
-                    $('.brandModelLineDiscriptionApendHere').each(function(i) {
-                        var index = +i + +1;
-                        $(this).attr('id','row-'+index);
-                        $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');
-                        $(this).find('.brands').attr('data-index',index);
-                        $(this).find('.model-line-div').attr('id','showDivdrop'+index);
-                        $(this).find('.model-lines').attr('name','brandModel['+ index +'][model_line_id]');
-                        $(this).find('.model-lines').attr('id','selectModelLine'+index);
-                        $(this).find('.model-lines').attr('data-index',index);
-                        $(this).find('.model-lines').attr('onchange','selectModelLineDescipt('+index+')');
-                        $(this).find('.ModelLineError').attr('id','ModelLineError'+index);
+                var indexNumber = $(this).attr('data-index');
+                alert(indexNumber);
+                removeModelLineItems(indexNumber);
 
-                        $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
-                        $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
-                        $(this).find('.model-numbers').attr('data-index',index);
-                        $(this).find('.model-numbers').attr('onchange','showValidationErrors('+index+')');
-                        $(this).find('.ModelNumberError').attr('id','ModelNumberError'+index);
-
-                        $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
-                        $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
-                        $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
-
-                        $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-                        $("#selectModelLine"+index).select2();
-                        $('#selectModelNumber'+index).select2
-                        ({
-                            placeholder:"Choose Model Number....     Or     Type Here To Search....",
-                            allowClear: true,
-                        });
-                    })
-                    // enableDropdown();
-                }
-                else
-                {
-                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Model Line and model Number is Required',function (e) {
-                   }).set({title:"Can't Remove Brand And Model Lines"})
-                }
-
-        })
+            })
         $("#add").on("click", function ()
         {
             // $('#allbrands').prop('disabled',true);
@@ -1590,8 +1494,69 @@
                 }
             });
         });
-    });
+        function removeModelLineItems(indexNumber) {
 
+            var countRow = 0;
+            var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+            alert(indexNumber);
+            if(countRow > 1)
+            {
+                alert("inside if");
+                // var indexNumber = $(this).attr('data-index');
+                // if(indexNumber == 1) {
+                //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
+                // }
+                $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = (this.value);
+                    var text = (this.text);
+                    alert(id);
+                    alert(text);
+                    addOption(id,text)
+                });
+                $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
+                // model-lines
+                $('.brandModelLineDiscriptionApendHere').each(function(i) {
+                    console.log("inside index change");
+                    console.log(i);
+                    var index = +i + +1;
+                    $(this).attr('id','row-'+index);
+                    $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');
+                    $(this).find('.brands').attr('data-index',index);
+                    $(this).find('.model-line-div').attr('id','showDivdrop'+index);
+                    $(this).find('.model-lines').attr('name','brandModel['+ index +'][model_line_id]');
+                    $(this).find('.model-lines').attr('id','selectModelLine'+index);
+                    $(this).find('.model-lines').attr('data-index',index);
+                    $(this).find('.model-lines').attr('onchange','selectModelLineDescipt('+index+')');
+                    $(this).find('.ModelLineError').attr('id','ModelLineError'+index);
+
+                    $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
+                    $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
+                    $(this).find('.model-numbers').attr('data-index',index);
+                    $(this).find('.model-numbers').attr('onchange','showValidationErrors('+index+')');
+                    $(this).find('.ModelNumberError').attr('id','ModelNumberError'+index);
+
+                    $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
+                    $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
+                    $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
+
+                    $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+                    $("#selectModelLine"+index).select2();
+                    $('#selectModelNumber'+index).select2
+                    ({
+                        placeholder:"Choose Model Number....     Or     Type Here To Search....",
+                        allowClear: true,
+                    });
+                })
+                // enableDropdown();
+            }
+            else
+            {
+                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Model Line and model Number is Required',function (e) {
+                }).set({title:"Can't Remove Brand And Model Lines"})
+            }
+        }
+
+    });
 
     function selectBrand(id,row)
     {
@@ -1750,13 +1715,75 @@
         let showaddtrim = document.getElementById('showaddtrim');
         showaddtrim.hidden = true
     }
+
     // function hideModelNumberDropdown(id,row)
     // {
     //     let showPartNumber = document.getElementById('showModelNumberdrop'+row);
     //     showPartNumber.hidden = true
     // }
-</script>
-<script type="text/javascript">
+    function getItemsDropdown(type) {
+
+        var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+        var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+
+        var selectedAddonModelNumbers = [];
+        for(let i=1; i<=indexValue; i++)
+        {
+            var eachSelectedModelNumbers = $('#selectModelNumber'+i).val();
+            $.each(eachSelectedModelNumbers, function( ind, value )
+            {
+                selectedAddonModelNumbers.push(value);
+            });
+        }
+
+        var selectedItems = [];
+        for(let j=1; j<= countRow; j++)
+        {
+            var item = $('#mainItem'+j).val();
+            if(item != ' ') {
+                selectedItems.push(item);
+            }
+        }
+        console.log(selectedItems);
+        $.ajax({
+            url: "{{url('getCommonKitItems')}}",
+            type: "GET",
+            data:
+                {
+                    selectedAddonModelNumbers: selectedAddonModelNumbers,
+                    count:selectedAddonModelNumbers.length,
+                    type:type,
+                    selectedItems:selectedItems
+                },
+            dataType: "json",
+            success: function (data) {
+                if(type == 'MODEL_NUMBER' || type == 'REMOVE') {
+                    $('.MainItemsClass').empty();
+                }
+                let addonDropdownData   = [];
+                $.each(data,function(key,value)
+                {
+                    addonDropdownData.push
+                    ({
+
+                        id: value.id,
+                        text: value.addon_code +' ('+value.addon_name.name +')'
+                    });
+                });
+
+                for(let i=1; i<= countRow; i++)
+                {
+                    $('#mainItem'+i).select2
+                    ({
+                        placeholder:"Choose Items....     Or     Type Here To Search....",
+                        allowClear: true,
+                        data: addonDropdownData,
+                        maximumSelectionLength: 1,
+                    });
+                }
+            }
+        })
+    }
     $(document).ready(function ()
     {
         $("#mainItem1").attr("data-placeholder","Choose Items....     Or     Type Here To Search....");
@@ -1845,27 +1872,27 @@
     {
         var index = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length + 1;
         $('#MainKitItemIndex').val(index);
-        var selectedItems = [];
-        for(let i=1; i<index; i++)
-        {
-            var eachSelectedAddon = $('#mainItem'+i).val();
-            if(eachSelectedAddon) {
-                selectedItems.push(eachSelectedAddon);
-            }
-        }
-        $.ajax({
-            url:"{{url('getKitItemsForAddon')}}",
-            type: "POST",
-            data:
-                {
-                    filteredArray: selectedItems,
-                    _token: '{{csrf_token()}}'
-                },
-            dataType : 'json',
-            success: function(data) {
-                myarray = data;
-                var size = myarray.length;
-                if (size >= 1) {
+        {{--var selectedItems = [];--}}
+        {{--for(let i=1; i<index; i++)--}}
+        {{--{--}}
+        {{--    var eachSelectedAddon = $('#mainItem'+i).val();--}}
+        {{--    if(eachSelectedAddon) {--}}
+        {{--        selectedItems.push(eachSelectedAddon);--}}
+        {{--    }--}}
+        {{--}--}}
+        {{--$.ajax({--}}
+        {{--    url:"{{url('getKitItemsForAddon')}}",--}}
+        {{--    type: "POST",--}}
+        {{--    data:--}}
+        {{--        {--}}
+        {{--            filteredArray: selectedItems,--}}
+        {{--            _token: '{{csrf_token()}}'--}}
+        {{--        },--}}
+        {{--    dataType : 'json',--}}
+        {{--    success: function(data) {--}}
+        {{--        myarray = data;--}}
+        {{--        var size = myarray.length;--}}
+        {{--        if (size >= 1) {--}}
                     $(".apendNewaMainItemHere").append(`
                         <div class="row kitMainItemRowForSupplier kititemdelete" id="item-${index}">
                             <div class="col-xxl-10 col-lg-6 col-md-12">
@@ -1891,27 +1918,31 @@
                             </div>
                         </div>
                     `);
-                    let addonDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        addonDropdownData.push
-                        ({
+                    var type = 'ADD_ITEM'
+            getItemsDropdown(type);
+        //             let addonDropdownData   = [];
+        //             $.each(data,function(key,value)
+        //             {
+        //                 addonDropdownData.push
+        //                 ({
+        //
+        //                     id: value.id,
+        //                     text: value.addon_code +' ('+value.addon_name.name +')'
+        //                 });
+        //             });
+        //             $('#mainItem'+index).html("");
+        //             $('#mainItem'+index).select2
+        //             ({
+        //                 placeholder:"Choose Items....     Or     Type Here To Search....",
+        //                 allowClear: true,
+        //                 // data: addonDropdownData,
+        //                 maximumSelectionLength: 1,
+        //             });
+        //         }
+        //     }
+        // });
 
-                            id: value.id,
-                            text: value.addon_code +' ('+value.addon_name.name +')'
-                        });
-                    });
-                    $('#mainItem'+index).html("");
-                    $('#mainItem'+index).select2
-                    ({
-                        placeholder:"Choose Items....     Or     Type Here To Search....",
-                        allowClear: true,
-                        // data: addonDropdownData,
-                        maximumSelectionLength: 1,
-                    });
-                }
-            }
-        });
+
     }
 </script>
 @endsection
