@@ -423,7 +423,7 @@ class AddonController extends Controller
             {
                 // return redirect()->route('kit.suppliers', $addon_details->id)
                 //                 ->with('success','Kit created successfully');
-                return redirect()->route('addon.kitItems', $addon_details->id)
+                return redirect()->route('kit.kitItems', $addon_details->id)
                                 ->with('success','Kit created successfully');
             }
             else

@@ -178,6 +178,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
     width: 100%;
   }
 }
+.widthinput
+    {
+        height:35px!important;
+    }
+    .widthinput1
+    {
+        height:25px!important; 
+    }
 </style>
 @section('content')
     <div class="card-header">
@@ -238,9 +246,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         @endif
                     @endif
                     @endcan
-                    <label for="choices-single-default" class="form-label"> Current Purchase Price :</label>
-                    <label for="choices-single-default" class="form-label"> Previous Purchase Price :</label>
-                    <label for="choices-single-default" class="form-label"> Selling Price :</label>
 
                 </div>
             </div>
@@ -287,6 +292,127 @@ body {font-family: Arial, Helvetica, sans-serif;}
             </div>
         </div>
     </br>
+
+<!--kit common items start-->
+<center><h5 class="card-title">
+     Kit Items and Prices
+</h5></center>
+    </br>
+    <!-- <div class="card-body"> -->
+    <div class="row" style="padding-left:10px; padding-right:10px;">
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
+        Previous Purchase Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
+        <input type="text" class="form-control widthinput" placeholder="Previous Purchase Price" value="" readonly>
+        </div>
+
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
+        Current Purchase Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
+        <input type="text" class="form-control widthinput" name="addon_code"
+                            placeholder="Previous Purchase Price" value="{{$supplierAddonDetails->totalPrice}}" readonly>
+        </div>
+
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
+        Selling Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
+        <input type="text" class="form-control widthinput" name="addon_code"
+                            placeholder="Previous Purchase Price" value="">
+        </div>
+    </div>
+    <!-- </div> -->
+</br>
+<div class="card-body" style="border:solid; border-color:#e9e9ef; border-width: 1px; border-radius: .25rem;">
+<div class="row">
+<div hidden>{{$i=0;}}</div>
+    @foreach($supplierAddonDetails->KitItems as $Kit)
+    <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+                        <!-- <div class="list2" id="addonbox"> -->
+                            <!-- <div class="row related-addon">  -->
+                                <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
+                                    <div class="row">
+                                        <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+                                            Item Name
+                                        </div>
+                                        <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+                                            {{$Kit->item->AddonName->name}}
+                                        </div>
+                                        <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
+                                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->item->image) }}" class="image-click-class"
+                                            style="width:100%; height:125px;" alt="Addon Image"  />
+                                        </div>
+                                        <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
+                                            <div class="row" style="padding-right:3px; padding-left:3px;">
+                                                
+                                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
+                                                    Item Code
+                                                </div>
+                                                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                                    {{ $Kit->item->addon_code }}
+                                                </div>
+                                                @if($Kit->item->part_number != '')
+                                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
+                                                    Part Number
+                                                </div>
+                                                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                                    {{ $Kit->item->part_number}}
+                                                </div>
+                                                @endif
+                                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                                                    Quantity
+                                                </div>
+                                                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                                <input id="quantity_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
+                                                placeholder="Previous Purchase Price" value="{{$Kit->quantity}}" readonly>
+                                                    
+                                                </div>
+
+                                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                                                    Purchase Price / Unit
+                                                </div>
+                                                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                                <input id="unit_price_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
+                                                placeholder="Previous Purchase Price" value="{{$Kit->leastPriceSupplier->purchase_price_aed}}" readonly>
+                                                </div>
+
+                                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
+                                                    Total Purchase Price
+                                                </div>
+                                                <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                                <input id="total_price_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
+                                                placeholder="Previous Purchase Price" value="{{$Kit->totalItemPrice}}" readonly>
+                                                 
+                                                </div>
+
+                                                
+
+                                            </div>
+                                        </div>
+                                        <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4" style="padding-top:7px;">
+                                            Item Supplier
+                                        </div>
+                                        <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+                                        <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" autofocus>
+                                            @foreach($Kit->allItemSuppliers as $allItemSuppliers)
+                                            <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
+                                            @endforeach
+                                        </select>
+                                        </div>
+                                        </br>
+                                    </div>
+                                </div>
+                            <!-- </div> -->
+                        <!-- </div> -->
+                    @endforeach
+</div>
+</div>
+<!--kit common items end-->
+
+
+
     <center><h5 class="card-title">
     Vendors Details And Kit Items
 </h5></center>
@@ -496,7 +622,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
       })
+      function calculatePrice(current, price)
+      {
+        alert($('#rowIndexCount').val());
+      }
       </script>
+     
 @endsection
 
 
