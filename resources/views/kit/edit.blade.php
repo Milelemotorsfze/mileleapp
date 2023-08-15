@@ -200,7 +200,7 @@
                         </div>
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="addon_code" class="col-form-label text-md-end">{{ __('Choose Addon Image') }}</label>
+                            <label for="addon_code" class="col-form-label text-md-end">{{ __('Choose Kit Image') }}</label>
                         </div>
                         <div class="col-xxl-3 col-lg-6 col-md-12">
 {{--                            <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>--}}
@@ -539,6 +539,7 @@
         var sub ='2';
         var fixingCharge = 'yes';
         var countKitItems = {!! json_encode($count) !!};
+        var imageIsOkay = false;
     $(document).ready(function ()
     {
         for(let i=1; i<=countKitItems; i++)
@@ -904,6 +905,11 @@
                     showFixingChargeAmountError($msg);
                     formInputError = true;
                 }
+            }
+            if(imageIsOkay == false)
+            {
+                formInputError = true;
+                document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
             }
             if(formInputError == true)
             {
@@ -1351,35 +1357,44 @@
         }
         function readURL(input)
         {
-            var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
-            var fileExtension = input.value.split('.').pop().toLowerCase();
-            var isValidFile = false;
-            for(var index in allowedExtension)
-            {
-                if(fileExtension === allowedExtension[index])
-                {
-                    isValidFile = true;
-                    break;
-                }
-            }
-            if(!isValidFile)
+            if(input.value == '')
             {
                 $('#blah').hide();
-                document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                document.getElementById("addonImageError").textContent='Addon Image is required';
+                imageIsOkay = false;
             }
             else
             {
-                if (input.files && input.files[0])
+                var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
+                var fileExtension = input.value.split('.').pop().toLowerCase();
+                var isValidFile = false;
+                for(var index in allowedExtension)
                 {
-                    document.getElementById("addonImageError").textContent='';
-                    var reader = new FileReader();
-                    reader.onload = function (e)
+                    if(fileExtension === allowedExtension[index])
                     {
-                        $('#blah').show();
-                        $('#blah').css('visibility', 'visible');
-                        $('#blah').attr('src', e.target.result);
-                    };
-                    reader.readAsDataURL(input.files[0]);
+                        isValidFile = true;
+                        break;
+                    }
+                }
+                if(!isValidFile)
+                {
+                    $('#blah').hide();
+                    document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                }
+                else
+                {
+                    if (input.files && input.files[0])
+                    {
+                        document.getElementById("addonImageError").textContent='';
+                        var reader = new FileReader();
+                        reader.onload = function (e)
+                        {
+                            $('#blah').show();
+                            $('#blah').css('visibility', 'visible');
+                            $('#blah').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                    }
                 }
             }
         }

@@ -399,6 +399,7 @@
                     </br>
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
+                    <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Addon Image</label>
                     <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
                     <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
@@ -513,6 +514,7 @@
         var formInputError = false;
         var startYear = Number(data.model_year_start);
         var endYear = Number(data.model_year_end);
+        var imageIsOkay = false;
         $(document).ready(function ()
         {
 
@@ -1105,6 +1107,11 @@
                     formInputError = true;
                 }
             }
+            if(imageIsOkay == false)
+            {
+                formInputError = true;
+                document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
+            }
             if(formInputError == true)
             {
                 e.preventDefault();
@@ -1545,35 +1552,46 @@
         }
         function readURL(input)
         {
-            var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
-            var fileExtension = input.value.split('.').pop().toLowerCase();
-            var isValidFile = false;
-            for(var index in allowedExtension)
-            {
-                if(fileExtension === allowedExtension[index])
-                {
-                    isValidFile = true;
-                    break;
-                }
-            }
-            if(!isValidFile)
+            if(input.value == '')
             {
                 $('#blah').hide();
-                document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                document.getElementById("addonImageError").textContent='Addon Image is required';
+                imageIsOkay = false;
             }
             else
             {
-                if (input.files && input.files[0])
+                var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
+                var fileExtension = input.value.split('.').pop().toLowerCase();
+                var isValidFile = false;
+                for(var index in allowedExtension)
                 {
-                    document.getElementById("addonImageError").textContent='';
-                    var reader = new FileReader();
-                    reader.onload = function (e)
+                    if(fileExtension === allowedExtension[index])
                     {
-                        $('#blah').show();
-                        $('#blah').css('visibility', 'visible');
-                        $('#blah').attr('src', e.target.result);
-                    };
-                    reader.readAsDataURL(input.files[0]);
+                        isValidFile = true;
+                        break;
+                    }
+                }
+                if(!isValidFile)
+                {
+                    $('#blah').hide();
+                    document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                    imageIsOkay = false;
+                }
+                else
+                {
+                    if (input.files && input.files[0])
+                    {
+                        document.getElementById("addonImageError").textContent='';
+                        var reader = new FileReader();
+                        reader.onload = function (e)
+                        {
+                            $('#blah').show();
+                            $('#blah').css('visibility', 'visible');
+                            $('#blah').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                        imageIsOkay = true;
+                    }
                 }
             }
         }
