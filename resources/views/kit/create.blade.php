@@ -1330,12 +1330,45 @@
         });
         $(document.body).on('select2:select', ".model-numbers", function (e) {
             e.preventDefault();
-            getItemsDropdown();
-
+            var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+            var KitItems = [];
+            for(let i=1; i<=countRow; i++)
+            {
+                var kitItem = $('#mainItem'+i).val();
+                if(kitItem != '') {
+                    KitItems.push(kitItem);
+                }
+            }
+            console.log(KitItems);
+            if(KitItems.length > 0) {
+                if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
+                    getItemsDropdown();
+                }
+            }else{
+                getItemsDropdown();
+            }
+        });
+        $(document.body).on('select2:unselect', ".model-numbers", function (e) {
+            e.preventDefault();
+            var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+            var KitItems = [];
+            for(let i=1; i<=countRow; i++)
+            {
+                var kitItem = $('#mainItem'+i).val();
+                if(kitItem != '') {
+                    KitItems.push(kitItem);
+                }
+            }
+            if(KitItems.length > 0) {
+                if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
+                    getItemsDropdown();
+                }
+            }else{
+                getItemsDropdown();
+            }
         });
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
-
             var index = $(this).attr('data-index');
             var data = e.params.data;
             // optionEnable(currentId,data);
@@ -1344,8 +1377,6 @@
         });
 
         function getItemsDropdown() {
-            // add an alert regarding change of data
-            // add option call this function and excepet the selected spare parts if function call from new add option
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             var selectedAddonModelNumbers = [];
             for(let i=1; i<=indexValue; i++)
@@ -1423,7 +1454,6 @@
             {
                var countRow = 0;
                 var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                alert(countRow);
                 if(countRow > 1)
                 {
                     var indexNumber = $(this).attr('data-index');
