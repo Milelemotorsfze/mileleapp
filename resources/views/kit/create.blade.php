@@ -448,9 +448,9 @@
         var i=1;
         var fixingCharge = 'yes';
         var sub ='1';
+        var imageIsOkay = false;
         $(document).ready(function ()
         {
-
             $("#addon_type").change(function () {
                 var addonType = $(this).val();
                 let url = '{{ url('supplier-change-addon-type') }}';
@@ -619,6 +619,11 @@
                     showFixingChargeAmountError($msg);
                     formInputError = true;
                 }
+            }
+            if(imageIsOkay == false)
+            {
+                formInputError = true;
+                document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
             }
             if(formInputError == true)
             {
@@ -1136,35 +1141,46 @@
         }
         function readURL(input)
         {
-            var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
-            var fileExtension = input.value.split('.').pop().toLowerCase();
-            var isValidFile = false;
-            for(var index in allowedExtension)
-            {
-                if(fileExtension === allowedExtension[index])
-                {
-                    isValidFile = true;
-                    break;
-                }
-            }
-            if(!isValidFile)
+            if(input.value == '')
             {
                 $('#blah').hide();
-                document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                document.getElementById("addonImageError").textContent='Addon Image is required';
+                imageIsOkay = false;
             }
             else
             {
-                if (input.files && input.files[0])
+                var allowedExtension = ['svg','jpeg','png','jpg','gif','bmp','tiff','jpe','jfif'];
+                var fileExtension = input.value.split('.').pop().toLowerCase();
+                var isValidFile = false;
+                for(var index in allowedExtension)
                 {
-                    document.getElementById("addonImageError").textContent='';
-                    var reader = new FileReader();
-                    reader.onload = function (e)
+                    if(fileExtension === allowedExtension[index])
                     {
-                        $('#blah').show();
-                        $('#blah').css('visibility', 'visible');
-                        $('#blah').attr('src', e.target.result);
-                    };
-                    reader.readAsDataURL(input.files[0]);
+                        isValidFile = true;
+                        break;
+                    }
+                }
+                if(!isValidFile)
+                {
+                    $('#blah').hide();
+                    document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+                    imageIsOkay = false;
+                }
+                else
+                {
+                    if (input.files && input.files[0])
+                    {
+                        document.getElementById("addonImageError").textContent='';
+                        var reader = new FileReader();
+                        reader.onload = function (e)
+                        {
+                            $('#blah').show();
+                            $('#blah').css('visibility', 'visible');
+                            $('#blah').attr('src', e.target.result);
+                        };
+                        reader.readAsDataURL(input.files[0]);
+                        imageIsOkay = true;
+                    }
                 }
             }
         }

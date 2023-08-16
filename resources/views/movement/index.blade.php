@@ -1,4 +1,9 @@
 @extends('layouts.table')
+<style>
+    #dtBasicExample2 {
+        width: 100%;
+    }
+</style>
 @section('content')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('View-daily-movemnets');
@@ -88,92 +93,27 @@
       @endcan
       @can('View-daily-movemnets')
       <div class="tab-content">
-      <div class="tab-pane fade show" id="tab2"> 
-    <div class="card-body">
-    @if ($errors->has('source_name'))
-            <div id="error-message" class="alert alert-danger">
-                {{ $errors->first('source_name') }}
-            </div>
-        @endif
-        @if (session('error'))
-            <div id="error-message" class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-        @if (session('success'))
-            <div id="success-message" class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-        <div class="table-responsive" >
+    <div class="tab-pane fade show" id="tab2">
+        <div class="card-body">
+            <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
                 <thead class="bg-soft-secondary">
-                <tr>
-                    <th>Date</th>
-                    <th>VIN</th>
-                    <th>Model</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>SO</th>
-                    <th>PO</th>
-                </tr>
-                </thead>
-                         <tbody>
-                        <div hidden>{{$i=0;}}
-                        </div>
-                        @foreach ($data as $movements)
-                        <tr data-id="1">
-                        @php
-                        $movementdate = DB::table('movements_reference')->where('id', $movements->reference_id)->first();
-                        $date = $movementdate ? $movementdate->date : '';
-                        @endphp
-                        @php
-        $vehicle = DB::table('vehicles')
-                    ->where('vin', $movements->vin)
-                    ->first();
-        if ($vehicle) {
-            $variant = DB::table('varaints')
-                        ->where('id', $vehicle->varaints_id)
-                        ->first();
-            $model_detail = $variant ? $variant->model_detail : '';
-        } else {
-            $model_detail = '';
-        }
-    @endphp
-                        <td>{{ date('d-M-Y', strtotime($date)) }} {{ date('H:i:s', strtotime($movements->created_at)) }}</td>
-                        <td>{{ $movements->vin }}</td>
-                        <td>{{ $model_detail }}</td>
-                        @php
-                        $locationfrom = DB::table('warehouse')->where('id', $movements->from)->first();
-                        $from = $locationfrom ? $locationfrom->name : '';
-                        @endphp
-                        <td>{{ $from }}</td>
-                        @php
-                        $locationto = DB::table('warehouse')->where('id', $movements->to)->first();
-                        $to = $locationto ? $locationto->name : '';
-                        @endphp
-                        <td>{{ $to }}</td>
-                        @php
-                        $soid = DB::table('vehicles')->where('vin', $movements->vin)->first();
-                        $soids = $soid ? $soid->so_id : '';
-                        $sonumber = DB::table('so')->where('id', $soids)->first();
-                        $so_numbers = $sonumber ? $sonumber->so_number : '';
-                        @endphp
-                        <td>SO - {{ $so_numbers }}</td>
-                        @php
-                        $purchasingorderid = DB::table('vehicles')->where('vin', $movements->vin)->first();
-                        $purchasingorderids = $purchasingorderid ? $purchasingorderid->purchasing_order_id : '';
-                        $purchasing_orders = DB::table('purchasing_order')->where('id', $purchasingorderids)->first();
-                        $po_number = $purchasing_orders ? $purchasing_orders->po_number : '';
-                        @endphp
-                        <td>PO - {{ $po_number }}</td>
-                        </tr>
-                        @endforeach
-                        </tbody>
-            </table>
+            <tr>
+                <th>Date</th>
+                <th>VIN</th>
+                <th>Model Detail</th>
+                <th>From Name</th>
+                <th>To Name</th>
+                <th>SO Number</th>
+                <th>PO Number</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+           </div>
         </div>
-        </div>  
-      </div>
+    </div>
+</div>
       @endcan
         <script>
         setTimeout(function() {
@@ -211,33 +151,45 @@
     }
     });
     });
-    $(document).ready(function () {
-    var dataTablea = $('#dtBasicExample2').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample2 th").eq([d]).text();
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
-            });
-            }
-            });
-            });
             </script>
+<script>
+    $(document).ready(function() {
+        var table = $('#dtBasicExample2').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": "{{ route('movement.index') }}", // Change this to your actual route
+
+            // Disable sorting for all columns
+            "ordering": false,
+
+            // Define column-specific filters
+            "columns": [
+                { data: 'date', name: 'date' },
+                { data: 'vin', name: 'vin' },
+                { data: 'model_detail', name: 'model_detail' },
+                { data: 'from_name', name: 'from_name' },
+                { data: 'to_name', name: 'to_name' },
+                { data: 'so_number', name: 'so_number' },
+                { data: 'po_number', name: 'po_number' }
+            ]
+        });
+
+        // Add individual column filters
+        $('#dtBasicExample2 thead tr').clone(true).appendTo('#dtBasicExample2 thead');
+        $('#dtBasicExample2 thead tr:eq(1) th').each(function(i) {
+            var title = $(this).text();
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            $('input', this).on('keyup change', function() {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+    });
+</script>
             </div>
             @else
     @php
