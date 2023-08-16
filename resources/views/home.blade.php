@@ -22,14 +22,14 @@
                     <div class="row">
                         <div class="col-xl-12 col-md-12">
                             <!-- card -->
-                            <div class="card card-h-100">
+                            <div class="card card-h-50">
                                 <!-- card body -->
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                     <div style="text-align: center;">
         <h3>Daily Calls & Messages Leads</h3>
     </div>
-    <div style="position: relative; width: 100%; height: 6vh;">
+    <div style="position: relative; width: 100%; height: 5vh;">
     <div id="reportrange" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
         <i class="fa fa-calendar"></i>&nbsp;
         <span></span> <i class="fa fa-caret-down"></i>
@@ -40,7 +40,7 @@
     <input type="hidden" name="start_date" id="start_date">
     <input type="hidden" name="end_date" id="end_date">
 </form>
-        <canvas id="barChart"></canvas>
+        <canvas id="barChart" style="height: 300px;"></canvas>
                                         
                                     </div>
                                 </div><!-- end card body -->
@@ -510,7 +510,6 @@ function updateCharts() {
                     }
                 }
             });
-            
             // ... update other charts as needed ...
         },
         error: function(error) {
