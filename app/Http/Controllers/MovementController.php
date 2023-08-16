@@ -15,23 +15,83 @@ use App\Models\Gdn;
 use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
+use Yajra\DataTables\Html\Builder;
+use Yajra\DataTables\Facades\DataTables; 
 
 class MovementController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $data = Movement::get();
-        $movementreference = MovementsReference::get();
-        $vehicles = Vehicles::whereNotNull('vin')
+    public function index(Request $request, Builder $builder)
+{
+    $movementreference = MovementsReference::get();
+    $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
-        ->pluck('vin', 'varaints_id');    
-        $warehouses = Warehouse::select('id', 'name')->get();
-        return view('movement.index', compact('data', 'vehicles', 'warehouses', 'movementreference'));
+        ->pluck('vin', 'varaints_id');
+    $warehouses = Warehouse::select('id', 'name')->get();
+ 
+    if ($request->ajax()) {
+        $movementsQuery = Movement::query();
+        foreach ($request->input('columns') as $column) {
+            $searchValue = $column['search']['value'];
+            $columnName = $column['name'];
+    
+            if ($columnName === 'date' && $searchValue !== null) {
+                info("its date");
+                $movementsQuery->orWhereHas('Movementrefernce', function ($query) use ($searchValue) {
+                    $query->where('date', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'model_detail' && $searchValue !== null) {
+                info("model_detail");
+                $movementsQuery->orWhereHas('vehicle.variant', function ($query) use ($searchValue) {
+                    $query->where('model_detail', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'from_name' && $searchValue !== null) {
+                info('from_name');
+                $movementsQuery->orWhereHas('fromWarehouse', function ($query) use ($searchValue) {
+                    $query->where('name', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'to_name' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('toWarehouse', function ($query) use ($searchValue) {
+                    $query->where('name', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'so_number' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('vehicle.so', function ($query) use ($searchValue) {
+                    $query->where('so_number', 'like', '%' . $searchValue . '%');
+                });
+            } elseif ($columnName === 'po_number' && $searchValue !== null) {
+                $movementsQuery->orWhereHas('vehicle.purchasingOrder', function ($query) use ($searchValue) {
+                    $query->where('po_number', 'like', '%' . $searchValue . '%');
+                });
+            }
+        }
+        return DataTables::of($movementsQuery)
+            ->addColumn('date', function ($movement) {
+                return date('d-M-Y', strtotime($movement->Movementrefernce->date));
+            })
+            ->addColumn('model_detail', function ($movement) {
+                return $movement->vehicle->variant->model_detail ?? '';
+            })
+            ->addColumn('from_name', function ($movement) {
+                return optional($movement->fromWarehouse)->name;
+            })
+            ->addColumn('to_name', function ($movement) {
+                return optional($movement->toWarehouse)->name;
+            })
+            ->addColumn('so_number', function ($movement) {
+                return $movement->vehicle->so->so_number ?? '';
+            })
+            ->addColumn('po_number', function ($movement) {
+                return $movement->vehicle->purchasingOrder->po_number ?? '';
+            })
+            ->toJson();
     }
+
+    return view('movement.index', compact('vehicles', 'warehouses', 'movementreference'));
+}
     /**
      * Show the form for creating a new resource.
      */

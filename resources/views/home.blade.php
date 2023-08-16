@@ -121,8 +121,9 @@
                                             Today      :  <span class="counter-value" data-target="{{ $totalleadscounttoday }}">0</span>
                                             </h4>
                                         </div>
-
-                                        <div class="col-6">
+                                        </div>
+                                        <div class="row align-items-center">
+                                        <div class="col-12">
                                         <canvas id="totalleads"></canvas>
                                         </div>
 </div>
