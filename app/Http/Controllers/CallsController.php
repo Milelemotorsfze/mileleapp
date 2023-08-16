@@ -20,6 +20,7 @@ use App\Models\Varaint;
 use App\Models\AvailableColour;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
+use League\Csv\Writer;
 
 class CallsController extends Controller
 {
@@ -28,7 +29,7 @@ class CallsController extends Controller
      */
     public function index()
     {
-        $data = Calls::where('STATUS', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get();    
+        $data = Calls::where('STATUS', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->orderBy('created_at', 'desc')->get();    
         $convertedleads = Calls::where('status', 'Converted To Leads')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         $convertedso = Calls::where('status','Converted To SO')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         $convertedrejection = Calls::where('status','Rejection')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
@@ -65,7 +66,7 @@ class CallsController extends Controller
         $email = $request->input('email');
         $phone = $request->input('phone');
         $language = $request->input('language');
-        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         $sales_person_id = null;
         $existing_email_count = null;
         $existing_phone_count = null;
@@ -327,16 +328,16 @@ return view('calls.resultbrand', compact('data'));
             $name = $row[0];
             $phone = $row[1];
             $email = $row[2];
-            $sales_person = $row[3];
-            $source_name = $row[4];
-            $language = $row[5];
-            $location = $row[6];
+            $sales_person = $row[4];
+            $source_name = $row[5];
+            $language = $row[6];
+            $location = $row[3];
 			$brand =  $row[7];
 			$model_line_name = $row[8];
             $custom_brand_model = $row[9];
             $remarks = $row[10];
             if ($sales_person === null) {
-			                $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;
                             $existing_email_count = null;
                             $existing_phone_count = null;
@@ -351,13 +352,14 @@ return view('calls.resultbrand', compact('data'));
                                                                         ->where('sales_person', $sales_person->model_id)
                                                                         ->whereNotNull('phone')
                                                                         ->count();
-                                                                        if($existing_email_count != 0 || $existing_phone_count != 0) {
+                                                                        if($existing_email_count !== 0 || $existing_phone_count !== 0) {
                                                                         $sales_person_id = $sales_person->model_id;
                                                                         break;
                                                                          } else {
                                                                                  $new_calls_count = Calls::where('status', 'New')
                                                                                  ->where('sales_person', $sales_person->model_id)
                                                                                  ->count();
+
                                                                                  if ($new_calls_count < 5) {
                                                                                  $sales_person_id = $sales_person->model_id;
                                                                                  break;
@@ -396,7 +398,7 @@ return view('calls.resultbrand', compact('data'));
             } 
 			else {
                 $lead_source_id = 1;
-            }
+            } 
             $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
@@ -406,12 +408,12 @@ return view('calls.resultbrand', compact('data'));
                 $call->custom_brand_model = $row[9];
                 $call->remarks = $row[10];
                 $call->source = $lead_source_id;
-                $call->language = $row[5];
+                $call->language = $row[6];
                 $call->sales_person = $sales_person_id;
                 $call->created_at = $formattedDate;
                 $call->created_by = Auth::id();
                 $call->status = "New";
-                $call->location = $row[6];
+                $call->location = $row[3];
                 $call->save();
                 if ($model_line_name !== null) {
                     $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();

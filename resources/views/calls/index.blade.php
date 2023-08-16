@@ -1,5 +1,6 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 @section('content')
 @php
   $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -14,7 +15,7 @@
   @endphp
   @if ($hasPermission)
     <a class="btn btn-sm btn-success float-end" href="{{ route('calls.createbulk') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Uploading Bulk CSV File
+        <i class="fa fa-plus" aria-hidden="true"></i> Upload Excel File
       </a>
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <a class="btn btn-sm btn-success float-end" href="{{ route('calls.create') }}" text-align: right>
@@ -42,7 +43,12 @@
   </div>
   <div class="tab-content">
       <div class="tab-pane fade show active" id="tab1"> 
-      <button class="btn btn-success left" id="export-csv">Export CSV</button>
+      <br>
+      <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
@@ -88,17 +94,17 @@
         ->where('calls_requirement.lead_id', $calls->id)
         ->get();
 @endphp
-
-<td>
-    @php
+@php
         $models_brands_string = '';
         foreach ($leads_models_brands as $lead_model_brand) {
             $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
         }
         // Remove the trailing comma and space from the string
         $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
+        
     @endphp
+<td>
+    {{ $models_brands_string }}
 </td>
                     <td>{{ $calls->custom_brand_model }}</td>
                     @php
@@ -137,7 +143,12 @@
     @endcan
     @can('Calls-view')
       <div class="tab-pane fade show" id="tab2">
-      <button class="btn btn-success left" id="export-csv-lead">Export CSV</button>
+      <br>
+      <div class="row">
+      <div class="col-lg-1">
+      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+      </div>
+      </div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
@@ -219,7 +230,12 @@
       @endcan
       @can('Calls-view')
       <div class="tab-pane fade show" id="tab3">
-      <button class="btn btn-success left" id="export-rejection">Export CSV</button>
+      <br>
+      <div class="row">
+      <div class="col-lg-1">
+      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+      </div>
+      </div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered">
@@ -303,7 +319,12 @@
       @endcan
       @can('Calls-view')
       <div class="tab-pane fade show" id="tab4">
-      <button class="btn btn-success left" id="export-csv-so">Export CSV</button>
+      <br>
+      <div class="row">
+      <div class="col-lg-1">
+      <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+      </div>
+      </div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered">
@@ -432,9 +453,40 @@ $(document).ready(function () {
     }
   });
 $('#my-table_filter').hide();
-  $('#export-csv').on('click', function() {
-    downloadCSVa(dataTablea, 'Call.csv');
-  });
+$('#export-excel').on('click', function() {
+    var filteredData = dataTablea.rows({ search: 'applied' }).data();
+    var data = [];
+    filteredData.each(function(rowData) {
+        var row = [];
+        for (var i = 0; i < rowData.length; i++) {
+            if (i !== 13 && i !== 14) {
+                row.push(rowData[i]);
+            }
+        }
+        data.push(row);
+    });
+    var excelData = [
+        ['S.No', 'Date', 'Purchase Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Sales Person', 'Brands & Models', 'Custom Model & Brand', 'Source', 'Preferred Language', 'Destination', 'Remarks & Messages']
+    ];
+    excelData = excelData.concat(data);
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Call.xlsx';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+function s2ab(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+    return view;
+}
   var dataTableb = $('#dtBasicExample2').DataTable({
     ordering: false,
     initComplete: function() {
@@ -583,29 +635,29 @@ $('#my-table_filter').hide();
     downloadCSVd(dataTabled, 'Lead-to-So.csv');
   });
 });
-function downloadCSVa(dataTablea, fileName) {
-  var csv = '';
-  var rows = dataTablea.rows({ 'search': 'applied' }).data();
-  var header = dataTablea.columns().header();
-  var headerArray = [];
-  $(header).each(function() {
-    headerArray.push($(this).text());
-  });
-  csv += headerArray.join(',') + '\r\n';
-  $(rows).each(function(index, row) {
-    var rowData = [];
-    $(row).each(function() {
-      rowData.push(this);
-    });
-    csv += rowData.join(',') + '\r\n';
-  });
-  var link = document.createElement('a');
-  link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
-  link.setAttribute('download', fileName);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
+// function downloadCSVa(dataTablea, fileName) {
+//   var csv = '';
+//   var rows = dataTablea.rows().data();
+//   var header = dataTablea.columns().header();
+//   var headerArray = [];
+//   $(header).each(function() {
+//     headerArray.push($(this).text());
+//   });
+//   csv += headerArray.join(',') + '\r\n';
+//   $(rows).each(function(index, row) {
+//     var rowData = [];
+//     $(row).each(function() {
+//       rowData.push(this);
+//     });
+//     csv += rowData.join(',') + '\r\n';
+//   });
+//   var link = document.createElement('a');
+//   link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+//   link.setAttribute('download', fileName);
+//   document.body.appendChild(link);
+//   link.click();
+//   document.body.removeChild(link);
+// }
 function downloadCSVb(dataTableb, fileName) {
   var csv = '';
   var rows = dataTableb.rows({ 'search': 'applied' }).data();
@@ -676,9 +728,9 @@ function downloadCSVd(dataTabled, fileName) {
   document.body.removeChild(link);
 }
 $(document).ready(function() {
-  $('.delete-link').click(function(e) {
+  $('#dtBasicExample1').on('click', '.delete-link', function(e) {
     e.preventDefault();
-
+    console.log("123");
     var url = $(this).data('url');
 
     if (confirm('Are you sure you want to delete this item?')) {
@@ -700,8 +752,7 @@ $(document).ready(function() {
         }
       });
     } else {
-      // If "No" is clicked, redirect back to the previous page
-      location.reload();
+      // If "No" is clicked, do nothing
     }
   });
 });
