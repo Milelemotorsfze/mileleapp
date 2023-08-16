@@ -207,72 +207,9 @@
                             <input id="image" type="file" class="form-control widthinput" name="image" autocomplete="image" onchange="readURL(this);" />
                             <span id="addonImageError" class="email-phone required-class paragraph-class"></span>
                         </div>
-{{--                        <div class="col-xxl-2 col-lg-6 col-md-12">--}}
-{{--                            <label for="lead_time" class="col-form-label text-md-end">{{ __('Lead Time') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-4 col-lg-6 col-md-12">--}}
-{{--                        <div class="input-group">--}}
-
-
-{{--                        <input id="lead_time" type="number" aria-label="measurement" aria-describedby="basic-addon2" onkeypress="return event.charCode >= 48" min="1"--}}
-{{--                        class="form-control widthinput @error('lead_time') is-invalid @enderror" name="lead_time" placeholder="Enter Lead Time"--}}
-{{--                        value="{{ $addonDetails->lead_time }}"  autocomplete="lead_time">--}}
-{{--                                                    <div class="input-group-append">--}}
-{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">Days</span>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                            @error('lead_time')--}}
-{{--                                <span class="invalid-feedback" role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                            @enderror--}}
-{{--                        </div>--}}
                     </div>
                     </br>
 
-{{--                    <div class="row">--}}
-
-{{--                        <div class="col-xxl-3 col-lg-2 col-md-4">--}}
-{{--                            <label for="fixing_charges_included" class="col-form-label text-md-end">{{ __('Fixing Charges Included') }}</label>--}}
-{{--                        </div>--}}
-{{--                            <div class="col-xxl-3 col-lg-3 col-md-6" id="">--}}
-{{--                                <fieldset>--}}
-{{--                                    <div class="some-class">--}}
-{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"--}}
-{{--                                        value="yes" id="yes" {{"yes" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />--}}
-{{--                                        <label for="yes">Yes</label>--}}
-{{--                                        <input type="radio" class="radioFixingCharge" name="fixing_charges_included"--}}
-{{--                                        value="no" id="no" {{"no" == $addonDetails->fixing_charges_included  ? 'checked' : ''}} />--}}
-{{--                                        <label for="no">No</label>--}}
-{{--                                    </div>--}}
-{{--                                </fieldset>--}}
-{{--                                @error('fixing_charges_included')--}}
-{{--                                    <span class="invalid-feedback" role="alert">--}}
-{{--                                        <strong>{{ $message }}</strong>--}}
-{{--                                    </span>--}}
-{{--                                @enderror--}}
-{{--                            </div>--}}
-{{--                            <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">--}}
-{{--                            <span class="error">* </span>--}}
-{{--                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">--}}
-{{--                        <div class="input-group">--}}
-{{--                        <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"--}}
-{{--                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >--}}
-{{--                                                    <div class="input-group-append">--}}
-{{--                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
-{{--                            @error('fixing_charge_amount')--}}
-{{--                                <span class="invalid-feedback" role="alert">--}}
-{{--                                    <strong>{{ $message }}</strong>--}}
-{{--                                </span>--}}
-{{--                            @enderror--}}
-{{--                            <span id="fixingChargeAmountError" class="invalid-feedback"></span>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    </br>--}}
 
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -322,38 +259,55 @@
                                                             <div class="col-md-12 p-0 brandModelLineClass" id="brandModelLineId">
                                                                 <div class="col-md-12 brandModelLineDiscription p-0">
                                                                     <div hidden>{{$i=0;}}</div>
-                                                                    @foreach($existingBrandModel as $existingBrand)
+                                                                    <div class="row">
+                                                                        <div class="col-xxl-4 col-lg-6 col-md-12">
+                                                                            <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
+{{--                                                                            {{$addonDetails->latestAddonType->brand_id}}--}}
+                                                                            <select onchange=selectBrand(this.id,1) name="brand" class="brands" id="selectBrand"
+                                                                                    multiple="true" style="width: 100%;" disabled>
+                                                                                {{--                                                                                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
+{{--                                                                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}"--}}
+{{--                                                                                        selected locked="locked">{{$existingBrand->brands->brand_name}}</option>--}}
+                                                                                @foreach($brands as $brand)
+                                                                                    <option value="{{$brand->id}}" {{ $brand->id == $addonDetails->latestAddonType->brand_id ? 'selected' : '' }}>{{$brand->brand_name}}</option>
+                                                                                @endforeach
+                                                                            </select>
+{{--                                                                            <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">--}}
+                                                                            <span id="brandError" class="brandError invalid-feedback"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                    @foreach($existingAddonTypes as $existingAddonType)
+
                                                                         <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
                                                                         <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-{{$i}}">
                                                                             <div class="row">
-                                                                                <div class="col-xxl-4 col-lg-6 col-md-12">
-                                                                                    <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-
-                                                                                    <select onchange=selectBrand(this.id,{{$i}})  class="brands" data-index="{{$i}}" id="selectBrand{{$i}}"
-                                                                                        multiple="true" style="width: 100%;" disabled>
-                                                                                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>
-                                                                                            <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}" selected locked="locked">{{$existingBrand->brands->brand_name}}</option>
-                                                                                            @foreach($brands as $brand)
-                                                                                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                                                                            @endforeach
-                                                                                    </select>
-                                                                                    <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">
-                                                                                    <span id="brandError{{$i}}" class="brandError invalid-feedback"></span>
+                                                                                <div class="col-md-1 col-xxl-1 col-sm-12">
                                                                                 </div>
-
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                                                    <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][modelline_id][]" data-index="{{$i}}" id="selectModelLine{{$i}}"  multiple="true"
+                                                                                    <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][model_line_id][]" data-index="{{$i}}"
+                                                                                            id="selectModelLine{{$i}}"  multiple="true"
                                                                                         style="width: 100%;" onchange=selectModelLine(this.id,{{$i}})>
-                                                                                        <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>All Model Lines</option>
-                                                                                        @foreach($existingBrand->ModalLines as $modelLine)
-                                                                                        <option value="{{ $modelLine->id }}" @if(in_array(" $modelLine->id ", $existingBrand->modelLinesData)) selected @endif
-                                                                                            @if($existingBrand->is_all_model_lines == "yes") disabled @endif
-                                                                                        >{{ $modelLine->model_line }}</option>
+
+{{--                                                                                        <option value="allmodellines" {{"yes" == $existingBrand->is_all_model_lines  ? 'selected' : 'disabled'}}>All Model Lines</option>--}}
+                                                                                        @foreach($modelLines as $modelLine)
+                                                                                        <option value="{{ $modelLine->id }}" {{ $modelLine->id == $existingAddonType->model_id ? 'selected' : '' }}>{{ $modelLine->model_line }}</option>
                                                                                         @endforeach
                                                                                     </select>
                                                                                     <span id="ModelLineError{{$i}}" class="ModelLineError invalid-feedback"></span>
+                                                                                </div>
 
+                                                                                <div class="col-xxl-4 col-lg-6 col-md-12 model-number-div" id="showDivModelNumber{{$i}}" >
+                                                                                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                                                                                    <select class="compare-tag1 model-numbers" name="brandModel[{{$i}}][model_number][]" data-index="{{$i}}"
+                                                                                            id="selectModelNumber{{$i}}"  multiple="true" style="width: 100%;" onchange="showValidationErrors({{$i}})" >
+                                                                                        @foreach($existingAddonType->model_numbers as $modelNumber)
+                                                                                            <option value="{{ $modelNumber->id }}"
+                                                                                                    @if(in_array( $modelNumber->id, $existingAddonType->kit_model_numbers)) selected @endif
+                                                                                             >{{ $modelNumber->model_description }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                    <span id="ModelNumberError{{$i}}" class="ModelNumberError invalid-feedback"></span>
                                                                                 </div>
                                                                                 <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                                                     <a class="btn_round removeButtonbrandModelLineDiscription" data-index="{{$i}}" >
@@ -362,6 +316,7 @@
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+
                                                                     @endforeach
                                                                 </div>
                                                                 <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
@@ -872,28 +827,28 @@
             // else
             // {
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                for (let i = 1; i <= countBrandRow; i++)
-                {
-                    var inputBrand = '';
-                    var inputBrand = $('#selectBrand'+i).val();
-                    if(inputBrand == '')
-                    {
-                        $msg = "Brand is required";
-                        showBrandError($msg,i);
-                        formInputError = true;
-                    }
-                    else if(inputBrand != 'allbrands')
-                    {
-                        var inputModelLines = '';
-                        var inputModelLines = $('#selectModelLine'+i).val();
-                        if(inputModelLines == '')
-                        {
-                            $msg = "Model Line is required";
-                            showModelLineError($msg,i);
-                            formInputError = true;
-                        }
-                    }
-                }
+                // for (let i = 1; i <= countBrandRow; i++)
+                // {
+                //     var inputBrand = '';
+                //     var inputBrand = $('#selectBrand'+i).val();
+                //     if(inputBrand == '')
+                //     {
+                //         $msg = "Brand is required";
+                //         showBrandError($msg,i);
+                //         formInputError = true;
+                //     }
+                //     else if(inputBrand != 'allbrands')
+                //     {
+                //         var inputModelLines = '';
+                //         var inputModelLines = $('#selectModelLine'+i).val();
+                //         if(inputModelLines == '')
+                //         {
+                //             $msg = "Model Line is required";
+                //             showModelLineError($msg,i);
+                //             formInputError = true;
+                //         }
+                //     }
+                // }
             // }
             if(inputAddonName == '')
             {
@@ -940,17 +895,17 @@
                 }
             }
         }
-        function showBrandError($msg,i)
+        function showBrandError($msg)
         {
-            document.getElementById("brandError"+i).textContent=$msg;
-            document.getElementById("selectBrand"+i).classList.add("is-invalid");
-            document.getElementById("brandError"+i).classList.add("paragraph-class");
+            document.getElementById("brandError").textContent=$msg;
+            document.getElementById("selectBrand").classList.add("is-invalid");
+            document.getElementById("brandError").classList.add("paragraph-class");
         }
-        function removeBrandError($msg,i)
+        function removeBrandError($msg)
         {
-            document.getElementById("brandError"+i).textContent="";
-            document.getElementById("selectBrand"+i).classList.remove("is-invalid");
-            document.getElementById("brandError"+i).classList.remove("paragraph-class");
+            document.getElementById("brandError").textContent="";
+            document.getElementById("selectBrand").classList.remove("is-invalid");
+            document.getElementById("brandError").classList.remove("paragraph-class");
         }
         function showModelLineError($msg,i)
         {
@@ -1195,8 +1150,8 @@
             if(currentAddonType != '')
             {
                 $("#selectBrandMo1").removeAttr('disabled');
-                $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#selectBrand1").select2({
+                $("#selectBrand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectBrand").select2({
                     maximumSelectionLength: 1,
                 });
 
@@ -1533,63 +1488,39 @@
 
 </script>
 <script type="text/javascript">
-    var existingBrandModel = {!! json_encode($existingBrandModel) !!};
-    var lengthExistingBrands = '';
+    var existingAddonTypeCount = {{ $existingAddonTypes->count() }};
+    var lengthExistingModels = '';
     $(document).ready(function ()
     {
-        lengthExistingBrands = existingBrandModel.length;
-        if(lengthExistingBrands == 0)
-        {
-                $("#selectBrand1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#selectBrand1").select2({
+
+        // if(existingAddonTypeCount == 0)
+        // {
+                $("#selectBrand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+                $("#selectBrand").select2({
                     maximumSelectionLength: 1,
                 });
-                $("#selectModelLine1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#selectModelLine1").select2();
-        }
-        else
-        {
+                // $("#selectModelLine1").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+                // $("#selectModelLine1").select2();
+                // $("#selectModelNumber1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
+                // $("#selectModelNumber1").select2();
+        // }
+        // else
+        // {
             let showaddtrim = document.getElementById('showaddtrim');
             showaddtrim.hidden = false
-            for(let i=1; i<=lengthExistingBrands; i++)
+            for(let i=1; i<=existingAddonTypeCount; i++)
             {
-                $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#selectBrand"+i).select2({
-                    maximumSelectionLength: 1,
-                });
-                $("#selectModelLine"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            //     $("#selectBrand"+i).attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+            //     $("#selectBrand"+i).select2({
+            //         maximumSelectionLength: 1,
+            //     });
+                $("#selectModelLine"+i).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                 $("#selectModelLine"+i).select2();
+
+                $("#selectModelNumber"+i).attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
+                $("#selectModelNumber"+i).select2();
             }
-        }
-        $(document.body).on('select2:select', "#selectBrand1", function (e) {
-            e.preventDefault();
-            var value = $(this).val();
-            if(value == "allbrands") {
-                var count = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                // check each item have data or not?
-                if(count > 1) {
-                    var isSubRowEmpty = [];
-                    for(let i=2; i<=count; i++)
-                    {
-                        var eachBrand = $('#selectBrand'+i).val();
-                        if(eachBrand != '') {
-                            // if any data then show alert.
-                            var confirm = alertify.confirm('You are not able to edit this field while any Items in Brand and Model Line.' +
-                                'Please remove those items to edit this field.',function (e) {
-                            }).set({title:"Remove Brands and ModelLines"})
-                            $("#selectBrand1 option:selected").prop("selected", false);
-                            $("#selectBrand1").trigger('change');
-                        }else{
-                            isSubRowEmpty.push(1);
-                        }
-                    }
-                    var subRowCount = count - 1;
-                    if(isSubRowEmpty.length == subRowCount ) {
-                        $(".brandModelLineDiscription").find(".dynamic-rows").remove();
-                    }
-                }
-            }
-        })
+        // }
 
         var index = 1;
 
@@ -1628,41 +1559,41 @@
              }
          }
 
-        $(document.body).on('select2:select', ".brands", function (e) {
-
-            var index = $(this).attr('data-index');
-            var value = e.params.data.id;
-            hideOption(index,value);
-            // disableDropdown();
-
-        });
-        function hideOption(index,value) {
-            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            for (var i = 1; i <= indexValue; i++) {
-                if (i != index) {
-                    var currentId = 'selectBrand' + i;
-                    $('#' + currentId + ' option[value=' + value + ']').detach();
-                }
-            }
-        }
-        $(document.body).on('select2:unselect', ".brands", function (e) {
-            var index = $(this).attr('data-index');
-            var data = e.params.data;
-            appendOption(index,data);
-            // enableDropdown();
-        });
-        function appendOption(index,data) {
-            var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            for(var i=1;i<=indexValue;i++) {
-                if(i != index) {
-                    $('#selectBrand'+i).append($('<option>', {value: data.id, text : data.text}))
-                }
-            }
-        }
+        // $(document.body).on('select2:select', ".brands", function (e) {
+        //
+        //     var index = $(this).attr('data-index');
+        //     var value = e.params.data.id;
+        //   //  hideOption(index,value);
+        //     // disableDropdown();
+        //
+        // });
+        // function hideOption(index,value) {
+        //     var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+        //     for (var i = 1; i <= indexValue; i++) {
+        //         if (i != index) {
+        //             var currentId = 'selectBrand' + i;
+        //             $('#' + currentId + ' option[value=' + value + ']').detach();
+        //         }
+        //     }
+        // // }
+        // $(document.body).on('select2:unselect', ".brands", function (e) {
+        //     var index = $(this).attr('data-index');
+        //     var data = e.params.data;
+        //     appendOption(index,data);
+        //     // enableDropdown();
+        // });
+        // function appendOption(index,data) {
+        //     var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+        //     for(var i=1;i<=indexValue;i++) {
+        //         if(i != index) {
+        //             $('#selectBrand'+i).append($('<option>', {value: data.id, text : data.text}))
+        //         }
+        //     }
+        // }
         function addOption(id,text) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
             for(var i=1;i<=indexValue;i++) {
-                $('#selectBrand'+i).append($('<option>', {value: id, text :text}))
+                $('#selectModelLine'+i).append($('<option>', {value: id, text :text}))
             }
         }
         //===== delete the form fieed row
@@ -1673,9 +1604,9 @@
             if(countRow > 1)
             {
                 var indexNumber = $(this).attr('data-index');
-                if(indexNumber == 1) {
-                        $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
-                    }
+                // if(indexNumber == 1) {
+                //         $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
+                //     }
                 $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
                     var id = (this.value);
                     var text = (this.text);
@@ -1686,8 +1617,8 @@
                     var index = +i + +1;
                     $(this).attr('id','row-'+index);
                     $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+ index +')');
-                    $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
-                    $(this).find('.brands').attr('id', 'selectBrand'+index);
+                    // $(this).find('.brands').attr('name', 'brandModel['+ index +'][brand_id]');
+                    // $(this).find('.brands').attr('id', 'selectBrand'+index);
                     $(this).find('.brands').attr('data-index',index);
                     $(this).find('.model-line-div').attr('id','showDivdrop'+index);
                     $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
@@ -1696,14 +1627,8 @@
                     $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
                     $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
                     $(this).find('.ModelLineError').attr('id', 'ModelLineError'+index);
-                    $(this).find('.brandError').attr('id', 'brandError'+index);
-                    $('#selectBrand'+index).select2
-                    ({
-                        placeholder:"Choose Brands....     Or     Type Here To Search....",
-                        allowClear: true,
-                        maximumSelectionLength: 1,
-                        minimumResultsForSearch: -1,
-                    });
+                    // $(this).find('.brandError').attr('id', 'brandError'+index);
+
                     $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
                     $("#selectModelLine"+index).select2();
                 })
@@ -1720,24 +1645,25 @@
             // $('#allbrands').prop('disabled',true);
             var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length + 1;
             $('#index').val(index);
-            var selectedAddonBrands = [];
+            var selectedAddonModelLines = [];
             for(let i=1; i<index; i++)
             {
-                var eachSelectedBrand = $('#selectBrand'+i).val();
-                if(eachSelectedBrand) {
-                    selectedAddonBrands.push(eachSelectedBrand);
+                var eachSelectedModelLines = $('#selectModelLine'+i).val();
+                if(eachSelectedModelLines) {
+                    selectedAddonModelLines.push(eachSelectedModelLines);
                 }
             }
-
+            var brand = $('#brand').val();
             $.ajax({
-                url:"{{url('getBranchForWarranty')}}",
+                url:"{{url('getModelDescriptionDropdown')}}",
                 type: "POST",
+                url: '/addons/brandModels/'+brand,
+                type: "GET",
                 data:
                     {
-                        filteredArray: selectedAddonBrands,
-                        _token: '{{csrf_token()}}'
+                        filteredArray: selectedAddonModelLines,
                     },
-                dataType : 'json',
+                dataType: "json",
                 success: function(data) {
                     myarray = data;
                     var size = myarray.length;
@@ -1745,17 +1671,25 @@
                         $(".brandModelLineDiscription").append(`
                             <div class="row brandModelLineDiscriptionApendHere dynamic-rows" id="row-${index}">
                                 <div class="row">
-                                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                                   </div>
-                                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" hidden>
+                                     <div class="col-xxl-1 col-lg-1 col-md-12">
+                                     </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop${index}" >
                                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                        <select class="compare-tag1 model-lines" name="brandModel[${index}][modelline_id][]" data-index="${index}"
-                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLine(this.id,${index})>
+                                        <select class="compare-tag1 model-lines" name="brandModel[${index}][model_line_id]" data-index="${index}"
+                                        id="selectModelLine${index}"  multiple="true" style="width: 100%;" onchange=selectModelLineDescipt(${index}) >
                                         </select>
                                         <span id="ModelLineError${index}" class="ModelLineError invalid-feedback"></span>
                                     </div>
+                                     <div class="col-xxl-4 col-lg-6 col-md-12 model-number-div" id="showDivModelNumber${index}"  >
+                                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                                        <select class="compare-tag1 model-numbers" name="brandModel[${index}][model_number][]" data-index="${index}"
+                                        id="selectModelNumber${index}" onchange="showValidationErrors(${index})"  multiple="true" style="width: 100%;"  >
+                                        </select>
+                                        <span id="ModelNumberError${index}" class="ModelNumberError invalid-feedback"></span>
+
+                                    </div>
                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" >
+                                        <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" id="removeButton${index}">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -1763,67 +1697,58 @@
                             </div>
                         `);
 
-                        let brandDropdownData   = [];
+                        let modelLinesData   = [];
                         $.each(data,function(key,value)
                         {
-                            brandDropdownData.push
+                            modelLinesData.push
                             ({
-
                                 id: value.id,
-                                text: value.brand_name
+                                text: value.model_line
                             });
                         });
-                        $('#selectBrand'+index).html("");
-                        $('#selectBrand'+index).select2
+
+                        $("#selectModelLine"+index).select2
                         ({
-                            placeholder:"Choose Brands....     Or     Type Here To Search....",
+                            placeholder: 'Choose Model Line....     Or     Type Here To Search....',
                             allowClear: true,
-                            data: brandDropdownData,
+                            data: modelLinesData,
                             maximumSelectionLength: 1,
+                        });
+
+                        $('#selectModelNumber'+index).select2
+                        ({
+                            placeholder:"Choose Model Number....     Or     Type Here To Search....",
+                            allowClear: true,
                         });
                     }
                 }
             });
-
-            $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-            $("#selectModelLine"+index).select2();
         });
     });
 
     function selectBrand(id,row)
     {
+        var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
         var value =$('#'+id).val();
-        var currentAddonType = $('#addon_type').val();
-        var brandId = value;
-        globalThis.selectedBrands .push(brandId);
-        if(brandId != '')
+        if(value != '')
         {
-            if(brandId != 'allbrands')
-            {
-                if(currentAddonType == '')
-                {
-                        // document.getElementById("addon_type_required").classList.add("paragraph-class");
-                        // .textContent="Please select any addon type";
-                        // classList..add("paragraph-class");
-                        // alert('please select any addon type');
-                }
-                else
-                {
-                    showRelatedModal(value,row,currentAddonType);
+            if(index == row) {
+                showRelatedModal(value,row);
+
+            }else {
+                for(var i = 1;i<=index;i++) {
+                    showRelatedModal(value,i);
                 }
             }
-            else
-            {
-                hideRelatedModal(brandId,row);
-            }
+
             $msg = "";
-            removeBrandError($msg,row);
+            removeBrandError($msg);
         }
         else
         {
             $msg = "Brand is Required";
-            showBrandError($msg,row);
-            hideRelatedModal(brandId,row);
+            showBrandError($msg);
+            removeRelatedModal(row);
         }
     }
     function showRelatedModal(value,row,currentAddonType)
@@ -1883,14 +1808,14 @@
         showPartNumber.hidden = true
     }
     $(function() {
-   $('#selectBrand1').select2({
+   $('#selectBrand').select2({
    	 tags: true,
      placeholder: 'Select an option',
      templateSelection : function (tag, container){
      		// here we are finding option element of tag and
         // if it has property 'locked' we will add class 'locked-tag'
         // to be able to style element in select
-      	var $option = $('#selectBrand1 option[value="'+tag.id+'"]');
+      	var $option = $('#selectBrand option[value="'+tag.id+'"]');
         if ($option.attr('locked')){
            $(container).addClass('locked-tag');
            tag.locked = true;

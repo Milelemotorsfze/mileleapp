@@ -184,7 +184,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     }
     .widthinput1
     {
-        height:25px!important; 
+        height:25px!important;
     }
 </style>
 @section('content')
@@ -199,7 +199,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
             <div class="col-xxl-4 col-lg-4 col-md-4">
                 <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> 
+                        <label for="choices-single-default" class="form-label">
                                 Kit Name :</label>
                     </div>
                     <div class="col-lg-6 col-md-9 col-sm-12">
@@ -346,7 +346,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         </div>
                                         <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                                             <div class="row" style="padding-right:3px; padding-left:3px;">
-                                                
+
                                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
                                                     Item Code
                                                 </div>
@@ -367,7 +367,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                 <input id="quantity_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
                                                 placeholder="Previous Purchase Price" value="{{$Kit->quantity}}" readonly>
-                                                    
+
                                                 </div>
 
                                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -384,10 +384,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                 <input id="total_price_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
                                                 placeholder="Previous Purchase Price" value="{{$Kit->totalItemPrice}}" readonly>
-                                                 
+
                                                 </div>
 
-                                                
+
 
                                             </div>
                                         </div>
@@ -396,9 +396,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
                                         <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" autofocus>
-                                            @foreach($Kit->allItemSuppliers as $allItemSuppliers)
-                                            <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
-                                            @endforeach
+{{--                                            @foreach($Kit->allItemSuppliers as $allItemSuppliers)--}}
+{{--                                            <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>--}}
+{{--                                            @endforeach--}}
                                         </select>
                                         </div>
                                         </br>
@@ -448,22 +448,22 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         @if($AddonSuppliers->updated_at != '')
-                        <span>{{ $AddonSuppliers->updated_at}} 
+                        <span>{{ $AddonSuppliers->updated_at}}
                             </span>
                             @else
                             <label class="badge badge-soft-info">Not Added</label>
                             @endif
                     </div>
                     @endif
-                    
+
                     <div class="col-lg-2 col-md-3 col-sm-12">
                         <label for="choices-single-default" class="form-label">Lead Time :</label>
                     </div>
                     <div class="col-lg-2 col-md-9 col-sm-12">
                         @if($AddonSuppliers->lead_time_max != '' || $AddonSuppliers->lead_time_min != '')
-                        <span>{{ $AddonSuppliers->lead_time_min}} 
-                            @if($AddonSuppliers->lead_time_max != '' && $AddonSuppliers->lead_time_min < $AddonSuppliers->lead_time_max) 
-                            - {{$AddonSuppliers->lead_time_max}} 
+                        <span>{{ $AddonSuppliers->lead_time_min}}
+                            @if($AddonSuppliers->lead_time_max != '' && $AddonSuppliers->lead_time_min < $AddonSuppliers->lead_time_max)
+                            - {{$AddonSuppliers->lead_time_max}}
                             @endif Days</span>
                             @else
                             <label class="badge badge-soft-info">Not Added</label>
@@ -627,7 +627,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         alert($('#rowIndexCount').val());
       }
       </script>
-     
+
 @endsection
 
 

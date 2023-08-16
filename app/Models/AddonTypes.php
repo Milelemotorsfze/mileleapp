@@ -20,6 +20,10 @@ class AddonTypes extends Model
         'updated_by',
         'deleted_by'
     ];
+    protected $appends = [
+        'kit_model_numbers',
+        'model_numbers'
+    ];
     public function brands()
     {
         return $this->belongsTo(Brand::class,'brand_id','id');
@@ -35,5 +39,20 @@ class AddonTypes extends Model
     public function AddonModelGroup()
     {
         return $this->hasMany(AddonTypes::class,'brand_id','id');
+    }
+    public function getKitModelNumbersAttribute() {
+        $addonType = AddonTypes::find($this->id);
+        $modelDescriptions = AddonTypes::where('brand_id', $addonType->brand_id)
+            ->where('addon_details_id', $addonType->addon_details_id)
+            ->where('model_id', $addonType->model_id)
+            ->pluck('model_number')->toArray();
+
+        return $modelDescriptions;
+    }
+    public function getModelNumbersAttribute() {
+        $addonType = AddonTypes::find($this->id);
+        $modelDescriptions = MasterModelDescription::where('model_line_id', $addonType->model_id)
+            ->get();
+        return $modelDescriptions;
     }
 }

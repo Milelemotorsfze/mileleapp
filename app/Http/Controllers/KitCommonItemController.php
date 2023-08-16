@@ -175,43 +175,45 @@ class KitCommonItemController extends Controller
         $addons = Addon::whereIn('addon_type',['K'])->select('id','name')->orderBy('name', 'ASC')->get();
         $existingBrandId = [];
         $existingBrandModel = [];
-        if($addonDetails->is_all_brands == 'no')
-        {
-            $existingBrandModel = AddonTypes::where('addon_details_id',$id)->groupBy('brand_id')->with('brands')->get();
-            foreach($existingBrandModel as $data)
-            {
-                array_push($existingBrandId,$data->brand_id);
-                $jsonmodelLine = [];
-                $data->ModelLine = AddonTypes::where([
-                    ['addon_details_id','=',$id],
-                    ['brand_id','=',$data->brand_id]
-                    ])->groupBy('model_id')->with('modelLines')->get();
-                    $data->ModelLine->modeldes = [];
-                if($data->is_all_model_lines == 'no')
-                {
-                    foreach($data->ModelLine as $mo)
-                    {
-                        $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
-                        $mo->modeldes = AddonTypes::where([
-                            ['addon_details_id','=',$id],
-                            ['brand_id','=',$mo->brand_id],
-                            ['model_id','=',$mo->model_id],
-                            ])->pluck('model_number');
-                            $mo->modeldes = json_decode($mo->modeldes);
-                    }
-                }
-                $modelLinesData = AddonTypes::where([
-                                                    ['addon_details_id','=',$id],
-                                                    ['brand_id','=',$data->brand_id]
-                                                    ])->pluck('model_id');
-                $jsonmodelLine = json_decode($modelLinesData);
-                $data->modelLinesData = $jsonmodelLine;
-                $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
-            }
-        }
+        $existingAddonTypes = AddonTypes::where('addon_details_id', $addonDetails->id)->get();
+//        if($addonDetails->is_all_brands == 'no')
+//        {
+//            $existingBrandModel = AddonTypes::where('addon_details_id',$id)->groupBy('brand_id')->with('brands')->get();
+//            foreach($existingBrandModel as $data)
+//            {
+//                array_push($existingBrandId,$data->brand_id);
+//                $jsonmodelLine = [];
+//                $data->ModelLine = AddonTypes::where([
+//                    ['addon_details_id','=',$id],
+//                    ['brand_id','=',$data->brand_id]
+//                    ])->groupBy('model_id')->with('modelLines')->get();
+//                    $data->ModelLine->modeldes = [];
+//                if($data->is_all_model_lines == 'no')
+//                {
+//                    foreach($data->ModelLine as $mo)
+//                    {
+//                        $mo->allDes = MasterModelDescription::where('model_line_id',$mo->model_id)->get();
+//                        $mo->modeldes = AddonTypes::where([
+//                            ['addon_details_id','=',$id],
+//                            ['brand_id','=',$mo->brand_id],
+//                            ['model_id','=',$mo->model_id],
+//                            ])->pluck('model_number');
+//                            $mo->modeldes = json_decode($mo->modeldes);
+//                    }
+//                }
+//                $modelLinesData = AddonTypes::where([
+//                                                    ['addon_details_id','=',$id],
+//                                                    ['brand_id','=',$data->brand_id]
+//                                                    ])->pluck('model_id');
+//                $jsonmodelLine = json_decode($modelLinesData);
+//                $data->modelLinesData = $jsonmodelLine;
+//                $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
+//            }
+//        }
         // dd($existingBrandModel);
-        $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
-        $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
+        $brands = Brand::select('id','brand_name')->get();
+        $brandId = $addonDetails->latestAddonType->brand_id ?? '';
+        $modelLines = MasterModelLines::where('brand_id',$brandId)->select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
         if($addonDetails->addon_type_name == 'P')
         {
@@ -261,7 +263,8 @@ class KitCommonItemController extends Controller
         $aa = AddonDetails::whereIn('addon_id',$a)->pluck('id');
         $itemDropdown = [];
         $itemDropdown = AddonDetails::whereIn('id',$aa)->whereNotIn('id',$kitItemiD)->with('AddonName')->get();
-        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count'));
+        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
+            'kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count','existingAddonTypes'));
     }
 
     public function updateKitSupplier(Request $request, $id)
@@ -421,20 +424,31 @@ class KitCommonItemController extends Controller
         if($request->selectedAddonModelNumbers) {
             if(count($request->selectedAddonModelNumbers) > 0)
             {
-                $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
-                $availableModelNumbers = AddonTypes::pluck('model_number')->toArray();
-                $commonItems = array_intersect($request->selectedAddonModelNumbers, $availableModelNumbers);
-
-                if(count($commonItems) == $request->count) {
-                    $addonDetailIds = AddonTypes::whereIn('model_number', $request->selectedAddonModelNumbers)
-                        ->groupBy('addon_details_id')->pluck('addon_details_id');
-                    $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
-                        ->whereIn('id', $addonDetailIds)
-                        ->get();
+                $kitItemDropdown = Addon::whereIn('addon_type', ['SP'])->pluck('id');
+                // get each model description rows
+                $Items = [];
+                foreach($request->selectedAddonModelNumbers as $key => $modelNumber) {
+                    $commonItems[$key] = [];
+                    $addonDetailIds = AddonTypes::where('model_number', $modelNumber)->pluck('addon_details_id')->toArray();
+                        foreach ($addonDetailIds as $addonDetail) {
+                            array_push($commonItems[$key], $addonDetail);
+                        }
+                    $Items[] = $commonItems[$key];
                 }
+
+                $result = call_user_func_array('array_intersect', $Items);
+                $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
+                    ->whereIn('id', $result);
+
+                if($request->type == 'ADD_ITEM') {
+                    if($request->selectedItems) {
+
+                        $data = $data->whereNotIn('id', $request->selectedItems);
+                    }
+                }
+                $data = $data->get();
             }
         }
-
         return response($data);
     }
 }
