@@ -31,7 +31,7 @@
         </div>
     </div>
     <div id="showaddtrim" class="col-xxl-12 col-lg-12 col-md-12" hidden>
-        <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
+        <a id="add" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add Model Lines</a>
     </div>
     <input type="hidden" value="" id="index">
 </div>

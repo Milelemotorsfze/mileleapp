@@ -226,15 +226,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         <span>{{ $supplierAddonDetails->addon_code}}</span>
                     </div>
 
-                    @if($supplierAddonDetails->part_number != '')
-                    <div class="col-lg-6 col-md-6 col-sm-12">
-                        <label for="choices-single-default" class="form-label"> Part Number :</label>
-                    </div>
-                    <div class="col-lg-6 col-md-9 col-sm-12">
-                        <span>{{ $supplierAddonDetails->part_number}} </span>
-                    </div>
-        	        @endif
-
                     @if($supplierAddonDetails->payment_condition != '')
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Payment Condition :</label>
@@ -317,7 +308,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @endif
                         </span>
                     </div>
+                    
                     @endif
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <label for="choices-single-default" class="form-label"> Part Numbers :</label>
+                    </div>
+                    <div class="col-lg-6 col-md-9 col-sm-12">
+                        <span>
+                            @foreach($supplierAddonDetails->partNumbers as $partNumbers)
+                            {{ $partNumbers->part_number}} , 
+                            @endforeach
+                        </span>
+                    </div>
 
                 </div>
             </div>

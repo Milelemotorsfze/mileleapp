@@ -16,6 +16,7 @@ use App\Models\AddonSellingPrice;
 use App\Models\PurchasePriceHistory;
 use App\Models\SupplierType;
 use App\Models\KitCommonItem;
+use App\Models\SparePartsNumber;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -182,6 +183,19 @@ class AddonController extends Controller
                 }
             }
             $addon_details = AddonDetails::create($input);
+            if($request->addon_type == 'SP')
+            {
+                if(count($request->part_number) > 0)
+                {
+                    foreach($request->part_number as $part_number)
+                    {
+                        $createPartNum = [];
+                        $createPartNum['addon_details_id'] = $addon_details->id;
+                        $createPartNum['part_number'] = $part_number;
+                        $createPartNumber = SparePartsNumber::create($createPartNum);
+                    }
+                }
+            }
             if($request->selling_price != '')
             {
                 $createsellingPriceInput['addon_details_id'] = $addon_details->id;
@@ -485,7 +499,7 @@ class AddonController extends Controller
     {
         // AddonSuppliersUsed
         // one addon - multiple suppliers - suppliers cannot repeat
-        $addonDetails = AddonDetails::where('id',$id)->with('AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
+        $addonDetails = AddonDetails::where('id',$id)->with('partNumbers','AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
         $price = '';
         $price = SupplierAddons::where('addon_details_id',$addonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
         $addonDetails->LeastPurchasePrices = $price;
@@ -526,7 +540,6 @@ class AddonController extends Controller
                 $data->ModalLines = MasterModelLines::where('brand_id',$data->brand_id)->get();
             }
         }
-        // dd($existingBrandModel);
         $brands = Brand::whereNotIn('id',$existingBrandId)->select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
@@ -607,11 +620,35 @@ class AddonController extends Controller
         }
         if($request->addon_type_hiden == 'SP')
         {
-            $addon_details->part_number = $request->part_number;
+            $deletePartNumbers = SparePartsNumber::where('addon_details_id',$id)->get();
+            if(count($deletePartNumbers) > 0)
+            {
+                foreach($deletePartNumbers as $deletePartNumber)
+                {
+                    $deletePartNumber->delete();
+                }
+            }
+            if(count($request->part_number) > 0)
+            {
+                foreach($request->part_number as $part_number)
+                {
+                    $createPartNum = [];
+                    $createPartNum['addon_details_id'] = $addon_details->id;
+                    $createPartNum['part_number'] = $part_number;
+                    $createPartNumber = SparePartsNumber::create($createPartNum);
+                }
+            }
         }
         else
         {
-            $addon_details->part_number = NULL;
+            $deletePartNumbers = SparePartsNumber::where('addon_details_id',$id)->get();
+            if(count($deletePartNumbers) > 0)
+            {
+                foreach($deletePartNumbers as $deletePartNumber)
+                {
+                    $deletePartNumber->delete();
+                }
+            }
         }
 
         if($request->description != null) {
@@ -1334,9 +1371,9 @@ class AddonController extends Controller
         $supplierAddonDetails = [];
         // AddonSuppliersUsed
         // one addon- multiple suppliers - suppliers cannot be repeated - supplier with kit needed
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('partNumbers','AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
         'AddonSuppliers.Kit.addon.AddonName')->first();
-
+// dd($supplierAddonDetails);
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $supplierAddonDetails->LeastPurchasePrices = $price;
