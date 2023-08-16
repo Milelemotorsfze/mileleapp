@@ -1442,8 +1442,6 @@
                     removeModelLineItems(indexNumber);
                     getItemsDropdown(type);
                 }
-
-
             })
         $("#add").on("click", function ()
         {

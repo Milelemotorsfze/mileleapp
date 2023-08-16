@@ -41,6 +41,10 @@ class AddonDetails extends Model
     {
         return $this->hasOne(Addon::class,'id','addon_id');
     }
+    public function latestAddonType()
+    {
+        return $this->hasOne(AddonTypes::class,'addon_details_id','id')->latest();
+    }
     public function AddonSuppliers()
     {
         return $this->hasMany(SupplierAddons::class,'addon_details_id','id');
