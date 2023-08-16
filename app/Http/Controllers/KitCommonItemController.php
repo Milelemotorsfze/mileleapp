@@ -213,7 +213,13 @@ class KitCommonItemController extends Controller
         // dd($existingBrandModel);
         $brands = Brand::select('id','brand_name')->get();
         $brandId = $addonDetails->latestAddonType->brand_id ?? '';
-        $modelLines = MasterModelLines::where('brand_id',$brandId)->select('id','brand_id','model_line')->get();
+        $kitModelLineIds = AddonTypes::where('addon_details_id', $addonDetails->id)->pluck('model_id')->toArray();
+
+        $modelLines = MasterModelLines::where('brand_id', $brandId)
+            ->whereNotIn('id', $kitModelLineIds)
+            ->select('id','model_line')
+            ->get();
+//        return $modelLines;
         $typeSuppliers = SupplierType::select('supplier_id','supplier_type');
         if($addonDetails->addon_type_name == 'P')
         {
@@ -263,7 +269,7 @@ class KitCommonItemController extends Controller
         $aa = AddonDetails::whereIn('addon_id',$a)->pluck('id');
         $itemDropdown = [];
         $itemDropdown = AddonDetails::whereIn('id',$aa)->whereNotIn('id',$kitItemiD)->with('AddonName')->get();
-        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
+        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitModelLineIds',
             'kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count','existingAddonTypes'));
     }
 

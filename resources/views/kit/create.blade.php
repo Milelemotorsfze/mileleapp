@@ -1423,25 +1423,30 @@
             {
                 var indexNumber = $(this).attr('data-index');
                 var type = 'REMOVE';
-
-                var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-                var KitItems = [];
-                for(let i=1; i<=countRow; i++)
-                {
-                    var kitItem = $('#mainItem'+i).val();
-                    if(kitItem != '') {
-                        KitItems.push(kitItem);
+                var modelDescription = $('#selectModelNumber'+indexNumber).val();
+                if(modelDescription != '') {
+                    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+                    var KitItems = [];
+                    for(let i=1; i<=countRow; i++)
+                    {
+                        var kitItem = $('#mainItem'+i).val();
+                        if(kitItem != '') {
+                            KitItems.push(kitItem);
+                        }
                     }
-                }
-                if(KitItems.length > 0) {
-                    if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
+                    if(KitItems.length > 0) {
+                        if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
+                            removeModelLineItems(indexNumber);
+                            getItemsDropdown(type);
+                        }
+                    }else{
                         removeModelLineItems(indexNumber);
                         getItemsDropdown(type);
                     }
                 }else{
                     removeModelLineItems(indexNumber);
-                    getItemsDropdown(type);
                 }
+
             })
         $("#add").on("click", function ()
         {
@@ -1458,8 +1463,6 @@
             }
             var brand = $('#brand').val();
             $.ajax({
-                url:"{{url('getModelDescriptionDropdown')}}",
-                type: "POST",
                 url: '/addons/brandModels/'+brand,
                 type: "GET",
                 data:
@@ -1542,7 +1545,10 @@
                     var text = $('#selectModelLine'+indexNumber).text();;
                     // alert(id);
                     // alert(text);
+                if(id != '') {
                     addOption(id,text)
+                }
+
                 // });
                 $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
                 // model-lines
@@ -1565,13 +1571,15 @@
                     $(this).find('.model-numbers').attr('data-index',index);
                     $(this).find('.model-numbers').attr('onchange','showValidationErrors('+index+')');
                     $(this).find('.ModelNumberError').attr('id','ModelNumberError'+index);
-
                     $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
+
                     $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
                     $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
 
                     $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-                    $("#selectModelLine"+index).select2();
+                    $("#selectModelLine"+index).select2({
+                        maximumSelectionLength:1
+                    });
                     $('#selectModelNumber'+index).select2
                     ({
                         placeholder:"Choose Model Number....     Or     Type Here To Search....",
