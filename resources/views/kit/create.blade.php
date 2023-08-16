@@ -1406,8 +1406,27 @@
         $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
             {
                 var indexNumber = $(this).attr('data-index');
-                alert(indexNumber);
-                removeModelLineItems(indexNumber);
+                var type = 'REMOVE';
+
+                var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+                var KitItems = [];
+                for(let i=1; i<=countRow; i++)
+                {
+                    var kitItem = $('#mainItem'+i).val();
+                    if(kitItem != '') {
+                        KitItems.push(kitItem);
+                    }
+                }
+                if(KitItems.length > 0) {
+                    if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
+                        removeModelLineItems(indexNumber);
+                        getItemsDropdown(type);
+                    }
+                }else{
+                    removeModelLineItems(indexNumber);
+                    getItemsDropdown(type);
+                }
+
 
             })
         $("#add").on("click", function ()
@@ -1498,21 +1517,19 @@
 
             var countRow = 0;
             var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-            alert(indexNumber);
             if(countRow > 1)
             {
-                alert("inside if");
                 // var indexNumber = $(this).attr('data-index');
                 // if(indexNumber == 1) {
                 //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrand2');
                 // }
-                $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).find("option:selected").each(function() {
-                    var id = (this.value);
-                    var text = (this.text);
-                    alert(id);
-                    alert(text);
+                // $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).find("option:selected").each(function() {
+                    var id = $('#selectModelLine'+indexNumber).val();
+                    var text = $('#selectModelLine'+indexNumber).text();;
+                    // alert(id);
+                    // alert(text);
                     addOption(id,text)
-                });
+                // });
                 $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
                 // model-lines
                 $('.brandModelLineDiscriptionApendHere').each(function(i) {
