@@ -1505,7 +1505,7 @@ class AddonController extends Controller
     public function getKitItemsForAddon(Request $request)
     {
         $kitItemDropdown = Addon::whereIn('addon_type',['SP'])->pluck('id');
-        $data = AddonDetails::select('id','addon_code','addon_id')
+        $data = AddonDetails::select('id','addon_code','addon_id','description')
                 ->whereIn('addon_id', $kitItemDropdown)->with('AddonName');
         if($request->filteredArray)
         {

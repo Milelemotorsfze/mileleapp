@@ -304,7 +304,7 @@
                                                                                         @foreach($existingAddonType->model_numbers as $modelNumber)
                                                                                             <option value="{{ $modelNumber->id }}"
                                                                                                     @if(in_array( $modelNumber->id, $existingAddonType->kit_model_numbers)) selected @endif
-                                                                                             >{{ $modelNumber->model_description }}</option>
+                                                                                             >{{ $modelNumber->model_description }} </option>
                                                                                         @endforeach
                                                                                     </select>
                                                                                     <span id="ModelNumberError{{$i}}" class="ModelNumberError invalid-feedback"></span>
@@ -362,11 +362,17 @@
                                                                         <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                                                         <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[{{$i}}][item]" id="mainItem{{$i}}"
                                                                                 multiple="true" style="width: 100%;" data-index="{{$i}}" required>
-                                                                                    <option value="{{$kitItemDropdownData->item->id}}" selected>
-                                                                                        {{$kitItemDropdownData->item->addon_code}} ( {{$kitItemDropdownData->item->AddonName->name}} )</option>
-                                                                                        @foreach($itemDropdown as $itemDrop)
+                                                                            <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $alreadyAddedItems)) selected @endif>
+                                                                                {{$kitItemDropdownData->item->addon_code}}
+                                                                                ( {{$kitItemDropdownData->item->AddonName->name}}
+                                                                                @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif  )
+                                                                            </option>
+{{--                                                                                    <option value="{{$kitItemDropdownData->item->id}}" selected>--}}
+
+{{--                                                                                    </option>--}}
+                                                                                        @foreach($availableCommonItems as $itemDrop)
                                                                                         <option value="{{$itemDrop->id}}">
-                                                                                        {{$itemDrop->addon_code}} ( {{$itemDrop->AddonName->name}} )</option>
+                                                                                        {{$itemDrop->addon_code}} ( {{$itemDrop->AddonName->name}} - {{ $itemDrop->description }})</option>
                                                                                         @endforeach
                                                                         </select>
                                                                     </div>
@@ -810,7 +816,7 @@
             sub ='2';
             var inputAddonType = $('#addon_type').val();
             var inputAddonName = $('#addon_id').val();
-            // var inputBrand = $('#selectBrand1').val();
+            var inputBrand = $('#selectBrand').val();
             var formInputError = false;
             // if(inputBrand == '')
             // {
@@ -825,32 +831,33 @@
                 showAddonTypeError($msg);
                 formInputError = true;
             }
-            // else
-            // {
+            if(inputBrand == '')
+            {
+                $msg = "Brand is required";
+                showBrandError($msg);
+                formInputError = true;
+            }else{
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                // for (let i = 1; i <= countBrandRow; i++)
-                // {
-                //     var inputBrand = '';
-                //     var inputBrand = $('#selectBrand'+i).val();
-                //     if(inputBrand == '')
-                //     {
-                //         $msg = "Brand is required";
-                //         showBrandError($msg,i);
-                //         formInputError = true;
-                //     }
-                //     else if(inputBrand != 'allbrands')
-                //     {
-                //         var inputModelLines = '';
-                //         var inputModelLines = $('#selectModelLine'+i).val();
-                //         if(inputModelLines == '')
-                //         {
-                //             $msg = "Model Line is required";
-                //             showModelLineError($msg,i);
-                //             formInputError = true;
-                //         }
-                //     }
-                // }
-            // }
+                for (let i = 1; i <= countBrandRow; i++)
+                {
+                    var inputModelLines = '';
+                    var inputModelLines = $('#selectModelLine'+i).val();
+                    if(inputModelLines == '')
+                    {
+                        $msg = "Model Line is required";
+                        showModelLineError($msg,i);
+                        formInputError = true;
+                    }
+                    var inputModelNumber = '';
+                    var inputModelNumber = $('#selectModelNumber'+i).val();
+                    if(inputModelNumber == '')
+                    {
+                        $msg = "Model Number is required";
+                        showModelNumberError($msg,i);
+                        formInputError = true;
+                    }
+                }
+            }
             if(inputAddonName == '')
             {
                 $msg = "Addon Name is required";
@@ -2110,75 +2117,32 @@
     function addItem()
     {
         var index = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length + 1;
-        $('#MainKitItemIndex').val(index);
-        var selectedItems = [];
-        for(let i=1; i<index; i++)
-        {
-            var eachSelectedAddon = $('#mainItem'+i).val();
-            if(eachSelectedAddon) {
-                selectedItems.push(eachSelectedAddon);
-            }
-        }
-        $.ajax({
-            url:"{{url('getKitItemsForAddon')}}",
-            type: "POST",
-            data:
-                {
-                    filteredArray: selectedItems,
-                    _token: '{{csrf_token()}}'
-                },
-            dataType : 'json',
-            success: function(data) {
-                myarray = data;
-                var size = myarray.length;
-                if (size >= 1) {
-                    $(".apendNewaMainItemHere").append(`
-                        <div class="row kitMainItemRowForSupplier kititemdelete" id="item-${index}">
-                            <div class="col-xxl-10 col-lg-6 col-md-12">
-                                <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                <select class="mainItem MainItemsClass" name="mainItem[${index}][item]" id="mainItem${index}" multiple="true"
-                                 style="width: 100%;" data-index="${index}" required>
-                                 @foreach($itemDropdown as $itemDrop)
-                                        <option value="{{$itemDrop->id}}">
-                                                                                        {{$itemDrop->addon_code}} ( {{$itemDrop->AddonName->name}} )</option>
-                                                                                        @endforeach
-                                </select>
-                                </div>
-                                <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
-                                    <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                                    <input name="mainItem[${index}][quantity]" id="mainQuantity${index}"
-                                     type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem"
-                                     placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
-                                     oninput="validity.valid||(value='1');" required>
-                                </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <a id="removeMainItem${index}" class="btn_round removeMainItem" data-index="${index}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `);
-                    let addonDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        addonDropdownData.push
-                        ({
 
-                            id: value.id,
-                            text: value.addon_code +' ('+value.addon_name.name +')'
-                        });
-                    });
-                    $('#mainItem'+index).html("");
-                    $('#mainItem'+index).select2
-                    ({
-                        placeholder:"Choose Items....     Or     Type Here To Search....",
-                        allowClear: true,
-                        data: addonDropdownData,
-                        maximumSelectionLength: 1,
-                    });
-                }
-            }
-        });
+            $(".apendNewaMainItemHere").append(`
+                <div class="row kitMainItemRowForSupplier kititemdelete" id="item-${index}">
+                    <div class="col-xxl-10 col-lg-6 col-md-12">
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
+                        <select class="mainItem MainItemsClass" name="mainItem[${index}][item]" id="mainItem${index}" multiple="true"
+                         style="width: 100%;" data-index="${index}" required>
+                        </select>
+                        </div>
+                        <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
+                            <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
+                            <input name="mainItem[${index}][quantity]" id="mainQuantity${index}"
+                             type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem"
+                             placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
+                             oninput="validity.valid||(value='1');" required>
+                        </div>
+                    <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                        <a id="removeMainItem${index}" class="btn_round removeMainItem" data-index="${index}">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            `);
+
+        var type = 'ADD_ITEM'
+        getItemsDropdown(type);
     }
 
 </script>

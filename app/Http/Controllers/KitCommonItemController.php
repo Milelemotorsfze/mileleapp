@@ -164,7 +164,7 @@ class KitCommonItemController extends Controller
         return view('kit.editsuppliers',compact('suppliers','kitItemDropdown','id','otherSuppliers'));
     }
 
-    public function editAddonDetails($id)
+    public function editAddonDetails(Request $request,$id)
     {
         // AddonSuppliersUsed
         // one addon - multiple suppliers - suppliers cannot repeat
@@ -262,17 +262,49 @@ class KitCommonItemController extends Controller
         $kitItems = KitCommonItem::where('addon_details_id',$addonDetails->id)->with('item')->get();
         $count = KitCommonItem::where('addon_details_id',$addonDetails->id)->with('item')->count();
         $kitItemiD = [];
-        $kitItemiD = KitCommonItem::where('addon_details_id',$addonDetails->id)->pluck('item_id');
+        $kitItemiD = KitCommonItem::where('addon_details_id',$addonDetails->id)->pluck('item_id')->toArray();
         $a = [];
         $a = Addon::whereIn('addon_type',['SP'])->pluck('id');
         $aa = [];
         $aa = AddonDetails::whereIn('addon_id',$a)->pluck('id');
         $itemDropdown = [];
+        // get available common items for this kit
         $itemDropdown = AddonDetails::whereIn('id',$aa)->whereNotIn('id',$kitItemiD)->with('AddonName')->get();
-        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitModelLineIds',
-            'kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count','existingAddonTypes'));
+        $selectedAddonModelNumbers = AddonTypes::where('addon_details_id', $addonDetails->id)->pluck('model_number')->toArray();
+        $alreadyAddedItems = $this->availableKitItems($selectedAddonModelNumbers);
+        $unselectedKitItems = array_diff($alreadyAddedItems, $kitItemiD);
+        $availableCommonItems = AddonDetails::whereIn('id', $unselectedKitItems)->get();
+
+//        return $availableCommonItems;
+
+        // kit common items which is used for this kit
+
+        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitModelLineIds','alreadyAddedItems',
+            'kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count','existingAddonTypes','availableCommonItems'));
     }
 
+    function availableKitItems($data)
+    {
+
+        $kitItemDropdown = Addon::whereIn('addon_type', ['SP'])->pluck('id');
+        // get each model description rows
+        $Items = [];
+        foreach($data as $key => $modelNumber) {
+            $commonItems[$key] = [];
+            $addonDetailIds = AddonTypes::where('model_number', $modelNumber)->pluck('addon_details_id')->toArray();
+            foreach ($addonDetailIds as $addonDetail) {
+                array_push($commonItems[$key], $addonDetail);
+            }
+            $Items[] = $commonItems[$key];
+        }
+
+        $result = call_user_func_array('array_intersect', $Items);
+        $availableKitItems = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
+            ->whereIn('id', $result);
+
+        $availableKitItems = $availableKitItems->pluck('id')->toArray();
+        return $availableKitItems;
+    }
     public function updateKitSupplier(Request $request, $id)
     {
         $ExistingSuppliersId = [];
@@ -425,7 +457,7 @@ class KitCommonItemController extends Controller
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
     public function getCommonKitItems(Request $request) {
-
+        info($request->all());
         $data = [];
         if($request->selectedAddonModelNumbers) {
             if(count($request->selectedAddonModelNumbers) > 0)
@@ -455,6 +487,7 @@ class KitCommonItemController extends Controller
                 $data = $data->get();
             }
         }
+        info($data);
         return response($data);
     }
 }
