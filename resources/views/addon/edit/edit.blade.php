@@ -1,5 +1,13 @@
 @extends('layouts.main')
 <style>
+    .removePartNumber
+    {
+        margin-top: 0px!important;
+    }
+    .partNumberApendHere
+    {
+        margin-bottom: 10px!important;
+    }
     .modal-xl
     {
         max-width: 99% !important;
@@ -333,52 +341,21 @@
                                         <label for="no">No</label>
                                     </div>
                                 </fieldset>
-                                @error('fixing_charges_included')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
                             </div>
-                    </div>
-                    </br>
-                    <div class="row">
-                    @if($addonDetails->addon_type_name == 'SP')
-                        <div class="col-xxl-2 col-lg-6 col-md-12" id="partNumberDiv">
-                            <span class="error">* </span>
-                            <label for="part_number" class="col-form-label text-md-end">{{ __('Part Number') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" id="partNumberDivBr">
-                            <input id="part_number" type="text" class="form-control widthinput" name="part_number" placeholder="Part Number"
-                            value="{{ $addonDetails->part_number }}" autocomplete="part_number" onkeyup="setPartNumber(this)">
-                            @error('part_number')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="partNumberError" class="invalid-feedback partNumberError"></span>
-                        </div>
-                    @endif
                             <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
-                            <span class="error">* </span>
-                            <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
-                        <div class="input-group">
-                        <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"
-                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
+                                <span class="error">* </span>
+                                <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
+                            </div>
+                                            <div class="col-xxl-4 col-lg-6 col-md-12" hidden id="FixingChargeAmountDivBr">
+                                                <div class="input-group">
+                                                    <input id="fixing_charge_amount" oninput="inputNumberAbs(this)" class="form-control widthinput" name="fixing_charge_amount" placeholder="Fixing Charge Amount"
+                                                        value="{{ $addonDetails->fixing_charge_amount }}" autocomplete="fixing_charge_amount" >
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>
                                                 </div>
-                            @error('fixing_charge_amount')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
-                            <span id="fixingChargeAmountError" class="invalid-feedback"></span>
-                        </div>
-
-
+                                                <span id="fixingChargeAmountError" class="invalid-feedback"></span>
+                                            </div>
                     </div>
                     </br>
                     <div class="row">
@@ -411,7 +388,41 @@
                     </center>
 
                 </div>
-
+                <div class="card" id="partNumberDiv">
+                    <div class="card-header">
+                        <h4 class="card-title">Part Numbers</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row partNumberMain">
+                        <div hidden>{{$i=0;}}</div>
+                        @foreach($addonDetails->partNumbers as $partNumbers)
+                        <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+                            <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-{{$i}}">
+                                <div class="row">
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="part_number_{{$i}}" type="text" class="form-control widthinput part_number" name="part_number[{{$i}}]" 
+                                        placeholder="Part Number" value="{{$partNumbers->part_number}}"
+                                        autocomplete="part_number" onkeyup="setPartNumber(this,1)">
+                                        <span id="partNumberError_{{$i}}" class="invalid-feedback partNumberError"></span>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-1 col-md-1">
+                                        <a class="btn_round removePartNumber" data-index="{{$i}}" >
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-xxl-12 col-lg-12 col-md-12" id="partNumberDivBr">
+                                <a id="addPartNumberBtn" style="float: right;" class="btn btn-sm btn-info">
+                                <i class="fa fa-plus" aria-hidden="true"></i> Add Part Numbers</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 @include('addon.edit.brandModel')
                 <div class="card"  id="kitSupplier" >
                     <div class="card-header">
@@ -514,10 +525,14 @@
         var formInputError = false;
         var startYear = Number(data.model_year_start);
         var endYear = Number(data.model_year_end);
+        var imageExist = data.image;
         var imageIsOkay = false;
         $(document).ready(function ()
         {
-
+            if(imageExist != '')
+            {
+                imageIsOkay = true;
+            }
             $("#model_year_start").yearpicker({
                 year: startYear,
                 startYear: 2019,
@@ -762,6 +777,54 @@
                     $('#' + modalId).removeClass('modalhide');
                 }
             });
+            $("#addPartNumberBtn").on("click", function ()
+            {
+                var index = $(".partNumberMain").find(".partNumberApendHere").length + 1;
+                $(".partNumberMain").append(`
+                                    <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-${index}">
+                                    <div class="row">
+                                    <div class="col-xxl-9 col-lg-6 col-md-12">
+                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]" 
+                                        placeholder="Part Number" value="{{ old('part_number') }}"
+                                        autocomplete="part_number" onkeyup="setPartNumber(this,${index})">
+                                        <span id="partNumberError_${index}" class="invalid-feedback partNumberError"></span>
+                                    </div>
+                                    <div class="col-xxl-3 col-lg-1 col-md-1 add_del_btn_outer">
+                                        <a class="btn_round removePartNumber" data-index="${index}" >
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                    </div>
+                                    </div>
+                `);
+            });
+            $(document.body).on('click', ".removePartNumber", function (e)
+            {
+               var countRow = 0;
+                var countRow = $(".partNumberMain").find(".partNumberApendHere").length;
+                if(countRow > 1)
+                {
+                    var indexNumber = $(this).attr('data-index');
+                    $(this).closest('#row-'+indexNumber).remove();
+                    $('.partNumberApendHere').each(function(i) {
+                        var index = +i + +1;
+                        $(this).attr('id','row-'+index);
+                        $(this).find('.part_number').attr('name', 'part_number['+ index +']');
+                        $(this).find('.part_number').attr('id', 'part_number_'+index);
+                        $(this).find('.removePartNumber').attr('data-index',index);
+                        $(this).find('.partNumberError').attr('id', 'partNumberError_'+index);
+                    })
+                    enableDropdown();
+                }
+                else
+                {
+                    var confirm = alertify.confirm('You are not able to remove this row, Atleast one Part Number Required',function (e) {
+                   }).set({title:"Can't Remove Part Number"})
+                }
+
+
+
+        })
         });
 
         function addonDescriptionUniqueCheck() {
@@ -990,12 +1053,16 @@
                 }
                 if(inputAddonType == 'SP')
                 {
-                    var inputPartNumber = $('#part_number').val();
-                    if(inputPartNumber == '')
+                    var countPartNumber = $(".partNumberMain").find(".partNumberApendHere").length;
+                    for (let i = 1; i <= countPartNumber; i++)
                     {
-                        $msg = "Part Number is required";
-                        showPartNumberError($msg);
-                        formInputError = true;
+                        var inputPartNumber = $('#part_number_'+i).val();
+                        if(inputPartNumber == '')
+                        {
+                            $msg = "Part Number is required";
+                            showPartNumberError($msg,i);
+                            formInputError = true;
+                        }
                     }
                     var inputModelYearStart = $('#model_year_start').val();
                     var inputModelYearEnd = $('#model_year_end').val();
@@ -1326,23 +1393,17 @@
             document.getElementById("addon_type").classList.remove("is-invalid");
             document.getElementById("AddonTypeError").classList.remove("paragraph-class");
         }
-        function showPartNumberError($msg)
+        function showPartNumberError($msg, index)
         {
-            document.getElementById("partNumberError").textContent=$msg;
-            document.getElementById("partNumberError1").textContent=$msg;
-            document.getElementById("part_number").classList.add("is-invalid");
-            document.getElementById("part_numberRaw").classList.add("is-invalid");
-            document.getElementById("partNumberError").classList.add("paragraph-class");
-            document.getElementById("partNumberError1").classList.add("paragraph-class");
+            document.getElementById("partNumberError_"+index).textContent=$msg;
+            document.getElementById("part_number_"+index).classList.add("is-invalid");
+            document.getElementById("partNumberError_"+index).classList.add("paragraph-class");
         }
-        function removePartNumberError($msg)
+        function removePartNumberError(index)
         {
-            document.getElementById("partNumberError").textContent="";
-            document.getElementById("partNumberError1").textContent="";
-            document.getElementById("part_number").classList.remove("is-invalid");
-            document.getElementById("part_numberRaw").classList.remove("is-invalid");
-            document.getElementById("partNumberError").classList.remove("paragraph-class");
-            document.getElementById("partNumberError1").classList.remove("paragraph-class");
+            document.getElementById("partNumberError_"+index).textContent="";
+            document.getElementById("part_number_"+index).classList.remove("is-invalid");
+            document.getElementById("partNumberError_"+index).classList.remove("paragraph-class");
         }
         function showAddonNameError($msg)
         {
@@ -1827,6 +1888,14 @@
                         }
                     }
                 }
+                var countPartNumbers = $(".partNumberMain").find(".partNumberApendHere").length;
+                for (let i = 1; i <= countPartNumbers; i++)
+                {
+                    if($('#part_number_'+i).val() != '')
+                    {
+                        canEnableDropdown = 'no';
+                    }
+                }
             }
             if(canEnableDropdown == 'yes')
             {
@@ -1916,6 +1985,23 @@
             document.getElementById('maxLeadTimeError_'+row).textContent="";
             document.getElementById('lead_time_max_'+row).classList.remove("is-invalid");
             document.getElementById('maxLeadTimeError_'+row).classList.remove("paragraph-class");
+        }
+        function setPartNumber(partNum, index)
+        {
+            $('#part_number_'+index).val(partNum.value);
+            var partNumberInput = $('#part_number_'+index).val();
+            if(partNumberInput == '')
+            {
+                $msg = "Part Number is required";
+                showPartNumberError($msg,index);
+                formInputError = true;
+                enableDropdown();
+            }
+            else
+            {
+                removePartNumberError(index);
+                disableDropdown();
+            }
         }
 </script>
 @endsection

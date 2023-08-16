@@ -496,8 +496,13 @@
         var fixingCharge = 'yes';
         var countKitItems = {!! json_encode($count) !!};
         var imageIsOkay = false;
+        var imageExist = data.image;
     $(document).ready(function ()
     {
+        if(imageExist != '')
+            {
+                imageIsOkay = true;
+            }
         for(let i=1; i<=countKitItems; i++)
         {
             $('#mainItem'+i).select2({

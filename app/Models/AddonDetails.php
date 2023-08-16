@@ -14,7 +14,6 @@ class AddonDetails extends Model
         'addon_id',
         'addon_code',
         'addon_type_name',
-        'part_number',
         'payment_condition',
         'model_year_start',
         'model_year_end',
@@ -64,5 +63,9 @@ class AddonDetails extends Model
     public function KitItems()
     {
         return $this->hasMany(KitCommonItem::class,'addon_details_id','id');
+    }
+    public function partNumbers()
+    {
+        return $this->hasMany(SparePartsNumber::class,'addon_details_id','id');
     }
 }

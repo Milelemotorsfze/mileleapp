@@ -173,7 +173,7 @@
 </div>
 </br>
 <div id="showaddtrimDis" class="col-xxl-12 col-lg-12 col-md-12" style="margin-top:20px;" hidden>
-    <a id="addDis" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a>
+    <!-- <a id="addDis" style="float: right;" class="btn btn-sm btn-info"><i class="fa fa-plus" aria-hidden="true"></i> Add trim</a> -->
 </div>
 </br>
 <input type="hidden" id="indexValue" value="">
