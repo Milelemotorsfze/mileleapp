@@ -100,6 +100,7 @@ Route::get('/d', function () {
     Route::get('getUniqueAccessories', [AddonController::class, 'getUniqueAccessories'])->name('addon.getUniqueAccessories');
     Route::get('getUniqueSpareParts', [AddonController::class, 'getUniqueSpareParts'])->name('addon.getUniqueSpareParts');
     Route::get('getUniqueAddonDescription', [AddonController::class, 'getUniqueAddonDescription'])->name('addon.getUniqueAddonDescription');
+    Route::get('getUniqueKits', [AddonController::class, 'getUniqueKits'])->name('addon.getUniqueKits');
 
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');

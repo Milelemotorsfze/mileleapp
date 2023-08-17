@@ -775,8 +775,8 @@ class AddonController extends Controller
                 if($request->brand_id)
                 {
                     $brandId = $request->brand_id;
-//                    $addon_details->is_all_brands = 'no';
-//                    $addon_details->update();
+                    $addon_details->is_all_brands = 'no';
+                    $addon_details->update();
                     if(isset($request->brandModel))
                     {
                         if(count($request->brandModel) > 0)
@@ -795,7 +795,7 @@ class AddonController extends Controller
                                     $createAddType['addon_details_id'] = $addon_details->id;
                                     $createAddType['brand_id'] = $brandId;
                                     $createAddType['model_id'] = $brandModelData['model_line_id'];
-//                                    $createAddType['is_all_model_lines'] = 'no';
+                                    $createAddType['is_all_model_lines'] = 'no';
                                     $createAddType['model_number'] = $modelNumber;
                                     $creBranModelDes = AddonTypes::create($createAddType);
 
@@ -1744,6 +1744,47 @@ class AddonController extends Controller
 
         $data['i'] = $request->i;
         $data['j'] = $request->j;
+
+        return response($data);
+
+    }
+    public function getUniqueKits(Request $request) {
+
+        $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
+            ->where('addon_type_name', $request->addonType);
+        // if edit page
+        if($request->id) {
+            $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
+        }
+        $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
+
+        $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
+            ->where('brand_id', $request->brand);
+        if($isExisting) {
+            $isExisting = $isExisting->where('model_id', $request->model_line);
+            if($isExisting ) {
+                $modelNumber = [];
+                if($request->model_number != null) {
+                    $modelNumber = $request->model_number;
+                }
+                $isExisting = $isExisting->whereIn('model_number', $modelNumber);
+                $modelNumbers = $isExisting->get();
+                $models = [];
+                foreach ($modelNumbers as $modelNumber) {
+                    $models[] = $modelNumber->modelDescription->model_description ?? '';
+                }
+                $data['model_number'] = implode(",", $models);
+            }
+        }
+
+        if($isExisting) {
+
+            $data['count'] = $isExisting->count();
+        }else{
+            $data['count'] = 0;
+        }
+
+        $data['index'] = $request->index;
 
         return response($data);
 
