@@ -156,7 +156,7 @@
                 <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Type') }}</label>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Name') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
@@ -211,7 +211,6 @@
                         </div>
                     </div>
                     </br>
-
 
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
@@ -358,27 +357,30 @@
                                                                         <span class="error">* </span>
                                                                         <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                                                         <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[{{$i}}][item]" id="mainItem{{$i}}"
-                                                                                multiple="true" style="width: 100%;" data-index="{{$i}}" required>
+                                                                                multiple="true" style="width: 100%;" data-index="{{$i}}" onchange="KitItemValidations(this,{{$i}})" >
                                                                             <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $alreadyAddedItems)) selected @endif>
                                                                                 {{$kitItemDropdownData->item->addon_code}}
                                                                                 ( {{$kitItemDropdownData->item->AddonName->name}}
                                                                                 @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif  )
                                                                             </option>
-{{--                                                                                    <option value="{{$kitItemDropdownData->item->id}}" selected>--}}
-
-{{--                                                                                    </option>--}}
-                                                                                        @foreach($availableCommonItems as $itemDrop)
-                                                                                        <option value="{{$itemDrop->id}}">
-                                                                                        {{$itemDrop->addon_code}} ( {{$itemDrop->AddonName->name}} - {{ $itemDrop->description }})</option>
-                                                                                        @endforeach
+                                                                            @foreach($availableCommonItems as $itemDrop)
+                                                                                <option value="{{$itemDrop->id}}">
+                                                                                    {{$itemDrop->addon_code}} ( {{$itemDrop->AddonName->name}} - {{ $itemDrop->description }})
+                                                                                </option>
+                                                                            @endforeach
                                                                         </select>
+                                                                        <span id="KitItemError1" class="KitItemError invalid-feedback"></span>
+
+
                                                                     </div>
                                                                     <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                                                         <span class="error">* </span>
                                                                         <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
                                                                         <input name="mainItem[{{$i}}][quantity]" id="mainQuantity{{$i}}" placeholder="Enter Quantity" type="number" value="{{$kitItemDropdownData->quantity}}" min="1"
-                                                                                class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus
-                                                                                oninput="validity.valid||(value='1');" required>
+                                                                                class="form-control widthinput quantityMainItem" autofocus  required
+                                                                                oninput="validity.valid||(value='1');" >
+                                                                        <span id="KitItemQuantityError1" class="kitItemQuantityError invalid-feedback"></span>
+
                                                                     </div>
                                                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                                     <a id="removeMainItem{{$i}}" class="btn_round removeMainItem" data-index="{{$i}}">
@@ -855,6 +857,26 @@
                     }
                 }
             }
+
+            var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+
+            for (let i = 1; i <= KitItemIndex; i++)
+            {
+                var inputKitItem = $('#mainItem'+i).val();
+                if(inputKitItem == '')
+                {
+                    $msg = "Kit Item is required";
+                    showKitItemError($msg,i);
+                    formInputError = true;
+                }
+                var inputKitQuantity = $('#mainQuantity'+i).val();
+                if(inputKitQuantity == '')
+                {
+                    $msg = "Quantity is required";
+                    showKitItemQuantityError($msg,i);
+                    formInputError = true;
+                }
+            }
             if(inputAddonName == '')
             {
                 $msg = "Addon Name is required";
@@ -881,25 +903,33 @@
                 e.preventDefault();
             }
         });
-        function validationOnKeyUp(clickInput)
-        {
-            if(clickInput.id == 'itemArr1')
-            {
-                var value = clickInput.value;
-                if(value == '')
-                {
-                    if(value.legth != 0)
-                    {
-                        $msg = "Supplier Type is required";
-                        showSupplierTypeError($msg);
-                    }
-                }
-                else
-                {
-                    removeSupplierTypeError();
-                }
-            }
-        }
+     function KitItemValidations(clickInput, index) {
+         var kitItem = clickInput.value;
+
+         if(kitItem == '')
+         {
+             $msg = "Kit Item is required";
+             showKitItemError($msg,index)
+         }else{
+
+             $msg = "";
+             removeKitItemError($msg,index)
+         }
+     }
+     function validationOnKeyUp(clickInput,index)
+     {
+         var kitItemQuantity = clickInput.value;
+
+         if(kitItemQuantity == '')
+         {
+             $msg = "Quantity is required";
+             showKitItemQuantityError($msg,index)
+         }else{
+             $msg = "";
+             removeKitItemQuantityError($msg,index)
+         }
+
+     }
         function showBrandError($msg)
         {
             document.getElementById("brandError").textContent=$msg;
@@ -1098,6 +1128,30 @@
             document.getElementById("addon_id").classList.remove("is-invalid");
             document.getElementById("addonNameError").classList.remove("paragraph-class");
         }
+         function showKitItemError($msg,i)
+         {
+             document.getElementById("KitItemError"+i).textContent=$msg;
+             document.getElementById("mainItem"+i).classList.add("is-invalid");
+             document.getElementById("KitItemError"+i).classList.add("paragraph-class");
+         }
+         function removeKitItemError($msg,i)
+         {
+             $("#KitItemError"+i).text(" ");
+             $("mainItem"+i).removeClass("is-invalid");
+             $("KitItemError"+i).removeClass("paragraph-class");
+         }
+         function showKitItemQuantityError($msg,i)
+         {
+             document.getElementById("KitItemQuantityError"+i).textContent=$msg;
+             document.getElementById("mainQuantity"+i).classList.add("is-invalid");
+             document.getElementById("KitItemQuantityError"+i).classList.add("paragraph-class");
+         }
+         function removeKitItemQuantityError($msg,i)
+         {
+             document.getElementById("KitItemQuantityError"+i).textContent=$msg;
+             document.getElementById("mainQuantity"+i).classList.remove("is-invalid");
+             document.getElementById("KitItemQuantityError"+i).classList.remove("paragraph-class");
+         }
         // function showFixingChargeAmountError($msg)
         // {
         //     document.getElementById("fixingChargeAmountError").textContent=$msg;
@@ -2120,15 +2174,17 @@
                     <div class="col-xxl-10 col-lg-6 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                         <select class="mainItem MainItemsClass" name="mainItem[${index}][item]" id="mainItem${index}" multiple="true"
-                         style="width: 100%;" data-index="${index}" required>
+                         style="width: 100%;" data-index="${index}" onchange="KitItemValidations(this, ${index})" >
                         </select>
+                         <span id="KitItemError${index}" class="KitItemError invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                             <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                            <input name="mainItem[${index}][quantity]" id="mainQuantity${index}"
-                             type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem"
-                             placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
-                             oninput="validity.valid||(value='1');" required>
+                            <input name="mainItem[${index}][quantity]" id="mainQuantity${index}" onkeyup="validationOnKeyUp(this, ${index})"
+                             type="number" value="1" min="1" class="form-control widthinput quantityMainItem"
+                             placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus required
+                             oninput="validity.valid||(value='1');"  >
+                              <span id="kitItemQuantityError${index}" class="kitItemQuantityError invalid-feedback"></span>
                         </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <a id="removeMainItem${index}" class="btn_round removeMainItem" data-index="${index}">
