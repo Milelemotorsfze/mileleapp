@@ -149,6 +149,7 @@
         <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.updatedetails',$addonDetails->id) }}">
             @csrf
             <div class="row">
+                <input type="hidden" name="fixing_charges_included" value="no">
 
                 <p><span style="float:right;" class="error">* Required Field</span></p>
                 <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -263,17 +264,12 @@
                                                                     <div class="row">
                                                                         <div class="col-xxl-4 col-lg-6 col-md-12">
                                                                             <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-{{--                                                                            {{$addonDetails->latestAddonType->brand_id}}--}}
-                                                                            <select  name="brand" class="brands" id="selectBrand"
-                                                                                    multiple="true" style="width: 100%;" disabled>
-                                                                                {{--                                                                                        <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
-{{--                                                                                <option class="{{$existingBrand->brands->id}}" value="{{$existingBrand->brands->id}}"--}}
-{{--                                                                                        selected locked="locked">{{$existingBrand->brands->brand_name}}</option>--}}
+                                                                            <select class="brands" name="brand" id="selectBrand" multiple="true" style="width: 100%;" disabled>
                                                                                 @foreach($brands as $brand)
                                                                                     <option value="{{$brand->id}}" {{ $brand->id == $addonDetails->latestAddonType->brand_id ? 'selected' : '' }}>{{$brand->brand_name}}</option>
                                                                                 @endforeach
                                                                             </select>
-{{--                                                                            <input hidden value="{{$existingBrand->brands->id}}" name="brandModel[{{$i}}][brand_id]">--}}
+                                                                            <input hidden value="{{$addonDetails->latestAddonType->brand_id}}" name="brand_id">
                                                                             <span id="brandError" class="brandError invalid-feedback"></span>
                                                                         </div>
                                                                     </div>
@@ -285,7 +281,7 @@
                                                                                 </div>
                                                                                 <div class="col-xxl-4 col-lg-6 col-md-12 model-line-div" id="showDivdrop{{$i}}">
                                                                                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                                                    <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][model_line_id][]" data-index="{{$i}}"
+                                                                                    <select class="compare-tag1 model-lines" name="brandModel[{{$i}}][model_line_id]" data-index="{{$i}}"
                                                                                             id="selectModelLine{{$i}}"  multiple="true"
                                                                                         style="width: 100%;" onchange=selectModelLineDescipt({{$i}})>
                                                                                         <option value="{{ $existingAddonType->model_id }}" @if(in_array($existingAddonType->model_id, $kitModelLineIds)) selected @endif>
@@ -1779,7 +1775,7 @@
                     // $(this).find('.brands').attr('id', 'selectBrand'+index);
                     $(this).find('.brands').attr('data-index',index);
                     $(this).find('.model-line-div').attr('id','showDivdrop'+index);
-                    $(this).find('.model-lines').attr('name','brandModel['+ index +'][modelline_id][]');
+                    $(this).find('.model-lines').attr('name','brandModel['+ index +'][model_line_id]');
                     $(this).find('.model-lines').attr('id','selectModelLine'+index);
                     $(this).find('.model-lines').attr('data-index',index);
                     $(this).find('.model-lines').attr('onchange','selectModelLine(this.id,'+index+')');
