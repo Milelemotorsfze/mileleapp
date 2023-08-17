@@ -2052,7 +2052,7 @@
         });
     });
         function MainKitItemHideOption(index,value) {
-            var indexValue = $('#MainKitItemIndex').val();
+            var indexValue = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != index) {
                     var currentId = 'mainItem' + i;
@@ -2061,7 +2061,7 @@
             }
         }
         function MainKitItemAppendOption(index,data) {
-            var indexValue = $('#MainKitItemIndex').val();
+            var indexValue = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             for(var i=1;i<=indexValue;i++) {
                 if(i != index) {
                     $('#mainItem'+i).append($('<option>', {value: data.id, text : data.text}))
