@@ -489,28 +489,18 @@
             });
 
             $('#brandModelNumberId').hide();
-            // $('.radioFixingCharge').click(function()
-            // {
-            //     var addon_type = $("#addon_type").val();
-            //     fixingCharge = $(this).val();
-            //     if($(this).val() == 'yes')
-            //     {
-            //         let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-            //         showFixingChargeAmount.hidden = true
-            //         let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-            //         showFixingChargeAmountBr.hidden = true
-            //     }
-            //     else
-            //     {
-            //         let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-            //         showFixingChargeAmount.hidden = false
-            //         let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-            //         showFixingChargeAmountBr.hidden = false
-            //     }
-            // });
+
+
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
             {
+               var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                var type = 'ADDON_NAME';
+
+                for(var i=1;i<= indexValue;i++) {
+                    uniqueCheckKit(i,type);
+                }
+
                 // fetch addon existing detils
                 var id = $('#addon_id').val();
                 if(id != '')
@@ -1375,6 +1365,47 @@
         // }
 </script>
 <script type="text/javascript">
+    function uniqueCheckKit(index,type) {
+
+        var addon_id = $('#addon_id').val();
+        var addonType = $('#addon_type').val();
+        var brand = $('#brand').val();
+        var modelLine = $('#selectModelLine'+index).val();
+        var modelNumber = $('#selectModelNumber'+index).val();
+
+        $.ajax({
+            url: "{{url('getUniqueKits')}}",
+            type: "GET",
+
+            data:
+                {
+                    addon_id: addon_id[0],
+                    addonType:addonType,
+                    brand:brand[0],
+                    model_line:modelLine[0],
+                    model_number:modelNumber,
+                    index:index,
+                },
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                if(data.count > 0 ) {
+                    var modelNumber = "";
+                    if(data.model_number) {
+                        var modelNumber = data.model_number;
+                    }
+                    $msg = "This Addon,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                    showModelLineError($msg,data.index);
+                    var count = data.count;
+                    // isExistingUniqueCounts.push(count);
+                }else{
+                    $msg = "";
+                    removeModelLineError($msg,data.index);
+                    // isExistingUniqueCounts.pop();
+                }
+            }
+        });
+    }
     $(document).ready(function ()
     {
         $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
@@ -1393,10 +1424,15 @@
             var index = $(this).attr('data-index');
             // optionDisable(index, value);
             hideOption(index,value);
+            var type = 'MODEL_LINE';
+            uniqueCheckKit(index,type);
 
         });
+
         $(document.body).on('select2:select', ".model-numbers", function (e) {
             e.preventDefault();
+            var index = $(this).attr('data-index');
+
             var type = 'MODEL_NUMBER';
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
@@ -1415,11 +1451,16 @@
             }else{
                 getItemsDropdown(type);
             }
+            var type = 'MODEL_NUMBER';
+
+            uniqueCheckKit(index, type);
         });
         $(document.body).on('select2:unselect', ".model-numbers", function (e) {
             e.preventDefault();
-            var type = 'MODEL_NUMBER';
 
+            var index = $(this).attr('data-index');
+
+            var type = 'MODEL_NUMBER';
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
             for(let i=1; i<=countRow; i++)
@@ -1436,13 +1477,19 @@
             }else{
                 getItemsDropdown(type);
             }
+            var type = 'MODEL_NUMBER';
+
+            uniqueCheckKit(index, type);
         });
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             // optionEnable(currentId,data);
             $('#selectModelNumber'+index).empty();
-            appendOption(index,data)
+            appendOption(index,data);
+            var type = 'MODEL_LINE';
+
+            uniqueCheckKit(index, type);
         });
 
         function hideOption(index,value) {
@@ -1936,6 +1983,9 @@
                 $(this).find('.quantityMainItem').attr('name', 'mainItem['+index+'][quantity]');
                 $(this).find('.quantityMainItem').attr('id', 'mainQuantity'+index);
                 $(this).find('.removeMainItem').attr('data-index', index);
+                $(this).find('.KitItemError').attr('id','KitItemError'+index);
+                $(this).find('.kitItemQuantityError').attr('id','kitItemQuantityError'+index);
+
                 $('#mainItem'+index).select2
                 ({
                     placeholder:"Choose Items....     Or     Type Here To Search....",

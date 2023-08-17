@@ -2143,6 +2143,8 @@
                 $(this).find('.quantityMainItem').attr('name', 'mainItem['+index+'][quantity]');
                 $(this).find('.quantityMainItem').attr('id', 'mainQuantity'+index);
                 $(this).find('.removeMainItem').attr('data-index', index);
+                $(this).find('.KitItemError').attr('id','KitItemError'+index);
+                $(this).find('.kitItemQuantityError').attr('id','kitItemQuantityError'+index);
                 $('#mainItem'+index).select2
                 ({
                     placeholder:"Choose Items....     Or     Type Here To Search....",
