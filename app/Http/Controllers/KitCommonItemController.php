@@ -421,7 +421,7 @@ class KitCommonItemController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('KitItems.partNumbers','AddonName','AddonTypes.brands','SellingPrice',
         'KitItems.item.AddonName','KitItems.item.AddonSuppliers.Suppliers',
         // old code start
         'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
