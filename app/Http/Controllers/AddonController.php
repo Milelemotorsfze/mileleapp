@@ -70,7 +70,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+//         dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -206,7 +206,7 @@ class AddonController extends Controller
             }
             if($request->addon_type == 'SP')
             {
-                info($request->all());
+//                info($request->all());
                 if($request->brand)
                 {
                     if(count($request->brand) > 0)
@@ -590,7 +590,7 @@ class AddonController extends Controller
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        // dd($request->addon_type_hiden);
+//         dd($request->all());
         $request->addon_type = $request->addon_type_hiden;
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
@@ -769,6 +769,50 @@ class AddonController extends Controller
                             }
                         }
                     }
+                }
+            }
+            elseif ($request->addon_type == 'K') {
+                if($request->brand_id)
+                {
+                    $brandId = $request->brand_id;
+//                    $addon_details->is_all_brands = 'no';
+//                    $addon_details->update();
+                    if(isset($request->brandModel))
+                    {
+                        if(count($request->brandModel) > 0)
+                        {
+//                            dd($request->all());
+                            // delete existing data
+
+//                            $addonTypes = AddonTypes::where('addon_details_id', $addon_details->id)->delete();
+                            // add new model line and numbers
+                            foreach($request->brandModel as $key => $brandModelData)
+                            {
+//                                info("inside loop");
+                                foreach ($brandModelData['model_number'] as $modelNumber) {
+                                    $createAddType = [];
+                                    $createAddType['created_by'] = $authId;
+                                    $createAddType['addon_details_id'] = $addon_details->id;
+                                    $createAddType['brand_id'] = $brandId;
+                                    $createAddType['model_id'] = $brandModelData['model_line_id'];
+//                                    $createAddType['is_all_model_lines'] = 'no';
+                                    $createAddType['model_number'] = $modelNumber;
+                                    $creBranModelDes = AddonTypes::create($createAddType);
+
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $createAddType = [];
+                        $createAddType['created_by'] = $authId;
+                        $createAddType['addon_details_id'] = $addon_details->id;
+                        $createAddType['brand_id'] = $brandId;
+                        $createAddType['is_all_model_lines'] = 'no';
+                        $creBranModelDes = AddonTypes::create($createAddType);
+                    }
+
                 }
             }
             else
