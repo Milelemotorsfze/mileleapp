@@ -1648,13 +1648,22 @@ class AddonController extends Controller
 
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
                 ->where('description', $description)
-                ->where('part_number', $request->part_number)
+                // ->where('part_number', $request->part_number)
                 ->where('addon_type_name', $request->addonType);
 
             if($request->id) {
                 $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
             }
+            if($request->part_number && $request->part_number != '')
+            {
+                $existingAddonDetailIds = $existingAddonDetailIds->whereHas('partNumbers', function($q) use($request)
+                {
+                    $q = $q->where('part_number',$request->part_number);
+                });
+            }
             $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
+
+
 
             $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
                                 ->where('brand_id', $request->brand);
