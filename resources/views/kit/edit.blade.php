@@ -149,6 +149,7 @@
         <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.updatedetails',$addonDetails->id) }}">
             @csrf
             <div class="row">
+
                 <p><span style="float:right;" class="error">* Required Field</span></p>
                 <div class="col-xxl-9 col-lg-6 col-md-12">
                 <div class="row">
@@ -499,7 +500,7 @@
         var selectedBrands = [];
         var i=1;
         var sub ='2';
-        var fixingCharge = 'yes';
+        // var fixingCharge = 'yes';
         var countKitItems = {!! json_encode($count) !!};
         var imageIsOkay = false;
         var imageExist = data.image;
@@ -522,13 +523,13 @@
         $(document).ready(function ()
         {
             currentAddonType =  $('#addon_type').val();
-            if(data.fixing_charges_included == 'no')
-            {
-                let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                showFixingChargeAmount.hidden = false
-                let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-                showFixingChargeAmountBr.hidden = false
-            }
+            // if(data.fixing_charges_included == 'no')
+            // {
+            //     let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
+            //     showFixingChargeAmount.hidden = false
+            //     let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
+            //     showFixingChargeAmountBr.hidden = false
+            // }
             if(data.addon_type == 'SP')
             {
                 // alert('show part number');
@@ -555,25 +556,25 @@
             $("#supplierArray1").select2({
                 // maximumSelectionLength: 1,
             });
-            $('.radioFixingCharge').click(function()
-            {
-                var addon_type = $("#addon_type").val();
-                fixingCharge = $(this).val();
-                if($(this).val() == 'yes')
-                {
-                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = true
-                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-                    showFixingChargeAmountBr.hidden = true
-                }
-                else
-                {
-                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = false
-                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-                    showFixingChargeAmountBr.hidden = false
-                }
-            });
+            // $('.radioFixingCharge').click(function()
+            // {
+            //     var addon_type = $("#addon_type").val();
+            //     fixingCharge = $(this).val();
+            //     if($(this).val() == 'yes')
+            //     {
+            //         let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
+            //         showFixingChargeAmount.hidden = true
+            //         let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
+            //         showFixingChargeAmountBr.hidden = true
+            //     }
+            //     else
+            //     {
+            //         let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
+            //         showFixingChargeAmount.hidden = false
+            //         let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
+            //         showFixingChargeAmountBr.hidden = false
+            //     }
+            // });
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
             {
@@ -864,16 +865,16 @@
                 showAddonNameError($msg);
                 formInputError = true;
             }
-            if(fixingCharge == 'no')
-            {
-                var inputFixingChargeAmount = $('#fixing_charge_amount').val();
-                if(inputFixingChargeAmount == '')
-                {
-                    $msg = "Fixing Charge Amount is required";
-                    showFixingChargeAmountError($msg);
-                    formInputError = true;
-                }
-            }
+            // if(fixingCharge == 'no')
+            // {
+            //     var inputFixingChargeAmount = $('#fixing_charge_amount').val();
+            //     if(inputFixingChargeAmount == '')
+            //     {
+            //         $msg = "Fixing Charge Amount is required";
+            //         showFixingChargeAmountError($msg);
+            //         formInputError = true;
+            //     }
+            // }
             if(imageIsOkay == false)
             {
                 formInputError = true;
@@ -1101,18 +1102,18 @@
             document.getElementById("addon_id").classList.remove("is-invalid");
             document.getElementById("addonNameError").classList.remove("paragraph-class");
         }
-        function showFixingChargeAmountError($msg)
-        {
-            document.getElementById("fixingChargeAmountError").textContent=$msg;
-            document.getElementById("fixing_charge_amount").classList.add("is-invalid");
-            document.getElementById("fixingChargeAmountError").classList.add("paragraph-class");
-        }
-        function removeFixingChargeAmountError($msg)
-        {
-            document.getElementById("fixingChargeAmountError").textContent="";
-            document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
-            document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
-        }
+        // function showFixingChargeAmountError($msg)
+        // {
+        //     document.getElementById("fixingChargeAmountError").textContent=$msg;
+        //     document.getElementById("fixing_charge_amount").classList.add("is-invalid");
+        //     document.getElementById("fixingChargeAmountError").classList.add("paragraph-class");
+        // }
+        // function removeFixingChargeAmountError($msg)
+        // {
+        //     document.getElementById("fixingChargeAmountError").textContent="";
+        //     document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
+        //     document.getElementById("fixingChargeAmountError").classList.remove("paragraph-class");
+        // }
          // function showNewAddonError($msg)
          // {
          //     document.getElementById("newAddonError").textContent=$msg;
@@ -1161,107 +1162,107 @@
             $('#showImageModal').removeClass('modalhide');
             modalImg.src = img.src;
         }
-        function getAddonCodeAndDropdown()
-        {
-            var e = document.getElementById("addon_type");
-            var value = e.value;
-            currentAddonType = value;
-            if(currentAddonType != '')
-            {
-                $("#selectBrandMo1").removeAttr('disabled');
-                $("#selectBrand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#selectBrand").select2({
-                    maximumSelectionLength: 1,
-                });
+        {{--function getAddonCodeAndDropdown()--}}
+        {{--{--}}
+        {{--    var e = document.getElementById("addon_type");--}}
+        {{--    var value = e.value;--}}
+        {{--    currentAddonType = value;--}}
+        {{--    if(currentAddonType != '')--}}
+        {{--    {--}}
+        {{--        $("#selectBrandMo1").removeAttr('disabled');--}}
+        {{--        $("#selectBrand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");--}}
+        {{--        $("#selectBrand").select2({--}}
+        {{--            maximumSelectionLength: 1,--}}
+        {{--        });--}}
 
-                // document.getElementById("AddonTypeError").classList.remove("paragraph-class");
-                // document.getElementById("AddonTypeError").classList.remove("paragraph-class");
-                // document.getElementById("AddonTypeError").textContent="";
-                document.getElementById("addon_type_required").textContent="";
-                $msg = "";
-                removeAddonTypeError($msg);
-                // document.getElementById("addon_type_required").hidden = true;
-                if(value == 'SP' )
-                {
-                    $("#brandModelLineId").hide();
-                    $("#brandModelNumberId").show();
-                    document.getElementById("brandModelNumberId").hidden = false;
-                    $("#showaddtrim").hide();
-                    $("#showaddtrimDis").show();
-                    let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = false
-                    let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = false
-                }
-                else
-                {
-                    let showPartNumber = document.getElementById('partNumberDiv');
-                    showPartNumber.hidden = true
-                    let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    showPartNumberBr.hidden = true
-                    $("#brandModelLineId").show();
-                    $("#brandModelNumberId").hide();
-                    $("#showaddtrim").show();
-                    $("#showaddtrimDis").hide();
-                }
-                $("#purchase_price").val('');
-                if(value == 'K')
-                {
-                    hidenotKitSupplier();
-                    showkitSupplier();
-                    setLeastPurchasePriceAED();
-                }
-                else
-                {
-                    hidekitSupplier();
-                    shownotKitSupplier();
-                    setLeastAEDPrice();
-                }
-                $.ajax
-                ({
-                    url:"{{url('getAddonCodeAndDropdown')}}",
-                    type: "POST",
-                    data:
-                    {
-                        addon_type: value,
-                        _token: '{{csrf_token()}}'
-                    },
-                    dataType : 'json',
-                    success: function(data)
-                    {
-                        $('#addon_type').val(currentAddonType);
-                        $('#addon_code').val(data.newAddonCode);
-                        $("#addon_id").html("");
-                        myarray = data.addonMasters;
-                        var size= myarray.length;
-                        if(size >= 1)
-                        {
-                            let AddonDropdownData   = [];
-                            $.each(data.addonMasters,function(key,value)
-                            {
-                                AddonDropdownData.push
-                                ({
-                                    id: value.id,
-                                    text: value.name
-                                });
-                            });
-                            $('#addon_id').select2
-                            ({
-                                placeholder: 'Select value',
-                                allowClear: true,
-                                data: AddonDropdownData,
-                                maximumSelectionLength: 1,
-                            });
-                        }
-                    }
-                });
-            }
-            else
-            {
-                $('#addon_code').val('');
-                $msg = "Addon Type is required";
-            }
-        }
+        {{--        // document.getElementById("AddonTypeError").classList.remove("paragraph-class");--}}
+        {{--        // document.getElementById("AddonTypeError").classList.remove("paragraph-class");--}}
+        {{--        // document.getElementById("AddonTypeError").textContent="";--}}
+        {{--        document.getElementById("addon_type_required").textContent="";--}}
+        {{--        $msg = "";--}}
+        {{--        removeAddonTypeError($msg);--}}
+        {{--        // document.getElementById("addon_type_required").hidden = true;--}}
+        {{--        if(value == 'SP' )--}}
+        {{--        {--}}
+        {{--            $("#brandModelLineId").hide();--}}
+        {{--            $("#brandModelNumberId").show();--}}
+        {{--            document.getElementById("brandModelNumberId").hidden = false;--}}
+        {{--            $("#showaddtrim").hide();--}}
+        {{--            $("#showaddtrimDis").show();--}}
+        {{--            let showPartNumber = document.getElementById('partNumberDiv');--}}
+        {{--            showPartNumber.hidden = false--}}
+        {{--            let showPartNumberBr = document.getElementById('partNumberDivBr');--}}
+        {{--            showPartNumberBr.hidden = false--}}
+        {{--        }--}}
+        {{--        else--}}
+        {{--        {--}}
+        {{--            let showPartNumber = document.getElementById('partNumberDiv');--}}
+        {{--            showPartNumber.hidden = true--}}
+        {{--            let showPartNumberBr = document.getElementById('partNumberDivBr');--}}
+        {{--            showPartNumberBr.hidden = true--}}
+        {{--            $("#brandModelLineId").show();--}}
+        {{--            $("#brandModelNumberId").hide();--}}
+        {{--            $("#showaddtrim").show();--}}
+        {{--            $("#showaddtrimDis").hide();--}}
+        {{--        }--}}
+        {{--        $("#purchase_price").val('');--}}
+        {{--        if(value == 'K')--}}
+        {{--        {--}}
+        {{--            hidenotKitSupplier();--}}
+        {{--            showkitSupplier();--}}
+        {{--            setLeastPurchasePriceAED();--}}
+        {{--        }--}}
+        {{--        else--}}
+        {{--        {--}}
+        {{--            hidekitSupplier();--}}
+        {{--            shownotKitSupplier();--}}
+        {{--            setLeastAEDPrice();--}}
+        {{--        }--}}
+        {{--        $.ajax--}}
+        {{--        ({--}}
+        {{--            url:"{{url('getAddonCodeAndDropdown')}}",--}}
+        {{--            type: "POST",--}}
+        {{--            data:--}}
+        {{--            {--}}
+        {{--                addon_type: value,--}}
+        {{--                _token: '{{csrf_token()}}'--}}
+        {{--            },--}}
+        {{--            dataType : 'json',--}}
+        {{--            success: function(data)--}}
+        {{--            {--}}
+        {{--                $('#addon_type').val(currentAddonType);--}}
+        {{--                $('#addon_code').val(data.newAddonCode);--}}
+        {{--                $("#addon_id").html("");--}}
+        {{--                myarray = data.addonMasters;--}}
+        {{--                var size= myarray.length;--}}
+        {{--                if(size >= 1)--}}
+        {{--                {--}}
+        {{--                    let AddonDropdownData   = [];--}}
+        {{--                    $.each(data.addonMasters,function(key,value)--}}
+        {{--                    {--}}
+        {{--                        AddonDropdownData.push--}}
+        {{--                        ({--}}
+        {{--                            id: value.id,--}}
+        {{--                            text: value.name--}}
+        {{--                        });--}}
+        {{--                    });--}}
+        {{--                    $('#addon_id').select2--}}
+        {{--                    ({--}}
+        {{--                        placeholder: 'Select value',--}}
+        {{--                        allowClear: true,--}}
+        {{--                        data: AddonDropdownData,--}}
+        {{--                        maximumSelectionLength: 1,--}}
+        {{--                    });--}}
+        {{--                }--}}
+        {{--            }--}}
+        {{--        });--}}
+        {{--    }--}}
+        {{--    else--}}
+        {{--    {--}}
+        {{--        $('#addon_code').val('');--}}
+        {{--        $msg = "Addon Type is required";--}}
+        {{--    }--}}
+        {{--}--}}
         $('#createAddonId').on('click', function()
         {
             // create new addon and list new addon in addon list
@@ -1377,82 +1378,82 @@
                 }
             }
         }
-        function changeCurrency(i)
-        {
-            var e = document.getElementById("currency_"+i);
-            var value = e.value;
-            if(value == 'USD')
-            {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = true
-                let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = false
-                let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = false
-            }
-            else
-            {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = false
-                let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = true
-                let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = true
-            }
-        }
-        function calculateAED(i)
-        {
-            var usd = $("#addon_purchase_price_in_usd_"+i).val();
-            var aed = usd * 3.6725;
-            var aed = aed.toFixed(4);
-            aed = parseFloat(aed);
-            if(aed == 0)
-            {
-                document.getElementById('addon_purchase_price_'+i).value = "";
-                setLeastAEDPrice();
-            }
-            else
-            {
-                document.getElementById('addon_purchase_price_'+i).value = aed;
-                setLeastAEDPrice();
-            }
-        }
-        function calculateUSD(i)
-        {
-            var aed = $("#addon_purchase_price_"+i).val();
-            var usd = aed / 3.6725;
-            var usd = usd.toFixed(4);
-            if(usd == 0)
-            {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
-            }
-            else
-            {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
-            }
-            setLeastAEDPrice();
-        }
-        function setLeastAEDPrice()
-        {
-            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
-            if(values != '')
-            {
-                var arrayOfNumbers = [];
-                values.forEach(v => {
-                    if(v != '')
-                    {
-                        arrayOfNumbers .push(v);
-                    }
-                });
-                var size= arrayOfNumbers.length;
-                if(size >= 1)
-                {
-                    var arrayOfNumbers = arrayOfNumbers.map(Number);
-                    const minOfPrice = Math.min(...arrayOfNumbers);
-                    $("#purchase_price").val(minOfPrice);
-                }
-            }
-        }
+        // function changeCurrency(i)
+        // {
+        //     var e = document.getElementById("currency_"+i);
+        //     var value = e.value;
+        //     if(value == 'USD')
+        //     {
+        //         let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
+        //         chooseCurrency.hidden = true
+        //         let currencyUSD = document.getElementById('div_price_in_usd_'+i);
+        //         currencyUSD.hidden = false
+        //         let currencyAED = document.getElementById('div_price_in_aed_'+i);
+        //         currencyAED.hidden = false
+        //     }
+        //     else
+        //     {
+        //         let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
+        //         chooseCurrency.hidden = false
+        //         let currencyUSD = document.getElementById('div_price_in_usd_'+i);
+        //         currencyUSD.hidden = true
+        //         let currencyAED = document.getElementById('div_price_in_aed_'+i);
+        //         currencyAED.hidden = true
+        //     }
+        // }
+        // function calculateAED(i)
+        // {
+        //     var usd = $("#addon_purchase_price_in_usd_"+i).val();
+        //     var aed = usd * 3.6725;
+        //     var aed = aed.toFixed(4);
+        //     aed = parseFloat(aed);
+        //     if(aed == 0)
+        //     {
+        //         document.getElementById('addon_purchase_price_'+i).value = "";
+        //         setLeastAEDPrice();
+        //     }
+        //     else
+        //     {
+        //         document.getElementById('addon_purchase_price_'+i).value = aed;
+        //         setLeastAEDPrice();
+        //     }
+        // }
+        // function calculateUSD(i)
+        // {
+        //     var aed = $("#addon_purchase_price_"+i).val();
+        //     var usd = aed / 3.6725;
+        //     var usd = usd.toFixed(4);
+        //     if(usd == 0)
+        //     {
+        //         document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+        //     }
+        //     else
+        //     {
+        //         document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+        //     }
+        //     setLeastAEDPrice();
+        // }
+        // function setLeastAEDPrice()
+        // {
+        //     const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
+        //     if(values != '')
+        //     {
+        //         var arrayOfNumbers = [];
+        //         values.forEach(v => {
+        //             if(v != '')
+        //             {
+        //                 arrayOfNumbers .push(v);
+        //             }
+        //         });
+        //         var size= arrayOfNumbers.length;
+        //         if(size >= 1)
+        //         {
+        //             var arrayOfNumbers = arrayOfNumbers.map(Number);
+        //             const minOfPrice = Math.min(...arrayOfNumbers);
+        //             $("#purchase_price").val(minOfPrice);
+        //         }
+        //     }
+        // }
         function showkitSupplier()
         {
             $('#kitSupplierIdToHideandshow').show();
@@ -1473,36 +1474,36 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
-        function inputNumberAbs(currentPriceInput)
-        {
-
-            var id = currentPriceInput.id
-            var input = document.getElementById(id);
-            var val = input.value;
-            val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2)
-            {
-                val =val.replace(/\.+$/,"");
-            }
-            input.value = val;
-            if(currentPriceInput.id == 'fixing_charge_amount')
-            {
-                var value = currentPriceInput.value;
-                if(value == '')
-                {
-
-                    if(value.legth != 0)
-                    {
-                        $msg = "Fixing Charge Amount is required";
-                        showFixingChargeAmountError($msg);
-                    }
-                }
-                else
-                {
-                    removeFixingChargeAmountError();
-                }
-            }
-        }
+        // function inputNumberAbs(currentPriceInput)
+        // {
+        //
+        //     var id = currentPriceInput.id
+        //     var input = document.getElementById(id);
+        //     var val = input.value;
+        //     val = val.replace(/^0+|[^\d.]/g, '');
+        //     if(val.split('.').length>2)
+        //     {
+        //         val =val.replace(/\.+$/,"");
+        //     }
+        //     input.value = val;
+        //     if(currentPriceInput.id == 'fixing_charge_amount')
+        //     {
+        //         var value = currentPriceInput.value;
+        //         if(value == '')
+        //         {
+        //
+        //             if(value.legth != 0)
+        //             {
+        //                 $msg = "Fixing Charge Amount is required";
+        //                 showFixingChargeAmountError($msg);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             removeFixingChargeAmountError();
+        //         }
+        //     }
+        // }
 
 
 </script>
