@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\calls;
+use App\Models\Calls;
 use Illuminate\Http\Request;
 
 class Repeatedcustomers extends Controller
@@ -10,11 +10,9 @@ class Repeatedcustomers extends Controller
     {
         $phone = $request->query('phone');
         $email = $request->query('email');
-        
         $calls = Calls::where('phone', $phone)
             ->orWhere('email', $email)
             ->get();
-        
         return view('calls.repeatedcustomer', compact('calls'));
     }
 }

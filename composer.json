@@ -23,6 +23,7 @@
         "microsoft/microsoft-graph": "^1.36",
         "monarobase/country-list": "^3.4",
         "nesbot/carbon": "^2.68",
+        "phpoffice/phpspreadsheet": "^1.29",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.3",
         "spatie/laravel-enum": "^3.0",

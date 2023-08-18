@@ -40,7 +40,9 @@
     <input type="hidden" name="start_date" id="start_date">
     <input type="hidden" name="end_date" id="end_date">
 </form>
-        <canvas id="barChart" style="height: 300px;"></canvas>
+<div id="chartContainer" style="width: 100%; height: 350px;">
+    <canvas id="barChart"></canvas>
+</div>
                                         
                                     </div>
                                 </div><!-- end card body -->
@@ -126,10 +128,10 @@
                                         <div class="col-12">
                                         <canvas id="totalleads"></canvas>
                                         </div>
-</div>
-</div>
-</div>
-</div>
+                                            </div>
+                                            </div>
+                                            </div>
+                                            </div>
                             <div class="col-xl-8">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
@@ -494,6 +496,8 @@ function updateCharts() {
             }
 
             // Create a new bar chart
+            $('#barChart').attr('width', $('#chartContainer').width());
+            $('#barChart').attr('height', 350);
             var ctx = document.getElementById('barChart').getContext('2d');
             var barChart = new Chart(ctx, {
                 type: 'bar',

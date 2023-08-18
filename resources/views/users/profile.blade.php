@@ -296,7 +296,7 @@ input[type=number]::-webkit-outer-spin-button {
     </div>
   </div>
 </div>
-<div class="modal fade" id="languagesModal" tabindex="-1" aria-labelledby="languagesModalLabel" aria-hidden="true">
+<div class="modal fade" id="languagesModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -576,7 +576,7 @@ input[type=number]::-webkit-outer-spin-button {
 </div>
       </div>
       <div class="modal-footer">
-  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
   <button type="button" class="btn btn-primary" onclick="savelogins()">Save Changes</button>
 </div>
     </div>
@@ -770,11 +770,25 @@ input[type=number]::-webkit-outer-spin-button {
     });
 function openEditModal() {
   var modal = new bootstrap.Modal(document.getElementById('languagesModal'));
-  modal.show();
+    modal._element.addEventListener('hidden.bs.modal', function (event) {
+      var backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    });
+    
+    modal.show();
 }
 function openEditModallogin() {
-  var modal = new bootstrap.Modal(document.getElementById('loginModalLabel'));
-  modal.show();
+  var modal = new bootstrap.Modal(document.getElementById('loginModal'));
+    modal._element.addEventListener('hidden.bs.modal', function (event) {
+      var backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.parentNode.removeChild(backdrop);
+      }
+    });
+    
+    modal.show();
 }
 function openEditModalpicture() {
   $('#PicturesModal').modal('show');

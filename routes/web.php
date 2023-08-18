@@ -47,6 +47,7 @@ use App\Http\Controllers\ColorCodesController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\LoginActivityController;
 use App\Http\Controllers\KitCommonItemController;
+use App\Http\Controllers\ProspectingController;
 
 
 /*
@@ -212,6 +213,7 @@ Route::get('/d', function () {
         abort(404);
     });
     Route::get('calls-get/getmodelline', [CallsController::class,'getmodelline'])->name('calls.get-modellines');
+    Route::get('download/rejected/{filename}', [CallsController::class,'downloadRejected'])->name('download.rejected');
     Route::delete('/delete-video/{id}', [VariatnsPicturesController::class, 'deleteVideo'])->name('delete_video');
     Route::delete('/delete-reel/{id}', [VariatnsPicturesController::class, 'deleteReel'])->name('delete_reel');
     Route::resource('lead_source', LeadSourceController::class);
@@ -377,4 +379,6 @@ Route::get('/d', function () {
     Route::resource('master-addons', MasterAddonController::class);
 
 
+
+    Route::resource('prospecting', ProspectingController::class);
 });

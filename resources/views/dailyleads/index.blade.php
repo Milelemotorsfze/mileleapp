@@ -191,7 +191,7 @@ input[type=number]::-webkit-outer-spin-button
               <tbody>
                 @foreach ($pendingdata as $key => $calls)
                 <tr data-id="1">
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 
@@ -234,6 +234,7 @@ input[type=number]::-webkit-outer-spin-button
       <li><a class="dropdown-item" href="{{ route('dailyleads.prospecting',$calls->id) }}">Prospecting</a></li>
       <li><a class="dropdown-item" href="#">Qualificaton</a></li>
       <li><a class="dropdown-item" href="#">Demand</a></li>
+      <li><a class="dropdown-item" href="#">Closed</a></li>
       @endcan
       <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>

@@ -91,19 +91,19 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number">
+    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" autocomplete="off">
 </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
     {!! Form::email('email', null, array('id' => 'email', 'placeholder' => 'Email','class' => 'form-control')) !!}
-    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
     <div id="emailError" class="error-text"></div>
 </div>
                     <div class="col-lg-4 col-md-6">
                     <span class="error">* </span>
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
-                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput">
+                    <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput" autocomplete="off">
                     <datalist id="milelemotorsList">
                     @foreach ($LeadSource as $source)
                     <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
@@ -113,7 +113,7 @@ input[type=number]::-webkit-outer-spin-button {
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
-    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput">
+    <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
     <datalist id="laList">
         <option value="English" data-value="English">English</option>
         <option value="Arabic" data-value="English">Arabic</option>
@@ -165,7 +165,7 @@ input[type=number]::-webkit-outer-spin-button {
 </div>
 <div class="col-lg-4 col-md-6" id="manual-sales-person-list" style="display: none;">
     <label for="manual-sales-person" class="form-label">Sales Person:</label>
-    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput">
+    <input type="text" placeholder="Sales Persons" name="sales_person" list="salesList" class="form-control" id="salesPersonInput" autocomplete="off">
 <datalist id="salesList">
     @foreach ($sales_persons as $sales_person)
         @php
@@ -285,9 +285,7 @@ input[type=number]::-webkit-outer-spin-button {
             datalist.html(options);
             var newRow = $('<div class="row"></div>');
             var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-            var label = $('<label for="brandInput' + x + '" class="form-label">Brand & Models:</label>');
             var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-            col1.append(label);
             col1.append(input);
             col1.append(datalist);
             var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
@@ -482,9 +480,8 @@ input[type=number]::-webkit-outer-spin-button {
     var input = document.querySelector("#phone");
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        initialCountry: "ae",
         separateDialCode: false,
-        nationalMode: true
+        nationalMode: false
     });
     input.addEventListener('input', function() {
         var currentValue = input.value;

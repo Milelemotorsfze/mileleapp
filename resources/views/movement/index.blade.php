@@ -123,33 +123,38 @@
             $('#success-message').fadeOut('slow');
         }, 2000);
         $(document).ready(function () {
-        var dataTablea = $('#dtBasicExample1').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample1 th").eq([d]).text();
-          if (d === 4) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
+            var dataTable = $('#dtBasicExample1').DataTable({
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 4) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
         });
-    }
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
     });
+  }
+});
     });
             </script>
 <script>

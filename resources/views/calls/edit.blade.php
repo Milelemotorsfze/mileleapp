@@ -75,18 +75,18 @@ input[type=number]::-webkit-outer-spin-button {
                 <div class="row"> 
 					<div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Customer Name : </label>
-                        <input type="text" name="name" class="form-control" value="{{ $calls->name }}">
+                        <input type="text" name="name" class="form-control" value="{{ $calls->name }}" autocomplete="off">
                     </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">* </span>
     <label for="basicpill-firstname-input" class="form-label">Customer Phone:</label>
-    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}">
+    <input type="tel" id="phone" name="phone" class="form-control" placeholder="Phone Number" value="{{ $calls->phone }}" autocomplete="off">
 </div>
                     <div class="col-lg-4 col-md-6">
     <span class="error">*</span>
     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
     <input type="text" name="email" class="form-control" value="{{ $calls->email }}" id="email">
-    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}">
+    <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
     <input type="hidden" name="call_id" value="{{ $calls->id }}">
     <div id="emailError" class="error-text"></div>
 </div>
@@ -515,9 +515,8 @@ $brand_name = $brand->brand_name;
     var input = document.querySelector("#phone");
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        initialCountry: "ae",
         separateDialCode: false,
-        nationalMode: true
+        nationalMode: false
     });
     input.addEventListener('input', function() {
         var currentValue = input.value;

@@ -1,4 +1,74 @@
 @extends('layouts.table')
+<style>
+    div.dataTables_wrapper div.dataTables_info {
+  padding-top: 0px;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+  padding: 4px 8px 4px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+.table-wrapper {
+      position: relative;
+    }
+    thead th {
+      position: sticky!important;
+      top: 0;
+      background-color: rgb(194, 196, 204)!important;
+      z-index: 1; /* Ensure the table header is on top of other elements */
+    }
+    #table-responsive {
+      height: 100vh;
+      overflow-y: auto;
+    }
+    #dtBasicSupplierInventory {
+      width: 100%;
+      font-size: 12px;
+    }
+    th.nowrap-td {
+      white-space: nowrap;
+      height: 10px;
+    }
+    .nowrap-td {
+        white-space: nowrap;
+      }
+      .select2-container .select2-selection--single {
+      height: 34px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 34px;
+      right: 6px;
+      top: 4px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+      border-color: #888 transparent transparent transparent;
+      border-style: solid;
+      border-width: 5px 5px 0 5px;
+      height: 0;
+      left: 50%;
+      margin-left: -4px;
+      margin-top: -2px;
+      position: absolute;
+      top: 50%;
+      width: 100px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 34px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+      line-height: 34px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      background-color: #f8f9fc;
+      border-color: #ddd;
+      border-radius: 0;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow:hover {
+      background-color: #e9ecef;
+      border-color: #bbb;
+    }
+  </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 @section('content')
@@ -54,7 +124,7 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>S.No</th>
+                  <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -63,7 +133,7 @@
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
-                  <th>Source</th>
+                  <th>Lead Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
@@ -75,17 +145,17 @@
                 @foreach ($data as $key => $calls)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
+                    <td class="nowrap-td">{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
+                    <td class="nowrap-td">{{ $calls->type }}</td>
+                    <td class="nowrap-td">{{ $calls->name }}</td>     
+                    <td class="nowrap-td">{{ $calls->phone }}</td> 
+                    <td class="nowrap-td">{{ $calls->email }}</td>
                      @php
                      $sales_persons_name = "";
                      $sales_persons = DB::table('users')->where('id', $calls->sales_person)->first();
                      $sales_persons_name = $sales_persons->name;
                      @endphp  
-                    <td>{{ $sales_persons_name }}</td>
+                    <td class="nowrap-td">{{ $sales_persons_name }}</td>
                     @php
     $leads_models_brands = DB::table('calls_requirement')
         ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
@@ -103,24 +173,24 @@
         $models_brands_string = rtrim($models_brands_string, ', ');
         
     @endphp
-<td>
+<td class="nowrap-td">
     {{ $models_brands_string }}
 </td>
-                    <td>{{ $calls->custom_brand_model }}</td>
+                    <td class="nowrap-td">{{ $calls->custom_brand_model }}</td>
                     @php
                     $leadsources = "";
                      $leadsource = DB::table('lead_source')->where('id', $calls->source)->first();
                      $leadsources = $leadsource->source_name;
                      @endphp
-                    <td>{{ $leadsources }}</td>
-                    <td>{{ $calls->language }}</td>
-                    <td>{{ $calls->location }}</td>
+                    <td class="nowrap-td">{{ $leadsources }}</td>
+                    <td class="nowrap-td">{{ $calls->language }}</td>
+                    <td class="nowrap-td">{{ $calls->location }}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>
+    <td class="nowrap-td">{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
+    <td class="nowrap-td">
     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Action">
       <i class="fa fa-bars" aria-hidden="true"></i>
@@ -154,7 +224,7 @@
             <table id="dtBasicExample2" class="table table-striped table-editable table-edits table table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>S.No</th>
+                <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -163,7 +233,7 @@
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
-                  <th>Source</th>
+                  <th>Lead Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
@@ -175,7 +245,7 @@
                 @foreach ($convertedleads as $key => $calls)
                 <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 
@@ -241,7 +311,7 @@
             <table id="dtBasicExample3" class="table table-striped table-editable table-edits table table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>S.No</th>
+                <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -250,7 +320,7 @@
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
-                  <th>Source</th>
+                  <th>Lead Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
@@ -263,7 +333,7 @@
                 @foreach ($convertedrejection as $key => $calls)
                 <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 
@@ -330,7 +400,7 @@
             <table id="dtBasicExample4" class="table table-striped table-editable table-edits table table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>S.No</th>
+                <th>Ser No</th>
                   <th>Date</th>
                   <th>Purchase Type</th>
                   <th>Customer Name</th>
@@ -339,7 +409,7 @@
                   <th>Sales Person</th>
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
-                  <th>Source</th>
+                  <th>Lead Source</th>
                   <th>Preferred Language</th>
                   <th>Destination</th>
                   <th>Remarks & Messages</th>
@@ -350,7 +420,7 @@
                 @foreach ($convertedso as $key => $calls)
                 <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
+                    <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>     
                     <td>{{ $calls->phone }}</td> 
@@ -407,51 +477,39 @@
   </div>
   <script type="text/javascript">
 $(document).ready(function () {
-  var dataTablea = $('#dtBasicExample1').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample1 th").eq([d]).text();
-          if (d === 12) {
-            return;
-          }
-          if (d === 13) {
-            return;
-          }
-          if (d === 0) {
-            return;
-          }
-          if (d === 1) {
-            return;
-          }
-          if (d === 3) {
-            return;
-          }
-          if (d === 4) {
-            return;
-          }
-          if (d === 5) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
+  $('.select2').select2();
+  var dataTable = $('#dtBasicExample1').DataTable({
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 12 || d === 13) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
         });
-    }
-  });
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
+    });
+  }
+});
 $('#my-table_filter').hide();
 $('#export-excel').on('click', function() {
     var filteredData = dataTablea.rows({ search: 'applied' }).data();
@@ -488,149 +546,107 @@ function s2ab(s) {
     return view;
 }
   var dataTableb = $('#dtBasicExample2').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample2 th").eq([d]).text();
-          if (d === 12) {
-            return;
-          }
-          if (d === 13) {
-            return;
-          }
-          if (d === 0) {
-            return;
-          }
-          if (d === 1) {
-            return;
-          }
-          if (d === 3) {
-            return;
-          }
-          if (d === 4) {
-            return;
-          }
-          if (d === 5) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 12 || d === 13) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
         });
-    }
-  });
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
+    });
+  }
+});
   $('#export-csv-lead').on('click', function() {
     downloadCSVb(dataTableb, 'Call-to-Lead.csv');
   });
   var dataTablec = $('#dtBasicExample3').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample3 th").eq([d]).text();
-          if (d === 12) {
-            return;
-          }
-          if (d === 13) {
-            return;
-          }
-          if (d === 14) {
-            return;
-          }
-          if (d === 0) {
-            return;
-          }
-          if (d === 1) {
-            return;
-          }
-          if (d === 3) {
-            return;
-          }
-          if (d === 4) {
-            return;
-          }
-          if (d === 5) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 12 || d === 13 || d === 14) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
         });
-    }
-  });
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
+    });
+  }
+});
   $('#export-rejection').on('click', function() {
     downloadCSVc(dataTablec, 'rejection.csv');
   });
   var dataTabled = $('#dtBasicExample4').DataTable({
-    ordering: false,
-    initComplete: function() {
-      this.api()
-        .columns()
-        .every(function(d) {
-          var column = this;
-          var theadname = $("#dtBasicExample4 th").eq([d]).text();
-          if (d === 12) {
-            return;
-          }
-          if (d === 13) {
-            return;
-          }
-          if (d === 0) {
-            return;
-          }
-          if (d === 1) {
-            return;
-          }
-          if (d === 3) {
-            return;
-          }
-          if (d === 4) {
-            return;
-          }
-          if (d === 5) {
-            return;
-          }
-          var select = $('<select class="form-control my-1"><option value="">All</option></select>')
-            .appendTo($(column.header()))
-            .on('change', function() {
-              var val = $.fn.dataTable.util.escapeRegex($(this).val());
-              column.search(val ? '^' + val + '$' : '', true, false).draw();
-            });
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function(d, j) {
-              select.append('<option value="' + d + '">' + d + '</option>');
-            });
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 12 || d === 13) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
         });
-    }
-  });
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        select.append('<option value="' + d + '">' + d + '</option>');
+      });
+    });
+  }
+});
   $('#export-csv-so').on('click', function() {
     downloadCSVd(dataTabled, 'Lead-to-So.csv');
   });

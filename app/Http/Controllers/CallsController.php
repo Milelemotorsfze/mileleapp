@@ -11,6 +11,8 @@ use App\Models\ModelHasRoles;
 use App\Models\SalesPersonLaugauges;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Brand;
+use App\Models\Country;
+use App\Models\Language;
 use App\Models\LeadSource;
 use App\Models\MasterModelLines;
 use App\Models\Logs;
@@ -21,6 +23,9 @@ use App\Models\AvailableColour;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
 use League\Csv\Writer;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class CallsController extends Controller
 {
@@ -43,7 +48,7 @@ class CallsController extends Controller
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
     }
     /**
@@ -212,7 +217,7 @@ return view('calls.resultbrand', compact('data'));
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        $sales_persons = ModelHasRoles::where('role_id', 3)->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         
         return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
     }
@@ -322,6 +327,10 @@ return view('calls.resultbrand', compact('data'));
             return back()->with('error', 'Invalid file format. Only Excel files (XLS or XLSX) are allowed.');
         }
         $rows = Excel::toArray([], $file, null, \Maatwebsite\Excel\Excel::XLSX)[0];
+        $filteredRows = [];
+        $rejectedRows = [];
+        $acceptedCount = 0;
+        $rejectedCount = 0;
         $headers = array_shift($rows);
         foreach ($rows as $row) {
             $call = new Calls();
@@ -336,6 +345,7 @@ return view('calls.resultbrand', compact('data'));
 			$model_line_name = $row[8];
             $custom_brand_model = $row[9];
             $remarks = $row[10];
+            $errorDescription = '';
             if ($sales_person === null) {
 			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;
@@ -386,7 +396,13 @@ return view('calls.resultbrand', compact('data'));
                                             }
              else {
                 $salesPerson = User::where('name', $sales_person)->first();
-                    $sales_person_id = $salesPerson->id;
+                if($salesPerson)
+                {
+                $sales_person_id = $salesPerson->id;
+                }
+                else{
+                    $salesPerson === 'not correct';
+                }
             }
             if ($source_name !== null) {
                 $leadSource = LeadSource::where('source_name', $source_name)->first();
@@ -398,8 +414,53 @@ return view('calls.resultbrand', compact('data'));
             } 
 			else {
                 $lead_source_id = 1;
+            }
+            if ($language !== null) {
+                $language = Language::where('name', $language)->first();
+                if ($language) {
+                    $language = $language->name;
+                } else {
+                    $language = 'Not Supported';
+                }
             } 
-            $date = Carbon::now();
+			else {
+                $language = 'Not Supported';
+            }
+            if ($location !== null) {
+                $location = Country::where('name', $location)->first();
+                if ($location) {
+                    $location = $location->name;
+                } else {
+                    $location = 'Not Supported';
+                }
+            } 
+			else {
+                $location = 'Not Supported';
+            }
+            if($lead_source_id === 1 || $salesPerson === 'not correct' || $language === 'Not Supported' || $location === 'Not Supported')
+            {
+                $filteredRows[] = $row;
+                if ($salesPerson === 'not correct') {
+                    $errorDescription .= 'Invalid sales person.';
+                }
+                if ($lead_source_id === 1) {
+                    $errorDescription .= 'Invalid Source ';
+                }
+                if ($language === 'Not Supported') {
+                    $errorDescription .= 'Invalid Language ';
+                }
+                if ($location === 'Not Supported') {
+                    $errorDescription .= 'Invalid Location';
+                }
+                if (!empty($errorDescription)) {
+                    $row[] = $errorDescription;
+                    $rejectedRows[] = $row;
+                    $rejectedCount++;
+                    continue;
+                }                
+            }
+            else{
+                $date = Carbon::now();
                 $date->setTimezone('Asia/Dubai');
                 $formattedDate = $date->format('Y-m-d H:i:s');
                 $call->name = $row[0];
@@ -419,16 +480,67 @@ return view('calls.resultbrand', compact('data'));
                     $modelLine = MasterModelLines::where('model_line', $model_line_name)->first();
                     if ($modelLine) {
                         $model_line_id = $modelLine->id;
-                        // Create and save the CallsRequirement record
                         $callsRequirement = new CallsRequirement();
                         $callsRequirement->lead_id = $call->id;
                         $callsRequirement->model_line_id = $model_line_id;
                         $callsRequirement->save();
                     } 
                 }
+                $acceptedCount++;
+            }
+        }
+        if (count($rejectedRows) > 0) {
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $headers = [
+                'Name',
+                'Phone',
+                'Email',
+                'Sales Person',
+                'Source Name',
+                'Language',
+                'Location',
+                'Brand',
+                'Model Line Name',
+                'Custom Brand Model',
+                'Remarks',
+                'Error Description', // New column
+            ];
+            $sheet->fromArray($headers, null, 'A1');
+            foreach ($rejectedRows as $row) {
+                $sheet->setCellValue('A' . ($sheet->getHighestRow() + 1), $row[0]); 
+                $sheet->setCellValue('B' . ($sheet->getHighestRow()), $row[1]);
+                $sheet->setCellValue('C' . ($sheet->getHighestRow()), $row[2]);
+                $sheet->setCellValue('D' . ($sheet->getHighestRow()), $row[3]);
+                $sheet->setCellValue('E' . ($sheet->getHighestRow()), $row[4]);
+                $sheet->setCellValue('F' . ($sheet->getHighestRow()), $row[5]);
+                $sheet->setCellValue('G' . ($sheet->getHighestRow()), $row[6]);
+                $sheet->setCellValue('H' . ($sheet->getHighestRow()), $row[7]);
+                $sheet->setCellValue('I' . ($sheet->getHighestRow()), $row[8]);
+                $sheet->setCellValue('J' . ($sheet->getHighestRow()), $row[9]);
+                $sheet->setCellValue('K' . ($sheet->getHighestRow()), $row[10]);
+                $errorDescriptionCell = 'L' . ($sheet->getHighestRow());
+                $sheet->setCellValue($errorDescriptionCell, end($row)); 
+                }
+            $writer = new Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), 'rejected_excel_file');
+            $writer->save($tempFile);
+        
+            // Move the temporary file to storage
+            $filename = 'rejected_records.xlsx';
+            Storage::put($filename, file_get_contents($tempFile));
+            unlink($tempFile);
+        
+            // Generate the download link
+            $downloadLink = route('download.rejected', ['filename' => $filename]);
+        
+            return redirect()->route('calls.createbulk')->with('success', [
+                'message' => "Data uploaded successfully! From the total " . (count($rows) - 1) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.",
+                'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
+            ]);                    
         }
         return redirect()->route('calls.index')
-            ->with('success', 'Data uploaded successfully!');
+            ->with('success', "Data uploaded successfully! From the total " . (count($rows) - 1) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
     } else {
         return back()->with('error', 'Please Select The Correct File for Uploading');
     }
@@ -573,5 +685,14 @@ public function storenewvarinats(Request $request) {
     $availableColour = new AvailableColour($data);
     $availableColour->save();
     return redirect()->back()->with('success', 'Variant and color details stored successfully');
+}
+public function downloadRejected($filename)
+{
+    $filePath = storage_path('app/public/' . $filename);
+    if (file_exists($filePath)) {
+        return response()->download($filePath);
+    } else {
+        return redirect()->route('calls.createbulk')->with('error', 'File not found.');
+    }
 }
 }
