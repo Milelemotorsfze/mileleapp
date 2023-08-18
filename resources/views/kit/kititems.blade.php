@@ -353,14 +353,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                     {{ $Kit->item->addon_code }}
                                                 </div>
-                                                @if($Kit->item->part_number != '')
+
                                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
                                                     Part Number
                                                 </div>
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
-                                                    {{ $Kit->item->part_number}}
+                                                    <select class="form-control widthinput" autofocus>
+                                                        @foreach($Kit->partNumbers as $partNumbers)
+                                                            <option  value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
-                                                @endif
+
                                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                                                     Quantity
                                                 </div>
@@ -395,11 +399,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             Item Supplier
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                        <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" autofocus>
-{{--                                            @foreach($Kit->allItemSuppliers as $allItemSuppliers)--}}
-{{--                                            <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>--}}
-{{--                                            @endforeach--}}
-                                        </select>
+                                            <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" autofocus>
+                                                @foreach($Kit->allItemSuppliers as $allItemSuppliers)
+                                                    <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         </br>
                                     </div>
@@ -518,7 +522,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                 </br>
                 <div class="row">
-                @foreach($AddonSuppliers->Kit as $Kit)
+                    @foreach($AddonSuppliers->Kit as $Kit)
                         <!-- <div class="list2" id="addonbox"> -->
                             <!-- <div class="row related-addon">  -->
                                 <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">

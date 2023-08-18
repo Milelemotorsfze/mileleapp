@@ -1139,10 +1139,17 @@ class AddonController extends Controller
                     }
                 }
             }
+            // if($request->addon_type == 'K')
+            // {
+            //     return redirect()->route('kit.editsuppliers', $id)
+            //                     ->with('success','Kit created successfully');
+            // }
             if($request->addon_type == 'K')
             {
-                return redirect()->route('kit.editsuppliers', $id)
-                                ->with('success','Kit created successfully');
+                // return redirect()->route('kit.suppliers', $addon_details->id)
+                //                 ->with('success','Kit created successfully');
+                return redirect()->route('kit.kitItems', $id)
+                ->with('success','Kit created successfully');
             }
             else
             {
