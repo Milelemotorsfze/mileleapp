@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\MasterAddonController;
 use App\Http\Controllers\ModelLinesController;
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
@@ -373,5 +374,7 @@ Route::get('/d', function () {
     // Master Data
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
+    Route::resource('master-addons', MasterAddonController::class);
+
 
 });

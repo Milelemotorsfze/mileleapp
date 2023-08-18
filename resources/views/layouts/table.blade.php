@@ -71,6 +71,9 @@
             $('#vendor-table').DataTable();
             $('#vehicle-with-price-table').DataTable();
             $('#vehicle-price-histories-table').DataTable();
+            $('#accessories-table').DataTable();
+            $('#spare-parts-table').DataTable();
+            $('#kits-table').DataTable();
 
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {

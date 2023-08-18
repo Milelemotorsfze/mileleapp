@@ -19,4 +19,10 @@ class Addon extends Model
         'updated_by',
         'deleted_by'
     ];
+    public function createdUser() {
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+    public function updatedUser() {
+        return $this->belongsTo(User::class,'updated_by','id');
+    }
 }
