@@ -355,12 +355,12 @@
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-view');
                     @endphp
                     @if ($hasPermission)
-                    <li class="nav-item dropdown">
+                    <!-- <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle arrow-none" href="{{ route('variant_pictures.index') }}" id="topnav-more" role="button">
                             <i data-feather="film"></i>
                             <span data-key="t-extra-pages">Add Pictures & Videos</span>
                         </a>
-					</li>
+					</li> -->
                     @endif
                     @endcan
                     @can('sales-view')

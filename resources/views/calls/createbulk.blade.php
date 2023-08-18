@@ -66,10 +66,12 @@
         @endif
 
         @if (session('success'))
-            <div id="success-message" class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div class="alert alert-success">
+        {!! session('success')['message'] !!}
+        <br>
+        <a href="{{ session('success')['fileLink'] }}" class="btn btn-primary" >Click here</a> to download the rejected records.
+    </div>
+@endif
 <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('calls.simplefile') }}" text-align: right><i class="fa fa-download" aria-hidden="true"></i> Download Sample File</a>
 <br>
             <div class="row">
@@ -105,11 +107,6 @@ $('#type').select2();
         // Set timer for error message
         setTimeout(function() {
             $('#error-message').fadeOut('slow');
-        }, 2000);
-
-        // Set timer for success message
-        setTimeout(function() {
-            $('#success-message').fadeOut('slow');
         }, 2000);
 </script>
 @endpush

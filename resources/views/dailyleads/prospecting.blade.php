@@ -46,12 +46,12 @@ textarea {
     @endif
     <div class="row">
     <div class="col-lg-7 col-md-6 form-container">
-    <form action="{{ route('strategy.store') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ route('prospecting.store') }}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row">
             <div class="col-lg-3 col-md-6">
                 <label for="medium-input" class="form-label">Medium:</label>
-                <select class="form-control" id="medium-input" name="medium">
+                <select class="form-control" id="medium-input" name="prospectingmedium">
                     <option value="Call">Call</option>
                     <option value="Email">Email</option>
                     <option value="SMS">SMS</option>
@@ -60,17 +60,18 @@ textarea {
             </div>
             <div class="col-lg-3 col-md-6">
                 <label for="name-input" class="form-label">Time:</label>
-                <input type="time" id="time-input" name="name" class="form-control" value="" required>
+                <input type="hidden" name="call_id" class="form-control" value="{{$dailyLead->id}}">
+                <input type="time" id="time-input" name="prospectingtime" class="form-control" value="">
             </div>
             <div class="col-lg-3 col-md-6">
                 <label for="cost-input" class="form-label">Date:</label>
-                <input type="date" id="cost-input" name="cost" class="form-control" value="" placeholder="Strategy Cost" required>
+                <input type="date" id="cost-input" name="prospectingdate" class="form-control" value="" placeholder="Strategy Cost">
             </div>
             <div class="col-lg-3 col-md-6">
                 <label for="deal-value-input" class="form-label">Deal Value:</label>
                 <div class="input-group mb-3">
                     <span class="input-group-text">AED</span>
-                    <input type="text" class="form-control" id="deal-value-input" aria-label="Deal Value">
+                    <input type="text" class="form-control" name="dealvalue" id="deal-value-input" aria-label="Deal Value">
                     <span class="input-group-text">.00</span>
                 </div>
             </div>
@@ -91,10 +92,10 @@ textarea {
                 <label for="brand-model-input" class="form-label">Brand & Model Change:</label>
                 <div>
                     <label>
-                        <input type="radio" name="brand-model" id="auto-assign-option" value="not-required" checked> Not Required
+                        <input type="radio" name="modification" id="auto-assign-option" value="not-required" checked> Not Required
                     </label>
                     <label>
-                        <input type="radio" name="brand-model" id="manual-assign-option" value="modified-requirement"> Modified Requirement
+                        <input type="radio" name="modification" id="manual-assign-option" value="modified-requirement"> Modified Requirement
                     </label>
                 </div>
             </div>
@@ -106,7 +107,7 @@ textarea {
         <div class="row">
             <div class="col-lg-4 col-md-6">
                 <label for="medium-input" class="form-label">Medium:</label>
-                <select class="form-control" id="medium-input" name="medium">
+                <select class="form-control" id="medium-input" name="fellowupmedium">
                     <option value="Call">Call</option>
                     <option value="Email">Email</option>
                     <option value="SMS">SMS</option>
@@ -115,11 +116,12 @@ textarea {
             </div>
             <div class="col-lg-4 col-md-6">
                 <label for="name-input" class="form-label">Time:</label>
-                <input type="time" id="time-input" name="name" class="form-control" value="" required>
+                <input type="time" id="time-input" name="fellowuptime" class="form-control" value="">
+                
             </div>
             <div class="col-lg-4 col-md-6">
                 <label for="cost-input" class="form-label">Date:</label>
-                <input type="date" id="cost-input" name="cost" class="form-control" value="" placeholder="Strategy Cost" required>
+                <input type="date" id="cost-input" name="fellowupdate" class="form-control" value="" placeholder="Strategy Cost">
             </div>
         </div>
 </div>
@@ -127,7 +129,7 @@ textarea {
         <div class="row">
             <div class="col-lg-12 col-md-12">
                 <label for="sales-notes-input" class="form-label">Sales Notes:</label>
-                <textarea name="sales-notes" id="sales-notes-input" rows="5"></textarea>
+                <textarea name="salesnotes" id="sales-notes-input" rows="5"></textarea>
             </div>
         </div>
         <div class="row">
@@ -154,11 +156,11 @@ textarea {
     </div>
     <div style="margin-bottom: 10px;">
       <label for="basicpill-firstname-input" style="font-weight: bold; margin-right: 5px;">Alternative Phone:</label>
-       <input type="number" id="time-input" name="name" class="form-control" value="">
+       <input type="number" id="time-input" name="alternativephone" class="form-control" value="">
     </div>
     <div style="margin-bottom: 10px;">
       <label for="basicpill-firstname-input" style="font-weight: bold; margin-right: 5px;">Alternative Email:</label>
-       <input type="text" id="time-input" name="name" class="form-control" value="">
+       <input type="text" id="time-input" name="alternativemail" class="form-control" value="">
     </div>
     <div style="margin-bottom: 10px;">
       <label for="basicpill-firstname-input" style="font-weight: bold; margin-right: 5px;">Location:</label>
