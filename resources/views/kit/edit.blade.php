@@ -502,22 +502,22 @@
         var countKitItems = {!! json_encode($count) !!};
         var imageIsOkay = false;
         var imageExist = data.image;
-    $(document).ready(function ()
-    {
-        if(imageExist != '')
-            {
-                imageIsOkay = true;
-            }
-        for(let i=1; i<=countKitItems; i++)
+        $(document).ready(function ()
         {
-            $('#mainItem'+i).select2({
-            allowClear: true,
-            minimumResultsForSearch: -1,
-            placeholder:"Choose Brands....     Or     Type Here To Search....",
-            });
-        }
+            if(imageExist != '')
+                {
+                    imageIsOkay = true;
+                }
+            for(let i=1; i<=countKitItems; i++)
+            {
+                $('#mainItem'+i).select2({
+                allowClear: true,
+                minimumResultsForSearch: -1,
+                placeholder:"Choose Brands....     Or     Type Here To Search....",
+                });
+            }
 
-    });
+        });
         $(document).ready(function ()
         {
             currentAddonType =  $('#addon_type').val();
@@ -574,8 +574,21 @@
             //     }
             // });
              // $("#supplierArray1").select2();
+            $('#selectBrand').change(function()
+            {
+                var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                for(var i=1;i<= indexValue;i++) {
+                    $msg = "";
+                    removeModelLineError($msg,i);
+                }
+            })
              $('#addon_id').change(function()
             {
+                var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+
+                for(var i=1;i<= indexValue;i++) {
+                    uniqueCheckKit(i);
+                }
                 // fetch addon existing detils
                 var id = $('#addon_id').val();
                 if(id != '')
@@ -627,189 +640,7 @@
                 }
             });
         });
-        // $('form').on('submit', function (e)
-        // {
-        //     var inputAddonType = $('#addon_type').val();
-        //     var inputAddonName = $('#addon_id').val();
-        //     // var inputBrand = $('#selectBrand1').val();
-        //     // var inputsupplierId = $('#itemArr1').val();
-        //     // var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-        //     // var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
-        //     var formInputError = false;
-        //     if(inputsupplierId == '')
-        //     {
-        //         $msg = "Supplier is required";
-        //         showSupplierError($msg);
-        //         formInputError = true;
-        //     }
-        //     if(inputPurchasePriceAED == '')
-        //     {
-        //         $msg = "Purchase price is required";
-        //         showPurchasePriceAEDError($msg);
-        //         formInputError = true;
-        //     }
-        //     if(inputPurchasePriceUSD == '')
-        //     {
-        //         $msg = "Purchase price is required";
-        //         showPurchasePriceUSDError($msg);
-        //         formInputError = true;
-        //     }
-        //     if(inputBrand == '')
-        //     {
-        //         $msg = "Brand is required";
-        //         showBrandError($msg,i);
-        //         formInputError = true;
-        //     }
-        //     else if(inputBrand != 'allbrands')
-        //             {
-        //                 var inputModelLines = '';
-        //                 var inputModelLines = $('#selectModelLine'+i).val();
-        //                 if(inputModelLines == '')
-        //                 {
-        //                     $msg = "Model Line is required";
-        //                     showModelLineError($msg,i);
-        //                     formInputError = true;
-        //                 }
-        //             }
-        //     if(inputAddonType == '')
-        //     {
-        //         $msg = "Addon Type is required";
-        //         showAddonTypeError($msg);
-        //         formInputError = true;
-        //     }
-        //     else
-        //     {
-        //         if(inputAddonType == 'SP')
-        //         {
-        //             var inputPartNumber = $('#part_number').val();
-        //             var inputSPBrand = $('#selectBrandMo1').val();
-        //             if(inputPartNumber == '')
-        //             {
-        //                 $msg = "Part Number is required";
-        //                 showPartNumberError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSPBrand == '')
-        //             {
-        //                 $msg = "Brand is required";
-        //                 showSPBrandError($msg);
-        //                 formInputError = true;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             var inputBrand = $('#selectBrand1').val();
-        //             if(inputBrand == '')
-        //             {
-        //                 $msg = "Brand is required";
-        //                 showBrandError($msg,row);
-        //                 formInputError = true;
-        //             }
-        //         }
-        //         if(inputAddonType == 'K')
-        //         {
-        //             var inputkitSupplierDropdown1 = $('#kitSupplierDropdown1').val();
-        //             var inputkitSupplier1Item1 = $('#kitSupplier1Item1').val();
-        //             var inputSupplier1Kit1Quantity = $('#Supplier1Kit1Quantity').val();
-        //             var inputSupplier1Kit1UnitPriceAED = $('#Supplier1Kit1UnitPriceAED').val();
-        //             var inputSupplier1Kit1TotalPriceAED = $('#Supplier1Kit1TotalPriceAED').val();
-        //             var inputSupplier1Kit1UnitPriceUSD = $('#Supplier1Kit1UnitPriceUSD').val();
-        //             var inputSupplier1Kit1TotalPriceUSD = $('#Supplier1Kit1TotalPriceUSD').val();
-        //             if(inputkitSupplierDropdown1 == '')
-        //             {
-        //                 $msg = "Supplier is required";
-        //                 showkitSupplierDropdown1Error($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputkitSupplier1Item1 == '')
-        //             {
-        //                 $msg = "Kit item is required";
-        //                 showkitSupplier1Item1Error($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSupplier1Kit1Quantity == '')
-        //             {
-        //                 $msg = "Item quantity is required";
-        //                 showSupplier1Kit1QuantityError($msg);
-        //                 formInputError = true;
-        //             }
-        //             else if(inputSupplier1Kit1Quantity <= 0)
-        //             {
-        //                 $msg = "Item quantity is must be greater than zero";
-        //                 showSupplier1Kit1QuantityError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSupplier1Kit1UnitPriceAED == '')
-        //             {
-        //                 $msg = "Item unit price is required";
-        //                 showSupplier1Kit1UnitPriceAEDError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSupplier1Kit1TotalPriceAED == '')
-        //             {
-        //                 $msg = "Item total price is required";
-        //                 showSupplier1Kit1TotalPriceAEDError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSupplier1Kit1UnitPriceUSD == '')
-        //             {
-        //                 $msg = "Item unit price is required";
-        //                 showSupplier1Kit1UnitPriceUSDError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputSupplier1Kit1TotalPriceUSD == '')
-        //             {
-        //                 $msg = "Item total price is required";
-        //                 showSupplier1Kit1TotalPriceUSDError($msg);
-        //                 formInputError = true;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             var inputsupplierId = $('#itemArr1').val();
-        //             var inputPurchasePriceAED = $('#addon_purchase_price_1').val();
-        //             var inputPurchasePriceUSD = $('#addon_purchase_price_in_usd_1').val();
-        //             if(inputsupplierId == '')
-        //             {
-        //                 $msg = "Supplier is required";
-        //                 showSupplierError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputPurchasePriceAED == '')
-        //             {
-        //                 $msg = "Purchase price is required";
-        //                 showPurchasePriceAEDError($msg);
-        //                 formInputError = true;
-        //             }
-        //             if(inputPurchasePriceUSD == '')
-        //             {
-        //                 $msg = "Purchase price is required";
-        //                 showPurchasePriceUSDError($msg);
-        //                 formInputError = true;
-        //             }
-        //         }
-        //     }
-        //     if(inputAddonName == '')
-        //     {
-        //         $msg = "Addon Name is required";
-        //         showAddonNameError($msg);
-        //         formInputError = true;
-        //     }
-        //     if(fixingCharge == 'no')
-        //     {
-        //         var inputFixingChargeAmount = $('#fixing_charge_amount').val();
-        //         if(inputFixingChargeAmount == '')
-        //         {
-        //             $msg = "Fixing Charge Amount is required";
-        //             showFixingChargeAmountError($msg);
-        //             formInputError = true;
-        //         }
-        //     }
-        //     if(formInputError == true)
-        //     {
-        //         e.preventDefault();
-        //     }
-        // });
+
         $('form').on('submit', function (e)
         {
             sub ='2';
@@ -823,19 +654,29 @@
             //     showBrandError($msg);
             //     formInputError = true;
             // }
-
+            // alert(inputAddonName);
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
                 showAddonTypeError($msg);
                 formInputError = true;
             }
+            if(inputAddonName == '')
+            {
+                e.preventDefault();
+                $msg = "Addon Name is required";
+                showAddonNameError($msg);
+                formInputError = true;
+            }
+
             if(inputBrand == '')
             {
                 $msg = "Brand is required";
                 showBrandError($msg);
                 formInputError = true;
             }else{
+                isExistingUniqueCounts = [];
+
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandRow; i++)
                 {
@@ -855,6 +696,51 @@
                         showModelNumberError($msg,i);
                         formInputError = true;
                     }
+
+                    var addon_id = $('#addon_id').val();
+                    var addonType = $('#addon_type').val();
+                    var brand = $('#selectBrand').val();
+
+                    $.ajax({
+                        url: "{{url('getUniqueKits')}}",
+                        type: "GET",
+                        async: false,
+                        cache: false,
+                        data:
+                            {
+                                addon_id: addon_id[0],
+                                addonType: addonType,
+                                brand: brand[0],
+                                model_line: inputModelLines[0],
+                                model_number: inputModelNumber,
+                                index: i,
+                                id: '{{$addonDetails->id}}'
+                            },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.count > 0) {
+                                var modelNumber = "";
+                                if (data.model_number) {
+                                    var modelNumber = data.model_number;
+                                }
+                                $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
+                                showModelLineError($msg, data.index);
+                                var count = data.count;
+                                isExistingUniqueCounts.push(count);
+                            } else {
+                                $msg = "";
+                                removeModelLineError($msg, data.index);
+                                isExistingUniqueCounts.pop();
+                            }
+                        }
+                    });
+                }
+
+                var uniqueValueCount = isExistingUniqueCounts.length;
+                if(uniqueValueCount > 0) {
+                    formInputError = true;
+                }else{
+                    formInputError = false;
                 }
             }
 
@@ -877,12 +763,7 @@
                     formInputError = true;
                 }
             }
-            if(inputAddonName == '')
-            {
-                $msg = "Addon Name is required";
-                showAddonNameError($msg);
-                formInputError = true;
-            }
+
             // if(fixingCharge == 'no')
             // {
             //     var inputFixingChargeAmount = $('#fixing_charge_amount').val();
@@ -965,6 +846,18 @@
              document.getElementById("ModelNumberError"+i).textContent="";
              document.getElementById("selectModelNumber"+i).classList.remove("is-invalid");
              document.getElementById("ModelNumberError"+i).classList.remove("paragraph-class");
+         }
+         function showAddonTypeError($msg)
+         {
+             document.getElementById("AddonTypeError").textContent=$msg;
+             document.getElementById("addon_type").classList.add("is-invalid");
+             document.getElementById("AddonTypeError").classList.add("paragraph-class");
+         }
+         function removeAddonTypeError($msg)
+         {
+             document.getElementById("AddonTypeError").textContent="";
+             document.getElementById("addon_type").classList.remove("is-invalid");
+             document.getElementById("AddonTypeError").classList.remove("paragraph-class");
          }
         // function showSPBrandError($msg)
         // {
@@ -1558,6 +1451,47 @@
 
 </script>
 <script type="text/javascript">
+    function uniqueCheckKit(index) {
+
+        var addon_id = $('#addon_id').val();
+        var addonType = $('#addon_type').val();
+        var brand = $('#selectBrand').val();
+        var modelLine = $('#selectModelLine'+index).val();
+        var modelNumber = $('#selectModelNumber'+index).val();
+
+        $.ajax({
+            url: "{{url('getUniqueKits')}}",
+            type: "GET",
+            data:
+                {
+                    addon_id: addon_id[0],
+                    addonType:addonType,
+                    brand:brand[0],
+                    model_line:modelLine[0],
+                    model_number:modelNumber,
+                    index:index,
+                    id: '{{$addonDetails->id}}'
+
+                },
+            dataType: 'json',
+            success: function (data) {
+                if(data.count > 0 ) {
+                    var modelNumber = "";
+                    if(data.model_number) {
+                        var modelNumber = data.model_number;
+                    }
+                    $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
+                    showModelLineError($msg,data.index);
+
+                }else{
+                    $msg = "";
+                    removeModelLineError($msg,data.index);
+
+                }
+            }
+        });
+    }
+
     var existingAddonTypeCount = {{ $existingAddonTypes->count() }};
     var lengthExistingModels = '';
     $(document).ready(function ()
@@ -1586,7 +1520,7 @@
             var index = $(this).attr('data-index');
             // optionDisable(index, value);
             hideOption(index,value);
-
+            uniqueCheckKit(index);
         });
          // function optionDisable(index, value){
          //     var currentId = 'selectModelLine'+index;
@@ -1599,16 +1533,17 @@
 
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
-            var currentId = 'selectModelLine'+index;
+            // var currentId = 'selectModelLine'+index;
             var data = e.params.data;
             $('#selectModelNumber'+index).empty();
             appendOption(index,data)
+            uniqueCheckKit(index);
             // optionEnable(currentId,data);
 
         });
         $(document.body).on('select2:select', ".model-numbers", function (e) {
-            e.preventDefault();
             var type = 'MODEL_NUMBER';
+            var index = $(this).attr('data-index');
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
             for(let i=1; i<=countRow; i++)
@@ -1622,14 +1557,19 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    $("#selectModelNumber"+index).find("option:selected").prop("selected", false);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
+            uniqueCheckKit(index);
         });
         $(document.body).on('select2:unselect', ".model-numbers", function (e) {
-            e.preventDefault();
             var type = 'MODEL_NUMBER';
+            var index = $(this).attr('data-index');
+            var value = e.params.data.id
 
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
@@ -1643,10 +1583,15 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    var currentId = 'selectModelNumber' + index;
+                    $('#' + currentId + ' option[value=' + value + ']').prop('selected', true);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
+            uniqueCheckKit(index);
         });
          // function optionEnable(currentId,data) {
          //     if(data == 'allmodellines') {

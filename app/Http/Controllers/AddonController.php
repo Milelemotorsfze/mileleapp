@@ -1744,15 +1744,16 @@ class AddonController extends Controller
     public function getUniqueKits(Request $request) {
 
         $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
-            ->where('addon_type_name', $request->addonType);
+                                ->where('addon_type_name', $request->addonType);
         // if edit page
         if($request->id) {
+            info("edit page");
             $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
         }
         $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
 
         $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
-            ->where('brand_id', $request->brand);
+                                ->where('brand_id', $request->brand);
         if($isExisting) {
             $isExisting = $isExisting->where('model_id', $request->model_line);
             if($isExisting ) {
@@ -1776,7 +1777,6 @@ class AddonController extends Controller
         }else{
             $data['count'] = 0;
         }
-
         $data['index'] = $request->index;
 
         return response($data);

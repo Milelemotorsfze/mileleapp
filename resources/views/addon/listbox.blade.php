@@ -126,7 +126,7 @@
     }
     @media only screen and (max-device-width: 1280px)
     {
- 
+
     }
     @media only screen and (min-device-width: 1280px)
     {
@@ -142,11 +142,11 @@
     }   */
 </style>
 @if($addon1)
-  @if(count($addon1) > 0)      
+  @if(count($addon1) > 0)
     <div class="list2" id="addonbox">
       <div class="row related-addon">
         @foreach($addon1 as $addonsdata)
-          <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">  
+          <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
             <div class="row">
               <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                 Addon Name
@@ -164,7 +164,7 @@
                 {{$addonsdata->additional_remarks}}
               </div>
               @endif
-                          
+
               <div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                 <div class="row" style="padding-right:3px; padding-left:3px;">
                   <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -191,13 +191,13 @@
                             Lead Time
                           </div>
                           <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                            {{$addonsdata->PurchasePrices->lead_time_min}} 
+                            {{$addonsdata->PurchasePrices->lead_time_min}}
                             @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
-                            - {{$addonsdata->PurchasePrices->lead_time_max}} 
+                            - {{$addonsdata->PurchasePrices->lead_time_max}}
                             @endif
-                            
+
                             Days
-                            
+
                           </div>@endif
                   @endif
 
@@ -260,16 +260,16 @@
                     @if ($hasPermission)
                     @if($addonsdata->SellingPrice!= null OR $addonsdata->PendingSellingPrice!= null)
                       <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                        Selling Price 
+                        Selling Price
                       </div>
-                      <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">       
+                      <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                         @if($addonsdata->SellingPrice!= null)
                           @if($addonsdata->SellingPrice->selling_price != '')
                             {{$addonsdata->SellingPrice->selling_price}} AED
                           @endif
                           @elseif($addonsdata->PendingSellingPrice!= null)
                           @if($addonsdata->PendingSellingPrice->selling_price != '')
-                            {{$addonsdata->PendingSellingPrice->selling_price}} AED 
+                            {{$addonsdata->PendingSellingPrice->selling_price}} AED
                             </br>
                             <label class="badge badge-soft-danger">Approval Awaiting</label>
                           @endif
@@ -300,13 +300,13 @@
                             Lead Time
                           </div>
                           <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                            {{$addonsdata->PurchasePrices->lead_time_min}} 
+                            {{$addonsdata->PurchasePrices->lead_time_min}}
                             @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
-                            - {{$addonsdata->PurchasePrices->lead_time_max}} 
+                            - {{$addonsdata->PurchasePrices->lead_time_max}}
                             @endif
-                            
+
                             Days
-                            
+
                           </div>@endif
                   @endif
                     </div>
@@ -316,7 +316,7 @@
                       Model Year
                     </div>
                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                    {{$addonsdata->model_year_start}} 
+                    {{$addonsdata->model_year_start}}
                     @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                     </div>
                   @endif
@@ -325,17 +325,17 @@
                       Part Number
                     </div>
                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                      {{$addonsdata->part_number}} 
+                      {{$addonsdata->part_number}}
                     </div>
                   @endif
-                </div>                     
-              </div> 
+                </div>
+              </div>
               <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
                 @if($addonsdata->image)
-                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image" 
+                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
                       style="width:100%;">
                 @endif
-              </div> 
+              </div>
               @if($addonsdata->is_all_brands == 'yes')
                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
                   Brand
@@ -349,12 +349,12 @@
                     <center>Brand</center>
                   </div>
                   <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
-                    <center> 
+                    <center>
                         Model Line
                     </center>
                   </div>
                   <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-                    <center> 
+                    <center>
                         Model Description
                     </center>
                   </div>
@@ -374,40 +374,40 @@
                   @if($addonsdata->addon_type_name == 'SP')
                     <div class="testtransform divcolor labellist databack1 col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                       {{$AddonTypes->brands->brand_name}}
-                    </div>  
-                    <div class="testtransform divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">          
+                    </div>
+                    <div class="testtransform divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
                       @if(isset($AddonTypes->modelLines->model_line))
-                        {{$AddonTypes->modelLines->model_line}}                        
-                        @endif                   
+                        {{$AddonTypes->modelLines->model_line}}
+                        @endif
                         @if($AddonTypes->is_all_model_lines == 'yes')
                           All Model Lines
-                        @endif                   
-                    </div>                 
+                        @endif
+                    </div>
                     <div class="testtransform divcolor labellist databack1 col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-                        {{$AddonTypes->modelDescription->model_description ?? ''}} 
+                        {{$AddonTypes->modelDescription->model_description ?? ''}}
                     </div>
                   @else
                     <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                       {{$AddonTypes->brands->brand_name}}
-                    </div>                   
+                    </div>
                     <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                         @if(isset($AddonTypes->modelLines->model_line))
-                          {{$AddonTypes->modelLines->model_line}}  
+                          {{$AddonTypes->modelLines->model_line}}
                         @endif
                         @if($AddonTypes->is_all_model_lines == 'yes')
                           All Model Lines
                         @endif
                     </div>
-                  @endif 
+                  @endif
                 @endforeach
-              @endif      
-            </div> 
+              @endif
+            </div>
             </br>
             <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
               <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                 @include('addon.action.addsellingprice')
                 @include('addon.action.action')
-                </div> 
+                </div>
               </div>
             </div>
           @endforeach
@@ -418,4 +418,3 @@
       <h6 style="text-align:center; padding-top:10px;">No data found !!</h6>
     @endif
   @endif
-  

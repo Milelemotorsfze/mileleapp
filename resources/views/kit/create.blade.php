@@ -489,16 +489,21 @@
             });
 
             $('#brandModelNumberId').hide();
-
-
+            $('#brand').change(function()
+            {
+                var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                for(var i=1;i<= indexValue;i++) {
+                    $msg = "";
+                    removeModelLineError($msg,i);
+                }
+            })
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
-            {
+                {
                var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-                var type = 'ADDON_NAME';
 
                 for(var i=1;i<= indexValue;i++) {
-                    uniqueCheckKit(i,type);
+                    uniqueCheckKit(i);
                 }
 
                 // fetch addon existing detils
@@ -573,7 +578,9 @@
                 $msg = "Brand is required";
                 showBrandError($msg);
                 formInputError = true;
-            }else{
+            }else
+            {
+                isExistingUniqueCounts = [];
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandRow; i++)
                 {
@@ -593,8 +600,49 @@
                         showModelNumberError($msg,i);
                         formInputError = true;
                     }
-                }
 
+                    var addon_id = $('#addon_id').val();
+                    var addonType = $('#addon_type').val();
+                    var brand = $('#brand').val();
+                    $.ajax({
+                        url: "{{url('getUniqueKits')}}",
+                        type: "GET",
+                        async: false,
+                        cache: false,
+                        data:
+                            {
+                                addon_id: addon_id[0],
+                                addonType: addonType,
+                                brand: brand[0],
+                                model_line: inputModelLines[0],
+                                model_number: inputModelNumber,
+                                index: i,
+                            },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.count > 0) {
+                                var modelNumber = "";
+                                if (data.model_number) {
+                                    var modelNumber = data.model_number;
+                                }
+                                $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
+                                showModelLineError($msg, data.index);
+                                var count = data.count;
+                                isExistingUniqueCounts.push(count);
+                            } else {
+                                $msg = "";
+                                removeModelLineError($msg, data.index);
+                                isExistingUniqueCounts.pop();
+                            }
+                        }
+                    });
+                }
+                var uniqueValueCount = isExistingUniqueCounts.length;
+                if(uniqueValueCount > 0) {
+                    formInputError = true;
+                }else{
+                    formInputError = false;
+                }
             }
 
             var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
@@ -1365,7 +1413,7 @@
         // }
 </script>
 <script type="text/javascript">
-    function uniqueCheckKit(index,type) {
+    function uniqueCheckKit(index) {
 
         var addon_id = $('#addon_id').val();
         var addonType = $('#addon_type').val();
@@ -1376,7 +1424,6 @@
         $.ajax({
             url: "{{url('getUniqueKits')}}",
             type: "GET",
-
             data:
                 {
                     addon_id: addon_id[0],
@@ -1388,24 +1435,23 @@
                 },
             dataType: 'json',
             success: function (data) {
-                console.log(data);
                 if(data.count > 0 ) {
                     var modelNumber = "";
                     if(data.model_number) {
                         var modelNumber = data.model_number;
                     }
-                    $msg = "This Addon,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                    $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
                     showModelLineError($msg,data.index);
-                    var count = data.count;
-                    // isExistingUniqueCounts.push(count);
+
                 }else{
                     $msg = "";
                     removeModelLineError($msg,data.index);
-                    // isExistingUniqueCounts.pop();
+
                 }
             }
         });
     }
+
     $(document).ready(function ()
     {
         $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
@@ -1424,8 +1470,8 @@
             var index = $(this).attr('data-index');
             // optionDisable(index, value);
             hideOption(index,value);
-            var type = 'MODEL_LINE';
-            uniqueCheckKit(index,type);
+
+            uniqueCheckKit(index);
 
         });
 
@@ -1447,17 +1493,18 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    $("#selectModelNumber"+index).find("option:selected").prop("selected", false);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
-            var type = 'MODEL_NUMBER';
-
-            uniqueCheckKit(index, type);
+            uniqueCheckKit(index);
         });
         $(document.body).on('select2:unselect', ".model-numbers", function (e) {
-            e.preventDefault();
-
+            // e.preventDefault();
+            var value = e.params.data.id;
             var index = $(this).attr('data-index');
 
             var type = 'MODEL_NUMBER';
@@ -1473,13 +1520,16 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    var currentId = 'selectModelNumber' + index;
+                    $('#' + currentId + ' option[value=' + value + ']').prop('selected', true);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
-            var type = 'MODEL_NUMBER';
 
-            uniqueCheckKit(index, type);
+            uniqueCheckKit(index);
         });
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
@@ -1487,9 +1537,8 @@
             // optionEnable(currentId,data);
             $('#selectModelNumber'+index).empty();
             appendOption(index,data);
-            var type = 'MODEL_LINE';
 
-            uniqueCheckKit(index, type);
+            uniqueCheckKit(index);
         });
 
         function hideOption(index,value) {
@@ -1517,35 +1566,33 @@
         }
         // Remove Brand and Model Lines
         //===== delete the form fieed row
-        $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
-            {
-                var indexNumber = $(this).attr('data-index');
-                var type = 'REMOVE';
-                var modelDescription = $('#selectModelNumber'+indexNumber).val();
-                if(modelDescription != '') {
-                    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-                    var KitItems = [];
-                    for(let i=1; i<=countRow; i++)
-                    {
-                        var kitItem = $('#mainItem'+i).val();
-                        if(kitItem != '') {
-                            KitItems.push(kitItem);
-                        }
+        $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e) {
+            var indexNumber = $(this).attr('data-index');
+            var type = 'REMOVE';
+            var modelDescription = $('#selectModelNumber'+indexNumber).val();
+            if(modelDescription != '') {
+                var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+                var KitItems = [];
+                for(let i=1; i<=countRow; i++)
+                {
+                    var kitItem = $('#mainItem'+i).val();
+                    if(kitItem != '') {
+                        KitItems.push(kitItem);
                     }
-                    if(KitItems.length > 0) {
-                        if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
-                            removeModelLineItems(indexNumber);
-                            getItemsDropdown(type);
-                        }
-                    }else{
+                }
+                if(KitItems.length > 0) {
+                    if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                         removeModelLineItems(indexNumber);
                         getItemsDropdown(type);
                     }
                 }else{
                     removeModelLineItems(indexNumber);
+                    getItemsDropdown(type);
                 }
-
-            })
+            }else{
+                removeModelLineItems(indexNumber);
+            }
+        })
         $("#add").on("click", function ()
         {
             // $('#allbrands').prop('disabled',true);
@@ -1651,8 +1698,7 @@
                 $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
                 // model-lines
                 $('.brandModelLineDiscriptionApendHere').each(function(i) {
-                    console.log("inside index change");
-                    console.log(i);
+
                     var index = +i + +1;
                     $(this).attr('id','row-'+index);
                     $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');

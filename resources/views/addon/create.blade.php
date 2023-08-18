@@ -368,7 +368,7 @@
                         </div>
                     </div>
                     </br>
-                   
+
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
                 <span class="error">* </span>
@@ -390,7 +390,7 @@
                             <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-1">
                                 <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_1" type="text" class="form-control widthinput part_number" name="part_number[1]" 
+                                        <input id="part_number_1" type="text" class="form-control widthinput part_number" name="part_number[1]"
                                         placeholder="Part Number" value="{{ old('part_number') }}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,1)">
                                         <span id="partNumberError_1" class="invalid-feedback partNumberError"></span>
@@ -637,10 +637,10 @@
             // $("#supplierArray1").select2();
 
 
-            $('#addon_id').change(function () { 
-                var id = $('#addon_id').val(); 
+            $('#addon_id').change(function () {
+                var id = $('#addon_id').val();
                 // fetch addon existing detils
-               
+
                 if (id != '') {
                     $('#addnewAddonButton').hide();
                     $.ajax
@@ -676,7 +676,7 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-${index}">
                                     <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]" 
+                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]"
                                         placeholder="Part Number" value="{{ old('part_number') }}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,${index})">
                                         <span id="partNumberError_${index}" class="invalid-feedback partNumberError"></span>
@@ -894,56 +894,55 @@
             for(var k = 1; k <= indexPartNumber; k++)
             {
                 var partNumber = $('#part_number_'+k).val();
-                            var isExistingUniqueCounts = [];
-                            var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-                            for (var i = 1; i <= indexValue; i++) {
-                                var brand =  $('#selectBrandMo'+i).val();
-                                var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
-                                for(let j=1; j<=index; j++)
+                var isExistingUniqueCounts = [];
+                var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                for (var i = 1; i <= indexValue; i++) {
+                    var brand =  $('#selectBrandMo'+i).val();
+                    var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                    for(let j=1; j<=index; j++)
+                    {
+                        var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
+                        var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                        $.ajax({
+                            url: "{{url('getUniqueSpareParts')}}",
+                            type: "GET",
+                            async: false,
+                            cache: false,
+                            data:
                                 {
-                                    var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
-                                    var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
-                                    $.ajax({
-                                        url: "{{url('getUniqueSpareParts')}}",
-                                        type: "GET",
-                                        async: false,
-                                        cache: false,
-                                        data:
-                                            {
-                                                addon_id: addon_id[0],
-                                                description:description[0],
-                                                newDescription:newDescription,
-                                                part_number:partNumber,
-                                                brand:brand[0],
-                                                i:i,
-                                                j:j,
-                                                model_line:modelLine[0],
-                                                model_number:modelNumber,
-                                                addonType:addonType
-                                            },
-                                        dataType: 'json',
-                                        success: function (data) {
-                                            if(data.count > 0 ) {
-                                                var modelNumber = "";
-                                                if(data.model_number) {
-                                                    var modelNumber = data.model_number;
-                                                }
-                                                $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
-                                                showSPModelLineError($msg,data.i,data.j);
-                                                var count = data.count;
-                                                isExistingUniqueCounts.push(count);
-                                            }else{
+                                    addon_id: addon_id[0],
+                                    description:description[0],
+                                    newDescription:newDescription,
+                                    part_number:partNumber,
+                                    brand:brand[0],
+                                    i:i,
+                                    j:j,
+                                    model_line:modelLine[0],
+                                    model_number:modelNumber,
+                                    addonType:addonType
+                                },
+                            dataType: 'json',
+                            success: function (data) {
+                                if(data.count > 0 ) {
+                                    var modelNumber = "";
+                                    if(data.model_number) {
+                                        var modelNumber = data.model_number;
+                                    }
+                                    $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                                    showSPModelLineError($msg,data.i,data.j);
+                                    var count = data.count;
+                                    isExistingUniqueCounts.push(count);
+                                }else{
 
-                                                removeSPModelLineError(data.i,data.j);
-                                                isExistingUniqueCounts.pop();
-                                            }
-                                        }
-                                    });
+                                    removeSPModelLineError(data.i,data.j);
+                                    isExistingUniqueCounts.pop();
                                 }
-
                             }
+                        });
+                    }
+
+                }
             }
-            
 
             var uniqueValueCount = isExistingUniqueCounts.length;
             if(uniqueValueCount > 0) {
@@ -1381,8 +1380,8 @@
                 removeAddonTypeError($msg);
                 showAddonTypeDependsData(value);
                 $("#purchase_price").val('');
-                
-                    
+
+
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
@@ -1808,7 +1807,7 @@
             }
             else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
             {
-                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; 
+                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                 for (let i = 1; i <= countModel; i++)
                 {
                     if($('#selectBrandMo'+i).val() != '')
