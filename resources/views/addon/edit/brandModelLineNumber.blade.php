@@ -216,12 +216,14 @@
             }
             hideOption(index,value);
             disableDropdown();
+            uniqueCheckSpareParts();
         });
         $(document.body).on('select2:unselect', ".brandRows", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             appendOption(index,data);
             enableDropdown();
+            uniqueCheckSpareParts();
         });
 
         function hideOption(index,value) {
@@ -247,7 +249,7 @@
             var modelIndex = $(this).attr('data-model-index');
             var value = e.params.data.id;
             modelLineDataHide(index,modelIndex,value);
-
+            uniqueCheckSpareParts();
         });
 
         $(document.body).on('select2:unselect', ".spare-parts-model-lines", function (e) {
@@ -256,7 +258,7 @@
             var id = e.params.data.id;
             var text = e.params.data.text;
             modelLineDataAppend(index,modelIndex,id,text);
-
+            uniqueCheckSpareParts();
         });
         $(document.body).on('select2:select', ".model-descriptions", function (e) {
             uniqueCheckSpareParts();

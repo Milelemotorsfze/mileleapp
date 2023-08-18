@@ -144,6 +144,8 @@
                 <div class="col-xxl-9 col-lg-6 col-md-12">
                     <div class="row">
                     <input hidden id="addon_type" name="addon_type" class="form-control" value="K">
+                    <input type="hidden" name="fixing_charges_included" value="no">
+
                         <!-- <div class="col-xxl-2 col-lg-6 col-md-12" >
                             <span class="error">* </span>
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
@@ -183,7 +185,7 @@
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                         <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Type') }}</label>
+                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Kit Name') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;">
@@ -323,19 +325,20 @@
                                                             <div class="col-xxl-10 col-lg-6 col-md-12">
                                                                 <span class="error">* </span>
                                                                 <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
-                                                                <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]" id="mainItem1"
-                                                                        multiple="true" style="width: 100%;" data-index="1" required>
-{{--                                                                        @foreach($kitItemDropdown as $kitItemDropdownData)--}}
-{{--                                                                            <option value="{{$kitItemDropdownData->id}}">{{$kitItemDropdownData->addon_code}} ( {{$kitItemDropdownData->AddonName->name}} )</option>--}}
-{{--                                                                        @endforeach--}}
+                                                                <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[1][item]"
+                                                                        id="mainItem1" onchange="KitItemValidations(this,1)"
+                                                                        multiple="true" style="width: 100%;" data-index="1" >
                                                                 </select>
+                                                                <span id="KitItemError1" class="KitItemError invalid-feedback"></span>
                                                             </div>
                                                             <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                                                 <span class="error">* </span>
                                                                 <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
                                                                 <input name="mainItem[1][quantity]" id="mainQuantity1" placeholder="Enter Quantity" type="number" value="1" min="1"
-                                                                        class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem" autofocus
-                                                                        oninput="validity.valid||(value='1');" required>
+                                                                        class="form-control widthinput quantityMainItem" autofocus
+                                                                        oninput="validity.valid||(value='1');" required >
+
+                                                                <span id="KitItemQuantityError1" class="kitItemQuantityError invalid-feedback"></span>
                                                             </div>
                                                             <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                                                             <a id="removeMainItem1" class="btn_round removeMainItem" data-index="1">
@@ -446,7 +449,7 @@
         var currentAddonType = '';
         var selectedBrands = [];
         var i=1;
-        var fixingCharge = 'yes';
+        // var fixingCharge = 'yes';
         var sub ='1';
         var imageIsOkay = false;
         $(document).ready(function ()
@@ -480,34 +483,29 @@
             // $('#kitSupplier').hide();
             // $('#branModaDiv').hide();
             $('#blah').css('visibility', 'hidden');
-            $("#addon_id").attr("data-placeholder","Choose Kit Type....     Or     Type Here To Search....");
+            $("#addon_id").attr("data-placeholder","Choose Kit Name....     Or     Type Here To Search....");
             $("#addon_id").select2({
                 maximumSelectionLength: 1,
             });
 
             $('#brandModelNumberId').hide();
-            $('.radioFixingCharge').click(function()
+            $('#brand').change(function()
             {
-                var addon_type = $("#addon_type").val();
-                fixingCharge = $(this).val();
-                if($(this).val() == 'yes')
-                {
-                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = true
-                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-                    showFixingChargeAmountBr.hidden = true
+                var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+                for(var i=1;i<= indexValue;i++) {
+                    $msg = "";
+                    removeModelLineError($msg,i);
                 }
-                else
-                {
-                    let showFixingChargeAmount = document.getElementById('FixingChargeAmountDiv');
-                    showFixingChargeAmount.hidden = false
-                    let showFixingChargeAmountBr = document.getElementById('FixingChargeAmountDivBr');
-                    showFixingChargeAmountBr.hidden = false
-                }
-            });
+            })
              // $("#supplierArray1").select2();
              $('#addon_id').change(function()
-            {
+                {
+               var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+
+                for(var i=1;i<= indexValue;i++) {
+                    uniqueCheckKit(i);
+                }
+
                 // fetch addon existing detils
                 var id = $('#addon_id').val();
                 if(id != '')
@@ -580,7 +578,9 @@
                 $msg = "Brand is required";
                 showBrandError($msg);
                 formInputError = true;
-            }else{
+            }else
+            {
+                isExistingUniqueCounts = [];
                 countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
                 for (let i = 1; i <= countBrandRow; i++)
                 {
@@ -600,26 +600,86 @@
                         showModelNumberError($msg,i);
                         formInputError = true;
                     }
+
+                    var addon_id = $('#addon_id').val();
+                    var addonType = $('#addon_type').val();
+                    var brand = $('#brand').val();
+                    $.ajax({
+                        url: "{{url('getUniqueKits')}}",
+                        type: "GET",
+                        async: false,
+                        cache: false,
+                        data:
+                            {
+                                addon_id: addon_id[0],
+                                addonType: addonType,
+                                brand: brand[0],
+                                model_line: inputModelLines[0],
+                                model_number: inputModelNumber,
+                                index: i,
+                            },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.count > 0) {
+                                var modelNumber = "";
+                                if (data.model_number) {
+                                    var modelNumber = data.model_number;
+                                }
+                                $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
+                                showModelLineError($msg, data.index);
+                                var count = data.count;
+                                isExistingUniqueCounts.push(count);
+                            } else {
+                                $msg = "";
+                                removeModelLineError($msg, data.index);
+                                isExistingUniqueCounts.pop();
+                            }
+                        }
+                    });
+                }
+                var uniqueValueCount = isExistingUniqueCounts.length;
+                if(uniqueValueCount > 0) {
+                    formInputError = true;
+                }else{
+                    formInputError = false;
                 }
             }
 
+            var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
 
+            for (let i = 1; i <= KitItemIndex; i++)
+            {
+                var inputKitItem = $('#mainItem'+i).val();
+                if(inputKitItem == '')
+                {
+                    $msg = "Kit Item is required";
+                    showKitItemError($msg,i);
+                    formInputError = true;
+                }
+                var inputKitQuantity = $('#mainQuantity'+i).val();
+                if(inputKitQuantity == '')
+                {
+                    $msg = "Quantity is required";
+                    showKitItemQuantityError($msg,i);
+                    formInputError = true;
+                }
+            }
             if(inputAddonName == '')
             {
                 $msg = "Addon Name is required";
                 showAddonNameError($msg);
                 formInputError = true;
             }
-            if(fixingCharge == 'no')
-            {
-                var inputFixingChargeAmount = $('#fixing_charge_amount').val();
-                if(inputFixingChargeAmount == '')
-                {
-                    $msg = "Fixing Charge Amount is required";
-                    showFixingChargeAmountError($msg);
-                    formInputError = true;
-                }
-            }
+            // if(fixingCharge == 'no')
+            // {
+            //     var inputFixingChargeAmount = $('#fixing_charge_amount').val();
+            //     if(inputFixingChargeAmount == '')
+            //     {
+            //         $msg = "Fixing Charge Amount is required";
+            //         showFixingChargeAmountError($msg);
+            //         formInputError = true;
+            //     }
+            // }
             if(imageIsOkay == false)
             {
                 formInputError = true;
@@ -630,25 +690,28 @@
                 e.preventDefault();
             }
         });
-        function validationOnKeyUp(clickInput)
-        {
-
-            if(clickInput.id == 'itemArr1')
+        function KitItemValidations(clickInput, index) {
+            var kitItem = clickInput.value;
+            if(kitItem == '')
             {
-                var value = clickInput.value;
-                // alert(value);
-                if(value == '')
-                {
-                    if(value.legth != 0)
-                    {
-                        $msg = "Supplier Type is required";
-                        showSupplierTypeError($msg);
-                    }
-                }
-                else
-                {
-                    removeSupplierTypeError();
-                }
+                $msg = "Kit Item is required";
+                showKitItemError($msg,index)
+            }else{
+                $msg = "";
+                removeKitItemError($msg,index)
+            }
+        }
+        function validationOnKeyUp(clickInput,index)
+        {
+            var kitItemQuantity = clickInput.value;
+
+            if(kitItemQuantity == '')
+            {
+                $msg = "Quantity is required";
+                showKitItemQuantityError($msg,index)
+            }else{
+                $msg = "";
+                removeKitItemQuantityError($msg,index)
             }
 
         }
@@ -704,30 +767,56 @@
             document.getElementById("selectModelNumber"+i).classList.remove("is-invalid");
             document.getElementById("ModelNumberError"+i).classList.remove("paragraph-class");
         }
-        function showSPBrandError($msg)
+        function showKitItemError($msg,i)
         {
+            document.getElementById("KitItemError"+i).textContent=$msg;
+            document.getElementById("mainItem"+i).classList.add("is-invalid");
+            document.getElementById("KitItemError"+i).classList.add("paragraph-class");
+        }
+        function removeKitItemError($msg,i)
+        {
+            $("#KitItemError"+i).text(" ");
+            $("mainItem"+i).removeClass("is-invalid");
+            $("KitItemError"+i).removeClass("paragraph-class");
+        }
+        function showKitItemQuantityError($msg,i)
+        {
+
+            document.getElementById("KitItemQuantityError"+i).textContent=$msg;
+            document.getElementById("mainQuantity"+i).classList.add("is-invalid");
+            document.getElementById("KitItemQuantityError"+i).classList.add("paragraph-class");
+        }
+        function removeKitItemQuantityError($msg,i)
+        {
+
+            document.getElementById("KitItemQuantityError"+i).textContent=$msg;
+            document.getElementById("mainQuantity"+i).classList.remove("is-invalid");
+            document.getElementById("KitItemQuantityError"+i).classList.remove("paragraph-class");
+        }
+        // function showSPBrandError($msg)
+        // {
             // document.getElementById("mobrandError").textContent=$msg;
             // document.getElementById("selectBrandMo1").classList.add("is-invalid");
             // document.getElementById("mobrandError").classList.add("paragraph-class");
-        }
-        function removeSPBrandError($msg)
-        {
+        // }
+        // function removeSPBrandError($msg)
+        // {
             // document.getElementById("mobrandError").textContent="";
             // document.getElementById("selectBrandMo1").classList.remove("is-invalid");
             // document.getElementById("mobrandError").classList.remove("paragraph-class");
-        }
-        function showkitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
-            document.getElementById("kitSupplierDropdown1").classList.add("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.add("paragraph-class");
-        }
-        function removekitSupplierDropdown1Error($msg)
-        {
-            document.getElementById("kitSupplierDropdown1Error").textContent="";
-            document.getElementById("kitSupplierDropdown1").classList.remove("is-invalid");
-            document.getElementById("kitSupplierDropdown1Error").classList.remove("paragraph-class");
-        }
+        // }
+        // function showkitSupplierDropdown1Error($msg)
+        // {
+        //     document.getElementById("kitSupplierDropdown1Error").textContent=$msg;
+        //     document.getElementById("kitSupplierDropdown1").classList.add("is-invalid");
+        //     document.getElementById("kitSupplierDropdown1Error").classList.add("paragraph-class");
+        // }
+        // function removekitSupplierDropdown1Error($msg)
+        // {
+        //     document.getElementById("kitSupplierDropdown1Error").textContent="";
+        //     document.getElementById("kitSupplierDropdown1").classList.remove("is-invalid");
+        //     document.getElementById("kitSupplierDropdown1Error").classList.remove("paragraph-class");
+        // }
         function showkitSupplier1Item1Error($msg)
         {
             // document.getElementById("kitSupplier1Item1Error").textContent=$msg;
@@ -752,90 +841,90 @@
             document.getElementById("Supplier1Kit1Quantity").classList.remove("is-invalid");
             document.getElementById("Supplier1Kit1QuantityError").classList.remove("paragraph-class");
         }
-        function showSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceAEDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceAED").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1UnitPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1UnitPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.remove("paragraph-class");
-        }
-        function showSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent=$msg;
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.add("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.add("paragraph-class");
-        }
-        function removeSupplier1Kit1TotalPriceUSDError($msg)
-        {
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent="";
-            document.getElementById("Supplier1Kit1TotalPriceUSD").classList.remove("is-invalid");
-            document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.remove("paragraph-class");
-        }
-        function showSupplierError($msg)
-        {
-            document.getElementById("supplierError").textContent=$msg;
-            document.getElementById("itemArr1").classList.add("is-invalid");
-            document.getElementById("supplierError").classList.add("paragraph-class");
-        }
-        function removeSupplierError($msg)
-        {
-            document.getElementById("supplierError").textContent="";
-            document.getElementById("itemArr1").classList.remove("is-invalid");
-            document.getElementById("supplierError").classList.remove("paragraph-class");
-        }
-        function showPurchasePriceAEDError($msg)
-        {
-            document.getElementById("purchasePriceAEDError").textContent=$msg;
-            document.getElementById("addon_purchase_price_1").classList.add("is-invalid");
-            document.getElementById("purchasePriceAEDError").classList.add("paragraph-class");
-        }
-        function removePurchasePriceAEDError($msg)
-        {
-            document.getElementById("purchasePriceAEDError").textContent="";
-            document.getElementById("addon_purchase_price_1").classList.remove("is-invalid");
-            document.getElementById("purchasePriceAEDError").classList.remove("paragraph-class");
-        }
-        function showPurchasePriceUSDError($msg)
-        {
-            document.getElementById("purchasePriceUSDError").textContent=$msg;
-            document.getElementById("addon_purchase_price_in_usd_1").classList.add("is-invalid");
-            document.getElementById("purchasePriceUSDError").classList.add("paragraph-class");
-        }
-        function removePurchasePriceUSDError($msg)
-        {
-            document.getElementById("purchasePriceUSDError").textContent="";
-            document.getElementById("addon_purchase_price_in_usd_1").classList.remove("is-invalid");
-            document.getElementById("purchasePriceUSDError").classList.remove("paragraph-class");
-        }
+        // function showSupplier1Kit1UnitPriceAEDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent=$msg;
+        //     document.getElementById("Supplier1Kit1UnitPriceAED").classList.add("is-invalid");
+        //     document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.add("paragraph-class");
+        // }
+        // function removeSupplier1Kit1UnitPriceAEDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1UnitPriceAEDError").textContent="";
+        //     document.getElementById("Supplier1Kit1UnitPriceAED").classList.remove("is-invalid");
+        //     document.getElementById("Supplier1Kit1UnitPriceAEDError").classList.remove("paragraph-class");
+        // }
+        // function showSupplier1Kit1TotalPriceAEDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent=$msg;
+        //     document.getElementById("Supplier1Kit1TotalPriceAED").classList.add("is-invalid");
+        //     document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.add("paragraph-class");
+        // }
+        // function removeSupplier1Kit1TotalPriceAEDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1TotalPriceAEDError").textContent="";
+        //     document.getElementById("Supplier1Kit1TotalPriceAED").classList.remove("is-invalid");
+        //     document.getElementById("Supplier1Kit1TotalPriceAEDError").classList.remove("paragraph-class");
+        // }
+        // function showSupplier1Kit1UnitPriceUSDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent=$msg;
+        //     document.getElementById("Supplier1Kit1UnitPriceUSD").classList.add("is-invalid");
+        //     document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.add("paragraph-class");
+        // }
+        // function removeSupplier1Kit1UnitPriceUSDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1UnitPriceUSDError").textContent="";
+        //     document.getElementById("Supplier1Kit1UnitPriceUSD").classList.remove("is-invalid");
+        //     document.getElementById("Supplier1Kit1UnitPriceUSDError").classList.remove("paragraph-class");
+        // }
+        // function showSupplier1Kit1TotalPriceUSDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent=$msg;
+        //     document.getElementById("Supplier1Kit1TotalPriceUSD").classList.add("is-invalid");
+        //     document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.add("paragraph-class");
+        // }
+        // function removeSupplier1Kit1TotalPriceUSDError($msg)
+        // {
+        //     document.getElementById("Supplier1Kit1TotalPriceUSDError").textContent="";
+        //     document.getElementById("Supplier1Kit1TotalPriceUSD").classList.remove("is-invalid");
+        //     document.getElementById("Supplier1Kit1TotalPriceUSDError").classList.remove("paragraph-class");
+        // }
+        // function showSupplierError($msg)
+        // {
+        //     document.getElementById("supplierError").textContent=$msg;
+        //     document.getElementById("itemArr1").classList.add("is-invalid");
+        //     document.getElementById("supplierError").classList.add("paragraph-class");
+        // }
+        // function removeSupplierError($msg)
+        // {
+        //     document.getElementById("supplierError").textContent="";
+        //     document.getElementById("itemArr1").classList.remove("is-invalid");
+        //     document.getElementById("supplierError").classList.remove("paragraph-class");
+        // }
+        // function showPurchasePriceAEDError($msg)
+        // {
+        //     document.getElementById("purchasePriceAEDError").textContent=$msg;
+        //     document.getElementById("addon_purchase_price_1").classList.add("is-invalid");
+        //     document.getElementById("purchasePriceAEDError").classList.add("paragraph-class");
+        // }
+        // function removePurchasePriceAEDError($msg)
+        // {
+        //     document.getElementById("purchasePriceAEDError").textContent="";
+        //     document.getElementById("addon_purchase_price_1").classList.remove("is-invalid");
+        //     document.getElementById("purchasePriceAEDError").classList.remove("paragraph-class");
+        // }
+        // function showPurchasePriceUSDError($msg)
+        // {
+        //     document.getElementById("purchasePriceUSDError").textContent=$msg;
+        //     document.getElementById("addon_purchase_price_in_usd_1").classList.add("is-invalid");
+        //     document.getElementById("purchasePriceUSDError").classList.add("paragraph-class");
+        // }
+        // function removePurchasePriceUSDError($msg)
+        // {
+        //     document.getElementById("purchasePriceUSDError").textContent="";
+        //     document.getElementById("addon_purchase_price_in_usd_1").classList.remove("is-invalid");
+        //     document.getElementById("purchasePriceUSDError").classList.remove("paragraph-class");
+        // }
         function showAddonTypeError($msg)
         {
             document.getElementById("AddonTypeError").textContent=$msg;
@@ -872,18 +961,18 @@
             document.getElementById("addon_id").classList.remove("is-invalid");
             document.getElementById("addonNameError").classList.remove("paragraph-class");
         }
-        function showFixingChargeAmountError($msg)
-        {
-            document.getElementById("fixingChargeAmountError1").textContent=$msg;
-            document.getElementById("fixing_charge_amount").classList.add("is-invalid");
-            document.getElementById("fixingChargeAmountError1").classList.add("paragraph-class");
-        }
-        function removeFixingChargeAmountError($msg)
-        {
-            document.getElementById("fixingChargeAmountError1").textContent="";
-            document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
-            document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
-        }
+        // function showFixingChargeAmountError($msg)
+        // {
+        //     document.getElementById("fixingChargeAmountError1").textContent=$msg;
+        //     document.getElementById("fixing_charge_amount").classList.add("is-invalid");
+        //     document.getElementById("fixingChargeAmountError1").classList.add("paragraph-class");
+        // }
+        // function removeFixingChargeAmountError($msg)
+        // {
+        //     document.getElementById("fixingChargeAmountError1").textContent="";
+        //     document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
+        //     document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
+        // }
 
         function showNewAddonYearError($msg)
         {
@@ -921,141 +1010,141 @@
             $('#showImageModal').removeClass('modalhide');
             modalImg.src = img.src;
         }
-        function getAddonCodeAndDropdown()
-        {
-            var e = document.getElementById("addon_type");
-            var value = e.value;
-            currentAddonType = value;
-            if(currentAddonType != '')
-            {
-                $("#selectBrandMo1").removeAttr('disabled');
-                $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $("#brand").select2({
-                    maximumSelectionLength: 1,
-                });
-                document.getElementById("addon_type_required").textContent="";
-                // $msg = "";
-                // removeAddonTypeError($msg);
-                if(currentAddonType == 'SP' && ifModelLineExist != '')
-                {
-                }
-                else
-                {
-                }
-                if(value == 'SP' )
-                {
-                    $("#brandModelLineId").hide();
-                    $("#brandModelNumberId").show();
-                    document.getElementById("brandModelNumberId").hidden = false;
-                    $("#showaddtrim").hide();
-                    $("#showaddtrimDis").show();
-                    // let showPartNumber = document.getElementById('partNumberDiv');
-                    // showPartNumber.hidden = false
-                    // let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    // showPartNumberBr.hidden = false
-                }
-                else
-                {
-                    // let showPartNumber = document.getElementById('partNumberDiv');
-                    // showPartNumber.hidden = true
-                    // let showPartNumberBr = document.getElementById('partNumberDivBr');
-                    // showPartNumberBr.hidden = true
-                    $("#brandModelLineId").show();
-                    $("#brandModelNumberId").hide();
-                    $("#showaddtrim").show();
-                    $("#showaddtrimDis").hide();
-                }
-                $("#purchase_price").val('');
-                if(value == 'K')
-                {
-                    $('#kitSupplier').show();
-                    $('#branModaDiv').show();
-                    hidenotKitSupplier();
-                    showkitSupplier();
-                    // setLeastPurchasePriceAED();
-                    // addItemForSupplier();
-                }
-                else
-                {
-                    $('#kitSupplier').show();
-                    $('#branModaDiv').show();
-                    hidekitSupplier();
-                    shownotKitSupplier();
-                    setLeastAEDPrice();
-                }
-                $.ajax
-                ({
-                    url:"{{url('getAddonCodeAndDropdown')}}",
-                    type: "POST",
-                    data:
-                    {
-                        addon_type: value,
-                        _token: '{{csrf_token()}}'
-                    },
-                    dataType : 'json',
-                    success: function(data)
-                    {
-                        // console.log(data.suppliers);
-                        $('#addon_type').val(currentAddonType);
-                        $('#addon_code').val(data.newAddonCode);
-                        $("#addon_id").html("");
-                        myarray = data.addonMasters;
-                        var size= myarray.length;
-                        if(size >= 1)
-                        {
-                            let AddonDropdownData   = [];
-                            $.each(data.addonMasters,function(key,value)
-                            {
-                                AddonDropdownData.push
-                                ({
-                                    id: value.id,
-                                    text: value.name
-                                });
-                            });
-                            $('#addon_id').select2
-                            ({
-                                placeholder: 'Choose Addon ....     Or     Type Here To Search....',
-                                allowClear: true,
-                                data: AddonDropdownData,
-                                maximumSelectionLength: 1,
-                            });
-                        }
+        {{--function getAddonCodeAndDropdown()--}}
+        {{--{--}}
+        {{--    var e = document.getElementById("addon_type");--}}
+        {{--    var value = e.value;--}}
+        {{--    currentAddonType = value;--}}
+        {{--    if(currentAddonType != '')--}}
+        {{--    {--}}
+        {{--        $("#selectBrandMo1").removeAttr('disabled');--}}
+        {{--        $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");--}}
+        {{--        $("#brand").select2({--}}
+        {{--            maximumSelectionLength: 1,--}}
+        {{--        });--}}
+        {{--        document.getElementById("addon_type_required").textContent="";--}}
+        {{--        // $msg = "";--}}
+        {{--        // removeAddonTypeError($msg);--}}
+        {{--        if(currentAddonType == 'SP' && ifModelLineExist != '')--}}
+        {{--        {--}}
+        {{--        }--}}
+        {{--        else--}}
+        {{--        {--}}
+        {{--        }--}}
+        {{--        if(value == 'SP' )--}}
+        {{--        {--}}
+        {{--            $("#brandModelLineId").hide();--}}
+        {{--            $("#brandModelNumberId").show();--}}
+        {{--            document.getElementById("brandModelNumberId").hidden = false;--}}
+        {{--            $("#showaddtrim").hide();--}}
+        {{--            $("#showaddtrimDis").show();--}}
+        {{--            // let showPartNumber = document.getElementById('partNumberDiv');--}}
+        {{--            // showPartNumber.hidden = false--}}
+        {{--            // let showPartNumberBr = document.getElementById('partNumberDivBr');--}}
+        {{--            // showPartNumberBr.hidden = false--}}
+        {{--        }--}}
+        {{--        else--}}
+        {{--        {--}}
+        {{--            // let showPartNumber = document.getElementById('partNumberDiv');--}}
+        {{--            // showPartNumber.hidden = true--}}
+        {{--            // let showPartNumberBr = document.getElementById('partNumberDivBr');--}}
+        {{--            // showPartNumberBr.hidden = true--}}
+        {{--            $("#brandModelLineId").show();--}}
+        {{--            $("#brandModelNumberId").hide();--}}
+        {{--            $("#showaddtrim").show();--}}
+        {{--            $("#showaddtrimDis").hide();--}}
+        {{--        }--}}
+        {{--        $("#purchase_price").val('');--}}
+        {{--        if(value == 'K')--}}
+        {{--        {--}}
+        {{--            $('#kitSupplier').show();--}}
+        {{--            $('#branModaDiv').show();--}}
+        {{--            hidenotKitSupplier();--}}
+        {{--            showkitSupplier();--}}
+        {{--            // setLeastPurchasePriceAED();--}}
+        {{--            // addItemForSupplier();--}}
+        {{--        }--}}
+        {{--        else--}}
+        {{--        {--}}
+        {{--            $('#kitSupplier').show();--}}
+        {{--            $('#branModaDiv').show();--}}
+        {{--            hidekitSupplier();--}}
+        {{--            shownotKitSupplier();--}}
+        {{--            // setLeastAEDPrice();--}}
+        {{--        }--}}
+        {{--        $.ajax--}}
+        {{--        ({--}}
+        {{--            url:"{{url('getAddonCodeAndDropdown')}}",--}}
+        {{--            type: "POST",--}}
+        {{--            data:--}}
+        {{--            {--}}
+        {{--                addon_type: value,--}}
+        {{--                _token: '{{csrf_token()}}'--}}
+        {{--            },--}}
+        {{--            dataType : 'json',--}}
+        {{--            success: function(data)--}}
+        {{--            {--}}
+        {{--                // console.log(data.suppliers);--}}
+        {{--                $('#addon_type').val(currentAddonType);--}}
+        {{--                $('#addon_code').val(data.newAddonCode);--}}
+        {{--                $("#addon_id").html("");--}}
+        {{--                myarray = data.addonMasters;--}}
+        {{--                var size= myarray.length;--}}
+        {{--                if(size >= 1)--}}
+        {{--                {--}}
+        {{--                    let AddonDropdownData   = [];--}}
+        {{--                    $.each(data.addonMasters,function(key,value)--}}
+        {{--                    {--}}
+        {{--                        AddonDropdownData.push--}}
+        {{--                        ({--}}
+        {{--                            id: value.id,--}}
+        {{--                            text: value.name--}}
+        {{--                        });--}}
+        {{--                    });--}}
+        {{--                    $('#addon_id').select2--}}
+        {{--                    ({--}}
+        {{--                        placeholder: 'Choose Addon ....     Or     Type Here To Search....',--}}
+        {{--                        allowClear: true,--}}
+        {{--                        data: AddonDropdownData,--}}
+        {{--                        maximumSelectionLength: 1,--}}
+        {{--                    });--}}
+        {{--                }--}}
 
-                        $("#suppliers1").html("");
-                        myarray1 = data.suppliers;
-                        var size1= myarray1.length;
-                        if(size1 >= 1)
-                        {
-                            let SupplierDropdownData   = [];
-                            $.each(data.suppliers,function(key,value)
-                            {
-                                SupplierDropdownData.push
-                                ({
-                                    id: value.id,
-                                    text: value.supplier
-                                });
-                            });
-                            $('#suppliers1').select2
-                            ({
-                                placeholder: 'Choose Supplier ....     Or     Type Here To Search....',
-                                allowClear: true,
-                                data: SupplierDropdownData,
-                                // maximumSelectionLength: 1,
-                            });
-                        }
+        {{--                $("#suppliers1").html("");--}}
+        {{--                myarray1 = data.suppliers;--}}
+        {{--                var size1= myarray1.length;--}}
+        {{--                if(size1 >= 1)--}}
+        {{--                {--}}
+        {{--                    let SupplierDropdownData   = [];--}}
+        {{--                    $.each(data.suppliers,function(key,value)--}}
+        {{--                    {--}}
+        {{--                        SupplierDropdownData.push--}}
+        {{--                        ({--}}
+        {{--                            id: value.id,--}}
+        {{--                            text: value.supplier--}}
+        {{--                        });--}}
+        {{--                    });--}}
+        {{--                    $('#suppliers1').select2--}}
+        {{--                    ({--}}
+        {{--                        placeholder: 'Choose Supplier ....     Or     Type Here To Search....',--}}
+        {{--                        allowClear: true,--}}
+        {{--                        data: SupplierDropdownData,--}}
+        {{--                        // maximumSelectionLength: 1,--}}
+        {{--                    });--}}
+        {{--                }--}}
 
-                    }
-                });
-            }
-            else
-            {
-                $('#kitSupplier').hide();
-                $('#branModaDiv').hide();
-                $('#addon_code').val('');
-                $msg = "Addon Type is required";
-                showAddonTypeError($msg);
-            }
-        }
+        {{--            }--}}
+        {{--        });--}}
+        {{--    }--}}
+        {{--    else--}}
+        {{--    {--}}
+        {{--        $('#kitSupplier').hide();--}}
+        {{--        $('#branModaDiv').hide();--}}
+        {{--        $('#addon_code').val('');--}}
+        {{--        $msg = "Addon Type is required";--}}
+        {{--        showAddonTypeError($msg);--}}
+        {{--    }--}}
+        {{--}--}}
         $('#createAddonId').on('click', function()
         {
             // create new addon and list new addon in addon list
@@ -1184,89 +1273,89 @@
                 }
             }
         }
-        function changeCurrency(i)
-        {
-            var e = document.getElementById("currency_"+i);
-            var value = e.value;
-            if(value == 'USD')
-            {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = true
-                let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = false
-                let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = false
-            }
-            else
-            {
-                let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
-                chooseCurrency.hidden = false
-                let currencyUSD = document.getElementById('div_price_in_usd_'+i);
-                currencyUSD.hidden = true
-                let currencyAED = document.getElementById('div_price_in_aed_'+i);
-                currencyAED.hidden = true
-            }
-        }
-        function calculateAED(i)
-        {
-            var usd = $("#addon_purchase_price_in_usd_"+i).val();
-            var aed = usd * 3.6725;
-            var aed = aed.toFixed(4);
-            aed = parseFloat(aed);
-            if(aed == 0)
-            {
-                document.getElementById('addon_purchase_price_'+i).value = "";
-                setLeastAEDPrice();
-            }
-            else
-            {
-                document.getElementById('addon_purchase_price_'+i).value = aed;
-                setLeastAEDPrice();
-            }
-        }
-        function calculateUSD(i)
-        {
-            var aed = $("#addon_purchase_price_"+i).val();
-            var usd = aed / 3.6725;
-            var usd = usd.toFixed(4);
-            if(usd == 0)
-            {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
-            }
-            else
-            {
-                document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
-            }
-            setLeastAEDPrice();
-        }
-        function setLeastAEDPrice()
-        {
-            const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
-            // alert(values);
-            if(values != '')
-            {
-                var arrayOfNumbers = [];
-                values.forEach(v => {
-                    if(v != '')
-                    {
-                        arrayOfNumbers .push(v);
-                    }
-                });
-                var size= arrayOfNumbers.length;
-                if(size >= 1)
-                {
-                    var arrayOfNumbers = arrayOfNumbers.map(Number);
-                    const minOfPrice = Math.min(...arrayOfNumbers);
-                    $("#purchase_price").val(minOfPrice);
-                    // disableDropdown();
-                }
-                else
-                {
-                    $("#purchase_price").val('');
-                    // enableDropdown();
-                }
-            }
-        }
+        // function changeCurrency(i)
+        // {
+        //     var e = document.getElementById("currency_"+i);
+        //     var value = e.value;
+        //     if(value == 'USD')
+        //     {
+        //         let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
+        //         chooseCurrency.hidden = true
+        //         let currencyUSD = document.getElementById('div_price_in_usd_'+i);
+        //         currencyUSD.hidden = false
+        //         let currencyAED = document.getElementById('div_price_in_aed_'+i);
+        //         currencyAED.hidden = false
+        //     }
+        //     else
+        //     {
+        //         let chooseCurrency = document.getElementById('div_price_in_aedOne_'+i);
+        //         chooseCurrency.hidden = false
+        //         let currencyUSD = document.getElementById('div_price_in_usd_'+i);
+        //         currencyUSD.hidden = true
+        //         let currencyAED = document.getElementById('div_price_in_aed_'+i);
+        //         currencyAED.hidden = true
+        //     }
+        // }
+        // function calculateAED(i)
+        // {
+        //     var usd = $("#addon_purchase_price_in_usd_"+i).val();
+        //     var aed = usd * 3.6725;
+        //     var aed = aed.toFixed(4);
+        //     aed = parseFloat(aed);
+        //     if(aed == 0)
+        //     {
+        //         document.getElementById('addon_purchase_price_'+i).value = "";
+        //         setLeastAEDPrice();
+        //     }
+        //     else
+        //     {
+        //         document.getElementById('addon_purchase_price_'+i).value = aed;
+        //         setLeastAEDPrice();
+        //     }
+        // }
+        // function calculateUSD(i)
+        // {
+        //     var aed = $("#addon_purchase_price_"+i).val();
+        //     var usd = aed / 3.6725;
+        //     var usd = usd.toFixed(4);
+        //     if(usd == 0)
+        //     {
+        //         document.getElementById('addon_purchase_price_in_usd_'+i).value = "";
+        //     }
+        //     else
+        //     {
+        //         document.getElementById('addon_purchase_price_in_usd_'+i).value = usd;
+        //     }
+        //     setLeastAEDPrice();
+        // }
+        // function setLeastAEDPrice()
+        // {
+        //     const values = Array.from(document.querySelectorAll('.notKitSupplierPurchasePrice')).map(input => input.value);
+        //     // alert(values);
+        //     if(values != '')
+        //     {
+        //         var arrayOfNumbers = [];
+        //         values.forEach(v => {
+        //             if(v != '')
+        //             {
+        //                 arrayOfNumbers .push(v);
+        //             }
+        //         });
+        //         var size= arrayOfNumbers.length;
+        //         if(size >= 1)
+        //         {
+        //             var arrayOfNumbers = arrayOfNumbers.map(Number);
+        //             const minOfPrice = Math.min(...arrayOfNumbers);
+        //             $("#purchase_price").val(minOfPrice);
+        //             // disableDropdown();
+        //         }
+        //         else
+        //         {
+        //             $("#purchase_price").val('');
+        //             // enableDropdown();
+        //         }
+        //     }
+        // }
         function showkitSupplier()
         {
             $('#kitSupplierIdToHideandshow').show();
@@ -1287,43 +1376,82 @@
             $('#kitSupplierBrToHideandshow').hide();
             $('#kitSupplierButtonToHideandshow').hide();
         }
-        function inputNumberAbs(currentPriceInput)
-        {
-
-            var id = currentPriceInput.id
-            var input = document.getElementById(id);
-            var val = input.value;
-            val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2)
-            {
-                val =val.replace(/\.+$/,"");
-            }
-            input.value = val;
-            if(currentPriceInput.id == 'fixing_charge_amount' && sub == '2')
-            {
-                var value = currentPriceInput.value;
-                if(value == '')
-                {
-
-                    if(value.legth != 0)
-                    {
-                        $msg = "Fixing Charge Amount is required";
-                        showFixingChargeAmountError($msg);
-                    }
-                }
-                else
-                {
-                    removeFixingChargeAmountError();
-                }
-            }
-        }
-        function showAlert()
-        {
-            var confirm = alertify.confirm('You are not able to edit this field while any Supplier is in selection',function (e) {
-                   }).set({title:"Remove Brands and Suppliers"})
-        }
+        // function inputNumberAbs(currentPriceInput)
+        // {
+        //
+        //     var id = currentPriceInput.id
+        //     var input = document.getElementById(id);
+        //     var val = input.value;
+        //     val = val.replace(/^0+|[^\d.]/g, '');
+        //     if(val.split('.').length>2)
+        //     {
+        //         val =val.replace(/\.+$/,"");
+        //     }
+        //     input.value = val;
+        //     if(currentPriceInput.id == 'fixing_charge_amount' && sub == '2')
+        //     {
+        //         var value = currentPriceInput.value;
+        //         if(value == '')
+        //         {
+        //
+        //             if(value.legth != 0)
+        //             {
+        //                 $msg = "Fixing Charge Amount is required";
+        //                 showFixingChargeAmountError($msg);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             removeFixingChargeAmountError();
+        //         }
+        //     }
+        // }
+        // function showAlert()
+        // {
+        //     var confirm = alertify.confirm('You are not able to edit this field while any Supplier is in selection',function (e) {
+        //            }).set({title:"Remove Brands and Suppliers"})
+        // }
 </script>
 <script type="text/javascript">
+    function uniqueCheckKit(index) {
+
+        var addon_id = $('#addon_id').val();
+        var addonType = $('#addon_type').val();
+        var brand = $('#brand').val();
+        var modelLine = $('#selectModelLine'+index).val();
+        var modelNumber = $('#selectModelNumber'+index).val();
+
+        $.ajax({
+            url: "{{url('getUniqueKits')}}",
+            type: "GET",
+            data:
+                {
+                    addon_id: addon_id[0],
+                    addonType:addonType,
+                    brand:brand[0],
+                    model_line:modelLine[0],
+                    model_number:modelNumber,
+                    index:index,
+                },
+            dataType: 'json',
+            success: function (data) {
+                if(data.count > 0 ) {
+                    var modelNumber = "";
+                    if(data.model_number) {
+                        var modelNumber = data.model_number;
+                    }
+                    $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
+                    showModelLineError($msg,data.index);
+
+                }else{
+                    $msg = "";
+                    removeModelLineError($msg,data.index);
+
+                }
+            }
+        });
+    }
+
     $(document).ready(function ()
     {
         $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
@@ -1343,9 +1471,14 @@
             // optionDisable(index, value);
             hideOption(index,value);
 
+            uniqueCheckKit(index);
+
         });
+
         $(document.body).on('select2:select', ".model-numbers", function (e) {
             e.preventDefault();
+            var index = $(this).attr('data-index');
+
             var type = 'MODEL_NUMBER';
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
@@ -1360,15 +1493,21 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    $("#selectModelNumber"+index).find("option:selected").prop("selected", false);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
+            uniqueCheckKit(index);
         });
         $(document.body).on('select2:unselect', ".model-numbers", function (e) {
-            e.preventDefault();
-            var type = 'MODEL_NUMBER';
+            // e.preventDefault();
+            var value = e.params.data.id;
+            var index = $(this).attr('data-index');
 
+            var type = 'MODEL_NUMBER';
             var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             var KitItems = [];
             for(let i=1; i<=countRow; i++)
@@ -1381,17 +1520,25 @@
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
+                }else{
+                    var currentId = 'selectModelNumber' + index;
+                    $('#' + currentId + ' option[value=' + value + ']').prop('selected', true);
+                    $("#selectModelNumber"+index).trigger('change');
                 }
             }else{
                 getItemsDropdown(type);
             }
+
+            uniqueCheckKit(index);
         });
         $(document.body).on('select2:unselect', ".model-lines", function (e) {
             var index = $(this).attr('data-index');
             var data = e.params.data;
             // optionEnable(currentId,data);
             $('#selectModelNumber'+index).empty();
-            appendOption(index,data)
+            appendOption(index,data);
+
+            uniqueCheckKit(index);
         });
 
         function hideOption(index,value) {
@@ -1419,35 +1566,33 @@
         }
         // Remove Brand and Model Lines
         //===== delete the form fieed row
-        $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e)
-            {
-                var indexNumber = $(this).attr('data-index');
-                var type = 'REMOVE';
-                var modelDescription = $('#selectModelNumber'+indexNumber).val();
-                if(modelDescription != '') {
-                    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-                    var KitItems = [];
-                    for(let i=1; i<=countRow; i++)
-                    {
-                        var kitItem = $('#mainItem'+i).val();
-                        if(kitItem != '') {
-                            KitItems.push(kitItem);
-                        }
+        $(document.body).on('click', ".removeButtonbrandModelLineDiscription", function (e) {
+            var indexNumber = $(this).attr('data-index');
+            var type = 'REMOVE';
+            var modelDescription = $('#selectModelNumber'+indexNumber).val();
+            if(modelDescription != '') {
+                var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
+                var KitItems = [];
+                for(let i=1; i<=countRow; i++)
+                {
+                    var kitItem = $('#mainItem'+i).val();
+                    if(kitItem != '') {
+                        KitItems.push(kitItem);
                     }
-                    if(KitItems.length > 0) {
-                        if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
-                            removeModelLineItems(indexNumber);
-                            getItemsDropdown(type);
-                        }
-                    }else{
+                }
+                if(KitItems.length > 0) {
+                    if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                         removeModelLineItems(indexNumber);
                         getItemsDropdown(type);
                     }
                 }else{
                     removeModelLineItems(indexNumber);
+                    getItemsDropdown(type);
                 }
-
-            })
+            }else{
+                removeModelLineItems(indexNumber);
+            }
+        })
         $("#add").on("click", function ()
         {
             // $('#allbrands').prop('disabled',true);
@@ -1553,8 +1698,7 @@
                 $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
                 // model-lines
                 $('.brandModelLineDiscriptionApendHere').each(function(i) {
-                    console.log("inside index change");
-                    console.log(i);
+
                     var index = +i + +1;
                     $(this).attr('id','row-'+index);
                     $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');
@@ -1845,7 +1989,7 @@
         });
     });
         function MainKitItemHideOption(index,value) {
-            var indexValue = $('#MainKitItemIndex').val();
+            var indexValue = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             for (var i = 1; i <= indexValue; i++) {
                 if (i != index) {
                     var currentId = 'mainItem' + i;
@@ -1854,7 +1998,7 @@
             }
         }
         function MainKitItemAppendOption(index,data) {
-            var indexValue = $('#MainKitItemIndex').val();
+            var indexValue = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
             for(var i=1;i<=indexValue;i++) {
                 if(i != index) {
                     $('#mainItem'+i).append($('<option>', {value: data.id, text : data.text}))
@@ -1885,6 +2029,9 @@
                 $(this).find('.quantityMainItem').attr('name', 'mainItem['+index+'][quantity]');
                 $(this).find('.quantityMainItem').attr('id', 'mainQuantity'+index);
                 $(this).find('.removeMainItem').attr('data-index', index);
+                $(this).find('.KitItemError').attr('id','KitItemError'+index);
+                $(this).find('.kitItemQuantityError').attr('id','kitItemQuantityError'+index);
+
                 $('#mainItem'+index).select2
                 ({
                     placeholder:"Choose Items....     Or     Type Here To Search....",
@@ -1916,15 +2063,18 @@
                     <div class="col-xxl-10 col-lg-6 col-md-12">
                         <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                         <select class="mainItem MainItemsClass" name="mainItem[${index}][item]" id="mainItem${index}" multiple="true"
-                         style="width: 100%;" data-index="${index}" required>
+                         style="width: 100%;" data-index="${index}" onchange="KitItemValidations(this,${index})">
                         </select>
+                         <span id="KitItemError${index}" class="KitItemError invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                             <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
-                            <input required name="mainItem[${index}][quantity]" id="mainQuantity${index}"
+                            <input name="mainItem[${index}][quantity]" id="mainQuantity${index}"
                              type="number" value="1" min="1" class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantityMainItem"
                              placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
-                             oninput="validity.valid||(value='1');">
+                             oninput="validity.valid||(value='1');" required >
+                              <span id="kitItemQuantityError${index}" class="kitItemQuantityError invalid-feedback"></span>
+
                         </div>
                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
                         <a id="removeMainItem${index}" class="btn_round removeMainItem" data-index="${index}">

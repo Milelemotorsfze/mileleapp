@@ -368,7 +368,7 @@
                         </div>
                     </div>
                     </br>
-                   
+
                 </div>
                 <div class="col-xxl-3 col-lg-6 col-md-12">
                 <span class="error">* </span>
@@ -390,7 +390,7 @@
                             <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-1">
                                 <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_1" type="text" class="form-control widthinput part_number" name="part_number[1]" 
+                                        <input id="part_number_1" type="text" class="form-control widthinput part_number" name="part_number[1]"
                                         placeholder="Part Number" value="{{ old('part_number') }}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,1)">
                                         <span id="partNumberError_1" class="invalid-feedback partNumberError"></span>
@@ -506,7 +506,7 @@
         var fixingCharge = 'yes';
         var sub ='1';
         var imageIsOkay = false;
-        // var formInputError = false;
+        var isPartNumberErrorExists = true;
 
         $(document).ready(function () {
 
@@ -529,13 +529,6 @@
                     uniqueCheckAccessories();
 
                 }else if(addonType == 'SP') {
-                    uniqueCheckSpareParts();
-                }
-            })
-
-            $('#part_number').keyup(function () {
-                var addonType =  $('#addon_type').val();
-                if(addonType == 'SP') {
                     uniqueCheckSpareParts();
                 }
             })
@@ -644,10 +637,10 @@
             // $("#supplierArray1").select2();
 
 
-            $('#addon_id').change(function () { 
-                var id = $('#addon_id').val(); 
+            $('#addon_id').change(function () {
+                var id = $('#addon_id').val();
                 // fetch addon existing detils
-               
+
                 if (id != '') {
                     $('#addnewAddonButton').hide();
                     $.ajax
@@ -683,7 +676,7 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-${index}">
                                     <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]" 
+                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]"
                                         placeholder="Part Number" value="{{ old('part_number') }}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,${index})">
                                         <span id="partNumberError_${index}" class="invalid-feedback partNumberError"></span>
@@ -704,15 +697,22 @@
                 if(countRow > 1)
                 {
                     var indexNumber = $(this).attr('data-index');
+                    var deletedValue = '';
+                    deletedValue = $("#part_number_"+indexNumber).val();
                     $(this).closest('#row-'+indexNumber).remove();
                     $('.partNumberApendHere').each(function(i) {
                         var index = +i + +1;
                         $(this).attr('id','row-'+index);
                         $(this).find('.part_number').attr('name', 'part_number['+ index +']');
                         $(this).find('.part_number').attr('id', 'part_number_'+index);
+                        $(this).find('.part_number').attr('onkeyup', 'setPartNumber(this,'+index+')');
                         $(this).find('.removePartNumber').attr('data-index',index);
                         $(this).find('.partNumberError').attr('id', 'partNumberError_'+index);
-                    })
+                        if(deletedValue != '')
+                        {
+                            partNumberUniquecheck(deletedValue);
+                        }
+                    });
                     enableDropdown();
                 }
                 else
@@ -749,6 +749,35 @@
                     $('#' + modalId).removeClass('modalhide');
                 }
             });
+            function partNumberUniquecheck(deletedValue)
+            {
+                var indexPartNumber = $(".partNumberMain").find(".partNumberApendHere").length;
+                var existingPartNumbers = [];
+                for(var l = 1; l <= indexPartNumber; l++)
+                {
+                    var partNumberInput = '';
+                    partNumberInput = $('#part_number_'+l).val();
+                    if(partNumberInput == deletedValue)
+                    {
+                        existingPartNumbers.push(partNumberInput);
+                    }
+                }
+                if(existingPartNumbers.length <= 1)
+                {
+                    for(var l = 1; l <= indexPartNumber; l++)
+                    {
+                        var partNumberInput = '';
+                        partNumberInput = $('#part_number_'+l).val();
+                        if(partNumberInput == deletedValue)
+                        {
+                            isPartNumberErrorExists = true;
+                            removePartNumberError(l);
+                            disableDropdown();
+                            uniqueCheckSpareParts();
+                        }
+                    }
+                }
+            }
             function uniqueCheck(addonType,id)
             {
                 addonDescriptionUniqueCheck();
@@ -861,55 +890,58 @@
             var description = $('#description').val();
             var newDescription = $('#description-text').val();
             var addonType = $('#addon_type').val();
-            var partNumber = $('#part_number').val();
+            var indexPartNumber = $(".partNumberMain").find(".partNumberApendHere").length;
+            for(var k = 1; k <= indexPartNumber; k++)
+            {
+                var partNumber = $('#part_number_'+k).val();
+                var isExistingUniqueCounts = [];
+                var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+                for (var i = 1; i <= indexValue; i++) {
+                    var brand =  $('#selectBrandMo'+i).val();
+                    var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
+                    for(let j=1; j<=index; j++)
+                    {
+                        var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
+                        var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
+                        $.ajax({
+                            url: "{{url('getUniqueSpareParts')}}",
+                            type: "GET",
+                            async: false,
+                            cache: false,
+                            data:
+                                {
+                                    addon_id: addon_id[0],
+                                    description:description[0],
+                                    newDescription:newDescription,
+                                    part_number:partNumber,
+                                    brand:brand[0],
+                                    i:i,
+                                    j:j,
+                                    model_line:modelLine[0],
+                                    model_number:modelNumber,
+                                    addonType:addonType
+                                },
+                            dataType: 'json',
+                            success: function (data) {
+                                if(data.count > 0 ) {
+                                    var modelNumber = "";
+                                    if(data.model_number) {
+                                        var modelNumber = data.model_number;
+                                    }
+                                    $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
+                                    showSPModelLineError($msg,data.i,data.j);
+                                    var count = data.count;
+                                    isExistingUniqueCounts.push(count);
+                                }else{
 
-            var isExistingUniqueCounts = [];
-            var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-            for (var i = 1; i <= indexValue; i++) {
-                var brand =  $('#selectBrandMo'+i).val();
-                var index = $(".MoDes"+i).find(".MoDesApndHere"+i).length;
-                for(let j=1; j<=index; j++)
-                {
-                    var modelLine = $('#selectModelLineNum'+ i+'Des'+j).val();
-                    var modelNumber = $('#selectModelNumberDiscri'+ i+'Des'+j).val();
-                    $.ajax({
-                        url: "{{url('getUniqueSpareParts')}}",
-                        type: "GET",
-                        async: false,
-                        cache: false,
-                        data:
-                            {
-                                addon_id: addon_id[0],
-                                description:description[0],
-                                newDescription:newDescription,
-                                part_number:partNumber,
-                                brand:brand[0],
-                                i:i,
-                                j:j,
-                                model_line:modelLine[0],
-                                model_number:modelNumber,
-                                addonType:addonType
-                            },
-                        dataType: 'json',
-                        success: function (data) {
-                            if(data.count > 0 ) {
-                                var modelNumber = "";
-                                if(data.model_number) {
-                                    var modelNumber = data.model_number;
+                                    removeSPModelLineError(data.i,data.j);
+                                    isExistingUniqueCounts.pop();
                                 }
-                                $msg = "This Addon,Description,Brand,model line and model Description("+ modelNumber +") Combination is existing";
-                                showSPModelLineError($msg,data.i,data.j);
-                                var count = data.count;
-                                isExistingUniqueCounts.push(count);
-                            }else{
-
-                                removeSPModelLineError(data.i,data.j);
-                                isExistingUniqueCounts.pop();
                             }
-                        }
-                    });
-                }
+                        });
+                    }
 
+                }
             }
 
             var uniqueValueCount = isExistingUniqueCounts.length;
@@ -1112,6 +1144,10 @@
             {
                 formInputError = true;
                 document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
+            }
+            if(isPartNumberErrorExists == false)
+            {
+                e.preventDefault();
             }
             if(formInputError == true)
             {
@@ -1344,8 +1380,8 @@
                 removeAddonTypeError($msg);
                 showAddonTypeDependsData(value);
                 $("#purchase_price").val('');
-                
-                    
+
+
                 $.ajax
                 ({
                     url:"{{url('getAddonCodeAndDropdown')}}",
@@ -1512,8 +1548,9 @@
         });
         function setPartNumber(partNum, index)
         {
+            var partNumberInput = '';
             $('#part_number_'+index).val(partNum.value);
-            var partNumberInput = $('#part_number_'+index).val();
+            partNumberInput = $('#part_number_'+index).val();
             if(partNumberInput == '')
             {
                 $msg = "Part Number is required";
@@ -1525,6 +1562,51 @@
             {
                 removePartNumberError(index);
                 disableDropdown();
+                uniqueCheckSpareParts();
+            }
+            var indexPartNumber = $(".partNumberMain").find(".partNumberApendHere").length;
+            var existingPartNumbers = [];
+            for(var k = 1; k <= indexPartNumber; k++)
+            {
+                if(k != index)
+                {
+                    var partNumberInputOther = '';
+                    var partNumberInputOther = $('#part_number_'+k).val();
+                    existingPartNumbers.push(partNumberInputOther);
+                }
+            }
+            var indexPartNum = $(".partNumberMain").find(".partNumberApendHere").length;
+            for(var j = 1; j <= indexPartNumber; j++)
+            {
+                inpartNumberInput = $('#part_number_'+j).val();
+                if(inpartNumberInput != '')
+                {
+                    var numexistingPartNumbers = [];
+                    for(var m = 1; m <= indexPartNumber; m++)
+                    {
+                        if(m != j)
+                        {
+                            var partNumberInputOther = '';
+                            var partNumberInputOther = $('#part_number_'+m).val();
+                            numexistingPartNumbers.push(partNumberInputOther);
+                        }
+                    }
+                    if(numexistingPartNumbers.includes(inpartNumberInput))
+                    {
+                        $msg = "Part Number is already exist";
+                        showPartNumberError($msg,j);
+                        formInputError = true;
+                        enableDropdown();
+                        isPartNumberErrorExists = false;
+                    }
+                    else
+                    {
+                        isPartNumberErrorExists = true;
+                        removePartNumberError(j);
+                        disableDropdown();
+                        // uniqueCheckSpareParts();
+                    }
+                }
             }
         }
         function closeImage()
@@ -1725,7 +1807,7 @@
             }
             else if(canEnableDropdown == 'yes' && currentAddonType == 'SP')
             {
-                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length; 
+                var countModel = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                 for (let i = 1; i <= countModel; i++)
                 {
                     if($('#selectBrandMo'+i).val() != '')

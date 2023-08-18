@@ -204,7 +204,9 @@
                                             <td>{{ ++$i }}</td>
                                             <td><img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
                                             style="width:100%; height:100px;"></td>
-                                            <td>{{$addonsdata->AddonName->name}}</td>
+                                            <td>
+                                                {{$addonsdata->AddonName->name}}
+                                            </td>
                                             <td>
                                                 @if($addonsdata->addon_type_name == 'K')
                                                     <label class="badge badge-soft-success">Kit</label>

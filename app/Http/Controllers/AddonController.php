@@ -70,7 +70,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+//         dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -206,7 +206,7 @@ class AddonController extends Controller
             }
             if($request->addon_type == 'SP')
             {
-                info($request->all());
+//                info($request->all());
                 if($request->brand)
                 {
                     if(count($request->brand) > 0)
@@ -590,7 +590,7 @@ class AddonController extends Controller
     }
     public function updateAddonDetails(Request $request, $id)
     {
-        // dd($request->addon_type_hiden);
+//         dd($request->all());
         $request->addon_type = $request->addon_type_hiden;
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
@@ -769,6 +769,50 @@ class AddonController extends Controller
                             }
                         }
                     }
+                }
+            }
+            elseif ($request->addon_type == 'K') {
+                if($request->brand_id)
+                {
+                    $brandId = $request->brand_id;
+                    $addon_details->is_all_brands = 'no';
+                    $addon_details->update();
+                    if(isset($request->brandModel))
+                    {
+                        if(count($request->brandModel) > 0)
+                        {
+//                            dd($request->all());
+                            // delete existing data
+
+//                            $addonTypes = AddonTypes::where('addon_details_id', $addon_details->id)->delete();
+                            // add new model line and numbers
+                            foreach($request->brandModel as $key => $brandModelData)
+                            {
+//                                info("inside loop");
+                                foreach ($brandModelData['model_number'] as $modelNumber) {
+                                    $createAddType = [];
+                                    $createAddType['created_by'] = $authId;
+                                    $createAddType['addon_details_id'] = $addon_details->id;
+                                    $createAddType['brand_id'] = $brandId;
+                                    $createAddType['model_id'] = $brandModelData['model_line_id'];
+                                    $createAddType['is_all_model_lines'] = 'no';
+                                    $createAddType['model_number'] = $modelNumber;
+                                    $creBranModelDes = AddonTypes::create($createAddType);
+
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        $createAddType = [];
+                        $createAddType['created_by'] = $authId;
+                        $createAddType['addon_details_id'] = $addon_details->id;
+                        $createAddType['brand_id'] = $brandId;
+                        $createAddType['is_all_model_lines'] = 'no';
+                        $creBranModelDes = AddonTypes::create($createAddType);
+                    }
+
                 }
             }
             else
@@ -1095,10 +1139,17 @@ class AddonController extends Controller
                     }
                 }
             }
+            // if($request->addon_type == 'K')
+            // {
+            //     return redirect()->route('kit.editsuppliers', $id)
+            //                     ->with('success','Kit created successfully');
+            // }
             if($request->addon_type == 'K')
             {
-                return redirect()->route('kit.editsuppliers', $id)
-                                ->with('success','Kit created successfully');
+                // return redirect()->route('kit.suppliers', $addon_details->id)
+                //                 ->with('success','Kit created successfully');
+                return redirect()->route('kit.kitItems', $id)
+                ->with('success','Kit created successfully');
             }
             else
             {
@@ -1648,13 +1699,22 @@ class AddonController extends Controller
 
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
                 ->where('description', $description)
-                ->where('part_number', $request->part_number)
+                // ->where('part_number', $request->part_number)
                 ->where('addon_type_name', $request->addonType);
 
             if($request->id) {
                 $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
             }
+            if($request->part_number && $request->part_number != '')
+            {
+                $existingAddonDetailIds = $existingAddonDetailIds->whereHas('partNumbers', function($q) use($request)
+                {
+                    $q = $q->where('part_number',$request->part_number);
+                });
+            }
             $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
+
+
 
             $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
                                 ->where('brand_id', $request->brand);
@@ -1684,6 +1744,47 @@ class AddonController extends Controller
 
         $data['i'] = $request->i;
         $data['j'] = $request->j;
+
+        return response($data);
+
+    }
+    public function getUniqueKits(Request $request) {
+
+        $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
+                                ->where('addon_type_name', $request->addonType);
+        // if edit page
+        if($request->id) {
+            info("edit page");
+            $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
+        }
+        $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
+
+        $isExisting = AddonTypes::whereIn('addon_details_id', $existingAddonDetailIds)
+                                ->where('brand_id', $request->brand);
+        if($isExisting) {
+            $isExisting = $isExisting->where('model_id', $request->model_line);
+            if($isExisting ) {
+                $modelNumber = [];
+                if($request->model_number != null) {
+                    $modelNumber = $request->model_number;
+                }
+                $isExisting = $isExisting->whereIn('model_number', $modelNumber);
+                $modelNumbers = $isExisting->get();
+                $models = [];
+                foreach ($modelNumbers as $modelNumber) {
+                    $models[] = $modelNumber->modelDescription->model_description ?? '';
+                }
+                $data['model_number'] = implode(",", $models);
+            }
+        }
+
+        if($isExisting) {
+
+            $data['count'] = $isExisting->count();
+        }else{
+            $data['count'] = 0;
+        }
+        $data['index'] = $request->index;
 
         return response($data);
 

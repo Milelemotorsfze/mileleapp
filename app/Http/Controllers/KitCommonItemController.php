@@ -175,7 +175,7 @@ class KitCommonItemController extends Controller
         $addons = Addon::whereIn('addon_type',['K'])->select('id','name')->orderBy('name', 'ASC')->get();
         $existingBrandId = [];
         $existingBrandModel = [];
-        $existingAddonTypes = AddonTypes::where('addon_details_id', $addonDetails->id)->get();
+        $existingAddonTypes = AddonTypes::where('addon_details_id', $addonDetails->id)->groupBy('model_id')->get();
 //        if($addonDetails->is_all_brands == 'no')
 //        {
 //            $existingBrandModel = AddonTypes::where('addon_details_id',$id)->groupBy('brand_id')->with('brands')->get();
@@ -299,8 +299,9 @@ class KitCommonItemController extends Controller
         }
 
         $result = call_user_func_array('array_intersect', $Items);
-        $availableKitItems = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
-            ->whereIn('id', $result);
+        $availableKitItems = AddonDetails::with('AddonName')
+                            ->whereIn('addon_id', $kitItemDropdown)
+                            ->whereIn('id', $result);
 
         $availableKitItems = $availableKitItems->pluck('id')->toArray();
         return $availableKitItems;
@@ -420,7 +421,7 @@ class KitCommonItemController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('KitItems.partNumbers','AddonName','AddonTypes.brands','SellingPrice',
         'KitItems.item.AddonName','KitItems.item.AddonSuppliers.Suppliers',
         // old code start
         'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
