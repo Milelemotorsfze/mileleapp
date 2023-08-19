@@ -10,9 +10,21 @@ class Repeatedcustomers extends Controller
     {
         $phone = $request->query('phone');
         $email = $request->query('email');
+        if($phone != null && $email == null)
+        {
         $calls = Calls::where('phone', $phone)
-            ->orWhere('email', $email)
-            ->get();
+                ->get();
+        }
+        else if($phone == null && $email != null)
+        {
+        $calls = Calls::where('email', $email)
+                ->get();
+        }
+        else{
+            $calls = Calls::where('email', $email)
+                    ->orwhere('phone', $phone)
+                ->get(); 
+        }
         return view('calls.repeatedcustomer', compact('calls'));
     }
 }

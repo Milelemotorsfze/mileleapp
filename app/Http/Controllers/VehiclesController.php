@@ -778,11 +778,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count();
         $previousYearSold = $this->previousYearSold()->count();
         $previousYearBooked = $this->previousYearBooked()->count();
@@ -877,10 +877,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count();
 
         $previousYearSold = $this->previousYearSold()->count();
@@ -1119,11 +1120,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
@@ -1140,6 +1141,7 @@ class VehiclesController extends Controller
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->where('latest_location', $warehouseId)
+            ->whereNotNull('grn_id')
             ->whereNull('inspection_date');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
@@ -1163,11 +1165,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
@@ -1206,11 +1208,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count();
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
@@ -2120,10 +2122,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss'));
@@ -2179,11 +2182,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
@@ -2224,11 +2227,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
@@ -2245,15 +2248,12 @@ class VehiclesController extends Controller
             $statuss = "Incoming Stock";
             $data = Vehicles::where('payment_status', $statuss)
             ->where('latest_location', $warehouseId)
-            ->whereNotNull('inspection_date')
             ->whereNotNull('grn_id')
-		    ->whereNotNull('netsuit_grn_number');
+		    ->whereNull('netsuit_grn_number');
             $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
             if ($hasEditSOPermission) {
                 $data = $data->where(function ($query) {
-                    // Include vehicles with 'so_id' is null
                     $query->whereNull('so_id')
-                        // OR vehicles associated with sales orders where sales_person_id matches the user's role ID
                         ->orWhereHas('So', function ($query) {
                             $query->where('sales_person_id', Auth::user()->role_id);
                         });
@@ -2270,11 +2270,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));
@@ -2320,11 +2320,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh','warehousesvehss', 'warehousesveher', 'warehousessold'));
@@ -2368,11 +2368,11 @@ class VehiclesController extends Controller
         $sales = User::whereIn('id', $sales_ids)->get();
         $exteriorColours = ColorCode::where('belong_to', 'ex')->get();
         $interiorColours = ColorCode::where('belong_to', 'int')->get();
-        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
-        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer'])->get();
+        $warehouses = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousessold = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveh = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesvehss = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
+        $warehousesveher = Warehouse::whereNotIn('name', ['Supplier', 'Customer', 'In Transit', 'Fleet - Assigned', 'SHIPPER', 'NEW STOCK'])->get();
         $countwarehouse = $warehouses->count() ?? 0;
         return view('vehicles.index', compact('data', 'varaint', 'sales', 'datapending'
         ,'exteriorColours','interiorColours','pendingVehicleDetailForApprovalCount', 'warehouses', 'countwarehouse', 'warehousesveh', 'warehousesveher', 'warehousesvehss', 'warehousessold'));

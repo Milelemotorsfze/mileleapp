@@ -334,7 +334,7 @@ input[type=number]::-webkit-outer-spin-button {
                         var message = 'Customer Names: ' + customerNames + '<br>';
                         message += 'Phone Count: ' + response.phoneCount + '<br>';
                         message += 'Email Count: ' + response.emailCount;
-                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + phone + '&email=' + email + '" class="btn btn-primary">See Details</a>';
+                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
                         message += '<br>' + buttonHtml;
                         
                         $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');

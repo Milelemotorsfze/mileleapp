@@ -567,6 +567,38 @@ return view('calls.resultbrand', compact('data'));
     
     return response()->json($data);
 }
+public function checkExistenceupdatecalls(Request $request)
+{
+    $emailCount = 0;
+    $phoneCount = 0;
+    $phone = $request->input('phone');
+    $email = $request->input('email');
+    $call_id = $request->input('call_id');
+    info($phone);
+    if ($phone !== null) {
+        $phoneCount = Calls::where('phone', $phone)->where('id', '<>', $call_id)->count();
+    }
+    if ($email !== null) {
+        $emailCount = Calls::where('email', $email)->where('id', '<>', $call_id)->count(); 
+    }
+    $customers = Calls::where(function ($query) use ($phone, $email, $call_id) {
+        if ($phone !== null) {
+            $query->where('phone', $phone);
+        }
+        if ($email !== null) {
+            $query->orWhere('email', $email);
+        }
+        $query->where('id', '<>', $call_id);
+    })->get();
+    $customerNames = $customers->pluck('name')->toArray();
+    $data = [
+        'phoneCount' => $phoneCount,
+        'emailCount' => $emailCount,
+        'customerNames' => $customerNames,
+    ];
+    
+    return response()->json($data);
+}
 public function sendDetails(Request $request)
 {
     $phone = $request->query('phone');
