@@ -102,6 +102,8 @@ class AddonController extends Controller
 //          else
 //         {
     $input = $request->all();
+//    info($input);
+//    dd($input);
     if($request->image)
     {
         $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
@@ -156,32 +158,7 @@ class AddonController extends Controller
                 $input['description'] = $request->description_text;
             }
 
-            if($request->addon_type == 'P' OR $request->addon_type == 'K')
-            {
-                $input['model_year_start'] = NULL;
-                $input['model_year_end'] = NULL;
-            }
-            else
-            {
-                if($request->model_year_start != '' && $request->model_year_end != '')
-                {
-                    if(intval($request->model_year_start) <= intval($request->model_year_end))
-                    {
-                        $input['model_year_start'] = $request->model_year_start;
-                        $input['model_year_end'] = $request->model_year_end;
-                    }
-                    else
-                    {
-                        $input['model_year_start'] = NULL;
-                        $input['model_year_end'] = NULL;
-                    }
-                }
-                elseif($request->model_year_start != '' && $request->model_year_end == '')
-                {
-                    $input['model_year_start'] = $request->model_year_start;
-                    $input['model_year_end'] = $request->model_year_start;
-                }
-            }
+
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
             {
@@ -206,6 +183,32 @@ class AddonController extends Controller
             }
             if($request->addon_type == 'SP')
             {
+//                if($request->addon_type == 'P' OR $request->addon_type == 'K')
+//                {
+//                    $input['model_year_start'] = NULL;
+//                    $input['model_year_end'] = NULL;
+//                }
+//                else
+//                {
+//                    if($request->model_year_start != '' && $request->model_year_end != '')
+//                    {
+//                        if(intval($request->model_year_start) <= intval($request->model_year_end))
+//                        {
+//                            $input['model_year_start'] = $request->model_year_start;
+//                            $input['model_year_end'] = $request->model_year_end;
+//                        }
+//                        else
+//                        {
+//                            $input['model_year_start'] = NULL;
+//                            $input['model_year_end'] = NULL;
+//                        }
+//                    }
+//                    elseif($request->model_year_start != '' && $request->model_year_end == '')
+//                    {
+//                        $input['model_year_start'] = $request->model_year_start;
+//                        $input['model_year_end'] = $request->model_year_start;
+//                    }
+//                }
 //                info($request->all());
                 if($request->brand)
                 {
@@ -230,6 +233,9 @@ class AddonController extends Controller
                                             $createAddType['created_by'] = $authId;
                                             $createAddType['addon_details_id'] = $addon_details->id;
                                             $createAddType['brand_id'] = $brandData['brand_id'];
+                                            $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                            $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
+
                                             if($brandModelDta['model_id'])
                                             {
                                                 if($brandModelDta['model_id'] == 'allmodellines')

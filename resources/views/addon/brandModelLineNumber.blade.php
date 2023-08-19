@@ -4,7 +4,7 @@
                 margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-1">
             <div class="row">
                 <div class="col-xxl-5 col-lg-5 col-md-12">
-                <span class="error">* </span>
+                    <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrandDisp(1) name="brand[1][brand_id]" id="selectBrandMo1" data-index="1"
                             class="brandRows" multiple="true" style="width: 100%;">
@@ -13,11 +13,7 @@
                             <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
                         @endforeach
                     </select>
-                    @error('is_primary_payment_method')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
+
                     <span id="mobrandError1" class="mobrandError invalid-feedback"></span>
                 </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
@@ -30,7 +26,7 @@
             </div>
             <div class="MoDes1">
                 <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
-                    <div class="col-xxl-2 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
+                    <div class="col-xxl-4 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
                     <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                         <select class="compare-tag1 spare-parts-model-lines" name="brand[1][model][1][model_id]" onchange=selectModelLineDescipt(1,1)
@@ -41,8 +37,8 @@
                         </select>
                         <span id="ModelLineError_1_1" class="ModelLineError invalid-feedback"></span>
                     </div>
-                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
-                    <span class="error">* </span>
+                    <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
+                        <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" onchange=selectModelDescipt(1,1)
                         id="selectModelNumberDiscri1Des1" multiple="true" style="width: 100%;">
@@ -52,22 +48,20 @@
                         </select>
                         <span id="ModelDescriptionError_1_1" class="ModelDescriptionError invalid-feedback"></span>
                     </div>
-
-                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
-                    <span class="error">* </span>
-                        <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
-                        <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
-                    </div>
-
-                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
-                    <span class="error">* </span>
-                        <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                        <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
-                    </div>
+                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearStartdrop1Des1" hidden>
+                            <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                            <input type="text" class=" form-control widthinput"  name="brand[1][model][1][model_year_start]"
+                                   id="selectModelYearStart1Des1" onkeydown="return false;" value=""/>
+                                <span id="modelYearStart1Error1" class="modelYearStartError invalid-feedback-lead"></span>
+                        </div>
+                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
+                            <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                            <input type="text" class=" form-control widthinput" onkeydown="return false;" name="brand[1][model][1][model_year_end]"
+                                   id="selectModelYearEnd1Des1"  value=""  />
+                                <span id="modelYearEnd1Error1" class="modelYearEndError invalid-feedback-lead"></span>
+                        </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="1" hidden id="removeModelNumberdrop1Des1">
                                 <i class="fas fa-trash-alt"></i>
@@ -112,6 +106,54 @@
 
         var index = 1;
         $('#indexValue').val(index);
+
+        $("#selectModelYearEnd1Des1").yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
+        });
+
+        $("#selectModelYearStart1Des1").yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
+        });
+
+        $( "#selectModelYearEnd1Des1" ).on("change", function() {
+            alert( "Handler for `change` called." );
+        } );
+        function checkGreaterYear(CurrentInput,i,j)
+        {
+            var id = CurrentInput.id
+            var input = document.getElementById(id);
+            var val = input.value;
+            val = val.replace(/^0+|[^\d]/g, '');
+            input.value = val;
+            var modelYearStart = $('#selectModelYearStart'+i+'Des'+ j).val();
+            var modelYearEnd = $('#selectModelYearEnd'+i+'Des'+ j).val();
+
+            if(id == 'selectModelYearStart'+i+'Des'+ j )
+            {
+                if(modelYearStart == '')
+                {
+                    $msg = "Model year is Required";
+                    showModelYearStartError($msg,i,j);
+                }
+                else if(modelYearStart.length != 4)
+                {
+                    $msg = "Model Year required 4 digits number";
+                    showModelYearStartError($msg,i,j);
+                }
+            }
+            else if(id == 'selectModelYearEnd'+i+'Des'+ j )
+            {
+                if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                {
+                    showModelYearEndError(i,j);
+                    formInputError = true;
+                }
+            }
+        }
 
         function sortDropDownListByText() {
             $("select").each(function() {
@@ -340,6 +382,19 @@
                             $(this).find('.model-descriptions').attr('name', 'brand[' + indexNumber + '][model][' + modelIndex + '][model_number][]');
                             $(this).find('.model-descriptions').attr('onchange', 'selectModelDescipt(' + indexNumber + ',' + modelIndex + ')');
                             $(this).find('.model-descriptions').attr('id', 'selectModelNumberDiscri' + indexNumber + 'Des' + modelIndex);
+
+                            $(this).find('.model-year-start-dropdown').attr('id', 'showModelYearStartdrop' + indexNumber + 'Des' + modelIndex);
+                            $(this).find('.startyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_start]');
+                            // $(this).find('.startyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                            $(this).find('.startyearpicker').attr('id', 'selectModelYearStart'+ indexNumber +'Des'+ modelIndex);
+                            $(this).find('.modelYearStartError').attr('id', 'modelYearStart'+ indexNumber +'Error' + modelIndex);
+
+                            $(this).find('.model-year-end-dropdown').attr('id', 'showModelYearEnddrop' + indexNumber + 'Des' + modelIndex);
+                            $(this).find('.endyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_end]');
+                            // $(this).find('.endyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                            $(this).find('.endyearpicker').attr('id', 'selectModelYearEnd'+ indexNumber +'Des'+ modelIndex);
+                            $(this).find('.modelYearEndError').attr('id', 'modelYearEnd'+ indexNumber +'Error' + modelIndex);
+
                             ////////////// end ////////////////
 
                             $(this).find('.removeButtonModelItem').attr('data-index', indexNumber);
@@ -515,9 +570,7 @@
 
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
-                <div class="col-xxl-1 col-lg-1 col-md-12">
-                </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12 model-line-item-dropdown" id="showDivdropDr${supplier}Des${index}">
+                <div class="col-xxl-4 col-lg-5 col-md-12 model-line-item-dropdown" id="showDivdropDr${supplier}Des${index}">
                 <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1 spare-parts-model-lines" name=brand[${supplier}][model][${index}][model_id]"
@@ -550,6 +603,23 @@
                     @enderror
                     <span id="ModelDescriptionError_${supplier}_${index}" class="ModelDescriptionError invalid-feedback"></span>
                 </div>
+
+                <div class="col-xxl-1 col-lg-1 col-md-12 model-year-start-dropdown" id="showModelYearStartdrop${supplier}Des${index}" hidden>
+                    <span class="error">* </span>
+                    <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                    <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_start]"
+                           id="selectModelYearStart${supplier}Des${index}" value=""/>
+
+                    <span id="modelYearStart${supplier}Error${index}" class="modelYearStartError invalid-feedback-lead"></span>
+                </div>
+
+                <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
+                    <span class="error">* </span>
+                    <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                    <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_end]"
+                           id="selectModelYearEnd${supplier}Des${index}"  value=""/>
+                    <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
+                </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
                     <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" id="removeModelNumberdrop${supplier}Des${index}">
                         <i class="fas fa-trash-alt"></i>
@@ -563,6 +633,16 @@
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
             allowClear: true,
+        });
+        $("#selectModelYearStart"+supplier+"Des"+index).yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
+        });
+        $("#selectModelYearEnd"+supplier+"Des"+index).yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
         });
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
@@ -707,7 +787,8 @@
         // let showDivdropDr = document.getElementById('showDivdropDr'+id+'Des'+row);
         // showDivdropDr.hidden = false
         $('#showDivdropDr'+id+'Des'+row).attr('hidden', false);
-
+        $('#showModelYearStartdrop'+id+'Des'+row).attr('hidden', false);
+        $('#showModelYearEnddrop'+id+'Des'+row).attr('hidden', false);
         let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
         showDel.hidden = false
         // $('removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
