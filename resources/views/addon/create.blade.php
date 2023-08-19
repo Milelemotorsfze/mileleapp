@@ -1059,6 +1059,8 @@
                                         removeModelYearStartError(i,j);
                                         showModelYearEndError(i,j);
                                         formInputError = true;
+                                    }else{
+                                       removeModelYearEndError(i,j);
                                     }
                                 }
                                 else
@@ -1068,9 +1070,7 @@
 
                             }
                         }
-
                     }
-
                 }
                 else
                 {

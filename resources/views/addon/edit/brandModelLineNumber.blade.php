@@ -2,77 +2,77 @@
     <div class="col-md-12 brandMoDescrip p-0">
         <div hidden>{{$i=0;}}</div>
         @if($addonDetails->is_all_brands == "yes")
-            <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
-            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px;
-                    margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-{{$i}}">
-                <div class="row">
-                    <div class="col-xxl-5 col-lg-5 col-md-12">
-                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                        <select onchange=selectBrandDisp({{$i}}) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"
-                                multiple="true" style="width: 100%;" class="brandRows">
+{{--            <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>--}}
+{{--            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;border-color:#e6e6ff; border-radius:10px;--}}
+{{--                    margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-{{$i}}">--}}
+{{--                <div class="row">--}}
+{{--                    <div class="col-xxl-5 col-lg-5 col-md-12">--}}
+{{--                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>--}}
+{{--                        <select onchange=selectBrandDisp({{$i}}) name="brand[{{$i}}][brand_id]" id="selectBrandMo{{$i}}" data-index="{{$i}}"--}}
+{{--                                multiple="true" style="width: 100%;" class="brandRows">--}}
 {{--                                <option id="allbrands" class="allbrands" value="allbrands" {{"yes" == $addonDetails->is_all_brands  ? 'selected' : ''}}>ALL BRANDS</option>--}}
-                            @foreach($brands as $brand)
-                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                            @endforeach
-                        </select>
-                        <span id="mobrandError{{$i}}" class="mobrandError invalid-feedback"></span>
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="col-xxl-6 col-lg-6 col-md-12">
-                    </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="{{$i}}" style="float:right;">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="MoDes{{$i}}" id="model-line-first-row">
-                    <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-1" >
-                        <div class="col-xxl-1 col-lg-1 col-md-12">
-                        </div>
-                        <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr{{$i}}Des1" hidden>
-                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                            <select class="compare-tag1 spare-parts-model-lines" name="brand[{{$i}}][model][1][model_id]" onchange=selectModelLineDescipt({{$i}},1)
-                                    id="selectModelLineNum{{$i}}Des1" multiple="true" style="width: 100%;"  data-index="{{$i}}" data-model-index="1">
-                                @foreach($modelLines as $modelLine)
-                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                @endforeach
-                            </select>
-                            <span id="ModelLineError_{{$i}}_1" class="ModelLineError invalid-feedback"></span>
+{{--                            @foreach($brands as $brand)--}}
+{{--                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                        <span id="mobrandError{{$i}}" class="mobrandError invalid-feedback"></span>--}}
+{{--                        @error('is_primary_payment_method')--}}
+{{--                            <span class="invalid-feedback" role="alert">--}}
+{{--                                <strong>{{ $message }}</strong>--}}
+{{--                            </span>--}}
+{{--                        @enderror--}}
+{{--                    </div>--}}
+{{--                    <div class="col-xxl-6 col-lg-6 col-md-12">--}}
+{{--                    </div>--}}
+{{--                    <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="{{$i}}" style="float:right;">--}}
+{{--                            <i class="fas fa-trash-alt"></i>--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="MoDes{{$i}}" id="model-line-first-row">--}}
+{{--                    <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-1" >--}}
+{{--                        <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr{{$i}}Des1" hidden>--}}
+{{--                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>--}}
+{{--                            <select class="compare-tag1 spare-parts-model-lines" name="brand[{{$i}}][model][1][model_id]" onchange=selectModelLineDescipt({{$i}},1)--}}
+{{--                                    id="selectModelLineNum{{$i}}Des1" multiple="true" style="width: 100%;"  data-index="{{$i}}" data-model-index="1">--}}
+{{--                                @foreach($modelLines as $modelLine)--}}
+{{--                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                                @endforeach--}}
+{{--                            </select>--}}
+{{--                            <span id="ModelLineError_{{$i}}_1" class="ModelLineError invalid-feedback"></span>--}}
 
-                        </div>
-                        <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop{{$i}}Des1" hidden>
-                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                            <select class="compare-tag1 model-descriptions" name="brand[{{$i}}][model][1][model_number][]" id="selectModelNumberDiscri{{$i}}Des1"
-                                    multiple="true" style="width: 100%;"   onchange=selectModelDescipt({{$i}},1)>
-                                @foreach($modelLines as $modelLine)
-                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>
-                                @endforeach
-                            </select>
-                            <span id="ModelDescriptionError_{{$i}}_1" class="ModelDescriptionError invalid-feedback"></span>
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop{{$i}}Des1" hidden>--}}
+{{--                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>--}}
+{{--                            <select class="compare-tag1 model-descriptions" name="brand[{{$i}}][model][1][model_number][]" id="selectModelNumberDiscri{{$i}}Des1"--}}
+{{--                                    multiple="true" style="width: 100%;"   onchange=selectModelDescipt({{$i}},1)>--}}
+{{--                                @foreach($modelLines as $modelLine)--}}
+{{--                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                                @endforeach--}}
+{{--                            </select>--}}
+{{--                            <span id="ModelDescriptionError_{{$i}}_1" class="ModelDescriptionError invalid-feedback"></span>--}}
 
-                        </div>
-                        <div class="col-xxl-1 col-lg-1 col-md-12">
-                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" hidden data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel{{$i}}" class="delete-model-line-row" hidden>
-                        <div id="showaddtrd{{$i}}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button"  >
-                            <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr({{$i}})">
-                                <i class="fa fa-plus" aria-hidden="true"></i> Add
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+{{--                        </div>--}}
+{{--                        <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                            <a  class="btn_round removeButtonModelItem" data-index="{{$i}}" hidden data-model-index="1" hidden id="removeModelNumberdrop{{$i}}Des1">--}}
+{{--                                <i class="fas fa-trash-alt"></i>--}}
+{{--                            </a>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--                <div class="row">--}}
+{{--                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel{{$i}}" class="delete-model-line-row" hidden>--}}
+{{--                        <div id="showaddtrd{{$i}}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button"  >--}}
+{{--                            <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr({{$i}})">--}}
+{{--                                <i class="fa fa-plus" aria-hidden="true"></i> Add--}}
+{{--                            </a>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
         @else
         @foreach($existingBrandModel as $existingBrand)
             <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
@@ -107,11 +107,11 @@
                     </div>
                     <div class="col-xxl-6 col-lg-6 col-md-12">
                     </div>
-                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="{{$i}}" style="float:right;">
-                            <i class="fas fa-trash-alt"></i>
-                        </a>
-                    </div>
+{{--                    <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="{{$i}}" style="float:right;">--}}
+{{--                            <i class="fas fa-trash-alt"></i>--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
                 </div>
                 <div class="MoDes{{$i}}" id="model-line-first-row">
                 <div hidden>{{$j=0;}}</div>
@@ -119,9 +119,7 @@
                 <div id="rowDesCount{{$i}}" hidden value="{{$j+1}}">{{$j=$j+1;}}</div>
 
                     <div class="row MoDesApndHere{{$i}}" id="row-spare-part-brand-{{$i}}-model-{{$j}}">
-                        <div class="col-xxl-1 col-lg-1 col-md-12">
-                        </div>
-                        <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr{{$i}}Des{{$j}}" >
+                        <div class="col-xxl-4 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr{{$i}}Des{{$j}}" >
                             <label for="choices-single-default" class="form-label font-size-13">Choose Model Line </label>
                             <select class="compare-tag1 spare-parts-model-lines" name="brand[{{$i}}][model][{{$j}}][model_id]" onchange=selectModelLineDescipt({{$i}},{{$j}})
                                     id="selectModelLineNum{{$i}}Des{{$j}}" multiple="true" style="width: 100%;"  data-index="{{$i}}" data-model-index="{{$j}}">
@@ -147,6 +145,23 @@
                             <span id="ModelDescriptionError_{{$i}}_{{$j}}" class="ModelDescriptionError invalid-feedback"></span>
 
                         </div>
+                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearStartdrop{{$i}}Des{{$j}}" >
+                            <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                            <input type="text" class="startyearpicker form-control widthinput"  name="brand[{{$i}}][model][{{$j}}][model_year_start]"
+                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value=" "/>
+
+                            <span id="modelYearStart{{$i}}Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
+                        </div>
+                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop{{$i}}Des{{$j}}" >
+                            <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                            <input type="text" class="endyearpicker  form-control widthinput" onkeydown="return false;" name="brand[{{$i}}][model][{{$j}}][model_year_end]"
+                                   id="selectModelYearEnd{{$i}}Des{{$j}}"  value=""  />
+
+                            <span id="modelYearEnd{{$i}}Error{{$j}}" class="modelYearEndError invalid-feedback-lead"></span>
+                        </div>
+
                         <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="{{$i}}"  data-model-index="{{$j}}" id="removeModelNumberdrop{{$i}}Des{{$j}}">
                                 <i class="fas fa-trash-alt"></i>
@@ -201,6 +216,17 @@
                 });
                 $(".model-descriptions").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
                 $(".model-descriptions").select2();
+                $(".startyearpicker").yearpicker({
+                    year: 2023,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
+
+                $(".endyearpicker").yearpicker({
+                    year: 2023,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
         ///////////////////// dropdown /////////////
 
         var index = 1;
@@ -414,6 +440,20 @@
 
                     $(this).find('.ModelLineError').attr('id','ModelLineError_'+indexNumber+'_'+modelIndex);
                     $(this).find('.ModelDescriptionError').attr('id','ModelDescriptionError_'+indexNumber+'_'+modelIndex);
+
+                    $(this).find('.model-year-start-dropdown').attr('id', 'showModelYearStartdrop' + indexNumber + 'Des' + modelIndex);
+                    $(this).find('.startyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_start]');
+                    // $(this).find('.startyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                    $(this).find('.startyearpicker').attr('id', 'selectModelYearStart'+ indexNumber +'Des'+ modelIndex);
+                    $(this).find('.modelYearStartError').attr('id', 'modelYearStart'+ indexNumber +'Error' + modelIndex);
+
+                    $(this).find('.model-year-end-dropdown').attr('id', 'showModelYearEnddrop' + indexNumber + 'Des' + modelIndex);
+                    $(this).find('.endyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_end]');
+                    // $(this).find('.endyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                    $(this).find('.endyearpicker').attr('id', 'selectModelYearEnd'+ indexNumber +'Des'+ modelIndex);
+                    $(this).find('.modelYearEndError').attr('id', 'modelYearEnd'+ indexNumber +'Error' + modelIndex);
+
+
                     ////////////// end ////////////////
 
                     $(this).find('.removeButtonModelItem').attr('data-index',indexNumber);
@@ -448,121 +488,118 @@
 
         //////////////// end //////////////////////
 
-        $("#addDis").on("click", function ()
-        {
-            // $('.allbrandsMo').prop('disabled',true);
-            var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
+        {{--$("#addDis").on("click", function ()--}}
+        {{--{--}}
+        {{--    // $('.allbrandsMo').prop('disabled',true);--}}
+        {{--    var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;--}}
 
-            $('#indexValue').val(index);
-            var selectedBrands = [];
-            for(let i=1; i<index; i++)
-            {
-                var eachSelectedBrand = $('#selectBrandMo'+i).val();
-                if(eachSelectedBrand) {
-                    selectedBrands.push(eachSelectedBrand);
-                }
-            }
-            $.ajax({
-                url:"{{url('getBrandForAddons')}}",
-                type: "POST",
-                data:
-                    {
-                        filteredArray: selectedBrands,
-                        _token: '{{csrf_token()}}'
-                    },
-                dataType : 'json',
-                success: function(data) {
-                    myarray = data;
-                    var size = myarray.length;
-                    if (size >= 1) {
-                        $(".brandMoDescrip").append(`
-                            </br>
-                            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;
-                                    border-color:#e6e6ff; border-radius:10px; margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;"
-                                    id="row-addon-brand-${index}">
-                                <div class="row">
-                                    <div class="col-xxl-5 col-lg-5 col-md-12">
-                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
-                                            multiple="true" style="width: 100%;" class="brandRows">
-                                            @foreach($brands as $brand)
-                                                <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>
-                                        @error('is_primary_payment_method')
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $message }}</strong>
-                                        </span>
-                                        @enderror
-                                    </div>
-                                    <div class="col-xxl-6 col-lg-6 col-md-12">
+        {{--    $('#indexValue').val(index);--}}
+        {{--    var selectedBrands = [];--}}
+        {{--    for(let i=1; i<index; i++)--}}
+        {{--    {--}}
+        {{--        var eachSelectedBrand = $('#selectBrandMo'+i).val();--}}
+        {{--        if(eachSelectedBrand) {--}}
+        {{--            selectedBrands.push(eachSelectedBrand);--}}
+        {{--        }--}}
+        {{--    }--}}
+        {{--    $.ajax({--}}
+        {{--        url:"{{url('getBrandForAddons')}}",--}}
+        {{--        type: "POST",--}}
+        {{--        data:--}}
+        {{--            {--}}
+        {{--                filteredArray: selectedBrands,--}}
+        {{--                _token: '{{csrf_token()}}'--}}
+        {{--            },--}}
+        {{--        dataType : 'json',--}}
+        {{--        success: function(data) {--}}
+        {{--            myarray = data;--}}
+        {{--            var size = myarray.length;--}}
+        {{--            if (size >= 1) {--}}
+        {{--                $(".brandMoDescrip").append(`--}}
+        {{--                    </br>--}}
+        {{--                    <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;--}}
+        {{--                            border-color:#e6e6ff; border-radius:10px; margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;"--}}
+        {{--                            id="row-addon-brand-${index}">--}}
+        {{--                        <div class="row">--}}
+        {{--                            <div class="col-xxl-5 col-lg-5 col-md-12">--}}
+        {{--                                <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>--}}
+        {{--                                <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"--}}
+        {{--                                    multiple="true" style="width: 100%;" class="brandRows">--}}
+        {{--                                    @foreach($brands as $brand)--}}
+        {{--                                        <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
+        {{--                                    @endforeach--}}
+        {{--                                </select>--}}
+        {{--                                <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>--}}
 
-                                    </div>
-                                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="${index}" style="float:right;">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="MoDes${index}" id="model-line-first-row">
-                                    <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >
-                                        <div class="col-xxl-1 col-lg-1 col-md-12">
-                                        </div>
-                                        <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
-                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                            <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
-                                                id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
+        {{--                            </div>--}}
+        {{--                            <div class="col-xxl-6 col-lg-6 col-md-12">--}}
 
-                                            </select>
-                                            <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
+        {{--                            </div>--}}
+        {{--                            <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+        {{--                                <a  class="btn_round removeButtonbrandMoDescrip" data-index="${index}" style="float:right;">--}}
+        {{--                                    <i class="fas fa-trash-alt"></i>--}}
+        {{--                                </a>--}}
+        {{--                            </div>--}}
+        {{--                        </div>--}}
+        {{--                        <div class="MoDes${index}" id="model-line-first-row">--}}
+        {{--                            <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >--}}
+        {{--                                <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+        {{--                                </div>--}}
+        {{--                                <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>--}}
+        {{--                                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>--}}
+        {{--                                    <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)--}}
+        {{--                                        id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">--}}
 
-                                        </div>
-                                        <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
-                                            <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                                            <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
-                                                multiple="true" style="width: 100%;"  onchange=selectModelDescipt(${index},1)>
+        {{--                                    </select>--}}
+        {{--                                    <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>--}}
 
-                                            </select>
-                                              <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>
+        {{--                                </div>--}}
+        {{--                                <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>--}}
+        {{--                                    <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>--}}
+        {{--                                    <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"--}}
+        {{--                                        multiple="true" style="width: 100%;"  onchange=selectModelDescipt(${index},1)>--}}
 
-                                        </div>
-                                        <div class="col-xxl-1 col-lg-1 col-md-12">
-                                            <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel${index}" class="delete-model-line-row">
-                                        <div id="showaddtrd${index}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" hidden >
-                                            <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(${index})">
-                                            <i class="fa fa-plus" aria-hidden="true"></i> Add</a>
-                                        </div>
-                                    </div>
-                                </div>
-                        `);
-                        let brandDropdownData   = [];
-                        $.each(data,function(key,value)
-                        {
-                            brandDropdownData.push
-                            ({
-                                id: value.id,
-                                text: value.brand_name
-                            });
-                        });
-                        $('#selectBrandMo'+index).html("");
-                        $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-                        $("#selectBrandMo"+index).select2
-                        ({
-                            data:brandDropdownData,
-                            maximumSelectionLength: 1,
-                        });
-                    }
-                }
-            });
-        });
+        {{--                                    </select>--}}
+        {{--                                      <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>--}}
+
+        {{--                                </div>--}}
+        {{--                                <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+        {{--                                    <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">--}}
+        {{--                                        <i class="fas fa-trash-alt"></i>--}}
+        {{--                                    </a>--}}
+        {{--                                </div>--}}
+        {{--                            </div>--}}
+        {{--                        </div>--}}
+        {{--                        <div class="row">--}}
+        {{--                            <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel${index}" class="delete-model-line-row">--}}
+        {{--                                <div id="showaddtrd${index}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" hidden >--}}
+        {{--                                    <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(${index})">--}}
+        {{--                                    <i class="fa fa-plus" aria-hidden="true"></i> Add</a>--}}
+        {{--                                </div>--}}
+        {{--                            </div>--}}
+        {{--                        </div>--}}
+        {{--                `);--}}
+        {{--                let brandDropdownData   = [];--}}
+        {{--                $.each(data,function(key,value)--}}
+        {{--                {--}}
+        {{--                    brandDropdownData.push--}}
+        {{--                    ({--}}
+        {{--                        id: value.id,--}}
+        {{--                        text: value.brand_name--}}
+        {{--                    });--}}
+        {{--                });--}}
+        {{--                $('#selectBrandMo'+index).html("");--}}
+        {{--                $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");--}}
+        {{--                $("#selectBrandMo"+index).select2--}}
+        {{--                ({--}}
+        {{--                    data:brandDropdownData,--}}
+        {{--                    maximumSelectionLength: 1,--}}
+        {{--                });--}}
+
+        {{--            }--}}
+        {{--        }--}}
+        {{--    });--}}
+        {{--});--}}
     });
 
     function addDiscr(supplier)
@@ -571,9 +608,8 @@
 
         $(".MoDes" + supplier).append(`
             <div class="row MoDesApndHere${supplier}" id="row-spare-part-brand-${supplier}-model-${index}">
-                <div class="col-xxl-1 col-lg-1 col-md-12">
-                </div>
-                <div class="col-xxl-5 col-lg-5 col-md-12 model-line-item-dropdown" id="showDivdropDr${supplier}Des${index}">
+
+                <div class="col-xxl-4 col-lg-5 col-md-12 model-line-item-dropdown" id="showDivdropDr${supplier}Des${index}">
                     <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                     <select class="compare-tag1 spare-parts-model-lines" name=brand[${supplier}][model][${index}][model_id]"
                         onchange=selectModelLineDescipt(${supplier},${index})
@@ -594,6 +630,22 @@
                       <span id="ModelDescriptionError_${supplier}_${index}" class="ModelDescriptionError invalid-feedback"></span>
 
                 </div>
+                <div class="col-xxl-1 col-lg-1 col-md-12 model-year-start-dropdown" id="showModelYearStartdrop${supplier}Des${index}" hidden>
+                    <span class="error">* </span>
+                    <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                    <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_start]"
+                           id="selectModelYearStart${supplier}Des${index}" value=""/>
+
+                    <span id="modelYearStart${supplier}Error${index}" class="modelYearStartError invalid-feedback-lead"></span>
+                </div>
+
+                <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
+                    <span class="error">* </span>
+                    <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                    <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_end]"
+                           id="selectModelYearEnd${supplier}Des${index}"  value=""/>
+                    <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
+                </div>
                 <div class="col-xxl-1 col-lg-1 col-md-12">
                     <a  class="btn_round removeButtonModelItem" data-index="${supplier}" data-model-index="${index}" id="removeModelNumberdrop${supplier}Des${index}">
                         <i class="fas fa-trash-alt"></i>
@@ -608,6 +660,16 @@
         ({
             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
             allowClear: true,
+        });
+        $("#selectModelYearStart"+supplier+"Des"+index).yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
+        });
+        $("#selectModelYearEnd"+supplier+"Des"+index).yearpicker({
+            year: 2023,
+            startYear: 2019,
+            endYear: 2050,
         });
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
@@ -754,6 +816,8 @@
         $('#showDivdropDr'+id+'Des'+row).attr('hidden', false);
         // let showDel = document.getElementById('removeModelNumberdrop'+id+'Des'+row);
         // showDel.hidden = false
+        $('#showModelYearStartdrop'+id+'Des'+row).attr('hidden', false);
+        $('#showModelYearEnddrop'+id+'Des'+row).attr('hidden', false);
         $('#removeModelNumberdrop'+id+'Des'+row).attr('hidden', false);
 
         let showaddtrimDis = document.getElementById('showaddtrimDis');

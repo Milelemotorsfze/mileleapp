@@ -400,7 +400,7 @@
                             <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-{{$i}}">
                                 <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_{{$i}}" type="text" class="form-control widthinput part_number" name="part_number[{{$i}}]" 
+                                        <input id="part_number_{{$i}}" type="text" class="form-control widthinput part_number" name="part_number[{{$i}}]"
                                         placeholder="Part Number" value="{{$partNumbers->part_number}}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,{{$i}})">
                                         <span id="partNumberError_{{$i}}" class="invalid-feedback partNumberError"></span>
@@ -414,7 +414,7 @@
                             </div>
                             @endforeach
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-xxl-12 col-lg-12 col-md-12" id="partNumberDivBr">
                                 <a id="addPartNumberBtn" style="float: right;" class="btn btn-sm btn-info">
@@ -523,8 +523,8 @@
         var i=1;
         var fixingCharge = 'yes';
         var formInputError = false;
-        var startYear = Number(data.model_year_start);
-        var endYear = Number(data.model_year_end);
+        // var startYear = Number(data.model_year_start);
+        // var endYear = Number(data.model_year_end);
         var imageExist = data.image;
         var imageIsOkay = false;
         var isPartNumberErrorExists = true;
@@ -534,16 +534,16 @@
             {
                 imageIsOkay = true;
             }
-            $("#model_year_start").yearpicker({
-                year: startYear,
-                startYear: 2019,
-                endYear: 2050,
-            });
-            $("#model_year_end").yearpicker({
-                year: endYear,
-                startYear: 2019,
-                endYear: 2050,
-            });
+            // $("#model_year_start").yearpicker({
+            //     year: startYear,
+            //     startYear: 2019,
+            //     endYear: 2050,
+            // });
+            // $("#model_year_end").yearpicker({
+            //     year: endYear,
+            //     startYear: 2019,
+            //     endYear: 2050,
+            // });
             currentAddonType =  $('#addon_type').val();
 
             $("#addnewDescriptionButton").click(function () {
@@ -779,7 +779,7 @@
                                     <div class="col-xxl-4 col-lg-6 col-md-12 partNumberApendHere" id="row-${index}">
                                     <div class="row">
                                     <div class="col-xxl-9 col-lg-6 col-md-12">
-                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]" 
+                                        <input id="part_number_${index}" type="text" class="form-control widthinput part_number" name="part_number[${index}]"
                                         placeholder="Part Number" value="{{ old('part_number') }}"
                                         autocomplete="part_number" onkeyup="setPartNumber(this,${index})">
                                         <span id="partNumberError_${index}" class="invalid-feedback partNumberError"></span>
@@ -1097,33 +1097,8 @@
                             formInputError = true;
                         }
                     }
-                    var inputModelYearStart = $('#model_year_start').val();
-                    var inputModelYearEnd = $('#model_year_end').val();
-                    if(inputModelYearStart == '')
-                    {
-                        $msg = "Model Year is required"
-                        showModelYearStartError($msg);
-                        formInputError = true;
-                    }
-                    else if(inputModelYearStart.length != 4)
-                    {
-                        $msg = "Model Year required 4 digits number"
-                        showModelYearStartError($msg);
-                        formInputError = true;
-                    }
-                    else if(inputModelYearEnd != '' && inputModelYearStart != '')
-                    {
-                        if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                        {
-                            removeModelYearStartError();
-                            showModelYearEndError();
-                            formInputError = true;
-                        }
-                    }
-                    else
-                    {
-                        removeModelYearStartError();
-                    }
+
+
                     var countBrandRow = 0;
                     countBrandRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
                     for (let i = 1; i <= countBrandRow; i++)
@@ -1158,6 +1133,37 @@
                                     }
                                 }
 
+                                // model Year validation
+
+                                var inputModelYearStart = $('#selectModelYearStart'+i+'Des'+j).val();
+                                var inputModelYearEnd = $('#selectModelYearEnd'+i+'Des'+j).val();
+                                if(inputModelYearStart == '')
+                                {
+                                    $msg = "Model Year is required"
+                                    showModelYearStartError($msg,i,j);
+                                    formInputError = true;
+                                }
+                                else if(inputModelYearStart.length != 4)
+                                {
+                                    $msg = "Model Year required 4 digits number"
+                                    showModelYearStartError($msg,i,j);
+                                    formInputError = true;
+                                }
+                                else if(inputModelYearEnd != '' && inputModelYearStart != '')
+                                {
+                                    if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                                    {
+                                        removeModelYearStartError(i,j);
+                                        showModelYearEndError(i,j);
+                                        formInputError = true;
+                                    }else{
+                                        removeModelYearEndError(i,j)
+                                    }
+                                }
+                                else
+                                {
+                                    removeModelYearStartError(i,j);
+                                }
                             }
                         }
                     }
@@ -1238,63 +1244,63 @@
                 removeSupplierError(row);
             }
         }
-        function checkGreaterYear(CurrentInput)
-        {
-            removeModelYearStartError();
-            removeModelYearEndError();
-            var id = CurrentInput.id
-            var input = document.getElementById(id);
-            var val = input.value;
-            val = val.replace(/^0+|[^\d]/g, '');
-            input.value = val;
-            var modelYearStart = $('#model_year_start').val();
-            var modelYearEnd = $('#model_year_end').val();
-            if(id == 'model_year_start')
-            {
-                if(modelYearStart == '')
-                {
-                    $msg = "Model year is Required";
-                    showModelYearStartError($msg);
-                }
-                else if(modelYearStart.length != 4)
-                {
-                    $msg = "Model Year required 4 digits number";
-                    showModelYearStartError($msg);
-                }
-            }
-            else if(id == 'model_year_end')
-            {
-                if(Number(inputModelYearEnd) < Number(inputModelYearStart))
-                {
-                    showModelYearEndError();
-                    formInputError = true;
-                }
-            }
-        }
-        function showModelYearStartError($msg)
-        {
-            document.getElementById('modelYearStartError').textContent=$msg;
-            document.getElementById('model_year_start').classList.add("is-invalid");
-            document.getElementById('modelYearStartError').classList.add("paragraph-class");
-        }
-        function showModelYearEndError()
-        {
-            document.getElementById('modelYearEndError').textContent="Enter higher value than min leadtime";
-            document.getElementById('model_year_end').classList.add("is-invalid");
-            document.getElementById('modelYearEndError').classList.add("paragraph-class");
-        }
-        function removeModelYearStartError()
-        {
-            document.getElementById('modelYearStartError').textContent="";
-            document.getElementById('model_year_start').classList.remove("is-invalid");
-            document.getElementById('modelYearStartError').classList.remove("paragraph-class");
-        }
-        function removeModelYearEndError()
-        {
-            document.getElementById('modelYearEndError').textContent="";
-            document.getElementById('model_year_end').classList.remove("is-invalid");
-            document.getElementById('modelYearEndError').classList.remove("paragraph-class");
-        }
+        // function checkGreaterYear(CurrentInput)
+        // {
+        //     removeModelYearStartError();
+        //     removeModelYearEndError();
+        //     var id = CurrentInput.id
+        //     var input = document.getElementById(id);
+        //     var val = input.value;
+        //     val = val.replace(/^0+|[^\d]/g, '');
+        //     input.value = val;
+        //     var modelYearStart = $('#model_year_start').val();
+        //     var modelYearEnd = $('#model_year_end').val();
+        //     if(id == 'model_year_start')
+        //     {
+        //         if(modelYearStart == '')
+        //         {
+        //             $msg = "Model year is Required";
+        //             showModelYearStartError($msg);
+        //         }
+        //         else if(modelYearStart.length != 4)
+        //         {
+        //             $msg = "Model Year required 4 digits number";
+        //             showModelYearStartError($msg);
+        //         }
+        //     }
+        //     else if(id == 'model_year_end')
+        //     {
+        //         if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+        //         {
+        //             showModelYearEndError();
+        //             formInputError = true;
+        //         }
+        //     }
+        // }
+     function showModelYearStartError($msg,i,j)
+     {
+         document.getElementById('modelYearStart'+i+'Error'+j).textContent=$msg;
+         document.getElementById('selectModelYearStart'+i+'Des'+j).classList.add("is-invalid");
+         document.getElementById('modelYearStart'+i+'Error'+j).classList.add("paragraph-class");
+     }
+     function showModelYearEndError(i,j)
+     {
+         document.getElementById('modelYearEnd'+i+'Error'+j).textContent="Enter higher value than min leadtime";
+         document.getElementById('selectModelYearEnd'+i+'Des'+j).classList.add("is-invalid");
+         document.getElementById('modelYearEnd'+i+'Error'+j).classList.add("paragraph-class");
+     }
+     function removeModelYearStartError(i,j)
+     {
+         document.getElementById('modelYearStart'+ i +'Error'+j).textContent="";
+         document.getElementById('selectModelYearStart'+i+'Des'+j).classList.remove("is-invalid");
+         document.getElementById('modelYearStart'+i+'Error'+j).classList.remove("paragraph-class");
+     }
+     function removeModelYearEndError(i,j)
+     {
+         document.getElementById('modelYearEnd'+i+'Error'+j).textContent="";
+         document.getElementById('selectModelYearEnd'+i+'Des'+j).classList.remove("is-invalid");
+         document.getElementById('modelYearEnd'+i+'Error'+j).classList.remove("paragraph-class");
+     }
      function showAddonUniqueError($msg)
      {
          document.getElementById("addonNameUniqueError").textContent=$msg;

@@ -18,11 +18,11 @@
                 </div>
                 <div class="col-xxl-6 col-lg-6 col-md-12">
                 </div>
-                <div class="col-xxl-1 col-lg-1 col-md-12">
-                    <a  class="btn_round removeButtonbrandMoDescrip" data-index="1" style="float:right;">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </div>
+{{--                <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                    <a  class="btn_round removeButtonbrandMoDescrip" data-index="1" style="float:right;">--}}
+{{--                        <i class="fas fa-trash-alt"></i>--}}
+{{--                    </a>--}}
+{{--                </div>--}}
             </div>
             <div class="MoDes1">
                 <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
@@ -48,20 +48,20 @@
                         </select>
                         <span id="ModelDescriptionError_1_1" class="ModelDescriptionError invalid-feedback"></span>
                     </div>
-                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearStartdrop1Des1" hidden>
-                            <span class="error">* </span>
-                            <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
-                            <input type="text" class=" form-control widthinput"  name="brand[1][model][1][model_year_start]"
-                                   id="selectModelYearStart1Des1" onkeydown="return false;" value=""/>
-                                <span id="modelYearStart1Error1" class="modelYearStartError invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
-                            <span class="error">* </span>
-                            <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                            <input type="text" class=" form-control widthinput" onkeydown="return false;" name="brand[1][model][1][model_year_end]"
-                                   id="selectModelYearEnd1Des1"  value=""  />
-                                <span id="modelYearEnd1Error1" class="modelYearEndError invalid-feedback-lead"></span>
-                        </div>
+                    <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearStartdrop1Des1" hidden>
+                        <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                        <input type="text" class="startyearpicker form-control widthinput"  name="brand[1][model][1][model_year_start]"
+                               id="selectModelYearStart1Des1" onkeydown="return false;" value=""/>
+                            <span id="modelYearStart1Error1" class="modelYearStartError invalid-feedback-lead"></span>
+                    </div>
+                    <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
+                        <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                        <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[1][model][1][model_year_end]"
+                               id="selectModelYearEnd1Des1"  value=""  />
+                            <span id="modelYearEnd1Error1" class="modelYearEndError invalid-feedback-lead"></span>
+                    </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="1" hidden id="removeModelNumberdrop1Des1">
                                 <i class="fas fa-trash-alt"></i>
@@ -119,9 +119,6 @@
             endYear: 2050,
         });
 
-        $( "#selectModelYearEnd1Des1" ).on("change", function() {
-            alert( "Handler for `change` called." );
-        } );
         function checkGreaterYear(CurrentInput,i,j)
         {
             var id = CurrentInput.id
@@ -259,90 +256,90 @@
             // sortDropDownListByText();
         }
 
-        $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) {
-            // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
-            //     if (e) {
-                    var countRow = 0;
-                    var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-                    // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
-                    if (countRow > 1) {
-                        var indexNumber = $(this).attr('data-index');
-
-                        // if (indexNumber == 1) {
-                        //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
-                        // }
-
-                        $(this).closest('#row-addon-brand-' + indexNumber).find("option:selected").each(function () {
-                            var id = (this.value);
-                            var text = (this.text);
-                            addOption(id, text)
-                        });
-
-                        $(this).closest('#row-addon-brand-' + indexNumber).remove();
-                        $('.brandMoDescripApendHere').each(function (i) {
-                            var index = +i + +1;
-                            $(this).attr('id', 'row-addon-brand-' + index);
-
-                            $(this).find('.brandRows').attr('data-index', index);
-                            $(this).find('.brandRows').attr('id', 'selectBrandMo' + index);
-                            $(this).find('.brandRows').attr('name', 'brand[' + index + '][brand_id]');
-                            $(this).find('.brandRows').attr('onchange', 'selectBrandDisp(' + index + ')');
-                            $('#selectBrandMo' + index).select2
-                            ({
-                                placeholder: "Choose Brands....     Or     Type Here To Search....",
-                                allowClear: true,
-                                minimumResultsForSearch: -1,
-                                maximumSelectionLength: 1,
-                            });
-
-                            $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
-                            $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel' + index);
-                            $(this).find('.show-add-button').attr('id', 'showaddtrd' + index);
-                            $(this).find('#addDids').attr('onclick', 'addDiscr(' + index + ')');
-                            $(this).find('.mobrandError').attr('id', 'mobrandError' + index);
-                            var oldIndex = '';
-                            oldIndex = index + 1;
-                            itemcount = $(".MoDes" + oldIndex).find(".MoDesApndHere" + oldIndex).length;
-                            for (var i = 1; i <= itemcount; i++) {
-                                $(this).find('#row-spare-part-brand-' + oldIndex + '-model-' + i).attr('id', 'row-spare-part-brand-' + index + '-model-' + i);
-                                $(this).find('#showDivdropDr' + oldIndex + 'Des' + i).attr('id', 'showDivdropDr' + index + 'Des' + i);
-                                $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('data-index', index);
-                                $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('name', 'brand[' + index + '][model][' + i + '][model_id]');
-                                $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('onchange', 'selectModelLineDescipt(' + index + ',' + i + ')');
-                                $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('class', 'compare-tag1 spare-parts-model-lines');
-                                $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('id', 'selectModelLineNum' + index + 'Des' + i);
-                                $("#selectModelLineNum" + index + "Des" + i).select2
-                                ({
-                                    placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                                    allowClear: true,
-                                    maximumSelectionLength: 1,
-                                });
-
-                                $(this).find('#showModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'showModelNumberdrop' + index + 'Des' + i);
-                                $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('name', 'brand[' + index + '][model][' + i + '][model_number][]');
-                                $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('onchange', 'selectModelDescipt(' + index + ',' + i + ')');
-                                $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('id', 'selectModelNumberDiscri' + index + 'Des' + i);
-                                $("#selectModelNumberDiscri" + index + "Des" + i).select2
-                                ({
-                                    placeholder: 'Choose Model Description....     Or     Type Here To Search....',
-                                    allowClear: true,
-                                });
-                                $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
-                                $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
-                                $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
-                                $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
-                            }
-                            $(this).find(".MoDes" + oldIndex).attr('class', "MoDes" + index);
-                            $(this).find(".MoDesApndHere" + oldIndex).attr('class', "row MoDesApndHere" + index);
-
-                        });
-                    } else {
-                        var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required', function (e) {
-                        }).set({title: "Can't Remove Brand And Model Lines"})
-                    }
-                // }
-            // }).set({title:"Delete Item"});
-        })
+        // $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e) {
+        //     // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+        //     //     if (e) {
+        //             var countRow = 0;
+        //             var countRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+        //             // $(".MoDes" + indexNumber).find(".MoDesApndHere" + indexNumber)
+        //             if (countRow > 1) {
+        //                 var indexNumber = $(this).attr('data-index');
+        //
+        //                 // if (indexNumber == 1) {
+        //                 //     $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+        //                 // }
+        //
+        //                 $(this).closest('#row-addon-brand-' + indexNumber).find("option:selected").each(function () {
+        //                     var id = (this.value);
+        //                     var text = (this.text);
+        //                     addOption(id, text)
+        //                 });
+        //
+        //                 $(this).closest('#row-addon-brand-' + indexNumber).remove();
+        //                 $('.brandMoDescripApendHere').each(function (i) {
+        //                     var index = +i + +1;
+        //                     $(this).attr('id', 'row-addon-brand-' + index);
+        //
+        //                     $(this).find('.brandRows').attr('data-index', index);
+        //                     $(this).find('.brandRows').attr('id', 'selectBrandMo' + index);
+        //                     $(this).find('.brandRows').attr('name', 'brand[' + index + '][brand_id]');
+        //                     $(this).find('.brandRows').attr('onchange', 'selectBrandDisp(' + index + ')');
+        //                     $('#selectBrandMo' + index).select2
+        //                     ({
+        //                         placeholder: "Choose Brands....     Or     Type Here To Search....",
+        //                         allowClear: true,
+        //                         minimumResultsForSearch: -1,
+        //                         maximumSelectionLength: 1,
+        //                     });
+        //
+        //                     $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
+        //                     $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel' + index);
+        //                     $(this).find('.show-add-button').attr('id', 'showaddtrd' + index);
+        //                     $(this).find('#addDids').attr('onclick', 'addDiscr(' + index + ')');
+        //                     $(this).find('.mobrandError').attr('id', 'mobrandError' + index);
+        //                     var oldIndex = '';
+        //                     oldIndex = index + 1;
+        //                     itemcount = $(".MoDes" + oldIndex).find(".MoDesApndHere" + oldIndex).length;
+        //                     for (var i = 1; i <= itemcount; i++) {
+        //                         $(this).find('#row-spare-part-brand-' + oldIndex + '-model-' + i).attr('id', 'row-spare-part-brand-' + index + '-model-' + i);
+        //                         $(this).find('#showDivdropDr' + oldIndex + 'Des' + i).attr('id', 'showDivdropDr' + index + 'Des' + i);
+        //                         $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('data-index', index);
+        //                         $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('name', 'brand[' + index + '][model][' + i + '][model_id]');
+        //                         $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('onchange', 'selectModelLineDescipt(' + index + ',' + i + ')');
+        //                         $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('class', 'compare-tag1 spare-parts-model-lines');
+        //                         $(this).find('#selectModelLineNum' + oldIndex + 'Des' + i).attr('id', 'selectModelLineNum' + index + 'Des' + i);
+        //                         $("#selectModelLineNum" + index + "Des" + i).select2
+        //                         ({
+        //                             placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+        //                             allowClear: true,
+        //                             maximumSelectionLength: 1,
+        //                         });
+        //
+        //                         $(this).find('#showModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'showModelNumberdrop' + index + 'Des' + i);
+        //                         $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('name', 'brand[' + index + '][model][' + i + '][model_number][]');
+        //                         $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('onchange', 'selectModelDescipt(' + index + ',' + i + ')');
+        //                         $(this).find('#selectModelNumberDiscri' + oldIndex + 'Des' + i).attr('id', 'selectModelNumberDiscri' + index + 'Des' + i);
+        //                         $("#selectModelNumberDiscri" + index + "Des" + i).select2
+        //                         ({
+        //                             placeholder: 'Choose Model Description....     Or     Type Here To Search....',
+        //                             allowClear: true,
+        //                         });
+        //                         $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
+        //                         $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
+        //                         $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
+        //                         $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
+        //                     }
+        //                     $(this).find(".MoDes" + oldIndex).attr('class', "MoDes" + index);
+        //                     $(this).find(".MoDesApndHere" + oldIndex).attr('class', "row MoDesApndHere" + index);
+        //
+        //                 });
+        //             } else {
+        //                 var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required', function (e) {
+        //                 }).set({title: "Can't Remove Brand And Model Lines"})
+        //             }
+        //         // }
+        //     // }).set({title:"Delete Item"});
+        // })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {
 
            // alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
@@ -433,136 +430,136 @@
 
         //////////////// end //////////////////////
 
-        $("#addDis").on("click", function ()
-        {
-            // $('.allbrandsMo').prop('disabled',true);
-            var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;
+{{--        $("#addDis").on("click", function ()--}}
+{{--        {--}}
+{{--            // $('.allbrandsMo').prop('disabled',true);--}}
+{{--            var index = $(".brandMoDescrip").find(".brandMoDescripApendHere").length + 1;--}}
 
-            $('#indexValue').val(index);
-            var selectedBrands = [];
-            for(let i=1; i<index; i++)
-            {
-                var eachSelectedBrand = $('#selectBrandMo'+i).val();
-                if(eachSelectedBrand) {
-                    selectedBrands.push(eachSelectedBrand);
-                }
-            }
-            $.ajax({
-                url:"{{url('getBrandForAddons')}}",
-                type: "POST",
-                data:
-                    {
-                        filteredArray: selectedBrands,
-                        _token: '{{csrf_token()}}'
-                    },
-                dataType : 'json',
-                success: function(data) {
-                    myarray = data;
-                    var size = myarray.length;
-                    if (size >= 1) {
-                        $(".brandMoDescrip").append(`
-                            </br>
-                            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;
-                                    border-color:#e6e6ff; border-radius:10px; margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;"
-                                    id="row-addon-brand-${index}">
-                                <div class="row">
-                                    <div class="col-xxl-5 col-lg-5 col-md-12">
-                                    <span class="error">* </span>
-                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
-                                        <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"
-                                         multiple="true" style="width: 100%;" class="brandRows">
-                                            @foreach($brands as $brand)
-                                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
-                                            @endforeach
-                                            </select>
-                                            <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>
-                                            @error('is_primary_payment_method')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
-                                    </div>
-                                    <div class="col-xxl-6 col-lg-6 col-md-12">
+{{--            $('#indexValue').val(index);--}}
+{{--            var selectedBrands = [];--}}
+{{--            for(let i=1; i<index; i++)--}}
+{{--            {--}}
+{{--                var eachSelectedBrand = $('#selectBrandMo'+i).val();--}}
+{{--                if(eachSelectedBrand) {--}}
+{{--                    selectedBrands.push(eachSelectedBrand);--}}
+{{--                }--}}
+{{--            }--}}
+{{--            $.ajax({--}}
+{{--                url:"{{url('getBrandForAddons')}}",--}}
+{{--                type: "POST",--}}
+{{--                data:--}}
+{{--                    {--}}
+{{--                        filteredArray: selectedBrands,--}}
+{{--                        _token: '{{csrf_token()}}'--}}
+{{--                    },--}}
+{{--                dataType : 'json',--}}
+{{--                success: function(data) {--}}
+{{--                    myarray = data;--}}
+{{--                    var size = myarray.length;--}}
+{{--                    if (size >= 1) {--}}
+{{--                        $(".brandMoDescrip").append(`--}}
+{{--                            </br>--}}
+{{--                            <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px;--}}
+{{--                                    border-color:#e6e6ff; border-radius:10px; margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;"--}}
+{{--                                    id="row-addon-brand-${index}">--}}
+{{--                                <div class="row">--}}
+{{--                                    <div class="col-xxl-5 col-lg-5 col-md-12">--}}
+{{--                                    <span class="error">* </span>--}}
+{{--                                        <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>--}}
+{{--                                        <select onchange=selectBrandDisp(${index}) name="brand[${index}][brand_id]" id="selectBrandMo${index}" data-index="${index}"--}}
+{{--                                         multiple="true" style="width: 100%;" class="brandRows">--}}
+{{--                                            @foreach($brands as $brand)--}}
+{{--                                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>--}}
+{{--                                            @endforeach--}}
+{{--                                            </select>--}}
+{{--                                            <span id="mobrandError${index}" class="mobrandError invalid-feedback"></span>--}}
+{{--                                            @error('is_primary_payment_method')--}}
+{{--                                            <span class="invalid-feedback" role="alert">--}}
+{{--                                                <strong>{{ $message }}</strong>--}}
+{{--                                            </span>--}}
+{{--                                            @enderror--}}
+{{--                                    </div>--}}
+{{--                                    <div class="col-xxl-6 col-lg-6 col-md-12">--}}
 
-                                    </div>
-                                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="${index}" style="float:right;">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                    <div class="MoDes${index}" id="model-line-first-row">
-                                        <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >
-                                            <div class="col-xxl-1 col-lg-1 col-md-12">
-                                            </div>
-                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>
-                                            <span class="error">* </span>
-                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                                                <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)
-                                                    id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">
+{{--                                    </div>--}}
+{{--                                    <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                                        <a  class="btn_round removeButtonbrandMoDescrip" data-index="${index}" style="float:right;">--}}
+{{--                                            <i class="fas fa-trash-alt"></i>--}}
+{{--                                        </a>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                    <div class="MoDes${index}" id="model-line-first-row">--}}
+{{--                                        <div class="row MoDesApndHere${index}" id="row-spare-part-brand-${index}-model-1" >--}}
+{{--                                            <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                                            </div>--}}
+{{--                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-line-dropdown" id="showDivdropDr${index}Des1" hidden>--}}
+{{--                                            <span class="error">* </span>--}}
+{{--                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>--}}
+{{--                                                <select class="compare-tag1 spare-parts-model-lines" name="brand[${index}][model][1][model_id]" onchange=selectModelLineDescipt(${index},1)--}}
+{{--                                                    id="selectModelLineNum${index}Des1" multiple="true" style="width: 100%;"  data-index="${index}" data-model-index="1">--}}
 {{--                                                    @foreach($modelLines as $modelLine)--}}
 {{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                                                    @endforeach--}}
-                                                    </select>
-                                                    <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>
-                                                    @error('is_primary_payment_method')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                    @enderror
-                                            </div>
-                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>
-                                            <span class="error">* </span>
-                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
-                                                <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"
-                                                multiple="true" style="width: 100%;" onchange=selectModelDescipt(${index},1)>
+{{--                                                    </select>--}}
+{{--                                                    <span id="ModelLineError_${index}_1" class="ModelLineError invalid-feedback"></span>--}}
+{{--                                                    @error('is_primary_payment_method')--}}
+{{--                                                    <span class="invalid-feedback" role="alert">--}}
+{{--                                                        <strong>{{ $message }}</strong>--}}
+{{--                                                    </span>--}}
+{{--                                                    @enderror--}}
+{{--                                            </div>--}}
+{{--                                            <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop${index}Des1" hidden>--}}
+{{--                                            <span class="error">* </span>--}}
+{{--                                                <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>--}}
+{{--                                                <select class="compare-tag1 model-descriptions" name="brand[${index}][model][1][model_number][]" id="selectModelNumberDiscri${index}Des1"--}}
+{{--                                                multiple="true" style="width: 100%;" onchange=selectModelDescipt(${index},1)>--}}
 {{--                                                    @foreach($modelLines as $modelLine)--}}
 {{--                                                    <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
 {{--                                                    @endforeach--}}
-                                                    </select>
-                                                    <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>
-                                                    @error('is_primary_payment_method')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                            <div class="col-xxl-1 col-lg-1 col-md-12">
-                                                <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel${index}" class="delete-model-line-row">
-                                            <div id="showaddtrd${index}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" hidden >
-                                                <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(${index})">
-                                                <i class="fa fa-plus" aria-hidden="true"></i> Add</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                    `);
-                    let brandDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        brandDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.brand_name
-                        });
-                    });
-                    $('#selectBrandMo'+index).html("");
-                    $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");
-                    $("#selectBrandMo"+index).select2
-                    ({
-                        data:brandDropdownData,
-                        maximumSelectionLength: 1,
-                    });
-                    }
-                }
-            });
-        });
+{{--                                                    </select>--}}
+{{--                                                    <span id="ModelDescriptionError_${index}_1" class="ModelDescriptionError invalid-feedback"></span>--}}
+{{--                                                    @error('is_primary_payment_method')--}}
+{{--                                                    <span class="invalid-feedback" role="alert">--}}
+{{--                                                        <strong>{{ $message }}</strong>--}}
+{{--                                                    </span>--}}
+{{--                                                @enderror--}}
+{{--                                            </div>--}}
+{{--                                            <div class="col-xxl-1 col-lg-1 col-md-12">--}}
+{{--                                                <a  class="btn_round removeButtonModelItem" data-index="${index}" data-model-index="1" hidden id="removeModelNumberdrop${index}Des1">--}}
+{{--                                                    <i class="fas fa-trash-alt"></i>--}}
+{{--                                                </a>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                    <div class="row">--}}
+{{--                                        <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel${index}" class="delete-model-line-row">--}}
+{{--                                            <div id="showaddtrd${index}" class="col-xxl-12 col-lg-12 col-md-12 show-add-button" hidden >--}}
+{{--                                                <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(${index})">--}}
+{{--                                                <i class="fa fa-plus" aria-hidden="true"></i> Add</a>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                    `);--}}
+{{--                    let brandDropdownData   = [];--}}
+{{--                    $.each(data,function(key,value)--}}
+{{--                    {--}}
+{{--                        brandDropdownData.push--}}
+{{--                        ({--}}
+{{--                            id: value.id,--}}
+{{--                            text: value.brand_name--}}
+{{--                        });--}}
+{{--                    });--}}
+{{--                    $('#selectBrandMo'+index).html("");--}}
+{{--                    $("#selectBrandMo"+index).attr("data-placeholder","Choose Brand....     Or     Type Here To Search....");--}}
+{{--                    $("#selectBrandMo"+index).select2--}}
+{{--                    ({--}}
+{{--                        data:brandDropdownData,--}}
+{{--                        maximumSelectionLength: 1,--}}
+{{--                    });--}}
+{{--                    }--}}
+{{--                }--}}
+{{--            });--}}
+{{--        });--}}
     });
     function addDiscr(supplier)
     {
