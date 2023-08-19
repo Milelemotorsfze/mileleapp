@@ -87,7 +87,7 @@ input[type=number]::-webkit-outer-spin-button {
     <label for="basicpill-firstname-input" class="form-label">Customer Email:</label>
     <input type="text" name="email" class="form-control" value="{{ $calls->email }}" id="email">
     <input type="hidden" name="user_id" placeholder="Email" class="form-control" value="{{ auth()->user()->id }}" autocomplete="off">
-    <input type="hidden" name="call_id" value="{{ $calls->id }}">
+    <input type="hidden" name="call_id" value="{{ $calls->id }}" id="call_id">
     <div id="emailError" class="error-text"></div>
 </div>
 @php
@@ -353,12 +353,14 @@ $brand_name = $brand->brand_name;
         $('#phone, #email').on('input', function() {
             var phone = $('#phone').val();
             var email = $('#email').val();
+            var call_id = $('#call_id').val();
             $.ajax({
-                url: "{{ route('checkExistence') }}",
+                url: "{{ route('checkExistenceupdatecalls') }}",
                 method: 'POST',
                 data: {
                     phone: phone,
                     email: email,
+                    call_id: call_id,
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
@@ -369,7 +371,7 @@ $brand_name = $brand->brand_name;
                         var message = 'Customer Names: ' + customerNames + '<br>';
                         message += 'Phone Count: ' + response.phoneCount + '<br>';
                         message += 'Email Count: ' + response.emailCount;
-                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + phone + '&email=' + email + '" class="btn btn-primary">See Details</a>';
+                        var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
                         message += '<br>' + buttonHtml;
                         
                         $('#flashMessage').html('<div class="alert alert-info">' + message + '</div>');

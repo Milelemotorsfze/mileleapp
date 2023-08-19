@@ -221,6 +221,7 @@ Route::get('/d', function () {
     Route::post('/uploadingbulk', [CallsController::class, 'uploadingbulk'])->name('calls.uploadingbulk');
     Route::resource('strategy', StrategyController::class);
     Route::post('calls/check-existence', [CallsController::class, 'checkExistence'])->name('checkExistence');
+    Route::post('calls/check-checkExistenceupdatecalls', [CallsController::class, 'checkExistenceupdatecalls'])->name('checkExistenceupdatecalls');
     Route::get('customers/repeatedcustomers', [Repeatedcustomers::class, 'repeatedcustomers'])->name('repeatedcustomers');
     Route::put('/strategy-updates/{id}', [StrategyController::class, 'updaters'])->name('strategy.updaters');
     Route::get('/simplefile', [CallsController::class,'simplefile'])->name('calls.simplefile');
@@ -354,7 +355,6 @@ Route::get('/d', function () {
     Route::post('/checkEntry', [VehiclesController::class, 'checkEntry'])->name('vehicles.checkEntry');
     Route::get('/vehiclesoldvehss', [VehiclesController::class, 'soldvehss'])->name('vehiclesincoming.soldvehss');
     Route::get('/vehicleavalibless', [VehiclesController::class, 'avalibless'])->name('vehiclesincoming.avalibless');
-    Route::get('/vehiclependinggrnnetsuilt', [VehiclesController::class, 'pendinggrnnetsuilt'])->name('vehiclesincoming.pendinggrnnetsuilt');
     Route::get('/vehiclependinggrnnetsuilt', [VehiclesController::class, 'pendinggrnnetsuilt'])->name('vehiclesincoming.pendinggrnnetsuilt');
     Route::get('/vehiclebookedstocked', [VehiclesController::class, 'bookedstocked'])->name('vehiclesincoming.bookedstocked');
     Route::get('/vehiclependingapprovalssales', [VehiclesController::class, 'pendingapprovalssales'])->name('vehicleinspectionpending.pendingapprovalssales');

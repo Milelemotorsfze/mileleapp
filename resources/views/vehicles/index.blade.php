@@ -331,7 +331,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @php
         $pendinggrnnetsuilt = DB::table('vehicles')->where('latest_location', $warehousessold->id)
         ->whereNotNull('grn_id')
-		->whereNotNull('netsuit_grn_number')
+		    ->whereNull('netsuit_grn_number')
         ->count();
         @endphp
         <td onclick="window.location.href = '{{ route('vehiclesincoming.pendinggrnnetsuilt', ['warehouse_id' => $warehousessold->id]) }}'" style="font-size: 12px;">{{$pendinggrnnetsuilt}}</td>
@@ -376,6 +376,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @foreach ($warehousesveh as $warehousesveh)
         @php
         $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
+            ->whereNotNull('grn_id')
             ->whereNull('inspection_date')
             ->count();
         @endphp
@@ -460,6 +461,7 @@ $countpendingsinspectionso = DB::table('vehicles')
         @foreach ($warehousesveh as $warehousesveh)
         @php
         $pendinginspection = DB::table('vehicles')->where('latest_location', $warehousesveh->id)
+            ->whereNotNull('grn_id')
             ->whereNull('inspection_date')
             ->count();
         @endphp
