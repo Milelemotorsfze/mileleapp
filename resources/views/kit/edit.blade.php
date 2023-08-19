@@ -2003,11 +2003,15 @@
                 let addonDropdownData   = [];
                 $.each(data,function(key,value)
                 {
+                    var description = '';
+                    if(value.description != null) {
+                        var description = value.description;
+                    }
                     addonDropdownData.push
                     ({
 
                         id: value.id,
-                        text: value.addon_code +' ('+value.addon_name.name +')'
+                        text: value.addon_code +' ('+value.addon_name.name +' - '+ description +')'
                     });
                 });
 

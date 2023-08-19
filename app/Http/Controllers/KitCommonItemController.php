@@ -458,7 +458,7 @@ class KitCommonItemController extends Controller
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
     public function getCommonKitItems(Request $request) {
-        info($request->all());
+
         $data = [];
         if($request->selectedAddonModelNumbers) {
             if(count($request->selectedAddonModelNumbers) > 0)
