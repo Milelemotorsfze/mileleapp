@@ -35,7 +35,7 @@
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
-                    <a class="nav-link @if($addonType == 'P') active @endif " data-bs-toggle="pill" href="#accessories">Accessories </a>
+                    <a class="nav-link @if($addonType == 'P' ) active @endif " data-bs-toggle="pill" href="#accessories">Accessories </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @if($addonType == 'SP') active @endif " data-bs-toggle="pill" href="#spare-parts">Spare Parts </a>
@@ -46,7 +46,7 @@
             </ul>
         </div>
         <div class="tab-content"  >
-            <div class="tab-pane fade show active" id="accessories">
+            <div class="tab-pane fade show @if($addonType == 'P' ) active @endif" id="accessories">
                 <div class="card-body">
                     <div class="table-responsive" >
                         <table id="accessories-table" class="table table-striped table-editable table-edits table table-condensed">
@@ -81,7 +81,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade show" id="spare-parts">
+            <div class="tab-pane fade show  @if($addonType == 'SP') active @endif" id="spare-parts">
                 <div class="card-body">
                     <div class="table-responsive" >
                         <table id="spare-parts-table" class="table table-striped table-editable table-edits table table-condensed">
@@ -116,7 +116,7 @@
                     </div>
                 </div>
             </div>
-            <div class="tab-pane fade show" id="kits">
+            <div class="tab-pane fade show  @if($addonType == 'K') active @endif" id="kits">
                 <div class="card-body">
                     <div class="table-responsive" >
                         <table id="kits-table" class="table table-striped table-editable table-edits table table-condensed">

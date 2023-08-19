@@ -579,6 +579,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
 					</li>
                     @endif
                     @endcan
+{{--                    @can('master-addon-view')--}}
+{{--                        @php--}}
+{{--                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-addon-list');--}}
+{{--                        @endphp--}}
+{{--                        @if ($hasPermission)--}}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="{{ route('master-addons.index') }}" id="topnav-more" role="button">
+                                    <i data-feather="server"></i>
+                                    <span data-key="t-extra-pages">Master Addons</span>
+                                </a>
+                            </li>
+{{--                        @endif--}}
+{{--                    @endcan--}}
 
                 </ul>
             </div>
