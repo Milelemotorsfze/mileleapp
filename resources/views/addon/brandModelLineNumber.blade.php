@@ -30,9 +30,7 @@
             </div>
             <div class="MoDes1">
                 <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
-                    <div class="col-xxl-1 col-lg-1 col-md-12">
-                    </div>
-                    <div class="col-xxl-5 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
+                    <div class="col-xxl-2 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
                     <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
                         <select class="compare-tag1 spare-parts-model-lines" name="brand[1][model][1][model_id]" onchange=selectModelLineDescipt(1,1)
@@ -42,13 +40,8 @@
                             @endforeach
                         </select>
                         <span id="ModelLineError_1_1" class="ModelLineError invalid-feedback"></span>
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                     </div>
-                    <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
+                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
                     <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
                         <select class="compare-tag1 model-descriptions" name="brand[1][model][1][model_number][]" onchange=selectModelDescipt(1,1)
@@ -58,11 +51,22 @@
 {{--                            @endforeach--}}
                         </select>
                         <span id="ModelDescriptionError_1_1" class="ModelDescriptionError invalid-feedback"></span>
-                        @error('is_primary_payment_method')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
+                    </div>
+
+                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
+                    <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                        <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
+                    </div>
+
+                    <div class="col-xxl-3 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des1" hidden>
+                    <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                        <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
+                                   oninput="checkGreaterYear(this)" value=""/>
+                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
                             <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="1" hidden id="removeModelNumberdrop1Des1">
