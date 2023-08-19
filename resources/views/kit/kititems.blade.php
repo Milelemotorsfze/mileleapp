@@ -1,5 +1,8 @@
 @extends('layouts.main')
 <style>
+    .labellist{
+        margin-top: 5px;
+    }
     .modal
     {
         width: 100% !important;
@@ -299,37 +302,60 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </h5></center>
     </br>
     <!-- <div class="card-body"> -->
+        <form action="{{ route('kit.priceStore') }}" method="POST">
+            @csrf
+            <input type="text" class="form-control widthinput" name="addon_details_id"
+                            placeholder="" value="{{$supplierAddonDetails->id}}" hidden>
     <div class="row" style="padding-left:10px; padding-right:10px;">
-        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
+        Least Purchase Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" 
+                            placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
+        </div>
+
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Previous Purchase Price (AED)
         </div>
-        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
-        <input type="text" class="form-control widthinput" placeholder="Previous Purchase Price" value="" readonly>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" placeholder="" value="" id="previous_purchase_price" name="previous_purchase_price" readonly>
         </div>
 
-        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Current Purchase Price (AED)
         </div>
-        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
-        <input type="text" class="form-control widthinput" name="addon_code"
-                            placeholder="Previous Purchase Price" value="{{$supplierAddonDetails->totalPrice}}" readonly>
+        <div class="labellist databack1 col-xxl-2 col-lg-1 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" name="current_purchase_price" id="current_purchase_price"
+                            placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
         </div>
 
-        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px;">
-        Selling Price (AED)
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
+        Previous Selling Price (AED)
         </div>
-        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2">
-        <input type="text" class="form-control widthinput" name="addon_code"
-                            placeholder="Previous Purchase Price" value="">
+        <div class="labellist databack1 col-xxl-2 col-lg-1 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" name="previous_selling_price" id="previous_selling_price"
+                            placeholder="" value="" readonly>
+        </div>
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
+        New Selling Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-1 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" name="current_selling_price" id="current_selling_price"
+                            placeholder="" value="">
+        </div>
+        <div class=" col-xxl-4 col-lg-1 col-md-2" style="margin-top:13px;">
+        <button type="submit" class="btn btn-success btn-sm" id="submit" style="float:right;">Save New Prices</button>
         </div>
     </div>
+</form>
     <!-- </div> -->
 </br>
 <div class="card-body" style="border:solid; border-color:#e9e9ef; border-width: 1px; border-radius: .25rem;">
 <div class="row">
 <div hidden>{{$i=0;}}</div>
     @foreach($supplierAddonDetails->KitItems as $Kit)
-    <div id="rowIndexCount" hidden value="{{$i+1}}">{{$i=$i+1;}}</div>
+    <div id="rowIndexCount" hidden value="5">{{$i=$i+1;}}</div>
                         <!-- <div class="list2" id="addonbox"> -->
                             <!-- <div class="row related-addon">  -->
                                 <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
@@ -399,9 +425,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             Item Supplier
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                            <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" autofocus>
+                                            <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" 
+                                            autofocus>
                                                 @foreach($Kit->allItemSuppliers as $allItemSuppliers)
-                                                    <option  value="{{$allItemSuppliers->purchase_price_aed}}">{{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
+                                                    <option  value="{{$allItemSuppliers->purchase_price_aed}}">
+                                                        {{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -609,6 +637,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </div>
 <script type="text/javascript">
 // show image in large view
+var data = {!! json_encode($supplierAddonDetails) !!};
+var lengthKitItems = 0;
+$(document).ready(function ()
+        {
+            lengthKitItems = data.kit_items.length;
+        });
     $('.image-click-class').click(function (e)
     {
         var id =  $(this).attr('id');
@@ -626,10 +660,36 @@ body {font-family: Arial, Helvetica, sans-serif;}
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
       })
-      function calculatePrice(current, price)
+      function calculatePrice(current, index)
       {
-        alert($('#rowIndexCount').val());
+        var CurrentPurchasePrice = 0;
+        for(var i=1; i<=lengthKitItems; i++)
+        {
+            var quantity = 0;
+            var price = 0;
+            var totalItemPrice = 0;
+            quantity = $("#quantity_"+i).val();
+            price = $('#supplier_'+i).val();
+            totalItemPrice = quantity * price;
+            CurrentPurchasePrice = CurrentPurchasePrice + totalItemPrice;
+        }
+        document.getElementById("current_purchase_price").value = CurrentPurchasePrice;
       }
+      $('form').on('submit', function (e)
+        {
+            var previousPurchaseprice = '';
+            var currentPurchasePrice = '';
+            var previousSellingPrice = '';
+            var currentSellingPrice = '';
+            previousPurchaseprice = $("#previous_purchase_price").val();
+            currentPurchasePrice = $("#current_purchase_price").val();
+            previousSellingPrice = $("#previous_selling_price").val();
+            currentSellingPrice = $("#current_selling_price").val();
+            if(previousPurchaseprice == currentPurchasePrice OR previousSellingPrice == currentSellingPrice)
+            {
+                e.preventDefault();
+            }
+        });
       </script>
 
 @endsection

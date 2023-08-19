@@ -375,7 +375,8 @@
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"  autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
+                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}" 
+                                            autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                                     <span id="contactRequired" class="contact_number required-class"></span>
                                 </div>
                             </div>

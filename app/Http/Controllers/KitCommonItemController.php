@@ -491,4 +491,8 @@ class KitCommonItemController extends Controller
         info($data);
         return response($data);
     }
+    public function priceStore(Request $request)
+    {   
+        dd($request->all());
+    }
 }

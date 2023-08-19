@@ -258,26 +258,6 @@
                         </div>
                     </div>
                     <br>
-                    <div class="row" hidden id="model_year">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
-                                   oninput="checkGreaterYear(this)" value=""/>
-                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
-                        </div>
-                    </div>
-                    <br hidden id="model_year_br">
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price') }}</label>
