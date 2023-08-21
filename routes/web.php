@@ -3,6 +3,8 @@
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\MasterAddonController;
 use App\Http\Controllers\ModelLinesController;
+use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SalesPersonLanguagesController;
 use App\Http\Controllers\VariantController;
 use App\Http\Controllers\VariantPriceController;
@@ -375,11 +377,11 @@ Route::get('/d', function () {
 
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     // Master Data
+
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
     Route::resource('master-addons', MasterAddonController::class);
-
-
-
+    Route::resource('permissions', PermissionController::class);
+    Route::resource('modules', ModuleController::class);
     Route::resource('prospecting', ProspectingController::class);
 });
