@@ -250,7 +250,7 @@
                                 @endphp
                                 @if ($hasPermission)
                                     <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
-                                       class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
+                                       class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New description</a>
                                     <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                     class="btn btn-sm btn-info" >Choose From List</a>
                                 @endif
@@ -497,7 +497,7 @@
                 $('#select-description').attr('hidden', true);
                 $('#addnewDescriptionButton').attr('hidden', true);
                 $("#description option:selected").prop("selected", false);
-                $("#description").trigger('change');
+               $("#description").trigger('change.select2');
             });
             $('#description').change(function () {
                 var addonType = $('#addon_type').val();
@@ -541,6 +541,8 @@
             });
 
             $("#descr-dropdown-button").click(function () {
+
+
                 $('#description-text').attr('hidden', true);
                 $('#select-description').attr('hidden', false);
                 $("#addnewDescriptionButton").attr('hidden', false);
@@ -840,8 +842,10 @@
                             var modelLine = "";
                             if(data.model_line) {
                               var  modelLine = data.model_line;
+                                $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
+                            }else if(data.is_all_brands > 0) {
+                                $msg = "This Addon,Description,Brand (all brands) Combination is existing";
                             }
-                            $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
                             showBrandError($msg,data.index);
                             var count = data.count;
                             uniqueCounts.push(count);

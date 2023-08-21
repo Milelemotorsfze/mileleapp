@@ -1654,11 +1654,12 @@ class AddonController extends Controller
         }
 
         if($request->brand == 'allbrands') {
-
+        info("is all brands");
             $isExisting = AddonDetails::where('is_all_brands', 'yes')
                 ->where('addon_id', $request->addon_id)
                 ->where('description', $description)
                 ->where('addon_type_name', $request->addonType);
+           $data['is_all_brands'] = $isExisting->count();
         }else{
             info("not all brands");
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)

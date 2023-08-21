@@ -530,7 +530,7 @@
                 $('#select-description').attr('hidden', true);
                 $('#addnewDescriptionButton').attr('hidden', true);
                 $("#description option:selected").prop("selected", false);
-                $("#description").trigger('change');
+                $("#description").trigger('change.select2');
 
             });
             $('#description').change(function () {
@@ -543,6 +543,7 @@
                 }
             })
             $("#descr-dropdown-button").click(function () {
+
                 $('#description-text').attr('hidden', true);
                 $('#select-description').attr('hidden', false);
                 $("#addnewDescriptionButton").attr('hidden', false);
@@ -664,7 +665,7 @@
                         jQuery.each(data, function (key, value) {
                             $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
                             if(description == value.description) {
-                                $("#description").val(value.description).trigger('change');
+                                $("#description").val(value.description).trigger('change.select2');
                             }
                         });
                     }
@@ -898,8 +899,11 @@
                          var modelLine = "";
                          if(data.model_line) {
                              var  modelLine = data.model_line;
+                             $msg = "This Addon,Description,Brand and model line ("+modelLine+") Combination is existing";
+                         }else if(data.is_all_brands > 0) {
+                             $msg = "This Addon,Description,Brand (all brands) Combination is existing";
                          }
-                         $msg = "This Addon,Description,Brand and model line ("+modelLine+") Combination is existing";
+
                          showBrandError($msg,data.index);
                          var count = data.count;
                          uniqueCounts.push(count);
