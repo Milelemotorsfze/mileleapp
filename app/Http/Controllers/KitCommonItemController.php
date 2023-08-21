@@ -16,6 +16,7 @@ use App\Models\KitItems;
 use App\Models\AddonTypes;
 use App\Models\SupplierType;
 use App\Models\MasterModelDescription;
+use App\Models\AddonDescription;
 
 class KitCommonItemController extends Controller
 {
@@ -476,12 +477,12 @@ class KitCommonItemController extends Controller
                 }
 
                 $result = call_user_func_array('array_intersect', $Items);
-                $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
-                    ->whereIn('id', $result);
+                $dataId = AddonDetails::whereIn('addon_id', $kitItemDropdown)
+                    ->whereIn('id', $result)->pluck('description');
 
+                $data = AddonDescription::with('Addon')->whereIn('id',$dataId);
                 if($request->type == 'ADD_ITEM') {
                     if($request->selectedItems) {
-
                         $data = $data->whereNotIn('id', $request->selectedItems);
                     }
                 }

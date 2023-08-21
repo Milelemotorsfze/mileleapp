@@ -1192,7 +1192,6 @@
                             $('#kit_year').val("");
                             $('#kit_km').val("");
 
-                            document.getElementById("newAddonError").textContent='';
                             $msg = "";
                             removeNewAddonKMError($msg);
                             removeNewAddonYearError($msg);
@@ -1954,7 +1953,7 @@
                     ({
 
                         id: value.id,
-                        text: value.addon_code +' ('+value.addon_name.name +' - '+ description +')'
+                        text: value.addon.name +' - '+ description 
                     });
                 });
 
