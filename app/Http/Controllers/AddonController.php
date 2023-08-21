@@ -286,6 +286,7 @@ class AddonController extends Controller
                                     $createAddType['addon_details_id'] = $addon_details->id;
                                     $createAddType['brand_id'] = $brandData['brand_id'];
                                     $createAddType['is_all_model_lines'] = 'yes';
+
                                     $creBranModelDes = AddonTypes::create($createAddType);
                                 }
                             }
@@ -739,6 +740,7 @@ class AddonController extends Controller
         }
             if($request->addon_type == 'SP')
             {
+//                dd($request->all());
                 if($request->brand)
                 {
                     if(count($request->brand) > 0)
@@ -769,6 +771,9 @@ class AddonController extends Controller
                                                     $createAddType['addon_details_id'] = $addon_details->id;
                                                     $createAddType['brand_id'] = $brandData['brand_id'];
                                                     $createAddType['is_all_model_lines'] = 'yes';
+                                                    $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                    $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
+
                                                     $creBranModelDes = AddonTypes::create($createAddType);
                                                 }
                                                 else
@@ -783,6 +788,8 @@ class AddonController extends Controller
                                                             $createAddType['brand_id'] = $brandData['brand_id'];
                                                             $createAddType['model_id'] = $brandModelDta['model_id'];
                                                             $createAddType['model_number'] = $modelDescr;
+                                                            $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                            $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
                                                             $creBranModelDes = AddonTypes::create($createAddType);
                                                         }
                                                     }
@@ -793,6 +800,8 @@ class AddonController extends Controller
                                                         $createAddType['addon_details_id'] = $addon_details->id;
                                                         $createAddType['brand_id'] = $brandData['brand_id'];
                                                         $createAddType['model_id'] = $brandModelDta['model_id'];
+                                                        $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                        $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
                                                         $creBranModelDes = AddonTypes::create($createAddType);
                                                     }
                                                 }

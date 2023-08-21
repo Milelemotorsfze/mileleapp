@@ -115,18 +115,9 @@ input[type=number]::-webkit-outer-spin-button {
     <label for="basicpill-firstname-input" class="form-label">Preferred Language:</label>
     <input type="text" placeholder="Language" name="language" list="laList" class="form-control" id="languageInput" autocomplete="off">
     <datalist id="laList">
-        <option value="English" data-value="English">English</option>
-        <option value="Arabic" data-value="English">Arabic</option>
-        <option value="Russian" data-value="English">Russian</option>
-        <option value="Urdu" data-value="English">Urdu</option>
-        <option value="Hindi" data-value="English">Hindi</option>
-        <option value="Kannada" data-value="English">Kannada</option>
-        <option value="French" data-value="English">French</option>
-        <option value="Malayalam" data-value="English">Malayalam</option>
-        <option value="Tamil" data-value="English">Tamil</option>
-        <option value="Spanish" data-value="English">Spanish</option>
-        <option value="Portuguese" data-value="English">Portuguese</option>
-        <option value="Shona" data-value="English">Shona</option>
+    @foreach ($Language as $language)
+        <option value="{{ $language->name }}" data-value="{{ $language->name }}">{{ $language->name }}</option>
+    @endforeach
     </datalist>
 </div>
                     <div class="col-xs-4 col-sm-12 col-md-4">

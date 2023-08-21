@@ -407,14 +407,14 @@
             <strong>Brand:</strong>
         </div>
         <div class="col-lg-8 value">
-            {{$brand_name}}</div>
+            {{$brand_name ?? ''}}</div>
         </div>
         <div class="row">
             <div class="col-lg-4 label">
                 <strong>Model Line:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$model_line}}
+                {{$model_line ?? ''}}
             </div>
         </div>
         <div class="row">
@@ -422,7 +422,7 @@
                 <strong>Model Desc:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$model_detail}}
+                {{$model_detail ?? ''}}
             </div>
         </div>
         <div class="row">
@@ -430,7 +430,7 @@
                 <strong> Model Year:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$varaints_my}}
+                {{$varaints_my ?? ''}}
             </div>
         </div>
       @endif
@@ -443,7 +443,7 @@
                 <strong> Production Year:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$vehicle->ppmmyyy}}
+                {{$vehicle->ppmmyyy ?? ''}}
             </div>
         </div>
       @endif
@@ -459,7 +459,7 @@
                 <strong>Variant:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$varaints_name}}
+                {{$varaints_name ?? ''}}
             </div>
         </div>
         <div class="row">
@@ -467,7 +467,7 @@
                 <strong>Variant Detail:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$varaints_detail}}
+                {{$varaints_detail ?? ''}}
             </div>
         </div>
         @endif
@@ -480,7 +480,7 @@
                 <strong> Engine:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$vehicle->engine}}
+                {{$vehicle->engine ?? ''}}
             </div>
         </div>
         @endif
@@ -493,7 +493,7 @@
                 <strong> Conversion:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$vehicle->conversion}}
+                {{$vehicle->conversion ?? ''}}
             </div>
         </div>
         @endif
@@ -506,7 +506,7 @@
                     <strong>Territory:</strong>
                  </div>
                 <div class="col-lg-8 value">
-                    {{$vehicle->territory}}
+                    {{$vehicle->territory ?? ''}}
                 </div>
             </div>
          @endif
@@ -521,28 +521,28 @@
             <strong> Steering:</strong>
                  </div>
             <div class="col-lg-8 value">
-                {{$varaints_steering}}</div>
+                {{$varaints_steering ?? ''}}</div>
             </div>
             <div class="row">
             <div class="col-lg-4 label">
             <strong>Fuel Type:</strong>
                  </div>
             <div class="col-lg-8 value">
-                {{$varaints_fuel_type}}</div>
+                {{$varaints_fuel_type ?? ''}}</div>
             </div>
             <div class="row">
             <div class="col-lg-4 label">
             <strong> Transmission:</strong>
                  </div>
             <div class="col-lg-8 value">
-                {{$varaints_gearbox}}</div>
+                {{$varaints_gearbox ?? ''}}</div>
             </div>
             <div class="row">
             <div class="col-lg-4 label">
             <strong>Seats:</strong>
                  </div>
             <div class="col-lg-8 value">
-                {{$varaints_seat}}</div>
+                {{$varaints_seat ?? ''}}</div>
             </div>
         @endif
         @php
@@ -554,7 +554,7 @@
                     <strong>Price:</strong>
                 </div>
                 <div class="col-lg-8 value">
-                {{$vehicle->price}}</div>
+                {{$vehicle->price ?? ''}}</div>
             </div>
         @endif
     </div>
@@ -568,7 +568,7 @@
                 <strong> Exterior Colour:</strong>
             </div>
             <div class="col-lg-8 value">
-                {{$ex_colours}}
+                {{$ex_colours ?? ''}}
             </div>
         </div>
         <div class="row">
@@ -576,7 +576,7 @@
                 <strong> Interior Colour:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$int_colours}}
+                {{$int_colours ?? ''}}
             </div>
         </div>
         <div class="row">
@@ -584,7 +584,7 @@
                 <strong> Upholstery:</strong>
              </div>
             <div class="col-lg-8 value">
-                {{$varaints_upholestry}}
+                {{$varaints_upholestry ?? ''}}
             </div>
         </div>
         @endif
@@ -604,7 +604,7 @@
                         <strong> Warehouse:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                        {{$warehouses}}
+                        {{$warehouses ?? ''}}
                     </div>
                 </div>
             @endif
@@ -617,7 +617,7 @@
                         <strong> BL Number:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                        {{$bl_number}}
+                        {{$bl_number ?? ''}}
                     </div>
                 </div>
             @endif
@@ -632,7 +632,7 @@
                         <strong>Import Doc Type:</strong>
                          </div>
                     <div class="col-lg-8 value">
-                        {{$import_type}}
+                        {{$import_type ?? ''}}
                     </div>
                 </div>
             </div>
@@ -642,7 +642,7 @@
                         <strong> Doc Owership:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                        {{$owership}}
+                        {{$owership ?? ''}}
                     </div>
                 </div>
             </div>
@@ -652,7 +652,7 @@
                         <strong> Doc With:</strong>
                     </div>
                     <div class="col-lg-8 value">
-                        {{$document_with}}
+                        {{$document_with ?? ''}}
                     </div>
                 </div>
             </div>

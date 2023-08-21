@@ -190,7 +190,7 @@
         }
     }
 @endphp  
-<td>{{ $brand_name }}</td>
+<td>{{ ucwords(strtolower($brand_name))}}</td>
 
 @php
     $model_line = '';
@@ -201,8 +201,8 @@
         }
     }
 @endphp  
-<td>{{ $model_line }}</td>
-                                                            <td>{{ $rowsmonth->location }}</td>
+<td>{{ ucwords(strtolower($model_line))}}</td>
+                                                            <td>{{ ucwords(strtolower($rowsmonth->location))}}</td>
                                                             @php
     $regionsg = DB::table('regions')->where('country_name', $rowsmonth->location)->first();
     $regionsf = $regionsg ? $regionsg->region_name : '';
@@ -246,7 +246,7 @@
                                                     }
                                                     }
                                                     @endphp  
-                                                    <td>{{ $brand_name }}</td>
+                                                    <td>{{ ucwords(strtolower($brand_name))}}</td>
                                                     @php
                                                     $model_line = '';
                                                     if (!is_null($rowsweek->model_line_id)) {
@@ -259,8 +259,8 @@
                                                      $model_line = $rowsweek->custom_brand_model;  
                                                     }
                                                     @endphp  
-                                                    <td>{{ $model_line }}</td>
-                                                    <td>{{ $rowsweek->location }}</td>
+                                                    <td>{{ ucwords(strtolower($model_line))}}</td>
+                                                    <td>{{ ucwords(strtolower($rowsweek->location))}}</td>
                                                     @php
                                                     $regionsg = DB::table('regions')->where('country_name', $rowsweek->location)->first();
                                                     $regionsf = $regionsg ? $regionsg->region_name : '';
@@ -304,7 +304,7 @@
         }
     }
 @endphp  
-<td>{{ $brand_name }}</td>
+<td>{{ ucwords(strtolower($brand_name))}}</td>
 @php
     $model_line = '';
     if (!is_null($rowsyesterday->model_line_id)) {
@@ -314,8 +314,8 @@
         }
     }
 @endphp  
-<td>{{ $model_line }}</td>
-                                                            <td>{{ $rowsyesterday->location }}</td>
+<td>{{ ucwords(strtolower($model_line))}}</td>
+                                                            <td>{{ ucwords(strtolower($rowsyesterday->location))}}</td>
                                                             @php
     $regionsg = DB::table('regions')->where('country_name', $rowsyesterday->location)->first();
     $regionsf = $regionsg ? $regionsg->region_name : '';
