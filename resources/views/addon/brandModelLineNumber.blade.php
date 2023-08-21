@@ -58,7 +58,7 @@
                     <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
                         <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                        <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[1][model][1][model_year_end]"
+                        <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][1][model_year_end]"
                                id="selectModelYearEnd1Des1"  value=""  />
                             <span id="modelYearEnd1Error1" class="modelYearEndError invalid-feedback-lead"></span>
                     </div>
@@ -106,15 +106,19 @@
 
         var index = 1;
         $('#indexValue').val(index);
+        // $("#selectModelYearStart1Des1").datepicker({
+        //     minViewMode: 2,
+        //     format: 'yyyy'
+        // });
 
         $("#selectModelYearEnd1Des1").yearpicker({
-            year: 2023,
+
             startYear: 2019,
             endYear: 2050,
         });
 
         $("#selectModelYearStart1Des1").yearpicker({
-            year: 2023,
+
             startYear: 2019,
             endYear: 2050,
         });
@@ -613,7 +617,7 @@
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                    <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_end]"
+                    <input type="text" class="endyearpicker form-control widthinput" name="brand[${supplier}][model][${index}][model_year_end]"
                            id="selectModelYearEnd${supplier}Des${index}"  value=""/>
                     <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
                 </div>

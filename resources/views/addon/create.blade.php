@@ -1037,7 +1037,7 @@
                                         formInputError = true;
                                     }
                                 }
-                                // validation chcek for model year
+                                // validation check for model year
                                 var inputModelYearStart = $('#selectModelYearStart'+i+'Des'+j).val();
                                 var inputModelYearEnd = $('#selectModelYearEnd'+i+'Des'+j).val();
                                 if(inputModelYearStart == '')
@@ -1046,18 +1046,30 @@
                                     showModelYearStartError($msg,i,j);
                                     formInputError = true;
                                 }
-                                else if(inputModelYearStart.length != 4)
+                                // else if(inputModelYearStart.length != 4)
+                                // {
+                                //     $msg = "Model Year required 4 digits number"
+                                //     showModelYearStartError($msg,i,j);
+                                //     formInputError = true;
+                                // }
+                                else if(inputModelYearEnd != '' && inputModelYearEnd.length != 4)
                                 {
                                     $msg = "Model Year required 4 digits number"
-                                    showModelYearStartError($msg,i,j);
+                                    showModelYearEndError($msg,i,j);
                                     formInputError = true;
                                 }
                                 else if(inputModelYearEnd != '' && inputModelYearStart != '')
                                 {
-                                    if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                                    if(Number(inputModelYearEnd) > 2050) {
+                                        $msg = "The Model Year should be between 2019-2050";
+                                        showModelYearEndError($msg,i,j);
+                                        formInputError = true;
+
+                                    }else if(Number(inputModelYearEnd) <= Number(inputModelYearStart))
                                     {
                                         removeModelYearStartError(i,j);
-                                        showModelYearEndError(i,j);
+                                        $msg = "Enter higher value than min leadtime"
+                                        showModelYearEndError($msg,i,j);
                                         formInputError = true;
                                     }else{
                                        removeModelYearEndError(i,j);
@@ -1912,9 +1924,9 @@
             document.getElementById('selectModelYearStart'+i+'Des'+j).classList.add("is-invalid");
             document.getElementById('modelYearStart'+i+'Error'+j).classList.add("paragraph-class");
         }
-        function showModelYearEndError(i,j)
+        function showModelYearEndError($msg,i,j)
         {
-            document.getElementById('modelYearEnd'+i+'Error'+j).textContent="Enter higher value than min leadtime";
+            document.getElementById('modelYearEnd'+i+'Error'+j).textContent=$msg;
             document.getElementById('selectModelYearEnd'+i+'Des'+j).classList.add("is-invalid");
             document.getElementById('modelYearEnd'+i+'Error'+j).classList.add("paragraph-class");
         }

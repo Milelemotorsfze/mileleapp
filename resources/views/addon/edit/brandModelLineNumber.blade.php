@@ -137,7 +137,7 @@
                                     multiple="true" style="width: 100%;"   onchange=selectModelDescipt({{$i}},{{$j}})>
                                     @if(isset($ModelLine->allDes))
                                 @foreach($ModelLine->allDes as $allDes)
-                                    <option class="{{$ModelLine->brand_id}}" value="{{$allDes->id}}" @if(in_array(" $allDes->id ", $ModelLine->modeldes)) selected @endif
+                                    <option class="{{$ModelLine->brand_id}}" value="{{$allDes->id}}" @if(in_array($allDes->id , $ModelLine->modeldes)) selected @endif
                                         >{{$allDes->model_description}}</option>
                                 @endforeach
                                 @endif
@@ -149,15 +149,15 @@
                             <span class="error">* </span>
                             <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                             <input type="text" class="startyearpicker form-control widthinput"  name="brand[{{$i}}][model][{{$j}}][model_year_start]"
-                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value=" "/>
+                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value="{{ $ModelLine->model_year_start }} "/>
 
                             <span id="modelYearStart{{$i}}Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop{{$i}}Des{{$j}}" >
                             <span class="error">* </span>
                             <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                            <input type="text" class="endyearpicker  form-control widthinput" onkeydown="return false;" name="brand[{{$i}}][model][{{$j}}][model_year_end]"
-                                   id="selectModelYearEnd{{$i}}Des{{$j}}"  value=""  />
+                            <input type="text" class="endyearpicker  form-control widthinput" name="brand[{{$i}}][model][{{$j}}][model_year_end]"
+                                   id="selectModelYearEnd{{$i}}Des{{$j}}"  value="{{ $ModelLine->model_year_end }}"  />
 
                             <span id="modelYearEnd{{$i}}Error{{$j}}" class="modelYearEndError invalid-feedback-lead"></span>
                         </div>
@@ -206,27 +206,26 @@
             let showAdTrim = document.getElementById('showaddtrimDis');
             showAdTrim.hidden = false
         }
-                $(".brandRows").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
-                $(".brandRows").select2({
-                    maximumSelectionLength: 1,
-                });
-                $(".spare-parts-model-lines").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-                $(".spare-parts-model-lines").select2({
-                    maximumSelectionLength: 1,
-                });
-                $(".model-descriptions").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
-                $(".model-descriptions").select2();
-                $(".startyearpicker").yearpicker({
-                    year: 2023,
-                    startYear: 2019,
-                    endYear: 2050,
-                });
+        $(".brandRows").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
+        $(".brandRows").select2({
+            maximumSelectionLength: 1,
+        });
+        $(".spare-parts-model-lines").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+        $(".spare-parts-model-lines").select2({
+            maximumSelectionLength: 1,
+        });
+        $(".model-descriptions").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
+        $(".model-descriptions").select2();
 
-                $(".endyearpicker").yearpicker({
-                    year: 2023,
-                    startYear: 2019,
-                    endYear: 2050,
-                });
+        $(".startyearpicker").yearpicker({
+            startYear: 2019,
+            endYear: 2050,
+        });
+
+        $(".endyearpicker").yearpicker({
+            startYear: 2019,
+            endYear: 2050,
+        });
         ///////////////////// dropdown /////////////
 
         var index = 1;
@@ -318,89 +317,89 @@
                 $('#selectBrandMo'+i).append($('<option>', {value: id, text :text}))
             }
         }
-        $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e)
-        {
-
-            var countRow = 0;
-            var countRow =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
-            if(countRow > 1)
-            {
-                var indexNumber = $(this).attr('data-index');
-                // if(indexNumber == 1) {
-                //         $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
-                //     }
-                $(this).closest('#row-addon-brand-'+indexNumber).find("option:selected").each(function() {
-                    var id = (this.value);
-                    var text = (this.text);
-                    addOption(id,text)
-                });
-
-                $(this).closest('#row-addon-brand-'+indexNumber).remove();
-                $('.brandMoDescripApendHere').each(function(i){
-                    var index = +i + +1;
-                    $(this).attr('id','row-addon-brand-'+ index);
-
-                    $(this).find('.brandRows').attr('data-index', index);
-                    $(this).find('.brandRows').attr('id','selectBrandMo'+ index);
-                    $(this).find('.brandRows').attr('name','brand['+ index +'][brand_id]');
-                    $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +')');
-                    $('#selectBrandMo'+index).select2
-                    ({
-                        placeholder:"Choose Brands....     Or     Type Here To Search....",
-                        allowClear: true,
-                        minimumResultsForSearch: -1,
-                    });
-
-                    $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
-                    $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
-                    $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
-                    $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
-
-                    var oldIndex = '';
-                    oldIndex = index+1;
-                    itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
-                    for (var i = 1; i <= itemcount; i++)
-                    {
-                        $(this).find('#row-spare-part-brand-'+oldIndex+'-model-'+i).attr('id', 'row-spare-part-brand-'+index+'-model-'+i);
-                        $(this).find('#showDivdropDr'+ oldIndex +'Des'+i).attr('id','showDivdropDr'+ index +'Des'+i);
-                        $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('data-index', index);
-                        $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('name','brand['+ index +'][model]['+i+'][model_id]');
-                        $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('onchange','selectModelLineDescipt('+ index +','+i+')');
-                        $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('class','compare-tag1 spare-parts-model-lines');
-                        $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('id','selectModelLineNum'+ index +'Des'+i);
-                        $("#selectModelLineNum"+index+"Des"+i).select2
-                        ({
-                            placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                            allowClear: true,
-                            maximumSelectionLength: 1,
-                        });
-
-                        $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
-                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
-                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);
-                        $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('onchange','selectModelNumberDiscri('+ index +','+i+')');
-                        $("#selectModelNumberDiscri"+index+"Des"+i).select2
-                        ({
-                            placeholder: 'Choose Model Description....     Or     Type Here To Search....',
-                            allowClear: true,
-                        });
-
-                        $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
-                        $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
-                        $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
-                        $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
-
-                    }
-                    $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
-                    $(this).find(".MoDesApndHere"+oldIndex).attr('class', "row MoDesApndHere"+index);
-                });
-            }
-            else
-            {
-                var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
-                }).set({title:"Can't Remove Brand And Model Lines"})
-            }
-        })
+        // $(document.body).on('click', ".removeButtonbrandMoDescrip", function (e)
+        // {
+        //
+        //     var countRow = 0;
+        //     var countRow =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
+        //     if(countRow > 1)
+        //     {
+        //         var indexNumber = $(this).attr('data-index');
+        //         // if(indexNumber == 1) {
+        //         //         $('<option value="allbrands"> ALL BRANDS </option>').prependTo('#selectBrandMo2');
+        //         //     }
+        //         $(this).closest('#row-addon-brand-'+indexNumber).find("option:selected").each(function() {
+        //             var id = (this.value);
+        //             var text = (this.text);
+        //             addOption(id,text)
+        //         });
+        //
+        //         $(this).closest('#row-addon-brand-'+indexNumber).remove();
+        //         $('.brandMoDescripApendHere').each(function(i){
+        //             var index = +i + +1;
+        //             $(this).attr('id','row-addon-brand-'+ index);
+        //
+        //             $(this).find('.brandRows').attr('data-index', index);
+        //             $(this).find('.brandRows').attr('id','selectBrandMo'+ index);
+        //             $(this).find('.brandRows').attr('name','brand['+ index +'][brand_id]');
+        //             $(this).find('.brandRows').attr('onchange','selectBrandDisp('+ index +')');
+        //             $('#selectBrandMo'+index).select2
+        //             ({
+        //                 placeholder:"Choose Brands....     Or     Type Here To Search....",
+        //                 allowClear: true,
+        //                 minimumResultsForSearch: -1,
+        //             });
+        //
+        //             $(this).find('.removeButtonbrandMoDescrip').attr('data-index', index);
+        //             $(this).find('.delete-model-line-row').attr('id', 'showModelNumDel'+ index);
+        //             $(this).find('.show-add-button').attr('id','showaddtrd'+ index);
+        //             $(this).find('#addDids').attr('onclick', 'addDiscr('+ index +')');
+        //
+        //             var oldIndex = '';
+        //             oldIndex = index+1;
+        //             itemcount = $(".MoDes"+oldIndex).find(".MoDesApndHere"+oldIndex).length;
+        //             for (var i = 1; i <= itemcount; i++)
+        //             {
+        //                 $(this).find('#row-spare-part-brand-'+oldIndex+'-model-'+i).attr('id', 'row-spare-part-brand-'+index+'-model-'+i);
+        //                 $(this).find('#showDivdropDr'+ oldIndex +'Des'+i).attr('id','showDivdropDr'+ index +'Des'+i);
+        //                 $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('data-index', index);
+        //                 $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('name','brand['+ index +'][model]['+i+'][model_id]');
+        //                 $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('onchange','selectModelLineDescipt('+ index +','+i+')');
+        //                 $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('class','compare-tag1 spare-parts-model-lines');
+        //                 $(this).find('#selectModelLineNum'+ oldIndex +'Des'+i).attr('id','selectModelLineNum'+ index +'Des'+i);
+        //                 $("#selectModelLineNum"+index+"Des"+i).select2
+        //                 ({
+        //                     placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+        //                     allowClear: true,
+        //                     maximumSelectionLength: 1,
+        //                 });
+        //
+        //                 $(this).find('#showModelNumberdrop'+ oldIndex +'Des'+i).attr('id', 'showModelNumberdrop'+ index +'Des'+i);
+        //                 $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('name', 'brand['+ index +'][model]['+i+'][model_number][]');
+        //                 $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('id', 'selectModelNumberDiscri'+ index +'Des'+i);
+        //                 $(this).find('#selectModelNumberDiscri'+ oldIndex +'Des'+i).attr('onchange','selectModelNumberDiscri('+ index +','+i+')');
+        //                 $("#selectModelNumberDiscri"+index+"Des"+i).select2
+        //                 ({
+        //                     placeholder: 'Choose Model Description....     Or     Type Here To Search....',
+        //                     allowClear: true,
+        //                 });
+        //
+        //                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('data-index', index);
+        //                 $(this).find('#removeModelNumberdrop' + oldIndex + 'Des' + i).attr('id', 'removeModelNumberdrop' + index + 'Des' + i);
+        //                 $(this).find('#ModelLineError_'+oldIndex+'_'+i).attr('id','ModelLineError_'+index+'_'+i);
+        //                 $(this).find('#ModelDescriptionError_'+oldIndex+'_'+i).attr('id','ModelDescriptionError_'+index+'_'+i);
+        //
+        //             }
+        //             $(this).find(".MoDes"+oldIndex).attr('class', "MoDes"+index);
+        //             $(this).find(".MoDesApndHere"+oldIndex).attr('class', "row MoDesApndHere"+index);
+        //         });
+        //     }
+        //     else
+        //     {
+        //         var confirm = alertify.confirm('You are not able to remove this row, Atleast one Brand and Model Lines Required',function (e) {
+        //         }).set({title:"Can't Remove Brand And Model Lines"})
+        //     }
+        // })
         $(document.body).on('click', ".removeButtonModelItem", function (e) {
             var indexNumber = $(this).attr('data-index');
             var countRow = 0;
@@ -633,7 +632,8 @@
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-start-dropdown" id="showModelYearStartdrop${supplier}Des${index}" hidden>
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
-                    <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_start]"
+                    <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;"
+                    name="brand[${supplier}][model][${index}][model_year_start]"
                            id="selectModelYearStart${supplier}Des${index}" value=""/>
 
                     <span id="modelYearStart${supplier}Error${index}" class="modelYearStartError invalid-feedback-lead"></span>
@@ -642,7 +642,8 @@
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                    <input type="text" class="endyearpicker form-control widthinput" onkeydown="return false;" name="brand[${supplier}][model][${index}][model_year_end]"
+                    <input type="text" class="endyearpicker form-control widthinput"
+                    name="brand[${supplier}][model][${index}][model_year_end]"
                            id="selectModelYearEnd${supplier}Des${index}"  value=""/>
                     <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
                 </div>
@@ -673,7 +674,6 @@
         });
         // $("#selectModelNumberDiscri" + supplier + "Des" + index).attr("data-placeholder", "Choose Model Description....     Or     Type Here To Search....");
     }
-
 
     function showBrandModelLines(id,row) {
         var brandTotalIndex = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;

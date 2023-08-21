@@ -253,29 +253,7 @@
 {{--                            @endcan--}}
                         </div>
                     </div>
-                    @if($addonDetails->addon_type_name == 'SP')
-                    <div class="row" id="model_year">
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                        <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year Start') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_start" id="model_year_start"
-                            oninput="checkGreaterYear(this)" maxlength="4" value=""/>
-                            <span id="modelYearStartError" class="invalid-feedback-lead"></span>
-                        </div>
-                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                        <span class="error">* </span>
-                            <label for="addon_id" class="col-form-label text-md-end">{{ __('Model Year End') }}</label>
-                        </div>
-                        <div class="col-xxl-4 col-lg-5 col-md-11">
-                            <input type="text" class="yearpicker form-control widthinput" name="model_year_end" id="model_year_end"
-                            oninput="checkGreaterYear(this)" maxlength="4" value=""/>
-                            <span id="modelYearEndError" class="invalid-feedback-lead"></span>
-                        </div>
-                    </div>
-                    <br id="model_year_br">
-                    @endif
+
                     <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="purchase_price" class="col-form-label text-md-end">{{ __('Least Purchase Price') }}</label>
@@ -1143,18 +1121,30 @@
                                     showModelYearStartError($msg,i,j);
                                     formInputError = true;
                                 }
-                                else if(inputModelYearStart.length != 4)
+                                // else if(inputModelYearStart.length != 4)
+                                // {
+                                //     $msg = "Model Year required 4 digits number"
+                                //     showModelYearStartError($msg,i,j);
+                                //     formInputError = true;
+                                // }
+                                else if(inputModelYearEnd != '' && inputModelYearEnd.length != 4)
                                 {
                                     $msg = "Model Year required 4 digits number"
-                                    showModelYearStartError($msg,i,j);
+                                    showModelYearEndError($msg,i,j);
                                     formInputError = true;
                                 }
                                 else if(inputModelYearEnd != '' && inputModelYearStart != '')
                                 {
-                                    if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                                    if(Number(inputModelYearEnd) > 2050) {
+                                        $msg = "The Model Year should be between 2019-2050";
+                                        showModelYearEndError($msg,i,j);
+                                        formInputError = true;
+
+                                    }else if(Number(inputModelYearEnd) <= Number(inputModelYearStart))
                                     {
                                         removeModelYearStartError(i,j);
-                                        showModelYearEndError(i,j);
+                                        $msg = "Enter higher value than min leadtime"
+                                        showModelYearEndError($msg,i,j);
                                         formInputError = true;
                                     }else{
                                         removeModelYearEndError(i,j)
@@ -1283,9 +1273,9 @@
          document.getElementById('selectModelYearStart'+i+'Des'+j).classList.add("is-invalid");
          document.getElementById('modelYearStart'+i+'Error'+j).classList.add("paragraph-class");
      }
-     function showModelYearEndError(i,j)
+     function showModelYearEndError($msg,i,j)
      {
-         document.getElementById('modelYearEnd'+i+'Error'+j).textContent="Enter higher value than min leadtime";
+         document.getElementById('modelYearEnd'+i+'Error'+j).textContent=$msg;
          document.getElementById('selectModelYearEnd'+i+'Des'+j).classList.add("is-invalid");
          document.getElementById('modelYearEnd'+i+'Error'+j).classList.add("paragraph-class");
      }
