@@ -68,6 +68,7 @@
       background-color: #e9ecef;
       border-color: #bbb;
     }
+    
   </style>
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
@@ -174,7 +175,7 @@
         
     @endphp
 <td class="nowrap-td">
-    {{ $models_brands_string }}
+{{ ucwords(strtolower($models_brands_string))}}
 </td>
                     <td class="nowrap-td">{{ $calls->custom_brand_model }}</td>
                     @php
@@ -183,8 +184,8 @@
                      $leadsources = $leadsource->source_name;
                      @endphp
                     <td class="nowrap-td">{{ $leadsources }}</td>
-                    <td class="nowrap-td">{{ $calls->language }}</td>
-                    <td class="nowrap-td">{{ $calls->location }}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->language))}}</td>
+                    <td class="nowrap-td">{{ ucwords(strtolower($calls->location))}}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
