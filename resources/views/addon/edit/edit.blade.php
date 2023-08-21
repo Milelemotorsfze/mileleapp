@@ -662,7 +662,7 @@
                     success: function (data) {
                         $('#description').empty();
                         jQuery.each(data, function (key, value) {
-                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
+                            $('#description').append('<option value="' + value.id + '">' + value.description + '</option>');
                             if(description == value.description) {
                                 $("#description").val(value.description).trigger('change');
                             }

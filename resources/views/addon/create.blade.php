@@ -775,7 +775,7 @@
                     success: function (data) {
                         $('#description').empty();
                         jQuery.each(data, function (key, value) {
-                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
+                            $('#description').append('<option value="' + value.id + '">' + value.description + '</option>');
                         });
                     }
                 });
