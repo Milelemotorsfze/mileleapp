@@ -106,19 +106,12 @@
 
         var index = 1;
         $('#indexValue').val(index);
-        // $("#selectModelYearStart1Des1").datepicker({
-        //     minViewMode: 2,
-        //     format: 'yyyy'
-        // });
-
         $("#selectModelYearEnd1Des1").yearpicker({
-
             startYear: 2019,
             endYear: 2050,
         });
 
         $("#selectModelYearStart1Des1").yearpicker({
-
             startYear: 2019,
             endYear: 2050,
         });
