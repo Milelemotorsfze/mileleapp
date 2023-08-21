@@ -25,7 +25,7 @@ class HomeController extends Controller
         ];
         foreach ($calls as $call) {
             $source = $call->source_name;
-            $location = $call->location;
+            $location = ucwords(strtolower($call->location));
             $sourceIndex = array_search($source, array_column($chartData['datasets'], 'label'));
             if ($sourceIndex === false) {
                 $chartData['datasets'][] = [
@@ -41,8 +41,8 @@ class HomeController extends Controller
                 }
             }
         }
-    $startOfWeek = Carbon::now()->startOfWeek();
-    $endOfWeek = Carbon::now()->endOfWeek();
+    $startOfWeek = Carbon::now()->subDays(7)->startOfDay();
+    $endOfWeek = Carbon::now()->endOfDay();
     $rowsweek = DB::table('calls')
     ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model',  DB::raw('COUNT(*) as count'))
     ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
@@ -52,26 +52,30 @@ class HomeController extends Controller
     ->orderByDesc('count')
     ->limit(8)
     ->get();
-    $yesterday = Carbon::yesterday();
+    $startOfyes = Carbon::now()->subDays(1)->startOfDay();
+    $endOfyes = Carbon::now()->endOfDay();
     $rowsyesterday = DB::table('calls')
     ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location', 'calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
     ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
     ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-    ->whereDate('calls.created_at', $yesterday)
+    ->whereBetween('calls.created_at', [$startOfyes, $endOfyes])
     ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
     ->orderByDesc('count')
     ->limit(8)
     ->get();
+    $startDatethr = Carbon::now()->subDays(30)->startOfDay();
+    $endDatethr = Carbon::now()->endOfDay();
     $rowsmonth = DB::table('calls')
     ->select('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location','calls.id  as id', 'calls.custom_brand_model', DB::raw('COUNT(*) as count'))
     ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
     ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
     ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-    ->whereMonth('calls.created_at', '=', date('m'))
+    ->whereBetween('calls.created_at', [$startDatethr, $endDatethr])
     ->groupBy('master_model_lines.brand_id', 'calls_requirement.model_line_id', 'calls.location')
     ->orderByDesc('count')
     ->limit(8)
     ->get();
+    // dd($rowsmonth);
     $variants = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
               ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
@@ -189,7 +193,7 @@ $totalvariantss = [
         ];
         foreach ($calls as $call) {
             $source = $call->source_name;
-            $location = $call->location;
+            $location = ucwords(strtolower($call->location));
             $sourceIndex = array_search($source, array_column($chartData['datasets'], 'label'));
             if ($sourceIndex === false) {
                 $chartData['datasets'][] = [

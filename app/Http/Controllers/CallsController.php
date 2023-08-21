@@ -46,10 +46,11 @@ class CallsController extends Controller
     public function create()
     {
         $countries = CountryListFacade::getList('en');
+        $Language = Language::get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
-        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
+        return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
     }
     /**
      * Store a newly created resource in storage.
@@ -187,17 +188,18 @@ foreach ($modelLineIds as $modelLineId) {
     public function show(Request $request, $call, $brand_id, $model_line_id, $location, $days, $custom_brand_model = null)
 {   
     $brandId = $request->route('brand_id');
+    $location = $request->route('location');
     $modelLineId = $request->route('model_line_id');
     $days = $request->route('days');
     $startDate = Carbon::now()->subDays($days)->startOfDay();
     $endDate = Carbon::now()->endOfDay();
-    
     $callIds = DB::table('calls')
         ->join('calls_requirement', 'calls.id', '=', 'calls_requirement.lead_id')
         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
         ->where('master_model_lines.brand_id', $brandId)
         ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
         ->where('master_model_lines.id', $modelLineId)
+        ->where('calls.location', $location)
         ->whereBetween('calls.created_at', [$startDate, $endDate])
         ->pluck('calls.id');   
 $data = Calls::orderBy('status', 'DESC')
@@ -214,12 +216,13 @@ return view('calls.resultbrand', compact('data'));
     public function edit($id)
     {
         $calls = Calls::findOrFail($id);
+        $Language = Language::get();
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
         
-        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons',));
+        return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
     }
 
     /**
@@ -393,7 +396,8 @@ return view('calls.resultbrand', compact('data'));
                                                                                         }	
 					                                                             }
                                                                      }
-                                            }
+                                                                     $salesPerson = $sales_person_id;
+                                                                    }
              else {
                 $salesPerson = User::where('name', $sales_person)->first();
                 if($salesPerson)
