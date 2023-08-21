@@ -17,6 +17,7 @@ use App\Models\PurchasePriceHistory;
 use App\Models\SupplierType;
 use App\Models\KitCommonItem;
 use App\Models\SparePartsNumber;
+use App\Models\AddonDescription;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -70,7 +71,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-//         dd($request->all());
+        // dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -152,12 +153,29 @@ class AddonController extends Controller
             $input['addon_type_name'] = $request->addon_type;
             $input['addon_id']= $request->addon_id;
 
-            if($request->description != null) {
-                $input['description'] = $request->description;
-            }elseif ($request->description_text != null) {
-                $input['description'] = $request->description_text;
+            // if($request->description != null) {
+            //     $input['description'] = $request->description;
+            // }elseif ($request->description_text != null) {
+            //     $input['description'] = $request->description_text;
+            // }
+            if($request->addon_type == 'P' || $request->addon_type == 'SP')
+            {
+                $exisingDescription = AddonDescription::where([
+                                                        ['addon_id','=',$request->addon_id],
+                                                        ['description','=',$request->description_text]
+                ])->first();
+                if($exisingDescription != '')
+                {
+                    $input['description'] = $exisingDescription->id;
+                }
+                else
+                {
+                    $createDescription['addon_id'] = $request->addon_id;
+                    $createDescription['description'] = $request->description_text;
+                    $createdDesc = AddonDescription::create($createDescription);
+                    $input['description'] = $createdDesc->id;
+                }
             }
-
 
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
@@ -586,10 +604,11 @@ class AddonController extends Controller
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
-        $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
-            ->where('addon_id', $addonDetails->addon_id)
-            ->whereNotNull('description')->select('id','description')
-            ->groupBy('description')->get();
+        // $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
+        //     ->where('addon_id', $addonDetails->addon_id)
+        //     ->whereNotNull('description')->select('id','description')
+        //     ->groupBy('description')->get();
+        $descriptions = AddonDescription::where('addon_id', $addonDetails->addon_id)->whereNotNull('description')->select('id','description')->get();
 
         return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
             'kitItemDropdown','supplierAddons','existingBrandModel','descriptions'));
@@ -657,11 +676,29 @@ class AddonController extends Controller
             }
         }
 
-        if($request->description != null) {
-            $request->description = $request->description;
-        }elseif ($request->description_text != null) {
-            $request->description = $request->description_text;
-        }
+        // if($request->description != null) {
+        //     $request->description = $request->description;
+        // }elseif ($request->description_text != null) {
+        //     $request->description = $request->description_text;
+        // }
+            if($request->addon_type == 'P' || $request->addon_type == 'SP')
+            {
+                $exisingDescription = AddonDescription::where([
+                                                        ['addon_id','=',$request->addon_id],
+                                                        ['description','=',$request->description_text]
+                ])->first();
+                if($exisingDescription != '')
+                {
+                    $input['description'] = $exisingDescription->id;
+                }
+                else
+                {
+                    $createDescription['addon_id'] = $request->addon_id;
+                    $createDescription['description'] = $request->description_text;
+                    $createdDesc = AddonDescription::create($createDescription);
+                    $input['description'] = $createdDesc->id;
+                }
+            }
         if($request->addon_type_hiden == 'P' OR $request->addon_type_hiden == 'K')
             {
                 $addon_details->model_year_start = NULL;
@@ -1628,11 +1665,9 @@ class AddonController extends Controller
 
     }
     public function getAddonDescription(Request $request) {
-        $descriptions = AddonDetails::where('addon_type_name', $request->addonType)
-            ->where('addon_id', $request->addon_id)
-            ->whereNotNull('description')->select('id','description')
-            ->groupBy('description')->get();
-
+        $descriptions = AddonDescription::where('addon_id', $request->addon_id)
+                                        ->whereNotNull('description')->select('id','description')
+                                        ->get();
         return response($descriptions);
 
     }

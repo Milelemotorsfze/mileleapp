@@ -224,8 +224,8 @@
                             <div id="select-description">
                                 <select name="description" id="description" multiple="true" style="width: 100%;" >
                                     @foreach($descriptions as $description)
-                                        <option value="{{$description->description}}"
-                                            {{ $description->description == $addonDetails->description ? 'selected' : ''}}> {{ $description->description }}</option>
+                                        <option value="{{$description->id}}"
+                                            {{ $description->id == $addonDetails->description ? 'selected' : ''}}> {{ $description->description }}</option>
                                     @endforeach
                                 </select>
                             </div>
