@@ -74,6 +74,9 @@
             $('#accessories-table').DataTable();
             $('#spare-parts-table').DataTable();
             $('#kits-table').DataTable();
+            $('#permission-table').DataTable();
+            $('#module-table').DataTable();
+
 
             // $('#suppliersList').DataTable();
             // $('#suppliersList').on( 'click', '.modal-button', function () {
