@@ -27,11 +27,10 @@
                 </div>
             @endif
         </div>
-{{--        @can('warranty-selling-price-histories-list')--}}
-{{--        @php--}}
-{{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-selling-price-histories-list']);--}}
-{{--        @endphp--}}
-{{--        @if ($hasPermission)--}}
+        @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-list']);
+        @endphp
+        @if ($hasPermission)
         <div class="portfolio">
             <ul class="nav nav-pills nav-fill" id="my-tab">
                 <li class="nav-item">
@@ -45,7 +44,7 @@
                 </li>
             </ul>
         </div>
-        <div class="tab-content"  >
+        <div class="tab-content" >
             <div class="tab-pane fade show @if($addonType == 'P' ) active @endif" id="accessories">
                 <div class="card-body">
                     <div class="table-responsive" >
@@ -63,15 +62,20 @@
                             <div hidden>{{$i=0;}}
                             </div>
                             @foreach ($accessories as $key => $data)
-                                <tr >
+                                <tr>
                                     <td>{{ ++$i }}</td>
                                     <td>{{ $data->name }}</td>
                                     <td>{{ $data->createdUser->name ?? '' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>
-                                        <a title="Edit Accessories" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                        </a>
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-edit']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <a title="Edit Accessories" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                                 </a>
@@ -104,9 +108,14 @@
                                     <td>{{ $data->createdUser->name ?? '' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>
-                                        <a title="Edit SpareParts" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                        </a>
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-edit']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <a title="Edit SpareParts" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </a>
+                                         @endif
                                     </td>
                                 </tr>
                                 </a>
@@ -139,9 +148,14 @@
                                     <td>{{ $data->createdUser->name ?? '' }}</td>
                                     <td>{{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y') }}</td>
                                     <td>
-                                        <a title="Edit Accessories" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                        </a>
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-edit']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <a title="Edit Accessories" class="btn btn-sm btn-info" href="{{ route('master-addons.edit', $data->id) }}">
+                                                <i class="fa fa-edit" aria-hidden="true"></i>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                                 </a>
@@ -152,64 +166,6 @@
                 </div>
             </div>
         </div>
-{{--       @endif--}}
-{{--       @endcan--}}
+       @endif
 @endsection
-@push('scripts')
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('.status-reject-button').click(function (e) {
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
-                updateSellingPrice(id, status)
-            })
-            $('.status-approve-button').click(function (e) {
-                var id = $(this).attr('data-id');
-                var status = $(this).attr('data-status');
-                updateSellingPrice(id, status)
-            })
-            function updateSellingPrice(id, status) {
 
-                var updated_price = $('#updated-price').val();
-                let url = '{{ route('warranty-brands.update-selling-price') }}';
-                if(status == 'rejected') {
-                    var message = 'Reject';
-                }else{
-                    var message = 'Approve';
-                }
-                var confirm = alertify.confirm('Are you sure you want to '+ message +' this item ?',function (e) {
-                    if (e) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            dataType: "json",
-                            data: {
-                                id: id,
-                                status: status,
-                                updated_price: updated_price,
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function (data) {
-                                window.location.reload();
-                                alertify.success(status + " Successfully")
-                            }
-                        });
-                    }
-
-                }).set({title:"Update Status"})
-            }
-        })
-        function inputNumberAbs(currentPriceInput)
-        {
-            var id = currentPriceInput.id;
-            var input = document.getElementById(id);
-            var val = input.value;
-            val = val.replace(/^0+|[^\d.]/g, '');
-            if(val.split('.').length>2)
-            {
-                val =val.replace(/\.+$/,"");
-            }
-            input.value = val;
-        }
-    </script>
-@endpush

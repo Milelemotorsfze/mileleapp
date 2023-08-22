@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
 use App\Models\Modules;
 use App\Models\Permission;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class PermissionController extends Controller
 {
@@ -17,7 +16,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::orderBy('id','DESC')->get();
         return view('permissions.index', compact('permissions'));
     }
 
@@ -58,6 +57,13 @@ class PermissionController extends Controller
         $permission->guard_name =  'web';
         $permission->description = $request->description;
         $permission->save();
+        $adminRole = Role::find(1);
+        $data = [
+            'permission_id' => $permission->id,
+            'role_id' => $adminRole->id
+        ];
+
+        DB::table('role_has_permissions')->insert($data);
 
         return redirect()->route('permissions.index')->with('success','Permissions Created Successfully.');
     }

@@ -23,7 +23,7 @@ class KitSeeder extends Seeder
             'id'       => $value[0],
             'name' => $value[1]
         ];
-        endforeach ;
+        endforeach;
         DB::table('modules')->insert($module);
         $Permissions = [
              //Kit
@@ -36,7 +36,7 @@ class KitSeeder extends Seeder
             //  ['14','Addons Create','addon-create', 'To Create the Addons'],
             // ['20','Kit Create','kit-create', 'To Create the Kits'],
             //  ['14','Addons Edit','addon-edit', 'To Edit the Addons'],
-            ['20','Kits Edit','kit-edit', 'To Edit the kits'],
+                ['20','Kits Edit','kit-edit', 'To Edit the kits'],
             //  ['14','Addons Delete','addon-delete', 'To Delete the Addons'],
             //  ['14','Addons View','addon-view', 'To View the Addons'],
             //  ['14','Addons Active','addon-active-inactive', 'To Activate and Inactivate the Addons'],

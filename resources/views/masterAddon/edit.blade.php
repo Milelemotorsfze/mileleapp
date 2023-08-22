@@ -41,37 +41,47 @@
                     <input type="hidden" id="addon_type" value="{{$addon->addon_type}}">
                     <div class="col-xxl-9 col-lg-6 col-md-12">
                         @if($addon->addon_type != 'K')
-                        <div class="row">
-                            <div class="col-xxl-2 col-lg-6 col-md-12">
-                                <span class="error">* </span>
-                                <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Name') }}</label>
-                            </div>
-                            <div class="col-xxl-4 col-lg-6 col-md-12">
-                                <input type="text" name="name" class="form-control" value="{{ old('name', $addon->name) }}">
-                            </div>
-                        </div>
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-create']);
+                            @endphp
+                            @if ($hasPermission)
+                                <div class="row">
+                                    <div class="col-xxl-2 col-lg-6 col-md-12">
+                                        <span class="error">* </span>
+                                        <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Name') }}</label>
+                                    </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                                        <input type="text" name="name" class="form-control" value="{{ old('name', $addon->name) }}">
+                                    </div>
+                                </div>
+                           @endif
                         @else
-                        <div class="row">
-                            <div class="col-xxl-2 col-lg-6 col-md-12">
-                                <span class="error">* </span>
-                                <label for="kit_km" class="col-form-label text-md-end">{{ __('Kit KiloMeter') }}</label>
-                            </div>
-                            <div class="col-xxl-4 col-lg-6 col-md-12">
-                                <input type="number" name="kit_km" class="form-control" value="{{ old('kit_km', $addon->kit_km) }}">
-                            </div>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-xxl-2 col-lg-6 col-md-12">
-                                <span class="error">* </span>
-                                <label for="kit_year" class="col-form-label text-md-end">{{ __('Kit Year') }}</label>
-                            </div>
-                            <div class="col-xxl-4 col-lg-6 col-md-12">
-                                <input type="number" name="kit_year" class="form-control" value="{{ old('kit_year', $addon->kit_year) }}">
-                            </div>
-                        </div>
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-kit-edit');
+                            @endphp
+                            @if ($hasPermission)
+                                <div class="row">
+                                    <div class="col-xxl-2 col-lg-6 col-md-12">
+                                        <span class="error">* </span>
+                                        <label for="kit_km" class="col-form-label text-md-end">{{ __('Kit KiloMeter') }}</label>
+                                    </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                                        <input type="number" name="kit_km" class="form-control" value="{{ old('kit_km', $addon->kit_km) }}">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-xxl-2 col-lg-6 col-md-12">
+                                        <span class="error">* </span>
+                                        <label for="kit_year" class="col-form-label text-md-end">{{ __('Kit Year') }}</label>
+                                    </div>
+                                    <div class="col-xxl-4 col-lg-6 col-md-12">
+                                        <input type="number" name="kit_year" class="form-control" value="{{ old('kit_year', $addon->kit_year) }}">
+                                    </div>
+                                </div>
+                            @endif
+                       @endif
                     </div>
-                    @endif
                     <div class="col-md-12 mt-3 ">
                     <button type="submit" class="btn btn-primary ">Submit</button>
                     </div>
