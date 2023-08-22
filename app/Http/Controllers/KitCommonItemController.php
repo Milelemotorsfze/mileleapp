@@ -419,13 +419,17 @@ class KitCommonItemController extends Controller
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
     }
-    public function kitItems($id)
+    public function kitItems1($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('KitItems.partNumbers','AddonName','AddonTypes.brands','SellingPrice',
-        'KitItems.item.AddonName','KitItems.item.AddonSuppliers.Suppliers',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.item.AddonName',
+        'KitItems.addon.AddonDescription',
+        'KitItems.partNumbers',
+            
+        // 'KitItems.item.AddonSuppliers.Suppliers',
         // old code start
-        'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
+        )
         // old code end
         ->first();
         $totalPrice = 0;
@@ -456,6 +460,63 @@ class KitCommonItemController extends Controller
         // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
+        return view('kit.kititems',compact('supplierAddonDetails'));
+    }
+    public function kitItems($id)
+    {
+        $supplierAddonDetails = [];
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription',
+        // 'KitItems.item.AddonName','KitItems.partNumbers','KitItems.item.AddonSuppliers.Suppliers',
+        // old code start
+        // 'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
+        )
+        // old code end
+        ->first();
+        // find model description Spare parts 
+        $modelDescriptions = [];
+        $modelDescriptions = Addontypes::where('addon_details_id',$id)->pluck('model_number');
+// dd($supplierAddonDetails);
+        $totalPrice = 0;
+        foreach($supplierAddonDetails->KitItems as $oneItem)
+        {
+            $itemMinPrice= '';
+            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
+            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
+            $oneItem->allItemSuppliers = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                    ->orderBy('purchase_price_aed','ASC')->with('Suppliers')->get();
+            $oneItem->totalItemPrice = $itemMinPrice * $oneItem->quantity;
+            $totalPrice = $totalPrice + $oneItem->totalItemPrice;
+        }
+        $supplierAddonDetails->totalPrice = $totalPrice;
+                // old code start
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $supplierAddonDetails->LeastPurchasePrices = $price;
+                //old code end
+
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
+        // {
+        //     return $q->where('status','active')->min('purchase_price_aed');
+        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
+        // })->first();
+        // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
+        // dd($supplierAddonDetails->KitItems);
+
+
+        // foreach($supplierAddonDetails->KitItems as $kitItem)
+        // {
+        //     // dd($kitItem->item_id);
+        //     $itemDes = '';
+        //     $itemDes = AddonDescription::where('id',$kitItem->item_id)->first();
+        //     if($itemDes != '')
+        //     {
+        //         $sparePartsID = AddonDetails::where('addon_id',$itemDes->addon_id)
+        //     }
+        // }
+
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
     public function getCommonKitItems(Request $request) {
