@@ -13,7 +13,7 @@ class AddonDescription extends Model
         'addon_id',
         'description'
     ];
-    public function AddonName()
+    public function Addon()
     {
         return $this->hasOne(Addon::class,'id','addon_id');
     }
