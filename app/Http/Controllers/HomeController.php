@@ -187,7 +187,6 @@ $totalvariantss = [
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
         ->whereBetween('calls.created_at', [$startdate, $enddate])
         ->get();
-        info($calls);
         $chartData = [
             'datasets' => []
         ];
@@ -210,5 +209,39 @@ $totalvariantss = [
             }
         }
         return response()->json(['chartData' => $chartData]);
+    }
+    public function leaddistruition(Request $request) {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $data = DB::table('calls')
+            ->join('users', 'calls.sales_person', '=', 'users.id')
+            ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
+            ->whereBetween('calls.created_at', [$startDate, $endDate])
+            ->groupBy('call_date', 'sales_person_name')
+            ->orderByDesc('call_count') // Order by call_count in descending order
+            ->limit(7)
+            ->get();
+    
+        // Create an associative array that includes the query result, startDate, and endDate
+        $response = [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'data' => $data,
+        ];
+    
+        // Convert the array to JSON and return it as the response
+        return response()->json($response);
+    }    
+    public function leaddistruitiondetail(Request $request) {
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $data = DB::table('calls')
+        ->join('users', 'calls.sales_person', '=', 'users.id')
+        ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
+        ->whereBetween('calls.created_at', [$startDate, $endDate])
+        ->groupBy('call_date', 'sales_person_name')
+        ->orderByDesc('call_count') // Order by call_count in descending order
+        ->get();
+        return view('calls.leaddistrubtion', compact('data'));
     }    
 }

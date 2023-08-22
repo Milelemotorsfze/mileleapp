@@ -132,7 +132,7 @@
                                             </div>
                                             </div>
                                             </div>
-                            <div class="col-xl-8">
+                            <div class="col-xl-5">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Most Inquiry Model Line</h4>
@@ -337,7 +337,53 @@
                             <!-- end card -->
                         </div>
                         <!-- end col -->
+<div class="col-xl-3">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
+                                    <div class="flex-shrink-0">
+                                    <div style="position: relative; width: 100%; height: 5vh;">
+    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 180px; text-align: right;">
+        <i class="fa fa-calendar"></i>&nbsp;
+        <span></span> <i class="fa fa-caret-down"></i>
+    </div>
 </div>
+<form id="date-range-form" method="POST">
+    @csrf
+    <input type="hidden" name="start_date" id="start_date">
+    <input type="hidden" name="end_date" id="end_date">
+</form> 
+                                    </div>
+                                </div><!-- end card header -->
+                                <div class="card-body px-0">
+                                            <div class="table-responsive px-3">
+                                                <table id="specificTable" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <th>
+                                                    Date
+                                                    </th>
+                                                    <th>
+                                                    Sales Person
+                                                    </th>
+                                                    <th>
+                                                    Leads
+                                                    </th>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                                <div id="readMoreLinkContainer">
+    <!-- "Read More" link will be added here -->
+</div>
+                                            </div>
+                                        </div>
+                                  
+                                    </div>
+                                    <!-- end tab content -->
+                                </div>
+                                <!-- end card body -->
+                            </div>
+                            <!-- end card -->
 <!-- @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
                     @endphp
@@ -439,7 +485,7 @@
                         </div>
                         @endif -->
                         <!-- end col -->
-                        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
 $(function() {
@@ -479,7 +525,7 @@ function updateCharts() {
     var startDate = $('#start_date').val();
     var endDate = $('#end_date').val();
     $.ajax({
-        url: '{{ route('homemarketing.update-charts') }}', // Replace with the actual route
+        url: '{{ route('homemarketing.update-charts') }}',
         type: 'POST',
         data: {
             _token: '{{ csrf_token() }}',
@@ -488,14 +534,10 @@ function updateCharts() {
         },
         success: function(response) {
             var chartData = response.chartData;
-
-            // Destroy the existing bar chart instance if it exists
             var existingBarChart = Chart.getChart('barChart');
             if (existingBarChart) {
                 existingBarChart.destroy();
             }
-
-            // Create a new bar chart
             $('#barChart').attr('width', $('#chartContainer').width());
             $('#barChart').attr('height', 350);
             var ctx = document.getElementById('barChart').getContext('2d');
@@ -514,7 +556,6 @@ function updateCharts() {
                     }
                 }
             });
-            // ... update other charts as needed ...
         },
         error: function(error) {
             console.error(error);
@@ -582,6 +623,56 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
         }
     });
     </script>
+    <script type="text/javascript">
+$(function() {
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+    function cb(start, end) {
+        $('#leadsdis span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+console.log("waqar");
+        // Send selected dates to the controller
+        $.ajax({
+            url: '{{ route('homemarketing.leaddistruition') }}',  // Update this URL with your Laravel route
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                start_date: start.format('YYYY-MM-DD'),
+                end_date: end.format('YYYY-MM-DD'),
+            },
+            success: function(response) {
+    var tbody = $('#specificTable tbody');
+    tbody.empty();
+
+    $.each(response.data, function(index, item) {
+        var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
+        tbody.append('<tr><td>' + formattedDate + '</td><td>' + item.sales_person_name + '</td><td>' + item.call_count + '</td></tr>');
+    });
+
+    $('#startDate').text('Start Date: ' + response.start_date);
+    $('#endDate').text('End Date: ' + response.end_date);
+
+    var readMoreLink = '<a href="{{ route("homemarketing.leaddistruitiondetails") }}?start_date=' + response.start_date + '&end_date=' + response.end_date + '">Read More</a>';
+    $('#readMoreLinkContainer').html(readMoreLink);
+}
+        });
+    }
+    
+    $('#leadsdis').daterangepicker({
+        startDate: start,
+        endDate: end,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    }, cb);
+    
+    cb(start, end);
+});
+</script>
     @endif
     @endcan
     <!-- <div id="root"></div>
