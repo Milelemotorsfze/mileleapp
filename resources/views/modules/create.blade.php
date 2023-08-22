@@ -41,8 +41,8 @@
                         </div>
                     </div>
                     </br>
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-dark ">Submit</button>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary ">Submit</button>
                     </div>
                 </div>
             </div>

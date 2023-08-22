@@ -6,7 +6,7 @@
     {{--    @if ($hasPermission)--}}
     <div class="card-header">
         <h4 class="card-title">
-            Brands
+            Modules
         </h4>
         {{--        @php--}}
         {{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}

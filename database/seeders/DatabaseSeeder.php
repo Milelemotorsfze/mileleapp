@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         // ]);
 
 
-        
-        // $this->call(PermissionTableSeeder::class);
-        // $this->call(CreateAdminUserSeeder::class);
+
+//         $this->call(PermissionTableSeeder::class);
+//         $this->call(CreateAdminUserSeeder::class);
         // $this->call(AddonTableSeeder::class);
         // $this->call(BrandsTableSeeder::class);
         // // $this->call(AddonDetailsTableSeeder::class);
@@ -30,10 +30,11 @@ class DatabaseSeeder extends Seeder
         // $this->call(ModelDescriptionMasterTableSeeder::class);
         // $this->call(WarrantyMasterDataSeeder::class);
         // $this->call(StrategySeeder::class);
-        // $this->call(KitSeeder::class);
+//         $this->call(KitSeeder::class);
         // $this->call(BrandRegionsSeeder::class);
-        
-        
-        
+        $this->call(PermissionSettingSeeder::class);
+
+
+
     }
 }
