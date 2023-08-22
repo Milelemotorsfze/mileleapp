@@ -311,7 +311,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         Least Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput" 
+        <input type="text" class="form-control widthinput"
                             placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
         </div>
 
@@ -364,7 +364,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             Item Name
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                            {{$Kit->item->AddonName->name}} - {{$Kit->item->description}}
+                                            {{$Kit->item->Addon->name}} - {{$Kit->item->description}}
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                                             <img id="myImg" src="{{ asset('addon_image/' . $Kit->item->image) }}" class="image-click-class"
@@ -385,7 +385,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                 </div>
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                     <select class="form-control widthinput" autofocus>
-                                                        @foreach($Kit->partNumbers as $partNumbers)
+                                                        @foreach($Kit->addon_part_numbers as $partNumbers)
                                                             <option  value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
                                                         @endforeach
                                                     </select>
@@ -405,7 +405,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                                 </div>
                                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                 <input id="unit_price_{{$i}}"type="text" class="form-control widthinput1" name="addon_code"
-                                                placeholder="Previous Purchase Price" value="{{$Kit->leastPriceSupplier->purchase_price_aed}}" readonly>
+                                                placeholder="Previous Purchase Price" value="{{$Kit->leastPriceSupplier->purchase_price_aed ?? ''}}" readonly>
                                                 </div>
 
                                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -417,19 +417,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                                                 </div>
 
-
-
                                             </div>
                                         </div>
                                         <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4" style="padding-top:7px;">
                                             Item Supplier
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                            <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})" 
+                                            <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})"
                                             autofocus>
-                                                @foreach($Kit->allItemSuppliers as $allItemSuppliers)
-                                                    <option  value="{{$allItemSuppliers->purchase_price_aed}}">
-                                                        {{$allItemSuppliers->Suppliers->supplier}} ( {{$allItemSuppliers->purchase_price_aed}} AED ) </option>
+                                                @foreach($Kit->kit_item_vendors as $itemVendor)
+                                                    <option  value="{{$itemVendor->purchase_price_aed}}"
+                                                        {{$itemVendor->supplier_id == $Kit->least_price_vendor ? 'selected' : ''}} >
+                                                        {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                                 @endforeach
                                             </select>
                                         </div>
