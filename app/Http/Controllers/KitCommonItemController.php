@@ -473,9 +473,25 @@ class KitCommonItemController extends Controller
         // old code end
         ->first();
         // find model description Spare parts 
-        $modelDescriptions = [];
-        $modelDescriptions = Addontypes::where('addon_details_id',$id)->pluck('model_number');
-// dd($supplierAddonDetails);
+        $modelDescriptionsId = [];
+        $modelDescriptionsId = Addontypes::where('addon_details_id',$id)->pluck('model_number');
+        $othrModelDesArr = Addontypes::whereIn('model_number',$modelDescriptionsId)->pluck('addon_details_id');
+        foreach($supplierAddonDetails->KitItems as $oneItem)
+        {
+            $itemAddonDes = '';
+            $itemAddonDes = AddonDescription::where('id',$oneItem->item_id)->select('addon_id','description')->first();
+            if($itemAddonDes != '')
+            {
+                $itemSpIds = [];
+                $itemSpIds = AddonDetails::whereIn('addon_id',$othrModelDesArr)->where('addon_id',$itemAddonDes->addon_id)
+                ->where('description',$itemAddonDes->description)->pluck('id');
+                $supplierAddons = SupplierAddons::where('addon_details_id',$itemSpIds->id)->pluck('id');
+                // $leastPrice = PurchasePriceHistory::where('supplier_addon_id',$supplierAddons)
+            }
+            dd($oneItem->item_id);
+        }
+
+// dd($modelDescriptions);
         $totalPrice = 0;
         foreach($supplierAddonDetails->KitItems as $oneItem)
         {
