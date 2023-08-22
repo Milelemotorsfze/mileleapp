@@ -90,6 +90,28 @@
         <div class="dropdown-divider"></div>
     @endif
     @endcanany
+        {{--    @canany(['module-list', 'module-create', 'module-edit'])--}}
+        {{--        @php--}}
+        {{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['module-list', 'module-create','module-edit']);--}}
+        {{--        @endphp--}}
+        {{--        @if ($hasPermission)--}}
+        <a class="dropdown-item" href="{{ route('modules.index') }}">
+            <i class="fa fa-book" aria-hidden="true"></i> Modules
+        </a>
+        <div class="dropdown-divider"></div>
+        {{--        @endif--}}
+        {{--    @endcanany--}}
+{{--    @canany(['permission-list', 'permission-create', 'permission-edit'])--}}
+{{--        @php--}}
+{{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['permission-list', 'permission-create','permission-edit']);--}}
+{{--        @endphp--}}
+{{--        @if ($hasPermission)--}}
+            <a class="dropdown-item" href="{{ route('permissions.index') }}">
+                <i class="fa fa-door-open" aria-hidden="true"></i> Permissions
+            </a>
+            <div class="dropdown-divider"></div>
+{{--        @endif--}}
+{{--    @endcanany--}}
     @canany(['view-log-activity'])
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-log-activity']);

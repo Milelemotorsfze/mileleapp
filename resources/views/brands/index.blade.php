@@ -58,7 +58,7 @@
                         <td>{{ ++$i }}</td>
                         <td>{{ $brand->brand_name ?? ''}}</td>
                         <td>{{ $brand->createdBy->name ?? '' }}</td>
-                        <td>{{ $brand->createdat ?? '' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($brand->created_at)->format('d-m-y')  }}</td>
                         <td>
 {{--                            @php--}}
 {{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}

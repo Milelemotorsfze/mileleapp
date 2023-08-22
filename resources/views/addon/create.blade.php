@@ -489,8 +489,6 @@
         var isPartNumberErrorExists = true;
 
         $(document).ready(function () {
-
-
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
                 $('#description-text').attr('hidden', false);
@@ -698,9 +696,6 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Part Number Required',function (e) {
                    }).set({title:"Can't Remove Part Number"})
                 }
-
-
-
         })
         });
            $(document).on('click', '.btn_remove', function()
