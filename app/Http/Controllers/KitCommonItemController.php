@@ -491,7 +491,7 @@ class KitCommonItemController extends Controller
             dd($oneItem->item_id);
         }
 
-// dd($modelDescriptions);
+    // dd($modelDescriptions);
         $totalPrice = 0;
         foreach($supplierAddonDetails->KitItems as $oneItem)
         {
