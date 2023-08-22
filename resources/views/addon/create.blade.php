@@ -250,7 +250,7 @@
                                 @endphp
                                 @if ($hasPermission)
                                     <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
-                                       class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
+                                       class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New description</a>
                                     <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                     class="btn btn-sm btn-info" >Choose From List</a>
                                 @endif
@@ -489,15 +489,13 @@
         var isPartNumberErrorExists = true;
 
         $(document).ready(function () {
-
-
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
                 $('#description-text').attr('hidden', false);
                 $('#select-description').attr('hidden', true);
                 $('#addnewDescriptionButton').attr('hidden', true);
                 $("#description option:selected").prop("selected", false);
-                $("#description").trigger('change');
+               $("#description").trigger('change.select2');
             });
             $('#description').change(function () {
                 var addonType = $('#addon_type').val();
@@ -541,6 +539,8 @@
             });
 
             $("#descr-dropdown-button").click(function () {
+
+
                 $('#description-text').attr('hidden', true);
                 $('#select-description').attr('hidden', false);
                 $("#addnewDescriptionButton").attr('hidden', false);
@@ -696,9 +696,6 @@
                     var confirm = alertify.confirm('You are not able to remove this row, Atleast one Part Number Required',function (e) {
                    }).set({title:"Can't Remove Part Number"})
                 }
-
-
-
         })
         });
            $(document).on('click', '.btn_remove', function()
@@ -775,7 +772,7 @@
                     success: function (data) {
                         $('#description').empty();
                         jQuery.each(data, function (key, value) {
-                            $('#description').append('<option value="' + value.description + '">' + value.description + '</option>');
+                            $('#description').append('<option value="' + value.id + '">' + value.description + '</option>');
                         });
                     }
                 });
@@ -840,8 +837,10 @@
                             var modelLine = "";
                             if(data.model_line) {
                               var  modelLine = data.model_line;
+                                $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
+                            }else if(data.is_all_brands > 0) {
+                                $msg = "This Addon,Description,Brand (all brands) Combination is existing";
                             }
-                            $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
                             showBrandError($msg,data.index);
                             var count = data.count;
                             uniqueCounts.push(count);
@@ -1037,7 +1036,7 @@
                                         formInputError = true;
                                     }
                                 }
-                                // validation chcek for model year
+                                // validation check for model year
                                 var inputModelYearStart = $('#selectModelYearStart'+i+'Des'+j).val();
                                 var inputModelYearEnd = $('#selectModelYearEnd'+i+'Des'+j).val();
                                 if(inputModelYearStart == '')
@@ -1046,18 +1045,30 @@
                                     showModelYearStartError($msg,i,j);
                                     formInputError = true;
                                 }
-                                else if(inputModelYearStart.length != 4)
+                                // else if(inputModelYearStart.length != 4)
+                                // {
+                                //     $msg = "Model Year required 4 digits number"
+                                //     showModelYearStartError($msg,i,j);
+                                //     formInputError = true;
+                                // }
+                                else if(inputModelYearEnd != '' && inputModelYearEnd.length != 4)
                                 {
                                     $msg = "Model Year required 4 digits number"
-                                    showModelYearStartError($msg,i,j);
+                                    showModelYearEndError($msg,i,j);
                                     formInputError = true;
                                 }
                                 else if(inputModelYearEnd != '' && inputModelYearStart != '')
                                 {
-                                    if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+                                    if(Number(inputModelYearEnd) > 2050) {
+                                        $msg = "The Model Year should be between 2019-2050";
+                                        showModelYearEndError($msg,i,j);
+                                        formInputError = true;
+
+                                    }else if(Number(inputModelYearEnd) <= Number(inputModelYearStart))
                                     {
                                         removeModelYearStartError(i,j);
-                                        showModelYearEndError(i,j);
+                                        $msg = "Enter higher value than min leadtime"
+                                        showModelYearEndError($msg,i,j);
                                         formInputError = true;
                                     }else{
                                        removeModelYearEndError(i,j);
@@ -1912,9 +1923,9 @@
             document.getElementById('selectModelYearStart'+i+'Des'+j).classList.add("is-invalid");
             document.getElementById('modelYearStart'+i+'Error'+j).classList.add("paragraph-class");
         }
-        function showModelYearEndError(i,j)
+        function showModelYearEndError($msg,i,j)
         {
-            document.getElementById('modelYearEnd'+i+'Error'+j).textContent="Enter higher value than min leadtime";
+            document.getElementById('modelYearEnd'+i+'Error'+j).textContent=$msg;
             document.getElementById('selectModelYearEnd'+i+'Des'+j).classList.add("is-invalid");
             document.getElementById('modelYearEnd'+i+'Error'+j).classList.add("paragraph-class");
         }

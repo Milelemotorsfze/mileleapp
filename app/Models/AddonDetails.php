@@ -68,4 +68,8 @@ class AddonDetails extends Model
     {
         return $this->hasMany(SparePartsNumber::class,'addon_details_id','id');
     }
+    public function AddonDescription()
+    {
+        return $this->hasOne(AddonDescription::class,'description','id');
+    }
 }

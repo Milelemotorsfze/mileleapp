@@ -16,6 +16,7 @@ use App\Models\KitItems;
 use App\Models\AddonTypes;
 use App\Models\SupplierType;
 use App\Models\MasterModelDescription;
+use App\Models\AddonDescription;
 
 class KitCommonItemController extends Controller
 {
@@ -418,13 +419,17 @@ class KitCommonItemController extends Controller
             return redirect()->route('addon.list', $data)
                             ->with('success','Addon created successfully');
     }
-    public function kitItems($id)
+    public function kitItems1($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('KitItems.partNumbers','AddonName','AddonTypes.brands','SellingPrice',
-        'KitItems.item.AddonName','KitItems.item.AddonSuppliers.Suppliers',
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.item.AddonName',
+        'KitItems.addon.AddonDescription',
+        'KitItems.partNumbers',
+            
+        // 'KitItems.item.AddonSuppliers.Suppliers',
         // old code start
-        'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
+        )
         // old code end
         ->first();
         $totalPrice = 0;
@@ -457,6 +462,79 @@ class KitCommonItemController extends Controller
         // dd($supplierAddonDetails);
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
+    public function kitItems($id)
+    {
+        $supplierAddonDetails = [];
+        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription',
+        // 'KitItems.item.AddonName','KitItems.partNumbers','KitItems.item.AddonSuppliers.Suppliers',
+        // old code start
+        // 'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
+        )
+        // old code end
+        ->first();
+        // find model description Spare parts 
+        $modelDescriptionsId = [];
+        $modelDescriptionsId = Addontypes::where('addon_details_id',$id)->pluck('model_number');
+        $othrModelDesArr = Addontypes::whereIn('model_number',$modelDescriptionsId)->pluck('addon_details_id');
+        foreach($supplierAddonDetails->KitItems as $oneItem)
+        {
+            $itemAddonDes = '';
+            $itemAddonDes = AddonDescription::where('id',$oneItem->item_id)->select('addon_id','description')->first();
+            if($itemAddonDes != '')
+            {
+                $itemSpIds = [];
+                $itemSpIds = AddonDetails::whereIn('addon_id',$othrModelDesArr)->where('addon_id',$itemAddonDes->addon_id)
+                ->where('description',$itemAddonDes->description)->pluck('id');
+                $supplierAddons = SupplierAddons::where('addon_details_id',$itemSpIds->id)->pluck('id');
+                // $leastPrice = PurchasePriceHistory::where('supplier_addon_id',$supplierAddons)
+            }
+            dd($oneItem->item_id);
+        }
+
+    // dd($modelDescriptions);
+        $totalPrice = 0;
+        foreach($supplierAddonDetails->KitItems as $oneItem)
+        {
+            $itemMinPrice= '';
+            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
+            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
+            $oneItem->allItemSuppliers = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+                                    ->orderBy('purchase_price_aed','ASC')->with('Suppliers')->get();
+            $oneItem->totalItemPrice = $itemMinPrice * $oneItem->quantity;
+            $totalPrice = $totalPrice + $oneItem->totalItemPrice;
+        }
+        $supplierAddonDetails->totalPrice = $totalPrice;
+                // old code start
+                $price = '';
+                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+                $supplierAddonDetails->LeastPurchasePrices = $price;
+                //old code end
+
+        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
+        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
+        // {
+        //     return $q->where('status','active')->min('purchase_price_aed');
+        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
+        // })->first();
+        // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
+        // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
+        // dd($supplierAddonDetails->KitItems);
+
+
+        // foreach($supplierAddonDetails->KitItems as $kitItem)
+        // {
+        //     // dd($kitItem->item_id);
+        //     $itemDes = '';
+        //     $itemDes = AddonDescription::where('id',$kitItem->item_id)->first();
+        //     if($itemDes != '')
+        //     {
+        //         $sparePartsID = AddonDetails::where('addon_id',$itemDes->addon_id)
+        //     }
+        // }
+
+        return view('kit.kititems',compact('supplierAddonDetails'));
+    }
     public function getCommonKitItems(Request $request) {
 
         $data = [];
@@ -476,12 +554,12 @@ class KitCommonItemController extends Controller
                 }
 
                 $result = call_user_func_array('array_intersect', $Items);
-                $data = AddonDetails::with('AddonName')->whereIn('addon_id', $kitItemDropdown)
-                    ->whereIn('id', $result);
+                $dataId = AddonDetails::whereIn('addon_id', $kitItemDropdown)
+                    ->whereIn('id', $result)->pluck('description');
 
+                $data = AddonDescription::with('Addon')->whereIn('id',$dataId);
                 if($request->type == 'ADD_ITEM') {
                     if($request->selectedItems) {
-
                         $data = $data->whereNotIn('id', $request->selectedItems);
                     }
                 }

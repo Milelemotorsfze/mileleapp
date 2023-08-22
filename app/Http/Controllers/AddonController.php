@@ -17,6 +17,7 @@ use App\Models\PurchasePriceHistory;
 use App\Models\SupplierType;
 use App\Models\KitCommonItem;
 use App\Models\SparePartsNumber;
+use App\Models\AddonDescription;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
@@ -70,7 +71,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-//         dd($request->all());
+        // dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -154,10 +155,27 @@ class AddonController extends Controller
 
             if($request->description != null) {
                 $input['description'] = $request->description;
-            }elseif ($request->description_text != null) {
-                $input['description'] = $request->description_text;
+            }else {
+                if($request->addon_type == 'P' || $request->addon_type == 'SP')
+                {
+                    $exisingDescription = AddonDescription::where([
+                                                            ['addon_id','=',$request->addon_id],
+                                                            ['description','=',$request->description_text]
+                    ])->first();
+                    if($exisingDescription != '')
+                    {
+                        $input['description'] = $exisingDescription->id;
+                    }
+                    else
+                    {
+                        $createDescription['addon_id'] = $request->addon_id;
+                        $createDescription['description'] = $request->description_text;
+                        $createdDesc = AddonDescription::create($createDescription);
+                        $input['description'] = $createdDesc->id;
+                    }
+                }
             }
-
+           
 
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
@@ -268,6 +286,7 @@ class AddonController extends Controller
                                     $createAddType['addon_details_id'] = $addon_details->id;
                                     $createAddType['brand_id'] = $brandData['brand_id'];
                                     $createAddType['is_all_model_lines'] = 'yes';
+
                                     $creBranModelDes = AddonTypes::create($createAddType);
                                 }
                             }
@@ -586,17 +605,18 @@ class AddonController extends Controller
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
         }
-        $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
-            ->where('addon_id', $addonDetails->addon_id)
-            ->whereNotNull('description')->select('id','description')
-            ->groupBy('description')->get();
+        // $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
+        //     ->where('addon_id', $addonDetails->addon_id)
+        //     ->whereNotNull('description')->select('id','description')
+        //     ->groupBy('description')->get();
+        $descriptions = AddonDescription::where('addon_id', $addonDetails->addon_id)->whereNotNull('description')->select('id','description')->get();
 
         return view('addon.edit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
             'kitItemDropdown','supplierAddons','existingBrandModel','descriptions'));
     }
     public function updateAddonDetails(Request $request, $id)
     {
-//         dd($request->all());
+        // dd($request->all());
         $request->addon_type = $request->addon_type_hiden;
         $authId = Auth::id();
         $addon_details = AddonDetails::find($id);
@@ -658,36 +678,54 @@ class AddonController extends Controller
         }
 
         if($request->description != null) {
-            $request->description = $request->description;
-        }elseif ($request->description_text != null) {
-            $request->description = $request->description_text;
+            $addon_details->description = $request->description;
+        }else {
+            if($request->addon_type_hiden == 'P' || $request->addon_type_hiden == 'SP')
+            {
+                $exisingDescription = AddonDescription::where([
+                                                        ['addon_id','=',$request->addon_id],
+                                                        ['description','=',$request->description_text]
+                ])->first();
+                if($exisingDescription != '')
+                {
+                    $addon_details->description = $exisingDescription->id;
+                }
+                else
+                {
+                    $createDescription['addon_id'] = $request->addon_id;
+                    $createDescription['description'] = $request->description_text;
+                    $createdDesc = AddonDescription::create($createDescription);
+                    $addon_details->description = $createdDesc->id;
+                }
+            }
         }
-        if($request->addon_type_hiden == 'P' OR $request->addon_type_hiden == 'K')
-            {
-                $addon_details->model_year_start = NULL;
-                $addon_details->model_year_end = NULL;
-            }
-            else
-            {
-                if($request->model_year_start != '' && $request->model_year_end != '')
-                {
-                    if(intval($request->model_year_start) <= intval($request->model_year_end))
-                    {
-                        $addon_details->model_year_start = $request->model_year_start;
-                        $addon_details->model_year_end = $request->model_year_end;
-                    }
-                    else
-                    {
-                        $addon_details->model_year_start = NULL;
-                        $addon_details->model_year_end = NULL;
-                    }
-                }
-                elseif($request->model_year_start != '' && $request->model_year_end == '')
-                {
-                    $addon_details->model_year_start = $request->model_year_start;
-                    $addon_details->model_year_end = $request->model_year_start;
-                }
-            }
+            
+            // if($request->addon_type_hiden == 'P' OR $request->addon_type_hiden == 'K')
+            // {
+            //     $addon_details->model_year_start = NULL;
+            //     $addon_details->model_year_end = NULL;
+            // }
+            // else
+            // {
+            //     if($request->model_year_start != '' && $request->model_year_end != '')
+            //     {
+            //         if(intval($request->model_year_start) <= intval($request->model_year_end))
+            //         {
+            //             $addon_details->model_year_start = $request->model_year_start;
+            //             $addon_details->model_year_end = $request->model_year_end;
+            //         }
+            //         else
+            //         {
+            //             $addon_details->model_year_start = NULL;
+            //             $addon_details->model_year_end = NULL;
+            //         }
+            //     }
+            //     elseif($request->model_year_start != '' && $request->model_year_end == '')
+            //     {
+            //         $addon_details->model_year_start = $request->model_year_start;
+            //         $addon_details->model_year_end = $request->model_year_start;
+            //     }
+            // }
         $addon_details->update();
         $deleteAddonTypes = [];
         $deleteAddonTypes = AddonTypes::where('addon_details_id',$id)->get();
@@ -702,6 +740,7 @@ class AddonController extends Controller
         }
             if($request->addon_type == 'SP')
             {
+//                dd($request->all());
                 if($request->brand)
                 {
                     if(count($request->brand) > 0)
@@ -732,6 +771,9 @@ class AddonController extends Controller
                                                     $createAddType['addon_details_id'] = $addon_details->id;
                                                     $createAddType['brand_id'] = $brandData['brand_id'];
                                                     $createAddType['is_all_model_lines'] = 'yes';
+                                                    $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                    $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
+
                                                     $creBranModelDes = AddonTypes::create($createAddType);
                                                 }
                                                 else
@@ -746,6 +788,8 @@ class AddonController extends Controller
                                                             $createAddType['brand_id'] = $brandData['brand_id'];
                                                             $createAddType['model_id'] = $brandModelDta['model_id'];
                                                             $createAddType['model_number'] = $modelDescr;
+                                                            $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                            $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
                                                             $creBranModelDes = AddonTypes::create($createAddType);
                                                         }
                                                     }
@@ -756,6 +800,8 @@ class AddonController extends Controller
                                                         $createAddType['addon_details_id'] = $addon_details->id;
                                                         $createAddType['brand_id'] = $brandData['brand_id'];
                                                         $createAddType['model_id'] = $brandModelDta['model_id'];
+                                                        $createAddType['model_year_start'] = $brandModelDta['model_year_start'];
+                                                        $createAddType['model_year_end'] = $brandModelDta['model_year_end'];
                                                         $creBranModelDes = AddonTypes::create($createAddType);
                                                     }
                                                 }
@@ -1628,11 +1674,9 @@ class AddonController extends Controller
 
     }
     public function getAddonDescription(Request $request) {
-        $descriptions = AddonDetails::where('addon_type_name', $request->addonType)
-            ->where('addon_id', $request->addon_id)
-            ->whereNotNull('description')->select('id','description')
-            ->groupBy('description')->get();
-
+        $descriptions = AddonDescription::where('addon_id', $request->addon_id)
+                                        ->whereNotNull('description')->select('id','description')
+                                        ->get();
         return response($descriptions);
 
     }
@@ -1646,13 +1690,13 @@ class AddonController extends Controller
         }
 
         if($request->brand == 'allbrands') {
-
             $isExisting = AddonDetails::where('is_all_brands', 'yes')
                 ->where('addon_id', $request->addon_id)
                 ->where('description', $description)
                 ->where('addon_type_name', $request->addonType);
+           $data['is_all_brands'] = $isExisting->count();
         }else{
-            info("not all brands");
+
             $existingAddonDetailIds = AddonDetails::where('addon_id', $request->addon_id)
                                     ->where('description', $description)
                                     ->where('addon_type_name', $request->addonType);
