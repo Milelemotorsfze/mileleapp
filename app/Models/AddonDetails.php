@@ -70,6 +70,6 @@ class AddonDetails extends Model
     }
     public function AddonDescription()
     {
-        return $this->hasOne(AddonDescription::class,'id','description');
+        return $this->hasOne(AddonDescription::class,'description','id');
     }
 }

@@ -30,4 +30,5 @@ class KitCommonItem extends Model
     {
         return $this->hasMany(SparePartsNumber::class,'addon_details_id','id');
     }
+    
 }

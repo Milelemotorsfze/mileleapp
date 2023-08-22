@@ -678,7 +678,7 @@ class AddonController extends Controller
         }
 
         if($request->description != null) {
-            $request->description = $request->description;
+            $addon_details->description = $request->description;
         }else {
             if($request->addon_type_hiden == 'P' || $request->addon_type_hiden == 'SP')
             {
@@ -688,14 +688,14 @@ class AddonController extends Controller
                 ])->first();
                 if($exisingDescription != '')
                 {
-                    $input['description'] = $exisingDescription->id;
+                    $addon_details->description = $exisingDescription->id;
                 }
                 else
                 {
                     $createDescription['addon_id'] = $request->addon_id;
                     $createDescription['description'] = $request->description_text;
                     $createdDesc = AddonDescription::create($createDescription);
-                    $request->description = $createdDesc->id;
+                    $addon_details->description = $createdDesc->id;
                 }
             }
         }
