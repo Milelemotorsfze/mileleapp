@@ -1761,7 +1761,7 @@
             if(countRow > 1)
             {
                 var id = $('#selectModelLine'+indexNumber).val();
-                var text = $('#selectModelLine'+indexNumber).text();
+                var text = $('#selectModelLine'+indexNumber).find(':selected').text();
                 if(id != '') {
                     addOption(id, text)
                 }

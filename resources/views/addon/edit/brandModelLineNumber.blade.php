@@ -410,11 +410,11 @@
                 // if(modelIndex == 1) {
                 //         $('<option value="allmodellines"> All Model Lines </option>').prependTo('#selectModelLineNum'+indexNumber+'Des2');
                 //     }
-                $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
-                    var id = (this.value);
-                    var text = (this.text);
+                // $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).find("option:selected").each(function() {
+                    var id = $('#selectModelLineNum'+indexNumber+'Des'+modelIndex).val();
+                    var text = $('#selectModelLineNum'+indexNumber+'Des'+modelIndex).find(':selected').text();
                     modelLineDataAppend(indexNumber,modelIndex,id,text)
-                });
+                // });
                 $(this).closest('#row-spare-part-brand-'+indexNumber+'-model-'+modelIndex).remove();
                 $('.MoDesApndHere'+indexNumber).each(function(i){
                     var modelIndex = +i + +1;
