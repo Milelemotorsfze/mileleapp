@@ -2,15 +2,13 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">List Permissions</h4>
-{{--        @can('permission-create')--}}
-{{--            @php--}}
-{{--                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['permission-create']);--}}
-{{--            @endphp--}}
-{{--            @if ($hasPermission)--}}
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-permission-create']);
+            @endphp
+            @if ($hasPermission)
                 <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('permissions.create') }}" text-align: right>
                     <i class="fa fa-plus" aria-hidden="true"></i> New Permission</a>
-{{--            @endif--}}
-{{--        @endcan--}}
+            @endif
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -50,7 +48,13 @@
                         <td>{{ $permission->slug_name }}</td>
                         <td>{{ $permission->description }}</td>
                         <td>
-                            <a href="{{ route('permissions.edit', $permission->id) }}"  class="btn btn-info btn-sm"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-permission-edit');
+                            @endphp
+                            @if ($hasPermission)
+                                <a href="{{ route('permissions.edit', $permission->id) }}"  class="btn btn-info btn-sm">
+                                    <i class="fa fa-edit" aria-hidden="true"></i></a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach

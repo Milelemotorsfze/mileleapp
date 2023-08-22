@@ -90,28 +90,28 @@
         <div class="dropdown-divider"></div>
     @endif
     @endcanany
-        {{--    @canany(['module-list', 'module-create', 'module-edit'])--}}
-        {{--        @php--}}
-        {{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['module-list', 'module-create','module-edit']);--}}
-        {{--        @endphp--}}
-        {{--        @if ($hasPermission)--}}
+    @canany(['master-module-list', 'master-module-create', 'master-module-edit'])
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-module-list', 'master-module-create','master-module-edit']);
+        @endphp
+        @if ($hasPermission)
         <a class="dropdown-item" href="{{ route('modules.index') }}">
             <i class="fa fa-book" aria-hidden="true"></i> Modules
         </a>
         <div class="dropdown-divider"></div>
-        {{--        @endif--}}
-        {{--    @endcanany--}}
-{{--    @canany(['permission-list', 'permission-create', 'permission-edit'])--}}
-{{--        @php--}}
-{{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['permission-list', 'permission-create','permission-edit']);--}}
-{{--        @endphp--}}
-{{--        @if ($hasPermission)--}}
+        @endif
+    @endcanany
+    @canany(['master-permission-list', 'master-permission-create', 'master-permission-edit'])
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-permission-list', 'master-permission-create','master-permission-edit']);
+        @endphp
+        @if ($hasPermission)
             <a class="dropdown-item" href="{{ route('permissions.index') }}">
                 <i class="fa fa-door-open" aria-hidden="true"></i> Permissions
             </a>
             <div class="dropdown-divider"></div>
-{{--        @endif--}}
-{{--    @endcanany--}}
+        @endif
+    @endcanany
     @canany(['view-log-activity'])
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-log-activity']);
@@ -528,26 +528,26 @@
                                 </a>
                             </div>
                             @endif
-<!-- @php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
-@endphp
-@if ($hasPermission)
+                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('brands.index');
+                    @endphp
+                    @if ($hasPermission)
                         <div class="dropdown">
                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('brands.index')}}" id="topnav-utility" role="button">
                                 <span data-key="t-utility">Brands </span>
                             </a>
                         </div>
-@endif
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
-@endphp
-@if ($hasPermission)
+                    @endif
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('model-lines.index');
+                    @endphp
+                    @if ($hasPermission)
                         <div class="dropdown">
                             <a class="dropdown-item dropdown-toggle arrow-none" href="{{route('model-lines.index')}}" id="topnav-utility" role="button">
                                 <span data-key="t-utility">Model Lines </span>
                             </a>
                         </div>
-@endif -->
+                     @endif
                             @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-view');
                     @endphp
@@ -601,20 +601,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole('variant-edit');
 					</li>
                     @endif
                     @endcan
-{{--                    @can('master-addon-view')--}}
-{{--                        @php--}}
-{{--                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-addon-list');--}}
-{{--                        @endphp--}}
-{{--                        @if ($hasPermission)--}}
+                    @can(['master-addons-list'])
+                        @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addons-list']);
+                        @endphp
+                        @if ($hasPermission)
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle arrow-none" href="{{ route('master-addons.index') }}" id="topnav-more" role="button">
                                     <i data-feather="server"></i>
                                     <span data-key="t-extra-pages">Master Addons</span>
                                 </a>
                             </li>
-{{--                        @endif--}}
-{{--                    @endcan--}}
-
+                        @endif
+                    @endcan
                 </ul>
             </div>
         </nav>

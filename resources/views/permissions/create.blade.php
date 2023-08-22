@@ -1,9 +1,9 @@
 @extends('layouts.main')
 @section('content')
-    {{--@php--}}
-    {{--    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}
-    {{--@endphp--}}
-    {{--@if ($hasPermission)--}}
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-permission-create');
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Add Permission</h4>
     </div>
@@ -36,8 +36,7 @@
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label"> Module</label>
-                        <select class="form-control" id="module" name="module_id">
-                            <option></option>
+                        <select class="form-control" id="module" name="module_id" multiple autofocus>
                             @foreach($modules as $module)
                                 <option value="{{$module->id}}">{{$module->name}}</option>
                             @endforeach
@@ -62,7 +61,7 @@
             </div>
         </form>
     </div>
-    {{--@endif--}}
+    @endif
 @endsection
 @push('scripts')
     <script>
@@ -78,9 +77,10 @@
                 },
             },
         });
-        $('#module').select2({
-            placeholder: 'Select Module'
-        })
+        $("#module").attr("data-placeholder", "Choose module....     Or     Type Here To Search....");
+        $("#module").select2({
+            maximumSelectionLength: 1,
+        });
     </script>
 @endpush
 

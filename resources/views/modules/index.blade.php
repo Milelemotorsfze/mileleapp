@@ -1,19 +1,19 @@
 @extends('layouts.table')
 @section('content')
-    {{--    @php--}}
-    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('view-brand-list');--}}
-    {{--    @endphp--}}
-    {{--    @if ($hasPermission)--}}
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-module-list');
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">
             Modules
         </h4>
-        {{--        @php--}}
-        {{--            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}
-        {{--        @endphp--}}
-        {{--        @if ($hasPermission)--}}
-        <a  class="btn btn-sm btn-info float-end" href="{{ route('modules.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
-        {{--        @endif--}}
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-module-create');
+        @endphp
+        @if ($hasPermission)
+            <a  class="btn btn-sm btn-info float-end" href="{{ route('modules.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        @endif
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -52,13 +52,13 @@
                             <td>{{ $module->name ?? ''}}</td>
                             <td>{{\Carbon\Carbon::parse($module->created_at)->format('d-m-y') }}</td>
                             <td>
-                                {{--                            @php--}}
-                                {{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-edit');--}}
-                                {{--                            @endphp--}}
-                                {{--                            @if ($hasPermission)--}}
+                            @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-module-edit');
+                            @endphp
+                            @if ($hasPermission)
                                 <a data-placement="top" href="{{ route('modules.edit', $module->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
                                 </a>
-                                {{--                            @endif--}}
+                            @endif
                             </td>
                         </tr>
                 @endforeach
@@ -66,7 +66,7 @@
             </table>
         </div>
     </div>
-    {{--@endif--}}
+    @endif
 @endsection
 
 
