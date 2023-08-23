@@ -306,20 +306,21 @@ body {font-family: Arial, Helvetica, sans-serif;}
             @csrf
             <input type="text" class="form-control widthinput" name="addon_details_id"
                             placeholder="" value="{{$supplierAddonDetails->id}}" hidden>
-    <div class="row" style="padding-left:10px; padding-right:10px;">
-        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
-        Least Purchase Price (AED)
-        </div>
-        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput" 
-                            placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
-        </div>
+        <div class="row" style="padding-left:10px; padding-right:10px;">
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Previous Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
         <input type="text" class="form-control widthinput" placeholder="" value="" id="previous_purchase_price" name="previous_purchase_price" readonly>
+        </div>
+
+        <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
+        Least Purchase Price (AED)
+        </div>
+        <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
+        <input type="text" class="form-control widthinput" 
+                            placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
         </div>
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
@@ -364,7 +365,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             Item Name
                                         </div>
                                         <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                            {{$Kit->item->AddonName->name}} - {{$Kit->item->description}}
+                                            {{$Kit->item->Addon->name}} - {{$Kit->item->description}}
                                         </div>
                                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                                             <img id="myImg" src="{{ asset('addon_image/' . $Kit->item->image) }}" class="image-click-class"
@@ -685,7 +686,7 @@ $(document).ready(function ()
             currentPurchasePrice = $("#current_purchase_price").val();
             previousSellingPrice = $("#previous_selling_price").val();
             currentSellingPrice = $("#current_selling_price").val();
-            if(previousPurchaseprice == currentPurchasePrice OR previousSellingPrice == currentSellingPrice)
+            if(previousPurchaseprice == currentPurchasePrice || previousSellingPrice == currentSellingPrice)
             {
                 e.preventDefault();
             }

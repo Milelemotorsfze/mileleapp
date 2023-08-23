@@ -462,7 +462,7 @@ class KitCommonItemController extends Controller
         // dd($supplierAddonDetails);
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
-    public function kitItems($id)
+    public function kitItems2($id)
     {
         $supplierAddonDetails = [];
         $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription',
@@ -485,10 +485,10 @@ class KitCommonItemController extends Controller
                 $itemSpIds = [];
                 $itemSpIds = AddonDetails::whereIn('addon_id',$othrModelDesArr)->where('addon_id',$itemAddonDes->addon_id)
                 ->where('description',$itemAddonDes->description)->pluck('id');
-                $supplierAddons = SupplierAddons::where('addon_details_id',$itemSpIds->id)->pluck('id');
+                // $supplierAddons = SupplierAddons::where('addon_details_id',$itemSpIds->id)->pluck('id');
                 // $leastPrice = PurchasePriceHistory::where('supplier_addon_id',$supplierAddons)
             }
-            dd($oneItem->item_id);
+            // dd($oneItem->item_id);
         }
 
     // dd($modelDescriptions);
@@ -571,6 +571,30 @@ class KitCommonItemController extends Controller
     }
     public function priceStore(Request $request)
     {   
-        dd($request->all());
+        if($request->current_purchase_price != '' && $request->previous_purchase_price != $request->current_purchase_price)
+        {
+            $existingPurchasePrice = KitPriceHistory::where([
+                ['status','=','active'],
+                ['addon_details_id','=',$request->addon_details_id]
+            ])->first();
+            if($existingPurchasePrice != '')
+            {
+                $existingPurchasePrice->status = 'inactive';
+                $existingPurchasePrice->updated_by =Auth::id();
+                $existingPurchasePrice->save();
+            }
+            $purchasePrice['addon_details_id'] = $request->addon_details_id;
+            $purchasePrice['old_price'] = $request->previous_purchase_price;
+            $purchasePrice['updated_price'] = $request->current_purchase_price;
+            $purchasePrice['status'] = 'active';
+            $purchasePrice['created_by'] = Auth::id();
+            $createPurchasePrice = KitPriceHistory::create($purchasePrice);
+        }
+        if($request->current_selling_price != '' && $request->previous_selling_price != $request->current_selling_price)
+        {
+            $sellingPrice = AddonSellingPrice::where([
+                ['addon_details_id','=',]
+            ])
+        }
     }
 }
