@@ -1559,6 +1559,7 @@
         }
         function addOption(id,text) {
             var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+
             for(var i=1;i<=indexValue;i++) {
                 $('#selectModelLine'+i).append($('<option>', {value: id, text :text}))
             }
@@ -1686,9 +1687,8 @@
                 // }
                 // $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).find("option:selected").each(function() {
                     var id = $('#selectModelLine'+indexNumber).val();
-                    var text = $('#selectModelLine'+indexNumber).text();;
-                    // alert(id);
-                    // alert(text);
+                    var text = $('#selectModelLine'+indexNumber).find(':selected').text();
+
                 if(id != '') {
                     addOption(id,text)
                 }
@@ -1953,7 +1953,7 @@
                     ({
 
                         id: value.id,
-                        text: value.addon.name +' - '+ description 
+                        text: value.addon.name +' - '+ description
                     });
                 });
 

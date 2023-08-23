@@ -78,60 +78,64 @@ class CallsController extends Controller
         $existing_phone_count = null;
         $existing_language_count = null;
         foreach ($sales_persons as $sales_person) {
-            if($language == "English") {
+            if ($language == "English") {
                 $existing_email_count = Calls::where('email', $email)
-                                             ->where('sales_person', $sales_person->model_id)
-                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-                                             ->whereNotNull('email')
-                                             ->count();
+                    ->where('sales_person', $sales_person->model_id)
+                    ->whereNotNull('email')
+                    ->count();
                 $existing_phone_count = Calls::where('phone', $phone)
-                                             ->where('sales_person', $sales_person->model_id)
-                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-                                             ->whereNotNull('phone')
-                                             ->count();
-                if($existing_email_count != 0 || $existing_phone_count != 0) {
+                    ->where('sales_person', $sales_person->model_id)
+                    ->whereNotNull('phone')
+                    ->count();
+                if ($existing_email_count > 0 || $existing_phone_count > 0) {
                     $sales_person_id = $sales_person->model_id;
                     break;
-                } 
-                else {
-                    $new_calls_count = Calls::where('status', 'New')
-                                             ->where('sales_person', $sales_person->model_id)
-                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-                                             ->count();
-                    if ($new_calls_count < 5) {
-                        $sales_person_id = $sales_person->model_id;
-                        break;
-                    }
                 }
-            } else {
-                $existing_language_count = SalesPersonLaugauges::where('language', $language)
-                                                                ->where('sales_person', $sales_person->model_id)
-                                                                ->count(); 
-                if($existing_language_count != 0){
+                else
+                {
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                    ->where('role_id', 7)
+                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->where('calls.status', 'New')
+                    ->groupBy('calls.sales_person')
+                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                }
+            } 
+            else {
+                $existing_language_count = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
+                ->where('language', $language)
+                ->count();      
+                if ($existing_language_count === 1) {
                     $sales_person_id = $sales_person->model_id;
                     break;
-                } else {
-                    $new_calls_count = Calls::where('status', 'New')
-                                             ->where('sales_person', $sales_person->model_id)
-                                             ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-                                             ->count();
-                    if ($new_calls_count < 5) {
-                        $sales_person_id = $sales_person->model_id;
-                        break;
+                }
+                elseif ($existing_language_count > 1) {
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                    ->where('role_id', 7)
+                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->where('calls.status', 'New')
+                    ->whereIn('model_has_roles.model_id', $sales_persons->pluck('model_id'))
+                    ->groupBy('calls.sales_person')
+                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                    break;
                     }
+                else{
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                    ->where('role_id', 7)
+                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->where('calls.status', 'New')
+                    ->groupBy('calls.sales_person')
+                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                }
                 }
             }
         }
-        if ($sales_person_id == null) {
-            $sales_person_id = Calls::select('sales_person', DB::raw('COUNT(*) as count'))
-                                     ->where('status', 'New')
-                                     ->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})
-                                     ->groupBy('sales_person')
-                                     ->orderBy('count', 'ASC')
-                                     ->first()
-                                     ->sales_person;
-        }  
-    }
     else{
         $sales_person_id = $request->input('sales_person_id');
     }
@@ -356,48 +360,65 @@ return view('calls.resultbrand', compact('data'));
                             $existing_phone_count = null;
                             $existing_language_count = null;
                             foreach ($sales_persons as $sales_person) {
-                                                                        if($language == "English") {
-                                                                         $existing_email_count = Calls::where('email', $email)
-                                                                        ->where('sales_person', $sales_person->model_id)
-                                                                        ->whereNotNull('email')
-                                                                        ->count();
-                                                                        $existing_phone_count = Calls::where('phone', $phone)
-                                                                        ->where('sales_person', $sales_person->model_id)
-                                                                        ->whereNotNull('phone')
-                                                                        ->count();
-                                                                        if($existing_email_count !== 0 || $existing_phone_count !== 0) {
-                                                                        $sales_person_id = $sales_person->model_id;
-                                                                        break;
-                                                                         } else {
-                                                                                 $new_calls_count = Calls::where('status', 'New')
-                                                                                 ->where('sales_person', $sales_person->model_id)
-                                                                                 ->count();
-
-                                                                                 if ($new_calls_count < 5) {
-                                                                                 $sales_person_id = $sales_person->model_id;
-                                                                                 break;
-                                                                                 }
-                                                                                }
-					                                                        } else{
-					                                                              $existing_language_count = SalesPersonLaugauges::where('language', $language)
-                                                                                  ->where('sales_person', $sales_person->model_id)
-                                                                                  ->count(); 
-                                                                                  if($existing_language_count != 0){
-                                                                                  $sales_person_id = $sales_person->model_id;
-                                                                                  break;
-                                                                                  } else {
-                                                                                  $new_calls_count = Calls::where('status', 'New')
-                                                                                  ->where('sales_person', $sales_person->model_id)
-                                                                                  ->count();
-                                                                                  if ($new_calls_count < 5) {
-                                                                                  $sales_person_id = $sales_person->model_id;
-                                                                                  break;
-                                                                                             }
-                                                                                        }	
-					                                                             }
-                                                                     }
-                                                                     $salesPerson = $sales_person_id;
-                                                                    }
+                                if ($language == "English") {
+                                    $existing_email_count = Calls::where('email', $email)
+                                        ->where('sales_person', $sales_person->model_id)
+                                        ->whereNotNull('email')
+                                        ->count();
+                                    $existing_phone_count = Calls::where('phone', $phone)
+                                        ->where('sales_person', $sales_person->model_id)
+                                        ->whereNotNull('phone')
+                                        ->count();
+                                    if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                                        $sales_person_id = $sales_person->model_id;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        ->where('role_id', 7)
+                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->where('calls.status', 'New')
+                                        ->groupBy('calls.sales_person')
+                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->first();
+                                        $sales_person_id = $lowest_lead_sales_person->model_id;
+                                    }
+                                } 
+                                else {
+                                    $existing_language_count = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
+                                    ->where('language', $language)
+                                    ->count();      
+                                    if ($existing_language_count === 1) {
+                                        $sales_person_id = $sales_person->model_id;
+                                        break;
+                                    }
+                                    elseif ($existing_language_count > 1) {
+                                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        ->where('role_id', 7)
+                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->where('calls.status', 'New')
+                                        ->whereIn('model_has_roles.model_id', $sales_persons->pluck('model_id'))
+                                        ->groupBy('calls.sales_person')
+                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->first();
+                                        $sales_person_id = $lowest_lead_sales_person->model_id;
+                                        break;
+                                        }
+                                    else{
+                                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        ->where('role_id', 7)
+                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->where('calls.status', 'New')
+                                        ->groupBy('calls.sales_person')
+                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->first();
+                                        $sales_person_id = $lowest_lead_sales_person->model_id;
+                                    }
+                                    }
+                                }
+                                $salesPerson = $sales_person_id;
+                                }
              else {
                 $salesPerson = User::where('name', $sales_person)->first();
                 if($salesPerson)
