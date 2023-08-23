@@ -594,8 +594,19 @@ class KitCommonItemController extends Controller
         if($request->current_selling_price != '' && $request->previous_selling_price != $request->current_selling_price)
         {
             $sellingPrice = AddonSellingPrice::where([
-                ['addon_details_id','=',]
-            ])
+                ['addon_details_id','=',$request->addon_details_id],
+                ['selling_price','=',$request->current_selling_price],
+                ['status','=','pending']
+            ])->latest()->first();
+            if($sellingPrice != '')
+            {
+                $createSellingPrice['addon_details_id'] = $request->addon_details_id;
+                $createSellingPrice['selling_price'] = $request->current_selling_price;
+                $createSellingPrice['status'] = 'pending';
+                $createSellingPrice['created_by'] = Auth::id();
+                $createSellPrice = AddonSellingPrice::create($createSellingPrice);
+            }
         }
+        return redirect()->back();
     }
 }
