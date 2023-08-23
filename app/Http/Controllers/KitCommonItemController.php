@@ -533,6 +533,7 @@ class KitCommonItemController extends Controller
         //         $sparePartsID = AddonDetails::where('addon_id',$itemDes->addon_id)
         //     }
         // }
+
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
     public function getCommonKitItems(Request $request) {
@@ -595,7 +596,21 @@ class KitCommonItemController extends Controller
 //            $sellingPrice = AddonSellingPrice::where([
 //                ['addon_details_id','=',]
 //            ])
+            $sellingPrice = AddonSellingPrice::where([
+                ['addon_details_id','=',$request->addon_details_id],
+                ['selling_price','=',$request->current_selling_price],
+                ['status','=','pending']
+            ])->latest()->first();
+            if($sellingPrice != '')
+            {
+                $createSellingPrice['addon_details_id'] = $request->addon_details_id;
+                $createSellingPrice['selling_price'] = $request->current_selling_price;
+                $createSellingPrice['status'] = 'pending';
+                $createSellingPrice['created_by'] = Auth::id();
+                $createSellPrice = AddonSellingPrice::create($createSellingPrice);
+            }
         }
+        return redirect()->back();
     }
 
     public function getPartNumbers(Request $request) {
