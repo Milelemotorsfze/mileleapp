@@ -39,13 +39,9 @@ class KitCommonItem extends Model
     public function getAddonPartNumbersAttribute() {
         $kitItem = KitCommonItem::find($this->id);
 
-        $addonDetailIds = AddonDetails::where('description', $this->item_id)
-            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id');
-        $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
-        $kitAddonDetails = AddonTypes::whereIn('addon_details_id', $addonDetailIds)->whereIn('model_number', $kitModelNumbers)
-            ->pluck('addon_details_id');
-
-        $partNumbers = SparePartsNumber::whereIn('addon_details_id', $kitAddonDetails)->get();
+        $vendorMinPrice = $kitItem->least_price_vendor;
+        $addonDetailId = $vendorMinPrice->addon_details_id;
+        $partNumbers = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 
         return $partNumbers;
     }

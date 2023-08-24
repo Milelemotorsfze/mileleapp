@@ -390,7 +390,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                     Part Number
                                 </div>
                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
-                                    <select class="form-control widthinput" autofocus>
+                                    <select class="form-control widthinput" autofocus id="part-number-{{$i}}">
                                         @foreach($Kit->addon_part_numbers as $partNumbers)
                                             <option  value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
                                         @endforeach
@@ -434,7 +434,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})"
                                     autofocus>
                                 @foreach($Kit->kit_item_vendors as $itemVendor)
-                                    <option  data-price="{{$itemVendor->purchase_price_aed}}" value="{{$itemVendor->id}}"
+                                    <option  data-id="{{$itemVendor->id}}" value="{{$itemVendor->purchase_price_aed}}"
                                         {{$itemVendor->supplier_id == $Kit->least_price_vendor->supplier_id ? 'selected' : ''}} >
                                         {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                 @endforeach
@@ -671,8 +671,8 @@ $(document).ready(function ()
       {
         var CurrentPurchasePrice = 0;
         var kit_quantity = $('#quantity_'+index).val();
-        var item_price = $('#supplier_'+index).find('option:selected').attr('data-price');
-        var id = current.value;
+        var item_price = $('#supplier_'+index).val();
+        var id = $('#supplier_'+index).find('option:selected').attr('data-id');
 
         $('#unit_price_'+index).val(item_price);
         var item_total_price = kit_quantity * item_price;
@@ -687,8 +687,13 @@ $(document).ready(function ()
                   },
               dataType: "json",
               success: function (data) {
-                 $('#item_code_'+index).text(data.item_code);
-
+                  $('#item_code_'+index).text(data.item_code);
+                  $('#part-number-'+index).empty();
+                  var data = data.part_number;
+                  jQuery.each(data, function (key, value) {
+                      {{--var selectedId = '{{ $letterOfIndent->customer_id }}';--}}
+                      $('#part-number-'+index).append('<option value="' + value.id + ' " >' + value.part_number + '</option>');
+                  });
               }
           });
 
@@ -698,7 +703,7 @@ $(document).ready(function ()
             var price = 0;
             var totalItemPrice = 0;
             quantity = $("#quantity_"+i).val();
-            price = $('#supplier_'+i).find('option:selected').attr('data-price');
+            price = $('#supplier_'+i).val();
 
             totalItemPrice = quantity * price;
             CurrentPurchasePrice = CurrentPurchasePrice + totalItemPrice;

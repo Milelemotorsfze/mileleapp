@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\SparePartsNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -567,7 +568,7 @@ class KitCommonItemController extends Controller
                 $data = $data->get();
             }
         }
-        info($data);
+
         return response($data);
     }
     public function priceStore(Request $request)
@@ -614,9 +615,16 @@ class KitCommonItemController extends Controller
     }
 
     public function getPartNumbers(Request $request) {
-
+        info($request->all());
+        info("part numebrs");
         $currentSupplierAddon = SupplierAddons::find($request->id);
+        info($currentSupplierAddon->supplierAddonDetails->addon_code);
+
         $data['item_code'] = $currentSupplierAddon->supplierAddonDetails->addon_code;
+
+        $addonDetailId = $currentSupplierAddon->addon_details_id;
+
+        $data['part_number'] = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 
         return response($data);
     }
