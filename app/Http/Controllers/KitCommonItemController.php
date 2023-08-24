@@ -466,13 +466,15 @@ class KitCommonItemController extends Controller
     public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription',
+        $supplierAddonDetails = AddonDetails::where('id',$id)
+                                    ->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')
+                                    ->first();
         // 'KitItems.item.AddonName','KitItems.partNumbers','KitItems.item.AddonSuppliers.Suppliers',
         // old code start
         // 'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
-        )
+
         // old code end
-        ->first();
+
         // find model description Spare parts
         $modelDescriptionsId = [];
 
@@ -615,15 +617,11 @@ class KitCommonItemController extends Controller
     }
 
     public function getPartNumbers(Request $request) {
-        info($request->all());
-        info("part numebrs");
+
         $currentSupplierAddon = SupplierAddons::find($request->id);
-        info($currentSupplierAddon->supplierAddonDetails->addon_code);
-
+        $data['item_image'] = url('addon_image/' . $currentSupplierAddon->supplierAddonDetails->image) ;
         $data['item_code'] = $currentSupplierAddon->supplierAddonDetails->addon_code;
-
         $addonDetailId = $currentSupplierAddon->addon_details_id;
-
         $data['part_number'] = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 
         return response($data);

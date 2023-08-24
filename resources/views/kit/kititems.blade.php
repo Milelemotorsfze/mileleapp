@@ -289,7 +289,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
             <div class="col-xxl-3 col-lg-3 col-md-3">
                 <div class="row">
                     <center>
-                    <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" class="contain image-click-class"
+
+                    <img id="blah" src="{{ url('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" class="contain image-click-class"
                          data-modal-id="showImageModal"/>
                     </center>
                 </div>
@@ -369,7 +370,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             {{$Kit->item->Addon->name}} - {{$Kit->item->description}}
                         </div>
                         <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                            <img id="myImg" src="{{ asset('addon_image/' . $Kit->item->image) }}" class="image-click-class"
+                            <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
                             style="width:100%; height:125px;" alt="Addon Image"  />
                         </div>
                         <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
@@ -688,6 +689,8 @@ $(document).ready(function ()
               dataType: "json",
               success: function (data) {
                   $('#item_code_'+index).text(data.item_code);
+                  console.log(data.item_image);
+                  $("#addon-item-image-"+index).attr('src', data.item_image);
                   $('#part-number-'+index).empty();
                   var data = data.part_number;
                   jQuery.each(data, function (key, value) {

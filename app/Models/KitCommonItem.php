@@ -22,7 +22,8 @@ class KitCommonItem extends Model
         'addon_part_numbers',
         'least_price_vendor',
         'kit_item_vendors',
-        'kit_item_total_purchase_price'
+        'kit_item_total_purchase_price',
+
     ];
     public function addon()
     {
