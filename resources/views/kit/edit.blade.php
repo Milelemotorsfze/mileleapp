@@ -360,7 +360,7 @@
                                                                                 multiple="true" style="width: 100%;" data-index="{{$i}}" onchange="KitItemValidations(this,{{$i}})" >
                                                                             <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $alreadyAddedItems)) selected @endif>
                                                                                 {{$kitItemDropdownData->item->addon_code}}
-                                                                                ( {{$kitItemDropdownData->item->AddonName->name}}
+                                                                                ( {{$kitItemDropdownData->item->Addon->name}}
                                                                                 @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif  )
                                                                             </option>
                                                                             @foreach($availableCommonItems as $itemDrop)
