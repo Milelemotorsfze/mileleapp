@@ -384,7 +384,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                     <span id="item_code_{{$i}}">
                                           {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code ?? '' }}
                                     </span>
-
+                                <input type="hidden" value="{{ $Kit->least_price_vendor->supplierAddonDetails->id}}" id="item-code-id-{{$i}}">
                                 </div>
 
                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
@@ -412,8 +412,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                     Purchase Price / Unit
                                 </div>
                                 <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
-                                <input id="unit_price_{{$i}}" type="text" class="form-control widthinput1" name="purchase_price_aed"
-                                placeholder="Previous Purchase Price" value="{{$Kit->least_price_vendor->purchase_price_aed ?? ''}}" readonly>
+                                    <input id="unit_price_{{$i}}" type="text" class="form-control widthinput1" name="purchase_price_aed"
+                                    placeholder="Previous Purchase Price" value="{{$Kit->least_price_vendor->purchase_price_aed ?? ''}}" readonly>
+
                                 </div>
 
                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -443,16 +444,54 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         </div>
                         </br>
                     </div>
+                    <button type="button" class="btn btn-info float-end spare-part-edit-button"
+                            data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Spare Part Edit">
+                        <i class="fa fa-edit"></i></button>
+                    <button type="button" class="btn btn-primary float-end purchase-price-edit-button"
+                            data-index="{{$i}}" data-bs-toggle="modal"
+                            data-bs-target="#purchase-price-edit-{{$i}}"
+
+                            title="Add New Purchase Price"><i class="fa fa-dollar-sign"></i> </button>
                 </div>
             <!-- </div> -->
         <!-- </div> -->
+        <div class="modal fade" id="purchase-price-edit-{{$i}}"
+             tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Purchase Price</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-3">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="row mt-2">
+                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                            <label class="form-label font-size-13">New Price</label>
+                                        </div>
+                                        <div class="col-lg-9 col-md-12 col-sm-12">
+                                            <input type="number" value=""  class="form-control"  >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary price-update-button" data-index="{{$i}}"
+                               >Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endforeach
 </div>
+
 </div>
 <!--kit common items end-->
-
-
-
     <center><h5 class="card-title">
     Vendors Details And Kit Items
 </h5></center>
@@ -651,6 +690,36 @@ $(document).ready(function ()
         {
             lengthKitItems = data.kit_items.length;
         });
+    $('.price-update-button').click(function (e) {
+        var index = $(this).attr('data-index');
+        var addonDetailId = $('#item-code-id-'+index).val();
+        var supplier_id = $('#supplier_'+index).find('option:selected').attr('data-id');
+
+        $.ajax({
+            url: "{{ url('addon/spare-part/price-update')}}",
+            type: "POST",
+            data:
+                {
+                    supplier_id: supplier_id,
+                    addon_details_id:addonDetailId,
+                    _token: '{{csrf_token()}}'
+                },
+            dataType: "json",
+            success: function (data) {
+                console.log(data)
+            }
+            })
+
+    })
+    $('.spare-part-edit-button').click(function (e) {
+        var index = $(this).attr('data-index');
+        var kit_id = $(this).attr('data-kit-id');
+        var addonDetailId = $('#item-code-id-'+index).val();
+
+        url = '{{ url('addons/details/edit/') }}' + "/"+addonDetailId + "?kit_id="+kit_id
+        window.location.href = url;
+    });
+
     $('.image-click-class').click(function (e)
     {
         var id =  $(this).attr('id');
@@ -689,6 +758,7 @@ $(document).ready(function ()
               dataType: "json",
               success: function (data) {
                   $('#item_code_'+index).text(data.item_code);
+                  $('#item-code-id-'+index).val(data.item_id);
                   console.log(data.item_image);
                   $("#addon-item-image-"+index).attr('src', data.item_image);
                   $('#part-number-'+index).empty();

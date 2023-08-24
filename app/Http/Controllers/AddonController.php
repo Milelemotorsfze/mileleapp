@@ -175,7 +175,7 @@ class AddonController extends Controller
                     }
                 }
             }
-           
+
 
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
@@ -458,6 +458,7 @@ class AddonController extends Controller
                     }
                 }
             }
+
             if($request->addon_type == 'K')
             {
                 // return redirect()->route('kit.suppliers', $addon_details->id)
@@ -699,7 +700,7 @@ class AddonController extends Controller
                 }
             }
         }
-            
+
             // if($request->addon_type_hiden == 'P' OR $request->addon_type_hiden == 'K')
             // {
             //     $addon_details->model_year_start = NULL;
@@ -1196,12 +1197,16 @@ class AddonController extends Controller
             //     return redirect()->route('kit.editsuppliers', $id)
             //                     ->with('success','Kit created successfully');
             // }
+
             if($request->addon_type == 'K')
             {
                 // return redirect()->route('kit.suppliers', $addon_details->id)
                 //                 ->with('success','Kit created successfully');
                 return redirect()->route('kit.kitItems', $id)
                 ->with('success','Kit created successfully');
+            }else if( $request->kit_id != '') {
+                return redirect()->route('kit.kitItems', $request->kit_id)
+                    ->with('success','Kit created successfully');
             }
             else
             {
@@ -1851,6 +1856,14 @@ class AddonController extends Controller
 
         return response($isExist);
 
+    }
+    public function addNewPurchasePrice(Request $request) {
+
+        $supplierAddon = SupplierAddons::where('addon_details_id', $request->addon_details_id)
+            ->where('supplier_id', $request->supplier_id)->first();
+
+
+        return response(true);
     }
 }
 

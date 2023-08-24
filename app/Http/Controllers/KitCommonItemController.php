@@ -579,6 +579,7 @@ class KitCommonItemController extends Controller
         $currentSupplierAddon = SupplierAddons::find($request->id);
         $data['item_image'] = url('addon_image/' . $currentSupplierAddon->supplierAddonDetails->image) ;
         $data['item_code'] = $currentSupplierAddon->supplierAddonDetails->addon_code;
+        $data['item_id'] = $currentSupplierAddon->supplierAddonDetails->id;
         $addonDetailId = $currentSupplierAddon->addon_details_id;
         $data['part_number'] = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 
