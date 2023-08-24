@@ -21,7 +21,9 @@ class KitCommonItem extends Model
     public $appends = [
         'addon_part_numbers',
         'least_price_vendor',
-        'kit_item_vendors'
+        'kit_item_vendors',
+        'kit_item_total_purchase_price',
+
     ];
     public function addon()
     {
@@ -36,32 +38,49 @@ class KitCommonItem extends Model
         return $this->hasMany(SparePartsNumber::class,'addon_details_id','id');
     }
     public function getAddonPartNumbersAttribute() {
+        $kitItem = KitCommonItem::find($this->id);
 
-        $commonItems = KitCommonItem::where('addon_details_id', $this->addon_details_id)
-            ->pluck('item_id');
-        $addonDetailIds  = AddonDetails::whereIn('description', $commonItems)->pluck('id');
-        $partNumbers = SparePartsNumber::whereIn('addon_details_id', $addonDetailIds)->get();
+        $vendorMinPrice = $kitItem->least_price_vendor;
+        $addonDetailId = $vendorMinPrice->addon_details_id;
+        $partNumbers = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 
         return $partNumbers;
     }
     public function getLeastPriceVendorAttribute() {
+        $kitItem = KitCommonItem::find($this->id);
 
-       $addonDetailId = AddonDetails::where('description', $this->item_id)->where('addon_type_name','SP')->first();
+        $addonDetailIds = AddonDetails::where('description', $this->item_id)
+            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id');
+        $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
+        $kitAddonDetails = AddonTypes::whereIn('addon_details_id', $addonDetailIds)->whereIn('model_number', $kitModelNumbers)
+            ->pluck('addon_details_id');
 
-       $vendorMinPrice = SupplierAddons::where('addon_details_id', $addonDetailId->id)
+       $vendorMinPrice = SupplierAddons::whereIn('addon_details_id', $kitAddonDetails)
            ->where('status', 'active')
            ->orderBy('purchase_price_aed','ASC')->first();
 
-       return $vendorMinPrice->supplier_id;
+        return $vendorMinPrice;
     }
     public function getKitItemVendorsAttribute() {
 
-        $addonDetailId = AddonDetails::where('description', $this->item_id)->where('addon_type_name','SP')->first();
+        $kitItem = KitCommonItem::find($this->id);
 
-        $kitItemVendors = SupplierAddons::where('addon_details_id', $addonDetailId->id)
-            ->where('status', 'active')
-           ->get();
+        $addonDetailIds = AddonDetails::where('description', $this->item_id)
+            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id');
+        $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
+        $kitAddonDetails = AddonTypes::whereIn('addon_details_id', $addonDetailIds)->whereIn('model_number', $kitModelNumbers)
+                            ->pluck('addon_details_id');
+        $kitItemVendors = SupplierAddons::whereIn('addon_details_id', $kitAddonDetails)
+                            ->where('status', 'active')
+                            ->get();
 
         return $kitItemVendors;
+    }
+    public function getKitItemTotalPurchasePriceAttribute() {
+        $kitItem = KitCommonItem::find($this->id);
+
+        $leastPriceVendor = $kitItem->least_price_vendor;
+        $totalItemPrice = $kitItem->quantity * $leastPriceVendor->purchase_price_aed;
+       return $totalItemPrice;
     }
 }

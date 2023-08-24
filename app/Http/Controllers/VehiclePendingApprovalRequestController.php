@@ -83,6 +83,7 @@ class VehiclePendingApprovalRequestController extends Controller
      * Update the specified resource in storage.
      */
     public function ApproveOrRejectVehicleDetails(Request $request) {
+
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
 
@@ -151,7 +152,7 @@ class VehiclePendingApprovalRequestController extends Controller
 
             $existingSo = So::where('so_date', $oldValue)->first();
             if($existingSo) {
-                info("test".$pendingApprovalRequest->updated_by);
+
                 $existingSo->sales_person_id  = $pendingApprovalRequest->updated_by;
                 $existingSo->so_date = $newValue;
                 $existingSo->save();
@@ -217,9 +218,9 @@ class VehiclePendingApprovalRequestController extends Controller
                 $colorlog->save();
 
             }
+        }else{
+            $vehicle->$field = $newValue;
         }
-
-        $vehicle->$field = $newValue;
 
         $vehicle->save();
         $pendingApprovalRequest->status = $request->status;

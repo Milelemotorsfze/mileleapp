@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\SparePartsNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -462,16 +463,18 @@ class KitCommonItemController extends Controller
         // dd($supplierAddonDetails);
         return view('kit.kititems',compact('supplierAddonDetails'));
     }
-    public function kitItems2($id)
+    public function kitItems($id)
     {
         $supplierAddonDetails = [];
-        $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription',
+        $supplierAddonDetails = AddonDetails::where('id',$id)
+                                    ->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')
+                                    ->first();
         // 'KitItems.item.AddonName','KitItems.partNumbers','KitItems.item.AddonSuppliers.Suppliers',
         // old code start
         // 'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
-        )
+
         // old code end
-        ->first();
+
         // find model description Spare parts
         $modelDescriptionsId = [];
 
@@ -497,19 +500,19 @@ class KitCommonItemController extends Controller
         foreach($supplierAddonDetails->KitItems as $oneItem)
         {
             $itemMinPrice= '';
-            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
-            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
-                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
+//            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
+//            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
+//                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
 //            $oneItem->allItemSuppliers = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
 //                                    ->orderBy('purchase_price_aed','ASC')->with('Suppliers')->get();
-            $oneItem->totalItemPrice = $itemMinPrice * $oneItem->quantity;
-            $totalPrice = $totalPrice + $oneItem->totalItemPrice;
+//            $oneItem->totalItemPrice =  $itemMinPrice * $oneItem->quantity;
+            $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
         }
         $supplierAddonDetails->totalPrice = $totalPrice;
                 // old code start
                 $price = '';
-                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-                $supplierAddonDetails->LeastPurchasePrices = $price;
+//                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+//                $supplierAddonDetails->LeastPurchasePrices = $price;
                 //old code end
 
         // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
@@ -567,11 +570,11 @@ class KitCommonItemController extends Controller
                 $data = $data->get();
             }
         }
-        info($data);
+
         return response($data);
     }
     public function priceStore(Request $request)
-    {   
+    {
         if($request->current_purchase_price != '' && $request->previous_purchase_price != $request->current_purchase_price)
         {
             $existingPurchasePrice = KitPriceHistory::where([
@@ -593,6 +596,9 @@ class KitCommonItemController extends Controller
         }
         if($request->current_selling_price != '' && $request->previous_selling_price != $request->current_selling_price)
         {
+//            $sellingPrice = AddonSellingPrice::where([
+//                ['addon_details_id','=',]
+//            ])
             $sellingPrice = AddonSellingPrice::where([
                 ['addon_details_id','=',$request->addon_details_id],
                 ['selling_price','=',$request->current_selling_price],
@@ -608,5 +614,16 @@ class KitCommonItemController extends Controller
             }
         }
         return redirect()->back();
+    }
+
+    public function getPartNumbers(Request $request) {
+
+        $currentSupplierAddon = SupplierAddons::find($request->id);
+        $data['item_image'] = url('addon_image/' . $currentSupplierAddon->supplierAddonDetails->image) ;
+        $data['item_code'] = $currentSupplierAddon->supplierAddonDetails->addon_code;
+        $addonDetailId = $currentSupplierAddon->addon_details_id;
+        $data['part_number'] = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
+
+        return response($data);
     }
 }

@@ -741,7 +741,7 @@
                                             Approved
                                         @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
                                             Rejected
-                                        @else 
+                                        @else
                                         <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
                                         data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
                                         Approve
@@ -780,7 +780,7 @@
                                             Approved
                                         @elseif($pendingVehicleDetailApprovalRequest->status == 'rejected')
                                             Rejected
-                                        @else 
+                                        @else
                                         <button type="button" class="btn btn-success btn-sm "  data-bs-toggle="modal"
                                         data-bs-target="#approve-vehicle-detail-{{$pendingVehicleDetailApprovalRequest->id}}">
                                         Approve
@@ -1035,7 +1035,6 @@
             $('.approve-button').click(function (e) {
                 var id = $(this).attr('data-id');
                 var status = $(this).attr('data-status');
-
                 updateValue(id, status)
             })
             function updateValue(id, status) {

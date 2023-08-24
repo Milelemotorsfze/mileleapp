@@ -92,8 +92,7 @@
         $(document.body).on('click', ".removeKitItem", function (e) {
             var indexNumber = $(this).attr('data-index');
             var supplier = $(this).attr('data-supplier');
-// alert(indexNumber);
-// alert(supplier);
+
             $(this).closest('#row-supplier-'+supplier+'-item-'+indexNumber).find("option:selected").each(function() {
                 var id = (this.value);
                 var text = (this.text);
@@ -210,10 +209,10 @@
                                                                 <div class="col-xxl-4 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                                                     <div class="input-group">
-                                                                    <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_aed]" id="Supplier${index}TotalPriceAED" 
+                                                                    <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_aed]" id="Supplier${index}TotalPriceAED"
                                                                     oninput="inputNumberAbs(this)"
                                                                     class="leastPurchasePriceAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
-                                                                    placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"  
+                                                                    placeholder="Enter Addons Purchase Price In AED , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"
                                                                     autocomplete="addon_purchase_price"
                                                                     autofocus onkeyup="calculateUSD(1)">
                                                                       <div class="input-group-append">
@@ -225,7 +224,7 @@
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
                                                                     <div class="input-group">
                                                                     <input readonly name="kitSupplierAndPrice[${index}][supplier_addon_purchase_price_in_usd]" id="Supplier${index}TotalPriceUSD"
-                                                                    oninput="inputNumberAbs(this)" class="form-control purchase-price-USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror" 
+                                                                    oninput="inputNumberAbs(this)" class="form-control purchase-price-USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
                                                                     placeholder="Enter Addons Purchase Price In USD , 1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
                                                                       autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(1)">
                                                                     <div class="input-group-append">
@@ -274,7 +273,7 @@
                                                                     <label for="choices-single-default" class="form-label font-size-13 ">Quantity</label>
                                                                     <input  name="kitSupplierAndPrice[${index}][item][1][quantity]" id="Supplier${index}Kit1Quantity" type="number" value="1" min="1"
                                                                      class="form-control widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror quantity" placeholder="Enter Quantity"
-                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)" 
+                                                                     autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateOtherValuesbyQuantity(${index},1)"
                                                                      onchange="calculateOtherValuesbyQuantity(${index},1)" oninput="validity.valid||(value='1');">
                                                                 </div>
                                                                 <div class="col-xxl-2 col-lg-3 col-md-3" id="div_price_in_aed_1" style="background-color: 	#F0F0F0;">
@@ -566,7 +565,7 @@
         {
             $("#Supplier"+supplier+"TotalPriceAED").val(sum);
             setLeastPurchasePriceAED();
-        } 
+        }
     }
     function  calculateTotalPriceInUSD(supplier)
     {
