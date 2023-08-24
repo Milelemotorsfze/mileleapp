@@ -1761,6 +1761,9 @@ function displayAppliedFilters() {
   var dataTable = $('#dtBasicExample1').DataTable({
     "order": [[4, "desc"]],
     pageLength: 100,
+    columnDefs: [
+  { type: 'date', targets: [2] }
+],
     initComplete: function() {
       this.api().columns().every(function(d) {
         var column = this;
