@@ -645,7 +645,7 @@ Clear Filters
                                 @endphp
                                 @if ($hasPermission)
                                 <th id="inspection_date" class="nowrap-td">GRN Inspection Date</th>
-                                <th id="grn_remark" class="nowrap-td">Inspection Remarks</th>
+                                <th id="grn_remark" class="nowrap-td">GRN Remarks</th>
                                 <th id="qc_remarks" class="nowrap-td">QC Remarks</th>
                                 @endif
                                 @php

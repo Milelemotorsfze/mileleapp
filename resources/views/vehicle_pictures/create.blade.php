@@ -50,35 +50,18 @@
                                     </select>
                                 </div>
                             </div>
-                        <div class="col-lg-1 col-md-6 col-sm-12">
+                        <div class="col-lg-2 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Pictures Category</label>
-                                    <select name="category[]" id="category" class="form-control mb-1" Required>
+                                    <select id="category" class="form-control mb-1">
                                 <option value="GRN">GRN</option>
                                 <option value="Modification">Modification</option>
                                 <option value="PDI">PDI</option>
                                 </select>
                                 </div>
                             </div>
-                            <div class="col-lg-1 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Brand</label>
-                                    <input type="text" class="form-control widthinput" id="brand" readonly placeholder="Brand">
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Model Line</label>
-                                    <input type="text" class="form-control widthinput" id="model_line" readonly placeholder="Model Line">
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-6 col-sm-12">
-                                <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Variant</label>
-                                    <input type="text" class="form-control widthinput" id="variant" readonly placeholder="Vehicle Details">
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-6 col-sm-12">
+
+                            <div class="col-lg-4 col-md-6 col-sm-12">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Vehicle Picture Link</label>
                                     <input type="url"  name="vehicle_picture_link[]" class="form-control widthinput " required placeholder="Vehicle Picture Link">
@@ -112,13 +95,126 @@
 <script>
     $(document).ready(function() {
         $('#category').select2();
-        $('#vin-input').select2();
+        $('#vehicles-1').select2();
     });
 </script>
-<script>
-    $(document).ready(function() {
-        $('#vin-input').change(function() {
-            var selectedVin = $(this).val();
+    <script>
+        var index = 1;
+        $('#indexValue').val(index);
+        $('#vehicles-1').select2({
+            placeholder: 'Choose Vehicles',
+            maximumSelectionLength:1,
+            allowClear: true
+
+        })
+
+        $("#form-create").validate({
+            rules: {
+                'vins[]': {
+                    required: true,
+                },
+                'vehicle_picture_link[]':{
+                    url:true,
+                    required: true
+                },
+
+            }
+        });
+        // $('#vehicles-1').on('change',function(){
+            function showVariantDetail(index) {
+                $('#vehicles-'+ index +'-error').remove();
+                var vehicle_id = $('#vehicles-'+index).val();
+                let url = '{{ route('vehicle-pictures.variant-details') }}'
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        id: vehicle_id,
+                    },
+                    success:function (response) {
+                        $('#variant-detail-'+index).val(response);
+                    }
+                });
+            }
+
+        // })
+        $(document.body).on('select2:select', ".vehicles", function (e) {
+            var index = $(this).attr('data-index');
+            var value = e.params.data.id;
+            hideOption(index,value);
+            showVariantDetail(index);
+        });
+        $(document.body).on('select2:unselect', ".vehicles", function (e) {
+            var index = $(this).attr('data-index');
+            var data = e.params.data;
+            appendOption(index,data);
+        });
+        function addOption(id,text) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+                $('#vehicles-'+i).append($('<option>', {value: id, text :text}))
+            }
+        }
+
+        function hideOption(index,value) {
+            var indexValue = $('#indexValue').val();
+            for (var i = 1; i <= indexValue; i++) {
+                if (i != index) {
+                    var currentId = 'vehicles-' + i;
+                    $('#' + currentId + ' option[value=' + value + ']').detach();
+                }
+            }
+        }
+        function appendOption(index,data) {
+            var indexValue = $('#indexValue').val();
+            for(var i=1;i<=indexValue;i++) {
+                if(i != index) {
+                    $('#vehicles-'+i).append($('<option>', {value: data.id, text : data.text}))
+                }
+            }
+        }
+        $(document.body).on('click', ".removeButton", function (e) {
+            var indexNumber = $(this).attr('data-index');
+
+            $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {
+                var id = (this.value);
+                var text = (this.text);
+                addOption(id,text)
+            });
+
+            $(this).closest('#row-'+indexNumber).remove();
+            $('.form_field_outer_row').each(function(i){
+                var index = +i + +1;
+                $(this).attr('id','row-'+ index);
+                $(this).find('select').attr('data-index', index);
+                $(this).find('select').attr('id','vehicles-'+ index);
+                $(this).find('.variant-detail').attr('id','variant-detail-'+index);
+                $(this).find('.select').attr('data-select2-id','select2-data-vehicles-'+index);
+
+                $(this).find('button').attr('data-index', index);
+                $(this).find('button').attr('id','remove-'+ index);
+                $('#vehicles-'+index).select2
+                ({
+                    placeholder: 'Choose Vehicles',
+                    maximumSelectionLength:1,
+                    allowClear: true
+                });
+            });
+        })
+        function clickAdd()
+        {
+            var index = $(".form_field_outer").find(".form_field_outer_row").length + 1;
+
+            $('#indexValue').val(index);
+            var selectedVehicles = [];
+            for(let i=1; i<index; i++)
+            {
+                var eachSelectedVehicle = $("#vehicles-"+i).val();
+                if(eachSelectedVehicle) {
+                    selectedVehicles.push(eachSelectedVehicle);
+                }
+            }
+
             $.ajax({
                 url: '{{ route('vehicles.vehiclesdetails') }}',
                 method: 'POST',
