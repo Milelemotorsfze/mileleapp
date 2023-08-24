@@ -11,13 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('kit_common_items', function (Blueprint $table) {
-            $table->dropForeign(['item_id']);
-        });
-        
-        Schema::table('kit_common_items', function (Blueprint $table) {
-            $table->foreign('item_id')->references('id')->on('addon_descriptions')->onDelete('cascade');  
-        });
+        Schema::dropIfExists('kit_common_items');
     }
 
     /**
@@ -25,12 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('kit_common_items', function (Blueprint $table) {
-            $table->dropForeign(['item_id']);
-        });
-        
-        Schema::table('kit_common_items', function (Blueprint $table) {
-            $table->foreign('item_id')->references('id')->on('addon_details')->onDelete('cascade');  
-        });
+
     }
 };
