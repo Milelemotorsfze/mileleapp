@@ -481,6 +481,9 @@ $(document).ready(function () {
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
+  columnDefs: [
+    { type: 'date', targets: [1] }
+  ],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
