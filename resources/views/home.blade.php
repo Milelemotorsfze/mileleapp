@@ -11,6 +11,18 @@
       color: #fff;
       text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
     }
+    /* Style for the "Read More" link as a button */
+.read-more-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-top: 10px;
+    float: right; /* This will move the link to the right side */
+}
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
@@ -109,7 +121,7 @@
                     </div>
 @endif -->
               <div class="row">
-              <div class="col-xl-4">
+              <div class="col-xl-5">
                 
               <div class="card card-h-100">
                                 <!-- card body -->
@@ -132,7 +144,54 @@
                                             </div>
                                             </div>
                                             </div>
-                            <div class="col-xl-5">
+<div class="col-xl-7">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
+                                    <div class="flex-shrink-0">
+                                    <div style="position: relative; width: 100%; height: 5vh;">
+    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+        <i class="fa fa-calendar"></i>&nbsp;
+        <span></span> <i class="fa fa-caret-down"></i>
+    </div>
+</div>
+<form id="date-range-form" method="POST">
+    @csrf
+    <input type="hidden" name="start_date" id="start_date">
+    <input type="hidden" name="end_date" id="end_date">
+</form> 
+                                    </div>
+                                </div><!-- end card header -->
+                                <div class="card-body px-0">
+                                            <div class="table-responsive px-3">
+                                                <table id="specificTable" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <th>
+                                                    Date
+                                                    </th>
+                                                    <th>
+                                                    Sales Person
+                                                    </th>
+                                                    <th>
+                                                    Leads
+                                                    </th>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                                <div id="readMoreLinkContainer">
+    <!-- "Read More" link will be added here -->
+</div>
+                                            </div>
+                                        </div>
+                                  
+                                    </div>
+                                    <!-- end tab content -->
+                                </div>
+                                <!-- end card body -->
+                            </div>
+<div class="row">
+                            <div class="col-xl-12">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Most Inquiry Model Line</h4>
@@ -337,53 +396,6 @@
                             <!-- end card -->
                         </div>
                         <!-- end col -->
-<div class="col-xl-3">
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
-                                    <div class="flex-shrink-0">
-                                    <div style="position: relative; width: 100%; height: 5vh;">
-    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 180px; text-align: right;">
-        <i class="fa fa-calendar"></i>&nbsp;
-        <span></span> <i class="fa fa-caret-down"></i>
-    </div>
-</div>
-<form id="date-range-form" method="POST">
-    @csrf
-    <input type="hidden" name="start_date" id="start_date">
-    <input type="hidden" name="end_date" id="end_date">
-</form> 
-                                    </div>
-                                </div><!-- end card header -->
-                                <div class="card-body px-0">
-                                            <div class="table-responsive px-3">
-                                                <table id="specificTable" class="table table-striped table-bordered">
-                                                <thead>
-                                                    <th>
-                                                    Date
-                                                    </th>
-                                                    <th>
-                                                    Sales Person
-                                                    </th>
-                                                    <th>
-                                                    Leads
-                                                    </th>
-                                                    </thead>
-                                                    <tbody>
-                                                    </tbody>
-                                                </table>
-                                                <div id="readMoreLinkContainer">
-    <!-- "Read More" link will be added here -->
-</div>
-                                            </div>
-                                        </div>
-                                  
-                                    </div>
-                                    <!-- end tab content -->
-                                </div>
-                                <!-- end card body -->
-                            </div>
-                            <!-- end card -->
 <!-- @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
                     @endphp

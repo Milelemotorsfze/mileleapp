@@ -5,7 +5,6 @@
         {
             position: absolute; left: 50px; z-index: 500; top: 10px;
         }
-
     }
     @media only screen and (max-device-width: 1280px)
     {

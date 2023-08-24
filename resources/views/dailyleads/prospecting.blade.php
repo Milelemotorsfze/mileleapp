@@ -24,9 +24,6 @@ textarea {
                     @if ($hasPermission)
 <div class="card-header">
     <h4 class="card-title">Prospecting</h4>
-    <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('lead_source.index') }}" text-align: right>
-        <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
-    </a>
 </div>
 <div class="card-body">
     @if (session('success'))

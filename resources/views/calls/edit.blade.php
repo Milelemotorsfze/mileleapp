@@ -271,7 +271,6 @@ $brand_name = $brand->brand_name;
   var wrapper = $("#row-container");
   var add_button = $(".add-row-btn");
   var x = 1;
-
   // Function to filter and update the dropdown list
   function updateDropdownList() {
     var selectedValues = $('input[name="model_line_id[]"]').map(function() {
@@ -508,28 +507,42 @@ $brand_name = $brand->brand_name;
     var input = document.querySelector("#phone");
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
+        autoFormat: false,
         separateDialCode: false,
         nationalMode: false
     });
+// Manually format the initial value
+var initialValue = input.value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    input.value = "+" + initialValue; // Add '+' at the beginning
+    var originalValue = input.value; // Store the original value on page load
+
     input.addEventListener('input', function() {
-        var currentValue = input.value;
-        var newValue = currentValue.replace(/[^0-9]/g, '');
+        // Remove all non-numeric characters
+        var newValue = input.value.replace(/[^0-9]/g, '');
+
+        // Add '+' at the beginning if not present
         if (newValue.charAt(0) !== '+') {
             newValue = '+' + newValue;
         }
         if (newValue.length > 15) {
-            newValue = newValue.slice(0, 15); // Truncate to 15 digits
+            newValue = newValue.slice(0, 15);
         }
         input.value = newValue;
     });
+
     iti.events.on("countrychange", function() {
         var countryCode = iti.getSelectedCountryData().dialCode;
+
+        // Update the country code without adding spaces, only if user has interacted
         if (input.value && input.value.charAt(0) === '+') {
             input.value = "+" + countryCode + input.value.substr(4);
         } else {
             input.value = "+" + countryCode;
         }
     });
+
+    // Set the original value back after initializing intlTelInput
+    input.value = originalValue;
 });
    $(document).ready(function() {
    $('.remove-row-btn').click(function(e) {

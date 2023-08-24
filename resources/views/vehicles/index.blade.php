@@ -162,30 +162,6 @@
                 @endif
                 <div id="flash-message" class="alert alert-success" style="display: none;"></div>
                 <div class="row">
-                <!-- @php
-                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
-                @endphp
-                @if ($hasPermission)
-                <div class="col-lg-3 col-md-3 col-sm-12 table-responsive">
-                    <table class="table table-striped table-editable table-edits table table-bordered">
-                        <thead>
-                            <th style="font-size: 12px;">Vehicle Detail Approval</th>
-                            <th style="font-size: 12px;">Vehicle QTY</th>
-                        </thead>
-                        <tbody>
-                            <tr  onclick="window.location.href = '{{ route('vehicle-detail-approvals.index') }}'">
-                                <td style="font-size: 12px;">
-                                    <a href="{{ route('vehicle-detail-approvals.index') }}">
-                                        Pending Vehicle Details
-                                    </a>
-                                </td>
-                                <td style="font-size: 12px;">{{ $pendingVehicleDetailForApprovalCount }}</td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                @endif -->
                 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-so','edit-reservation']);
                 @endphp
@@ -593,7 +569,6 @@ $countpendingsinspectionso = DB::table('vehicles')
 <a href="{{ route('Vehicles.index') }}" class="btn btn-danger" role="button">
 Clear Filters
                                   </a>
-      <!-- <input type="text" id="tableSearch" placeholder="Search Table"> -->
     </div>
 
                 @if (count($errors) > 0)

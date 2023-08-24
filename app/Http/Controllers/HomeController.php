@@ -95,7 +95,8 @@ class HomeController extends Controller
     // Fetch the data from the database
 $last30Days = Carbon::now()->subDays(30);
 $last7Days = Carbon::now()->subDays(7);
-$todayl = Carbon::now()->subDays(1);
+$todayl = Carbon::now();
+$todayl = $todayl->startOfDay();
 $variantsdays = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
               ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
@@ -185,7 +186,8 @@ $totalvariantss = [
         $calls = DB::table('calls')
         ->select('calls.source', 'calls.location', 'lead_source.source_name')
         ->join('lead_source', 'calls.source', '=', 'lead_source.id')
-        ->whereBetween('calls.created_at', [$startdate, $enddate])
+        ->whereDate('calls.created_at', '>=', $startdate)
+        ->whereDate('calls.created_at', '<=', $enddate)
         ->get();
         $chartData = [
             'datasets' => []
@@ -216,12 +218,13 @@ $totalvariantss = [
         $data = DB::table('calls')
             ->join('users', 'calls.sales_person', '=', 'users.id')
             ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
-            ->whereBetween('calls.created_at', [$startDate, $endDate])
+            ->whereDate('calls.created_at', '>=', $startDate)
+            ->whereDate('calls.created_at', '<=', $endDate)
             ->groupBy('call_date', 'sales_person_name')
             ->orderByDesc('call_count') // Order by call_count in descending order
             ->limit(7)
             ->get();
-    
+            info($data);
         // Create an associative array that includes the query result, startDate, and endDate
         $response = [
             'start_date' => $startDate,
@@ -238,7 +241,8 @@ $totalvariantss = [
         $data = DB::table('calls')
         ->join('users', 'calls.sales_person', '=', 'users.id')
         ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
-        ->whereBetween('calls.created_at', [$startDate, $endDate])
+        ->whereDate('calls.created_at', '>=', $startDate)
+        ->whereDate('calls.created_at', '<=', $endDate)
         ->groupBy('call_date', 'sales_person_name')
         ->orderByDesc('call_count') // Order by call_count in descending order
         ->get();

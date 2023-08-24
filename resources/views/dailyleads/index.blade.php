@@ -1,5 +1,6 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 @section('content')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
@@ -122,11 +123,6 @@ input[type=number]::-webkit-outer-spin-button
     <h4 class="card-title">
       Leads Info
     </h4>
-    <!-- @can('user-view')
-    <a class="btn btn-sm btn-success float-end" href="{{ route('users.create') }}" text-align: right>
-        <i class="fa fa-plus" aria-hidden="true"></i> Add New Demand
-      </a>
-      @endcan -->
       @can('sales-view')
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
@@ -156,7 +152,7 @@ input[type=number]::-webkit-outer-spin-button
       </li>
       @can('user-view')
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Review Quotation</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Negotiation</a>
       </li>
       @endcan
       <li class="nav-item">
@@ -170,10 +166,16 @@ input[type=number]::-webkit-outer-spin-button
   <div class="tab-content">
     @can('sales-view')
       <div class="tab-pane fade show active" id="tab1">
+      <br>
+      <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div>
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
-            <thead>
+            <thead class="bg-soft-secondary">
                 <tr>
                   <th>Date</th>
                   <th>Purchase Type</th>
@@ -183,8 +185,8 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Preferred Language</th>
+                  <th>Location</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Status</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -194,8 +196,26 @@ input[type=number]::-webkit-outer-spin-button
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
+                    <td>
+                    <div class="dropdown">
+                    <a href="#" role="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ $calls->phone }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" style=" min-width: 0; padding: 0;">
+                        <li>
+                            <a class="dropdown-item" href="#" onclick="openWhatsApp('{{ $calls->phone }}')">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="tel:{{ $calls->phone }}">
+                                <i class="fas fa-phone"></i>
+                            </a>
+                        </li>
+                        </ul>
+                    </div>
+                    </td>
+                    <td><a href="mailto:{{ $calls->email }}">{{ $calls->email }}</a></td>
                     @php
     $leads_models_brands = DB::table('calls_requirement')
         ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
@@ -218,12 +238,12 @@ input[type=number]::-webkit-outer-spin-button
 </td>
                     <td>{{ $calls->custom_brand_model }}</td>
                     <td>{{ $calls->language }}</td>
+                    <td>{{ $calls->location }}</td>
                     @php
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>{{ $calls->status }}</td>       
+    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>        
                     <td>
                     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -232,7 +252,7 @@ input[type=number]::-webkit-outer-spin-button
     <ul class="dropdown-menu dropdown-menu-end">
     @can('sales-view')
       <li><a class="dropdown-item" href="{{ route('dailyleads.prospecting',$calls->id) }}">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#">Qualificaton</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Qualificaton</a></li>
       <li><a class="dropdown-item" href="#">Demand</a></li>
       <li><a class="dropdown-item" href="#">Closed</a></li>
       @endcan
@@ -254,6 +274,58 @@ input[type=number]::-webkit-outer-spin-button
           </div>  
         </div>  
       </div>  
+      <div class="modal fade" id="qualified" tabindex="-1" aria-labelledby="qualifiedLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qualifiedLabel">Qualified Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+              <input type="date" class="form-control" id="date" value="">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="deal-value-input" class="form-label">Deal Value:</label>
+            </div>
+            <div class="col-md-8">
+              <div class="input-group">
+                <span class="input-group-text">AED</span>
+                <input type="number" class="form-control" id="deal-value-input" aria-label="Deal Value">
+                <span class="input-group-text">.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+              <textarea class="form-control" id="sales-notes"></textarea>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Upload Document:</label>
+            </div>
+            <div class="col-md-8">
+              <input type="file" class="form-control" id="document-upload">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="saveQuotations()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
       <div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -793,6 +865,10 @@ input[type=number]::-webkit-outer-spin-button
   $('#quotationModal').data('call-id', callId);
   $('#quotationModal').modal('show');
 }
+function openModalqualified(callId) {
+  $('#qualified').data('call-id', callId);
+  $('#qualified').modal('show');
+}
 // function openModalr(callId) {
 //   $('#rejectionModal').data('call-id', callId);
 //   $('#rejectionModal').modal('show');
@@ -932,6 +1008,109 @@ function openModalclosed(callId) {
     };
     xhr.send(formData);
   }
+</script>
+<script>
+  function openWhatsApp(phoneNumber) {
+    // Replace any non-digit characters to create a clean phone number
+    var cleanPhoneNumber = phoneNumber.replace(/\D/g, '');
+
+    // Form the WhatsApp URL
+    var whatsappURL = 'https://api.whatsapp.com/send?phone=' + cleanPhoneNumber;
+
+    // Open the WhatsApp chat window
+    window.open(whatsappURL, '_blank');
+}
+</script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $('.select2').select2();
+  var dataTable = $('#dtBasicExample1').DataTable({
+  pageLength: 10,
+  initComplete: function() {
+    this.api().columns().every(function(d) {
+      var column = this;
+      var columnId = column.index();
+      var columnName = $(column.header()).attr('id');
+      if (d === 9 || d === 10) {
+        return;
+      }
+
+      var selectWrapper = $('<div class="select-wrapper"></div>');
+      var select = $('<select class="form-control my-1" multiple><option value="">All</option></select>')
+        .appendTo(selectWrapper)
+        .select2({
+          width: '100%',
+          dropdownCssClass: 'select2-blue'
+        });
+      select.on('change', function() {
+        var selectedValues = $(this).val();
+        column.search(selectedValues ? selectedValues.join('|') : '', true, false).draw();
+      });
+
+      selectWrapper.appendTo($(column.header()));
+      $(column.header()).addClass('nowrap-td');
+      
+      column.data().unique().sort().each(function(d, j) {
+        if (columnId === 3) {  // Assuming the phone column is at index 2
+          var phoneNumber = $(d).text().trim();  // Extract phone number
+        select.append('<option value="' + phoneNumber + '">' + phoneNumber + '</option>');
+    }
+    else if (columnId === 4) {  // Assuming the phone column is at index 2
+          var Email = $(d).text().trim();  // Extract phone number
+        select.append('<option value="' + Email + '">' + Email + '</option>');
+    } 
+    else {
+        select.append('<option value="' + d + '">' + d + '</option>');
+    }
+      });
+    });
+  }
+});
+$('#my-table_filter').hide();
+$('#export-excel').on('click', function() {
+    var filteredData = dataTable.rows({ search: 'applied' }).data();
+    var data = [];
+    filteredData.each(function(rowData) {
+        var row = [];
+        for (var i = 0; i < rowData.length; i++) {
+            if (i !== 10 && i !== 11) {
+              if (i === 3) {  // Assuming the phone column is at index 2
+                var phoneNumber = $(rowData[i]).text().trim();  // Extract phone number
+                row.push(phoneNumber);
+            }
+            else if (i === 4) {  // Assuming the phone column is at index 2
+              var Email = $(rowData[i]).text().trim();  // Extract phone number
+                row.push(Email);
+            } else {
+                row.push(rowData[i]);
+            }
+            }
+        }
+        data.push(row);
+    });
+    var excelData = [
+        ['Date', 'Purchase Type', 'Customer Name', 'Customer Phone', 'Customer Email', 'Brands & Models', 'Custom Model & Brand','Preferred Language', 'Destination', 'Remarks & Messages']
+    ];
+    excelData = excelData.concat(data);
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.aoa_to_sheet(excelData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    var blob = new Blob([s2ab(XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Leads.xlsx';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+function s2ab(s) {
+    var buf = new ArrayBuffer(s.length);
+    var view = new Uint8Array(buf);
+    for (var i = 0; i !== s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+    return view;
+}
+});
 </script>
 @else
     @php

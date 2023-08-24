@@ -69,6 +69,7 @@ class CallsController extends Controller
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
         ]);      
         if ($request->input('sales-option') == "auto-assign") {
+        $excluded_user_ids = [1, 2, 46, 47, 26, 31];
         $email = $request->input('email');
         $phone = $request->input('phone');
         $language = $request->input('language');
@@ -96,6 +97,7 @@ class CallsController extends Controller
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                     ->where('role_id', 7)
                     ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                     ->where('calls.status', 'New')
                     ->groupBy('calls.sales_person')
                     ->orderByRaw('COUNT(calls.id) ASC')
@@ -104,22 +106,28 @@ class CallsController extends Controller
                 }
             } 
             else {
-                $existing_language_count = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
+                $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
                 ->where('language', $language)
-                ->count();      
+                ->get();
+                $existing_language_count = $sales_person_languages->count();     
                 if ($existing_language_count === 1) {
-                    $sales_person_id = $sales_person->model_id;
+                    $sales_person = $sales_person_languages->first();
+                    $sales_person_id = $sales_person->sales_person;
                     break;
                 }
                 elseif ($existing_language_count > 1) {
-                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
-                    ->where('role_id', 7)
-                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
-                    ->where('calls.status', 'New')
-                    ->whereIn('model_has_roles.model_id', $sales_persons->pluck('model_id'))
-                    ->groupBy('calls.sales_person')
-                    ->orderByRaw('COUNT(calls.id) ASC')
-                    ->first();
+                    $sales_person_ids = $sales_person_languages->pluck('sales_person');
+                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        ->where('role_id', 7)
+                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                                        ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
+                                        ->where('calls.status', 'New')
+                                        ->whereIn('model_has_roles.model_id', $sales_person_ids)
+                                        ->where('sales_person_laugauges.language', $language)
+                                        ->groupBy('calls.sales_person')
+                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->first();
                     $sales_person_id = $lowest_lead_sales_person->model_id;
                     break;
                     }
@@ -128,6 +136,7 @@ class CallsController extends Controller
                     ->where('role_id', 7)
                     ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                     ->where('calls.status', 'New')
+                    ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                     ->groupBy('calls.sales_person')
                     ->orderByRaw('COUNT(calls.id) ASC')
                     ->first();
@@ -354,6 +363,7 @@ return view('calls.resultbrand', compact('data'));
             $remarks = $row[10];
             $errorDescription = '';
             if ($sales_person === null) {
+                $excluded_user_ids = [1, 2, 46, 47, 26, 31];
 			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;
                             $existing_email_count = null;
@@ -378,6 +388,7 @@ return view('calls.resultbrand', compact('data'));
                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                                         ->where('calls.status', 'New')
                                         ->groupBy('calls.sales_person')
                                         ->orderByRaw('COUNT(calls.id) ASC')
@@ -386,19 +397,26 @@ return view('calls.resultbrand', compact('data'));
                                     }
                                 } 
                                 else {
-                                    $existing_language_count = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
+                                    $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
                                     ->where('language', $language)
-                                    ->count();      
+                                    ->get();
+                                    $existing_language_count = $sales_person_languages->count();
                                     if ($existing_language_count === 1) {
-                                        $sales_person_id = $sales_person->model_id;
+                                        $sales_person = $sales_person_languages->first();
+                                        $sales_person_id = $sales_person->sales_person;
                                         break;
                                     }
                                     elseif ($existing_language_count > 1) {
-                                        $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        $sales_person_ids = $sales_person_languages->pluck('sales_person');
+                                        info($sales_person_ids);
+                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                                        ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                                         ->where('calls.status', 'New')
-                                        ->whereIn('model_has_roles.model_id', $sales_persons->pluck('model_id'))
+                                        ->whereIn('model_has_roles.model_id', $sales_person_ids)
+                                        ->where('sales_person_laugauges.language', $language)
                                         ->groupBy('calls.sales_person')
                                         ->orderByRaw('COUNT(calls.id) ASC')
                                         ->first();
@@ -409,6 +427,7 @@ return view('calls.resultbrand', compact('data'));
                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                                         ->where('calls.status', 'New')
                                         ->groupBy('calls.sales_person')
                                         ->orderByRaw('COUNT(calls.id) ASC')
@@ -536,10 +555,10 @@ return view('calls.resultbrand', compact('data'));
                 $sheet->setCellValue('A' . ($sheet->getHighestRow() + 1), $row[0]); 
                 $sheet->setCellValue('B' . ($sheet->getHighestRow()), $row[1]);
                 $sheet->setCellValue('C' . ($sheet->getHighestRow()), $row[2]);
-                $sheet->setCellValue('D' . ($sheet->getHighestRow()), $row[3]);
-                $sheet->setCellValue('E' . ($sheet->getHighestRow()), $row[4]);
-                $sheet->setCellValue('F' . ($sheet->getHighestRow()), $row[5]);
-                $sheet->setCellValue('G' . ($sheet->getHighestRow()), $row[6]);
+                $sheet->setCellValue('D' . ($sheet->getHighestRow()), $row[4]);
+                $sheet->setCellValue('E' . ($sheet->getHighestRow()), $row[5]);
+                $sheet->setCellValue('F' . ($sheet->getHighestRow()), $row[6]);
+                $sheet->setCellValue('G' . ($sheet->getHighestRow()), $row[3]);
                 $sheet->setCellValue('H' . ($sheet->getHighestRow()), $row[7]);
                 $sheet->setCellValue('I' . ($sheet->getHighestRow()), $row[8]);
                 $sheet->setCellValue('J' . ($sheet->getHighestRow()), $row[9]);
@@ -560,12 +579,12 @@ return view('calls.resultbrand', compact('data'));
             $downloadLink = route('download.rejected', ['filename' => $filename]);
         
             return redirect()->route('calls.createbulk')->with('success', [
-                'message' => "Data uploaded successfully! From the total " . (count($rows) - 1) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.",
+                'message' => "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.",
                 'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
             ]);                    
         }
         return redirect()->route('calls.index')
-            ->with('success', "Data uploaded successfully! From the total " . (count($rows) - 1) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
+            ->with('success', "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
     } else {
         return back()->with('error', 'Please Select The Correct File for Uploading');
     }

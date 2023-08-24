@@ -472,6 +472,7 @@ input[type=number]::-webkit-outer-spin-button {
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
         separateDialCode: false,
+        autoFormat: false,
         nationalMode: false
     });
     input.addEventListener('input', function() {
