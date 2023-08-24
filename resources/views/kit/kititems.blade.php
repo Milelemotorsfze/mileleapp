@@ -314,7 +314,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         Previous Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput" placeholder="" value="" id="previous_purchase_price" name="previous_purchase_price" readonly>
+        <input type="text" class="form-control widthinput" placeholder="" value="{{ $previousPurchasePrice }}" id="previous_purchase_price" name="previous_purchase_price" readonly>
         </div>
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
@@ -334,11 +334,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
         </div>
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
-        Previous Selling Price (AED)
+        Current Selling Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-1 col-md-2" style="margin-top:10px;">
         <input type="text" class="form-control widthinput" name="previous_selling_price" id="previous_selling_price"
-                            placeholder="" value="" readonly>
+                            placeholder="" value="{{ $previousSellingPrice }}" readonly>
         </div>
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         New Selling Price (AED)
@@ -723,9 +723,15 @@ $(document).ready(function ()
             currentPurchasePrice = $("#current_purchase_price").val();
             previousSellingPrice = $("#previous_selling_price").val();
             currentSellingPrice = $("#current_selling_price").val();
-            if(previousPurchaseprice == currentPurchasePrice || previousSellingPrice == currentSellingPrice)
+            if(previousPurchaseprice == currentPurchasePrice )
             {
                 e.preventDefault();
+            }
+            if(currentSellingPrice != '') {
+                if(currentSellingPrice == previousSellingPrice )
+                {
+                    e.preventDefault();
+                }
             }
         });
       </script>
