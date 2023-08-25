@@ -41,7 +41,7 @@ class AddonController extends Controller
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-        $addon1 = $addon1->orderBy('id', 'DESC')->get();
+        $addon1 = $addon1->orderBy('id', 'ASC')->get();
         foreach($addon1 as $addon)
         {
             $price = '';
