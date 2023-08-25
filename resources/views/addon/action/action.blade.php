@@ -1,3 +1,5 @@
+
+
 @if($addonsdata->addon_type_name == 'K')
     <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$addonsdata->id) }}">
             <i class="fa fa-eye" aria-hidden="true"></i>
@@ -53,14 +55,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-active-inact
 @endphp
 @if ($hasPermission)
     @if( $addonsdata->status == 'active')
-        <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button" data-id="{{ $addonsdata->id }}" 
+        <button title="Make Inactive" data-placement="top" class="btn btn-sm btn-secondary status-inactive-button" data-id="{{ $addonsdata->id }}"
                 data-status="inactive" >
             <i class="fa fa-ban" aria-hidden="true"></i>
-        </button>                                                      
+        </button>
     @else
         <a data-id="{{ $addonsdata->id }}" data-status="active" title="Make Active" data-placement="top" class="btn btn-sm btn-secondary status-active-button" >
             <i class="fa fa-check" aria-hidden="true"></i>
-        </a>                                                 
+        </a>
     @endif
 @endif
 @endcan

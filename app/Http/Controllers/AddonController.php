@@ -35,8 +35,7 @@ class AddonController extends Controller
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
-        $addon1 = AddonDetails::with('AddonName','AddonTypes.brands','AddonTypes.modelLines','AddonTypes.modelDescription','SellingPrice',
-        'PendingSellingPrice');
+        $addon1 = AddonDetails::orderBy('id', 'DESC');
 
         if($data != 'all')
         {
