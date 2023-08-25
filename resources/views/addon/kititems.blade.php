@@ -308,8 +308,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @endif
                         </span>
                     </div>
-                    
-                    @endif
                     <div class="col-lg-6 col-md-6 col-sm-12">
                         <label for="choices-single-default" class="form-label"> Part Numbers :</label>
                     </div>
@@ -320,6 +318,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @endforeach
                         </span>
                     </div>
+                    @endif
+                    
 
                 </div>
             </div>
