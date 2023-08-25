@@ -131,7 +131,6 @@ Route::get('/d', function () {
     Route::get('getCommonKitItems', [KitCommonItemController::class, 'getCommonKitItems'])->name('getCommonKitItems');
     Route::post('kit/priceStore', [KitCommonItemController::class, 'priceStore'])->name('kit.priceStore');
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
-    Route::post('addon/spare-part/price-update', [AddonController::class, 'addNewPurchasePrice'])->name('spare-part-price-update');
 
 
     // Warranty

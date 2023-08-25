@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\User;
 use App\Models\VendorCategory;
 use App\Models\VendorDocument;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -146,6 +147,9 @@ class SupplierController extends Controller
                 $input['created_by'] = $authId;
                 $addons = PurchasePriceHistory::create($input);
                 // $addons = SupplierAddons::where('id',$addons->id)->first();
+            }
+            if($request->kit_id) {
+                return response(true);
             }
             return redirect()->route('suppliers.addonprice', $request->supplier_id)->with('success','Supplier Addon Price Updated Successfully.');
             // return response()->json($addons);
