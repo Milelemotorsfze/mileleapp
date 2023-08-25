@@ -1809,7 +1809,7 @@ class AddonController extends Controller
                                 ->where('addon_type_name', $request->addonType);
         // if edit page
         if($request->id) {
-            info("edit page");
+
             $existingAddonDetailIds = $existingAddonDetailIds->whereNot('id',$request->id);
         }
         $existingAddonDetailIds = $existingAddonDetailIds->pluck('id');
@@ -1857,13 +1857,6 @@ class AddonController extends Controller
         return response($isExist);
 
     }
-    public function addNewPurchasePrice(Request $request) {
 
-        $supplierAddon = SupplierAddons::where('addon_details_id', $request->addon_details_id)
-            ->where('supplier_id', $request->supplier_id)->first();
-
-
-        return response(true);
-    }
 }
 
