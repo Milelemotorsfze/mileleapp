@@ -146,16 +146,20 @@
         <div class="list2" id="addonbox">
             <div class="row related-addon">
                 @foreach($addon1 as $value => $addonsdata)
+
                     <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="row">
                             <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                 Addon Name
                             </div>
                             <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
+{{--                                // condition chcek not included--}}
                                 @if($addonsdata->AddonName->name != '')
                                     {{$addonsdata->AddonName->name}}
                                 @endif
                             </div>
+
+{{--                            // not included--}}
                             @if($addonsdata->additional_remarks)
                                 <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                     Additional Remarks
@@ -198,7 +202,8 @@
 
                                             Days
 
-                                        </div>@endif
+                                        </div>
+                                       @endif
                                     @endif
 
                                     @if($content == '')
@@ -290,12 +295,14 @@
                                             @endif
                                         @endif
                                     </div>
+
                                     @if($addonsdata->lead_time)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                             Lead Time
                                         </div>
                                         <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                            @if($content == '')@if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
+                                            @if($content == '')
+                                                @if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
                                                 <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                     Lead Time
                                                 </div>
@@ -307,7 +314,8 @@
 
                                                     Days
 
-                                                </div>@endif
+                                                </div>
+                                                @endif
                                             @endif
                                         </div>
                                     @endif
@@ -331,10 +339,11 @@
                                 </div>
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
-                                {{--                @if($addonsdata->image)--}}
-                                {{--                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"--}}
-                                {{--                      style="width:100%;">--}}
-                                {{--                @endif--}}
+                                @if($addonsdata->image)
+                                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
+                                           alt="Addon Image"
+                                      style="width:100%;">
+                                @endif
                             </div>
                             @if($addonsdata->is_all_brands == 'yes')
                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
@@ -368,15 +377,15 @@
                                         </center>
                                     </div>
                                 @endif
-                                <input type="hidden" id="addon-type-count-{{$value}}" value="{{$addonsdata->AddonTypes->count()}}">
+                                <input type="hidden" id="addon-type-count-{{$addonsdata->id}}" value="{{$addonsdata->AddonTypes->count()}}">
                                 @foreach($addonsdata->AddonTypes as $key =>$AddonTypes)
                                     <div class="divcolorclass" value="5" hidden>
                                     </div>
                                     @if($addonsdata->addon_type_name == 'SP')
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                             {{$AddonTypes->brands->brand_name}}
                                         </div>
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-model-line-{{$key}} col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-line-{{$key}} col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
                                             @if(isset($AddonTypes->modelLines->model_line))
                                                 {{$AddonTypes->modelLines->model_line}}
                                             @endif
@@ -384,7 +393,7 @@
                                                 All Model Lines
                                             @endif
                                         </div>
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-model-number-{{$key}} col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-number-{{$key}} col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
                                             {{$AddonTypes->modelDescription->model_description ?? ''}}
                                         </div>
                                     @else
@@ -405,10 +414,13 @@
                             @if($addonsdata->AddonTypes->count() > 5)
                                 <div class="row justify-content-center mt-1">
                                     <div class="col-lg-3 col-md-12 col-sm-12">
-                                        <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center" id="view-more-{{$value}}"  data-key="{{$value}}" >
+                                        <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
+                                                onclick="viewMore({{$addonsdata->id}})"
+                                                id="view-more-{{$addonsdata->id}}"  data-key="{{$key}}" >
                                             View More <i class="fa fa-arrow-down"></i>
                                         </button>
-                                        <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center" id="view-less-{{$value}}" data-key="{{$value}}" >
+                                        <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
+                                                onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
                                             View Less<i class="fa fa-arrow-down"></i>
                                         </button>
                                     </div>
@@ -433,44 +445,44 @@
     @endif
 @endif
 <script>
-    {{--var addonCount = '{{$addon1->count()}}';--}}
-    {{--for(var i=0;i<=addonCount;i++) {--}}
-    {{--    var addonTypeCount = $('#addon-type-count-'+i).val();--}}
-    {{--    if(addonTypeCount > 5) {--}}
-    {{--        for(var j=5;j<=addonTypeCount;j++) {--}}
-    {{--            $('.addon-'+i+'-brand-'+j).attr('hidden',true);--}}
-    {{--            $('.addon-'+i+'-model-line-'+j).attr('hidden',true);--}}
-    {{--            $('.addon-'+i+'-model-number-'+j).attr('hidden', true);--}}
-    {{--        }--}}
-    {{--    }--}}
-    {{--}--}}
+    var addons = [];
+    var addonCount = '{{$addon1->count()}}';
 
-    {{--$('.view-more').click(function () {--}}
-    {{--    var key = $(this).attr('data-key');--}}
-    {{--    var addonTypeCount = $('#addon-type-count-'+key).val();--}}
-    {{--    $('#view-more-'+key).attr('hidden', true);--}}
-    {{--    $('#view-less-'+key).attr('hidden', false);--}}
+    for(var i=0;i<=addonCount;i++) {
+        var addonTypeCount = $('#addon-type-count-'+i).val();
+        if(addonTypeCount > 5) {
+            for(var j=5;j<=addonTypeCount;j++) {
+                $('.addon-'+i+'-brand-'+j).attr('hidden',true);
+                $('.addon-'+i+'-model-line-'+j).attr('hidden',true);
+                $('.addon-'+i+'-model-number-'+j).attr('hidden', true);
+            }
+        }
+    }
 
-    {{--    for(var j=5;j<=addonTypeCount;j++) {--}}
-    {{--        $('.addon-'+key+'-brand-'+j).attr('hidden',false);--}}
-    {{--        $('.addon-'+key+'-model-line-'+j).attr('hidden',false);--}}
-    {{--        $('.addon-'+key+'-model-number-'+j).attr('hidden', false);--}}
+    function viewMore(addonId) {
+        alert("ok");
+        var addonTypeCount = $('#addon-type-count-'+addonId).val();
+        $('#view-more-'+addonId).attr('hidden', true);
+        $('#view-less-'+addonId).attr('hidden', false);
+        for(var j=5;j<=addonTypeCount;j++) {
+            $('.addon-'+addonId+'-brand-'+j).attr('hidden',false);
+            $('.addon-'+addonId+'-model-line-'+j).attr('hidden',false);
+            $('.addon-'+addonId+'-model-number-'+j).attr('hidden', false);
 
-    {{--    }--}}
-    {{--})--}}
-    {{--$('.view-less').click(function () {--}}
+        }
+    }
+    function viewLess(addonId) {
 
-    {{--    var key = $(this).attr('data-key');--}}
-    {{--    var addonTypeCount = $('#addon-type-count-'+key).val();--}}
-    {{--    $('#view-more-'+key).attr('hidden', false);--}}
-    {{--    $('#view-less-'+key).attr('hidden', true);--}}
+        var addonTypeCount = $('#addon-type-count-'+addonId).val();
+        $('#view-more-'+addonId).attr('hidden', false);
+        $('#view-less-'+addonId).attr('hidden', true);
 
-    {{--    for(var j=5;j<=addonTypeCount;j++) {--}}
-    {{--        $('.addon-'+key+'-brand-'+j).attr('hidden',true);--}}
-    {{--        $('.addon-'+key+'-model-line-'+j).attr('hidden',true)--}}
-    {{--        $('.addon-'+key+'-model-number-'+j).attr('hidden', true);--}}
+        for(var j=5;j<=addonTypeCount;j++) {
+            $('.addon-'+addonId+'-brand-'+j).attr('hidden',true);
+            $('.addon-'+addonId+'-model-line-'+j).attr('hidden',true)
+            $('.addon-'+addonId+'-model-number-'+j).attr('hidden', true);
 
-    {{--    }--}}
+        }
 
-    {{--})--}}
+    }
 </script>

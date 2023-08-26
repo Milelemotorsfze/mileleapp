@@ -30,6 +30,7 @@ class AddonController extends Controller
      */
     public function index($data)
     {
+        $rowperpage = 10;
         $content = 'addon';
         $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
@@ -41,16 +42,326 @@ class AddonController extends Controller
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-        $addon1 = $addon1->orderBy('id', 'ASC')->get();
+        $addon1 = $addon1->orderBy('id', 'DESC')->get();
+//        $addon1 = $addon1->orderBy('id', 'DESC')->take($rowperpage)->get();
         foreach($addon1 as $addon)
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
             $addon->LeastPurchasePrices = $price;
         }
-        return view('addon.index',compact('addon1','addonMasters','brandMatsers','modelLineMasters','data','content'));
+
+        return view('addon.index',compact('addon1','addonMasters','brandMatsers',
+            'modelLineMasters','data','content','rowperpage'));
 
     }
+    public function getAddonlists(Request $request) {
+        $start = $request->start;
+        $rowperpage = 10;
+        $content = 'addon';
+        // Fetch records
+        $addons = AddonDetails::skip($start)
+            ->where('addon_type_name',$request->addon_type)
+            ->take($rowperpage)
+            ->orderBy('id','DESC');
+
+        $addons = $addons->get();
+
+        $html = "";
+        foreach($addons as $value => $addon){
+
+            $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
+                    <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                        <div class="row">
+                            <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                                Addon Name
+                            </div>
+                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                 if($addon->AddonName->name != '') {
+                                     $html .= $addon->AddonName->name;
+                                 }
+                                 $html .=  '</div>';
+                                         if($addon->additional_remarks) {
+                                             $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                Additional Remarks
+                                            </div>
+                                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                '.$addon->additional_remarks.'
+                                            </div>';
+                                         }
+
+                                $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
+                                                <div class="row" style="padding-right:3px; padding-left:3px;">
+                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        Addon Code
+                                                    </div>
+                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        '. $addon->addon_code.'
+                                                    </div>
+                                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        Addon Type
+                                                    </div>
+                                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                        if($addon->addon_type_name == 'K'){
+                                                            $html .=    'Kit';
+                                                        }
+                                                        elseif($addon->addon_type_name == 'P') {
+                                                            $html .=   'Accessories';
+                                                        }
+                                                        elseif($addon->addon_type_name == 'SP') {
+                                                            $html .=  'Spare Parts';
+                                                        }
+                                                     $html .= '</div>';
+
+                                                    if($content == '') {
+                                                        if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '')
+                                                        {
+                                                            $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                            Lead Time
+                                                                      </div>
+                                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                        '.$addon->PurchasePrices->lead_time_min.'';
+
+                                                                        if($addon->PurchasePrices->lead_time_max != '' &&
+                                                                            $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                                                                        $html .=   '- '.$addon->PurchasePrices->lead_time_max.'';
+                                                                        }
+                                                                        $html .= '</div>';
+                                                        }
+                                                    }
+                                                     if($content == '') {
+                                                        if($addon->PurchasePrices!= null) {
+                                                            if($addon->PurchasePrices->purchase_price_aed != '') {
+                                                                if( Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
+                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                                                                    if ($hasPermission) {
+                                                                        $html .=    '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                        Purchase Price
+                                                                        </div>
+                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                            '.$addon->PurchasePrices->purchase_price_aed.' AED
+                                                                        </div>';
+                                                                    }
+                                                                }
+
+                                                            }
+                                                        }
+                                                     }
+                                                    if($content == '') {
+                                                        if($addon->addon_type_name == 'SP') {
+                                                            if($addon->PurchasePrices!= null) {
+                                                                if($addon->PurchasePrices->updated_at != '') {
+                                                                   $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                                Quotation Date
+                                                                            </div>
+                                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                                '.$addon->PurchasePrices->updated_at.'
+                                                                            </div>';
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    if($addon->least_purchase_price != null) {
+                                                        if($addon->least_purchase_price->purchase_price_aed != '') {
+                                                            if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
+                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                                if ($hasPermission) {
+                                                                    $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                            Least Purchase Price
+                                                                         </div>
+                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                            '.$addon->least_purchase_price->purchase_price_aed.' AED
+                                                                        </div>';
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    if( Auth::user()->hasPermissionTo('addon-selling-price-view')) {
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                                                        if($hasPermission) {
+                                                            if($addon->SellingPrice!= null OR $addon->PendingSellingPrice!= null) {
+                                                             $html .=  '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                        Selling Price
+                                                                        </div>
+                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                                            if($addon->SellingPrice!= null) {
+                                                                                if($addon->SellingPrice->selling_price != '') {
+                                                                                    $html .= $addon->SellingPrice->selling_price . 'AED';
+                                                                                } elseif($addon->PendingSellingPrice!= null)
+                                                                                {
+                                                                                    if($addon->PendingSellingPrice->selling_price != '')
+                                                                                    {
+                                                                                        $html .=  $addon->PendingSellingPrice->selling_price .'AED
+                                                                                            </br>
+                                                                                            <label class="badge badge-soft-danger">Approval Awaiting</label>';
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                   $html .= '</div>';
+                                                            }
+                                                        }
+                                                    }
+                                                     $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                        Fixing Charge
+                                                                  </div>
+                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                                    if($addon->fixing_charges_included == 'yes') {
+                                                                        $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                                                    }
+                                                                    else {
+                                                                        if($addon->fixing_charge_amount != '') {
+                                                                            $html .=$addon->fixing_charge_amount .'AED';
+                                                                        }
+
+                                                                    }
+                                                    $html .=    '</div>';
+
+                                                    if($addon->lead_time) {
+                                                        $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                Lead Time
+                                                            </div>
+                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                                if($content == '') {
+                                                                    if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '') {
+                                                                        $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                                    Lead Time
+                                                                                  </div>
+                                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">;
+                                                                                    '.$addon->PurchasePrices->lead_time_min.'';
+                                                                                    if($addon->PurchasePrices->lead_time_max != '' &&
+                                                                                        $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                                                                                      $html .=   '-'.$addon->PurchasePrices->lead_time_max.' Days';
+
+                                                                                    }
+                                                                               $html .= '</div>';
+                                                                    }
+                                                                }
+                                                        $html .= '</div>';
+                                                    }
+                                                    if($addon->model_year_start OR $addon->model_year_end) {
+                                                     $html .=   '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                    Model Year
+                                                                </div>
+                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                '.$addon->model_year_start.'';
+                                                        if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end){
+                                                            $html .= '- '.$addon->model_year_end.'';
+                                                        }
+                                                        $html .= '</div>';
+
+                                                    }
+                                                    if($addon->part_number) {
+                                                        $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                                Part Number
+                                                            </div>
+                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            '.$addon->part_number.'
+                                                            </div>';
+                                                    }
+        $html .=                                '</div>
+                                                    </div>
+                                                    <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
+                                                        <img  id="myImg_'.$addon->id.'" class="image-click-class" src=" '.asset('addon_image/' . $addon->image).' "  alt="Addon Image">
+                                                            </div>';
+
+                                        if($addon->is_all_brands == 'yes') {
+                                            $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
+                                                        Brand
+                                                    </div>
+                                                    <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                                        All Brands
+                                                    </div>';
+                                        }else{
+                                            if($addon->addon_type_name == 'SP') {
+                                                $html .= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                                            <center>Brand</center>
+                                                            </div>
+                                                            <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                                                                <center>
+                                                                    Model Line
+                                                                </center>
+                                                            </div>
+                                                            <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                                                <center>
+                                                                    Model Description
+                                                                </center>
+                                                            </div>';
+                                            }else{
+                                                $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                                                <center>Brand</center>
+                                                            </div>
+                                                            <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                                                <center>
+                                                                    Model Line
+                                                                </center>
+                                                            </div>';
+                                            }
+                                            foreach($addon->AddonTypes as $key =>$AddonTypes) {
+                                                $html .= ' <div class="divcolorclass" value="5" hidden>
+                                                        </div>';
+
+                                                if($addon->addon_type_name == 'SP') {
+                                                    $html .= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                                            '.$AddonTypes->brands->brand_name.'
+                                                            </div>
+                                                         <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-line-'.$key.' col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">';
+                                                    if(isset($AddonTypes->modelLines->model_line)) {
+                                                        $html .= $AddonTypes->modelLines->model_line;
+                                                    }
+                                                    if($AddonTypes->is_all_model_lines == 'yes') {
+                                                        $html .= ' All Model Lines';
+                                                    }
+                                                    $html .= '</div>
+                                                            <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                                                '.$AddonTypes->modelDescription->model_description.'
+                                                                </div>';
+
+                                                }else{
+                                                    $html .= ' <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                                            '.$AddonTypes->brands->brand_name.'
+                                                            </div>
+                                                            <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">';
+                                                    if(isset($AddonTypes->modelLines->model_line)) {
+                                                        $html .= $AddonTypes->modelLines->model_line;
+                                                    }
+                                                    if($AddonTypes->is_all_model_lines == 'yes') {
+                                                        $html .= 'All Model Lines';
+                                                    }
+
+                                                    $html .= '</div>';
+                                                }
+                                            }
+
+                                        }
+                                    if($addon->AddonTypes->count() > 5) {
+                                        $html .= '<div class="row justify-content-center mt-1">
+                                        <div class="col-lg-3 col-md-12 col-sm-12">
+                                            <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
+                                              onclick="viewMore('.$addon->id.')"
+                                              id="view-more-'.$addon->id.'"  data-key="'.$value.'" >
+                                                View More <i class="fa fa-arrow-down"></i>
+                                            </button>
+                                            <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
+                                             id="view-less-'.$addon->id.'" data-key="'.$value.'"  onclick="viewLess('.$addon->id.')">
+                                                View Less<i class="fa fa-arrow-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>';
+                                }
+
+            $html .=         '</div>
+                                <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
+                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                        Include files
+                                    </div>
+                                </div>
+                            </div>';
+        }
+
+        $data['html'] = $html;
+        return response($data);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
