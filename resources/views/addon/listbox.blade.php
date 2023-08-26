@@ -331,10 +331,10 @@
                 </div>
               </div>
               <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
-{{--                @if($addonsdata->image)--}}
-{{--                      <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"--}}
-{{--                      style="width:100%;">--}}
-{{--                @endif--}}
+               @if($addonsdata->image)
+                    <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
+                      style="width:100%;">
+                @endif
               </div>
               @if($addonsdata->is_all_brands == 'yes')
                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
