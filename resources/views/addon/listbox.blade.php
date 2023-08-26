@@ -418,6 +418,117 @@
                         </br>
                         <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
                             <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                          </div>@endif
+                  @endif
+                    </div>
+                  @endif
+                  @if($addonsdata->model_year_start OR $addonsdata->model_year_end)
+                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                      Model Year
+                    </div>
+                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                    {{$addonsdata->model_year_start}}
+                    @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
+                    </div>
+                  @endif
+                  @if($addonsdata->part_number)
+                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                      Part Number
+                    </div>
+                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                      {{$addonsdata->part_number}}
+                    </div>
+                  @endif
+                </div>
+              </div>
+              <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
+               @if($addonsdata->image)
+                    <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}" alt="Addon Image"
+                      style="width:100%;">
+                @endif
+              </div>
+              @if($addonsdata->is_all_brands == 'yes')
+                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
+                  Brand
+                </div>
+                <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                  All Brands
+                </div>
+              @else
+                @if($addonsdata->addon_type_name == 'SP')
+                  <div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                    <center>Brand</center>
+                  </div>
+                  <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                    <center>
+                        Model Line
+                    </center>
+                  </div>
+                  <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                    <center>
+                        Model Description
+                    </center>
+                  </div>
+                @else
+                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                  <center>Brand</center>
+                </div>
+                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                  <center>
+                      Model Line
+                  </center>
+                </div>
+                @endif
+                <input type="hidden" id="addon-type-count-{{$value}}" value="{{$addonsdata->AddonTypes->count()}}">
+                @foreach($addonsdata->AddonTypes as $key =>$AddonTypes)
+                  <div class="divcolorclass" value="5" hidden>
+                  </div>
+                      @if($addonsdata->addon_type_name == 'SP')
+                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                            {{$AddonTypes->brands->brand_name}}
+                        </div>
+                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-model-line-{{$key}} col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                            @if(isset($AddonTypes->modelLines->model_line))
+                                {{$AddonTypes->modelLines->model_line}}
+                            @endif
+                            @if($AddonTypes->is_all_model_lines == 'yes')
+                                All Model Lines
+                            @endif
+                        </div>
+                        <div class="testtransform divcolor labellist databack1 addon-{{$value}}-model-number-{{$key}} col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                            {{$AddonTypes->modelDescription->model_description ?? ''}}
+                        </div>
+                      @else
+                        <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                          {{$AddonTypes->brands->brand_name}}
+                        </div>
+                        <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                            @if(isset($AddonTypes->modelLines->model_line))
+                              {{$AddonTypes->modelLines->model_line}}
+                            @endif
+                            @if($AddonTypes->is_all_model_lines == 'yes')
+                              All Model Lines
+                            @endif
+                        </div>
+                      @endif
+                @endforeach
+              @endif
+                @if($addonsdata->AddonTypes->count() > 5)
+                    <div class="row justify-content-center mt-1">
+                        <div class="col-lg-3 col-md-12 col-sm-12">
+                            <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center" id="view-more-{{$value}}"  data-key="{{$value}}" >
+                                View More <i class="fa fa-arrow-down"></i>
+                            </button>
+                            <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center" id="view-less-{{$value}}" data-key="{{$value}}" >
+                                View Less<i class="fa fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                @endif
+            </div>
+            </br>
+            <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
+              <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
 
                                 @include('addon.action.addsellingprice')
                                 @include('addon.action.action')
