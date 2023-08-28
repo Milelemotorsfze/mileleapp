@@ -16,4 +16,8 @@ class So extends Model
         'payment_percentage',
     ];
     public $timestamps = false;
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicles::class);
+    }
 }

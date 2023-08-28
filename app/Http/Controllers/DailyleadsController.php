@@ -12,23 +12,86 @@ use App\Models\quotation;
 use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\Brand;
+use App\Models\Prospecting;
+use App\Models\Salesdemand;
+use App\Models\Negotiation;
 use Carbon\Carbon;
 use App\Models\MasterModelLines;
 use Monarobase\CountryList\CountryListFacade;
 use App\Models\Logs;
+use Yajra\DataTables\DataTables; // Import DataTables from Yajra namespace
 use Illuminate\Support\Facades\Response;
 
 class DailyleadsController extends Controller
 {
     public function index(Request $request)
     {
-       $id = Auth::user()->id;
-       $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
-       $qutationsdata = Calls::where('status', 'Quoted')->where('sales_person', $id)->get();
-       $rejectiondata = Calls::where('status', 'Rejected')->where('sales_person', $id)->get();
-       $closeddata = Calls::where('status', 'Closed')->where('sales_person', $id)->get();
-       $intialcallsdata = Calls::where('status', 'Initial Contact')->where('sales_person', $id)->get();
-       return view('dailyleads.index',compact('pendingdata', 'intialcallsdata', 'qutationsdata', 'rejectiondata', 'closeddata'));
+        $id = Auth::user()->id;
+        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
+        if ($request->ajax()) {
+            $status = $request->input('status');
+            $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', 'calls.remarks'])
+                ->where('status', $status)->where('sales_person', $id);
+            $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
+                JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
+                JOIN brands ON master_model_lines.brand_id = brands.id
+                WHERE calls_requirement.lead_id = calls.id) as models_brands'));
+            if ($status === 'Prospecting') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+            } elseif ($status === 'New Demand') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+            } elseif ($status === 'Quoted') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+            } elseif ($status === 'Negotiation') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+            } elseif ($status === 'Closed') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(lead_closed.date, '%d-%b-%Y') as cdate"), 'lead_closed.sales_notes as csalesnotes', 'lead_closed.dealvalues as cdealvalues', 'lead_closed.so_number as so_number');
+                $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
+            } elseif ($status === 'Rejected') {
+                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+                $data->addSelect(DB::raw("DATE_FORMAT(lead_rejection.date, '%d-%b-%Y') as rdate"), 'lead_rejection.sales_notes as rsalesnotes', 'lead_rejection.Reason as reason');
+                $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
+            }
+            $data->groupBy('calls.id');
+            return DataTables::of($data)
+                ->addColumn('models_brands', function ($row) {
+                    return $row->models_brands;
+                })
+                ->toJson();
+        }    
+    
+        return view('dailyleads.index', compact('pendingdata'));
     }
     /**
      * Show the form for creating a new resource.
@@ -177,7 +240,6 @@ public function prospecting($id)
         'date' => 'required|date',
         'dealValue' => 'required|numeric',
         'salesNotes' => 'nullable|string',
-        'file' => 'nullable|mimes:pdf,doc,docx|max:2048',
     ]);
     $quotation = new quotation();
     $quotation->date = $validatedData['date'];
@@ -218,9 +280,10 @@ public function rejection(Request $request)
 public function closed(Request $request)
 {
     $Closed = new Closed();
-    $Closed->date = $request->dealdate;
+    $Closed->date = $request->date;
     $Closed->so_number = $request->sonumber;
-    $Closed->sales_notes = $request->dealsalesNotes;
+    $Closed->sales_notes = $request->salesNotes;
+    $Closed->dealvalues = $request->dealvalues;
     $Closed->created_by = auth()->user()->id;
     $Closed->created_at = now();
     $Closed->call_id = $request->callId;
@@ -230,4 +293,55 @@ public function closed(Request $request)
     $call->save();
     return response()->json(['success' => true]);
 }
+public function savenegotiation(Request $request)
+{
+    $negotiation = new Negotiation();
+    $negotiation->date = $request->date;
+    $negotiation->sales_notes = $request->salesNotes;
+    $negotiation->dealvalues = $request->dealvalues;
+    $negotiation->created_by = auth()->user()->id;
+    $negotiation->created_at = now();
+    $negotiation->calls_id = $request->callId;
+    $negotiation->save();
+    $call = Calls::findOrFail($request->callId);
+    $call->status = 'Negotiation';
+    $call->save();
+    return response()->json(['success' => true]);
+}
+public function saveprospecting(Request $request)
+	{
+    $validatedData = $request->validate([
+        'date' => 'required|date',
+        'salesNotes' => 'nullable|string',
+    ]);
+    $prospecting = new Prospecting();
+    $prospecting->date = $validatedData['date'];
+    $prospecting->salesnotes = $validatedData['salesNotes'];
+    $prospecting->created_by = auth()->user()->id;
+    $prospecting->created_at = now();
+    $prospecting->calls_id = $request->callId;
+    $prospecting->save();
+    $call = Calls::findOrFail($request->callId);
+    $call->status = 'Prospecting';
+    $call->save();
+    return response()->json(['success' => true]);
+	}
+    public function savedemand(Request $request)
+	{
+    $validatedData = $request->validate([
+        'date' => 'required|date',
+        'salesNotes' => 'nullable|string',
+    ]);
+    $demands = new Salesdemand();
+    $demands->date = $validatedData['date'];
+    $demands->salesnotes = $validatedData['salesNotes'];
+    $demands->created_by = auth()->user()->id;
+    $demands->created_at = now();
+    $demands->calls_id = $request->callId;
+    $demands->save();
+    $call = Calls::findOrFail($request->callId);
+    $call->status = 'New Demand';
+    $call->save();
+    return response()->json(['success' => true]);
+	}
 }

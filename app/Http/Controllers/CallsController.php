@@ -69,11 +69,14 @@ class CallsController extends Controller
             'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
         ]);      
         if ($request->input('sales-option') == "auto-assign") {
-        $excluded_user_ids = [1, 2, 46, 47, 26, 31];
+        $excluded_user_ids = [1, 2, 46, 47, 26, 31, 16];
         $email = $request->input('email');
         $phone = $request->input('phone');
         $language = $request->input('language');
-        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
         $sales_person_id = null;
         $existing_email_count = null;
         $existing_phone_count = null;
@@ -81,21 +84,46 @@ class CallsController extends Controller
         foreach ($sales_persons as $sales_person) {
             if ($language == "English") {
                 $existing_email_count = Calls::where('email', $email)
-                    ->where('sales_person', $sales_person->model_id)
-                    ->whereNotNull('email')
-                    ->count();
-                $existing_phone_count = Calls::where('phone', $phone)
-                    ->where('sales_person', $sales_person->model_id)
-                    ->whereNotNull('phone')
-                    ->count();
+                ->whereNotIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('email')
+                ->count();
+                $cleanedPhone = ltrim($phone, '+');
+                $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                ->whereNotIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('phone')
+                ->count();
                 if ($existing_email_count > 0 || $existing_phone_count > 0) {
-                    $sales_person_id = $sales_person->model_id;
-                    break;
+                if($existing_email_count > 0)
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                              ->whereNotIn('sales_person', $excluded_user_ids)
+                              ->orWhere('email', $email);
+                    })
+                    ->where(function ($query) {
+                        $query->WhereNotNull('email');
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }else
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotIn('sales_person', $excluded_user_ids);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
                 }
+            }
                 else
                 {
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                     ->where('role_id', 7)
+                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                    ->where('users.status', 'active')
                     ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                     ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                     ->where('calls.status', 'New')
@@ -106,6 +134,43 @@ class CallsController extends Controller
                 }
             } 
             else {
+                $existing_email_count = Calls::where('email', $email)
+                ->whereNotIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('email')
+                ->count();
+                $cleanedPhone = ltrim($phone, '+');
+                $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                ->whereNotIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('phone')
+                ->count();
+                if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                if($existing_email_count > 0)
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                                ->whereNotIn('sales_person', $excluded_user_ids)
+                              ->orWhere('email', $email);
+                    })
+                    ->where(function ($query) {
+                        $query->WhereNotNull('email');
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }else
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotIn('sales_person', $excluded_user_ids);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }
+            }
+                else
+                {
                 $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
                 ->where('language', $language)
                 ->get();
@@ -119,6 +184,8 @@ class CallsController extends Controller
                     $sales_person_ids = $sales_person_languages->pluck('sales_person');
                      $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                                         ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
                                         ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
@@ -134,6 +201,8 @@ class CallsController extends Controller
                 else{
                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                     ->where('role_id', 7)
+                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                    ->where('users.status', 'active')
                     ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                     ->where('calls.status', 'New')
                     ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
@@ -143,6 +212,7 @@ class CallsController extends Controller
                     $sales_person_id = $lowest_lead_sales_person->model_id;
                 }
                 }
+            }
             }
         }
     else{
@@ -363,7 +433,7 @@ return view('calls.resultbrand', compact('data'));
             $remarks = $row[10];
             $errorDescription = '';
             if ($sales_person === null) {
-                $excluded_user_ids = [1, 2, 46, 47, 26, 31];
+                $excluded_user_ids = [1, 2, 46, 47, 26, 31, 16];
 			                $sales_persons = ModelHasRoles::where('role_id', 7)->get();
                             $sales_person_id = null;
                             $existing_email_count = null;
@@ -372,21 +442,46 @@ return view('calls.resultbrand', compact('data'));
                             foreach ($sales_persons as $sales_person) {
                                 if ($language == "English") {
                                     $existing_email_count = Calls::where('email', $email)
-                                        ->where('sales_person', $sales_person->model_id)
-                                        ->whereNotNull('email')
-                                        ->count();
-                                    $existing_phone_count = Calls::where('phone', $phone)
-                                        ->where('sales_person', $sales_person->model_id)
-                                        ->whereNotNull('phone')
-                                        ->count();
+                                    ->whereNotIn('sales_person', $excluded_user_ids)
+                                    ->whereNotNull('email')
+                                    ->count();
+                                    $cleanedPhone = ltrim($phone, '+');
+                                    $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                                    ->whereNotIn('sales_person', $excluded_user_ids)
+                                    ->whereNotNull('phone')
+                                    ->count();
                                     if ($existing_email_count > 0 || $existing_phone_count > 0) {
-                                        $sales_person_id = $sales_person->model_id;
-                                        break;
+                                    if($existing_email_count > 0)
+                                    {
+                                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                                                    ->whereNotIn('sales_person', $excluded_user_ids)
+                                                  ->orWhere('email', $email);
+                                        })
+                                        ->where(function ($query) {
+                                            $query->WhereNotNull('email');
+                                        })
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                                    $sales_person_id = $sales_person->sales_person;
+                                    break;
+                                    }else
+                                    {
+                                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotIn('sales_person', $excluded_user_ids);
+                                        })
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                                    $sales_person_id = $sales_person->sales_person;
+                                    break;
                                     }
+                                }
                                     else
                                     {
                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                                         ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                                         ->where('calls.status', 'New')
@@ -397,6 +492,43 @@ return view('calls.resultbrand', compact('data'));
                                     }
                                 } 
                                 else {
+                                    $existing_email_count = Calls::where('email', $email)
+                                    ->whereNotNull('email')
+                                    ->whereNotIn('sales_person', $excluded_user_ids)
+                                    ->count();
+                                    $cleanedPhone = ltrim($phone, '+');
+                                    $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                                    ->whereNotNull('phone')
+                                    ->whereNotIn('sales_person', $excluded_user_ids)
+                                    ->count();
+                                    if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                                    if($existing_email_count > 0)
+                                    {
+                                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                                            ->whereNotIn('sales_person', $excluded_user_ids)
+                                                  ->orWhere('email', $email);
+                                        })
+                                        ->where(function ($query) {
+                                            $query->WhereNotNull('email');
+                                        })
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                                    $sales_person_id = $sales_person->sales_person;
+                                    break;
+                                    }else
+                                    {
+                                        $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                                            $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereNotIn('sales_person', $excluded_user_ids);
+                                        })
+                                        ->orderBy('created_at', 'desc')
+                                        ->first();
+                                    $sales_person_id = $sales_person->sales_person;
+                                    break;
+                                    }
+                                }
+                                else
+                                {
                                     $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
                                     ->where('language', $language)
                                     ->get();
@@ -411,6 +543,8 @@ return view('calls.resultbrand', compact('data'));
                                         info($sales_person_ids);
                                          $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                                         ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
                                         ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
@@ -426,6 +560,8 @@ return view('calls.resultbrand', compact('data'));
                                     else{
                                         $lowest_lead_sales_person = ModelHasRoles::select('model_id')
                                         ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
                                         ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
                                         ->whereNotIn('model_has_roles.model_id', $excluded_user_ids)
                                         ->where('calls.status', 'New')
@@ -435,6 +571,7 @@ return view('calls.resultbrand', compact('data'));
                                         $sales_person_id = $lowest_lead_sales_person->model_id;
                                     }
                                     }
+                                }
                                 }
                                 $salesPerson = $sales_person_id;
                                 }
@@ -596,7 +733,8 @@ return view('calls.resultbrand', compact('data'));
     $phone = $request->input('phone');
     $email = $request->input('email');
     if ($phone !== null) {
-        $phoneCount = Calls::where('phone', $phone)->count();
+        $cleanedPhone = ltrim($phone, '+');
+        $phoneCount = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->count();
     }
     if ($email !== null) {
         $emailCount = Calls::where('email', $email)->count(); 
@@ -620,7 +758,8 @@ public function checkExistenceupdatecalls(Request $request)
     $call_id = $request->input('call_id');
     info($phone);
     if ($phone !== null) {
-        $phoneCount = Calls::where('phone', $phone)->where('id', '<>', $call_id)->count();
+        $cleanedPhone = ltrim($phone, '+');
+        $phoneCount = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)->where('id', '<>', $call_id)->count();
     }
     if ($email !== null) {
         $emailCount = Calls::where('email', $email)->where('id', '<>', $call_id)->count(); 

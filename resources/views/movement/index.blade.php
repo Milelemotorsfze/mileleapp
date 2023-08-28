@@ -71,7 +71,7 @@
                         </div>
                         @foreach ($movementreference as $movementreference)
                         <tr data-id="1">
-                        <td>MOV - {{ $movementreference->id }}</td>
+                        <td class="refernacenumber">MOV - {{ $movementreference->id }}</td>
                         @php
                         $vehicles = DB::table('movements')->where('reference_id', $movementreference->id)->count();
                         @endphp
@@ -81,7 +81,7 @@
                         $created_by = $created_bys->name;
                         @endphp
                         <td>{{ $created_by }}</td>
-                        <td>{{ date('d-M-Y', strtotime($movementreference->date)) }} {{ date('H:i:s', strtotime($movementreference->created_at)) }}</td>
+                        <td class="createdDated">{{ date('d-M-Y', strtotime($movementreference->date)) }}</td>
                         <td><a title="Details" data-placement="top" class="btn btn-sm btn-primary" href="{{ route('movement.show', $movementreference->id) }}"><i class="fa fa-car" aria-hidden="true"></i> View Details</a></td>
                       </tr>
                         @endforeach
@@ -123,8 +123,16 @@
             $('#success-message').fadeOut('slow');
         }, 2000);
         $(document).ready(function () {
+          $.fn.dataTable.ext.order['mov-number-pre'] = function(data) {
+    var match = data.match(/^MOV - (\d+)/);
+    return match ? parseInt(match[1], 10) : -1;
+};
             var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
+  columnDefs: [
+  { type: 'date', targets: $('.createdDated').index() },
+  { type: 'mov-number', targets: $('.refernacenumber').index() }
+],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;

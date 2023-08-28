@@ -899,7 +899,7 @@ Clear Filters
                                 @endphp
                                 @if ($hasPermission)
                                 @if($vehicles->estimation_date)
-                                <td class="nowrap-td eta">{{date('d-M-Y', strtotime($vehicles->estimation_date))}}</td>
+                                <td class="nowrap-td estimation_date">{{date('d-M-Y', strtotime($vehicles->estimation_date))}}</td>
                                 @else
                                 <td class="nowrap-td">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       </td>
                                 @endif
@@ -957,9 +957,9 @@ Clear Filters
                                     @endphp
                                     @if ($hasPermission)
   								                  @if (!empty($vehicles->inspection_date))
-                                    <td>{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
+                                    <td class="inspection_date">{{ date('d-M-Y', strtotime($vehicles->inspection_date)) }}</td>
                                     @else
-                                    <td></td>
+                                    <td class="inspection_date"></td>
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
@@ -1086,14 +1086,14 @@ Clear Filters
                                     <td class="editable-field reservation_end_date" data-is-date="true" data-type="date" data-vehicle-id="{{ $vehicles->id }}" data-field-name="reservation_end_date">
                                     {{ $vehicles->reservation_end_date }}</td>
 									                 @else
-								                    <td>
+								                    <td class="reservation_start_date">
                                       @if($vehicles->reservation_start_date)
                                       {{ $vehicles->reservation_start_date }}
                                       @else
                                     date('d-M-Y', strtotime($vehicles->reservation_start_date))
                                     @endif
                                     </td>
-                                    <td>
+                                    <td class="reservation_end_date">
                                       @if($vehicles->reservation_end_date)
                                     {{ $vehicles->reservation_end_date }}
                                   @else
@@ -1126,9 +1126,9 @@ Clear Filters
 									                  @endif
                                     @endif
                                     @if (!empty($vehicles->pdi_date))
-                                    <td>{{ date('d-M-Y', strtotime($vehicles->pdi_date)) }}</td>
+                                    <td class="pdi_date">{{ date('d-M-Y', strtotime($vehicles->pdi_date)) }}</td>
                                     @else
-                                    <td></td>
+                                    <td class="pdi_date"></td>
                                     @endif
                                     @php
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-detail-edit');
@@ -1762,7 +1762,16 @@ function displayAppliedFilters() {
     "order": [[4, "desc"]],
     pageLength: 100,
     columnDefs: [
-  { type: 'date', targets: [2] }
+  { type: 'date', targets: $('.PoDate').index() },
+  { type: 'date', targets: $('.grnDate').index() },
+  { type: 'date', targets: $('.estimation_date').index() },
+  { type: 'date', targets: $('.netsuit_grn_date').index('.editable-field') },
+  { type: 'date', targets: $('.inspection_date').index('.editable-field') },
+  { type: 'date', targets: $('.so_date').index('.editable-field') },
+  { type: 'date', targets: $('.reservation_start_date').index('.editable-field') },
+  { type: 'date', targets: $('.reservation_end_date').index('.editable-field') },
+  { type: 'date', targets: $('.pdi_date').index('.editable-field') },
+  { type: 'date', targets: $('.gdnDate').index() }
 ],
     initComplete: function() {
       this.api().columns().every(function(d) {

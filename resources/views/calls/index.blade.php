@@ -516,7 +516,7 @@ $(document).ready(function () {
 });
 $('#my-table_filter').hide();
 $('#export-excel').on('click', function() {
-    var filteredData = dataTablea.rows({ search: 'applied' }).data();
+    var filteredData = dataTable.rows({ search: 'applied' }).data();
     var data = [];
     filteredData.each(function(rowData) {
         var row = [];
