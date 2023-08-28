@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('addon_details', function (Blueprint $table) {
-            $table->dropColumn('lead_time');
-            $table->dropColumn('lead_time_max');
+            // $table->dropColumn('lead_time');
+            // $table->dropColumn('lead_time_max');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('addon_details', function (Blueprint $table) {
-            $table->string('lead_time')->nullable();
-            $table->string('lead_time_max')->nullable();
+            // $table->string('lead_time')->nullable();
+            // $table->string('lead_time_max')->nullable();
         });
     }
 };

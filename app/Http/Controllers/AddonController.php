@@ -54,7 +54,7 @@ class AddonController extends Controller
             $addon->LeastPurchasePrices = $price;
         }
 
-        return view('addon.test',compact('addon1','addonMasters','brandMatsers',
+        return view('addon.index',compact('addon1','addonMasters','brandMatsers',
             'modelLineMasters','data','content','rowperpage','addonIds'));
 
     }

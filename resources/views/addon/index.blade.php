@@ -182,8 +182,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};
+    var addon = {!! json_encode($addonIds) !!};
     $(document).ready(function ()
     {
+      // console.log(addon[0]);
       $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
       $("#fltr-addon-code").select2();
       $("#fltr-brand").attr("data-placeholder","Choose Brand....    Or     Type Here To Search....");
