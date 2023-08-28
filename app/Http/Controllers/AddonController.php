@@ -54,7 +54,6 @@ class AddonController extends Controller
             $addon->LeastPurchasePrices = $price;
         }
 
-
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
             'modelLineMasters','data','content','rowperpage','addonIds'));
 
@@ -64,14 +63,95 @@ class AddonController extends Controller
         $rowperpage = 12;
         $content = 'addon';
         // Fetch records
-        $addons = AddonDetails::skip($start)
-            ->take($rowperpage)
-            ->orderBy('id','DESC');
+//        info($request->all());
+        $addons = AddonDetails::orderBy('id','DESC');
         if($request->addon_type != 'all')
         {
             $addons =  $addons->where('addon_type_name', $request->addon_type);
         }
-        $addons = $addons->get();
+        /// filter
+        if($request->AddonIds)
+        {
+            info("addonc code serach");
+            $addons = $addons->whereIn('addon_id', $request->AddonIds);
+        }
+        if($request->BrandIds)
+        {
+            info("brandId code serach");
+
+            if(in_array('yes',$request->BrandIds))
+            {
+                info("all brands");
+                $addons = $addons->where('is_all_brands','yes');
+            }
+            else
+            {
+                info("separate branch serach");
+//                $addons = $addons->where('is_all_brands','yes');
+                $addons = $addons->orWhereHas('AddonTypes', function($q) use($request) {
+                    $q = $q->whereIn('brand_id',$request->BrandIds);
+                });
+            }
+        }
+        info($addons->count());
+
+        if($request->ModelLineIds)
+        {
+            info("model lis search");
+//            $addons = $addons->where('is_all_brands','yes');
+            $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
+            {
+                if(!in_array('yes',$request->ModelLineIds))
+                {
+                    info("all model line search");
+
+                    $q = $q->where('is_all_model_lines','yes');
+                }else
+                {
+                    info("separate model line search");
+
+                    $q->where( function ($query) use ($request) {
+                        $query = $query->whereIn('model_id',$request->ModelLineIds);
+                    });
+                }
+            });
+        }
+//        $addonIds = $addons->pluck('id');
+//        info($addonIds);
+//
+//        if(count($addonIds) > 0)
+//        {
+//            $addonsTableData = AddonDetails::whereIn('id',$addonIds)
+//                ->with('AddonTypes', function($q) use($request)
+//                {
+//                    if($request->BrandIds)
+//                    {
+//                        $q = $q->whereIn('brand_id',$request->BrandIds);
+//                    }
+//                    if($request->ModelLineIds)
+//                    {
+//                        $q = $q->whereIn('model_id',$request->ModelLineIds);
+//                    }
+//                    $q = $q->with('brands','modelLines','modelDescription')->get();
+//                })
+//                ->with('AddonName','SellingPrice','PendingSellingPrice');
+//            $addons = $addonsTableData;
+////            foreach($addons as $addonData)
+////            {
+////                $price = '';
+////                $price = SupplierAddons::where('addon_details_id',$addonData->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+////                $addonData->LeastPurchasePrices = $price;
+////            }
+//        }
+        ////////////// filter end ////////////////
+//        info($addons->pluck('id'));
+//        info("start");
+        info($addons->pluck('id'));
+        $addons = $addons->skip($start)
+            ->take($rowperpage)->get();
+        info("addons per request");
+        info($addons->pluck('id'));
+
         $addonIds = $addons->pluck('id');
         $data['addonIds'] = json_decode($addonIds);
         $html = "";
@@ -265,7 +345,7 @@ class AddonController extends Controller
                                                             '.$addon->part_number.'
                                                             </div>';
                                                     }
-        $html .=                                '</div>
+                                    $html .=      '</div>
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
                                                         <img  id="myImg_'.$addon->id.'" class="image-click-class" src=" '.asset('addon_image/' . $addon->image).' "  alt="Addon Image">
@@ -357,6 +437,7 @@ class AddonController extends Controller
                                 }
 
             $html .=         '</div>
+                                </br>
                                 <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
                                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">';
                                         $html.=    $this->addsellingprice($addon);

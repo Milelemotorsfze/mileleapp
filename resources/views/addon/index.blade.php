@@ -197,15 +197,24 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-model-line").select2();
       $('#fltr-addon-code').change(function()
       {
-        addonFilter();
+          var totalrecords = Number($('#totalrecords').val());
+          var start = 0;
+          $('.each-addon').attr('hidden', true);
+          fetchData(start,totalrecords);
       });
       $('#fltr-brand').change(function()
       {
-        addonFilter();
+          var totalrecords = Number($('#totalrecords').val());
+          var start = 0;
+          $('.each-addon').attr('hidden', true);
+          fetchData(start,totalrecords);
       });
       $('#fltr-model-line').change(function()
       {
-        addonFilter();
+          var totalrecords = Number($('#totalrecords').val());
+          var start = 0;
+          $('.each-addon').attr('hidden', true);
+          fetchData(start,totalrecords);
       });
       $('.modal-button').on('click', function()
       {
@@ -264,119 +273,72 @@ body {font-family: Arial, Helvetica, sans-serif;}
       let addonBoxButton = document.getElementById('addonBoxButton');
       addonBoxButton.hidden = true
     }
-    function addonFilter(global)
-    {
-      var AddonIds = [];
-      var BrandIds = [];
-      var ModelLineIds = [];
-      var Data = '';
-      var AddonIds = $('#fltr-addon-code').val();
-      var BrandIds = $('#fltr-brand').val();
-      if (BrandIds === undefined || BrandIds.length == 0)
-      {
-        $('#allBrandsFilter').prop("disabled", false);
-        $('.allBrandsFilterClass').prop("disabled", false);
-        $('#ModelLineDiv').show();
-      }
-      else
-      {
-        if(BrandIds.includes('yes'))
-        {
-          $('.allBrandsFilterClass').prop("disabled", true);
-          $('#ModelLineDiv').hide();
-        }
-        else
-        {
-          $('#allBrandsFilter').prop("disabled", true);
-        }
-      }
+        // function addonFilter(global) {
+        //     var AddonIds = [];
+        //     var BrandIds = [];
+        //     var ModelLineIds = [];
+        //     var Data = '';
+        //     var AddonIds = $('#fltr-addon-code').val();
+        //     var BrandIds = $('#fltr-brand').val();
+        //     if (BrandIds === undefined || BrandIds.length == 0) {
+        //         $('#allBrandsFilter').prop("disabled", false);
+        //         $('.allBrandsFilterClass').prop("disabled", false);
+        //         $('#ModelLineDiv').show();
+        //     } else {
+        //         if (BrandIds.includes('yes')) {
+        //             $('.allBrandsFilterClass').prop("disabled", true);
+        //             $('#ModelLineDiv').hide();
+        //         } else {
+        //             $('#allBrandsFilter').prop("disabled", true);
+        //         }
+        //     }
+        // }
 
-      var ModelLineIds = $('#fltr-model-line').val();
-      if (ModelLineIds === undefined || ModelLineIds.length == 0)
-      {
-        $('#allMoLiId').prop("disabled", false);
-        $('.allMoLiClass').prop("disabled", false);
-      }
-      else
-      {
-        if(ModelLineIds.includes('yes'))
-        {
-          $('.allMoLiClass').prop("disabled", true);
-        }
-        else
-        {
-          $('#allMoLiId').prop("disabled", true);
-        }
-      }
-
-      var Data = $('#data').val();
-      $.ajax
-      ({
-        url:"{{url('addonFilters')}}",
-        type: "POST",
-        data:
-        {
-          AddonIds: AddonIds,
-          BrandIds: BrandIds,
-          ModelLineIds: ModelLineIds,
-          Data: Data,
-          _token: '{{csrf_token()}}'
-        },
-        dataType : 'json',
-        success: function(result)
-        {
-          $(".each-addon").hide();
-          $(".tr").hide();
-          $.each(result.addonsBox, function (index, value)
-          {
-            $("#"+value).show();
-          });
-          $.each(result.addonsTable, function (index, value)
-          {
-            if(value.is_all_brands == 'yes')
-            {
-              $("."+value.id+"_allbrands").show();
-            }
-            else
-            {
-              $.each(value.addon_types, function (index, val)
-              {
-                if(val.is_all_model_lines == 'yes')
-                {
-                  $("."+value.id+"_"+val.brand_id+"_all_model_lines").show();
-                }
-                else
-                {
-                  $("."+value.id+"_"+val.brand_id+"_"+val.model_id).show();
-                }
-              });
-            }
-          });
-        }
-      });
-    }
     function onScroll(){
         if($(window).scrollTop() > $(document).height() - $(window).height()-100) {
-            fetchData();
+            var start = Number($('#start').val());
+            var totalrecords = Number($('#totalrecords').val());
+            var rowperpage = Number($('#rowperpage').val());
+            start = start + rowperpage;
+            if(start <= totalrecords) {
+                $('#start').val(start);
+            }
+            fetchData(start,totalrecords);
         }
     }
     $(window).scroll(function(){
         onScroll();
     });
-    function fetchData() {
+    function fetchData(start,totalrecords) {
+        var BrandIds = [];
 
-        var start = Number($('#start').val());
+        var AddonIds = $('#fltr-addon-code').val();
+        var BrandIds = $('#fltr-brand').val();
+
+        var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
-        var totalrecords = Number($('#totalrecords').val());
         var rowperpage = Number($('#rowperpage').val());
-        start = start + rowperpage;
-        if(start <= totalrecords){
-            $('#start').val(start);
+            if (BrandIds === undefined || BrandIds.length == 0) {
+                $('#allBrandsFilter').prop("disabled", false);
+                $('.allBrandsFilterClass').prop("disabled", false);
+                $('#ModelLineDiv').show();
+            } else {
+                if (BrandIds.includes('yes')) {
+                    $('.allBrandsFilterClass').prop("disabled", true);
+                    $('#ModelLineDiv').hide();
+                } else {
+                    $('#allBrandsFilter').prop("disabled", true);
+                }
+            }
+
             $.ajax({
                 url:"{{url('getAddonlists')}}",
                 data: {
                     start:start,
                     addon_type:addon_type,
+                    AddonIds: AddonIds,
+                    BrandIds: BrandIds,
+                    ModelLineIds: ModelLineIds
                 },
                 dataType: 'json',
                 success: function(response){
@@ -390,7 +352,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                 }
             });
-        }
+
     }
   </script>
 @endsection
