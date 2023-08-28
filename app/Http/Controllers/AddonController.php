@@ -42,8 +42,11 @@ class AddonController extends Controller
         {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-        $addon1 = $addon1->orderBy('id', 'DESC')->get();
-//        $addon1 = $addon1->orderBy('id', 'DESC')->take($rowperpage)->get();
+//        $addon1 = $addon1->orderBy('id', 'DESC')->get();
+        $addon1 = $addon1->orderBy('id', 'DESC')->take($rowperpage)->get();
+        $addonIds = $addon1->pluck('id');
+        $addonIds = json_decode($addonIds);
+//        dd($addonIds);
         foreach($addon1 as $addon)
         {
             $price = '';
@@ -51,8 +54,8 @@ class AddonController extends Controller
             $addon->LeastPurchasePrices = $price;
         }
 
-        return view('addon.index',compact('addon1','addonMasters','brandMatsers',
-            'modelLineMasters','data','content','rowperpage'));
+        return view('addon.test',compact('addon1','addonMasters','brandMatsers',
+            'modelLineMasters','data','content','rowperpage','addonIds'));
 
     }
     public function getAddonlists(Request $request) {

@@ -59,7 +59,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 /* Add Animation */
-.modalContentForImage, #caption {  
+.modalContentForImage, #caption {
   -webkit-animation-name: zoom;
   -webkit-animation-duration: 0.6s;
   animation-name: zoom;
@@ -67,12 +67,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
 }
 
 @-webkit-keyframes zoom {
-  from {-webkit-transform:scale(0)} 
+  from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}
 }
 
 @keyframes zoom {
-  from {transform:scale(0)} 
+  from {transform:scale(0)}
   to {transform:scale(1)}
 }
 
@@ -120,21 +120,21 @@ body {font-family: Arial, Helvetica, sans-serif;}
     @if ($hasPermission)
     <a id="addonListTableButton" onclick="showAddonTable()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info">
       <i class="fa fa-table" aria-hidden="true"></i>
-    </a>  
+    </a>
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
-    </a> 
+    </a>
     @endif
     @endcanany
     <ul class="nav nav-pills nav-fill">
-      
+
       <!-- <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">Active Addons</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Inactive Addons</a>
       </li> -->
-    </ul> 
+    </ul>
   </div>
   <div class="card-header">
     <form>
@@ -170,7 +170,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       </div>
     </form>
   </div>
-  
+
   <div id="myModal" class="modal modalForImage">
   <span class="closeImage close">&times;</span>
   <img class="modalContentForImage" id="img01">
@@ -190,15 +190,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-brand").select2();
       $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
       $("#fltr-model-line").select2();
-      $('#fltr-addon-code').change(function() 
+      $('#fltr-addon-code').change(function()
       {
         addonFilter();
       });
-      $('#fltr-brand').change(function() 
+      $('#fltr-brand').change(function()
       {
         addonFilter();
       });
-      $('#fltr-model-line').change(function() 
+      $('#fltr-model-line').change(function()
       {
         addonFilter();
       });
@@ -215,7 +215,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       });
     });
     // show image in large view
-    $('.image-click-class').click(function (e) 
+    $('.image-click-class').click(function (e)
     {
         var id =  $(this).attr('id');
         var src = $(this).attr('src');
@@ -227,11 +227,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
         modalImg.src = src;
         captionText.innerHTML = this.alt;
       })
-      $('.closeImage').click(function (e) 
+      $('.closeImage').click(function (e)
       {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
-      })   
+      })
     function closemodal()
     {
       $('.modal').removeClass('modalshow');
@@ -267,7 +267,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       var Data = '';
       var AddonIds = $('#fltr-addon-code').val();
       var BrandIds = $('#fltr-brand').val();
-      if (BrandIds === undefined || BrandIds.length == 0) 
+      if (BrandIds === undefined || BrandIds.length == 0)
       {
         $('#allBrandsFilter').prop("disabled", false);
         $('.allBrandsFilterClass').prop("disabled", false);
@@ -284,10 +284,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
         {
           $('#allBrandsFilter').prop("disabled", true);
         }
-      } 
+      }
 
       var ModelLineIds = $('#fltr-model-line').val();
-      if (ModelLineIds === undefined || ModelLineIds.length == 0) 
+      if (ModelLineIds === undefined || ModelLineIds.length == 0)
       {
         $('#allMoLiId').prop("disabled", false);
         $('.allMoLiClass').prop("disabled", false);
@@ -309,13 +309,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
       ({
         url:"{{url('addonFilters')}}",
         type: "POST",
-        data: 
+        data:
         {
           AddonIds: AddonIds,
           BrandIds: BrandIds,
           ModelLineIds: ModelLineIds,
           Data: Data,
-          _token: '{{csrf_token()}}' 
+          _token: '{{csrf_token()}}'
         },
         dataType : 'json',
         success: function(result)
@@ -350,6 +350,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         }
       });
     }
+
   </script>
 @endsection
 

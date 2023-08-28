@@ -420,7 +420,7 @@
                                             View More <i class="fa fa-arrow-down"></i>
                                         </button>
                                         <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
-                                                onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
+                                                onclick="viewLess({{$addonsdata->id}})" id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
                                             View Less<i class="fa fa-arrow-down"></i>
                                         </button>
                                     </div>
@@ -447,6 +447,9 @@
 <script>
     var addons = [];
     var addonCount = '{{$addon1->count()}}';
+    var addons = '{{ json_encode($addonIds) }}';
+    console.log("array test");
+    console.log(addons[0]);
 
     for(var i=0;i<=addonCount;i++) {
         var addonTypeCount = $('#addon-type-count-'+i).val();
