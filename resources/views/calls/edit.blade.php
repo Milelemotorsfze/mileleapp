@@ -357,9 +357,9 @@ $brand_name = $brand->brand_name;
                     $('#phoneCount').text('Phone count: ' + response.phoneCount);
                     $('#emailCount').text('Email count: ' + response.emailCount);
                     if (response.phoneCount > 0 || response.emailCount > 0) {
-                        var customerNames = response.customerNames.join(', ');
-                        var message = 'Customer Names: ' + customerNames + '<br>';
-                        message += 'Phone Count: ' + response.phoneCount + '<br>';
+                        // var customerNames = response.customerNames.join(', ');
+                        // var message = 'Customer Names: ' + customerNames + '<br>';
+                        message = 'Phone Count: ' + response.phoneCount + '<br>';
                         message += 'Email Count: ' + response.emailCount;
                         var buttonHtml = '<a href="{{ route('repeatedcustomers') }}?phone=' + encodeURIComponent(phone) + '&email=' + email + '" class="btn btn-primary">See Details</a>';
                         message += '<br>' + buttonHtml;

@@ -179,10 +179,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
     @include('addon.listbox')
     @include('addon.table')
 @endif
+  <input type="hidden" id="start" value="0">
+  <input type="hidden" id="rowperpage" value="{{ $rowperpage }}">
+  <input type="hidden" id="totalrecords" value="{{$rowperpage}}">
+  <input type="hidden" name="addon_type" id="addon_type" value="{{$data}}">
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};
-    var addon = {!! json_encode($addonIds) !!};
+
     $(document).ready(function ()
     {
       // console.log(addon[0]);
@@ -352,7 +356,43 @@ body {font-family: Arial, Helvetica, sans-serif;}
         }
       });
     }
+    function onScroll(){
+        if($(window).scrollTop() > $(document).height() - $(window).height()-100) {
+            fetchData();
+        }
+    }
+    $(window).scroll(function(){
+        onScroll();
+    });
+    function fetchData() {
 
+        var start = Number($('#start').val());
+        var addon_type = $('#addon_type').val();
+        var totalrecords = Number($('#totalrecords').val());
+        var rowperpage = Number($('#rowperpage').val());
+        start = start + rowperpage;
+        if(start <= totalrecords){
+            $('#start').val(start);
+            $.ajax({
+                url:"{{url('getAddonlists')}}",
+                data: {
+                    start:start,
+                    addon_type:addon_type,
+                },
+                dataType: 'json',
+                success: function(response){
+
+                    var total_record = rowperpage + totalrecords;
+                    $('#totalrecords').val(total_record);
+
+                    $(".each-addon:last").after(response.html).show().fadeIn("slow");
+                    var addonIds = response.addonIds;
+                    hideModelDescription(addonIds);
+
+                }
+            });
+        }
+    }
   </script>
 @endsection
 

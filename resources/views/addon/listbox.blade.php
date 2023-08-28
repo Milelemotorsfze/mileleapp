@@ -448,19 +448,29 @@
 <script>
     var addons = [];
     var addonCount = '{{$addon1->count()}}';
+    var addonsIds = {!! json_encode($addonIds)  !!};
+    $(document).ready(function () {
+        hideModelDescription(addonsIds);
 
-    for(var i=0;i<=addonCount;i++) {
-        var addonTypeCount = $('#addon-type-count-'+i).val();
+    });
+
+    function hideModelDescription(addonsIds)
+    {
+        for(var i=0;i<=addonCount;i++) {
+        var addonTypeCount = $('#addon-type-count-'+addonsIds[i]).val();
+
         if(addonTypeCount > 5) {
             for(var j=5;j<=addonTypeCount;j++) {
-                $('.addon-'+i+'-brand-'+j).attr('hidden',true);
-                $('.addon-'+i+'-model-line-'+j).attr('hidden',true);
-                $('.addon-'+i+'-model-number-'+j).attr('hidden', true);
+                $('.addon-'+addonsIds[i]+'-brand-'+j).attr('hidden',true);
+                $('.addon-'+addonsIds[i]+'-model-line-'+j).attr('hidden',true);
+                $('.addon-'+addonsIds[i]+'-model-number-'+j).attr('hidden', true);
             }
         }
     }
 
+    }
     function viewMore(addonId) {
+
         var addonTypeCount = $('#addon-type-count-'+addonId).val();
         $('#view-more-'+addonId).attr('hidden', true);
         $('#view-less-'+addonId).attr('hidden', false);
@@ -483,6 +493,5 @@
             $('.addon-'+addonId+'-model-number-'+j).attr('hidden', true);
 
         }
-
     }
 </script>

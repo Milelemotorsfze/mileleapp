@@ -30,7 +30,7 @@ class AddonController extends Controller
      */
     public function index($data)
     {
-        $rowperpage = 10;
+        $rowperpage = 12;
         $content = 'addon';
         $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
@@ -60,16 +60,19 @@ class AddonController extends Controller
     }
     public function getAddonlists(Request $request) {
         $start = $request->start;
-        $rowperpage = 10;
+        $rowperpage = 12;
         $content = 'addon';
         // Fetch records
         $addons = AddonDetails::skip($start)
-            ->where('addon_type_name',$request->addon_type)
             ->take($rowperpage)
             ->orderBy('id','DESC');
-
+        if($request->addon_type != 'all')
+        {
+            $addons =  $addons->where('addon_type_name', $request->addon_type);
+        }
         $addons = $addons->get();
-
+        $addonIds = $addons->pluck('id');
+        $data['addonIds'] = json_decode($addonIds);
         $html = "";
         foreach($addons as $value => $addon){
 
@@ -354,11 +357,12 @@ class AddonController extends Controller
 
             $html .=         '</div>
                                 <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
-                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                        Include files
+                                    <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">';
+                                        $html.=    $this->addsellingprice($addon);
+                                        $html.=    $this->actionPage($addon);
+            $html .=                   '</div>
                                     </div>
-                                </div>
-                            </div>';
+                                </div>';
         }
 
         $data['html'] = $html;
@@ -368,6 +372,15 @@ class AddonController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    function actionPage($addon) {
+        $addonsdata = $addon;
+        return view('addon.action.action', compact('addonsdata'));
+    }
+    function addsellingprice($addon) {
+
+        $addonsdata = $addon;
+        return view('addon.action.addsellingprice', compact('addonsdata'));
+    }
     public function create()
     {
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');

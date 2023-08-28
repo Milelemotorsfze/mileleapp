@@ -447,9 +447,6 @@
 <script>
     var addons = [];
     var addonCount = '{{$addon1->count()}}';
-    var addons = '{{ json_encode($addonIds) }}';
-    console.log("array test");
-    console.log(addons[0]);
 
     for(var i=0;i<=addonCount;i++) {
         var addonTypeCount = $('#addon-type-count-'+i).val();
@@ -463,7 +460,7 @@
     }
 
     function viewMore(addonId) {
-        alert("ok");
+
         var addonTypeCount = $('#addon-type-count-'+addonId).val();
         $('#view-more-'+addonId).attr('hidden', true);
         $('#view-less-'+addonId).attr('hidden', false);

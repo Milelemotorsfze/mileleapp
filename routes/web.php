@@ -283,6 +283,7 @@ Route::get('/d', function () {
     Route::post('/update-qoutation-info', [DailyleadsController::class, 'qoutations'])->name('sales.qoutations');
     Route::post('/update-rejection-info', [DailyleadsController::class, 'rejection'])->name('sales.rejection');
     Route::post('/update-closed-info', [DailyleadsController::class, 'closed'])->name('sales.closed');
+    Route::post('/update-closed-negotiation', [DailyleadsController::class, 'savenegotiation'])->name('sales.savenegotiation');
 
     // HR
     Route::resource('hiring', HiringController::class);
@@ -371,6 +372,11 @@ Route::get('/d', function () {
     Route::post('/marekting/update-charts', [HomeController::class, 'marketingupdatechart'])->name('homemarketing.update-charts');
     Route::post('/marekting/lead-distribution', [HomeController::class, 'leaddistruition'])->name('homemarketing.leaddistruition');
     Route::get('/marekting/lead-distribution-detail', [HomeController::class, 'leaddistruitiondetail'])->name('homemarketing.leaddistruitiondetails');
+    Route::get('/get-vehicles-data-for-movementso', [MovementController::class, 'getVehiclesDataformovementso'])->name('vehicles.getVehiclesDataformovementso');
+    Route::post('movemnet/get-vehicles-detailsaspo', [MovementController::class, 'vehiclesdetailsaspo'])->name('vehicles.vehiclesdetailsaspo');
+    Route::post('movemnet/get-vehicles-detailsasso', [MovementController::class, 'vehiclesdetailsasso'])->name('vehicles.vehiclesdetailsasso');
+    Route::post('/update-prospecting-info', [DailyleadsController::class, 'saveprospecting'])->name('sales.saveprospecting');
+    Route::post('/update-demand-info', [DailyleadsController::class, 'savedemand'])->name('sales.savedemand');
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');

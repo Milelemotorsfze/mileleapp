@@ -1,5 +1,4 @@
 
-
 @if($addonsdata->addon_type_name == 'K')
     <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$addonsdata->id) }}">
             <i class="fa fa-eye" aria-hidden="true"></i>

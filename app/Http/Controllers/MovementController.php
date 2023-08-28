@@ -11,6 +11,7 @@ use App\Models\Brand;
 use Illuminate\Support\Facades\Auth;
 use App\Models\MovementsReference;
 use App\Models\Grn;
+use App\Models\So;
 use App\Models\Gdn;
 use App\Models\PurchasingOrder;
 use Illuminate\Http\Request;
@@ -108,14 +109,31 @@ class MovementController extends Controller
         ->pluck('vin');       
     $warehouses = Warehouse::select('id', 'name')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
-    $purchasing_order = PurchasingOrder::where('status', 'Approved')->get();
+    $purchasing_order = PurchasingOrder::where('status', 'Approved')
+    ->whereDoesntHave('vehicles', function ($query) {
+        $query->whereNotNull('gdn_id');
+    })
+    ->get();
+    $po = PurchasingOrder::where('status', 'Approved')
+    ->whereDoesntHave('vehicles', function ($query) {
+        $query->whereNotNull('gdn_id');
+    })
+    ->pluck('po_number');
+    $so_number = So::whereDoesntHave('vehicles', function ($query) {
+        $query->whereNotNull('gdn_id');
+    })
+    ->pluck('so_number');
+    $so = So::whereDoesntHave('vehicles', function ($query) {
+        $query->whereNotNull('gdn_id');
+    })
+    ->get();
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
     $NextIdExists = MovementsReference::where('id', $movementsReferenceId + 1)->exists();
     return view('movement.create', [
         'movementsReferenceId' => $movementsReferenceId,
         'lastIdExists' => $lastIdExists,
         'NextIdExists' => $NextIdExists,
-    ], compact('vehicles', 'warehouses','purchasing_order'));
+    ], compact('vehicles', 'warehouses','purchasing_order', 'so', 'po', 'so_number'));
     }
     /**
      * Store a newly created resource in storage.
@@ -232,6 +250,8 @@ class MovementController extends Controller
     $vehicle = Vehicles::where('vin', $vin)->first();
     $variant = Varaint::find($vehicle->varaints_id)->name;
     $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+    $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+    $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
     $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
     $movement = Movement::where('vin', $vin)->pluck('to')->last();
     $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
@@ -242,9 +262,40 @@ class MovementController extends Controller
         'variant' => $variant,
         'brand' => $brand,
         'movement' => $warehouseName,
+        'po_number' => $po_number,
+        'so_number' => $so_number,
         'modelLine' => $modelLine
     ]);
     }
+    public function vehiclesdetailsaspo(Request $request)
+    {
+    $selectedPo = $request->input('po');
+    $po_id = PurchasingOrder::where('po_number', $selectedPo)
+    ->pluck('id');
+    $vehiclesWithSelectedPo = Vehicles::where('purchasing_order_id', $po_id)->where('gdn_id', null)->pluck('vin');
+    $so_ids = Vehicles::where('purchasing_order_id', $po_id)->whereNull('gdn_id')->pluck('so_id');
+    $so_numbers = So::whereIn('id', $so_ids)->pluck('so_number');
+    info($so_numbers);
+    return response()->json([
+        'vin_list' => $vehiclesWithSelectedPo,
+        'so_number' => $so_numbers,
+    ]);
+    }
+    public function vehiclesdetailsasso(Request $request)
+    {
+    $selectedSo = $request->input('so');
+    $so_id = So::where('so_number', $selectedSo)
+    ->pluck('id');
+    $vehiclesWithSelectedSo = Vehicles::where('so_id', $so_id)->where('gdn_id', null)->pluck('vin');
+    $purchasing_order_id = Vehicles::where('so_id', $so_id)->whereNull('gdn_id')->pluck('purchasing_order_id');
+    $po_numbers = PurchasingOrder::whereIn('id', $purchasing_order_id)->pluck('po_number');
+    info($po_numbers);
+    return response()->json([
+        'vin_list' => $vehiclesWithSelectedSo,
+        'po_number' => $po_numbers,
+    ]);
+    }
+    
     public function grnlist(){
         return view('movement.grnlist');   
     }
@@ -312,13 +363,14 @@ public function grnfilepost(Request $request)
             ->whereNull('gdn_id')
             ->where('payment_status', '=', 'Incoming Stock')
             ->pluck('id');
-            
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);
                 $vehicleDetails[$key]['vin'] = $data->vin;
                 $vehicle = Vehicles::where('vin', $data->vin)->first();
                 $variant = Varaint::find($vehicle->varaints_id)->name;
+                $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+                $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
                 $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
                 $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
                 $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
@@ -332,11 +384,50 @@ public function grnfilepost(Request $request)
                     }
                  $vehicleDetails[$key]['variant'] = $variant;
                  $vehicleDetails[$key]['modelLine'] = $modelLine;
-                 $vehicleDetails[$key]['brand'] = $variant;
+                 $vehicleDetails[$key]['brand'] = $brand;
                  $vehicleDetails[$key]['warehouseName'] = $warehouseName;
                  $vehicleDetails[$key]['warehouseNames'] = $warehouseNames;
+                 $vehicleDetails[$key]['po_number'] = $po_number;
+                 $vehicleDetails[$key]['so_number'] = $so_number;
             }
-            //  info($vehicleDetails);
+         return response()->json($vehicleDetails);
+    }
+    public function getVehiclesDataformovementso(Request $request)
+    {
+        $selectedSOId = $request->input('so_id');
+        $vehicles = Vehicles::where('so_id', $selectedSOId)
+            ->whereNotNull('vin')
+            ->where('status', '!=', 'cancel')
+            ->whereNull('gdn_id')
+            ->where('payment_status', '=', 'Incoming Stock')
+            ->pluck('id');
+            $vehicleDetails = [];
+            foreach($vehicles  as $key =>  $vehicle) {
+                $data = Vehicles::find($vehicle);
+                $vehicleDetails[$key]['vin'] = $data->vin;
+                $vehicle = Vehicles::where('vin', $data->vin)->first();
+                $variant = Varaint::find($vehicle->varaints_id)->name;
+                $po_number = PurchasingOrder::find($vehicle->purchasing_order_id)->po_number;
+                $so_number = $vehicle->so_id ? So::find($vehicle->so_id)->so_number : '';
+                $modelLine = MasterModelLines::find($vehicle->variant->master_model_lines_id)->model_line;
+                $brand = Brand::find($vehicle->variant->brands_id)->brand_name;
+                $movement = Movement::where('vin', $data->vin)->pluck('to')->last();
+                $warehouseName = Warehouse::where('id', $movement)->pluck('id')->first();
+                $warehouseNames = Warehouse::where('id', $movement)->pluck('name')->first();
+                if (empty($warehouseName)) {
+                 $warehouseName = 1;
+                 }
+                 if (empty($warehouseNames)) {
+                    $warehouseNames = "Supplier";
+                    }
+                 $vehicleDetails[$key]['variant'] = $variant;
+                 $vehicleDetails[$key]['modelLine'] = $modelLine;
+                 $vehicleDetails[$key]['brand'] = $brand;
+                 $vehicleDetails[$key]['warehouseName'] = $warehouseName;
+                 $vehicleDetails[$key]['warehouseNames'] = $warehouseNames;
+                 $vehicleDetails[$key]['po_number'] = $po_number;
+                 $vehicleDetails[$key]['so_number'] = $so_number;
+            }
          return response()->json($vehicleDetails);
     }
     }
