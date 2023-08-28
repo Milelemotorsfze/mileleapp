@@ -11,6 +11,7 @@ class AddonDetails extends Model
     use HasFactory, SoftDeletes;
     protected $table = "addon_details";
     protected $fillable = [
+        'id',
         'addon_id',
         'addon_code',
         'addon_type_name',

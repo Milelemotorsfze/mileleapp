@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\AddonSellingPrice;
+use App\Models\KitPriceHistory;
 use App\Models\SparePartsNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -277,8 +279,6 @@ class KitCommonItemController extends Controller
         $unselectedKitItems = array_diff($alreadyAddedItems, $kitItemiD);
         $availableCommonItems = AddonDetails::whereIn('id', $unselectedKitItems)->get();
 
-//        return $availableCommonItems;
-
         // kit common items which is used for this kit
 
         return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitModelLineIds','alreadyAddedItems',
@@ -469,75 +469,36 @@ class KitCommonItemController extends Controller
         $supplierAddonDetails = AddonDetails::where('id',$id)
                                     ->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')
                                     ->first();
-        // 'KitItems.item.AddonName','KitItems.partNumbers','KitItems.item.AddonSuppliers.Suppliers',
-        // old code start
-        // 'AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName'
-
-        // old code end
-
-        // find model description Spare parts
-        $modelDescriptionsId = [];
-
-        $modelDescriptionsId = Addontypes::where('addon_details_id',$id)->pluck('model_number');
-        $othrModelDesArr = Addontypes::whereIn('model_number',$modelDescriptionsId)->pluck('addon_details_id');
-//        foreach($supplierAddonDetails->KitItems as $oneItem)
-//        {
-//            $itemAddonDes = '';
-//            $itemAddonDes = AddonDescription::where('id',$oneItem->item_id)->select('addon_id','description')->first();
-//            if($itemAddonDes != '')
-//            {
-//                $itemSpIds = [];
-//                $itemSpIds = AddonDetails::whereIn('addon_id',$othrModelDesArr)->where('addon_id',$itemAddonDes->addon_id)
-//                    ->where('description',$itemAddonDes->description)->pluck('id');
-//                // $supplierAddons = SupplierAddons::where('addon_details_id',$itemSpIds->id)->pluck('id');
-//                // $leastPrice = PurchasePriceHistory::where('supplier_addon_id',$supplierAddons)
-//            }
-//            // dd($oneItem->item_id);
-//        }
-
-    // dd($modelDescriptions);
         $totalPrice = 0;
         foreach($supplierAddonDetails->KitItems as $oneItem)
         {
-            $itemMinPrice= '';
-//            $itemMinPrice = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')->min('purchase_price_aed');
-//            $oneItem->leastPriceSupplier = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
-//                                            ->where('purchase_price_aed',$itemMinPrice)->with('Suppliers')->first();
-//            $oneItem->allItemSuppliers = SupplierAddons::where('addon_details_id',$oneItem->item_id)->where('status','active')
-//                                    ->orderBy('purchase_price_aed','ASC')->with('Suppliers')->get();
-//            $oneItem->totalItemPrice =  $itemMinPrice * $oneItem->quantity;
             $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
         }
         $supplierAddonDetails->totalPrice = $totalPrice;
-                // old code start
-                $price = '';
-//                $price = SupplierAddons::where('addon_details_id',$supplierAddonDetails->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-//                $supplierAddonDetails->LeastPurchasePrices = $price;
-                //old code end
 
-        // $supplierAddonDetails = AddonDetails::where('id',$id)->with('AddonName','AddonTypes.brands','SellingPrice','AddonSuppliers.Suppliers',
-        // 'AddonSuppliers.Kit.addon.AddonName')->with('LeastPurchasePrices', function($q)
-        // {
-        //     return $q->where('status','active')->min('purchase_price_aed');
-        //     // $q->where('status','active')->ofMany('purchase_price_aed', 'min')->first();
-        // })->first();
-        // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
-        // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
-        // dd($supplierAddonDetails->KitItems);
+        $previousPurchsePriceHistory = KitPriceHistory::where('status', 'active')
+                                        ->where('addon_details_id', $id)
+                                        ->first();
+        $previousPurchasePrice = 0;
+        if($previousPurchsePriceHistory) {
+            if($previousPurchsePriceHistory->old_price != '') {
+                $previousPurchasePrice = $previousPurchsePriceHistory->old_price;
+            }else{
+                $previousPurchasePrice = $previousPurchsePriceHistory->updated_price;
+            }
+        }
+        $previousSellingPriceHistory = AddonSellingPrice::where([
+            ['addon_details_id','=', $id],
+            ['status','=','active']
+        ])->latest()->first();
+        $previousSellingPrice = 0;
+        if($previousSellingPriceHistory) {
+           $previousSellingPrice = $previousSellingPriceHistory->selling_price;
 
+        }
 
-        // foreach($supplierAddonDetails->KitItems as $kitItem)
-        // {
-        //     // dd($kitItem->item_id);
-        //     $itemDes = '';
-        //     $itemDes = AddonDescription::where('id',$kitItem->item_id)->first();
-        //     if($itemDes != '')
-        //     {
-        //         $sparePartsID = AddonDetails::where('addon_id',$itemDes->addon_id)
-        //     }
-        // }
-
-        return view('kit.kititems',compact('supplierAddonDetails'));
+        return view('kit.kititems',compact('supplierAddonDetails','previousPurchasePrice',
+        'previousSellingPrice'));
     }
     public function getCommonKitItems(Request $request) {
 
@@ -596,15 +557,12 @@ class KitCommonItemController extends Controller
         }
         if($request->current_selling_price != '' && $request->previous_selling_price != $request->current_selling_price)
         {
-//            $sellingPrice = AddonSellingPrice::where([
-//                ['addon_details_id','=',]
-//            ])
             $sellingPrice = AddonSellingPrice::where([
                 ['addon_details_id','=',$request->addon_details_id],
                 ['selling_price','=',$request->current_selling_price],
                 ['status','=','pending']
             ])->latest()->first();
-            if($sellingPrice != '')
+            if(!$sellingPrice)
             {
                 $createSellingPrice['addon_details_id'] = $request->addon_details_id;
                 $createSellingPrice['selling_price'] = $request->current_selling_price;
@@ -621,6 +579,7 @@ class KitCommonItemController extends Controller
         $currentSupplierAddon = SupplierAddons::find($request->id);
         $data['item_image'] = url('addon_image/' . $currentSupplierAddon->supplierAddonDetails->image) ;
         $data['item_code'] = $currentSupplierAddon->supplierAddonDetails->addon_code;
+        $data['item_id'] = $currentSupplierAddon->supplierAddonDetails->id;
         $addonDetailId = $currentSupplierAddon->addon_details_id;
         $data['part_number'] = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
 

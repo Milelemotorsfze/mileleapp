@@ -358,6 +358,7 @@
                                                                         <label for="choices-single-default" class="form-label font-size-13">Choose Items</label>
                                                                         <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[{{$i}}][item]" id="mainItem{{$i}}"
                                                                                 multiple="true" style="width: 100%;" data-index="{{$i}}" onchange="KitItemValidations(this,{{$i}})" >
+
                                                                             <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $alreadyAddedItems)) selected @endif>
                                                                                 {{$kitItemDropdownData->item->addon_code}}
                                                                                 ( {{$kitItemDropdownData->item->Addon->name}}

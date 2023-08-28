@@ -106,6 +106,11 @@ Route::get('/d', function () {
     Route::get('getUniqueAddonDescription', [AddonController::class, 'getUniqueAddonDescription'])->name('addon.getUniqueAddonDescription');
     Route::get('getUniqueKits', [AddonController::class, 'getUniqueKits'])->name('addon.getUniqueKits');
 
+    // addon scroll list route
+
+        Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
+
+
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
     Route::get('addons/brandModels/{id}', [AddonController::class, 'brandModels'])->name('addon.brandModels');
     Route::get('addons/{data}', [AddonController::class,'index'])->name('addon.list');
@@ -131,7 +136,6 @@ Route::get('/d', function () {
     Route::get('getCommonKitItems', [KitCommonItemController::class, 'getCommonKitItems'])->name('getCommonKitItems');
     Route::post('kit/priceStore', [KitCommonItemController::class, 'priceStore'])->name('kit.priceStore');
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
-
 
 
     // Warranty

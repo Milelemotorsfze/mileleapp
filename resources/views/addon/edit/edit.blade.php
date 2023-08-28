@@ -145,6 +145,7 @@
         @endif
         <form id="createAddonForm" name="createAddonForm" method="POST" enctype="multipart/form-data" action="{{ route('addon.updatedetails',$addonDetails->id) }}">
             @csrf
+            <input type="hidden" name="kit_id" value="{{ request()->kit_id}}">
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
                 <div class="col-xxl-9 col-lg-6 col-md-12">
@@ -264,10 +265,10 @@
                         <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
                         name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed }}"
                         autocomplete="purchase_price" autofocus readonly>
-                                                    <div class="input-group-append">
-                                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                                    </div>
-                                                </div>
+                            <div class="input-group-append">
+                                <span class="input-group-text widthinput" id="basic-addon2">AED</span>
+                            </div>
+                        </div>
                             @error('purchase_price')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
