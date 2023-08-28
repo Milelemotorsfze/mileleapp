@@ -12,18 +12,20 @@ class Repeatedcustomers extends Controller
         $email = $request->query('email');
         if($phone != null && $email == null)
         {
-        $calls = Calls::where('phone', $phone)
-                ->get();
+        $cleanedPhone = ltrim($phone, '+');
+        $calls = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+        ->get();
         }
         else if($phone == null && $email != null)
         {
         $calls = Calls::where('email', $email)
-                ->get();
+        ->get();
         }
         else{
+            $cleanedPhone = ltrim($phone, '+');
             $calls = Calls::where('email', $email)
-                    ->orwhere('phone', $phone)
-                ->get(); 
+                     ->orwhere('phone', 'LIKE', '%' . $cleanedPhone)
+                     ->get(); 
         }
         return view('calls.repeatedcustomer', compact('calls'));
     }

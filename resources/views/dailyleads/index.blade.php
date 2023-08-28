@@ -1,13 +1,16 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-@section('content')
-@php
+                    @section('content')
+                    @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
                     @endphp
                     @if ($hasPermission)
   <div class="card-header">
   <style>
+    #dtBasicExample2 {
+        width: 100%;
+    }
   .wrapper 
   {
     display: table-cell;
@@ -136,30 +139,23 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="pill" href="#tab1">New / Pending Inquiry</a>
       </li>
-      @can('user-view')
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab2">Prospecting</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Qualification</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab3">Demands</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Demands</a>
-      </li>
-      @endcan
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Quotation</a>
-      </li>
-      @can('user-view')
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Negotiation</a>
-      </li>
-      @endcan
-      <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Closed</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab4">Quotation</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab8">Rejected Inquiry</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Closed</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
       </li>
     </ul>      
   </div>
@@ -167,11 +163,11 @@ input[type=number]::-webkit-outer-spin-button
     @can('sales-view')
       <div class="tab-pane fade show active" id="tab1">
       <br>
-      <div class="row">
+      <!-- <div class="row">
   <div class="col-lg-1">
     <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
   </div>
-</div>
+</div> -->
         <div class="card-body">
           <div class="table-responsive">
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table">
@@ -224,7 +220,6 @@ input[type=number]::-webkit-outer-spin-button
         ->where('calls_requirement.lead_id', $calls->id)
         ->get();
 @endphp
-
 <td>
     @php
         $models_brands_string = '';
@@ -251,13 +246,13 @@ input[type=number]::-webkit-outer-spin-button
     </button>
     <ul class="dropdown-menu dropdown-menu-end">
     @can('sales-view')
-      <li><a class="dropdown-item" href="{{ route('dailyleads.prospecting',$calls->id) }}">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Qualificaton</a></li>
-      <li><a class="dropdown-item" href="#">Demand</a></li>
-      <li><a class="dropdown-item" href="#">Closed</a></li>
-      @endcan
+      <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Closed</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
+      @endcan
     </ul>
   </div>
                     </td>
@@ -273,12 +268,12 @@ input[type=number]::-webkit-outer-spin-button
             </br>
           </div>  
         </div>  
-      </div>  
-      <div class="modal fade" id="qualified" tabindex="-1" aria-labelledby="qualifiedLabel" aria-hidden="true">
+      </div>
+      <div class="modal fade" id="prospectingmodel" tabindex="-1" aria-labelledby="prospectingmodelLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="qualifiedLabel">Qualified Customer</h5>
+          <h5 class="modal-title" id="prospectingmodelLabel">Prospecting</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -287,19 +282,7 @@ input[type=number]::-webkit-outer-spin-button
               <label for="date" class="form-label">Date:</label>
             </div>
             <div class="col-md-8">
-              <input type="date" class="form-control" id="date" value="">
-            </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="deal-value-input" class="form-label">Deal Value:</label>
-            </div>
-            <div class="col-md-8">
-              <div class="input-group">
-                <span class="input-group-text">AED</span>
-                <input type="number" class="form-control" id="deal-value-input" aria-label="Deal Value">
-                <span class="input-group-text">.00</span>
-              </div>
+            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
             </div>
           </div>
           <div class="row mb-3">
@@ -310,23 +293,143 @@ input[type=number]::-webkit-outer-spin-button
               <textarea class="form-control" id="sales-notes"></textarea>
             </div>
           </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="saveprospecting()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <div class="modal fade" id="demandmodel" tabindex="-1" aria-labelledby="demandmodelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="demandmodelLabel">Demand</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
           <div class="row mb-3">
             <div class="col-md-4">
-              <label for="document-upload" class="form-label">Upload Document:</label>
+              <label for="date" class="form-label">Date:</label>
             </div>
             <div class="col-md-8">
-              <input type="file" class="form-control" id="document-upload">
+            <input type="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+              <textarea class="form-control" id="sales-notesdemands"></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="saveQuotations()">Save Changes</button>
+          <button type="button" class="btn btn-primary" onclick="savedemand()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <div class="modal fade" id="ClosedModal" tabindex="-1" aria-labelledby="ClosedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ClosedModalLabel">Closed</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+            <input type="date" class="form-control" id="date-closed" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="reason" class="form-label">SO Number</label>
+          </div>
+          <div class="col-md-8">
+            <input type="text" class="form-control" id="so_number-closed" value="">
+          </div>
+        </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="deal-value-input" class="form-label">Deal Value:</label>
+            </div>
+            <div class="col-md-8">
+              <div class="input-group">
+                <span class="input-group-text">AED</span>
+                <input type="number" class="form-control" id="deal-value-input-closed" aria-label="Deal Value">
+                <span class="input-group-text">.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+              <textarea class="form-control" id="sales-notes-closed"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="saveclosed()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div> 
+      <div class="modal fade" id="qualified" tabindex="-1" aria-labelledby="qualifiedLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qualifiedLabel">Negotiation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="date" class="form-label">Date:</label>
+            </div>
+            <div class="col-md-8">
+              <input type="date" class="form-control" id="date-negotiation" value="{{ date('Y-m-d') }}">
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="deal-value-input" class="form-label">Deal Value:</label>
+            </div>
+            <div class="col-md-8">
+              <div class="input-group">
+                <span class="input-group-text">AED</span>
+                <input type="number" class="form-control" id="deal-value-input-negotiation" aria-label="Deal Value">
+                <span class="input-group-text">.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="sales-notes" class="form-label">Sales Notes:</label>
+            </div>
+            <div class="col-md-8">
+              <textarea class="form-control" id="sales-notes-negotiation"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="savenegotiation()">Save Changes</button>
         </div>
       </div>
     </div>
   </div>
-      <div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
+  <div class="modal fade" id="quotationModal" tabindex="-1" aria-labelledby="quotationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -339,7 +442,7 @@ input[type=number]::-webkit-outer-spin-button
               <label for="date" class="form-label">Date:</label>
             </div>
             <div class="col-md-8">
-              <input type="date" class="form-control" id="date" value="">
+              <input type="date" class="form-control" id="dateqoutation" value="{{ date('Y-m-d') }}">
             </div>
           </div>
           <div class="row mb-3">
@@ -349,7 +452,7 @@ input[type=number]::-webkit-outer-spin-button
             <div class="col-md-8">
               <div class="input-group">
                 <span class="input-group-text">AED</span>
-                <input type="number" class="form-control" id="deal-value-input" aria-label="Deal Value">
+                <input type="number" class="form-control" id="deal-value-input-qoutation" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
               </div>
             </div>
@@ -359,7 +462,7 @@ input[type=number]::-webkit-outer-spin-button
               <label for="sales-notes" class="form-label">Sales Notes:</label>
             </div>
             <div class="col-md-8">
-              <textarea class="form-control" id="sales-notes"></textarea>
+              <textarea class="form-control" id="sales-note-qoutation"></textarea>
             </div>
           </div>
           <div class="row mb-3">
@@ -367,7 +470,7 @@ input[type=number]::-webkit-outer-spin-button
               <label for="document-upload" class="form-label">Upload Document:</label>
             </div>
             <div class="col-md-8">
-              <input type="file" class="form-control" id="document-upload">
+              <input type="file" class="form-control" id="document-upload-qoutation">
             </div>
           </div>
         </div>
@@ -391,7 +494,7 @@ input[type=number]::-webkit-outer-spin-button
             <label for="date-input" class="form-label">Date:</label>
           </div>
           <div class="col-md-8">
-            <input type="date" class="form-control" id="date-input" value="">
+            <input type="date" class="form-control" id="date-input-reject" value="{{ date('Y-m-d') }}">
           </div>
         </div>
         <div class="row mb-3">
@@ -399,7 +502,7 @@ input[type=number]::-webkit-outer-spin-button
             <label for="reason" class="form-label">Reason:</label>
           </div>
           <div class="col-md-8">
-            <input type="text" class="form-control" id="reason" value="">
+            <input type="text" class="form-control" id="reason-reject" value="">
           </div>
         </div>
         <div class="row mb-3">
@@ -407,7 +510,7 @@ input[type=number]::-webkit-outer-spin-button
             <label for="sales-notess" class="form-label">Sales Notes:</label>
           </div>
           <div class="col-md-8">
-            <textarea class="form-control" id="salesnotes"></textarea>
+            <textarea class="form-control" id="salesnotes-reject"></textarea>
           </div>
         </div>
       </div>
@@ -421,122 +524,16 @@ input[type=number]::-webkit-outer-spin-button
     @endcan
     @can('sales-view')
       <div class="tab-pane fade show" id="tab2">
-        <div class="card-body">
-        <div class="wrapper">	
-        <div class="arrow-steps clearfix">
-          <div class="step current"> <span>Initial Contact</span> </div>
-          <div class="step"> <span>Fellow Up</span> </div>
-          <div class="step"> <span>Need Analysis</span> </div>
-          <div class="step"> <span>Interested</span> </div>
-			</div>
-</div>
-    </br>
-    </br>
-          <div class="table-responsive">
-          <table id="dtBasicExample2" class="table table-striped table-editable table-edits table">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Purchase Type</th>
-      <th>Customer Name</th>
-      <th>Customer Phone</th>
-      <th>Customer Email</th>
-      <th>Brands & Models</th>
-      <th>Custom Model & Brand</th>
-      <th>Preferred Language</th>
-      <th>Customer Update</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="table-body">
-  @foreach ($intialcallsdata as $key => $leads)
-  <tr data-id="1">
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($leads->created_at)) }}</td>
-                    <td>{{ $leads->type }}</td>
-                    <td>{{ $leads->name }}</td>     
-                    <td>{{ $leads->phone }}</td> 
-                    <td>{{ $leads->email }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $leads->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $leads->custom_brand_model }}</td>
-                    <td>{{ $leads->language }}</td>
-                    <td>{{ $leads->language }}</td>
-                    <td>
-                    <div class="dropdown">
-    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-      <i class="fa fa-bars" aria-hidden="true"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" href="#">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#">Qualificaton</a></li>
-      <li><a class="dropdown-item" href="#">Demand</a></li>
-      <li><a class="dropdown-item" href="#">Quotation</a></li>
-      <li><a class="dropdown-item" href="#">Rejected</a></li>
-    </ul>
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
   </div>
-                    </td>
-                    </td>       
-                  </tr>
-  @endforeach
-</tbody>
-            </table>
-          </div> 
-        </div>  
-      </div> 
-      @endcan
-      @can('sales-view')
-        <div class="tab-pane fade show" id="tab3">
-          <div class="card-body">
-            <div class="table-responsive">
-              <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                @foreach ($pendingdata as $key => $leads)
-                  <tr data-id="1">
-                    <td>{{ $leads->date }}</td>
-                    <td>{{ $leads->name }}</td>               
-                  </tr>
-                @endforeach
-                 </tbody>
-                 </br>
-                </table>
-              </div>
-            </div>
-          </div>
-        @endcan
-		    @can('sales-view')
-      <div class="tab-pane fade show" id="tab5">
+</div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample5" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample2" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
                 <tr>
                   <th>Date</th>
                   <th>Purchase Type</th>
@@ -546,124 +543,30 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Preferred Language</th>
+                  <th>Location</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Status</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
                   <th>Action</th>
                 </tr>
               </thead>
-              <tbody>
-                @foreach ($qutationsdata as $key => $calls)
-                <tr data-id="1">
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->language }}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>{{ $calls->status }}</td>       
-                    <td>
-                    <div class="dropdown">
-    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
-      <i class="fa fa-bars" aria-hidden="true"></i>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-    @can('user-view')
-      <li><a class="dropdown-item" href="{{ route('dailyleads.prospecting',$calls->id) }}">Prospecting</a></li>
-      <li><a class="dropdown-item" href="#">Qualificaton</a></li>
-      <li><a class="dropdown-item" href="#">Demand</a></li>
-      @endcan
-      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Closed</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
-    </ul>
-  </div>
-                    </td>
-                    </td>       
-                  </tr>
-                @endforeach
-              </tbody>
             </table>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
           </div>  
-        </div>  
-      </div> 
-      
-  <div class="modal fade" id="dealcloseModal" tabindex="-1" aria-labelledby="dealcloseModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="dealcloseModalLabel">Closed</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div> 
       </div>
-      <div class="modal-body">
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label for="dealdate" class="form-label">Date:</label>
-          </div>
-          <div class="col-md-8">
-            <input type="date" class="form-control" id="dealdate" value="">
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label for="so-number" class="form-label">SO Number:</label>
-          </div>
-          <div class="col-md-8">
-            <input type="text" class="form-control" id="so-number" value="">
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label for="dealsalesNotes" class="form-label">Sales Notes:</label>
-          </div>
-          <div class="col-md-8">
-            <textarea class="form-control" id="dealsalesNotes"></textarea>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="savecloserss()">Save Changes</button>
-      </div>
-    </div>
+      @endcan
+      @can('sales-view')
+        <div class="tab-pane fade show" id="tab3">
+        <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
   </div>
-</div>
-    @endcan
-    @can('sales-view')
-      <div class="tab-pane fade show" id="tab7">
+</div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample7" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
                 <tr>
                   <th>Date</th>
                   <th>Purchase Type</th>
@@ -673,65 +576,111 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Preferred Language</th>
+                  <th>Location</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Status</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
+                  <th>Action</th>
                 </tr>
               </thead>
-              <tbody>
-                @foreach ($closeddata as $key => $calls)
-                <tr data-id="1">
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->language }}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>{{ $calls->status }}</td>              
-                  </tr>
-                @endforeach
-              </tbody>
             </table>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
           </div>  
-        </div>  
+        </div> 
+          </div>
+        @endcan
+		    @can('sales-view')
+      <div class="tab-pane fade show" id="tab4">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample4" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Date</th>
+                  <th>Purchase Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Custom Model & Brand</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
+                  <th>Qoutation Date</th>
+                  <th>Deal Values</th>
+                  <th>Qoutation Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>  
+        </div> 
+      </div> 
+    @endcan
+    @can('sales-view')
+      <div class="tab-pane fade show" id="tab5">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample5" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Date</th>
+                  <th>Purchase Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Custom Model & Brand</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
+                  <th>Qoutation Date</th>
+                  <th>Deal Values</th>
+                  <th>Qoutation Notes</th>
+                  <th>Negotiation Date</th>
+                  <th>Deal Values</th>
+                  <th>Negotiation Notes</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>  
+        </div> 
       </div>  
     @endcan
     @can('sales-view')
-      <div class="tab-pane fade show" id="tab8">
+      <div class="tab-pane fade show" id="tab6">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
         <div class="card-body">
           <div class="table-responsive">
-            <table id="dtBasicExample8" class="table table-striped table-editable table-edits table">
-            <thead>
+            <table id="dtBasicExample6" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
                 <tr>
                   <th>Date</th>
                   <th>Purchase Type</th>
@@ -741,57 +690,70 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Brands & Models</th>
                   <th>Custom Model & Brand</th>
                   <th>Preferred Language</th>
+                  <th>Location</th>
                   <th>Remarks & Messages</th>
-                  <th>Sales Status</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
+                  <th>Qoutation Date</th>
+                  <th>Qoutation Values</th>
+                  <th>Qoutation Notes</th>
+                  <th>Negotiation Date</th>
+                  <th>Negotiation Values</th>
+                  <th>Negotiation Notes</th>
+                  <th>Closing Date</th>
+                  <th>Closing Values</th>
+                  <th>Closing Notes</th>
+                  <th>So Number</th>
                 </tr>
               </thead>
-              <tbody>
-                @foreach ($rejectiondata as $key => $calls)
-                <tr data-id="1">
-                    <td>{{ date('d-m-Y (H:i A)', strtotime($calls->created_at)) }}</td>
-                    <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
-                    <td>{{ $calls->phone }}</td> 
-                    <td>{{ $calls->email }}</td>
-                    @php
-    $leads_models_brands = DB::table('calls_requirement')
-        ->select('calls_requirement.model_line_id', 'master_model_lines.brand_id', 'brands.brand_name', 'master_model_lines.model_line')
-        ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
-        ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-        ->where('calls_requirement.lead_id', $calls->id)
-        ->get();
-@endphp
-
-<td>
-    @php
-        $models_brands_string = '';
-        foreach ($leads_models_brands as $lead_model_brand) {
-            $models_brands_string .= $lead_model_brand->brand_name . ' - ' . $lead_model_brand->model_line . ', ';
-        }
-        // Remove the trailing comma and space from the string
-        $models_brands_string = rtrim($models_brands_string, ', ');
-        echo $models_brands_string;
-    @endphp
-</td>
-                    <td>{{ $calls->custom_brand_model }}</td>
-                    <td>{{ $calls->language }}</td>
-                    @php
-    $text = $calls->remarks;
-    $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
-    @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>   
-    <td>{{ $calls->status }}</td>           
-                  </tr>
-                @endforeach
-              </tbody>
             </table>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
           </div>  
-        </div>  
+        </div> 
+      </div>  
+    @endcan
+    @can('sales-view')
+      <div class="tab-pane fade show" id="tab7">
+      <br>
+      <!-- <div class="row">
+  <div class="col-lg-1">
+    <button class="btn btn-success" id="export-excel" style="margin: 10px;">Export CSV</button>
+  </div>
+</div> -->
+        <div class="card-body">
+          <div class="table-responsive">
+            <table id="dtBasicExample7" class="table table-striped table-editable table-edits table" style = "width:100%;">
+            <thead class="bg-soft-secondary">
+                <tr>
+                  <th>Date</th>
+                  <th>Purchase Type</th>
+                  <th>Customer Name</th>
+                  <th>Customer Phone</th>
+                  <th>Customer Email</th>
+                  <th>Brands & Models</th>
+                  <th>Custom Model & Brand</th>
+                  <th>Preferred Language</th>
+                  <th>Location</th>
+                  <th>Remarks & Messages</th>
+                  <th>Prospectings Date</th>
+                  <th>Prospectings Notes</th>
+                  <th>Demand Date</th>
+                  <th>Demand Notes</th>
+                  <th>Qoutation Date</th>
+                  <th>Qoutation Values</th>
+                  <th>Qoutation Notes</th>
+                  <th>Negotiation Date</th>
+                  <th>Negotiation Values</th>
+                  <th>Negotiation Notes</th>
+                  <th>Reject Date</th>
+                  <th>Reject Reason</th>
+                  <th>Reject Notes</th>
+                </tr>
+              </thead>
+            </table>
+          </div>  
+        </div> 
       </div>  
     @endcan
       </div><!-- end tab-content-->
@@ -801,18 +763,13 @@ input[type=number]::-webkit-outer-spin-button
   jQuery(document).ready(function() {
     var steps = jQuery(".step");
     var dataTable = null; 
-
     steps.on("click", function() {
       var clickedStep = jQuery(this);
       var currentIndex = steps.index(clickedStep);
       steps.removeClass("current done");
       clickedStep.addClass("current");
       steps.slice(0, currentIndex).addClass("done");
-
-      // Get the step status based on the clickedStep
       var stepStatus = clickedStep.find("span").text();
-
-      // Make an AJAX request to the Laravel controller
       jQuery.ajax({
         url: "{{ route('processStep') }}",
         method: "POST",
@@ -822,11 +779,9 @@ input[type=number]::-webkit-outer-spin-button
         },
         success: function(response) {
           console.log("no");
-          // Destroy the previous DataTables instance if it exists
           if (dataTable) {
             dataTable.destroy();
           }
-          // Clear the previous data
           jQuery("#table-body").empty();
           response.forEach(function(item) {
     var row = '<tr data-id="1">' +
@@ -837,14 +792,12 @@ input[type=number]::-webkit-outer-spin-button
         '<td>' + item.email + '</td>';
 
     var modelLines = '';
-
     item.model_lines.forEach(function(modelLine, index) {
         if (index > 0) {
             modelLines += ', ';
         }
         modelLines += modelLine;
     });
-
     row += '<td>' + modelLines + '</td>' +
         '<td>' + item.custom_brand_model + '</td>' +
         '<td>' + item.language + '</td>' +
@@ -865,20 +818,104 @@ input[type=number]::-webkit-outer-spin-button
   $('#quotationModal').data('call-id', callId);
   $('#quotationModal').modal('show');
 }
+function openModalclosed(callId) {
+  $('#ClosedModal').data('call-id', callId);
+  $('#ClosedModal').modal('show');
+}
+function openModalp(callId) {
+  $('#prospectingmodel').data('call-id', callId);
+  $('#prospectingmodel').modal('show');
+}
+function openModald(callId) {
+  $('#demandmodel').data('call-id', callId);
+  $('#demandmodel').modal('show');
+}
 function openModalqualified(callId) {
   $('#qualified').data('call-id', callId);
   $('#qualified').modal('show');
 }
-// function openModalr(callId) {
-//   $('#rejectionModal').data('call-id', callId);
-//   $('#rejectionModal').modal('show');
-// }
+function openModalr(callId) {
+  $('#rejectionModal').data('call-id', callId);
+  $('#rejectionModal').modal('show');
+}
+function saveprospecting() {
+  var callId = $('#prospectingmodel').data('call-id');
+  var date = document.getElementById('date').value;
+  var salesNotes = document.getElementById('sales-notes').value;
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.saveprospecting') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          console.log('Prospecting saved successfully');
+          alert('Prospecting saved successfully');
+          location.reload();
+        } else {
+          console.error('Error saving Prospecting');
+          alert('Error saving Prospecting');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
+function savedemand() {
+  var callId = $('#demandmodel').data('call-id');
+  var date = document.getElementById('date').value;
+  var salesNotes = document.getElementById('sales-notesdemands').value;
+  if (date === '') {
+    alert('Please select a date');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savedemand') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          console.log('Prospecting saved successfully');
+          alert('Prospecting saved successfully');
+          location.reload();
+        } else {
+          console.error('Error saving Prospecting');
+          alert('Error saving Prospecting');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
 function saveQuotations() {
   var callId = $('#quotationModal').data('call-id');
-  var date = document.getElementById('date').value;
-  var dealValue = document.getElementById('deal-value-input').value;
-  var salesNotes = document.getElementById('sales-notes').value;
-  var fileInput = document.getElementById('document-upload');
+  var date = document.getElementById('dateqoutation').value;
+  var dealValue = document.getElementById('deal-value-input-qoutation').value;
+  var salesNotes = document.getElementById('sales-note-qoutation').value;
+  var fileInput = document.getElementById('document-upload-qoutation');
   
   if (date === '') {
     alert('Please select a date');
@@ -894,14 +931,12 @@ function saveQuotations() {
     alert('Please upload a document');
     return;
   }
-  
   var formData = new FormData();
   formData.append('callId', callId);
   formData.append('date', date);
   formData.append('dealValue', dealValue);
   formData.append('salesNotes', salesNotes);
   formData.append('file', fileInput.files[0]);
-  
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.qoutations') }}', true);
@@ -926,18 +961,11 @@ function saveQuotations() {
   };
   xhr.send(formData);
 }
-function openModalr(callId) {
-  $('#rejectionModal').data('callId', callId);
-  document.getElementById('date-input').value = '';
-  document.getElementById('reason').value = '';
-  document.getElementById('sales-notes').value = '';
-  $('#rejectionModal').modal('show');
-}
 function saveRejection() {
   var callId = $('#rejectionModal').data('callId');
-  var date = document.getElementById('date-input').value;
-  var reason = document.getElementById('reason').value;
-  var salesNotes = document.getElementById('salesnotes').value;
+  var date = document.getElementById('date-input-reject').value;
+  var reason = document.getElementById('reason-reject').value;
+  var salesNotes = document.getElementById('salesnotes-reject').value;
   var formData = new FormData();
   formData.append('callId', callId);
   formData.append('date', date);
@@ -967,47 +995,92 @@ function saveRejection() {
   };
   xhr.send(formData);
 }
-function openModalclosed(callId) {
-    $('#dealcloseModal').data('callId', callId);
-    document.getElementById('dealdate').value = '';
-    document.getElementById('so-number').value = '';
-    document.getElementById('dealsalesNotes').value = '';
-    $('#dealcloseModal').modal('show');
+function savenegotiation() {
+  var callId = $('#qualified').data('call-id');
+  var date = document.getElementById('date-negotiation').value;
+  var salesNotes = document.getElementById('sales-notes-negotiation').value;
+  var dealvalues = document.getElementById('deal-value-input-negotiation').value;
+  if (date === '') {
+    alert('Please select a date');
+    return;
   }
-  function savecloserss() {
-    var callId = $('#dealcloseModal').data('callId');
-    var dealdate = document.getElementById('dealdate').value;
-    var sonumber = document.getElementById('so-number').value;
-    var dealsalesNotes = document.getElementById('dealsalesNotes').value;
-    var formData = new FormData();
-    formData.append('callId', callId);
-    formData.append('dealdate', dealdate);
-    formData.append('sonumber', sonumber);
-    formData.append('dealsalesNotes', dealsalesNotes);
-    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '{{ route('sales.closed') }}', true);
-    xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4) {
-        if (xhr.status === 200) {
-          var response = JSON.parse(xhr.responseText);
-          if (response.success) {
-            console.log('Closed saved successfully');
-            alert('Closed saved successfully');
-            location.reload();
-          } else {
-            console.error('Error saving Closed');
-            alert('Error saving Closed');
-          }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('dealvalues', dealvalues);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.savenegotiation') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          console.log('Prospecting saved successfully');
+          alert('Prospecting saved successfully');
+          location.reload();
         } else {
-          console.error('Request failed with status ' + xhr.status);
-          alert('Request failed. Please try again.');
+          console.error('Error saving Prospecting');
+          alert('Error saving Prospecting');
         }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
       }
-    };
-    xhr.send(formData);
+    }
+  };
+  xhr.send(formData);
+}
+  function saveclosed() {
+  var callId = $('#ClosedModal').data('call-id');
+  var date = document.getElementById('date').value;
+  var salesNotes = document.getElementById('sales-notes-closed').value;
+  var dealvalues = document.getElementById('deal-value-input-closed').value;
+  var sonumber = document.getElementById('so_number-closed').value;
+  if (date === '') {
+    alert('Please select a date');
+    return;
   }
+  if (dealvalues === '') {
+    alert('Please Enter the Correct Deal Value');
+    return;
+  }
+  if (sonumber === '') {
+    alert('Please Enter the Correct SO');
+    return;
+  }
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('salesNotes', salesNotes);
+  formData.append('dealvalues', dealvalues);
+  formData.append('sonumber', sonumber);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.closed') }}', true);
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          console.log('Prospecting saved successfully');
+          alert('Prospecting saved successfully');
+          location.reload();
+        } else {
+          console.error('Error saving Prospecting');
+          alert('Error saving Prospecting');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
 </script>
 <script>
   function openWhatsApp(phoneNumber) {
@@ -1111,6 +1184,232 @@ function s2ab(s) {
     return view;
 }
 });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#dtBasicExample2').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'Prospecting']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at' },
+                { data: 'type', name: 'type' },
+                { data: 'name', name: 'name' },
+                { data: 'phone', name: 'phone' },
+                { data: 'email', name: 'email' },
+                { data: 'models_brands', name: 'models_brands' },
+                { data: 'custom_brand_model', name: 'custom_brand_model' },
+                { data: 'location', name: 'location' },
+                { data: 'language', name: 'language' },
+                { data: 'remarks', name: 'remarks' },
+                { data: 'date', name: 'date', searchable: false},
+                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (data, type, row) {
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                    }
+                },
+            ]
+        });
+        $('#dtBasicExample3').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'New Demand']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at' },
+                { data: 'type', name: 'type' },
+                { data: 'name', name: 'name' },
+                { data: 'phone', name: 'phone' },
+                { data: 'email', name: 'email' },
+                { data: 'models_brands', name: 'models_brands' },
+                { data: 'custom_brand_model', name: 'custom_brand_model' },
+                { data: 'location', name: 'location' },
+                { data: 'language', name: 'language' },
+                { data: 'remarks', name: 'remarks' },
+                { data: 'date', name: 'date', searchable: false},
+                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                { data: 'ddate', name: 'ddate', searchable: false },
+                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (data, type, row) {
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                    }
+                },
+            ]
+        });
+        $('#dtBasicExample4').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at' },
+                { data: 'type', name: 'type' },
+                { data: 'name', name: 'name' },
+                { data: 'phone', name: 'phone' },
+                { data: 'email', name: 'email' },
+                { data: 'models_brands', name: 'models_brands' },
+                { data: 'custom_brand_model', name: 'custom_brand_model' },
+                { data: 'location', name: 'location' },
+                { data: 'language', name: 'language' },
+                { data: 'remarks', name: 'remarks' },
+                { data: 'date', name: 'date', searchable: false},
+                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                { data: 'ddate', name: 'ddate', searchable: false },
+                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                { data: 'qdate', name: 'qdate', searchable: false},
+                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
+                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (data, type, row) {
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                    }
+                },
+            ]
+        });
+        $('#dtBasicExample5').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'Negotiation']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at' },
+                { data: 'type', name: 'type' },
+                { data: 'name', name: 'name' },
+                { data: 'phone', name: 'phone' },
+                { data: 'email', name: 'email' },
+                { data: 'models_brands', name: 'models_brands' },
+                { data: 'custom_brand_model', name: 'custom_brand_model' },
+                { data: 'location', name: 'location' },
+                { data: 'language', name: 'language' },
+                { data: 'remarks', name: 'remarks' },
+                { data: 'date', name: 'date', searchable: false },
+                { data: 'salesnotes', name: 'salesnotes', searchable: false },
+                { data: 'ddate', name: 'ddate, searchable: false' },
+                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false },
+                { data: 'qdate', name: 'qdate', searchable: false },
+                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
+                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
+                { data: 'ndate', name: 'ndate', searchable: false },
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
+                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (data, type, row) {
+                        return `
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
+                                </ul>
+                            </div>`;
+                    }
+                },
+            ]
+        });
+        $('#dtBasicExample6').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'Closed']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at' },
+                { data: 'type', name: 'type' },
+                { data: 'name', name: 'name' },
+                { data: 'phone', name: 'phone' },
+                { data: 'email', name: 'email' },
+                { data: 'models_brands', name: 'models_brands' },
+                { data: 'custom_brand_model', name: 'custom_brand_model' },
+                { data: 'location', name: 'location' },
+                { data: 'language', name: 'language' },
+                { data: 'remarks', name: 'remarks'},
+                { data: 'date', name: 'date', searchable: false},
+                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                { data: 'ddate', name: 'ddate', searchable: false},
+                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                { data: 'qdate', name: 'qdate', searchable: false},
+                { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
+                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false},
+                { data: 'ndate', name: 'ndate', searchable: false},
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
+                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false},
+                { data: 'cdate', name: 'cdate', searchable: false},
+                { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
+                { data: 'csalesnotes', name: 'csalesnotes', searchable: false},
+                { data: 'so_number', name: 'so_number', searchable: false},
+            ]
+        });
+        $('#dtBasicExample7').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
+            columns: [
+                { data: 'created_at', name: 'created_at'},
+                { data: 'type', name: 'type'},
+                { data: 'name', name: 'name'},
+                { data: 'phone', name: 'phone'},
+                { data: 'email', name: 'email'},
+                { data: 'models_brands', name: 'models_brands'},
+                { data: 'custom_brand_model', name: 'custom_brand_model'},
+                { data: 'location', name: 'location'},
+                { data: 'language', name: 'language'},
+                { data: 'remarks', name: 'remarks'},
+                { data: 'date', name: 'date', searchable: false},
+                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                { data: 'ddate', name: 'ddate', searchable: false},
+                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                { data: 'qdate', name: 'qdate', searchable: false},
+                { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
+                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false},
+                { data: 'ndate', name: 'ndate', searchable: false},
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
+                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false},
+                { data: 'rdate', name: 'rdate', searchable: false},
+                { data: 'reason', name: 'reason', searchable: false },
+                { data: 'rsalesnotes', name: 'rsalesnotes', searchable: false},
+            ]
+        });
+    });
 </script>
 @else
     @php

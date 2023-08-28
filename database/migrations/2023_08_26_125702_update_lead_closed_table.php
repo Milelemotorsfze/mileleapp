@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('addon_details', function (Blueprint $table) {
-            // $table->dropColumn('lead_time');
-            // $table->dropColumn('lead_time_max');
+        Schema::table('lead_closed', function (Blueprint $table) {
+            $table->string('dealvalues')->nullable();
         });
     }
 
@@ -22,9 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('addon_details', function (Blueprint $table) {
-            // $table->string('lead_time')->nullable();
-            // $table->string('lead_time_max')->nullable();
-        });
+        $table->dropColumn('dealvalues');
     }
 };

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('addon_details', function (Blueprint $table) {
-            $table->dropColumn('model_year_start');
-            $table->dropColumn('model_year_end');
+            // $table->dropColumn('model_year_start');
+            // $table->dropColumn('model_year_end');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('addon_details', function (Blueprint $table) {
-            $table->year('model_year_start')->nullable();
-            $table->year('model_year_end')->nullable();
+            // $table->year('model_year_start')->nullable();
+            // $table->year('model_year_end')->nullable();
         });
     }
 };
