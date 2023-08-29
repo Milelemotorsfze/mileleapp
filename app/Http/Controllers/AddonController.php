@@ -64,7 +64,8 @@ class AddonController extends Controller
         $content = 'addon';
         // Fetch records
 //        info($request->all());
-        $addons = AddonDetails::orderBy('id','DESC');
+        $addons = AddonDetails::with('AddonTypes')
+                    ->orderBy('id','DESC');
         if($request->addon_type != 'all')
         {
             $addons =  $addons->where('addon_type_name', $request->addon_type);
@@ -87,8 +88,9 @@ class AddonController extends Controller
             else
             {
                 info("separate branch serach");
+                info($request->BrandIds);
 //                $addons = $addons->where('is_all_brands','yes');
-                $addons = $addons->orWhereHas('AddonTypes', function($q) use($request) {
+                $addons = $addons->whereHas('AddonTypes', function($q) use($request) {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
                 });
             }
@@ -98,10 +100,11 @@ class AddonController extends Controller
         if($request->ModelLineIds)
         {
             info("model lis search");
+            info($request->ModelLineIds);
 //            $addons = $addons->where('is_all_brands','yes');
-            $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
+            $addons = $addons->whereHas('AddonTypes', function($q) use($request)
             {
-                if(!in_array('yes',$request->ModelLineIds))
+                if(in_array('yes', $request->ModelLineIds))
                 {
                     info("all model line search");
 
@@ -146,14 +149,24 @@ class AddonController extends Controller
         ////////////// filter end ////////////////
 //        info($addons->pluck('id'));
 //        info("start");
-        info($addons->pluck('id'));
-        $addons = $addons->skip($start)
-            ->take($rowperpage)->get();
-        info("addons per request");
-        info($addons->pluck('id'));
+        info('start');
+        info($start);
+        if($start >= $addons->count()) {
+            info('addon null command00');
+            $addons = [];
+            $data['addonIds'] = [];
+        }else{
+            info($addons->pluck('id'));
+            $addons = $addons->skip($start)
+                ->take($rowperpage)->get();
+            $addonIds = $addons->pluck('id');
+            $data['addonIds'] = json_decode($addonIds);
+            info("addons per request");
+            info($addons->pluck('id'));
+        }
 
-        $addonIds = $addons->pluck('id');
-        $data['addonIds'] = json_decode($addonIds);
+
+
         $html = "";
         foreach($addons as $value => $addon){
 

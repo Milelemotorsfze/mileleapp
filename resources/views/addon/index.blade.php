@@ -186,6 +186,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};
+    var dataPerScroll = '{{ $rowperpage }}';
 
     $(document).ready(function ()
     {
@@ -196,26 +197,38 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-brand").select2();
       $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
       $("#fltr-model-line").select2();
-      $('#fltr-addon-code').change(function()
-      {
-          var totalrecords = Number($('#totalrecords').val());
+      $('#fltr-addon-code').change(function() {
+
+          $('#totalrecords').val(dataPerScroll);
+
           var start = 0;
+          $('#start').val(start);
           $('.each-addon').attr('hidden', true);
-          fetchData(start,totalrecords);
+          if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+              fetchData(start,dataPerScroll);
+          }
       });
-      $('#fltr-brand').change(function()
-      {
-          var totalrecords = Number($('#totalrecords').val());
+      $('#fltr-brand').change(function() {
+          $('#totalrecords').val(dataPerScroll);
+          var totalrecords = dataPerScroll;
           var start = 0;
+          $('#start').val(start);
+
           $('.each-addon').attr('hidden', true);
-          fetchData(start,totalrecords);
+          if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+              fetchData(start,dataPerScroll);
+          }
+
       });
-      $('#fltr-model-line').change(function()
-      {
-          var totalrecords = Number($('#totalrecords').val());
+      $('#fltr-model-line').change(function() {
+          $('#totalrecords').val(dataPerScroll);
+            // set total recorde default 12 and start = 0
           var start = 0;
+          $('#start').val(start);
           $('.each-addon').attr('hidden', true);
-          fetchData(start,totalrecords);
+          if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+              fetchData(start,dataPerScroll);
+          }
       });
       $('.modal-button').on('click', function()
       {
@@ -294,14 +307,26 @@ body {font-family: Arial, Helvetica, sans-serif;}
         //         }
         //     }
         // }
-
+    function checkWindowSize(){
+        if($(window).height() >= $(document).height()){
+            // Fetch records
+            fetchData();
+        }
+    }
     function onScroll(){
-        if($(window).scrollTop() > $(document).height() - $(window).height()-100) {
+        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+        //     page++;
+        //     load_more(page);
+        // }
+        // if($(window).scrollTop() > $(document).height() - $(window).height()-100) {
             var start = Number($('#start').val());
+            console.log(start);
             var totalrecords = Number($('#totalrecords').val());
             var rowperpage = Number($('#rowperpage').val());
             start = start + rowperpage;
+            console.log(start);
             if(start <= totalrecords) {
+                console.log("start value less add 12");
                 $('#start').val(start);
             }
             fetchData(start,totalrecords);
@@ -310,51 +335,55 @@ body {font-family: Arial, Helvetica, sans-serif;}
     $(window).scroll(function(){
         onScroll();
     });
-    function fetchData(start,totalrecords) {
-        var BrandIds = [];
+        function fetchData(start,totalrecords) {
+            console.log(totalrecords)
+            var BrandIds = [];
 
-        var AddonIds = $('#fltr-addon-code').val();
-        var BrandIds = $('#fltr-brand').val();
+            var AddonIds = $('#fltr-addon-code').val();
+            var BrandIds = $('#fltr-brand').val();
 
-        var ModelLineIds = $('#fltr-model-line').val();
-        var addon_type = $('#addon_type').val();
-        var rowperpage = Number($('#rowperpage').val());
-            if (BrandIds === undefined || BrandIds.length == 0) {
-                $('#allBrandsFilter').prop("disabled", false);
-                $('.allBrandsFilterClass').prop("disabled", false);
-                $('#ModelLineDiv').show();
-            } else {
-                if (BrandIds.includes('yes')) {
-                    $('.allBrandsFilterClass').prop("disabled", true);
-                    $('#ModelLineDiv').hide();
+            var ModelLineIds = $('#fltr-model-line').val();
+
+            var addon_type = $('#addon_type').val();
+            var rowperpage = Number($('#rowperpage').val());
+                if (BrandIds === undefined || BrandIds.length == 0) {
+                    $('#allBrandsFilter').prop("disabled", false);
+                    $('.allBrandsFilterClass').prop("disabled", false);
+                    $('#ModelLineDiv').show();
                 } else {
-                    $('#allBrandsFilter').prop("disabled", true);
+                    if (BrandIds.includes('yes')) {
+                        $('.allBrandsFilterClass').prop("disabled", true);
+                        $('#ModelLineDiv').hide();
+                    } else {
+                        $('#allBrandsFilter').prop("disabled", true);
+                    }
                 }
-            }
+                $.ajax({
+                    url:"{{url('getAddonlists')}}",
+                    data: {
+                        start:start,
+                        addon_type:addon_type,
+                        AddonIds: AddonIds,
+                        BrandIds: BrandIds,
+                        ModelLineIds: ModelLineIds
+                    },
+                    dataType: 'json',
+                    success: function(response){
+                        console.log("incoming total".totalrecords);
+                        var total = rowperpage + totalrecords;
+                        console.log("incoming total".total);
+                        console.log(total);
+                        $('#totalrecords').val(total);
 
-            $.ajax({
-                url:"{{url('getAddonlists')}}",
-                data: {
-                    start:start,
-                    addon_type:addon_type,
-                    AddonIds: AddonIds,
-                    BrandIds: BrandIds,
-                    ModelLineIds: ModelLineIds
-                },
-                dataType: 'json',
-                success: function(response){
+                        $(".each-addon:last").after(response.html).show().fadeIn("slow");
+                        checkWindowSize();
+                        var addonIds = response.addonIds;
+                        hideModelDescription(addonIds);
 
-                    var total_record = rowperpage + totalrecords;
-                    $('#totalrecords').val(total_record);
+                    }
+                });
 
-                    $(".each-addon:last").after(response.html).show().fadeIn("slow");
-                    var addonIds = response.addonIds;
-                    hideModelDescription(addonIds);
-
-                }
-            });
-
-    }
+        }
   </script>
 @endsection
 
