@@ -34,10 +34,10 @@ class CallsController extends Controller
      */
     public function index()
     {
-        $data = Calls::where('STATUS', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->orderBy('created_at', 'desc')->get();    
-        $convertedleads = Calls::where('status', 'Converted To Leads')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
-        $convertedso = Calls::where('status','Converted To SO')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
-        $convertedrejection = Calls::where('status','Rejection')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $data = Calls::where('status', 'New')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->orderBy('created_at', 'desc')->get();    
+        $convertedleads = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $convertedso = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $convertedrejection = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         return view('calls.index',compact('data','convertedleads', 'convertedso','convertedrejection'));
     }
     /**
