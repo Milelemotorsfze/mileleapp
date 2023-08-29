@@ -48,19 +48,19 @@
         <br>
         <div id ="rows-containertitle">
         <div class="row">
-        <div class="col-lg-2 col-md-6">
+        <div class="col-lg-1 col-md-6" style="width:12%;">
         <label for="basicpill-firstname-input" class="form-label">Vin</label>
         </div>
-        <div class="col-lg-1 col-md-6">
+        <div class="col-lg-1 col-md-6" style="width:6%;">
         <label for="basicpill-firstname-input" class="form-label">PO</label>
         </div>
-        <div class="col-lg-1 col-md-6">
+        <div class="col-lg-1 col-md-6" style="width:6%;">
         <label for="basicpill-firstname-input" class="form-label">SO</label>
         </div>
-        <div class="col-lg-1 col-md-6">
+        <div class="col-lg-2 col-md-6">
         <label for="basicpill-firstname-input" class="form-label">From</label>
         </div>
-        <div class="col-lg-1 col-md-6">
+        <div class="col-lg-2 col-md-6">
         <label for="basicpill-firstname-input" class="form-label">To </label>
         </div>
         <div class="col-lg-1 col-md-6">
@@ -97,7 +97,7 @@
             @endforeach
         </select>
         <button class="btn btn-outline-secondary" type="button" id="generate-button">
-    <i class="fas fa-cogs"></i> Generate
+    <i class="fas fa-cogs"></i> Add PO Vehicles
 </button>
     </div>
 </div>
@@ -110,7 +110,7 @@
             @endforeach
         </select>
         <button class="btn btn-outline-secondary" type="button" id="generate-sobutton">
-    <i class="fas fa-cogs"></i> Generate
+    <i class="fas fa-cogs"></i> Add SO Vehicles
 </button>
     </div>
 </div>
@@ -138,7 +138,7 @@
             row++;
             var newRow = `
             <div class="row" data-row="${row}">
-                <div class="col-lg-2 col-md-6">
+                <div class="col-md-2 col-md-6" style="width: 12%;">
                     <select name="vin[]" class="form-control mb-1 vin" id="vin${row}">
                         <option value="" selected disabled>Select VIN</option>
                         @foreach ($vehicles as $vin)
@@ -146,13 +146,13 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-lg-1 col-md-6">
-                    <input type="text" id="po${row}" class="form-control" placeholder="PO Number" readonly>
+                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                    <input type="text" id="po${row}" class="form-control" placeholder="PO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6">
-                    <input type="text" id="so_number${row}" class="form-control" placeholder="SO Number" readonly>
+                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                    <input type="text" id="so_number${row}" class="form-control" placeholder="SO #" readonly>
                 </div>
-                <div class="col-lg-1 col-md-6">
+                <div class="col-lg-2 col-md-6">
                     <select class="form-control mb-1" id="from${row}" readonly disabled>
                         @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -160,7 +160,7 @@
                     </select>
                     <input type="hidden" name="from[]" class="form-control mb-1" id="from-input${row}">
                 </div>
-                <div class="col-lg-1 col-md-6">
+                <div class="col-lg-2 col-md-6">
                     <select name="to[]" class="form-control mb-1" id="to${row}" required>
                         @foreach ($warehouses as $warehouse)
                         @if ($warehouse->name !== 'Supplier')
@@ -179,11 +179,13 @@
                     <input type="text" id="variant${row}" name="variant[]" class="form-control" placeholder="Variant" readonly>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <input type="text" id="remarks" name="remarks[]" class="form-control" placeholder="Remarks">
-                </div>
-                <div class="col-lg-1 col-md-6">
-                    <button type="button" class="btn btn-danger btn-sm remove-row-btn" data-row="${row}">Remove</button>
-                </div>
+    <div class="d-flex align-items-center">
+        <input type="text" id="remarks" name="remarks[]" class="form-control" placeholder="Remarks">
+        <button type="button" class="btn btn-danger btn-sm ml-2 remove-row-btn" data-row="${row}">
+              <i class="fa fa-times"></i>
+        </button>
+    </div>
+</div>
             </div>
             `;
             $('#rows-container').append(newRow);
@@ -270,20 +272,20 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-2 col-md-6" style="width: 12%;">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                            <div class="col-lg-1 col-md-6">
-                                    <input type="text" name="vin[]" class="form-control" placeholder="PO Number" readonly value="${vehicle.po_number}">
+                            <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                    <input type="text" name="vin[]" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
-                                    <input type="text" name="vin[]" class="form-control" placeholder="SO Number" readonly value="${vehicle.so_number}">
+                                <div class="col-lg-1 col-md-6"style="width: 6%;"> 
+                                    <input type="text" name="vin[]" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control mb-1" id="to" required>
                                         @foreach ($warehouses as $warehouse)
                                             @if ($warehouse->name !== 'Supplier')
@@ -302,10 +304,10 @@
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
-                                    <input type="text" name="remarks[]" class="form-control" placeholder="Remarks">
+                                <div class="d-flex align-items-center">
+                                    <input type="text" name="remarks[]" class="form-control mr-2" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
                                 </div>
-                                <div class="col-lg-1 col-md-6">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn">Remove</button>
                                 </div>
                             </div>
                         `;
@@ -336,20 +338,20 @@
                     response.forEach(function (vehicle) {
                         var rowHtml = `
                             <div class="row">
-                            <div class="col-lg-2 col-md-6">
+                            <div class="col-lg-2 col-md-6" style="width: 12%;">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                            <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control" placeholder="PO Number" readonly value="${vehicle.po_number}">
+                            <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                    <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
-                                    <input type="text" class="form-control" placeholder="SO Number" readonly value="${vehicle.so_number}">
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                    <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
                                     <input type="hidden" name="from[]" class="form-control mb-1"value="${vehicle.warehouseName}">
                                 </div>
-                                <div class="col-lg-1 col-md-6">
+                                <div class="col-lg-2 col-md-6">
                                     <select name="to[]" class="form-control mb-1" id="to" required>
                                         @foreach ($warehouses as $warehouse)
                                             @if ($warehouse->name !== 'Supplier')
@@ -368,10 +370,10 @@
                                     <input type="text" name="variant" class="form-control" placeholder="Variants Detail" readonly value="${vehicle.variant}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
+                                <div class="d-flex align-items-center">
                                     <input type="text" name="remarks[]" class="form-control" placeholder="Remarks">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn"><i class="fa fa-times"></i></button>
                                 </div>
-                                <div class="col-lg-1 col-md-6">
-                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn">Remove</button>
                                 </div>
                             </div>
                         `;

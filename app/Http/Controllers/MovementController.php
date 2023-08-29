@@ -100,6 +100,7 @@ class MovementController extends Controller
     {
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
+        ->where('vin', '!=', '')
         ->whereNull('gdn_id')
         ->where(function ($query) {
             $query->where('latest_location', '!=', '2')
@@ -151,40 +152,51 @@ class MovementController extends Controller
         $movementsReference->created_by = $createdBy;
         $movementsReference->save();
         $movementsReferenceId = $movementsReference->id;
+        $grnVins = [];
+        $gdnVins = [];
+        $otherVins = [];
         foreach ($vin as $index => $value) {
-            if ($from[$index] === $to[$index]) {
-                return back()->withErrors("The 'from' and 'to' values cannot be the same.");
-            } 
-            $vehicle = Vehicles::where('vin', $vin[$index])->first();
-            if ($vehicle && !$vehicle->grn_id && $to[$index] !== '6') {
-                $grn = new Grn();
-                $grn->date = $date;
-                $grn->save();
-                $gdnNumber = $grn->id;
-                $grn->grn_number = $gdnNumber;
-                $grn->save();
-                $vehicle->grn_id = $gdnNumber;
-                $vehicle->save();$grnNumber;
-                $vehicle->save();
+            if ($to[$index] !== '6') {
+                $vehicle = Vehicles::where('vin', $vin[$index])->first();
+                if ($vehicle) {
+                    if (!$vehicle->grn_id) {
+                        $grnVins[] = $vin[$index];
+                    } elseif ($to[$index] === '2') {
+                        $gdnVins[] = $vin[$index];
+                    } else {
+                        $otherVins[] = $vin[$index];
+                    }
+                }
             }
-            if ($to[$index] === '2') {
-                $gdn = new Gdn();
-                $gdn->date = $date;
-                $gdn->save();
-                $gdnNumber = $gdn->id;
-                $gdn->gdn_number = $gdnNumber;
-                $gdn->save();
-                $vehicle->gdn_id = $gdnNumber;
-                $vehicle->save();
-            }
+        }
+        if (!empty($grnVins)) {
+            $grn = new Grn();
+            $grn->date = $date;
+            $grn->save();
+            $grnNumber = $grn->id;
+            $grn->grn_number = $grnNumber;
+            $grn->save();
+            Vehicles::whereIn('vin', $grnVins)->update(['grn_id' => $grnNumber]);
+        }
+        if (!empty($gdnVins)) {
+            $gdn = new Gdn();
+            $gdn->date = $date;
+            $gdn->save();
+            $gdnNumber = $gdn->id;
+            $gdn->gdn_number = $gdnNumber;
+            $gdn->save();
+            Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
+        }
+        foreach ($otherVins as $vinValue) {
+            $index = array_search($vinValue, $vin);
             $movement = new Movement();
-            $movement->vin = $vin[$index];
+            $movement->vin = $vinValue;
             $movement->from = $from[$index];
             $movement->to = $to[$index];
             $movement->reference_id = $movementsReferenceId;
             $movement->save();
-            $vehicle->latest_location = $to[$index];
-            $vehicle->save();
+            // Update latest location for the vehicle
+            Vehicles::where('vin', $vinValue)->update(['latest_location' => $to[$index]]);
         }
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')
