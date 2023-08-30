@@ -70,6 +70,8 @@
                     <th>Email</th>
                     <th>contact Number</th>
                     <th>Alternative Contact</th>
+                    <th>Office Phone</th>
+                    <th>Phone</th>
                     <th>Contact Person</th>
                     <th>Person Contact By</th>
                     <th>Categories</th>
@@ -95,6 +97,8 @@
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->contact_number }}</td>
                         <td>{{ $supplier->alternative_contact_number }}</td>
+                        <td>{{ $supplier->office_phone }}</td>
+                        <td>{{ $supplier->phone }}</td>
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->person_contact_by }}</td>
                           <td>
