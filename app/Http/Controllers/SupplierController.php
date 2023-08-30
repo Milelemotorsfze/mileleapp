@@ -178,7 +178,7 @@ class SupplierController extends Controller
             {
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-                $addon->LeastPurchasePrices = $price;
+                $addon->least_purchase_price = $price;
             }
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')

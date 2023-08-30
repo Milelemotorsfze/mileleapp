@@ -51,7 +51,7 @@ class AddonController extends Controller
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-            $addon->LeastPurchasePrices = $price;
+            $addon->least_purchase_price = $price;
         }
 
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
