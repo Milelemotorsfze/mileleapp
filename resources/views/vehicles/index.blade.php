@@ -831,8 +831,6 @@ Clear Filters
                                      $sales_person_id = $so ? $so->sales_person_id : null;
                                     $sales_person = $sales_person_id ? DB::table('users')->where('id', $sales_person_id)->first() : null;
                                     $salesname = $sales_person ? $sales_person->name : null;
-//                                    $booking = $vehicles->booking_id ? DB::table('booking')->where('id', $vehicles->booking_id)->first() : null;
-//                                    $booking_name = $booking ? $booking->name : null;
                                     $warehouse = $vehicles->vin ? DB::table('movements')->where('vin', $vehicles->vin)->latest()->first() : null;
                                     $warehouses = $warehouse ? DB::table('warehouse')->where('id', $warehouse->to)->value('name') : null;
                                      $result = DB::table('varaints')

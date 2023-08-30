@@ -377,6 +377,9 @@ Route::get('/d', function () {
     Route::post('movemnet/get-vehicles-detailsasso', [MovementController::class, 'vehiclesdetailsasso'])->name('vehicles.vehiclesdetailsasso');
     Route::post('/update-prospecting-info', [DailyleadsController::class, 'saveprospecting'])->name('sales.saveprospecting');
     Route::post('/update-demand-info', [DailyleadsController::class, 'savedemand'])->name('sales.savedemand');
+    Route::get('vehicles/viewall', [VehiclesController::class, 'viewall'])->name('vehicles.viewall');
+    Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
+    
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');

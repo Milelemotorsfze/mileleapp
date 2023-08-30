@@ -21,6 +21,7 @@ use App\Models\Solog;
 use App\Models\Remarks;
 use App\Models\Warehouse;
 use App\Models\VehiclePicture;
+use DataTables;
 use App\Models\MasterModelLines;
 use Carbon\CarbonTimeZone;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +43,7 @@ class VehiclesController extends Controller
                       ->orWhere(function ($subQuery) {
                           $subQuery->whereNotNull('gdn_id')
                                    ->whereHas('gdn', function ($gdnQuery) {
-                                       $sixMonthsAgo = now()->subMonths(6);
+                                       $sixMonthsAgo = now()->subMonths(1);
                                        $gdnQuery->where('date', '>', $sixMonthsAgo);
                                    });
                       });
@@ -768,8 +769,7 @@ class VehiclesController extends Controller
                 }
             }
             $data = $data->paginate(100);
-        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')
-                                                ->groupBy('vehicle_id')->get();
+        $pendingVehicleDetailForApprovals = VehicleApprovalRequests::where('status','Pending')->groupBy('vehicle_id')->get();
         $pendingVehicleDetailForApprovalCount = $pendingVehicleDetailForApprovals->count();
         $datapending = Vehicles::where('status', '!=', 'cancel')->whereNull('inspection_date')->get();
         $varaint = Varaint::whereNotNull('master_model_lines_id')->get();
@@ -2380,5 +2380,31 @@ class VehiclesController extends Controller
         else{
             return redirect()->route('home');
         }
+    }
+    public function viewall(Request $request)
+{
+    return view('vehicles.indext');
+}
+public function viewalls(Request $request)
+    {
+        $offset = $request->input('offset', 0);
+        $length = $request->input('length', 40);
+        $vehicles = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn'])
+        ->select('id', 'status', 'vin', 'int_colour', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine' )
+        ->skip($offset)
+        ->take($length)
+        ->get();
+            $modifiedVehicles = $vehicles->map(function ($vehicle) {
+            $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : 'N/A';
+            $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : 'N/A';
+            $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : 'N/A';
+            $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : 'N/A';
+            $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : 'N/A';
+            $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : 'N/A';
+            $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : 'N/A';
+            $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->grn_number : 'N/A';
+            return $vehicle;
+        });
+        return response()->json($vehicles);
     }
     }
