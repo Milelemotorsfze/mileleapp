@@ -158,7 +158,10 @@ class SupplierController extends Controller
     public function show(Supplier $supplier)
     {
         $content = '';
-        $addon1 = $addons = $supplierTypes = '';
+        $addon1 =  $supplierTypes = '';
+        $addons = [];
+        $addonIds = [];
+
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')
             ->with('PaymentMethods')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)
