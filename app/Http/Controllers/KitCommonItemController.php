@@ -275,14 +275,16 @@ class KitCommonItemController extends Controller
         // get available common items for this kit
         $itemDropdown = AddonDetails::whereIn('id',$aa)->whereNotIn('id',$kitItemiD)->with('AddonName')->get();
         $selectedAddonModelNumbers = AddonTypes::where('addon_details_id', $addonDetails->id)->pluck('model_number')->toArray();
-        $alreadyAddedItems = $this->availableKitItems($selectedAddonModelNumbers);
-        $unselectedKitItems = array_diff($alreadyAddedItems, $kitItemiD);
+        $availableKitItems = $this->availableKitItems($selectedAddonModelNumbers);
+//        dd($alreadyAddedItems);
+        $unselectedKitItems = array_diff($kitItemiD, $availableKitItems);
         $availableCommonItems = AddonDetails::whereIn('id', $unselectedKitItems)->get();
 
         // kit common items which is used for this kit
 
-        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers','kitModelLineIds','alreadyAddedItems',
-            'kitItemDropdown','supplierAddons','existingBrandModel','kitItems','itemDropdown','count','existingAddonTypes','availableCommonItems'));
+        return view('kit.edit',compact('addons','brands','modelLines','addonDetails','suppliers',
+            'kitModelLineIds', 'kitItemDropdown','supplierAddons','existingBrandModel',
+            'kitItems','itemDropdown','count','existingAddonTypes','availableCommonItems','kitItemiD'));
     }
 
     function availableKitItems($data)
@@ -475,11 +477,11 @@ class KitCommonItemController extends Controller
             $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
 
             $itemSps = [];
-            $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id');
+            $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id')->toArray();
             $itemModelDes = [];
             $itemModelDes = AddonTypes::where('addon_details_id',$id)->pluck('model_number');
             $modelDescSps = [];
-            $modelDescSps = AddonTypes::where('model_number',$itemModelDes)->pluck('addon_details_id');
+            $modelDescSps = AddonTypes::where('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
             $intersect = array_intersect($modelDescSps,$itemSps);
             // dd($intersect);
         }

@@ -370,8 +370,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 {{$Kit->item->Addon->name}} - {{$Kit->item->description}}
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                                <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
-                                style="width:100%; height:125px;" alt="Addon Image"  />
+                                @if($Kit->least_price_vendor->supplierAddonDetails)
+                                    <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
+                                    style="width:100%; height:125px;" alt="Addon Image"  />
+                                @endif
                             </div>
                             <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
                                 <div class="row" style="padding-right:3px; padding-left:3px;">

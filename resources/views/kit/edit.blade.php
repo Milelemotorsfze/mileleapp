@@ -359,7 +359,7 @@
                                                                         <select class="mainItem form-control widthinput MainItemsClass" name="mainItem[{{$i}}][item]" id="mainItem{{$i}}"
                                                                                 multiple="true" style="width: 100%;" data-index="{{$i}}" onchange="KitItemValidations(this,{{$i}})" >
 
-                                                                            <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $alreadyAddedItems)) selected @endif>
+                                                                            <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $kitItemiD)) selected @endif>
                                                                                 {{$kitItemDropdownData->item->addon_code}}
                                                                                 ( {{$kitItemDropdownData->item->Addon->name}}
                                                                                 @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif  )
