@@ -60,22 +60,22 @@
             <table id="suppliersList" class="table table-striped table-editable table-edits table">
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th>Name</th>
+                  <th>Ref No</th>
+                  <th>Vendor Name</th>
                     @can('addon-supplier-list')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
                     @endphp
                     @if ($hasPermission)
+                    <th>Categories</th>
+                    <th>Sub Categories</th>                    
+                    <th>Person Contact By</th>
+                    <th>Contact Person</th>
                     <th>Email</th>
-                    <th>contact Number</th>
+                    <th>Contact Number</th>
                     <th>Alternative Contact</th>
                     <th>Office Phone</th>
                     <th>Phone</th>
-                    <th>Contact Person</th>
-                    <th>Person Contact By</th>
-                    <th>Categories</th>
-                    <th>Sub Categories</th>
                     <th>Payment Methods</th>
                     @endif
                     @endcan
@@ -94,14 +94,7 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
                       @endphp
                       @if ($hasPermission)
-                        <td>{{ $supplier->email }}</td>
-                        <td>{{ $supplier->contact_number }}</td>
-                        <td>{{ $supplier->alternative_contact_number }}</td>
-                        <td>{{ $supplier->office_phone }}</td>
-                        <td>{{ $supplier->phone }}</td>
-                        <td>{{ $supplier->contact_person }}</td>
-                        <td>{{ $supplier->person_contact_by }}</td>
-                          <td>
+                      <td>
                               @if($supplier->vendorCategories->count() > 0)
                                   @foreach($supplier->vendorCategories as $vendorCategory)
                                       <label class="badge badge-soft-info">   {{ $vendorCategory->category }} </label>
@@ -135,7 +128,13 @@
                             @endforeach
                           @endif
                         </td>
-
+                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>{{ $supplier->contact_person }}</td>
+                        <td>{{ $supplier->email }}</td>
+                        <td>{{ $supplier->contact_number }}</td>
+                        <td>{{ $supplier->alternative_contact_number }}</td>
+                        <td>{{ $supplier->office_phone }}</td>
+                        <td>{{ $supplier->phone }}</td>
                         <td>
                           @if(!empty($supplier->paymentMethods()))
                             @foreach($supplier->paymentMethods as $v)
@@ -223,20 +222,22 @@
             <table id="inactiveSuppliersList" class="table table-striped table-editable table-edits table">
               <thead>
                 <tr>
-                  <th>No</th>
-                  <th>Name</th>
+                  <th>Ref No</th>
+                  <th>Vendor Name</th>
                     @can('addon-supplier-list')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
                     @endphp
-                    @if ($hasPermission)
-                    <th>Email</th>
-                    <th>contact Number</th>
-                    <th>Alternative Contact</th>
-                    <th>Contact Person</th>
-                    <th>Person Contact By</th>
+                    @if ($hasPermission)                   
                     <th>Categories</th>
                     <th>Sub Categories</th>
+                    <th>Person Contact By</th>
+                    <th>Contact Person</th>
+                    <th>Email</th>
+                    <th>Contact Number</th>
+                    <th>Alternative Contact</th>
+                    <th>Office Phone</th>
+                    <th>Phone</th>
                     <th>Payment Methods</th>
                     @endif
                     @endcan
@@ -255,12 +256,7 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
                       @endphp
                       @if ($hasPermission)
-                        <td>{{ $supplier->email }}</td>
-                        <td>{{ $supplier->contact_number }}</td>
-                        <td>{{ $supplier->alternative_contact_number }}</td>
-                        <td>{{ $supplier->contact_person }}</td>
-                        <td>{{ $supplier->person_contact_by }}</td>
-                        <td>
+                      <td>
                           @if($supplier->vendorCategories->count() > 0)
                               @foreach($supplier->vendorCategories as $vendorCategory)
                                   <label class="badge badge-soft-info">   {{ $vendorCategory->category }} </label>
@@ -293,8 +289,14 @@
                               </label>
                             @endforeach
                           @endif
-                        </td>
-
+                        </td>                       
+                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>{{ $supplier->contact_person }}</td>
+                        <td>{{ $supplier->email }}</td>
+                        <td>{{ $supplier->contact_number }}</td>
+                        <td>{{ $supplier->alternative_contact_number }}</td>
+                        <td>{{ $supplier->office_phone }}</td>
+                        <td>{{ $supplier->phone }}</td>
                         <td>
                           @if(!empty($supplier->paymentMethods()))
                             @foreach($supplier->paymentMethods as $v)
