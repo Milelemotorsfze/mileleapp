@@ -71,6 +71,10 @@ class Vehicles extends Model
     {
         return $this->belongsTo(So::class, 'so_id');
     }
+    public function grn()
+    {
+        return $this->belongsTo(Grn::class, 'grn_id');
+    }
     public function gdn()
     {
         return $this->belongsTo(Gdn::class, 'gdn_id');

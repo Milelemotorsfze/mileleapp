@@ -158,7 +158,10 @@ class SupplierController extends Controller
     public function show(Supplier $supplier)
     {
         $content = '';
-        $addon1 = $addons = $supplierTypes = '';
+        $addon1 =  $supplierTypes = '';
+        $addons = [];
+        $addonIds = [];
+
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')
             ->with('PaymentMethods')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)
@@ -178,7 +181,7 @@ class SupplierController extends Controller
             {
                 $price = '';
                 $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-                $addon->LeastPurchasePrices = $price;
+                $addon->least_purchase_price = $price;
             }
             $addons = DB::table('addon_details')
                         ->join('addons','addons.id','addon_details.addon_id')
@@ -187,12 +190,14 @@ class SupplierController extends Controller
                         ->join('master_model_lines','master_model_lines.id','addon_types.model_id')
                         ->whereIn('addon_details.id',$supplierAddonId)
                         ->select('addons.name','addon_details.id as addon_details_table_id','addon_details.addon_id','addon_details.addon_code','addon_details.payment_condition',
-                        'addon_details.lead_time','addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
+                        'addon_details.additional_remarks','addon_details.image','addon_details.is_all_brands','addon_details.status','addon_types.brand_id','addon_types.model_id','addon_types.is_all_model_lines','brands.brand_name',
                         'master_model_lines.model_line')
                         ->orderBy('addon_details.id','ASC')
                         ->get();
+                        $addonIds = $addons->pluck('id');
+                        $addonIds = json_decode($addonIds);
         }
-        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes','content'));
+        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes','content','addonIds'));
     }
 
     /**
