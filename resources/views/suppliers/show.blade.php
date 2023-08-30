@@ -233,6 +233,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                         </div>
                         <div class="row">
                             <div class="col-xxl-4 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Office Phone') }}</label>
+                            </div>
+                            <div class="col-xxl-8 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->office_phone}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-4 col-md-6 col-sm-12 ">
                                 <label for="choices-single-default" class="form-label fw-bold">{{ __('Person Contact By') }}</label>
                             </div>
                             <div class="col-xxl-8 col-md-6 col-sm-12 ">
@@ -255,6 +263,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                             </div>
                             <div class="col-xxl-7 col-md-6 col-sm-12 ">
                                 <span>{{$supplier->alternative_contact_number}}</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xxl-5 col-md-6 col-sm-12 ">
+                                <label for="choices-single-default" class="form-label fw-bold">{{ __('Phone') }}</label>
+                            </div>
+                            <div class="col-xxl-7 col-md-6 col-sm-12 ">
+                                <span>{{$supplier->phone}}</span>
                             </div>
                         </div>
                         <div class="row">
