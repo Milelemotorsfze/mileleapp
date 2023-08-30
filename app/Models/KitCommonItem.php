@@ -50,9 +50,9 @@ class KitCommonItem extends Model
         $kitItem = KitCommonItem::find($this->id);
 
         $addonDetailIds = AddonDetails::where('description', $this->item_id)
-            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id');
+            ->where('addon_type_name','SP')->pluck('id');
         $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
-        $kitAddonDetails = AddonTypes::whereIn('addon_details_id', $addonDetailIds)->whereIn('model_number', $kitModelNumbers)
+        $kitAddonDetails = AddonTypes::whereIn('model_number', $kitModelNumbers)
             ->pluck('addon_details_id');
 
        $vendorMinPrice = SupplierAddons::whereIn('addon_details_id', $kitAddonDetails)
@@ -80,7 +80,11 @@ class KitCommonItem extends Model
         $kitItem = KitCommonItem::find($this->id);
 
         $leastPriceVendor = $kitItem->least_price_vendor;
-        $totalItemPrice = $kitItem->quantity * $leastPriceVendor->purchase_price_aed;
+        $totalItemPrice = 0;
+        if($leastPriceVendor && $leastPriceVendor->purchase_price_aed) {
+            $totalItemPrice = $kitItem->quantity * $leastPriceVendor->purchase_price_aed;
+        }
+
        return $totalItemPrice;
     }
 }
