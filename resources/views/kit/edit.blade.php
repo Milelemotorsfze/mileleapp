@@ -172,9 +172,9 @@
                             <span id="addonNameError" class="invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
-                            @can('master-addon-create')
+                            @can('master-kit-create')
                             @php
-                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-create']);
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-kit-create']);
                             @endphp
                             @if ($hasPermission)
                             <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;"
@@ -360,9 +360,8 @@
                                                                                 multiple="true" style="width: 100%;" data-index="{{$i}}" onchange="KitItemValidations(this,{{$i}})" >
 
                                                                             <option value="{{ $kitItemDropdownData->item->id }}" @if(in_array( $kitItemDropdownData->item->id , $kitItemiD)) selected @endif>
-                                                                                {{$kitItemDropdownData->item->addon_code}}
-                                                                                ( {{$kitItemDropdownData->item->Addon->name}}
-                                                                                @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif  )
+                                                                                {{$kitItemDropdownData->item->Addon->name}}
+                                                                                @if($kitItemDropdownData->item->description) - {{ $kitItemDropdownData->item->description }} @endif
                                                                             </option>
                                                                             @foreach($availableCommonItems as $itemDrop)
                                                                                 <option value="{{$itemDrop->id}}">
@@ -370,9 +369,7 @@
                                                                                 </option>
                                                                             @endforeach
                                                                         </select>
-                                                                        <span id="KitItemError1" class="KitItemError invalid-feedback"></span>
-
-
+                                                                        <span id="KitItemError{{$i}}" class="KitItemError invalid-feedback"></span>
                                                                     </div>
                                                                     <div class="col-xxl-1 col-lg-3 col-md-3" id="div_price_in_usd_1" >
                                                                         <span class="error">* </span>
@@ -380,7 +377,7 @@
                                                                         <input name="mainItem[{{$i}}][quantity]" id="mainQuantity{{$i}}" placeholder="Enter Quantity" type="number" value="{{$kitItemDropdownData->quantity}}" min="1"
                                                                                 class="form-control widthinput quantityMainItem" autofocus  required
                                                                                 oninput="validity.valid||(value='1');" >
-                                                                        <span id="KitItemQuantityError1" class="kitItemQuantityError invalid-feedback"></span>
+                                                                        <span id="KitItemQuantityError{{$i}}" class="kitItemQuantityError invalid-feedback"></span>
 
                                                                     </div>
                                                                     <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
@@ -491,7 +488,6 @@
     </div>
 <script type="text/javascript">
      var data = {!! json_encode($addonDetails) !!};
-    //  console.log(data.fixing_charges_included);
         var selectedSuppliers = [];
         var oldselectedSuppliers = [];
         var ifModelLineExist = [];
@@ -655,7 +651,7 @@
             //     showBrandError($msg);
             //     formInputError = true;
             // }
-            // alert(inputAddonName);
+
             if(inputAddonType == '')
             {
                 $msg = "Addon Type is required";
@@ -786,6 +782,7 @@
             }
         });
      function KitItemValidations(clickInput, index) {
+
          var kitItem = clickInput.value;
 
          if(kitItem == '')
@@ -1554,7 +1551,6 @@
                     KitItems.push(kitItem);
                 }
             }
-            // console.log(KitItems);
             if(KitItems.length > 0) {
                 if(confirm("Your Selected Kit Items will be Cleared While changing model Number")) {
                     getItemsDropdown(type);
@@ -1882,7 +1878,7 @@
     }
     function showRelatedModal(value,row,currentAddonType)
     {
-        // alert("div");
+
         let showDivdrop = document.getElementById('showDivdrop'+row);
 
         showDivdrop.hidden = false
@@ -1985,7 +1981,6 @@
                 selectedItems.push(item);
             }
         }
-        console.log(selectedItems);
         $.ajax({
             url: "{{url('getCommonKitItems')}}",
             type: "GET",
@@ -2012,7 +2007,7 @@
                     ({
 
                         id: value.id,
-                        text: value.addon_code +' ('+value.addon_name.name +' - '+ description +')'
+                        text: value.addon.name +' - '+ description
                     });
                 });
 

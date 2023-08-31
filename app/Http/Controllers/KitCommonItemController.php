@@ -287,28 +287,34 @@ class KitCommonItemController extends Controller
             'kitItems','itemDropdown','count','existingAddonTypes','availableCommonItems','kitItemiD'));
     }
 
-    function availableKitItems($data)
+    function availableKitItems($selectedAddonModelNumbers)
     {
 
-        $kitItemDropdown = Addon::whereIn('addon_type', ['SP'])->pluck('id');
-        // get each model description rows
-        $Items = [];
-        foreach($data as $key => $modelNumber) {
-            $commonItems[$key] = [];
-            $addonDetailIds = AddonTypes::where('model_number', $modelNumber)->pluck('addon_details_id')->toArray();
-            foreach ($addonDetailIds as $addonDetail) {
-                array_push($commonItems[$key], $addonDetail);
+        if($selectedAddonModelNumbers) {
+            if(count($selectedAddonModelNumbers) > 0)
+            {
+                $kitItemDropdown = Addon::whereIn('addon_type', ['SP'])->pluck('id');
+                // get each model description rows
+                $Items = [];
+                foreach($selectedAddonModelNumbers as $key => $modelNumber) {
+                    $commonItems[$key] = [];
+                    $addonDetailIds = AddonTypes::where('model_number', $modelNumber)->pluck('addon_details_id')->toArray();
+                    foreach ($addonDetailIds as $addonDetail) {
+                        array_push($commonItems[$key], $addonDetail);
+                    }
+                    $Items[] = $commonItems[$key];
+                }
+
+                $result = call_user_func_array('array_intersect', $Items);
+                $dataId = AddonDetails::whereIn('addon_id', $kitItemDropdown)
+                    ->whereIn('id', $result)->pluck('description');
+
+                $data = AddonDescription::with('Addon')->whereIn('id',$dataId)
+                                    ->pluck('id')->toArray();
+
+                return $data;
             }
-            $Items[] = $commonItems[$key];
         }
-
-        $result = call_user_func_array('array_intersect', $Items);
-        $availableKitItems = AddonDetails::with('AddonName')
-                            ->whereIn('addon_id', $kitItemDropdown)
-                            ->whereIn('id', $result);
-
-        $availableKitItems = $availableKitItems->pluck('id')->toArray();
-        return $availableKitItems;
     }
     public function updateKitSupplier(Request $request, $id)
     {
