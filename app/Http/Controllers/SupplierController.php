@@ -61,6 +61,10 @@ class SupplierController extends Controller
          }
         return view('suppliers.index',compact('suppliers','inactiveSuppliers'));
     }
+    public function getVendorAddonList(Request $request) {
+
+
+    }
 
     /**
      * Show the form for creating a new resource.
