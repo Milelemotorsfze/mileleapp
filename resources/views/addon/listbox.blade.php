@@ -353,7 +353,7 @@
                                     All Brands
                                 </div>
                             @else
-                                @if($addonsdata->addon_type_name == 'SP')
+                                @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'K')
                                     <div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                         <center>Brand</center>
                                     </div>
@@ -382,7 +382,7 @@
                                 @foreach($addonsdata->AddonTypes as $key =>$AddonTypes)
                                     <div class="divcolorclass" value="5" hidden>
                                     </div>
-                                    @if($addonsdata->addon_type_name == 'SP')
+                                    @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'K')
                                         <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                             {{$AddonTypes->brands->brand_name}}
                                         </div>

@@ -372,7 +372,7 @@ class AddonController extends Controller
                                                         All Brands
                                                     </div>';
                                         }else{
-                                            if($addon->addon_type_name == 'SP') {
+                                            if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
                                                 $html .= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                                             <center>Brand</center>
                                                             </div>
@@ -400,7 +400,7 @@ class AddonController extends Controller
                                                 $html .= ' <div class="divcolorclass" value="5" hidden>
                                                         </div>';
 
-                                                if($addon->addon_type_name == 'SP') {
+                                                if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
                                                     $html .= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                                             '.$AddonTypes->brands->brand_name.'
                                                             </div>
