@@ -20,4 +20,8 @@ class So extends Model
     {
         return $this->hasMany(Vehicles::class);
     }
+    public function salesperson()
+    {
+        return $this->belongsTo(User::class,'sales_person_id');
+    }
 }
