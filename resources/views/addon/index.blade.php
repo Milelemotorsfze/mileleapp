@@ -367,7 +367,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
                     $(".each-addon:last").after(response.html).show().fadeIn("slow");
-                    checkWindowSize();
+                  //  checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
 

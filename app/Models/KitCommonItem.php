@@ -39,11 +39,14 @@ class KitCommonItem extends Model
     }
     public function getAddonPartNumbersAttribute() {
         $kitItem = KitCommonItem::find($this->id);
-
+        $partNumbers = [];
         $vendorMinPrice = $kitItem->least_price_vendor;
-        $addonDetailId = $vendorMinPrice->addon_details_id;
-        $partNumbers = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
-
+        if($vendorMinPrice)
+        {
+            $addonDetailId = $vendorMinPrice->addon_details_id;
+            $partNumbers = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
+        }
+        
         return $partNumbers;
     }
     public function getLeastPriceVendorAttribute() {

@@ -161,14 +161,14 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                             <!-- <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus> -->
-                            <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus>
+                            <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus @if($addon_type == 'SP') disabled @endif>
                                 <option value="">Choose Addon Type</option>
                                 <option value="P">Accessories</option>
                                 <!-- <option value="D">Documentation</option>
                                 <option value="DP">Documentation On Purchase</option>
                                 <option value="E">Others</option>
                                 <option value="S">Shipping Cost</option> -->
-                                <option value="SP">Spare Parts</option>
+                                <option value="SP" @if($addon_type == 'SP') selected @endif>Spare Parts</option>
                                 <!-- <option value="K">Kit</option> -->
                                 <!-- <option value="W">Warranty</option> -->
                             </select>
@@ -183,12 +183,7 @@
                         </div>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                             <input id="addon_code" type="text" class="form-control widthinput @error('addon_code') is-invalid @enderror" name="addon_code"
-                            placeholder="Addon Code" value="{{ old('addon_code') }}"  autocomplete="addon_code" autofocus readonly>
-                            @error('addon_code')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
+                            placeholder="Addon Code" value="{{$addon_code}}"  autocomplete="addon_code" autofocus readonly>
                         </div>
                     </div>
                     </br>
@@ -198,19 +193,15 @@
                             <label for="addon_id" class="col-form-label text-md-end">{{ __('Addon Name') }}</label>
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
-                            <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;" autofocus>
+                            <select name="addon_id" id="addon_id" multiple="true" style="width: 100%;" autofocus @if($addon_id != '') disabled @endif>
                                 @foreach($addons as $addon)
-                                    <option class="{{$addon->addon_type}}" value="{{$addon->id}}">{{$addon->name}}</option>
+                                    <option class="{{$addon->addon_type}}" value="{{$addon->id}}" @if($addon_id == $addon->id) selected @endif>{{$addon->name}}</option>
                                 @endforeach
                             </select>
-                            @error('addon_id')
-                                <span class="invalid-feedback" role="alert">
-                                    <strong>{{ $message }}</strong>
-                                </span>
-                            @enderror
                             <span id="addonNameError" class="invalid-feedback"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
+                        @if($addon_id == '')
                             @can('master-addon-create')
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-addon-create']);
@@ -219,7 +210,8 @@
                             <a id="addnewAddonButton" data-toggle="popover" data-trigger="hover" title="Create New Addon" data-placement="top" style="float: right;"
                             class="btn btn-sm btn-info modal-button" data-modal-id="createNewAddon"><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                             @endif
-                        @endcan
+                            @endcan
+                        @endif
                         </div>
                     </div>
                     </br>
