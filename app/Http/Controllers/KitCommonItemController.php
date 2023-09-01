@@ -482,14 +482,16 @@ class KitCommonItemController extends Controller
         {
             $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
 
-            // $itemSps = [];
-            // $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id');
-            // $itemModelDes = [];
-            // $itemModelDes = AddonTypes::where('addon_details_id',$id)->pluck('model_number');
-            // $modelDescSps = [];
-            // $modelDescSps = AddonTypes::where('model_number',$itemModelDes)->pluck('addon_details_id');
-            // $intersect = array_intersect($modelDescSps,$itemSps);
-            // // dd($intersect);
+            $itemSps = [];
+            $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id')->toArray();
+            $itemModelDes = [];
+            $itemModelDes = AddonTypes::where('addon_details_id',$id)->pluck('model_number');
+            $modelDescSps = [];
+            $modelDescSps = AddonTypes::where('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
+            $intersectArray = [];
+            $intersectArray = array_intersect($modelDescSps,$itemSps);
+            $oneItem->countArray = count($intersectArray);
+            // dd(count($intersectArray));
         }
         $supplierAddonDetails->totalPrice = $totalPrice;
 

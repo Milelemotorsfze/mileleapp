@@ -699,15 +699,37 @@ class AddonController extends Controller
         return view('addon.action.modelAddonSellingPrice', compact('addonsdata','AddonTypes'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $description_id = $addon_id = $addon_code = $addon_type = $submitFrom = '';
+        if($request->kit_item_id != '')
+        {
+            $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
+            $description_id = $kititem->item_id;
+            $addon = AddonDescription::where('id',$description_id)->first();
+            $addon_id = $addon->addon_id;
+            $addon_type = 'SP';
+            $submitFrom = 'kit';
+            $lastAddonCode = AddonDetails::where('addon_type_name','SP')->withTrashed()->orderBy('id', 'desc')->first();
+                if($lastAddonCode != '')
+                {
+                    $lastAddonCodeNo =  $lastAddonCode->addon_code;
+                    $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
+                    $newAddonCodeNumber =  $lastAddonCodeNumber+1;
+                    $addon_code =  "SP".$newAddonCodeNumber;
+                }
+                else
+                {
+                    $addon_code =  "SP1";
+                }
+        }
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
         $addons = Addon::whereIn('addon_type',['P','SP','K','W'])->select('id','name','addon_type')->orderBy('name', 'ASC')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
-        return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown'));
+        return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown','description_id','addon_id','addon_type','addon_code'));
     }
 
     /**
@@ -774,7 +796,6 @@ class AddonController extends Controller
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
-                    $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
                     if($request->addon_type == 'SP')
                     {
                         $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
