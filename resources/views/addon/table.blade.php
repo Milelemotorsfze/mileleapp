@@ -117,6 +117,7 @@
                                         <td>All Brands</td>
                                         <td>All Model Lines</td>
                                         <td></td>
+                                        @if($content == '')
                                         <td> @if(isset($addonsdata->LeastPurchasePrices->lead_time_min) || isset($addonsdata->LeastPurchasePrices->lead_time_max))
                                             {{$addonsdata->LeastPurchasePrices->lead_time_min}}
                                             @if($addonsdata->LeastPurchasePrices->lead_time_max != ''
@@ -127,6 +128,7 @@
                                             @endif
                                             @endif
                                         </td>
+                                        @endif
                                         <td>
                                             {{$addonsdata->model_year_start}}
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
@@ -232,6 +234,7 @@
                                                 @endif
                                             </td>
                                             <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>
+                                            @if($content == '')
                                             <td>
                                                 @if(isset($addonsdata->LeastPurchasePrices->lead_time_min) || isset($addonsdata->LeastPurchasePrices->lead_time_max))
                                                     @if($addonsdata->LeastPurchasePrices->lead_time_min != '' OR $addonsdata->LeastPurchasePrices->lead_time_max != '')
@@ -243,6 +246,7 @@
                                                     @endif
                                                 @endif
                                             </td>
+                                            @endif
                                             <td>{{$addonsdata->model_year_start}}
                                                 @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif</td>
                                             <td>{{$addonsdata->additional_remarks}}</td>
@@ -262,19 +266,26 @@
                                             @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
                                             @endphp
+
                                             @if ($hasPermission)
-                                            @if($addonsdata->LeastPurchasePrices!= null)
-                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
-                                                @can('addon-least-purchase-price-view')
-                                                @php
-                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                    <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
-                                                @endif
-                                                @endcan
-                                            @endif
-                                            @endif
+
+{{--                                                @can('addon-least-purchase-price-view')--}}
+{{--                                                @php--}}
+{{--                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);--}}
+{{--                                                @endphp--}}
+{{--                                                @if ($hasPermission)--}}
+                                                    <td>
+                                                        @if($addonsdata->LeastPurchasePrices!= null)
+                                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+
+                                                                {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
+                                                            @endif
+                                                        @endif
+                                                    </td>
+{{--                                                @endif--}}
+{{--                                                @endcan--}}
+{{--                                            @endif--}}
+{{--                                            @endif--}}
                                             @endif
                                             @endcan
                                             @can('addon-selling-price-view')
