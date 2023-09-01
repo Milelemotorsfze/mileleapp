@@ -2389,20 +2389,243 @@ public function viewalls(Request $request)
     {
         $offset = $request->input('offset', 0);
         $length = $request->input('length', 40);
-        $vehicles = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn'])
-        ->select('id', 'status', 'vin', 'int_colour', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine' )
-        ->skip($offset)
-        ->take($length)
-        ->get();
+        $searchParams = $request->input('columns', []);
+        info($searchParams);
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']); 
+        foreach ($searchParams as $column => $searchValue) {
+            if ($searchValue !== null) {
+                // Apply the search condition for this column
+                if ($column === "po_number") { 
+                    $query->whereHas('PurchasingOrder', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('po_number', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "po_date") { 
+                    $query->whereHas('PurchasingOrder', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('po_date', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "estimation_date") { 
+                    $query->where('estimation_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "grn_number") { 
+                    $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('grn_number', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "grn_date") { 
+                    $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "netsuit_grn_number") { 
+                    $query->where('netsuit_grn_number', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "netsuit_grn_date") { 
+                    $query->where('netsuit_grn_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "inspection_date") { 
+                    $query->where('inspection_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "grn_remark") { 
+                    $query->where('grn_remark', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "qc_remarks") { 
+                    $query->where('qc_remarks', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "so_number") { 
+                    $query->whereHas('So', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('so_number', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "so_date") { 
+                    $query->whereHas('So', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('so_date', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "reservation_start_date") { 
+                    $query->where('reservation_start_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "reservation_end_date") { 
+                    $query->where('reservation_end_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "pdi_date") { 
+                    $query->where('pdi_date', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "pdi_remarks") { 
+                    $query->where('pdi_remarks', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "gdn_number") { 
+                    $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('gdn_number', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "gdn_date") { 
+                    $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "gdn_date") { 
+                    $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "brand") { 
+                    $query->whereHas('variant.brand', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('brand_name', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "model_line") { 
+                    $query->whereHas('variant.master_model_lines', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('model_line', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "model_description") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('model_detail', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "variant") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "variant_details") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('detail', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "vin") { 
+                    $query->where('vin', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "conversion") { 
+                    $query->where('conversion', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "engine") { 
+                    $query->where('engine', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "model_year") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('my', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "steering") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('steering', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "seats") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('seat', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "fuel_type") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('fuel_type', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "gear") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('gear', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "int_colour") { 
+                    $query->whereHas('interior', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "ex_colour") { 
+                    $query->whereHas('exterior', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "upholestry") { 
+                    $query->whereHas('variant', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('upholestry', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "extra_features") { 
+                    $query->where('extra_features', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "ppmmyyy") { 
+                    $query->where('ppmmyyy', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "territory") { 
+                    $query->where('territory', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "latest_location") { 
+                    $query->where('latest_location', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "warehouseremarks") { 
+                    $query->whereHas('latestRemarkWarehouse', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('remark', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "price") { 
+                    $query->where('price', 'LIKE', '%' . $searchValue . '%');
+                }
+                if ($column === "importdoc") { 
+                    $query->whereHas('document', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('importdoc', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "ownership") { 
+                    $query->whereHas('document', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('ownership', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "documentwith") { 
+                    $query->whereHas('document', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('documentwith', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "bl_number") { 
+                    $query->whereHas('document', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('bl_number', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+                if ($column === "bl_dms_uploading") { 
+                    $query->whereHas('document', function ($subQuery) use ($searchValue) {
+                        $subQuery->where('bl_dms_uploading', 'LIKE', '%' . $searchValue . '%');
+                    });
+                }
+            }
+        }
+        $vehicles = $query->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour','varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price' )->skip($offset)->take($length)->get();
             $modifiedVehicles = $vehicles->map(function ($vehicle) {
-            $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : 'N/A';
-            $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : 'N/A';
-            $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : 'N/A';
-            $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : 'N/A';
-            $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : 'N/A';
-            $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : 'N/A';
-            $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : 'N/A';
-            $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->grn_number : 'N/A';
+            $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
+            $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
+            $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : '';
+            $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : '';
+            $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : '';
+            $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : '';
+            $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : '';
+            $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->gdn_number : '';
+            $vehicle->variantname = $vehicle->variant ? $vehicle->variant->name : '';
+            $vehicle->variantdetail = $vehicle->variant ? $vehicle->variant->detail : '';
+            $vehicle->variantmy = $vehicle->variant ? $vehicle->variant->my : '';
+            $vehicle->variantsteering = $vehicle->variant ? $vehicle->variant->steering : '';
+            $vehicle->variantseat = $vehicle->variant ? $vehicle->variant->seat : '';
+            $vehicle->model_detail = $vehicle->variant ? $vehicle->variant->model_detail : '';
+            $vehicle->variantfuel_type = $vehicle->variant ? $vehicle->variant->fuel_type : '';
+            $vehicle->transmission = $vehicle->variant ? $vehicle->variant->transmission : '';
+            $vehicle->upholestry = $vehicle->variant ? $vehicle->variant->upholestry : '';
+            $vehicle->import_type = $vehicle->document ? $vehicle->document->import_type : '';
+            $vehicle->owership = $vehicle->document ? $vehicle->document->owership : '';
+            $vehicle->document_with = $vehicle->document ? $vehicle->document->document_with : '';
+            $vehicle->bl_number = $vehicle->document ? $vehicle->document->bl_number : '';
+            $vehicle->bl_dms_uploading = $vehicle->document ? $vehicle->document->bl_dms_uploading : '';
+            $vehicle->bl_dms_uploading = $vehicle->document ? $vehicle->document->bl_dms_uploading : '';
+            $vehicle->warehousename = $vehicle->warehouse ? $vehicle->warehouse->name : '';
+            $vehicle->interiorcolours = $vehicle->interior ? $vehicle->interior->name : '';
+            $vehicle->exteriorcolour = $vehicle->exterior ? $vehicle->exterior->name : '';
+            $vehicle->latest_remark_sales = $vehicle->latestRemarkSales ? $vehicle->latestRemarkSales->remarks : '';
+            $vehicle->latest_remark_warehouse = $vehicle->latestRemarkWarehouse ? $vehicle->latestRemarkWarehouse->remarks : '';
+            $salespersonName = '';
+            if ($vehicle->so && $vehicle->so->salesperson) {
+                $salespersonName = $vehicle->so->salesperson->name;
+            }
+            $vehicle->salespersonname = $salespersonName;
             return $vehicle;
         });
         return response()->json($vehicles);

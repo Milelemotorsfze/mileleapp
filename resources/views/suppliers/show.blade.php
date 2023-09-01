@@ -542,6 +542,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
   <span class="closeImage close">&times;</span>
   <img class="modalContentForImage" id="img01">
   <div id="caption"></div>
+    <input type="hidden" id="start" value="0">
+    <input type="hidden" id="rowperpage" value="{{ $rowperpage }}">
+    <input type="hidden" id="totalrecords" value="{{$rowperpage}}">
+    <input type="hidden" name="addon_type" id="addon_type" value="{{$data}}">
 </div>
     @endif
     @endcan
@@ -615,6 +619,52 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
             addonbox.hidden = false
             let addonBoxButton = document.getElementById('addonBoxButton');
             addonBoxButton.hidden = true
+        }
+
+        function checkWindowSize(){
+            if($(window).height() >= $(document).height()){
+                // Fetch records
+                fetchData();
+            }
+        }
+        function onScroll(){
+            if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                var start = Number($('#start').val());
+
+                var totalrecords = Number($('#totalrecords').val());
+                var rowperpage = Number($('#rowperpage').val());
+                start = start + rowperpage;
+
+                if(start <= totalrecords) {
+                    console.log("start value less add 12");
+                    $('#start').val(start);
+                }
+                fetchData(start,totalrecords);
+            }
+        }
+        $(window).scroll(function(){
+            onScroll();
+        });
+        function fetchData(start,totalrecords) {
+            var addon_type = $('#addon_type').val();
+            var rowperpage = Number($('#rowperpage').val());
+
+            $.ajax({
+                url:"{{url('getAddonlists')}}",
+                data: {
+                    start:start,
+                    addon_type:addon_type,
+                },
+                dataType: 'json',
+                success: function(response){
+                    var total = parseInt(rowperpage) + parseInt(totalrecords);
+                    $('#totalrecords').val(total);
+                    $(".each-addon:last").after(response.html).show().fadeIn("slow");
+                    // checkWindowSize();
+                    var addonIds = response.addonIds;
+                    hideModelDescription(addonIds);
+                }
+            });
         }
     </script>
 @endsection
