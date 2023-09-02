@@ -451,7 +451,7 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <div class="input-group">
-              <select name class="form-select" id="currency-select">
+              <select name = "" class="form-select" id="currency-select">
       <option value="AED">AED</option>
       <option value="USD">USD</option>
       <option value="EURO">EURO</option>
