@@ -78,7 +78,7 @@ class AddonController extends Controller
         {
             if(in_array('yes',$request->BrandIds))
             {
-                info("all brands");
+//                info("all brands");
                 $addons = $addons->where('is_all_brands','yes');
 
             }
@@ -90,7 +90,7 @@ class AddonController extends Controller
                 });
             }
         }
-        info($addons->count());
+//        info($addons->count());
         if($request->ModelLineIds)
         {
 //            $addons = $addons->where('is_all_brands','yes');
@@ -98,11 +98,11 @@ class AddonController extends Controller
             {
                 if(in_array('yes', $request->ModelLineIds))
                 {
-                    info("all model line search");
+//                    info("all model line search");
                     $q = $q->where('is_all_model_lines','yes');
                 }else
                 {
-                    info("separate model line search");
+//                    info("separate model line search");
                     $q->where( function ($query) use ($request) {
                         $query = $query->whereIn('model_id',$request->ModelLineIds);
                     });
@@ -115,27 +115,22 @@ class AddonController extends Controller
         ////////////// filter end ////////////////
         $totalRowsloaded = $addon1->take($start)->pluck('id');
         $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $totalRowsloaded)->count();
-        info("already loaded  data");
-        info($latestSerialNumberloaded);
-        info('start');
-        info($start);
+//        info("already loaded  data");
+//        info($latestSerialNumberloaded);
+//        info('start');
+//        info($start);
 
         if($start >= $addons->count()) {
-            info('addon null command');
+//            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-            info("addons per request");
-            info($addons->pluck('id'));
-
-//            info($addons->AddonTypes->count());
-            // get  the count of already loaded data to find the serial number :- add loop key to get S.No:
 
         }
         foreach($addons as $addon)
@@ -145,7 +140,13 @@ class AddonController extends Controller
             $addon->LeastPurchasePrices = $price;
         }
         $html = "";
-        $i= $latestSerialNumberloaded;
+        // get the count of already loaded data to find the serial number :- add loop key to get S.No:
+        if($request->BrandIds && in_array('yes',$request->BrandIds)){
+            $i = $start;
+        }else{
+            $i= $latestSerialNumberloaded;
+        }
+
         foreach($addons as $value => $addon)
         {
             if($request->isAddonBoxView == 1)
@@ -449,7 +450,6 @@ class AddonController extends Controller
                                                      alt="Addon Image" style="width:100%; height:100px;">
                                           </td>
                                           <td> '.$addon->AddonName->name.'</td>
-
                                            <td>';
                                                 if($addon->addon_type_name == 'K') {
                                                     $html .= '<label class="badge badge-soft-success">Kit</label>';
@@ -558,7 +558,7 @@ class AddonController extends Controller
                               }else{
                                   $html .= ''.$addon->id.'_'.$AddonTypes->brand_id.'_'.$AddonTypes->model_id.'';
                               }
-                              $html .= 'each-addon-table-row" id="'.$addon->id.'_'.$AddonTypes->brand_id.'">';
+                              $html .= ' each-addon-table-row" id="'.$addon->id.'_'.$AddonTypes->brand_id.'">';
                               $html .=  '<td> '. ++$i. '</td>
                                         <td>
                                            <img id="myallModalImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
@@ -585,7 +585,11 @@ class AddonController extends Controller
                                               }
 
                             $html .=     '</td>
-                                          <td>  '.$AddonTypes->modelDescription->model_description ?? ''.'</td>';
+                                          <td>';
+                                              if($AddonTypes->modelDescription) {
+                                                  $html .= ''.$AddonTypes->modelDescription->model_description ?? " ".'';
+                                              }
+                                              $html .= '</td>';
                                           if($content == '') {
                                               $html .=        '<td>';
                                                   if(isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
@@ -666,11 +670,8 @@ class AddonController extends Controller
                   }
 
                 $data['table_html'] = $html;
-
             }
-
         }
-
 
         return response($data);
     }

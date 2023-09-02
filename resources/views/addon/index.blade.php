@@ -213,7 +213,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
       $("#fltr-model-line").select2();
       $('#fltr-addon-code').change(function(e) {
-          // e.preventDefault();
           var start = 0;
           var totalrecords = 0;
 
@@ -227,10 +226,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
           }
       });
       $('#fltr-brand').change(function(e) {
-
-          // e.preventDefault();
-          // e.stopPropagation();
-          // e.stopImmediatePropagation();
+          var BrandIds = $(this).val();
           var totalrecords = 0;
           var start = 0;
 
@@ -238,15 +234,27 @@ body {font-family: Arial, Helvetica, sans-serif;}
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
-
+          if (BrandIds === undefined || BrandIds.length == 0) {
+              $('#allBrandsFilter').prop("disabled", false);
+              $('.allBrandsFilterClass').prop("disabled", false);
+              $('#ModelLineDiv').show();
+          } else {
+              if (BrandIds.includes('yes')) {
+                  $('.allBrandsFilterClass').prop("disabled", true);
+                  $("#fltr-model-line option:selected").prop("selected", false);
+                  $("#fltr-model-line").trigger('change.select2');
+                  $('#ModelLineDiv').hide();
+              }
+              else {
+                  $('#allBrandsFilter').prop("disabled", true);
+              }
+          }
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
               // $('.page-overlay').show();
           }
       });
-        // $( document ).on( "ajaxStart", function() {
-        //     $('.page-overlay').show();
-        // } );
+
       $('#fltr-model-line').change(function(e) {
           e.preventDefault();
             // set total record and start = 0
@@ -315,7 +323,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         $(".each-addon-table-row").attr('hidden', true);
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
             fetchData(0,0);
-            // $('.page-overlay').show();
+            $('.page-overlay').show();
         }
     }
     function showAddonBox()
@@ -332,32 +340,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         $('#start').val(0);
         $('#totalrecords').val(12);
     }
-        // function addonFilter(global) {
-        //     var AddonIds = [];
-        //     var BrandIds = [];
-        //     var ModelLineIds = [];
-        //     var Data = '';
-        //     var AddonIds = $('#fltr-addon-code').val();
-        //     var BrandIds = $('#fltr-brand').val();
-        //     if (BrandIds === undefined || BrandIds.length == 0) {
-        //         $('#allBrandsFilter').prop("disabled", false);
-        //         $('.allBrandsFilterClass').prop("disabled", false);
-        //         $('#ModelLineDiv').show();
-        //     } else {
-        //         if (BrandIds.includes('yes')) {
-        //             $('.allBrandsFilterClass').prop("disabled", true);
-        //             $('#ModelLineDiv').hide();
-        //         } else {
-        //             $('#allBrandsFilter').prop("disabled", true);
-        //         }
-        //     }
-        // }
-    // function checkWindowSize(){
-    //     if($(window).height() >= $(document).height()){
-    //         // Fetch records
-    //         fetchData();
-    //     }
-    // }
+
     function onScroll(){
 
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -383,18 +366,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
         var rowperpage = Number($('#rowperpage').val());
-            if (BrandIds === undefined || BrandIds.length == 0) {
-                $('#allBrandsFilter').prop("disabled", false);
-                $('.allBrandsFilterClass').prop("disabled", false);
-                $('#ModelLineDiv').show();
-            } else {
-                if (BrandIds.includes('yes')) {
-                    $('.allBrandsFilterClass').prop("disabled", true);
-                    $('#ModelLineDiv').hide();
-                } else {
-                    $('#allBrandsFilter').prop("disabled", true);
-                }
-            }
+
             $.ajax({
                 url:"{{url('getAddonlists')}}",
                 data: {
@@ -413,8 +385,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     $('#totalrecords').val(total);
                     $(".each-addon:last").after(response.addon_box_html).show().fadeIn("slow");
                     $(".each-addon-table-row:last").after(response.table_html).show().fadeIn("slow");
-                    console.log(response.table_html);
-                    // checkWindowSize();
+                   // checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
 
