@@ -158,6 +158,7 @@
     var selectedBrandsDisArr = [];
     $(document).ready(function ()
     {
+        // TO LOCK KIT MODEL DESCRIPTIONS WHEN CREATE KIT SP
         $(function() {
            $('.model-descriptions').select2({
              tags: true,
@@ -188,8 +189,8 @@
         $("#selectBrandMo1").select2({
             maximumSelectionLength: 1,
         });
-        $("#selectModelLineNum1Des1").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-        $("#selectModelLineNum1Des1").select2({
+        $(".spare-parts-model-lines").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+        $(".spare-parts-model-lines").select2({
             maximumSelectionLength: 1,
         });
         $("#selectModelNumberDiscri1Des1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
@@ -199,14 +200,22 @@
 
         var index = 1;
         $('#indexValue').val(index);
-        $("#selectModelYearEnd1Des1").yearpicker({
+        $(".startyearpicker").yearpicker({
             startYear: 2019,
             endYear: 2050,
+            onChange : function(value){
+                // YOUR CODE COMES_HERE
+                alert('startyearpicker onchange');
+            }
         });
 
-        $("#selectModelYearStart1Des1").yearpicker({
+        $(".endyearpicker").yearpicker({
             startYear: 2019,
             endYear: 2050,
+            onChange : function(value){
+                // YOUR CODE COMES_HERE
+                alert('endyearpicker onchange');
+            }
         });
 
         function checkGreaterYear(CurrentInput,i,j)
@@ -722,12 +731,10 @@
             allowClear: true,
         });
         $("#selectModelYearStart"+supplier+"Des"+index).yearpicker({
-            year: 2023,
             startYear: 2019,
             endYear: 2050,
         });
         $("#selectModelYearEnd"+supplier+"Des"+index).yearpicker({
-            year: 2023,
             startYear: 2019,
             endYear: 2050,
         });
