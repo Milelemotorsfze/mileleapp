@@ -379,7 +379,8 @@ Route::get('/d', function () {
     Route::post('/update-demand-info', [DailyleadsController::class, 'savedemand'])->name('sales.savedemand');
     Route::get('vehicles/viewall', [VehiclesController::class, 'viewall'])->name('vehicles.viewall');
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
-    
+    Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
+
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');

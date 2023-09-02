@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\ColorCode;
+use App\Events\DataUpdatedEvent;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Vehicles;
 use App\Models\PurchasingOrder;
@@ -1477,6 +1478,7 @@ class VehiclesController extends Controller
                         $documentupdate = new Document();
                         $documentupdate->$fieldName = $newValue;
                         $documentupdate->save();
+                        event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
                         $newdocuments_id = $documentupdate->id;
                         $vehicle->documents_id = $newdocuments_id;
                         $vehicle->save();
@@ -1542,6 +1544,7 @@ class VehiclesController extends Controller
                             $remarks->time = $currentDateTime->toTimeString();
                             $remarks->remarks = $fieldValue;
                             $remarks->created_by = auth()->user()->id;
+                            event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
                             $remarks->save();
                             $vehicleslog = new Vehicleslog();
                             $vehicleslog->time = $currentDateTime->toTimeString();
@@ -1573,6 +1576,7 @@ class VehiclesController extends Controller
                         if (!empty($changes)) {
                             $vehicle->$fieldName = $fieldValue;
                             $vehicle->save();
+                            event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
                             $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
                             $currentDateTime = Carbon::now($dubaiTimeZone);
                             $vehicleslog = new Vehicleslog();
@@ -1836,6 +1840,7 @@ class VehiclesController extends Controller
                 $remarksdata->department = "Sales";
                 $remarksdata->created_at = $currentDateTime;
                 $remarksdata->save();
+                event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
 //                if($soID) {
 //                    $remarklog = new Solog();
 //                    $remarklog->time = $currentDateTime->toTimeString();
@@ -2004,6 +2009,7 @@ class VehiclesController extends Controller
                     $documents->document_with = $request->documents_with[$key];
                     $documents->bl_number = $request->bl_numbers[$key];
                     $documents->save();
+                    event(new DataUpdatedEvent(['id' => $vehicle->id, 'message' => "Data Update"]));
                     $documents_id = $documents->id;
 
                     $documentlog = new Documentlog();
@@ -2060,7 +2066,7 @@ class VehiclesController extends Controller
                 $remarksdata->department = "WareHouse";
                 $remarksdata->created_at = $currentDateTime;
                 $remarksdata->save();
-
+                event(new DataUpdatedEvent(['id' => $vehicleId, 'message' => "Data Update"]));
                 $vehicle->remarks = $request->warehouse_remarks[$key];
 
             }
@@ -2630,4 +2636,53 @@ public function viewalls(Request $request)
         });
         return response()->json($vehicles);
     }
+    public function getUpdatedVehicle($id)
+    {
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
+            ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
+            ->where('id', $id);
+    
+        $vehicle = $query->first();
+    
+        if (!$vehicle) {
+            return response()->json(['message' => 'Vehicle not found'], 404);
+        }
+    
+        // Modify the vehicle data here as needed...
+        $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
+        $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';
+        $vehicle->po_number = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_number : '';
+        $vehicle->po_date = $vehicle->purchasingOrder ? $vehicle->purchasingOrder->po_date : '';
+        $vehicle->grn_date = $vehicle->grn ? $vehicle->grn->date : '';
+        $vehicle->grn_number = $vehicle->grn ? $vehicle->grn->grn_number : '';
+        $vehicle->gdn_date = $vehicle->gdn ? $vehicle->gdn->date : '';
+        $vehicle->gdn_number = $vehicle->gdn ? $vehicle->gdn->gdn_number : '';
+        $vehicle->variantname = $vehicle->variant ? $vehicle->variant->name : '';
+        $vehicle->variantdetail = $vehicle->variant ? $vehicle->variant->detail : '';
+        $vehicle->variantmy = $vehicle->variant ? $vehicle->variant->my : '';
+        $vehicle->variantsteering = $vehicle->variant ? $vehicle->variant->steering : '';
+        $vehicle->variantseat = $vehicle->variant ? $vehicle->variant->seat : '';
+        $vehicle->model_detail = $vehicle->variant ? $vehicle->variant->model_detail : '';
+        $vehicle->variantfuel_type = $vehicle->variant ? $vehicle->variant->fuel_type : '';
+        $vehicle->transmission = $vehicle->variant ? $vehicle->variant->transmission : '';
+        $vehicle->upholestry = $vehicle->variant ? $vehicle->variant->upholestry : '';
+        $vehicle->import_type = $vehicle->document ? $vehicle->document->import_type : '';
+        $vehicle->owership = $vehicle->document ? $vehicle->document->owership : '';
+        $vehicle->document_with = $vehicle->document ? $vehicle->document->document_with : '';
+        $vehicle->bl_number = $vehicle->document ? $vehicle->document->bl_number : '';
+        $vehicle->bl_dms_uploading = $vehicle->document ? $vehicle->document->bl_dms_uploading : '';
+        $vehicle->bl_dms_uploading = $vehicle->document ? $vehicle->document->bl_dms_uploading : '';
+        $vehicle->warehousename = $vehicle->warehouse ? $vehicle->warehouse->name : '';
+        $vehicle->interiorcolours = $vehicle->interior ? $vehicle->interior->name : '';
+        $vehicle->exteriorcolour = $vehicle->exterior ? $vehicle->exterior->name : '';
+        $vehicle->latest_remark_sales = $vehicle->latestRemarkSales ? $vehicle->latestRemarkSales->remarks : '';
+        $vehicle->latest_remark_warehouse = $vehicle->latestRemarkWarehouse ? $vehicle->latestRemarkWarehouse->remarks : '';
+        $salespersonName = '';
+        if ($vehicle->so && $vehicle->so->salesperson) {
+            $salespersonName = $vehicle->so->salesperson->name;
+        }
+        $vehicle->salespersonname = $salespersonName;
+    info($vehicle);
+        return response()->json($vehicle);
+    }    
     }
