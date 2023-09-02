@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DataUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Models\AvailableColour;
 use App\Models\ColorCode;
@@ -219,6 +220,7 @@ class VehiclePendingApprovalRequestController extends Controller
             }
         }else{
             $vehicle->$field = $newValue;
+            event(new DataUpdatedEvent(['id' => $vehicle->id, 'message' => "Data Update"]));
         }
 
         $vehicle->save();

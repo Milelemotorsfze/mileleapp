@@ -482,7 +482,7 @@
         var sub ='1';
         var imageIsOkay = false;
         var isPartNumberErrorExists = true;
-        // var KitaddonType = 
+        // var KitaddonType =
         $(document).ready(function () {
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
@@ -1066,7 +1066,7 @@
                                     }else if(Number(inputModelYearEnd) <= Number(inputModelYearStart))
                                     {
                                         removeModelYearStartError(i,j);
-                                        $msg = "Enter higher value than min leadtime"
+                                        $msg = "Enter higher value than Model Year Start"
                                         showModelYearEndError($msg,i,j);
                                         formInputError = true;
                                     }else{
