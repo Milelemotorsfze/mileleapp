@@ -149,7 +149,7 @@
                             <span class="error">* </span>
                             <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                             <input type="text" class="startyearpicker form-control widthinput"  name="brand[{{$i}}][model][{{$j}}][model_year_start]"
-                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value="{{ $ModelLine->model_year_start }} "/>
+                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value="2027"/>
 
                             <span id="modelYearStart{{$i}}Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                         </div>
@@ -205,6 +205,7 @@
         {
             let showAdTrim = document.getElementById('showaddtrimDis');
             showAdTrim.hidden = false
+            // for(let i=0; )
         }
         $(".brandRows").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
         $(".brandRows").select2({
@@ -216,16 +217,30 @@
         });
         $(".model-descriptions").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
         $(".model-descriptions").select2();
+        var existingModelLineRowCount = existingBrandModel[0].ModelLine.length;
+        if(existingModelLineRowCount > 0)
+        {
+            for(var i=1; i<=existingModelLineRowCount; i++)
+            {
+                var selectedStartYear = null;
+                var selectedEndYear = null;
+                selectedStartYear = existingBrandModel[0].ModelLine[i-1].model_year_start;
+                selectedEndYear = existingBrandModel[0].ModelLine[i-1].model_year_end;
+                $("#selectModelYearStart1Des"+i).yearpicker({
+                    year: selectedStartYear,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
 
-        $(".startyearpicker").yearpicker({
-            startYear: 2019,
-            endYear: 2050,
-        });
+                $("#selectModelYearEnd1Des"+i).yearpicker({
+                    year: selectedEndYear,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
+            }
+        }
 
-        $(".endyearpicker").yearpicker({
-            startYear: 2019,
-            endYear: 2050,
-        });
+       
         ///////////////////// dropdown /////////////
 
         var index = 1;
