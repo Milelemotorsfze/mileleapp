@@ -51,7 +51,7 @@ class AddonController extends Controller
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-            $addon->least_purchase_price = $price;
+            $addon->LeastPurchasePrices = $price;
         }
 
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
@@ -63,8 +63,7 @@ class AddonController extends Controller
         $rowperpage = 12;
         $content = 'addon';
         // Fetch records
-//        info($request->all());
-        $addons = AddonDetails::with('AddonTypes')
+        $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
                     ->orderBy('id','DESC');
         if($request->addon_type != 'all')
         {
@@ -73,124 +72,106 @@ class AddonController extends Controller
         /// filter
         if($request->AddonIds)
         {
-            info("addonc code serach");
             $addons = $addons->whereIn('addon_id', $request->AddonIds);
         }
         if($request->BrandIds)
         {
-            info("brandId code serach");
-
             if(in_array('yes',$request->BrandIds))
             {
-                info("all brands");
+//                info("all brands");
                 $addons = $addons->where('is_all_brands','yes');
+
             }
             else
             {
-                info("separate branch serach");
-                info($request->BrandIds);
 //                $addons = $addons->where('is_all_brands','yes');
                 $addons = $addons->whereHas('AddonTypes', function($q) use($request) {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
                 });
             }
         }
-        info($addons->count());
-
+//        info($addons->count());
         if($request->ModelLineIds)
         {
-            info("model lis search");
-            info($request->ModelLineIds);
 //            $addons = $addons->where('is_all_brands','yes');
             $addons = $addons->whereHas('AddonTypes', function($q) use($request)
             {
                 if(in_array('yes', $request->ModelLineIds))
                 {
-                    info("all model line search");
-
+//                    info("all model line search");
                     $q = $q->where('is_all_model_lines','yes');
                 }else
                 {
-                    info("separate model line search");
-
+//                    info("separate model line search");
                     $q->where( function ($query) use ($request) {
                         $query = $query->whereIn('model_id',$request->ModelLineIds);
                     });
                 }
             });
         }
-//        $addonIds = $addons->pluck('id');
-//        info($addonIds);
-//
-//        if(count($addonIds) > 0)
-//        {
-//            $addonsTableData = AddonDetails::whereIn('id',$addonIds)
-//                ->with('AddonTypes', function($q) use($request)
-//                {
-//                    if($request->BrandIds)
-//                    {
-//                        $q = $q->whereIn('brand_id',$request->BrandIds);
-//                    }
-//                    if($request->ModelLineIds)
-//                    {
-//                        $q = $q->whereIn('model_id',$request->ModelLineIds);
-//                    }
-//                    $q = $q->with('brands','modelLines','modelDescription')->get();
-//                })
-//                ->with('AddonName','SellingPrice','PendingSellingPrice');
-//            $addons = $addonsTableData;
-////            foreach($addons as $addonData)
-////            {
-////                $price = '';
-////                $price = SupplierAddons::where('addon_details_id',$addonData->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-////                $addonData->LeastPurchasePrices = $price;
-////            }
-//        }
+
+        $addon1 = $addons->get();
+
         ////////////// filter end ////////////////
-//        info($addons->pluck('id'));
-//        info("start");
-        info('start');
-        info($start);
+        $totalRowsloaded = $addon1->take($start)->pluck('id');
+        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $totalRowsloaded)->count();
+//        info("already loaded  data");
+//        info($latestSerialNumberloaded);
+//        info('start');
+//        info($start);
+
         if($start >= $addons->count()) {
-            info('addon null command00');
+//            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
+
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-            info("addons per request");
-            info($addons->pluck('id'));
+
+        }
+        foreach($addons as $addon)
+        {
+            $price = '';
+            $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+            $addon->LeastPurchasePrices = $price;
+        }
+        $html = "";
+        // get the count of already loaded data to find the serial number :- add loop key to get S.No:
+        if($request->BrandIds && in_array('yes',$request->BrandIds)){
+            $i = $start;
+        }else{
+            $i= $latestSerialNumberloaded;
         }
 
-
-
-        $html = "";
-        foreach($addons as $value => $addon){
-
-            $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
+        foreach($addons as $value => $addon)
+        {
+            if($request->isAddonBoxView == 1)
+            {
+                $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
                     <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="row">
                             <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                 Addon Name
                             </div>
                             <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                 if($addon->AddonName->name != '') {
-                                     $html .= $addon->AddonName->name;
-                                 }
-                                 $html .=  '</div>';
-                                         if($addon->additional_remarks) {
-                                             $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                if($addon->AddonName->name != '') {
+                    $html .= $addon->AddonName->name;
+                }
+                $html .=  '</div>';
+                if($addon->additional_remarks) {
+                    $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                                 Additional Remarks
                                             </div>
                                             <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
                                                 '.$addon->additional_remarks.'
                                             </div>';
-                                         }
+                }
 
-                                $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
+                $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                                 <div class="row" style="padding-right:3px; padding-left:3px;">
                                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                         Addon Code
@@ -202,178 +183,178 @@ class AddonController extends Controller
                                                         Addon Type
                                                     </div>
                                                      <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                                        if($addon->addon_type_name == 'K'){
-                                                            $html .=    'Kit';
-                                                        }
-                                                        elseif($addon->addon_type_name == 'P') {
-                                                            $html .=   'Accessories';
-                                                        }
-                                                        elseif($addon->addon_type_name == 'SP') {
-                                                            $html .=  'Spare Parts';
-                                                        }
-                                                     $html .= '</div>';
+                if($addon->addon_type_name == 'K'){
+                    $html .=    'Kit';
+                }
+                elseif($addon->addon_type_name == 'P') {
+                    $html .=   'Accessories';
+                }
+                elseif($addon->addon_type_name == 'SP') {
+                    $html .=  'Spare Parts';
+                }
+                $html .= '</div>';
 
-                                                    if($content == '') {
-                                                        if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '')
-                                                        {
-                                                            $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                if($content == '') {
+                    if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '')
+                    {
+                        $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                             Lead Time
                                                                       </div>
                                                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                         '.$addon->PurchasePrices->lead_time_min.'';
 
-                                                                        if($addon->PurchasePrices->lead_time_max != '' &&
-                                                                            $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
-                                                                        $html .=   '- '.$addon->PurchasePrices->lead_time_max.'';
-                                                                        }
-                                                                        $html .= '</div>';
-                                                        }
-                                                    }
-                                                     if($content == '') {
-                                                        if($addon->PurchasePrices!= null) {
-                                                            if($addon->PurchasePrices->purchase_price_aed != '') {
-                                                                if( Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
-                                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
-                                                                    if ($hasPermission) {
-                                                                        $html .=    '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                        if($addon->PurchasePrices->lead_time_max != '' &&
+                            $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                            $html .=   '- '.$addon->PurchasePrices->lead_time_max.'';
+                        }
+                        $html .= '</div>';
+                    }
+                }
+                if($content == '') {
+                    if($addon->PurchasePrices!= null) {
+                        if($addon->PurchasePrices->purchase_price_aed != '') {
+                            if( Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                                if ($hasPermission) {
+                                    $html .=    '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                         Purchase Price
                                                                         </div>
                                                                         <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                             '.$addon->PurchasePrices->purchase_price_aed.' AED
                                                                         </div>';
-                                                                    }
-                                                                }
+                                }
+                            }
 
-                                                            }
-                                                        }
-                                                     }
-                                                    if($content == '') {
-                                                        if($addon->addon_type_name == 'SP') {
-                                                            if($addon->PurchasePrices!= null) {
-                                                                if($addon->PurchasePrices->updated_at != '') {
-                                                                   $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                        }
+                    }
+                }
+                if($content == '') {
+                    if($addon->addon_type_name == 'SP') {
+                        if($addon->PurchasePrices!= null) {
+                            if($addon->PurchasePrices->updated_at != '') {
+                                $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                                 Quotation Date
                                                                             </div>
                                                                             <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                                 '.$addon->PurchasePrices->updated_at.'
                                                                             </div>';
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    if($addon->least_purchase_price != null) {
-                                                        if($addon->least_purchase_price->purchase_price_aed != '') {
-                                                            if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
-                                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
-                                                                if ($hasPermission) {
-                                                                    $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            }
+                        }
+                    }
+                }
+                if($addon->least_purchase_price != null) {
+                    if($addon->least_purchase_price->purchase_price_aed != '') {
+                        if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                            if ($hasPermission) {
+                                $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                             Least Purchase Price
                                                                          </div>
                                                                         <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                             '.$addon->least_purchase_price->purchase_price_aed.' AED
                                                                         </div>';
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    if( Auth::user()->hasPermissionTo('addon-selling-price-view')) {
-                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
-                                                        if($hasPermission) {
-                                                            if($addon->SellingPrice!= null OR $addon->PendingSellingPrice!= null) {
-                                                             $html .=  '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            }
+                        }
+                    }
+                }
+                if( Auth::user()->hasPermissionTo('addon-selling-price-view')) {
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
+                    if($hasPermission) {
+                        if($addon->SellingPrice!= null OR $addon->PendingSellingPrice!= null) {
+                            $html .=  '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                         Selling Price
                                                                         </div>
                                                                         <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                                                            if($addon->SellingPrice!= null) {
-                                                                                if($addon->SellingPrice->selling_price != '') {
-                                                                                    $html .= $addon->SellingPrice->selling_price . 'AED';
-                                                                                } elseif($addon->PendingSellingPrice!= null)
-                                                                                {
-                                                                                    if($addon->PendingSellingPrice->selling_price != '')
-                                                                                    {
-                                                                                        $html .=  $addon->PendingSellingPrice->selling_price .'AED
+                            if($addon->SellingPrice!= null) {
+                                if($addon->SellingPrice->selling_price != '') {
+                                    $html .= $addon->SellingPrice->selling_price . 'AED';
+                                } elseif($addon->PendingSellingPrice!= null)
+                                {
+                                    if($addon->PendingSellingPrice->selling_price != '')
+                                    {
+                                        $html .=  $addon->PendingSellingPrice->selling_price .'AED
                                                                                             </br>
                                                                                             <label class="badge badge-soft-danger">Approval Awaiting</label>';
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                   $html .= '</div>';
-                                                            }
-                                                        }
-                                                    }
-                                                     $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    }
+                                }
+                            }
+                            $html .= '</div>';
+                        }
+                    }
+                }
+                $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                         Fixing Charge
                                                                   </div>
                                                                 <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                                                    if($addon->fixing_charges_included == 'yes') {
-                                                                        $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
-                                                                    }
-                                                                    else {
-                                                                        if($addon->fixing_charge_amount != '') {
-                                                                            $html .=$addon->fixing_charge_amount .'AED';
-                                                                        }
+                if($addon->fixing_charges_included == 'yes') {
+                    $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
+                }
+                else {
+                    if($addon->fixing_charge_amount != '') {
+                        $html .=$addon->fixing_charge_amount .'AED';
+                    }
 
-                                                                    }
-                                                    $html .=    '</div>';
+                }
+                $html .=    '</div>';
 
-                                                    if($addon->lead_time) {
-                                                        $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                if($addon->lead_time) {
+                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                 Lead Time
                                                             </div>
                                                             <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                                                if($content == '') {
-                                                                    if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '') {
-                                                                        $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                    if($content == '') {
+                        if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '') {
+                            $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                                     Lead Time
                                                                                   </div>
                                                                                 <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">;
                                                                                     '.$addon->PurchasePrices->lead_time_min.'';
-                                                                                    if($addon->PurchasePrices->lead_time_max != '' &&
-                                                                                        $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
-                                                                                      $html .=   '-'.$addon->PurchasePrices->lead_time_max.' Days';
+                            if($addon->PurchasePrices->lead_time_max != '' &&
+                                $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                                $html .=   '-'.$addon->PurchasePrices->lead_time_max.' Days';
 
-                                                                                    }
-                                                                               $html .= '</div>';
-                                                                    }
-                                                                }
-                                                        $html .= '</div>';
-                                                    }
-                                                    if($addon->model_year_start OR $addon->model_year_end) {
-                                                     $html .=   '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            }
+                            $html .= '</div>';
+                        }
+                    }
+                    $html .= '</div>';
+                }
+                if($addon->model_year_start OR $addon->model_year_end) {
+                    $html .=   '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                     Model Year
                                                                 </div>
                                                                 <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                 '.$addon->model_year_start.'';
-                                                        if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end){
-                                                            $html .= '- '.$addon->model_year_end.'';
-                                                        }
-                                                        $html .= '</div>';
+                    if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end){
+                        $html .= '- '.$addon->model_year_end.'';
+                    }
+                    $html .= '</div>';
 
-                                                    }
-                                                    if($addon->part_number) {
-                                                        $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                }
+                if($addon->part_number) {
+                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                                 Part Number
                                                             </div>
                                                             <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                                             '.$addon->part_number.'
                                                             </div>';
-                                                    }
-                                    $html .=      '</div>
+                }
+                $html .=      '</div>
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
                                                         <img  id="myImg_'.$addon->id.'" class="image-click-class" src=" '.asset('addon_image/' . $addon->image).' "  alt="Addon Image">
                                                             </div>';
 
-                                        if($addon->is_all_brands == 'yes') {
-                                            $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
+                if($addon->is_all_brands == 'yes') {
+                    $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
                                                         Brand
                                                     </div>
                                                     <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                                                         All Brands
                                                     </div>';
-                                        }else{
-                                            if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
-                                                $html .= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                }else{
+                    if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
+                        $html .= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                                             <center>Brand</center>
                                                             </div>
                                                             <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
@@ -386,8 +367,8 @@ class AddonController extends Controller
                                                                     Model Description
                                                                 </center>
                                                             </div>';
-                                            }else{
-                                                $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                    }else{
+                        $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                                                                 <center>Brand</center>
                                                             </div>
                                                             <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
@@ -395,46 +376,46 @@ class AddonController extends Controller
                                                                     Model Line
                                                                 </center>
                                                             </div>';
-                                            }
-                                            foreach($addon->AddonTypes as $key =>$AddonTypes) {
-                                                $html .= ' <div class="divcolorclass" value="5" hidden>
+                    }
+                    foreach($addon->AddonTypes as $key =>$AddonTypes) {
+                        $html .= ' <div class="divcolorclass" value="5" hidden>
                                                         </div>';
 
-                                                if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
-                                                    $html .= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                        if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
+                            $html .= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
                                                             '.$AddonTypes->brands->brand_name.'
                                                             </div>
                                                          <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-line-'.$key.' col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">';
-                                                    if(isset($AddonTypes->modelLines->model_line)) {
-                                                        $html .= $AddonTypes->modelLines->model_line;
-                                                    }
-                                                    if($AddonTypes->is_all_model_lines == 'yes') {
-                                                        $html .= ' All Model Lines';
-                                                    }
-                                                    $html .= '</div>
+                            if(isset($AddonTypes->modelLines->model_line)) {
+                                $html .= $AddonTypes->modelLines->model_line;
+                            }
+                            if($AddonTypes->is_all_model_lines == 'yes') {
+                                $html .= ' All Model Lines';
+                            }
+                            $html .= '</div>
                                                             <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
                                                                 '.$AddonTypes->modelDescription->model_description.'
                                                                 </div>';
 
-                                                }else{
-                                                    $html .= ' <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                        }else{
+                            $html .= ' <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                                                             '.$AddonTypes->brands->brand_name.'
                                                             </div>
                                                             <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">';
-                                                    if(isset($AddonTypes->modelLines->model_line)) {
-                                                        $html .= $AddonTypes->modelLines->model_line;
-                                                    }
-                                                    if($AddonTypes->is_all_model_lines == 'yes') {
-                                                        $html .= 'All Model Lines';
-                                                    }
+                            if(isset($AddonTypes->modelLines->model_line)) {
+                                $html .= $AddonTypes->modelLines->model_line;
+                            }
+                            if($AddonTypes->is_all_model_lines == 'yes') {
+                                $html .= 'All Model Lines';
+                            }
 
-                                                    $html .= '</div>';
-                                                }
-                                            }
+                            $html .= '</div>';
+                        }
+                    }
 
-                                        }
-                                    if($addon->AddonTypes->count() > 5) {
-                                        $html .= '<div class="row justify-content-center mt-1">
+                }
+                if($addon->AddonTypes->count() > 5) {
+                    $html .= '<div class="row justify-content-center mt-1">
                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                             <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
                                               onclick="viewMore('.$addon->id.')"
@@ -447,20 +428,251 @@ class AddonController extends Controller
                                             </button>
                                         </div>
                                     </div>';
-                                }
+                }
 
-            $html .=         '</div>
+                $html .=         '</div>
                                 </br>
                                 <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
                                     <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">';
-                                        $html.=    $this->addsellingprice($addon);
-                                        $html.=    $this->actionPage($addon);
-            $html .=                   '</div>
+                $html.=    $this->addsellingprice($addon);
+                $html.=    $this->actionPage($addon);
+                $html .=                   '</div>
                                     </div>
                                 </div>';
+                $data['addon_box_html'] = $html;
+            }else{
+
+                  if($addon->is_all_brands == 'yes') {
+                    $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
+                                        <td>'. ++$i. '</td>
+                                          <td>
+                                              <img id="myallBrandImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
+                                                     alt="Addon Image" style="width:100%; height:100px;">
+                                          </td>
+                                          <td> '.$addon->AddonName->name.'</td>
+                                           <td>';
+                                                if($addon->addon_type_name == 'K') {
+                                                    $html .= '<label class="badge badge-soft-success">Kit</label>';
+                                                } elseif($addon->addon_type_name == 'P')
+                                                {
+
+                                                    $html .= '<label class="badge badge-soft-primary">Accessories</label>';
+                                                }elseif($addon->addon_type_name == 'SP') {
+                                                    $html .= ' <label class="badge badge-soft-warning">Spare Parts</label>';
+                                                }
+
+                      $html .=              '</td>
+                                            <td> '.$addon->addon_code.' </td>
+                                             <td>All Brands</td>
+                                            <td>All Model Lines</td>
+                                            <td></td>';
+                                              if($content == '') {
+                                                  $html .= '<td>';
+                                                  if (isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
+                                                      $html .= '' . $addon->LeastPurchasePrices->lead_time_min . '';
+                                                  }
+                                                  if ($addon->LeastPurchasePrices->lead_time_max != ''
+                                                      && $addon->LeastPurchasePrices->lead_time_min < $addon->LeastPurchasePrices->lead_time_max) {
+
+                                                      $html .= '- ' . $addon->LeastPurchasePrices->lead_time_max . '';
+
+                                                  }
+                                                  if ($addon->LeastPurchasePrices->lead_time_min != '' or $addon->LeastPurchasePrices->lead_time_max != '') {
+                                                      $html .= 'Days';
+                                                  }
+
+                                                  $html .= '</td>';
+                                              }
+                      $html .=              '<td>
+                                            '.$addon->model_year_start.'';
+                                                if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end)
+                                                {
+                                                    $html .= '- '.$addon->model_year_end.'';
+                                                }
+                      $html .=          '</td>
+                                            <td>'.$addon->additional_remarks.'</td>';
+
+                                          if($content == '') {
+                                              if( Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
+                                                  if(Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view'])) {
+                                                   $html .=   '<td> '.$addon->PurchasePrices->purchase_price_aed.' AED</td>';
+                                                  }
+                                              }
+                                              $html .= '  <td>'.$addon->PurchasePrices->updated_at.'</td>';
+                                          }
+                                          if($addon->LeastPurchasePrices!= null) {
+                                              if($addon->LeastPurchasePrices->purchase_price_aed != '') {
+                                                  if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
+                                                      if (Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view'])) {
+                                                          $html .= ' <td>'.$addon->LeastPurchasePrices->purchase_price_aed.' AED</td>';
+                                                      }
+                                                  }
+                                              }
+                                          }
+
+                                          if( Auth::user()->hasPermissionTo('addon-selling-price-view')) {
+                                              if(Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view'])) {
+                                                  $html .= '<td>';
+                                                      if($addon->SellingPrice == '' && $addon->PendingSellingPrice == '') {
+                                                          $html .= ' <label class="badge badge-soft-info">Not Added</label>';
+                                                      }elseif($addon->SellingPrice!= null OR $addon->PendingSellingPrice!= null) {
+                                                          if($addon->SellingPrice!= null) {
+                                                              if($addon->SellingPrice->selling_price != '') {
+                                                                  $html .= ''.$addon->SellingPrice->selling_price.' AED';
+                                                              }
+                                                          }elseif($addon->PendingSellingPrice!= null){
+                                                              if($addon->PendingSellingPrice->selling_price != '') {
+                                                           $html .=    ''.$addon->PendingSellingPrice->selling_price.' AED
+                                                                  <label class="badge badge-soft-danger">Approval Awaiting</label>';
+                                                              }
+                                                          }
+                                                      }
+                                                      $html .= '</td>';
+                                              }
+                                          }
+
+                                    $html .= '<td>';
+                                      if($addon->fixing_charges_included == 'yes') {
+                                          $html .= ' <label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                      }else{
+                                          if($addon->fixing_charge_amount != '') {
+                                              $html .= ''.$addon->fixing_charge_amount.' AED';
+                                          }
+                                      }
+
+                      $html .= ' </td>
+                                        <td>'.$addon->part_number.'</td>
+                                        <td>';
+                                              $html.=    $this->tableAddSellingPrice($addon);
+                                              $html.=    $this->actionPage($addon);
+
+
+                      $html .=              '</td>
+                                        </tr>';
+                }else{
+                      foreach($addon->AddonTypes as $key => $AddonTypes) {
+
+                          $html .= '<tr data-id="1" class="';
+                              if($AddonTypes->is_all_model_lines == 'yes') {
+                                  $html .= ''.$addon->id.'_'.$AddonTypes->brand_id.'_'.'all_model_lines';
+                              }else{
+                                  $html .= ''.$addon->id.'_'.$AddonTypes->brand_id.'_'.$AddonTypes->model_id.'';
+                              }
+                              $html .= ' each-addon-table-row" id="'.$addon->id.'_'.$AddonTypes->brand_id.'">';
+                              $html .=  '<td> '. ++$i. '</td>
+                                        <td>
+                                           <img id="myallModalImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
+                                                alt="Addon Image" style="width:100%; height:100px;">
+                                        </td>
+                                        <td>'. $addon->AddonName->name.'</td>
+                                        <td>';
+                                          if($addon->addon_type_name == 'K') {
+                                              $html .=   '<label class="badge badge-soft-success">Kit</label>';
+                                          }elseif($addon->addon_type_name == 'P') {
+                                              $html .=   '  <label class="badge badge-soft-primary">Accessories</label>';
+                                          }elseif($addon->addon_type_name == 'SP') {
+                                              $html .=   '<label class="badge badge-soft-warning">Spare Parts</label>';
+                                          }
+
+                     $html .=           '</td>
+                                         <td>'.$addon->addon_code.'</td>
+                                          <td>'.$AddonTypes->brands->brand_name.'</td>
+                                          <td>';
+                                              if($AddonTypes->is_all_model_lines == 'yes') {
+                                                 $html .= 'All Model Lines';
+                                              }else{
+                                                  $html .= ''.$AddonTypes->modelLines->model_line ?? " " .'';
+                                              }
+
+                            $html .=     '</td>
+                                          <td>';
+                                              if($AddonTypes->modelDescription) {
+                                                  $html .= ''.$AddonTypes->modelDescription->model_description ?? " ".'';
+                                              }
+                                              $html .= '</td>';
+                                          if($content == '') {
+                                              $html .=        '<td>';
+                                                  if(isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
+                                                      if($addon->LeastPurchasePrices->lead_time_min != '' OR $addon->LeastPurchasePrices->lead_time_max != '') {
+                                                          $html .= ''. $addon->LeastPurchasePrices->lead_time_min .'';
+                                                      }
+                                                      if($addon->LeastPurchasePrices->lead_time_max != ''
+                                                          && $addon->LeastPurchasePrices->lead_time_min < $addon->LeastPurchasePrices->lead_time_max) {
+                                                          $html .= '- '.$addon->LeastPurchasePrices->lead_time_max.'';
+                                                      }
+                                                      $html .= 'Days';
+                                                  }
+                                              $html .=      '</td>';
+                                          }
+
+                            $html .=      '<td>'. $addon->model_year_start .'';
+                                                  if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end) {
+                                                      $html .= ' -'.$addon->model_year_end.' ';
+                                                  }
+
+                          $html .=      ' </td>
+                                          	<td>'.$addon->additional_remarks.'</td>';
+                                              if($content == '') {
+                                                  if(Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
+                                                      if(Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view'])) {
+                                                          $html .= '<td>'.$addon->PurchasePrices->purchase_price_aed.' </td>';
+                                                      }
+                                                  }
+                                                  $html .= '<td>'.$addon->PurchasePrices->updated_at.'</td>';
+                                              }
+                                              if(Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
+                                                  if(Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view'])) {
+                                                      $html .= ' <td>';
+                                                      if($addon->LeastPurchasePrices!= null) {
+                                                          if($addon->LeastPurchasePrices->purchase_price_aed != '') {
+                                                              $html .= ''.$addon->LeastPurchasePrices->purchase_price_aed.' AED';
+                                                          }
+                                                      }
+                                                      $html .= '</td>';
+                                                  }
+                                              }
+                                              if(Auth::user()->hasPermissionTo('addon-selling-price-view')) {
+                                                  if (Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view'])) {
+                                                      $html .= '<td>';
+                                                      if ($addon->SellingPrice == '' && $addon->PendingSellingPrice == '') {
+                                                          $html .= '<label class="badge badge-soft-info">Not Added</label>';
+                                                      } elseif ($addon->SellingPrice != null) {
+                                                          if ($addon->SellingPrice->selling_price != '') {
+                                                              $html .= '' . $addon->SellingPrice->selling_price . ' AED';
+                                                          }
+                                                      } elseif ($addon->PendingSellingPrice != null) {
+                                                          if ($addon->PendingSellingPrice->selling_price != '') {
+                                                              $html .= '' . $addon->PendingSellingPrice->selling_price . ' AED
+                                                                                <label class="badge badge-soft-danger">Approval Awaiting</label>';
+                                                          }
+                                                      }
+
+                                                      $html .= '</td>';
+                                                  }
+                                              }
+                                             $html .= '<td>';
+                                                      if($addon->fixing_charges_included == 'yes') {
+                                                          $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                                      }else {
+                                                          if($addon->fixing_charge_amount != '') {
+                                                              $html .=  ''.$addon->fixing_charge_amount.' AED';
+                                                          }
+                                                      }
+                                          $html .= '</td>
+                                                    <td>'.$addon->part_number.'</td>
+                                                    <td>';
+                          $html.=    $this->modelAddonSellingPrice($addon,$AddonTypes);
+                          $html.=    $this->actionPage($addon);
+                            $html .= 	'</td>
+                          </tr>';
+
+                      }
+                  }
+
+                $data['table_html'] = $html;
+            }
         }
 
-        $data['html'] = $html;
         return response($data);
     }
 
@@ -476,15 +688,68 @@ class AddonController extends Controller
         $addonsdata = $addon;
         return view('addon.action.addsellingprice', compact('addonsdata'));
     }
-    public function create()
+    function tableAddSellingPrice($addon) {
+
+        $addonsdata = $addon;
+        return view('addon.action.tableAddSellingPrice', compact('addonsdata'));
+    }
+    function modelAddonSellingPrice($addon, $AddonTypes) {
+
+        $addonsdata = $addon;
+        $AddonTypes = $AddonTypes;
+        return view('addon.action.modelAddonSellingPrice', compact('addonsdata','AddonTypes'));
+    }
+
+    public function create(Request $request)
     {
+        $description_id = $addon_id = $addon_code = $addon_type = $submitFrom =  $addonDescription =  $kitBrand = '';
+        $kitModelLines = [];
+        if($request->kit_item_id != '')
+        {
+            $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
+            $addonTypes = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->first();
+            $kitBrand = $addonTypes->brand_id;
+            $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
+                                        ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
+                                        ->select('addon_details_id','model_id','model_year_start','model_year_end')
+                                        ->get();
+            foreach($kitModelLines as $kitModelLine)       
+            {
+                $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
+                $kitModelLine->Descriptions = AddonTypes::where([
+                    ['addon_details_id','=',$kitModelLine->addon_details_id],
+                    ['model_id','=',$kitModelLine->model_id],
+                    ['model_year_start','=',$kitModelLine->model_year_start],
+                    ['model_year_end','=',$kitModelLine->model_year_end],
+                ])->pluck('model_number')->toArray();
+            }  
+            $description_id = $kititem->item_id;
+            $addon = AddonDescription::where('id',$description_id)->first();
+            $addon_id = $addon->addon_id;
+            $addonDescription = AddonDescription::where('addon_id',$addon_id)->first();
+            $addon_type = 'SP';
+            $submitFrom = 'kit';
+            $lastAddonCode = AddonDetails::where('addon_type_name','SP')->withTrashed()->orderBy('id', 'desc')->first();
+                if($lastAddonCode != '')
+                {
+                    $lastAddonCodeNo =  $lastAddonCode->addon_code;
+                    $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);
+                    $newAddonCodeNumber =  $lastAddonCodeNumber+1;
+                    $addon_code =  "SP".$newAddonCodeNumber;
+                }
+                else
+                {
+                    $addon_code =  "SP1";
+                }
+        }
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
         $addons = Addon::whereIn('addon_type',['P','SP','K','W'])->select('id','name','addon_type')->orderBy('name', 'ASC')->get();
         $brands = Brand::select('id','brand_name')->get();
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
-        return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown'));
+        return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown','description_id','addon_id','addon_type','addon_code',
+                                            'addonDescription','submitFrom','kitBrand','kitModelLines'));
     }
 
     /**
@@ -492,7 +757,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->is_from);
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
@@ -551,7 +816,6 @@ class AddonController extends Controller
                 if($lastAddonCode != '')
                 {
                     $lastAddonCodeNo =  $lastAddonCode->addon_code;
-                    $lastAddonCodeNumber = substr($lastAddonCodeNo, 1, 5);
                     if($request->addon_type == 'SP')
                     {
                         $lastAddonCodeNumber = substr($lastAddonCodeNo, 2, 5);

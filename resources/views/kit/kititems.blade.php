@@ -361,18 +361,25 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <div id="rowIndexCount" hidden value="5">{{$i=$i+1;}}</div>
             <!-- <div class="list2" id="addonbox"> -->
                 <!-- <div class="row related-addon">  -->
+                    
                     <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="row">
                             <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
                                 Item Name
                             </div>
                             <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
-                                {{$Kit->item->Addon->name}} - {{$Kit->item->description}}
+                                {{$Kit->item->Addon->name}} @if($Kit->item->description != '') - {{$Kit->item->description}} @endif
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
+                            @if($Kit->countArray > 0)
                                 @if($Kit->least_price_vendor->supplierAddonDetails)
                                     <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
+                                @endif
+                                @else
+                                <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="width:100%; height:125px;" alt="Addon Image"  />
+                                
                                 @endif
                             </div>
                             <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
@@ -382,22 +389,30 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         Item Code
                                     </div>
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
-    {{--                                    {{ $Kit->item->addon_code }}--}}
+                                                 {{--                                    {{ $Kit->item->addon_code }}--}}
                                         <span id="item_code_{{$i}}">
-                                              {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code ?? '' }}
+                                              {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code ?? 'NOT AVAILABLE' }}
                                         </span>
-                                    <input type="hidden" value="{{ $Kit->least_price_vendor->supplierAddonDetails->id}}" id="item-code-id-{{$i}}">
+                                    <input type="hidden" value="@if($Kit->countArray > 0)
+                                    {{ $Kit->least_price_vendor->supplierAddonDetails->id}}
+                                    @else
+                                NOT AVAILABLE
+                                @endif" id="item-code-id-{{$i}}">
                                     </div>
 
                                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
                                         Part Number
                                     </div>
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                        @if(count($Kit->addon_part_numbers) > 0)
                                         <select class="form-control widthinput" autofocus id="part-number-{{$i}}">
                                             @foreach($Kit->addon_part_numbers as $partNumbers)
                                                 <option  value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
                                             @endforeach
                                         </select>
+                                        @else
+                                        NOT AVAILABLE
+                                        @endif
                                     </div>
 
                                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -414,9 +429,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         Purchase Price / Unit
                                     </div>
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                        @if($Kit->least_price_vendor != '')
                                         <input id="unit_price_{{$i}}" type="text" class="form-control widthinput1" name="purchase_price_aed"
                                         placeholder="Previous Purchase Price" value="{{$Kit->least_price_vendor->purchase_price_aed ?? ''}}" readonly>
-
+                                        @else
+                                        Not AVAILABLE
+                                        @endif
                                     </div>
 
                                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
@@ -435,14 +453,20 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 Item Supplier
                             </div>
                             <div class="labellist databack1 col-xxl-8 col-lg-8 col-md-8">
+                            @if(count($Kit->kit_item_vendors) > 0)
                                 <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})"
                                         autofocus>
+                                       
                                     @foreach($Kit->kit_item_vendors as $itemVendor)
                                         <option  data-id="{{$itemVendor->id}}" value="{{$itemVendor->purchase_price_aed}}"
                                             {{$itemVendor->supplier_id == $Kit->least_price_vendor->supplier_id ? 'selected' : ''}} >
                                             {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                     @endforeach
+                                    
                                 </select>
+                                @else
+                                        NOT AVAILABLE
+                                        @endif
                             </div>
                             </br>
                         </div>
@@ -457,14 +481,22 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         data-kit-id="{{$Kit->id}}">Update</button>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm pt-2"
+                        @if($Kit->countArray > 0)
+                        <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
                                 data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Spare Part Edit">
                            Add New Vendor</button>
                         <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning float-end purchase-price-edit-button"
                                 style="margin-right: 5px" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
                                 <i class="fa fa-plus"></i>
                         </button>
+                        @else
+                        <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create',['kit_item_id' => $Kit->id]) }}">
+                        <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
+                        </a>
+                        <!-- {{$Kit->id}} -->
+                        @endif
                     </div>
+                    
                 <!-- </div> -->
             <!-- </div> -->
         @endforeach

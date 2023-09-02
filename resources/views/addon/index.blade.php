@@ -99,6 +99,17 @@ body {font-family: Arial, Helvetica, sans-serif;}
   .modalContentForImage {
     width: 100%;
   }
+    .page-overlay {
+        z-index: 9999;
+        position: fixed; /*Important to cover the screen in case of scolling content*/
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        text-align: center;
+        background-color: rgba(128,128,128,0.5); /* color */
+    }
 }
 </style>
   @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
@@ -106,6 +117,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
   $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create','accessories-list','spare-parts-list','kit-list']);
   @endphp
   @if ($hasPermission)
+
   <div class="card-header">
     <h4 class="card-title">
       Addon Info
@@ -124,6 +136,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     <a id="addonBoxButton" onclick="showAddonBox()" style="float: right; margin-right:5px;" class="btn btn-sm btn-info" hidden>
       <i class="fa fa-th-large" aria-hidden="true"></i>
     </a>
+        <input type="hidden" id="is-addon-box-view" value="1">
     @endif
     @endcanany
     <ul class="nav nav-pills nav-fill">
@@ -136,6 +149,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       </li> -->
     </ul>
   </div>
+  <div class="page-overlay"></div>
   <div class="card-header">
     <form>
       <input type="text", value="{{$data}}" id="data" hidden>
@@ -178,6 +192,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
 </div>
     @include('addon.listbox')
     @include('addon.table')
+
+
 @endif
   <input type="hidden" id="start" value="0">
   <input type="hidden" id="rowperpage" value="{{ $rowperpage }}">
@@ -196,30 +212,51 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-brand").select2();
       $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
       $("#fltr-model-line").select2();
-      $('#fltr-addon-code').change(function() {
+      $('#fltr-addon-code').change(function(e) {
           var start = 0;
           var totalrecords = 0;
 
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
+
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
           }
       });
-      $('#fltr-brand').change(function() {
+      $('#fltr-brand').change(function(e) {
+          var BrandIds = $(this).val();
           var totalrecords = 0;
           var start = 0;
 
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
+          if (BrandIds === undefined || BrandIds.length == 0) {
+              $('#allBrandsFilter').prop("disabled", false);
+              $('.allBrandsFilterClass').prop("disabled", false);
+              $('#ModelLineDiv').show();
+          } else {
+              if (BrandIds.includes('yes')) {
+                  $('.allBrandsFilterClass').prop("disabled", true);
+                  $("#fltr-model-line option:selected").prop("selected", false);
+                  $("#fltr-model-line").trigger('change.select2');
+                  $('#ModelLineDiv').hide();
+              }
+              else {
+                  $('#allBrandsFilter').prop("disabled", true);
+              }
+          }
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
+              // $('.page-overlay').show();
           }
-
       });
-      $('#fltr-model-line').change(function() {
+
+      $('#fltr-model-line').change(function(e) {
+          e.preventDefault();
             // set total record and start = 0
           var start = 0;
           var totalrecords = 0;
@@ -227,8 +264,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
+              // $('.page-overlay').show();
           }
       });
       $('.modal-button').on('click', function()
@@ -276,6 +315,16 @@ body {font-family: Arial, Helvetica, sans-serif;}
       addonbox.hidden = true
       let addonBoxButton = document.getElementById('addonBoxButton');
       addonBoxButton.hidden = false
+      $('#is-addon-box-view').val(0);
+
+      $('#start').val(0);
+      $('#totalrecords').val(0);
+
+        $(".each-addon-table-row").attr('hidden', true);
+        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            fetchData(0,0);
+            $('.page-overlay').show();
+        }
     }
     function showAddonBox()
     {
@@ -287,41 +336,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
       addonbox.hidden = false
       let addonBoxButton = document.getElementById('addonBoxButton');
       addonBoxButton.hidden = true
+        $('#is-addon-box-view').val(1);
+        $('#start').val(0);
+        $('#totalrecords').val(12);
     }
-        // function addonFilter(global) {
-        //     var AddonIds = [];
-        //     var BrandIds = [];
-        //     var ModelLineIds = [];
-        //     var Data = '';
-        //     var AddonIds = $('#fltr-addon-code').val();
-        //     var BrandIds = $('#fltr-brand').val();
-        //     if (BrandIds === undefined || BrandIds.length == 0) {
-        //         $('#allBrandsFilter').prop("disabled", false);
-        //         $('.allBrandsFilterClass').prop("disabled", false);
-        //         $('#ModelLineDiv').show();
-        //     } else {
-        //         if (BrandIds.includes('yes')) {
-        //             $('.allBrandsFilterClass').prop("disabled", true);
-        //             $('#ModelLineDiv').hide();
-        //         } else {
-        //             $('#allBrandsFilter').prop("disabled", true);
-        //         }
-        //     }
-        // }
-    function checkWindowSize(){
-        if($(window).height() >= $(document).height()){
-            // Fetch records
-            fetchData();
-        }
-    }
+
     function onScroll(){
+
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
             var start = Number($('#start').val());
-            console.log(start);
             var totalrecords = Number($('#totalrecords').val());
             var rowperpage = Number($('#rowperpage').val());
             start = start + rowperpage;
-            console.log(start);
             if(start <= totalrecords) {
                 console.log("start value less add 12");
                 $('#start').val(start);
@@ -333,26 +359,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
         onScroll();
     });
     function fetchData(start,totalrecords) {
-
         var BrandIds = [];
-
+        var isAddonBoxView = $('#is-addon-box-view').val();
         var AddonIds = $('#fltr-addon-code').val();
         var BrandIds = $('#fltr-brand').val();
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
         var rowperpage = Number($('#rowperpage').val());
-            if (BrandIds === undefined || BrandIds.length == 0) {
-                $('#allBrandsFilter').prop("disabled", false);
-                $('.allBrandsFilterClass').prop("disabled", false);
-                $('#ModelLineDiv').show();
-            } else {
-                if (BrandIds.includes('yes')) {
-                    $('.allBrandsFilterClass').prop("disabled", true);
-                    $('#ModelLineDiv').hide();
-                } else {
-                    $('#allBrandsFilter').prop("disabled", true);
-                }
-            }
+
             $.ajax({
                 url:"{{url('getAddonlists')}}",
                 data: {
@@ -360,14 +374,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     addon_type:addon_type,
                     AddonIds: AddonIds,
                     BrandIds: BrandIds,
-                    ModelLineIds: ModelLineIds
+                    ModelLineIds: ModelLineIds,
+                    isAddonBoxView:isAddonBoxView
                 },
                 dataType: 'json',
                 success: function(response){
+                    // $('.page-overlay').hide();
+
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
-                    $(".each-addon:last").after(response.html).show().fadeIn("slow");
-                    checkWindowSize();
+                    $(".each-addon:last").after(response.addon_box_html).show().fadeIn("slow");
+                    $(".each-addon-table-row:last").after(response.table_html).show().fadeIn("slow");
+                   // checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
 

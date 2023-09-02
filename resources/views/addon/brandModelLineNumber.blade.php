@@ -1,5 +1,6 @@
 <div class="col-md-12 p-0 brandModelNumberClass" id="brandModelNumberId" hidden>
     <div class="col-md-12 brandMoDescrip p-0">
+    <div hidden>{{$i=0;}}</div>
         <div class="row brandMoDescripApendHere" style="background-color:#F8F8F8; border-style: solid; border-width:1px; border-color:#e6e6ff; border-radius:10px;
                 margin-left:10px; margin-right:10px; padding-top:10px; padding-bottom:10px;" id="row-addon-brand-1">
             <div class="row">
@@ -7,10 +8,10 @@
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Choose Brand Name</label>
                     <select onchange=selectBrandDisp(1) name="brand[1][brand_id]" id="selectBrandMo1" data-index="1"
-                            class="brandRows" multiple="true" style="width: 100%;">
+                            class="brandRows" multiple="true" style="width: 100%;" @if($kitBrand != '') disabled @endif>
 {{--                        <option id="allbrandsMo" class="allbrands" value="allbrands">ALL BRANDS</option>--}}
                         @foreach($brands as $brand)
-                            <option class="{{$brand->id}}" value="{{$brand->id}}">{{$brand->brand_name}}</option>
+                            <option class="{{$brand->id}}" value="{{$brand->id}}" @if($kitBrand == $brand->id) selected @endif>{{$brand->brand_name}}</option>
                         @endforeach
                     </select>
 
@@ -25,6 +26,68 @@
 {{--                </div>--}}
             </div>
             <div class="MoDes1">
+            @if(count($kitModelLines) > 0)
+            <div hidden>{{$j=0;}}</div>
+            @foreach($kitModelLines as $kitModelLine)
+            <div id="rowDesCount{{$i}}" hidden value="{{$j+1}}">{{$j=$j+1;}}</div>
+                <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-{{$j}}">
+                    <div class="col-xxl-4 col-lg-5 col-md-12" id="showDivdropDr1Des{{$j}}">
+                    <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
+                        <select class="compare-tag1 spare-parts-model-lines" name="brand[1][model][{{$j}}][model_id]" onchange=selectModelLineDescipt(1,{{$j}})
+                                id="selectModelLineNum1Des{{$j}}" multiple="true" style="width: 100%;" data-index="1" data-model-index="{{$j}}"
+                                @if($kitModelLine->model_id != '') disabled @endif>
+                            @foreach($modelLines as $modelLine)
+                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}" @if($kitModelLine->model_id == $modelLine->id) selected @endif>{{$modelLine->model_line}}</option>
+                            @endforeach
+                        </select>
+                        <span id="ModelLineError_1_{{$j}}" class="ModelLineError invalid-feedback"></span>
+                    </div>
+                    <div class="col-xxl-5 col-lg-5 col-md-12 model-description-dropdown" id="showModelNumberdrop1Des{{$j}}" >
+                        <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Choose Model Description</label>
+                        <select class="compare-tag1 model-descriptions" name="brand[1][model][{{$j}}][model_number][]" onchange=selectModelDescipt(1,{{$j}})
+                        id="selectModelNumberDiscri1Des{{$j}}" multiple="true" style="width: 100%;">
+                        @if(count($kitModelLine->allDescriptions) > 0)
+                        @foreach($kitModelLine->allDescriptions as $Description)
+                        <option class="{{$Description->brand_id}}" value="{{$Description->id}}" 
+                            @if(in_array($Description->id, $kitModelLine->Descriptions)) selected locked="locked" @endif>{{$Description->model_description}}</option>
+                        @endforeach
+                        @endif
+{{--                            @foreach($modelLines as $modelLine)--}}
+{{--                                <option class="{{$modelLine->brand_id}}" value="{{$modelLine->id}}">{{$modelLine->model_line}}</option>--}}
+{{--                            @endforeach--}}
+                        </select>
+                        <span id="ModelDescriptionError_1_{{$j}}" class="ModelDescriptionError invalid-feedback"></span>
+                    </div>
+                    <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearStartdrop1Des{{$j}}">
+                        <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
+                        <input type="text" class="startyearpicker form-control widthinput"  name="brand[1][model][{{$j}}][model_year_start]"
+                               id="selectModelYearStart1Des{{$j}}" onkeydown="return false;" value="{{$kitModelLine->model_year_start}}"/>
+                            <span id="modelYearStart1Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
+                    </div>
+                    <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des{{$j}}">
+                        <span class="error">* </span>
+                        <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
+                        <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][{{$j}}][model_year_end]"
+                               id="selectModelYearEnd1Des{{$j}}"  value="{{$kitModelLine->model_year_end}}" />
+                            <span id="modelYearEnd1Error{{$j}}" class="modelYearEndError invalid-feedback-lead"></span>
+                    </div>
+                    <div class="col-xxl-1 col-lg-1 col-md-12">
+                            <a  class="btn_round removeButtonModelItem" data-index="1"  data-model-index="{{$j}}" hidden id="removeModelNumberdrop1Des{{$j}}">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                </div>
+            @endforeach
+           @else
+
+
+
+
+
+
                 <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
                     <div class="col-xxl-4 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
                     <span class="error">* </span>
@@ -68,6 +131,10 @@
                             </a>
                         </div>
                 </div>
+                @endif
+
+
+
             </div>
             <div class="row">
                 <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel1">
@@ -91,12 +158,39 @@
     var selectedBrandsDisArr = [];
     $(document).ready(function ()
     {
+        // TO LOCK KIT MODEL DESCRIPTIONS WHEN CREATE KIT SP
+        $(function() {
+           $('.model-descriptions').select2({
+             tags: true,
+             placeholder: 'Select an option',
+             templateSelection : function (tag, container){
+                    // here we are finding option element of tag and
+                // if it has property 'locked' we will add class 'locked-tag'
+                // to be able to style element in select
+                var $option = $('.model-descriptions option[value="'+tag.id+'"]');
+                if ($option.attr('locked')){
+                   $(container).addClass('locked-tag');
+                   tag.locked = true;
+                }
+                return tag.text;
+             },
+           })
+           .on('select2:unselecting', function(e){
+                // before removing tag we check option element of tag and
+              // if it has property 'locked' we will create error to prevent all select2 functionality
+               if ($(e.params.args.data.element).attr('locked')) {
+                var confirm = alertify.confirm('You are not able to remove this description',function (e) {
+                           }).set({title:"Not Able to Remove"})
+                   e.preventDefault();
+                }
+             });
+            });
         $("#selectBrandMo1").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
         $("#selectBrandMo1").select2({
             maximumSelectionLength: 1,
         });
-        $("#selectModelLineNum1Des1").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
-        $("#selectModelLineNum1Des1").select2({
+        $(".spare-parts-model-lines").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
+        $(".spare-parts-model-lines").select2({
             maximumSelectionLength: 1,
         });
         $("#selectModelNumberDiscri1Des1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
@@ -106,14 +200,22 @@
 
         var index = 1;
         $('#indexValue').val(index);
-        $("#selectModelYearEnd1Des1").yearpicker({
+        $(".startyearpicker").yearpicker({
             startYear: 2019,
             endYear: 2050,
+            onChange : function(value){
+                // YOUR CODE COMES_HERE
+                alert('startyearpicker onchange');
+            }
         });
 
-        $("#selectModelYearStart1Des1").yearpicker({
+        $(".endyearpicker").yearpicker({
             startYear: 2019,
             endYear: 2050,
+            onChange : function(value){
+                // YOUR CODE COMES_HERE
+                alert('endyearpicker onchange');
+            }
         });
 
         function checkGreaterYear(CurrentInput,i,j)
@@ -629,12 +731,10 @@
             allowClear: true,
         });
         $("#selectModelYearStart"+supplier+"Des"+index).yearpicker({
-            year: 2023,
             startYear: 2019,
             endYear: 2050,
         });
         $("#selectModelYearEnd"+supplier+"Des"+index).yearpicker({
-            year: 2023,
             startYear: 2019,
             endYear: 2050,
         });
