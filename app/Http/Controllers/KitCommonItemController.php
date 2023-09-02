@@ -487,7 +487,7 @@ class KitCommonItemController extends Controller
             $itemModelDes = [];
             $itemModelDes = AddonTypes::where('addon_details_id',$id)->pluck('model_number');
             $modelDescSps = [];
-            $modelDescSps = AddonTypes::where('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
+            $modelDescSps = AddonTypes::whereIn('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
             $intersectArray = [];
             $intersectArray = array_intersect($modelDescSps,$itemSps);
             $oneItem->countArray = count($intersectArray);

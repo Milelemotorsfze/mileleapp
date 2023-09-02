@@ -159,6 +159,7 @@
                             <span class="error">* </span>
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
+                        <input name="is_from" value="{{ $submitFrom }}" hidden>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                             <!-- <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus> -->
                             <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus @if($addon_type == 'SP') disabled @endif>
@@ -221,8 +222,12 @@
                         </div>
                         <div class="col-xxl-9 col-lg-5 col-md-11">
                             <div id="select-description">
-                                <select name="description" id="description" multiple="true" style="width: 100%;" >
-
+                                <select name="description" id="description" multiple="true" style="width: 100%;" @if($addonDescription != '') disabled @endif>
+                                    @if($addonDescription != '')
+                                    @if($addonDescription->description != '')
+                                    <option value="{{$addonDescription->id}}" selected>{{$addonDescription->description}}</option>
+                                    @endif
+                                    @endif
                                 </select>
                             </div>
                             <input type="text" hidden name="description_text" id="description-text" placeholder="Enter Addon Description" value=""
@@ -241,10 +246,13 @@
                                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-master-addon-description']);
                                 @endphp
                                 @if ($hasPermission)
+                                @if($addon_id == '')
                                     <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                        class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New description</a>
                                     <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                     class="btn btn-sm btn-info" >Choose From List</a>
+                                    <!-- addonDescriptionArr -->
+                                @endif
                                 @endif
 {{--                            @endcan--}}
                         </div>
@@ -302,15 +310,7 @@
                                         <label for="no">No</label>
                                     </div>
                                 </fieldset>
-                                @error('fixing_charges_included')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
                         </div>
-                    </div>
-                    </br>
-                    <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12" hidden id="FixingChargeAmountDiv">
                             <span class="error">* </span>
                             <label for="fixing_charge_amount" class="col-form-label text-md-end">{{ __('Fixing Charge Amount') }}</label>
@@ -325,6 +325,9 @@
                                 <span id="fixingChargeAmountError1" class="invalid-feedback"></span>
                             </div>
                         </div>
+                    </div>
+                    </br>
+                    <div class="row">
                         <div class="col-xxl-2 col-lg-6 col-md-12">
                             <label for="additional_remarks" class="col-form-label text-md-end">{{ __('Additional Remarks') }}</label>
                         </div>
@@ -472,14 +475,14 @@
         var selectedSuppliers = [];
         var oldselectedSuppliers = [];
         var ifModelLineExist = [];
-        var currentAddonType = '';
+        var currentAddonType = {!!json_encode($addon_type)!!};
         var selectedBrands = [];
         var i=1;
         var fixingCharge = 'yes';
         var sub ='1';
         var imageIsOkay = false;
         var isPartNumberErrorExists = true;
-
+        // var KitaddonType = 
         $(document).ready(function () {
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
@@ -689,6 +692,10 @@
                    }).set({title:"Can't Remove Part Number"})
                 }
         })
+        if(currentAddonType == 'SP')
+            {
+                showAddonTypeDependsData(currentAddonType);
+            }
         });
            $(document).on('click', '.btn_remove', function()
             {
