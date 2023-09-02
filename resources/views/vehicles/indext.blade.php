@@ -1,4 +1,5 @@
 @extends('layouts.table')
+<script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <style>
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
@@ -409,7 +410,6 @@
                                     <input type="text" data-search-column="bl_dms_uploading" id="bl_dms_uploading" placeholder="Search">
                                     </th>
                                 @endif
-                                    <!-- <th id="changelogs" class="nowrap-td"id="log" style="vertical-align: middle;">Details</th> -->
                                </tr>
                             </thead>
                             <tbody>
@@ -418,6 +418,43 @@
     </tbody>
 </table>
 <script>
+    Pusher.logToConsole = true;
+    var pusher = new Pusher('243a287e00b3a38463a9', {
+    cluster: 'ap2',
+    encrypted: true
+});
+$(document).ready(function() {
+    var channel = pusher.subscribe('datatable-updates');
+    channel.bind('updatedDatat', function(data) {
+        if (data.message && data.message.id) {
+            var id = data.message.id;
+            var url = '{{ route("getUpdatedVehicle", ["id" => "__id__"]) }}'.replace('__id__', id);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(updatedData) {
+                    console.log('Updated data:', updatedData);
+                    var table = $('#dtBasicExample1').DataTable();
+                    // Check if the row exists in the DataTable
+                    var row = table.row('#' + id);
+                    if (row.length > 0) {
+                        var rowData = row.data();
+                        console.log('Row data:', rowData);
+                        row.data(updatedData);
+
+                        // Redraw the DataTable
+                        table.draw(false);
+                    } else {
+                        console.warn('Row not found in DataTable.');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error fetching updated data:', error);
+                }
+            });
+        }
+    });
+});
 var offset = 0;
 var length = 40;
 var isLoading = false;
@@ -451,6 +488,7 @@ $(document).ready(function() {
         paging: false,
         searching: true,
         info: false,
+        rowId: 'id',
         columns: [
             { data: 'id', name: 'id' },
             @if (Auth::user()->hasPermissionForSelectedRole('view-po'))

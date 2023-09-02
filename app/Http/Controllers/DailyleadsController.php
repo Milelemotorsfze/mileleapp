@@ -30,7 +30,7 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
         if ($request->ajax()) {
             $status = $request->input('status');
-            $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', 'calls.remarks'])
+            $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
                 ->where('status', $status)->where('sales_person', $id);
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
@@ -40,46 +40,93 @@ class DailyleadsController extends Controller
                 $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
             } elseif ($status === 'New Demand') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                );
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');                
                 $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
             } elseif ($status === 'Quoted') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                );
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');  
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
+                );
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');                
                 $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
             } elseif ($status === 'Negotiation') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                );
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');  
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
+                );
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id'); 
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
+                    DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
+                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                );
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
                 $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
                 $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
             } elseif ($status === 'Closed') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
-                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                );
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');  
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
+                );
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id'); 
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
+                    DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
+                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                );
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%d-%b-%Y'), '') as ndate"),
+                    DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
+                    DB::raw("IFNULL(negotiations.dealvalues, '') as ndealvalues")
+                );
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');                
                 $data->addSelect(DB::raw("DATE_FORMAT(lead_closed.date, '%d-%b-%Y') as cdate"), 'lead_closed.sales_notes as csalesnotes', 'lead_closed.dealvalues as cdealvalues', 'lead_closed.so_number as so_number');
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
             } elseif ($status === 'Rejected') {
-                $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
-                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(demand.date, '%d-%b-%Y') as ddate"), 'demand.salesnotes as dsalesnotes');
-                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
-                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
-                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
+                    DB::raw("IFNULL(prospectings.salesnotes, '') as salesnotes")
+                );
+                $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');  
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(demand.date, '%d-%b-%Y'), '') as ddate"),
+                    DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
+                );
+                $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id'); 
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
+                    DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
+                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                );
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%d-%b-%Y'), '') as ndate"),
+                    DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
+                    DB::raw("IFNULL(negotiations.dealvalues, '') as ndealvalues")
+                );
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');                
                 $data->addSelect(DB::raw("DATE_FORMAT(lead_rejection.date, '%d-%b-%Y') as rdate"), 'lead_rejection.sales_notes as rsalesnotes', 'lead_rejection.Reason as reason');
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
             }
@@ -93,9 +140,6 @@ class DailyleadsController extends Controller
     
         return view('dailyleads.index', compact('pendingdata'));
     }
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $countries = CountryListFacade::getList('en');

@@ -156,7 +156,6 @@ class VehiclePendingApprovalRequestController extends Controller
                 $existingSo->sales_person_id  = $pendingApprovalRequest->updated_by;
                 $existingSo->so_date = $newValue;
                 $existingSo->save();
-
                 $solog = new Solog();
                 $solog->time = $currentDateTime->toTimeString();
                 $solog->date = $currentDateTime->toDateString();

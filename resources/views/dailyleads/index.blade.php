@@ -451,9 +451,13 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <div class="input-group">
-                <span class="input-group-text">AED</span>
-                <input type="number" class="form-control" id="deal-value-input-qoutation" aria-label="Deal Value">
-                <span class="input-group-text">.00</span>
+              <select name class="form-select" id="currency-select">
+      <option value="AED">AED</option>
+      <option value="USD">USD</option>
+      <option value="EURO">EURO</option>
+    </select>
+    <input type="number" class="form-control" id="deal-value-input-quotation" aria-label="Deal Value">
+    <span class="input-group-text">.00</span>
               </div>
             </div>
           </div>
@@ -1201,9 +1205,47 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                { data: 'remarks', name: 'remarks' },
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false},
-                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 {
                     data: 'id',
                     name: 'id',
@@ -1239,11 +1281,68 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                { data: 'remarks', name: 'remarks' },
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false},
-                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ddate', name: 'ddate', searchable: false },
-                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 {
                     data: 'id',
                     name: 'id',
@@ -1278,13 +1377,89 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                { data: 'remarks', name: 'remarks' },
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false},
-                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ddate', name: 'ddate', searchable: false },
-                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'qdate', name: 'qdate', searchable: false},
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
                 {
                     data: 'id',
@@ -1319,17 +1494,112 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                { data: 'remarks', name: 'remarks' },
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false },
-                { data: 'salesnotes', name: 'salesnotes', searchable: false },
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ddate', name: 'ddate, searchable: false' },
-                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false },
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'qdate', name: 'qdate', searchable: false },
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
-                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ndate', name: 'ndate', searchable: false },
                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
-                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false },
+                {
+    data: 'qsalesnotes',
+    name: 'qsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'qsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 {
                     data: 'id',
                     name: 'id',
@@ -1362,20 +1632,134 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model' },
                 { data: 'location', name: 'location' },
                 { data: 'language', name: 'language' },
-                { data: 'remarks', name: 'remarks'},
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false},
-                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ddate', name: 'ddate', searchable: false},
-                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'qdate', name: 'qdate', searchable: false},
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
-                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ndate', name: 'ndate', searchable: false},
                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false},
+                {
+    data: 'nsalesnotes',
+    name: 'nsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'nsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'cdate', name: 'cdate', searchable: false},
                 { data: 'cdealvalues', name: 'ndealvalues', searchable: false},
-                { data: 'csalesnotes', name: 'csalesnotes', searchable: false},
+                {
+    data: 'csalesnotes',
+    name: 'csalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'csalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'so_number', name: 'so_number', searchable: false},
             ]
         });
@@ -1393,23 +1777,152 @@ function s2ab(s) {
                 { data: 'custom_brand_model', name: 'custom_brand_model'},
                 { data: 'location', name: 'location'},
                 { data: 'language', name: 'language'},
-                { data: 'remarks', name: 'remarks'},
+                {
+    data: 'remarks',
+    name: 'remarks',
+    render: function (data, type, row) {
+        // Set the maximum length for remarks before adding "Read More" link
+        const maxLength = 20;
+        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'date', name: 'date', searchable: false},
-                { data: 'salesnotes', name: 'salesnotes', searchable: false},
+                {
+    data: 'salesnotes',
+    name: 'salesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'salesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ddate', name: 'ddate', searchable: false},
-                { data: 'dsalesnotes', name: 'dsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'qdate', name: 'qdate', searchable: false},
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
-                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false},
+                {
+    data: 'dsalesnotes',
+    name: 'dsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'dsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'ndate', name: 'ndate', searchable: false},
                 { data: 'ndealvalues', name: 'ndealvalues', searchable: false},
-                { data: 'nsalesnotes', name: 'nsalesnotes', searchable: false},
+                {
+    data: 'nsalesnotes',
+    name: 'nsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'nsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 { data: 'rdate', name: 'rdate', searchable: false},
                 { data: 'reason', name: 'reason', searchable: false },
-                { data: 'rsalesnotes', name: 'rsalesnotes', searchable: false},
+                {
+    data: 'rsalesnotes',
+    name: 'rsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'rsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
             ]
         });
     });
+    // Add an event listener to handle "Read More" clicks
+    function toggleRemarks(uniqueId) {
+    const $truncatedText = $('#' + uniqueId + '_truncated');
+    const $fullText = $('#' + uniqueId + '_full');
+    const $readMoreLink = $truncatedText.siblings('.read-more-link');
+    if ($fullText.is(':hidden')) {
+        $truncatedText.hide();
+        $fullText.show();
+        $readMoreLink.text('Read Less');
+    } else {
+        $truncatedText.show();
+        $fullText.hide();
+        $readMoreLink.text('Read More');
+    }
+}
 </script>
 @else
     @php
