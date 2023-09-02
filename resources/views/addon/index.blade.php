@@ -220,6 +220,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
+
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
           }
@@ -235,14 +237,16 @@ body {font-family: Arial, Helvetica, sans-serif;}
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
+
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
               // $('.page-overlay').show();
           }
       });
-        $( document ).on( "ajaxStart", function() {
-            $('.page-overlay').show();
-        } );
+        // $( document ).on( "ajaxStart", function() {
+        //     $('.page-overlay').show();
+        // } );
       $('#fltr-model-line').change(function(e) {
           e.preventDefault();
             // set total record and start = 0
@@ -252,6 +256,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
           $('.each-addon').attr('hidden', true);
+          $(".each-addon-table-row").attr('hidden', true);
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
               fetchData(start,totalrecords);
               // $('.page-overlay').show();
@@ -304,6 +309,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
       addonBoxButton.hidden = false
       $('#is-addon-box-view').val(0);
 
+      $('#start').val(0);
+      $('#totalrecords').val(0);
+
+        $(".each-addon-table-row").attr('hidden', true);
+        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            fetchData(0,0);
+            // $('.page-overlay').show();
+        }
     }
     function showAddonBox()
     {
@@ -316,6 +329,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
       let addonBoxButton = document.getElementById('addonBoxButton');
       addonBoxButton.hidden = true
         $('#is-addon-box-view').val(1);
+        $('#start').val(0);
+        $('#totalrecords').val(12);
     }
         // function addonFilter(global) {
         //     var AddonIds = [];
@@ -347,11 +362,9 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
             var start = Number($('#start').val());
-            console.log(start);
             var totalrecords = Number($('#totalrecords').val());
             var rowperpage = Number($('#rowperpage').val());
             start = start + rowperpage;
-            console.log(start);
             if(start <= totalrecords) {
                 console.log("start value less add 12");
                 $('#start').val(start);
@@ -399,9 +412,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
                     $(".each-addon:last").after(response.addon_box_html).show().fadeIn("slow");
-                    console.log(response.table_html);
                     $(".each-addon-table-row:last").after(response.table_html).show().fadeIn("slow");
-
+                    console.log(response.table_html);
                     // checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);

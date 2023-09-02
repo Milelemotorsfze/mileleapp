@@ -51,7 +51,7 @@ class AddonController extends Controller
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
-            $addon->least_purchase_price = $price;
+            $addon->LeastPurchasePrices = $price;
         }
 
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
@@ -63,7 +63,7 @@ class AddonController extends Controller
         $rowperpage = 12;
         $content = 'addon';
         // Fetch records
-        $addons = AddonDetails::with('AddonTypes')
+        $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
                     ->orderBy('id','DESC');
         if($request->addon_type != 'all')
         {
@@ -80,6 +80,7 @@ class AddonController extends Controller
             {
                 info("all brands");
                 $addons = $addons->where('is_all_brands','yes');
+
             }
             else
             {
@@ -89,7 +90,7 @@ class AddonController extends Controller
                 });
             }
         }
-
+        info($addons->count());
         if($request->ModelLineIds)
         {
 //            $addons = $addons->where('is_all_brands','yes');
@@ -98,12 +99,10 @@ class AddonController extends Controller
                 if(in_array('yes', $request->ModelLineIds))
                 {
                     info("all model line search");
-
                     $q = $q->where('is_all_model_lines','yes');
                 }else
                 {
                     info("separate model line search");
-
                     $q->where( function ($query) use ($request) {
                         $query = $query->whereIn('model_id',$request->ModelLineIds);
                     });
@@ -111,29 +110,44 @@ class AddonController extends Controller
             });
         }
 
-        ////////////// filter end ////////////////
+        $addon1 = $addons->get();
 
+        ////////////// filter end ////////////////
+        $totalRowsloaded = $addon1->take($start)->pluck('id');
+        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $totalRowsloaded)->count();
+        info("already loaded  data");
+        info($latestSerialNumberloaded);
         info('start');
         info($start);
+
         if($start >= $addons->count()) {
-            info('addon null command00');
+            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
             info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
+
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
             info("addons per request");
             info($addons->pluck('id'));
+
+//            info($addons->AddonTypes->count());
+            // get  the count of already loaded data to find the serial number :- add loop key to get S.No:
+
         }
-
-
+        foreach($addons as $addon)
+        {
+            $price = '';
+            $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
+            $addon->LeastPurchasePrices = $price;
+        }
         $html = "";
+        $i= $latestSerialNumberloaded;
         foreach($addons as $value => $addon)
         {
-
             if($request->isAddonBoxView == 1)
             {
                 $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
@@ -429,7 +443,7 @@ class AddonController extends Controller
 
                   if($addon->is_all_brands == 'yes') {
                     $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
-                                        <td>51</td>
+                                        <td>'. ++$i. '</td>
                                           <td>
                                               <img id="myallBrandImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
                                                      alt="Addon Image" style="width:100%; height:100px;">
@@ -451,23 +465,25 @@ class AddonController extends Controller
                                             <td> '.$addon->addon_code.' </td>
                                              <td>All Brands</td>
                                             <td>All Model Lines</td>
-                                            <td></td>
-                                            <td>';
-                                                  if(isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
-                                                      $html .= '.$addonsdata->LeastPurchasePrices->lead_time_min .';
+                                            <td></td>';
+                                              if($content == '') {
+                                                  $html .= '<td>';
+                                                  if (isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
+                                                      $html .= '' . $addon->LeastPurchasePrices->lead_time_min . '';
                                                   }
-                                                   if($addon->LeastPurchasePrices->lead_time_max != ''
+                                                  if ($addon->LeastPurchasePrices->lead_time_max != ''
                                                       && $addon->LeastPurchasePrices->lead_time_min < $addon->LeastPurchasePrices->lead_time_max) {
 
-                                                       $html .= '- '.$addon->LeastPurchasePrices->lead_time_max.'';
+                                                      $html .= '- ' . $addon->LeastPurchasePrices->lead_time_max . '';
 
-                                                   }
-                                                   if($addon->LeastPurchasePrices->lead_time_min != '' OR $addon->LeastPurchasePrices->lead_time_max != '') {
-                                                     $html .= 'Days';
-                                                   }
+                                                  }
+                                                  if ($addon->LeastPurchasePrices->lead_time_min != '' or $addon->LeastPurchasePrices->lead_time_max != '') {
+                                                      $html .= 'Days';
+                                                  }
 
-                      $html .=              '</td>
-                                            <td>
+                                                  $html .= '</td>';
+                                              }
+                      $html .=              '<td>
                                             '.$addon->model_year_start.'';
                                                 if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end)
                                                 {
@@ -534,7 +550,7 @@ class AddonController extends Controller
                       $html .=              '</td>
                                         </tr>';
                 }else{
-                      foreach($addon->AddonTypes as $AddonTypes) {
+                      foreach($addon->AddonTypes as $key => $AddonTypes) {
 
                           $html .= '<tr data-id="1" class="';
                               if($AddonTypes->is_all_model_lines == 'yes') {
@@ -543,7 +559,7 @@ class AddonController extends Controller
                                   $html .= ''.$addon->id.'_'.$AddonTypes->brand_id.'_'.$AddonTypes->model_id.'';
                               }
                               $html .= 'each-addon-table-row" id="'.$addon->id.'_'.$AddonTypes->brand_id.'">';
-                              $html .=  '<td>51</td>
+                              $html .=  '<td> '. ++$i. '</td>
                                         <td>
                                            <img id="myallModalImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
                                                 alt="Addon Image" style="width:100%; height:100px;">
@@ -568,30 +584,82 @@ class AddonController extends Controller
                                                   $html .= ''.$AddonTypes->modelLines->model_line ?? " " .'';
                                               }
 
-                          $html .=      '</td>
-                                          <td>'. $AddonTypes->modelDescription->model_description ?? " ".'</td>
-                                          <td>';
-                                          if(isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
-                                              if($addon->LeastPurchasePrices->lead_time_min != '' OR $addon->LeastPurchasePrices->lead_time_max != '') {
-                                                  $html .= ''. $addon->LeastPurchasePrices->lead_time_min .'';
-                                              }
-                                              if($addon->LeastPurchasePrices->lead_time_max != ''
-                                                  && $addon->LeastPurchasePrices->lead_time_min < $addon->LeastPurchasePrices->lead_time_max) {
-                                                  $html .= '- '.$addon->LeastPurchasePrices->lead_time_max.'';
-                                              }
-                                              $html .= 'Days';
+                            $html .=     '</td>
+                                          <td>  '.$AddonTypes->modelDescription->model_description ?? ''.'</td>';
+                                          if($content == '') {
+                                              $html .=        '<td>';
+                                                  if(isset($addon->LeastPurchasePrices->lead_time_min) || isset($addon->LeastPurchasePrices->lead_time_max)) {
+                                                      if($addon->LeastPurchasePrices->lead_time_min != '' OR $addon->LeastPurchasePrices->lead_time_max != '') {
+                                                          $html .= ''. $addon->LeastPurchasePrices->lead_time_min .'';
+                                                      }
+                                                      if($addon->LeastPurchasePrices->lead_time_max != ''
+                                                          && $addon->LeastPurchasePrices->lead_time_min < $addon->LeastPurchasePrices->lead_time_max) {
+                                                          $html .= '- '.$addon->LeastPurchasePrices->lead_time_max.'';
+                                                      }
+                                                      $html .= 'Days';
+                                                  }
+                                              $html .=      '</td>';
                                           }
-                            $html .=      '</td>
-                                            <td>'. $addon->model_year_start .'';
+
+                            $html .=      '<td>'. $addon->model_year_start .'';
                                                   if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end) {
                                                       $html .= ' -'.$addon->model_year_end.' ';
                                                   }
 
                           $html .=      ' </td>
-                                          	<td>'.$addon->additional_remarks.'</td>
-                                          		<td>Least Purchase Price</td>
-                                            <td>3800.00 AED</td>
-                                        <td>Fixing Charge Included	</td>
+                                          	<td>'.$addon->additional_remarks.'</td>';
+                                              if($content == '') {
+                                                  if(Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
+                                                      if(Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view'])) {
+                                                          $html .= '<td>'.$addon->PurchasePrices->purchase_price_aed.' </td>';
+                                                      }
+                                                  }
+                                                  $html .= '<td>'.$addon->PurchasePrices->updated_at.'</td>';
+                                              }
+                                              if(Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
+                                                  if(Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view'])) {
+                                                      $html .= ' <td>';
+                                                      if($addon->LeastPurchasePrices!= null) {
+                                                          if($addon->LeastPurchasePrices->purchase_price_aed != '') {
+                                                              $html .= ''.$addon->LeastPurchasePrices->purchase_price_aed.' AED';
+                                                          }
+                                                      }
+                                                      $html .= '</td>';
+                                                  }
+                                              }
+                                              if(Auth::user()->hasPermissionTo('addon-selling-price-view')) {
+                                                  if (Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view'])) {
+                                                      $html .= '<td>';
+                                                      if ($addon->SellingPrice == '' && $addon->PendingSellingPrice == '') {
+                                                          $html .= '<label class="badge badge-soft-info">Not Added</label>';
+                                                      } elseif ($addon->SellingPrice != null) {
+                                                          if ($addon->SellingPrice->selling_price != '') {
+                                                              $html .= '' . $addon->SellingPrice->selling_price . ' AED';
+                                                          }
+                                                      } elseif ($addon->PendingSellingPrice != null) {
+                                                          if ($addon->PendingSellingPrice->selling_price != '') {
+                                                              $html .= '' . $addon->PendingSellingPrice->selling_price . ' AED
+                                                                                <label class="badge badge-soft-danger">Approval Awaiting</label>';
+                                                          }
+                                                      }
+
+                                                      $html .= '</td>';
+                                                  }
+                                              }
+                                             $html .= '<td>';
+                                                      if($addon->fixing_charges_included == 'yes') {
+                                                          $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                                      }else {
+                                                          if($addon->fixing_charge_amount != '') {
+                                                              $html .=  ''.$addon->fixing_charge_amount.' AED';
+                                                          }
+                                                      }
+                                          $html .= '</td>
+                                                    <td>'.$addon->part_number.'</td>
+                                                    <td>';
+                          $html.=    $this->modelAddonSellingPrice($addon,$AddonTypes);
+                          $html.=    $this->actionPage($addon);
+                            $html .= 	'</td>
                           </tr>';
 
                       }
@@ -600,7 +668,6 @@ class AddonController extends Controller
                 $data['table_html'] = $html;
 
             }
-
 
         }
 
@@ -624,6 +691,12 @@ class AddonController extends Controller
 
         $addonsdata = $addon;
         return view('addon.action.tableAddSellingPrice', compact('addonsdata'));
+    }
+    function modelAddonSellingPrice($addon, $AddonTypes) {
+
+        $addonsdata = $addon;
+        $AddonTypes = $AddonTypes;
+        return view('addon.action.modelAddonSellingPrice', compact('addonsdata','AddonTypes'));
     }
 
     public function create(Request $request)
