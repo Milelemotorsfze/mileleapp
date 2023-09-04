@@ -483,14 +483,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         </div>
                         @if($Kit->countArray > 0)
                         <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
-                                data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Spare Part Edit">
-                           Add New Vendor</button>
-                        <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning float-end purchase-price-edit-button"
-                                style="margin-right: 5px; height:30px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
-                                <i class="fa fa-plus"></i>
+                                data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Add New Vendor">
+                                <i class="fa fa-plus" aria-hidden="true"></i>Add New Vendor</button>
+                        <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning btn-sm float-end purchase-price-edit-button"
+                                style="margin-right: 5px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
+                                <i class="fa fa-plus"></i>New Purchase Price
                         </button>
                         @endif
-                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
+                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" title="Add New Spare Part" 
+                        href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
                         <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
                         </a>
                         <!-- {{$Kit->id}} -->
