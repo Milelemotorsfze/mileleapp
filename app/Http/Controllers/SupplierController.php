@@ -161,6 +161,7 @@ class SupplierController extends Controller
     }
     public function show(Supplier $supplier)
     {
+        $rowperpage = $data = '';
         $content = '';
         $addon1 =  $supplierTypes = '';
         $addons = [];
@@ -201,7 +202,8 @@ class SupplierController extends Controller
                         $addonIds = $addons->pluck('id');
                         $addonIds = json_decode($addonIds);
         }
-        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes','content','addonIds'));
+        return view('suppliers.show',compact('supplier','primaryPaymentMethod','otherPaymentMethods','addon1','addons','supplierTypes','content','addonIds'
+                                                ,'rowperpage','data'));
     }
 
     /**

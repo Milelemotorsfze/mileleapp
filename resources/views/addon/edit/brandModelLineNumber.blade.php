@@ -154,7 +154,7 @@
                             <span id="modelYearStart{{$i}}Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop{{$i}}Des{{$j}}" >
-                            <span class="error">* </span>
+                            
                             <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                             <input type="text" class="endyearpicker  form-control widthinput" name="brand[{{$i}}][model][{{$j}}][model_year_end]"
                                    id="selectModelYearEnd{{$i}}Des{{$j}}"  value="{{ $ModelLine->model_year_end }}"  />
@@ -655,7 +655,6 @@
                 </div>
 
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
-                    <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                     <input type="text" class="endyearpicker form-control widthinput"
                     name="brand[${supplier}][model][${index}][model_year_end]"

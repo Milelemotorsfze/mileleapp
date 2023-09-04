@@ -358,7 +358,8 @@
                 </div>
                 <div class="card" id="partNumberDiv" hidden>
                     <div class="card-header">
-                        <h4 class="card-title">Part Numbers</h4>
+                        <h4 class="card-title">
+                    <span class="error">* </span> Part Numbers </h4>
                     </div>
                     <div class="card-body">
                         <div class="row partNumberMain">
@@ -482,8 +483,10 @@
         var sub ='1';
         var imageIsOkay = false;
         var isPartNumberErrorExists = true;
-        // var KitaddonType =
+        var submitFrom = {!! json_encode($submitFrom) !!}
         $(document).ready(function () {
+            // console.log(currentAddonType);
+            // alert($('#addon_type').val());
             $("#addnewDescriptionButton").click(function () {
                 $('#descr-dropdown-button').attr('hidden', false);
                 $('#description-text').attr('hidden', false);
@@ -1137,9 +1140,14 @@
             {
                 e.preventDefault();
             }
-            if(formInputError == true)
+            else if(formInputError == true)
             {
                 e.preventDefault();
+            }
+            else if(submitFrom == 'kit'){
+                $('#addon_type').removeAttr('disabled');
+                $('#addon_id').removeAttr('disabled');
+                $('#selectBrandMo1').removeAttr('disabled');
             }
         });
         function validationOnKeyUp(clickInput,row)

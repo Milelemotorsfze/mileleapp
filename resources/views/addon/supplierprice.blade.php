@@ -17,6 +17,11 @@
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
                                             <select name="supplierAndPrice[1][supplier_id][]" data-index="1" id="suppliers1" multiple="true" style="width: 100%;"
                                                     onchange="validationOnKeyUp(this,1)" class="suppliers">
+                                                    @if(count($vendors) > 0)
+                                                    @foreach($vendors as $vendor)
+                                                    <option value="{{$vendor->id}}">{{$vendor->supplier}}</option>
+                                                    @endforeach
+                                                    @endif
                                             </select>
                                             <span id="supplierError_1" class=" supplierError invalid-feedback"></span>
                                         </div>

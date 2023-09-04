@@ -369,7 +369,8 @@
                 </div>
                 <div class="card" id="partNumberDiv">
                     <div class="card-header">
-                        <h4 class="card-title">Part Numbers</h4>
+                        <h4 class="card-title">
+                    <span class="error">* </span> Part Numbers</h4>
                     </div>
                     <div class="card-body">
                         <div class="row partNumberMain">

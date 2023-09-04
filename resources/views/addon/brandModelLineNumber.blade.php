@@ -69,7 +69,6 @@
                             <span id="modelYearStart1Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des{{$j}}">
-                        <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                         <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][{{$j}}][model_year_end]"
                                id="selectModelYearEnd1Des{{$j}}"  value="{{$kitModelLine->model_year_end}}" />
@@ -120,7 +119,6 @@
                             <span id="modelYearStart1Error1" class="modelYearStartError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
-                        <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                         <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][1][model_year_end]"
                                id="selectModelYearEnd1Des1"  value="" onchange=checkGreaterYear(this,1,1)  />
@@ -137,7 +135,7 @@
             </div>
             <div class="row">
                 <div class="col-xxl-12 col-lg-12 col-md-12 " id="showModelNumDel1">
-                    <div id="showaddtrd1" class="col-xxl-12 col-lg-12 col-md-12" hidden>
+                    <div id="showaddtrd1" class="col-xxl-12 col-lg-12 col-md-12" @if($kitBrand == '' && $notAddedModelLines > 0) hidden @endif>
                         <a id="addDids" style="float: right;" class="btn btn-sm btn-info" onclick="addDiscr(1)"><i class="fa fa-plus" aria-hidden="true"></i> Add</a>
                     </div>
                 </div>
@@ -155,8 +153,11 @@
 
 <script type="text/javascript">
     var selectedBrandsDisArr = [];
+    var kitModelLines = {!! json_encode($kitModelLines) !!}
     $(document).ready(function ()
     {
+        lengthExistingkitModelLines = kitModelLines.length;
+        // console.log(lengthExistingkitModelLines);
         // TO LOCK KIT MODEL DESCRIPTIONS WHEN CREATE KIT SP
         $(function() {
            $('.model-descriptions').select2({
@@ -199,7 +200,29 @@
 
         var index = 1;
         $('#indexValue').val(index);
-        $(".startyearpicker").yearpicker({
+        if(lengthExistingkitModelLines > 0)
+        {
+            for(var i=1; i<=lengthExistingkitModelLines; i++)
+            {
+                var selectedStartYear = null;
+                var selectedEndYear = null;
+                selectedStartYear = kitModelLines[i-1].model_year_start;
+                selectedEndYear = kitModelLines[i-1].model_year_end;
+                $("#selectModelYearStart1Des"+i).yearpicker({
+                    year: selectedStartYear,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
+
+                $("#selectModelYearEnd1Des"+i).yearpicker({
+                    year: selectedEndYear,
+                    startYear: 2019,
+                    endYear: 2050,
+                });
+            }
+        }
+        else{
+            $(".startyearpicker").yearpicker({
             startYear: 2019,
             endYear: 2050,
             // onChange : function(value){
@@ -219,6 +242,8 @@
             //     alert('endyearpicker onchange');
             // }
         });
+        }
+        
 
         function sortDropDownListByText() {
             $("select").each(function() {
@@ -681,7 +706,6 @@
                 </div>
 
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
-                    <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                     <input type="text" class="endyearpicker form-control widthinput"
                        onchange=checkGreaterYear(this,${supplier},${index})

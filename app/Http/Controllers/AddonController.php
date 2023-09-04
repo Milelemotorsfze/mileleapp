@@ -703,7 +703,8 @@ class AddonController extends Controller
     public function create(Request $request)
     {
         $description_id = $addon_id = $addon_code = $addon_type = $submitFrom =  $addonDescription =  $kitBrand = '';
-        $kitModelLines = [];
+        $kitModelLines = $vendors = [];
+        $notAddedModelLines = 0;
         if($request->kit_item_id != '')
         {
             $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
@@ -713,6 +714,11 @@ class AddonController extends Controller
                                         ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
                                         ->select('addon_details_id','model_id','model_year_start','model_year_end')
                                         ->get();
+            $countBrandModelLines = 0;                            
+            $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
+            $addedModelLines = 0;
+            $addedModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->select('model_id')->distinct('model_id')->count();
+            $notAddedModelLines = $countBrandModelLines - $addedModelLines;
             foreach($kitModelLines as $kitModelLine)       
             {
                 $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
@@ -741,6 +747,9 @@ class AddonController extends Controller
                 {
                     $addon_code =  "SP1";
                 }
+            $spVendorsIds = [];
+            $spVendorsIds = SupplierType::where('supplier_type','spare_parts')->pluck('supplier_id');
+            $vendors =  Supplier::whereIn('id',$spVendorsIds)->select('id','supplier')->get();
         }
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
@@ -749,7 +758,7 @@ class AddonController extends Controller
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
         return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown','description_id','addon_id','addon_type','addon_code',
-                                            'addonDescription','submitFrom','kitBrand','kitModelLines'));
+                                            'addonDescription','submitFrom','kitBrand','kitModelLines','notAddedModelLines','vendors'));
     }
 
     /**
@@ -757,7 +766,7 @@ class AddonController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->is_from);
+        // dd($request->all());
         $authId = Auth::id();
 //         $validator = Validator::make($request->all(), [
 //             'addon_id' => 'required',
