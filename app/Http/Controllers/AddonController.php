@@ -709,33 +709,44 @@ class AddonController extends Controller
         {
             $kititem = '';
             $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
+            $countBrandModelLines = 0; 
             if($kititem != '')
             {
+                $addonTypes = '';
                 $addonTypes = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->first();
-                $kitBrand = $addonTypes->brand_id;
+                if($addonTypes != '')
+                {
+                    $kitBrand = $addonTypes->brand_id;
+                    $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
+                }               
                 $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
                 ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
                 ->select('addon_details_id','model_id','model_year_start','model_year_end')
                 ->get();
-                $countBrandModelLines = 0;                            
-                $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
                 $addedModelLines = 0;
                 $addedModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->select('model_id')->distinct('model_id')->count();
                 $notAddedModelLines = $countBrandModelLines - $addedModelLines;
-                foreach($kitModelLines as $kitModelLine)       
+                if(count($kitModelLines) > 0)
                 {
-                    $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
-                    $kitModelLine->Descriptions = AddonTypes::where([
-                        ['addon_details_id','=',$kitModelLine->addon_details_id],
-                        ['model_id','=',$kitModelLine->model_id],
-                        ['model_year_start','=',$kitModelLine->model_year_start],
-                        ['model_year_end','=',$kitModelLine->model_year_end],
-                    ])->pluck('model_number')->toArray();
+                    foreach($kitModelLines as $kitModelLine)       
+                    {
+                        $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
+                        $kitModelLine->Descriptions = AddonTypes::where([
+                            ['addon_details_id','=',$kitModelLine->addon_details_id],
+                            ['model_id','=',$kitModelLine->model_id],
+                            ['model_year_start','=',$kitModelLine->model_year_start],
+                            ['model_year_end','=',$kitModelLine->model_year_end],
+                        ])->pluck('model_number')->toArray();
+                    }
                 }
                 $description_id = $kititem->item_id;
+                $addon = '';
                 $addon = AddonDescription::where('id',$description_id)->first();
-                $addon_id = $addon->addon_id;
-                $addonDescription = AddonDescription::where('addon_id',$addon_id)->first();
+                if($addon != '')
+                {
+                    $addon_id = $addon->addon_id;
+                    $addonDescription = AddonDescription::where('addon_id',$addon_id)->first();
+                }
             }
             $addon_type = 'SP';
             $submitFrom = 'kit';
