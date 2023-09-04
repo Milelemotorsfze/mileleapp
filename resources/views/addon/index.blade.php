@@ -366,7 +366,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
         var rowperpage = Number($('#rowperpage').val());
-
+        $('.overlay').show();
             $.ajax({
                 url:"{{url('getAddonlists')}}",
                 data: {
@@ -388,7 +388,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                    // checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
-
+                    $('.overlay').hide();
                 }
             });
         }

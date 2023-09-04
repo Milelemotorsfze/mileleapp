@@ -707,32 +707,36 @@ class AddonController extends Controller
         $notAddedModelLines = 0;
         if($request->kit_item_id != '')
         {
+            $kititem = '';
             $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
-            $addonTypes = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->first();
-            $kitBrand = $addonTypes->brand_id;
-            $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
-                                        ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
-                                        ->select('addon_details_id','model_id','model_year_start','model_year_end')
-                                        ->get();
-            $countBrandModelLines = 0;                            
-            $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
-            $addedModelLines = 0;
-            $addedModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->select('model_id')->distinct('model_id')->count();
-            $notAddedModelLines = $countBrandModelLines - $addedModelLines;
-            foreach($kitModelLines as $kitModelLine)       
+            if($kititem != '')
             {
-                $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
-                $kitModelLine->Descriptions = AddonTypes::where([
-                    ['addon_details_id','=',$kitModelLine->addon_details_id],
-                    ['model_id','=',$kitModelLine->model_id],
-                    ['model_year_start','=',$kitModelLine->model_year_start],
-                    ['model_year_end','=',$kitModelLine->model_year_end],
-                ])->pluck('model_number')->toArray();
-            }  
-            $description_id = $kititem->item_id;
-            $addon = AddonDescription::where('id',$description_id)->first();
-            $addon_id = $addon->addon_id;
-            $addonDescription = AddonDescription::where('addon_id',$addon_id)->first();
+                $addonTypes = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->first();
+                $kitBrand = $addonTypes->brand_id;
+                $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
+                ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
+                ->select('addon_details_id','model_id','model_year_start','model_year_end')
+                ->get();
+                $countBrandModelLines = 0;                            
+                $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
+                $addedModelLines = 0;
+                $addedModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)->select('model_id')->distinct('model_id')->count();
+                $notAddedModelLines = $countBrandModelLines - $addedModelLines;
+                foreach($kitModelLines as $kitModelLine)       
+                {
+                    $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
+                    $kitModelLine->Descriptions = AddonTypes::where([
+                        ['addon_details_id','=',$kitModelLine->addon_details_id],
+                        ['model_id','=',$kitModelLine->model_id],
+                        ['model_year_start','=',$kitModelLine->model_year_start],
+                        ['model_year_end','=',$kitModelLine->model_year_end],
+                    ])->pluck('model_number')->toArray();
+                }
+                $description_id = $kititem->item_id;
+                $addon = AddonDescription::where('id',$description_id)->first();
+                $addon_id = $addon->addon_id;
+                $addonDescription = AddonDescription::where('addon_id',$addon_id)->first();
+            }
             $addon_type = 'SP';
             $submitFrom = 'kit';
             $lastAddonCode = AddonDetails::where('addon_type_name','SP')->withTrashed()->orderBy('id', 'desc')->first();
