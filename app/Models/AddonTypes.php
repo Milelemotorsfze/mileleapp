@@ -44,17 +44,26 @@ class AddonTypes extends Model
     }
     public function getKitModelNumbersAttribute() {
         $addonType = AddonTypes::find($this->id);
-        $modelDescriptions = AddonTypes::where('brand_id', $addonType->brand_id)
+        $modelDescriptions = [];
+        if(isset($addonType))
+        {
+            $modelDescriptions = AddonTypes::where('brand_id', $addonType->brand_id)
             ->where('addon_details_id', $addonType->addon_details_id)
             ->where('model_id', $addonType->model_id)
             ->pluck('model_number')->toArray();
+        }
+       
 
         return $modelDescriptions;
     }
     public function getModelNumbersAttribute() {
         $addonType = AddonTypes::find($this->id);
+        $modelDescriptions = [];
+        if(isset($addonType))
+        {
         $modelDescriptions = MasterModelDescription::where('model_line_id', $addonType->model_id)
             ->get();
+        }
         return $modelDescriptions;
     }
 }
