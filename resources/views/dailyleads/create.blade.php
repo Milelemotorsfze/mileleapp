@@ -105,11 +105,9 @@ input[type=number]::-webkit-outer-spin-button {
                     <label for="basicpill-firstname-input" class="form-label">Source:</label>
                     <input type="text" placeholder="Source" name="milelemotors" list="milelemotorsList" class="form-control" id="milelemotorsInput">
                     <datalist id="milelemotorsList">
-                    <option value="Walking Customer" data-value="Walking Customer">Walking Customer</option>
-                    <option value="Online" data-value="Online">Online</option>
-                    <option value="Direct Reference" data-value="Direct Reference">Direct Reference</option>
-                    <option value="Direct Calls" data-value="Direct Calls">Direct Calls</option>
-                    <option value="Agent" data-value="Agent">Agent</option>
+                    @foreach ($LeadSource as $source)
+                    <option value="{{ $source->source_name }}">{{ $source->source_name }}</option>
+                    @endforeach
                     </datalist>
                     </div>
                     <div class="col-lg-4 col-md-6">
@@ -154,10 +152,10 @@ input[type=number]::-webkit-outer-spin-button {
                     </div>
                     </br>
                     <div class="maindd">
-                    <div id="row-container">
-                        <div class="row">
-                            <div class="col-lg-4 col-md-6">
-                            <label for="brandInput" class="form-label">Brand & Models:</label>
+    <div id="row-container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6">
+                <label for="brandInput" class="form-label">Brand & Models:</label>
                 <input type="text" placeholder="Select Brand & Model" name="model_line_id[]" list="brandList" class="form-control mb-1" id="brandInput">
                 <datalist id="brandList">
                     @foreach ($modelLineMasters as $modelLineMaster)
@@ -168,16 +166,16 @@ input[type=number]::-webkit-outer-spin-button {
                         <option value="{{ $brand_name }} / {{ $modelLineMaster->model_line }}" data-value="{{ $modelLineMaster->id }}">{{ $brand_name }} / {{ $modelLineMaster->model_line }}</option>
                     @endforeach
                 </datalist>
-                <input type="hidden" name="model_line_ids[]" id="selectedBrandId">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
-                        <div class="btn btn-primary add-row-btn">
-                            <i class="fas fa-plus"></i> Add More
-                        </div>
-                    </div>
-                </div>
+                <input type="hidden" name="model_line_ids" id="selectedBrandIds">
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 col-md-12 mt-3 d-flex justify-content-start">
+        <div class="btn btn-primary add-row-btn">
+            <i class="fas fa-plus"></i> Add More
+        </div>
+    </div>
+</div>
                     <div class="col-lg-4 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Custom Brand & Model : </label>
                         {!! Form::text('custom_brand_model', null, array('placeholder' => 'Custom Brand & Model','class' => 'form-control')) !!}
@@ -203,7 +201,7 @@ input[type=number]::-webkit-outer-spin-button {
 @endsection
 @push('scripts')
     <script type="text/javascript">
-    $(document).ready(function() {
+$(document).ready(function() {
   var max_fields = 10;
   var wrapper = $("#row-container");
   var add_button = $(".add-row-btn");
@@ -235,30 +233,28 @@ input[type=number]::-webkit-outer-spin-button {
     e.preventDefault();
     if (x < max_fields) {
       x++;
-            var selectedValues = $('input[name="model_line_id[]"]').map(function() {
-                return $(this).val();
-            }).get();
-            var datalist = $('<datalist id="brandList' + x + '"></datalist>');
-            var options = '';
-            $('#brandList option').each(function() {
-                if (selectedValues.indexOf($(this).val()) === -1) {
-                    options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
-                }
-            });
-            datalist.html(options);
-            var newRow = $('<div class="row"></div>');
-            var col1 = $('<div class="col-lg-4 col-md-6"></div>');
-            var label = $('<label for="brandInput' + x + '" class="form-label">Brand & Models:</label>');
-            var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids[]" id="selectedBrandId' + x + '">');
-            col1.append(label);
-            col1.append(input);
-            col1.append(datalist);
-            var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
-            var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
-            col2.append(removeBtn);
-            newRow.append(col1);
-            newRow.append(col2);
-            $(wrapper).append(newRow);
+      var selectedValues = $('input[name="model_line_id[]"]').map(function() {
+        return $(this).val();
+      }).get();
+      var datalist = $('<datalist id="brandList' + x + '"></datalist>');
+      var options = '';
+      $('#brandList option').each(function() {
+        if (selectedValues.indexOf($(this).val()) === -1) {
+          options += '<option value="' + $(this).val() + '" data-value="' + $(this).data('value') + '"></option>';
+        }
+      });
+      datalist.html(options);
+      var newRow = $('<div class="row"></div>');
+      var col1 = $('<div class="col-lg-4 col-md-6"></div>');
+      var input = $('<input type="text" placeholder="Select Brand & Model" name="model_line_id[]" class="form-control mb-1 new-select" id="brandInput' + x + '" list="brandList' + x + '" autocomplete="off" /><input type="hidden" name="model_line_ids" class="selectedBrandId">');
+      col1.append(input);
+      col1.append(datalist);
+      var col2 = $('<div class="col-lg-4 col-md-6 align-self-end"></div>');
+      var removeBtn = $('<a href="#" class="remove-row-btn btn btn-danger"><i class="fas fa-minus"></i> Remove</a>');
+      col2.append(removeBtn);
+      newRow.append(col1);
+      newRow.append(col2);
+      $(wrapper).append(newRow);
       updateDropdownList();
     }
   });
@@ -272,10 +268,18 @@ input[type=number]::-webkit-outer-spin-button {
 
   $(wrapper).on("input", "input[name='model_line_id[]']", function() {
     var selectedBrandInput = $(this);
-    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids[]"]');
+    var selectedBrandIdInput = selectedBrandInput.next('input[name="model_line_ids"]');
     var selectedOption = selectedBrandInput.val();
     var selectedOptionId = selectedBrandInput.siblings('datalist').find('option[value="' + selectedOption + '"]').data('value');
-    selectedBrandIdInput.val(selectedOptionId);
+    
+    var selectedBrandIds = $('input[name="model_line_ids"]').val() || '[]';
+    selectedBrandIds = JSON.parse(selectedBrandIds);
+
+    if (selectedBrandIds.indexOf(selectedOptionId) === -1) {
+      selectedBrandIds.push(selectedOptionId);
+    }
+
+    $('input[name="model_line_ids"]').val(JSON.stringify(selectedBrandIds));
     updateDropdownList();
   });
 });
@@ -414,9 +418,9 @@ document.getElementById('languageInput').addEventListener('input', function(even
     var input = document.querySelector("#phone");
     var iti = window.intlTelInput(input, {
         utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/utils.js",
-        initialCountry: "ae",
         separateDialCode: false,
-        nationalMode: true
+        autoFormat: false,
+        nationalMode: false
     });
     input.addEventListener('input', function() {
         var currentValue = input.value;

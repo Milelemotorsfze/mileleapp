@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Models\quotation;
 use App\Models\Rejection;
 use App\Models\Closed;
+use App\Models\LeadSource;
 use App\Models\Brand;
 use App\Models\Prospecting;
 use App\Models\Salesdemand;
@@ -161,9 +162,10 @@ class DailyleadsController extends Controller
     }
     public function create()
     {
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $countries = CountryListFacade::getList('en');
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-        return view('dailyleads.create', compact('countries', 'modelLineMasters'));
+        return view('dailyleads.create', compact('countries', 'modelLineMasters', 'LeadSource'));
     }
 
     /**
@@ -171,24 +173,24 @@ class DailyleadsController extends Controller
      */
     public function store(Request $request)
     {
-        $modelLineIds = $request->input('model_line_ids');
-        dd($modelLineIds);
+        $modelLineIdsRaw = $request->input('model_line_ids');
+        $modelLineIds = json_decode($modelLineIdsRaw, true);
+        $modelLineIds = array_map('strval', $modelLineIds);
         $this->validate($request, [
             'phone' => 'nullable|required_without:email',
             'email' => 'nullable|required_without:phone|email',           
             'location' => 'required',
             'milelemotors' => 'required',
             'language' => 'required',
-            'model_line_ids' => 'array',
-            'model_line_ids.*' => 'distinct',
             'type' => 'required',
         ]);      
         $date = Carbon::now();
         $date->setTimezone('Asia/Dubai');
         $formattedDate = $date->format('Y-m-d H:i:s');
+        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
         $data = [
             'name' => $request->input('name'),
-            // 'source' => $request->input('milelemotors'),
+            'source' => $dataValue,
             'email' => $request->input('email'),
             'type' => $request->input('type'),
             'sales_person' => Auth::id(),
@@ -202,14 +204,13 @@ class DailyleadsController extends Controller
             'status' => "New",
             'customer_coming_type' => "Direct From Sales",
         ];
-        $model = new Calls($data);
-        $model->save();
+        $calls = new Calls($data);
+        $calls->save();
         $lastRecord = Calls::where('created_by', $data['created_by'])
                    ->orderBy('id', 'desc')
-                   ->where('sales_person', $id)
+                   ->where('sales_person', Auth::id())
                    ->first();
         $table_id = $lastRecord->id;
-        $modelLineIds = $request->input('model_line_ids');
         if ($modelLineIds[0] !== null) {
         foreach ($modelLineIds as $modelLineId) {
         $datacalls = [
