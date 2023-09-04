@@ -58,8 +58,13 @@ class DailyleadsController extends Controller
                     DB::raw("IFNULL(demand.salesnotes, '') as dsalesnotes")
                 );
                 $data->leftJoin('demand', 'calls.id', '=', 'demand.calls_id');                
-                $data->addSelect(DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"), 'quotations.sales_notes as qsalesnotes', 'quotations.deal_value as ddealvalues');
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');
+                $data->addSelect([
+                    DB::raw("DATE_FORMAT(quotations.date, '%d-%b-%Y') as qdate"),
+                    'quotations.sales_notes as qsalesnotes',
+                    DB::raw("IFNULL(quotations.file_path, '') as file_path"),
+                    DB::raw("CONCAT(quotations.deal_value, ' ', quotations.currency) as ddealvalues"),
+                ]);
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
             } elseif ($status === 'Negotiation') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
@@ -74,10 +79,16 @@ class DailyleadsController extends Controller
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
-                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                    DB::raw("IFNULL(quotations.file_path, '') as file_path"),
+                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
-                $data->addSelect(DB::raw("DATE_FORMAT(negotiations.date, '%d-%b-%Y') as ndate"), 'negotiations.sales_notes as nsalesnotes', 'negotiations.dealvalues as ndealvalues');
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%d-%b-%Y'), '') as ndate"),
+                    DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
+                    DB::raw("IFNULL(negotiations.file_path, '') as nfile_path"),
+                    DB::raw("CONCAT(IFNULL(negotiations.dealvalues, ''), ' ', IFNULL(negotiations.currency, '')) as ndealvalues"),
+                );
                 $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');
             } elseif ($status === 'Closed') {
                 $data->addSelect(
@@ -93,16 +104,23 @@ class DailyleadsController extends Controller
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
-                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                    DB::raw("IFNULL(quotations.file_path, '') as file_path"),
+                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
-                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
+                $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                 
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%d-%b-%Y'), '') as ndate"),
                     DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
-                    DB::raw("IFNULL(negotiations.dealvalues, '') as ndealvalues")
+                    DB::raw("IFNULL(negotiations.file_path, '') as nfile_path"),
+                    DB::raw("CONCAT(IFNULL(negotiations.dealvalues, ''), ' ', IFNULL(negotiations.currency, '')) as ndealvalues"),
                 );
-                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');                
-                $data->addSelect(DB::raw("DATE_FORMAT(lead_closed.date, '%d-%b-%Y') as cdate"), 'lead_closed.sales_notes as csalesnotes', 'lead_closed.dealvalues as cdealvalues', 'lead_closed.so_number as so_number');
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');               
+                $data->addSelect(
+                    DB::raw("IFNULL(DATE_FORMAT(lead_closed.date, '%d-%b-%Y'), '') as cdate"),
+                    DB::raw("IFNULL(lead_closed.sales_notes, '') as csalesnotes"),
+					DB::raw("IFNULL(lead_closed.so_number, '') as so_number"),
+                    DB::raw("CONCAT(IFNULL(lead_closed.dealvalues, ''), ' ', IFNULL(lead_closed.currency, '')) as cdealvalues"),
+                );
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
@@ -118,15 +136,17 @@ class DailyleadsController extends Controller
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(quotations.date, '%d-%b-%Y'), '') as qdate"),
                     DB::raw("IFNULL(quotations.sales_notes, '') as qsalesnotes"),
-                    DB::raw("IFNULL(quotations.deal_value, '') as ddealvalues")
+                    DB::raw("IFNULL(quotations.file_path, '') as file_path"),
+                    DB::raw("CONCAT(IFNULL(quotations.deal_value, ''), ' ', IFNULL(quotations.currency, '')) as qdealvalues"),
                 );
                 $data->leftJoin('quotations', 'calls.id', '=', 'quotations.calls_id');                
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(negotiations.date, '%d-%b-%Y'), '') as ndate"),
                     DB::raw("IFNULL(negotiations.sales_notes, '') as nsalesnotes"),
-                    DB::raw("IFNULL(negotiations.dealvalues, '') as ndealvalues")
+                    DB::raw("IFNULL(negotiations.file_path, '') as nfile_path"),
+                    DB::raw("CONCAT(IFNULL(negotiations.dealvalues, ''), ' ', IFNULL(negotiations.currency, '')) as ndealvalues"),
                 );
-                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');                
+                $data->leftJoin('negotiations', 'calls.id', '=', 'negotiations.calls_id');               
                 $data->addSelect(DB::raw("DATE_FORMAT(lead_rejection.date, '%d-%b-%Y') as rdate"), 'lead_rejection.sales_notes as rsalesnotes', 'lead_rejection.Reason as reason');
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
             }
@@ -137,7 +157,6 @@ class DailyleadsController extends Controller
                 })
                 ->toJson();
         }    
-    
         return view('dailyleads.index', compact('pendingdata'));
     }
     public function create()
@@ -284,11 +303,13 @@ public function prospecting($id)
         'date' => 'required|date',
         'dealValue' => 'required|numeric',
         'salesNotes' => 'nullable|string',
+        'currency' => 'nullable|string',
     ]);
     $quotation = new quotation();
     $quotation->date = $validatedData['date'];
     $quotation->deal_value = $validatedData['dealValue'];
     $quotation->sales_notes = $validatedData['salesNotes'];
+    $quotation->currency = $validatedData['currency'];
     $quotation->created_by = auth()->user()->id;
     $quotation->created_at = now();
     $quotation->calls_id = $request->callId;
@@ -296,7 +317,6 @@ public function prospecting($id)
         $file = $request->file('file');
         $filename = time() . '_' . $file->getClientOriginalName();
         $path = $file->storeAs('quotation_files', $filename, 'public');
-
         $quotation->file_path = $path;
     }
     $quotation->save();
@@ -328,6 +348,7 @@ public function closed(Request $request)
     $Closed->so_number = $request->sonumber;
     $Closed->sales_notes = $request->salesNotes;
     $Closed->dealvalues = $request->dealvalues;
+    $Closed->currency = $request->currency;
     $Closed->created_by = auth()->user()->id;
     $Closed->created_at = now();
     $Closed->call_id = $request->callId;
@@ -343,9 +364,16 @@ public function savenegotiation(Request $request)
     $negotiation->date = $request->date;
     $negotiation->sales_notes = $request->salesNotes;
     $negotiation->dealvalues = $request->dealvalues;
+    $negotiation->currency = $request->currency;
     $negotiation->created_by = auth()->user()->id;
     $negotiation->created_at = now();
     $negotiation->calls_id = $request->callId;
+    if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('negotiation_files', $filename, 'public');
+        $negotiation->file_path = $path;
+    }
     $negotiation->save();
     $call = Calls::findOrFail($request->callId);
     $call->status = 'Negotiation';

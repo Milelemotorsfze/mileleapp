@@ -363,7 +363,11 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <div class="input-group">
-                <span class="input-group-text">AED</span>
+              <select name = "currency" class="form-select" id="currency-select-closed">
+      <option value="AED">AED</option>
+      <option value="USD">USD</option>
+      <option value="EURO">EURO</option>
+    </select>
                 <input type="number" class="form-control" id="deal-value-input-closed" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
               </div>
@@ -407,7 +411,11 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <div class="input-group">
-                <span class="input-group-text">AED</span>
+              <select name = "currency" class="form-select" id="currency-select-negotiation">
+      <option value="AED">AED</option>
+      <option value="USD">USD</option>
+      <option value="EURO">EURO</option>
+    </select>
                 <input type="number" class="form-control" id="deal-value-input-negotiation" aria-label="Deal Value">
                 <span class="input-group-text">.00</span>
               </div>
@@ -419,6 +427,14 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <textarea class="form-control" id="sales-notes-negotiation"></textarea>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="document-upload" class="form-label">Upload Re-Qoutation:</label>
+            </div>
+            <div class="col-md-8">
+              <input type="file" class="form-control" id="document-upload-negotiation">
             </div>
           </div>
         </div>
@@ -451,12 +467,12 @@ input[type=number]::-webkit-outer-spin-button
             </div>
             <div class="col-md-8">
               <div class="input-group">
-              <select name = "" class="form-select" id="currency-select">
+              <select name = "currency" class="form-select" id="currency-select">
       <option value="AED">AED</option>
       <option value="USD">USD</option>
       <option value="EURO">EURO</option>
     </select>
-    <input type="number" class="form-control" id="deal-value-input-quotation" aria-label="Deal Value">
+    <input type="number" class="form-control" id="deal-value-input-qoutation" aria-label="Deal Value">
     <span class="input-group-text">.00</span>
               </div>
             </div>
@@ -524,6 +540,38 @@ input[type=number]::-webkit-outer-spin-button
       </div>
     </div>
   </div>
+</div>
+<div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabel">File Viewer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="fileViewer" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="fileModaln" tabindex="-1" aria-labelledby="fileModalLabeln" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fileModalLabeln">File Viewer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="fileViewern" width="100%" height="500" frameborder="0"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
     @endcan
     @can('sales-view')
@@ -624,6 +672,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Deal Values</th>
                   <th>Qoutation Notes</th>
+                  <th>View Qoutation</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -662,9 +711,11 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Deal Values</th>
                   <th>Qoutation Notes</th>
+                  <th>View Qoutation</th>
                   <th>Negotiation Date</th>
                   <th>Deal Values</th>
                   <th>Negotiation Notes</th>
+                  <th>View Re-Qoutation</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -703,9 +754,11 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
+                  <th>View Qoutation</th>
                   <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
+                  <th>View Re-Qoutation</th>
                   <th>Closing Date</th>
                   <th>Closing Values</th>
                   <th>Closing Notes</th>
@@ -747,9 +800,11 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Qoutation Date</th>
                   <th>Qoutation Values</th>
                   <th>Qoutation Notes</th>
+                  <th>View Qoutation</th>
                   <th>Negotiation Date</th>
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
+                  <th>View Re-Qoutation</th>
                   <th>Reject Date</th>
                   <th>Reject Reason</th>
                   <th>Reject Notes</th>
@@ -764,6 +819,26 @@ input[type=number]::-webkit-outer-spin-button
     </div>
   </div>
   <script>
+     function openModalfile(filePath) {
+      const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
+    console.log('File URL:', fileUrl); // Log the URL to the console
+    $('#fileViewer').attr('src', fileUrl);
+    $('#fileModal').modal('show');
+}
+$('#fileModal').on('hidden.bs.modal', function () {
+    $('#fileViewer').attr('src', '');
+});
+function openModalfilen(filePath) {
+      const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+    const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
+    console.log('File URL:', fileUrl); // Log the URL to the console
+    $('#fileViewern').attr('src', fileUrl);
+    $('#fileModaln').modal('show');
+}
+$('#fileModaln').on('hidden.bs.modal', function () {
+    $('#fileViewern').attr('src', '');
+});
   jQuery(document).ready(function() {
     var steps = jQuery(".step");
     var dataTable = null; 
@@ -920,7 +995,8 @@ function saveQuotations() {
   var dealValue = document.getElementById('deal-value-input-qoutation').value;
   var salesNotes = document.getElementById('sales-note-qoutation').value;
   var fileInput = document.getElementById('document-upload-qoutation');
-  
+  var currencySelect = document.getElementById('currency-select');
+
   if (date === '') {
     alert('Please select a date');
     return;
@@ -940,6 +1016,7 @@ function saveQuotations() {
   formData.append('date', date);
   formData.append('dealValue', dealValue);
   formData.append('salesNotes', salesNotes);
+  formData.append('currency', currencySelect.value);
   formData.append('file', fileInput.files[0]);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
   var xhr = new XMLHttpRequest();
@@ -1004,8 +1081,14 @@ function savenegotiation() {
   var date = document.getElementById('date-negotiation').value;
   var salesNotes = document.getElementById('sales-notes-negotiation').value;
   var dealvalues = document.getElementById('deal-value-input-negotiation').value;
+  var fileInput = document.getElementById('document-upload-negotiation');
+  var currencySelect = document.getElementById('currency-select-negotiation');
   if (date === '') {
     alert('Please select a date');
+    return;
+  }
+  if (fileInput.files.length === 0) {
+    alert('Please upload a document');
     return;
   }
   var formData = new FormData();
@@ -1013,6 +1096,8 @@ function savenegotiation() {
   formData.append('date', date);
   formData.append('salesNotes', salesNotes);
   formData.append('dealvalues', dealvalues);
+  formData.append('currency', currencySelect.value);
+  formData.append('file', fileInput.files[0]);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.savenegotiation') }}', true);
@@ -1042,6 +1127,7 @@ function savenegotiation() {
   var date = document.getElementById('date').value;
   var salesNotes = document.getElementById('sales-notes-closed').value;
   var dealvalues = document.getElementById('deal-value-input-closed').value;
+  var currencySelect = document.getElementById('currency-select-closed');
   var sonumber = document.getElementById('so_number-closed').value;
   if (date === '') {
     alert('Please select a date');
@@ -1060,6 +1146,7 @@ function savenegotiation() {
   formData.append('date', date);
   formData.append('salesNotes', salesNotes);
   formData.append('dealvalues', dealvalues);
+  formData.append('currency', currencySelect.value);
   formData.append('sonumber', sonumber);
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
   var xhr = new XMLHttpRequest();
@@ -1440,27 +1527,21 @@ function s2ab(s) {
     }
 },
                 { data: 'qdate', name: 'qdate', searchable: false},
+                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
+                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
                 {
-    data: 'dsalesnotes',
-    name: 'dsalesnotes',
-    searchable: false,
+    data: 'file_path',
+    name: 'file_path',
     render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'dsalesnotes_' + row.id;
-
-        if (data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
+        if (data) {
             return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
             `;
         } else {
-            return `<span class="remarks-text">${data}</span>`;
+            return '';
         }
     }
 },
-                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
                 {
                     data: 'id',
                     name: 'id',
@@ -1557,29 +1638,7 @@ function s2ab(s) {
     }
 },
                 { data: 'qdate', name: 'qdate', searchable: false },
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
-                {
-    data: 'dsalesnotes',
-    name: 'dsalesnotes',
-    searchable: false,
-    render: function (data, type, row) {
-        const maxLength = 20;
-        const uniqueId = 'dsalesnotes_' + row.id;
-
-        if (data.length > maxLength) {
-            const truncatedText = data.substring(0, maxLength);
-            return `
-                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
-                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
-                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
-            `;
-        } else {
-            return `<span class="remarks-text">${data}</span>`;
-        }
-    }
-},
-                { data: 'ndate', name: 'ndate', searchable: false },
-                { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
+                { data: 'qdealvalues', name: 'qdealvalues', searchable: false },
                 {
     data: 'qsalesnotes',
     name: 'qsalesnotes',
@@ -1597,6 +1656,54 @@ function s2ab(s) {
             `;
         } else {
             return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'file_path',
+    name: 'file_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
+        }
+    }
+},
+                { data: 'ndate', name: 'ndate', searchable: false },
+                { data: 'ndealvalues', name: 'ndealvalues', searchable: false },
+                {
+    data: 'nsalesnotes',
+    name: 'nsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'nsalesnotes_' + row.id;
+
+        if (data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'nfile_path',
+    name: 'nfile_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
+            `;
+        } else {
+            return '';
         }
     }
 },
@@ -1695,14 +1802,14 @@ function s2ab(s) {
     }
 },
                 { data: 'qdate', name: 'qdate', searchable: false},
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
+                { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
-    data: 'dsalesnotes',
-    name: 'dsalesnotes',
+    data: 'qsalesnotes',
+    name: 'qsalesnotes',
     searchable: false,
     render: function (data, type, row) {
         const maxLength = 20;
-        const uniqueId = 'dsalesnotes_' + row.id;
+        const uniqueId = 'qsalesnotes_' + row.id;
 
         if (data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
@@ -1713,6 +1820,19 @@ function s2ab(s) {
             `;
         } else {
             return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'file_path',
+    name: 'file_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
         }
     }
 },
@@ -1735,6 +1855,19 @@ function s2ab(s) {
             `;
         } else {
             return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'nfile_path',
+    name: 'nfile_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
+            `;
+        } else {
+            return '';
         }
     }
 },
@@ -1840,14 +1973,14 @@ function s2ab(s) {
     }
 },
                 { data: 'qdate', name: 'qdate', searchable: false},
-                { data: 'ddealvalues', name: 'ddealvalues', searchable: false},
+                { data: 'qdealvalues', name: 'qdealvalues', searchable: false},
                 {
-    data: 'dsalesnotes',
-    name: 'dsalesnotes',
+    data: 'qsalesnotes',
+    name: 'qsalesnotes',
     searchable: false,
     render: function (data, type, row) {
         const maxLength = 20;
-        const uniqueId = 'dsalesnotes_' + row.id;
+        const uniqueId = 'qsalesnotes_' + row.id;
 
         if (data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
@@ -1858,6 +1991,19 @@ function s2ab(s) {
             `;
         } else {
             return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'file_path',
+    name: 'file_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfile('${data}')"></i>
+            `;
+        } else {
+            return '';
         }
     }
 },
@@ -1880,6 +2026,19 @@ function s2ab(s) {
             `;
         } else {
             return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
+{
+    data: 'nfile_path',
+    name: 'nfile_path',
+    render: function (data, type, row) {
+        if (data) {
+            return `
+                <i class="fas fa-file-alt view-file" data-file="${data}" style="cursor: pointer;" onclick="openModalfilen('${data}')"></i>
+            `;
+        } else {
+            return '';
         }
     }
 },
