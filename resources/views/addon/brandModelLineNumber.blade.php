@@ -34,7 +34,7 @@
                     <div class="col-xxl-4 col-lg-5 col-md-12" id="showDivdropDr1Des{{$j}}">
                     <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Choose Model Line</label>
-                        <select class="compare-tag1 spare-parts-model-lines" name="brand[1][model][{{$j}}][model_id]" onchange=selectModelLineDescipt(1,{{$j}})
+                        <select class="compare-tag1 spare-parts-model-lines  @if($kitModelLine->model_id != '') disabledModelLine @endif" name="brand[1][model][{{$j}}][model_id]" onchange=selectModelLineDescipt(1,{{$j}})
                                 id="selectModelLineNum1Des{{$j}}" multiple="true" style="width: 100%;" data-index="1" data-model-index="{{$j}}"
                                 @if($kitModelLine->model_id != '') disabled @endif>
                             @foreach($modelLines as $modelLine)
@@ -167,6 +167,7 @@
                     // here we are finding option element of tag and
                 // if it has property 'locked' we will add class 'locked-tag'
                 // to be able to style element in select
+                // console.log(tag.id);
                 var $option = $('.model-descriptions option[value="'+tag.id+'"]');
                 if ($option.attr('locked')){
                    $(container).addClass('locked-tag');

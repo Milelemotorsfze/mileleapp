@@ -517,7 +517,7 @@ class KitCommonItemController extends Controller
         }
 
         return view('kit.kititems',compact('supplierAddonDetails','previousPurchasePrice',
-        'previousSellingPrice'));
+        'previousSellingPrice','id'));
     }
     public function getCommonKitItems(Request $request) {
 

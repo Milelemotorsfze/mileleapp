@@ -486,15 +486,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Spare Part Edit">
                            Add New Vendor</button>
                         <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning float-end purchase-price-edit-button"
-                                style="margin-right: 5px" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
+                                style="margin-right: 5px; height:30px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
                                 <i class="fa fa-plus"></i>
                         </button>
-                        @else
-                        <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create',['kit_item_id' => $Kit->id]) }}">
+                        @endif
+                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
                         <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
                         </a>
                         <!-- {{$Kit->id}} -->
-                        @endif
+                       
                     </div>
                     
                 <!-- </div> -->

@@ -702,7 +702,7 @@ class AddonController extends Controller
 
     public function create(Request $request)
     {
-        $description_id = $addon_id = $addon_code = $addon_type = $submitFrom =  $addonDescription =  $kitBrand = '';
+        $description_id = $addon_id = $addon_code = $addon_type = $submitFrom =  $addonDescription =  $kitBrand = $kitId = '';
         $kitModelLines = $vendors = [];
         $notAddedModelLines = 0;
         if($request->kit_item_id != '')
@@ -765,6 +765,7 @@ class AddonController extends Controller
             $spVendorsIds = [];
             $spVendorsIds = SupplierType::where('supplier_type','spare_parts')->pluck('supplier_id');
             $vendors =  Supplier::whereIn('id',$spVendorsIds)->select('id','supplier')->get();
+            $kitId = $request->kit_id;
         }
         $kitItemDropdown = Addon::whereIn('addon_type',['P','SP'])->pluck('id');
         $kitItemDropdown = AddonDetails::whereIn('addon_id', $kitItemDropdown)->with('AddonName')->get();
@@ -773,7 +774,7 @@ class AddonController extends Controller
         $modelLines = MasterModelLines::select('id','brand_id','model_line')->get();
         $suppliers = Supplier::select('id','supplier')->get();
         return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown','description_id','addon_id','addon_type','addon_code',
-                                            'addonDescription','submitFrom','kitBrand','kitModelLines','notAddedModelLines','vendors'));
+                                            'addonDescription','submitFrom','kitBrand','kitModelLines','notAddedModelLines','vendors','kitId'));
     }
 
     /**
@@ -1167,19 +1168,26 @@ class AddonController extends Controller
                     }
                 }
             }
-
-            if($request->addon_type == 'K')
+            if($request->is_from == 'kit')
             {
-                // return redirect()->route('kit.suppliers', $addon_details->id)
-                //                 ->with('success','Kit created successfully');
-                return redirect()->route('kit.kitItems', $addon_details->id)
-                                ->with('success','Kit created successfully');
+                return redirect()->route('kit.kitItems', $request->kit_id)
+                ->with('success','Kit created successfully');
             }
             else
             {
-                $data = 'all';
-                return redirect()->route('addon.list', $data)
-                                ->with('success','Addon created successfully');
+                if($request->addon_type == 'K')
+                {
+                    // return redirect()->route('kit.suppliers', $addon_details->id)
+                    //                 ->with('success','Kit created successfully');
+                    return redirect()->route('kit.kitItems', $addon_details->id)
+                                    ->with('success','Kit created successfully');
+                }
+                else
+                {
+                    $data = 'all';
+                    return redirect()->route('addon.list', $data)
+                                    ->with('success','Addon created successfully');
+                }
             }
 
         // }

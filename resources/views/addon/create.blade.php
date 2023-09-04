@@ -160,6 +160,7 @@
                             <label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
                         </div>
                         <input name="is_from" value="{{ $submitFrom }}" hidden>
+                        <input name="kit_id" value="{{ $kitId }}" hidden>
                         <div class="col-xxl-4 col-lg-6 col-md-12">
                             <!-- <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus> -->
                             <select id="addon_type" name="addon_type" class="form-control" onchange=getAddonCodeAndDropdown() autofocus @if($addon_type == 'SP') disabled @endif>
@@ -1148,6 +1149,12 @@
                 $('#addon_type').removeAttr('disabled');
                 $('#addon_id').removeAttr('disabled');
                 $('#selectBrandMo1').removeAttr('disabled');
+                var elts = document.getElementsByClassName("disabledModelLine");
+
+                for(var e = 0; e < elts.length; e++) { // For each element
+                var elt = elts[e];
+                elt.removeAttribute("disabled");
+                }
             }
         });
         function validationOnKeyUp(clickInput,row)
