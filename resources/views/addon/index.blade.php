@@ -122,9 +122,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
     <h4 class="card-title">
       Addon Info
     </h4>
+
+    @canany(['addon-create'])
+    @php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+    @endphp
+    @if ($hasPermission)
     <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('addon.create') }}">
       <i class="fa fa-plus" aria-hidden="true"></i> New Addon
     </a>
+    @endif
+    @endcanany
+
     @canany(['accessories-list', 'spare-parts-list', 'kit-list'])
     @php
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);

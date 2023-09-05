@@ -477,24 +477,55 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 <span id="purchase-price-error-{{$i}}"></span>
                             </div>
                             <div class="col-lg-3 col-md-12 col-sm-12 mb-1">
+                            @canany(['addon-edit'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
+                            @endphp
+                            @if ($hasPermission)
                                 <button type="button" class="btn btn-info price-update-button" data-index="{{$i}}"
                                         data-kit-id="{{$Kit->id}}">Update</button>
+                            @endif
+                            @endcan
                             </div>
                         </div>
                         @if($Kit->countArray > 0)
-                        <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
-                                data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Add New Vendor">
-                                <i class="fa fa-plus" aria-hidden="true"></i>Add New Vendor</button>
-                        <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning btn-sm float-end purchase-price-edit-button"
-                                style="margin-right: 5px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
-                                <i class="fa fa-plus"></i>New Purchase Price
-                        </button>
+
+                            @canany(['addon-edit'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
+                            @endphp
+                            @if ($hasPermission)
+                            <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
+                            data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Add New Vendor">
+                            <i class="fa fa-plus" aria-hidden="true"></i>Add New Vendor</button>
+                            @endif
+                            @endcan
+
+                            @can('supplier-new-purchase-price')
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-new-purchase-price']);
+                            @endphp
+                            @if ($hasPermission)
+                            <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning btn-sm float-end purchase-price-edit-button"
+                                    style="margin-right: 5px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
+                                    <i class="fa fa-plus"></i>New Purchase Price
+                            </button>
+                            @endif
+                            @endcan
+
                         @endif
+
+                        @canany(['addon-create'])
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+                        @endphp
+                        @if ($hasPermission)
                         <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" title="Add New Spare Part" 
                         href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
                         <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
                         </a>
-                        <!-- {{$Kit->id}} -->
+                        @endif
+                        @endcanany
                        
                     </div>
                     
