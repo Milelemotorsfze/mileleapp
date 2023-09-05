@@ -30,6 +30,22 @@ class AddonController extends Controller
      */
     public function index($data)
     {
+        // $addons = AddonDetails::select('id','image')->get();
+        // foreach($addons as $addon)
+        // {
+        //     $file = '';
+        //     $file = public_path().'/addon_image/'.$addon->image;
+        //                         if (@getimagesize($file)) {
+        //                             // dd('file exist');
+        //                         }
+        //                         else
+        //                         {
+        //                             $updateAddon = AddonDetails::where('id',$addon->id)->first();
+        //                             $updateAddon->image = NULL;
+        //                             $updateAddon->update();
+        //                         }
+        // }
+        // dd('hi');
         $rowperpage = 12;
         $content = 'addon';
         $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();

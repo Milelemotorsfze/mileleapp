@@ -397,7 +397,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
             <div class="col-xxl-3 col-lg-3 col-md-3">
                 <div class="row">
                     <center>
-                    <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" class="contain image-click-class" data-modal-id="showImageModal"/>
+                    @if($supplierAddonDetails->image)
+                                    <img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" 
+                                    class="contain image-click-class" data-modal-id="showImageModal"/>
+
+                                @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="width:200px; height: 200px;;" alt="Addon Image"  />
+                                    @endif
                     </center>
                 </div>
             </div>

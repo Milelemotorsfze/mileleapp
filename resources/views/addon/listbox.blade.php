@@ -340,24 +340,13 @@
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
                                 @if($addonsdata->image)
-                                <?php
-                                $file = public_path().'/addon_image/'.$addonsdata->image;
-                                if (@getimagesize($file)) {
-                                    ?>
+                               
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                          alt="Addon Image"
                                          style="width:100%;">
-                                <?php
-                                }
-                                else
-                                {
-                                    ?>
-                                <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />
-                                <?php
-                                }
-                                ?>
-                                    
+                               @else
+                               <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="width:100%; height:125px;" alt="Addon Image"  />   
                                 @endif
                             </div>
                             @if($addonsdata->is_all_brands == 'yes')

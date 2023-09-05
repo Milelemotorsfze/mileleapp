@@ -1,19 +1,9 @@
-                                <?php
-                                $file = public_path().'/addon_image/'.$addonsdata->image;
-                                if (@getimagesize($file)) {
-                                    ?>
+                                @if($addonsdata->image)
                                      <img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                                     alt="Addon Image" style="width:100%; height:100px;">
-                                <?php
-                                }
-                                else
-                                {
-                                    ?>
-                                <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                               @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
-                                <?php
-                                }
-                                ?>
+                                    @endif
                                 <script type="text/javascript">
                                     $(document).ready(function ()
                                     {
