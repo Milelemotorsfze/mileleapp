@@ -99,17 +99,17 @@ body {font-family: Arial, Helvetica, sans-serif;}
   .modalContentForImage {
     width: 100%;
   }
-    .page-overlay {
+    /* .page-overlay {
         z-index: 9999;
-        position: fixed; /*Important to cover the screen in case of scolling content*/
+        position: fixed;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
         display: block;
         text-align: center;
-        background-color: rgba(128,128,128,0.5); /* color */
-    }
+        background-color: rgba(128,128,128,0.5); 
+    } */
 }
 </style>
   @canany(['addon-create', 'accessories-list', 'spare-parts-list', 'kit-list'])
@@ -158,7 +158,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       </li> -->
     </ul>
   </div>
-  <div class="page-overlay"></div>
+  <!-- <div class="page-overlay"></div> -->
   <div class="card-header">
     <form>
       <input type="text", value="{{$data}}" id="data" hidden>
@@ -332,7 +332,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         $(".each-addon-table-row").attr('hidden', true);
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
             fetchData(0,0);
-            $('.page-overlay').show();
+            // $('.page-overlay').show();
         }
     }
     function showAddonBox()
