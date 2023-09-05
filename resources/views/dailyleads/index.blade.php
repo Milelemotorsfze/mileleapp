@@ -152,7 +152,7 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Closed</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
@@ -250,7 +250,7 @@ input[type=number]::-webkit-outer-spin-button
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Closed</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
       @endcan
     </ul>
@@ -337,7 +337,7 @@ input[type=number]::-webkit-outer-spin-button
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ClosedModalLabel">Closed</h5>
+          <h5 class="modal-title" id="ClosedModalLabel">Sales Order</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -759,9 +759,9 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th>
-                  <th>Closing Date</th>
-                  <th>Closing Values</th>
-                  <th>Closing Notes</th>
+                  <th>Sales Date</th>
+                  <th>Sales Values</th>
+                  <th>Sales Notes</th>
                   <th>So Number</th>
                 </tr>
               </thead>
@@ -1107,12 +1107,12 @@ function savenegotiation() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
+          console.log('Negotiation saved successfully');
+          alert('Negotiation saved successfully');
           location.reload();
         } else {
-          console.error('Error saving Prospecting');
-          alert('Error saving Prospecting');
+          console.error('Error saving Negotiation');
+          alert('Error saving Negotiation');
         }
       } else {
         console.error('Request failed with status ' + xhr.status);
@@ -1157,8 +1157,8 @@ function savenegotiation() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
+          console.log('Sales Order saved successfully');
+          alert('Sales Order saved successfully');
           location.reload();
         } else {
           console.error('Error saving Prospecting');
@@ -1346,7 +1346,7 @@ function s2ab(s) {
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1442,7 +1442,7 @@ function s2ab(s) {
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1553,7 +1553,7 @@ function s2ab(s) {
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1717,7 +1717,7 @@ function s2ab(s) {
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
