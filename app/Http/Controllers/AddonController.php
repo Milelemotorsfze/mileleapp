@@ -341,9 +341,17 @@ class AddonController extends Controller
                 }
                 $html .=      '</div>
                                                     </div>
-                                                    <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
-                                                        <img  id="myImg_'.$addon->id.'" class="image-click-class" src=" '.asset('addon_image/' . $addon->image).' "  alt="Addon Image">
-                                                            </div>';
+                                                    <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
+                $file = public_path().'/addon_image/'.$addon->image;
+                if (@getimagesize($file)) {
+                $html .='<img  id="myImg_'.$addon->id.'" class="image-click-class" src=" '.asset('addon_image/' . $addon->image).' "  alt="Addon Image">';
+                }
+                else
+                {
+                $html .='<img src=" '.asset('addon_image/imageNotAvailable.png').' " class="image-click-class"
+                style="width:100%; height:125px;" alt="Addon Image"  />';
+                }
+                $html .='</div>';
 
                 if($addon->is_all_brands == 'yes') {
                     $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
@@ -445,10 +453,18 @@ class AddonController extends Controller
                   if($addon->is_all_brands == 'yes') {
                     $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
                                         <td>'. ++$i. '</td>
-                                          <td>
-                                              <img id="myallBrandImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
-                                                     alt="Addon Image" style="width:100%; height:100px;">
-                                          </td>
+                                          <td>';
+                                          $file = public_path().'/addon_image/'.$addon->image;
+                                          if (@getimagesize($file)) {
+                                          $html .='<img id="myallBrandImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
+                                                     alt="Addon Image" style="width:100%; height:100px;">';
+                                                    }
+                                                    else
+                                                    {
+                                                        $html .=' <img src="'. asset('addon_image/imageNotAvailable.png') .'" class="image-click-class"
+                                                        style="width:100%; height:100px;" alt="Addon Image"  />';
+                                                    }
+                                                     $html .='</td>
                                           <td> '.$addon->AddonName->name.'</td>
                                            <td>';
                                                 if($addon->addon_type_name == 'K') {
@@ -560,10 +576,17 @@ class AddonController extends Controller
                               }
                               $html .= ' each-addon-table-row" id="'.$addon->id.'_'.$AddonTypes->brand_id.'">';
                               $html .=  '<td> '. ++$i. '</td>
-                                        <td>
-                                           <img id="myallModalImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
-                                                alt="Addon Image" style="width:100%; height:100px;">
-                                        </td>
+                                        <td>';
+                                        $file = public_path().'/addon_image/'.$addon->image;
+                                if (@getimagesize($file)) {
+                                        $html .= '<img id="myallModalImg_'.$addon->id.'" class="image-click-class" src="'. asset('addon_image/' . $addon->image) .'"
+                                                alt="Addon Image" style="width:100%; height:100px;">';
+                                }
+                                else{
+                                    $html .= '<img src="'. asset('addon_image/imageNotAvailable.png') .'" class="image-click-class"
+                                    style="width:100%; height:125px;" alt="Addon Image"  />';
+                                }
+                                                $html .= '</td>
                                         <td>'. $addon->AddonName->name.'</td>
                                         <td>';
                                           if($addon->addon_type_name == 'K') {
