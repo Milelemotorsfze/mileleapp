@@ -1422,29 +1422,32 @@
                                 maximumSelectionLength: 1,
                             });
                         }
-
-                        $("#suppliers1").html("");
-                        myarray1 = data.suppliers;
-                        var size1= myarray1.length;
-                        if(size1 >= 1)
+                        if(value == 'P')
                         {
-                            let SupplierDropdownData   = [];
-                            $.each(data.suppliers,function(key,value)
-                            {
-                                SupplierDropdownData.push
-                                ({
-                                    id: value.id,
-                                    text: value.supplier
-                                });
-                            });
-                            $('#suppliers1').select2
-                            ({
-                                placeholder: 'Choose Vendor ....     Or     Type Here To Search....',
-                                allowClear: true,
-                                data: SupplierDropdownData,
-                                // maximumSelectionLength: 1,
-                            });
+                            apendVendorPrices();
                         }
+                        // $("#suppliers1").html("");
+                        // myarray1 = data.suppliers;
+                        // var size1= myarray1.length;
+                        // if(size1 >= 1)
+                        // {
+                        //     let SupplierDropdownData   = [];
+                        //     $.each(data.suppliers,function(key,value)
+                        //     {
+                        //         SupplierDropdownData.push
+                        //         ({
+                        //             id: value.id,
+                        //             text: value.supplier
+                        //         });
+                        //     });
+                        //     $('#suppliers1').select2
+                        //     ({
+                        //         placeholder: 'Choose Vendor ....     Or     Type Here To Search....',
+                        //         allowClear: true,
+                        //         data: SupplierDropdownData,
+                        //         // maximumSelectionLength: 1,
+                        //     });
+                        // }
 
                     }
                 });

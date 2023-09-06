@@ -11,7 +11,7 @@
                         <div class="row">
                             <div class="col-md-12 p-0">
                                 <div class="col-md-12 supplierWithoutKit p-0">
-                                    <div class="row supplierWithoutKitApendHere" id="row-1" >
+                                    <!-- <div class="row supplierWithoutKitApendHere" id="row-1">
                                         <div class="col-xxl-3 col-lg-6 col-md-12">
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
@@ -96,7 +96,7 @@
                                                 <i class="fas fa-trash-alt"></i>
                                             </a>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -175,9 +175,10 @@
             sortDropDownListByText();
         }
         $(document.body).on('click', ".removeButton", function (e) {
+            var addonType = $('#addon_type').val();
             var countRow = 0;
             var countRow = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
-                if(countRow > 1)
+                if((countRow > 1 && addonType=='P')  || (countRow > 0 && addonType=='SP'))
                 {
                     var indexNumber = $(this).attr('data-index');
 
@@ -238,134 +239,137 @@
 
     $("body").on("click",".addSupplierAndPriceWithoutKit", function ()
     {
-        var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1;
+        apendVendorPrices();
+    });
+ function apendVendorPrices()
+ {
+    var index = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length + 1;
 
-        $('#indexValue').val(index);
-        var selectedSuppliers = [];
-        for(let i=1; i<index; i++)
+    $('#indexValue').val(index);
+    var selectedSuppliers = [];
+    for(let i=1; i<index; i++)
+    {
+        var eachSelectedSupplier = $("#suppliers"+i).val();
+        $.each(eachSelectedSupplier, function( ind, value )
         {
-            var eachSelectedSupplier = $("#suppliers"+i).val();
-            $.each(eachSelectedSupplier, function( ind, value )
+            selectedSuppliers.push(value);
+        });
+    }
+    $.ajax({
+        url:"{{url('getSupplierForAddon')}}",
+        type: "POST",
+        data:
             {
-                selectedSuppliers.push(value);
-            });
-        }
-        $.ajax({
-            url:"{{url('getSupplierForAddon')}}",
-            type: "POST",
-            data:
-                {
-                    addonType:currentAddonType,
-                    filteredArray: selectedSuppliers,
-                    _token: '{{csrf_token()}}'
-                },
-            dataType : 'json',
-            success: function(data)
+                addonType:currentAddonType,
+                filteredArray: selectedSuppliers,
+                _token: '{{csrf_token()}}'
+            },
+        dataType : 'json',
+        success: function(data)
+        {
+            myarray = data;
+            var size= myarray.length;
+            if(size >= 1)
             {
-                myarray = data;
-                var size= myarray.length;
-                if(size >= 1)
-                {
-                    $(".supplierWithoutKit").append(`
-                        <div class="row supplierWithoutKitApendHere" id="row-${index}" >
-                            <div class="col-xxl-3 col-lg-6 col-md-12">
-                            <span class="error">* </span>
-                                <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
-                                <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
-                                 multiple="true" style="width: 100%;" onchange="validationOnKeyUp(this,${index})">
-                                </select>
-                                <span id="supplierError_${index}" class="supplierError invalid-feedback"></span>
-                                </div>
+                $(".supplierWithoutKit").append(`
+                    <div class="row supplierWithoutKitApendHere" id="row-${index}" >
+                        <div class="col-xxl-3 col-lg-6 col-md-12">
+                        <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13">Choose Vendors</label>
+                            <select class="addonClass suppliers" data-index="${index}"  id="suppliers${index}" name="supplierAndPrice[${index}][supplier_id][]"
+                            multiple="true" style="width: 100%;" onchange="validationOnKeyUp(this,${index})">
+                            </select>
+                            <span id="supplierError_${index}" class="supplierError invalid-feedback"></span>
+                            </div>
 
-                                <div class="col-xxl-2 col-lg-6 col-md-12">
-                                            <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
-                                            <div class="input-group">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text widthinput" id="basic-addon2">Min</span>
-                                                </div>
-                                                <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
-                                                name="supplierAndPrice[${index}][lead_time]" maxlength="3"
-                                                value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                </div>
+                            <div class="col-xxl-2 col-lg-6 col-md-12">
+                                        <label for="choices-single-default" class="form-label font-size-13">Minimum Lead Time</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text widthinput" id="basic-addon2">Min</span>
                                             </div>
-                                            <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
-                                            
-                                        </div>
-                                        <div class="col-xxl-2 col-lg-6 col-md-12">
-                                            <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
-                                           
-                                            <div class="input-group">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text widthinput" id="basic-addon2">Max</span>
-                                                </div>
-                                                <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
-                                                class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
-                                                name="supplierAndPrice[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
-                                                value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text widthinput" id="basic-addon2">Days</span>
-                                                </div>
+                                            <input id="lead_time_${index}" aria-label="measurement" aria-describedby="basic-addon2"
+                                            class="lead_time form-control widthinput @error('lead_time') is-invalid @enderror" 
+                                            name="supplierAndPrice[${index}][lead_time]" maxlength="3"
+                                            value="{{ old('lead_time') }}"  autocomplete="lead_time" oninput="checkGreater(this, ${index})">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text widthinput" id="basic-addon2">Days</span>
                                             </div>
-                                            <span id="maxLeadTimeError_${index}" class="maxLeadTimeError invalid-feedback-lead"></span>
                                         </div>
+                                        <span id="minLeadTimeError_${index}" class="minLeadTimeError invalid-feedback-lead"></span>
+                                        
+                                    </div>
+                                    <div class="col-xxl-2 col-lg-6 col-md-12">
+                                        <label for="choices-single-default" class="form-label font-size-13">Maximum Lead Time</label>
+                                    
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text widthinput" id="basic-addon2">Max</span>
+                                            </div>
+                                            <input id="lead_time_max_${index}" aria-label="measurement" aria-describedby="basic-addon2"
+                                            class="lead_time_max form-control widthinput @error('lead_time_max') is-invalid @enderror" 
+                                            name="supplierAndPrice[${index}][lead_time_max]" oninput="checkGreater(this, ${index})"
+                                            value="{{ old('lead_time_max') }}"  autocomplete="lead_time_max" maxlength="3">
+                                            <div class="input-group-append">
+                                                <span class="input-group-text widthinput" id="basic-addon2">Days</span>
+                                            </div>
+                                        </div>
+                                        <span id="maxLeadTimeError_${index}" class="maxLeadTimeError invalid-feedback-lead"></span>
+                                    </div>
 
-                                <div class="col-xxl-2 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_${index}">
-                                <span class="error">* </span>
-                                <label for="choices-single-default" class="form-label font-size-13">Purchase Price In AED</label>
-                                <div class="input-group">
-                                <input name="supplierAndPrice[${index}][addon_purchase_price_in_aed]" id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
-                                class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice purchase_price_AED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
-                                 placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"
-                                  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">AED</span>
-                                    </div>
-                                </div>
-                                <span id="purchasePriceAEDError_${index}" class="purchasePriceAEDError"></span>
-                            </div>
-                            <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
+                            <div class="col-xxl-2 col-lg-3 col-md-3 AED_price" id="div_price_in_aed_${index}">
                             <span class="error">* </span>
-                                <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
-                                <div class="input-group">
-                                <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}"
-                                oninput="inputNumberAbs(this)" class=" form-control purchase_price_USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
-                                 placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
-                                   autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text widthinput" id="basic-addon2">USD</span>
-                                    </div>
+                            <label for="choices-single-default" class="form-label font-size-13">Purchase Price In AED</label>
+                            <div class="input-group">
+                            <input name="supplierAndPrice[${index}][addon_purchase_price_in_aed]" id="addon_purchase_price_${index}" oninput="inputNumberAbs(this)"
+                            class="leastPurchasePriceAEDKIT notKitSupplierPurchasePrice purchase_price_AED form-control widthinput @error('addon_purchase_price') is-invalid @enderror"
+                            placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price') }}"
+                            autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(${index})">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                 </div>
-                                <span id="purchasePriceUSDError_${index}" class="purchasePriceUSDError"></span>
                             </div>
-                            <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
-                                <a class="btn_round removeButton" data-index="${index}" >
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </div>
+                            <span id="purchasePriceAEDError_${index}" class="purchasePriceAEDError"></span>
                         </div>
-                    `);
-                    let brandDropdownData   = [];
-                    $.each(data,function(key,value)
-                    {
-                        brandDropdownData.push
-                        ({
-                            id: value.id,
-                            text: value.supplier
-                        });
-                    });
-                    $('#suppliers'+index).select2
+                        <div class="col-xxl-2 col-lg-3 col-md-3 USD_price" id="div_price_in_usd_${index}">
+                        <span class="error">* </span>
+                            <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In USD</label>
+                            <div class="input-group">
+                            <input name="supplierAndPrice[${index}][addon_purchase_price_in_usd]" id="addon_purchase_price_in_usd_${index}"
+                            oninput="inputNumberAbs(this)" class=" form-control purchase_price_USD widthinput @error('addon_purchase_price_in_usd') is-invalid @enderror"
+                            placeholder="Enter Addons Purchase Price In USD ,1 USD = 3.6725 AED" value="{{ old('addon_purchase_price_in_usd') }}"
+                            autocomplete="addon_purchase_price_in_usd" autofocus onkeyup="calculateAED(${index})">
+                                <div class="input-group-append">
+                                    <span class="input-group-text widthinput" id="basic-addon2">USD</span>
+                                </div>
+                            </div>
+                            <span id="purchasePriceUSDError_${index}" class="purchasePriceUSDError"></span>
+                        </div>
+                        <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
+                            <a class="btn_round removeButton" data-index="${index}" >
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                `);
+                let brandDropdownData   = [];
+                $.each(data,function(key,value)
+                {
+                    brandDropdownData.push
                     ({
-                        placeholder:"Choose Vendor....     Or     Type Here To Search....",
-                        allowClear: true,
-                        data: brandDropdownData,
-                        minimumResultsForSearch: -1,
+                        id: value.id,
+                        text: value.supplier
                     });
-                }
+                });
+                $('#suppliers'+index).select2
+                ({
+                    placeholder:"Choose Vendor....     Or     Type Here To Search....",
+                    allowClear: true,
+                    data: brandDropdownData,
+                    minimumResultsForSearch: -1,
+                });
             }
-        });
-        });
-
+        }
+    });
+ }
 </script>

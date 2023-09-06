@@ -263,7 +263,7 @@
                         <div class="input-group">
 
                         <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
-                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed }}"
+                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed ?? '' }}" 
                         autocomplete="purchase_price" autofocus readonly>
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
