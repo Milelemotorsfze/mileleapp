@@ -501,7 +501,7 @@
         var imageExist = data.image;
         $(document).ready(function ()
         {
-            if(imageExist != '')
+            if(imageExist != null)
                 {
                     imageIsOkay = true;
                 }

@@ -198,6 +198,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
+        @if (Session::has('success'))
+            <div class="alert alert-success" id="success-alert">
+                <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
+                {{ Session::get('success') }}
+            </div>
+        @endif
         <div class="row">
             <div class="col-xxl-4 col-lg-4 col-md-4">
                 <div class="row">
@@ -288,10 +294,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
             </div>
             <div class="col-xxl-3 col-lg-3 col-md-3">
                 <div class="row">
+                </br>
                     <center>
-
-                    <img id="blah" src="{{ url('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" class="contain image-click-class"
-                         data-modal-id="showImageModal"/>
+                                @if($supplierAddonDetails->image)
+                                    <img id="blah" src="{{ url('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image"
+                                     class="contain image-click-class"
+                                        data-modal-id="showImageModal"/>
+                               @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="width:200px; height: 200px;;" alt="Addon Image"  />
+                                    @endif
                     </center>
                 </div>
             </div>
@@ -308,20 +319,21 @@ body {font-family: Arial, Helvetica, sans-serif;}
             @csrf
             <input type="text" class="form-control widthinput" name="addon_details_id"
                             placeholder="" value="{{$supplierAddonDetails->id}}" hidden>
-        <div class="row" style="padding-left:10px; padding-right:10px;">
+        <div class="row" id="purchase_price_row" style="padding-left:10px; padding-right:10px;">
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Previous Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput" placeholder="" value="{{ $previousPurchasePrice }}" id="previous_purchase_price" name="previous_purchase_price" readonly>
+        <input type="text" class="form-control widthinput" placeholder="" value="{{ $previousPurchasePrice }}" id="previous_purchase_price" 
+        name="previous_purchase_price" readonly>
         </div>
 
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Least Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput"
+        <input type="text" class="form-control widthinput" id="least_purchase_price"
                             placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
         </div>
 
@@ -332,7 +344,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <input type="text" class="form-control widthinput" name="current_purchase_price" id="current_purchase_price"
                             placeholder="" value="{{$supplierAddonDetails->totalPrice}}" readonly>
         </div>
-
+        </div>
+        <div class="row" style="padding-left:10px; padding-right:10px;">
         <div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2" style="padding-top:7px; margin-top:10px;">
         Current Selling Price (AED)
         </div>
@@ -372,7 +385,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                             @if($Kit->countArray > 0)
-                                @if($Kit->least_price_vendor->supplierAddonDetails)
+                                @if($Kit->least_price_vendor->supplierAddonDetails->image)
                                     <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
                                 @endif
@@ -430,10 +443,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                     </div>
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                         @if($Kit->least_price_vendor != '')
-                                        <input id="unit_price_{{$i}}" type="text" class="form-control widthinput1" name="purchase_price_aed"
+                                        <input id="unit_price_{{$i}}" type="text" class="form-control widthinput1 purchase_price" name="purchase_price_aed"
                                         placeholder="Previous Purchase Price" value="{{$Kit->least_price_vendor->purchase_price_aed ?? ''}}" readonly>
                                         @else
-                                        Not AVAILABLE
+                                        <input type="text" class="form-control widthinput1 purchase_price" name="purchase_price_aed"
+                                         value="NOT AVAILABLE" readonly>
                                         @endif
                                     </div>
 
@@ -731,6 +745,17 @@ var data = {!! json_encode($supplierAddonDetails) !!};
 var lengthKitItems = 0;
 $(document).ready(function () {
             lengthKitItems = data.kit_items.length;
+            var values = [];
+            values = Array.from(document.querySelectorAll('.purchase_price')).map(input => input.value);
+            if(values != '' || values !=',')
+            {
+                if(values.includes("NOT AVAILABLE"))
+                {
+                    $("#previous_purchase_price").val("NOT AVAILABLE");
+                    $("#current_purchase_price").val("NOT AVAILABLE");
+                    $("#least_purchase_price").val("NOT AVAILABLE");
+                }
+            }
         });
     $('.purchase-price-edit-button').click(function (e) {
         var index = $(this).attr('data-index');
@@ -863,16 +888,15 @@ $(document).ready(function () {
             currentPurchasePrice = $("#current_purchase_price").val();
             previousSellingPrice = $("#previous_selling_price").val();
             currentSellingPrice = $("#current_selling_price").val();
-            if(previousPurchaseprice == currentPurchasePrice )
+            var values = [];
+            if(previousPurchaseprice != "NOT AVAILABLE" && currentPurchasePrice != "NOT AVAILABLE" && previousPurchaseprice == currentPurchasePrice )
             {
                 e.preventDefault();
-            }
-            if(currentSellingPrice != '') {
-                if(currentSellingPrice == previousSellingPrice )
+            } 
+                if(currentSellingPrice == '' || currentSellingPrice == previousSellingPrice )
                 {
                     e.preventDefault();
                 }
-            }
         });
       </script>
 

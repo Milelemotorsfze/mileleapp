@@ -498,7 +498,7 @@ class KitCommonItemController extends Controller
         $previousPurchsePriceHistory = KitPriceHistory::where('status', 'active')
                                         ->where('addon_details_id', $id)
                                         ->first();
-        $previousPurchasePrice = 0;
+        $previousPurchasePrice = '';
         if($previousPurchsePriceHistory) {
             if($previousPurchsePriceHistory->old_price != '') {
                 $previousPurchasePrice = $previousPurchsePriceHistory->old_price;
@@ -510,7 +510,7 @@ class KitCommonItemController extends Controller
             ['addon_details_id','=', $id],
             ['status','=','active']
         ])->latest()->first();
-        $previousSellingPrice = 0;
+        $previousSellingPrice = '';
         if($previousSellingPriceHistory) {
            $previousSellingPrice = $previousSellingPriceHistory->selling_price;
 
@@ -555,7 +555,9 @@ class KitCommonItemController extends Controller
     }
     public function priceStore(Request $request)
     {
-        if($request->current_purchase_price != '' && $request->previous_purchase_price != $request->current_purchase_price)
+        $success = false;
+        if(($request->current_purchase_price != '' || $request->current_purchase_price != 'NOT AVAILABLE' ) 
+        && $request->previous_purchase_price != $request->current_purchase_price)
         {
             $existingPurchasePrice = KitPriceHistory::where([
                 ['status','=','active'],
@@ -573,6 +575,7 @@ class KitCommonItemController extends Controller
             $purchasePrice['status'] = 'active';
             $purchasePrice['created_by'] = Auth::id();
             $createPurchasePrice = KitPriceHistory::create($purchasePrice);
+            $success = true;
         }
         if($request->current_selling_price != '' && $request->previous_selling_price != $request->current_selling_price)
         {
@@ -589,8 +592,15 @@ class KitCommonItemController extends Controller
                 $createSellingPrice['created_by'] = Auth::id();
                 $createSellPrice = AddonSellingPrice::create($createSellingPrice);
             }
+            $success = true;
         }
-        return redirect()->back();
+        if($success = true)
+        {
+            return redirect()->back()->with('success','Price added successfully');
+        }
+        else{
+            return redirect()->back();
+        }
     }
 
     public function getPartNumbers(Request $request) {

@@ -510,7 +510,7 @@
         var isPartNumberErrorExists = true;
         $(document).ready(function ()
         {
-            if(imageExist != '')
+            if(imageExist != null)
             {
                 imageIsOkay = true;
             }
