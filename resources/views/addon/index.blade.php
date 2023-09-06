@@ -108,7 +108,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         height: 100%;
         display: block;
         text-align: center;
-        background-color: rgba(128,128,128,0.5); 
+        background-color: rgba(128,128,128,0.5);
     } */
 }
 </style>
