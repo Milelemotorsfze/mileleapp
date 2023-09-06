@@ -74,6 +74,16 @@ class AddonController extends Controller
             'modelLineMasters','data','content','rowperpage','addonIds'));
 
     }
+    public function getRelatedModelLines(Request $request)
+    {
+        $modelLines = MasterModelLines::select('id','brand_id','model_line');
+        if(count($request->BrandIds) > 0)
+        {
+            $modelLines = $modelLines->whereIn('brand_id',$request->BrandIds);
+        }
+        $modelLines = $modelLines->get();
+        return response()->json($modelLines);
+    }
     public function getAddonlists(Request $request) {
         $start = $request->start;
         $rowperpage = 12;

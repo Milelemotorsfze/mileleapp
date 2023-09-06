@@ -247,6 +247,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
               $('#allBrandsFilter').prop("disabled", false);
               $('.allBrandsFilterClass').prop("disabled", false);
               $('#ModelLineDiv').show();
+              getRelatedModelLines(BrandIds)
           } else {
               if (BrandIds.includes('yes')) {
                   $('.allBrandsFilterClass').prop("disabled", true);
@@ -256,6 +257,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
               }
               else {
                   $('#allBrandsFilter').prop("disabled", true);
+                  getRelatedModelLines(BrandIds)
               }
           }
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -314,6 +316,62 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $('.modal').removeClass('modalshow');
       $('.modal').addClass('modalhide');
     }
+    function getRelatedModelLines(BrandIds)
+    {
+                  var ModelLineIds = $('#fltr-model-line').val();
+                  $.ajax({
+                    url:"{{url('getRelatedModelLines')}}",
+                    data: {
+                        BrandIds: BrandIds,
+                    },
+                    dataType: 'json',
+                    success: function(response){
+                      // console.log(response);
+                      $("#fltr-model-line").html("");
+                      let BrandModelLine   = [];
+                      BrandModelLine.push
+                          ({
+                              id: 'allmodellines',
+                              text: 'All Model Lines'
+                          });
+                      $.each(response,function(key,value)
+                      {
+                          BrandModelLine.push
+                          ({
+                              id: value.id,
+                              text: value.model_line
+                          });
+                      });
+                      $('#fltr-model-line').select2
+                      ({
+                          placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                          allowClear: true,
+                          data: BrandModelLine
+                      });
+                      if(ModelLineIds != null)
+                      {
+                        selectedModelLines(BrandModelLine,ModelLineIds);
+                      }
+                    }
+                  });
+    }
+    function selectedModelLines(BrandModelLine,ModelLineIds)
+    {
+      var setSelected = [];
+      for(let i=0; i<BrandModelLine.length; i++)
+      {
+        currentModelId = '';
+        currentModelId = BrandModelLine[i].id;
+        for(let j=0; j<ModelLineIds.length; j++)
+        {
+          if(ModelLineIds[j] == currentModelId)
+          {
+            setSelected.push(currentModelId);
+          }
+        }
+      }
+      $("#fltr-model-line").val(setSelected).trigger("change"); 
+  }
     function showAddonTable()
     {
       let addonTable = document.getElementById('addonListTable');
