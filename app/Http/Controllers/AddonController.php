@@ -89,90 +89,126 @@ class AddonController extends Controller
         $rowperpage = 12;
         $content = 'addon';
         // Fetch records
+        $addonIds = $addonsTableData = [];
         $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
                     ->orderBy('id','DESC');
+
         if($request->addon_type != 'all')
         {
-            $addons =  $addons->where('addon_type_name', $request->addon_type);
+            $addons = $addons->where('addon_type_name',$request->addon_type);
         }
-        /// filter
+        else
+        {
+            $addons = $addons->whereIn('addon_type_name',['P','SP','K']);
+        }
         if($request->AddonIds)
         {
-            $addons = $addons->whereIn('addon_id', $request->AddonIds);
+            $addons = $addons->whereIn('addon_id',$request->AddonIds);
         }
+        info($request->BrandIds);
+        info($request->ModelLineIds);
+
         if($request->BrandIds)
         {
             if(in_array('yes',$request->BrandIds))
             {
-//                info("all brands");
                 $addons = $addons->where('is_all_brands','yes');
-
             }
             else
             {
-//                $addons = $addons->where('is_all_brands','yes');
-                $addons = $addons->whereHas('AddonTypes', function($q) use($request) {
+                $addons = $addons->where('is_all_brands','yes');
+                $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
+                {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
+                    if($request->ModelLineIds)
+                    {
+                        if(in_array('yes',$request->ModelLineIds))
+                        {
+                            $q = $q->orWhere('is_all_model_lines','yes');
+                        }
+                        else
+                        {
+                            $q->where( function ($query) use ($request)
+                            {
+                                $query = $query->whereIn('model_id',$request->ModelLineIds);
+                            });
+                        }
+                    }
                 });
             }
         }
-//        info($addons->count());
-        if($request->ModelLineIds)
+        elseif($request->ModelLineIds)
         {
-//            $addons = $addons->where('is_all_brands','yes');
-            $addons = $addons->whereHas('AddonTypes', function($q) use($request)
+            $addons = $addons->where('is_all_brands','yes');
+            $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
             {
-                if(in_array('yes', $request->ModelLineIds))
+                if(!in_array('yes',$request->ModelLineIds))
                 {
-//                    info("all model line search");
+                    $q = $q->whereIn('model_id',$request->ModelLineIds);
+                }else{
                     $q = $q->where('is_all_model_lines','yes');
-                }else
-                {
-//                    info("separate model line search");
-                    $q->where( function ($query) use ($request) {
-                        $query = $query->whereIn('model_id',$request->ModelLineIds);
-                    });
                 }
             });
         }
+        $fetchedAddonIds = $addons->pluck('id');
+        if(count($fetchedAddonIds) > 0 && $request->isAddonBoxView != 1)
+        {
+            $addons = AddonDetails::whereIn('id', $fetchedAddonIds)
+                ->with('AddonTypes', function ($q) use ($request) {
+                    if ($request->BrandIds) {
+                        $q = $q->whereIn('brand_id', $request->BrandIds);
+                    }
+                    if ($request->ModelLineIds) {
+                        $q = $q->whereIn('model_id', $request->ModelLineIds);
+                    }
+                    $q = $q->with('brands', 'modelLines', 'modelDescription')->get();
+                })
+                ->with('AddonName', 'SellingPrice', 'PendingSellingPrice');
 
+        }
         $addon1 = $addons->get();
 
         ////////////// filter end ////////////////
-        $totalRowsloaded = $addon1->take($start)->pluck('id');
-        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $totalRowsloaded)->count();
-//        info("already loaded  data");
-//        info($latestSerialNumberloaded);
-//        info('start');
-//        info($start);
+        $latestSerialNumberloaded = $addon1->take($start)->pluck('id');
+        info("already loaded data");
+//        info($totalRowsloaded);
+        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $latestSerialNumberloaded)->count();
+
+        info('start');
+        info($start);
 
         if($start >= $addons->count()) {
-//            info('addon null command');
+            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
-//            info($addons->pluck('id'));
+            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-
+            info($addons->pluck('id'));
         }
+
         foreach($addons as $addon)
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
             $addon->LeastPurchasePrices = $price;
         }
+
         $html = "";
         // get the count of already loaded data to find the serial number :- add loop key to get S.No:
-        if($request->BrandIds && in_array('yes',$request->BrandIds)){
+        if($request->BrandIds && in_array('yes', $request->BrandIds)){
+            $i = $start;
+        } else if($request->ModelLineIds && in_array('yes', $request->ModelLineIds)){
             $i = $start;
         }else{
-            $i= $latestSerialNumberloaded;
+            $i= $latestSerialNumberloaded ;
         }
-
+//        info("latest 12 datas");
+//        info($addons->pluck('id'));
         foreach($addons as $value => $addon)
         {
             if($request->isAddonBoxView == 1)
@@ -369,7 +405,7 @@ class AddonController extends Controller
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
                 $html.=    $this->ImagePage($addon);
-               
+
                 $html .='</div>';
 
                 if($addon->is_all_brands == 'yes') {
@@ -468,13 +504,14 @@ class AddonController extends Controller
                                 </div>';
                 $data['addon_box_html'] = $html;
             }else{
-
                   if($addon->is_all_brands == 'yes') {
+//                      info("each loop id");
+//                      info($addon->id);
                     $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
                                         <td>'. ++$i. '</td>
                                           <td>';
                                           $html.=    $this->ImageTable($addon);
-                
+
                                                      $html .='</td>
                                           <td> '.$addon->AddonName->name.'</td>
                                            <td>';
@@ -577,7 +614,11 @@ class AddonController extends Controller
                       $html .=              '</td>
                                         </tr>';
                 }else{
-                      foreach($addon->AddonTypes as $key => $AddonTypes) {
+//                      info("inside addon types");
+//                      info($addon->id);
+//                      info($addon->AddonTypes);
+                      $AddonTypes = AddonTypes::where('addon_details_id', $addon->id)->get();
+                      foreach($AddonTypes as $key => $AddonTypes) {
 
                           $html .= '<tr data-id="1" class="';
                               if($AddonTypes->is_all_model_lines == 'yes') {
@@ -696,6 +737,7 @@ class AddonController extends Controller
                   }
 
                 $data['table_html'] = $html;
+
             }
         }
 
@@ -705,7 +747,7 @@ class AddonController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    
+
     function ImageTable($addon) {
         $addonsdata = $addon;
         return view('addon.imageTable', compact('addonsdata'));
@@ -744,7 +786,7 @@ class AddonController extends Controller
         {
             $kititem = '';
             $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
-            $countBrandModelLines = 0; 
+            $countBrandModelLines = 0;
             if($kititem != '')
             {
                 $addonTypes = '';
@@ -753,7 +795,7 @@ class AddonController extends Controller
                 {
                     $kitBrand = $addonTypes->brand_id;
                     $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
-                }               
+                }
                 $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
                 ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
                 ->select('addon_details_id','model_id','model_year_start','model_year_end')
@@ -763,7 +805,7 @@ class AddonController extends Controller
                 $notAddedModelLines = $countBrandModelLines - $addedModelLines;
                 if(count($kitModelLines) > 0)
                 {
-                    foreach($kitModelLines as $kitModelLine)       
+                    foreach($kitModelLines as $kitModelLine)
                     {
                         $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
                         $kitModelLine->Descriptions = AddonTypes::where([
@@ -2071,6 +2113,7 @@ class AddonController extends Controller
             });
         }
         $addonIds = $addonIds->pluck('id');
+
         $data['addonsBox'] = $addonIds;
 
         if(count($addonIds) > 0)
