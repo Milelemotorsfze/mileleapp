@@ -1,36 +1,30 @@
 @extends('layouts.table')
 <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <style>
-   /* Add CSS to change cursor style on hover */
 #dtBasicExample1 tbody tr:hover {
-    background-color: #FFFFE0; /* Change to the background color you want */
-    cursor: pointer; /* Change to the desired cursor style, e.g., pointer, hand, etc. */
+    background-color: #FFFFE0 !important;
+    cursor: pointer;
 }
-/* CSS for the context menu */
 .context-menu {
     display: none;
     position: absolute;
     z-index: 1000;
-    background-color: #fff; /* Background color of the context menu */
-    border: 1px solid #ccc; /* Border around the context menu */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Box shadow for a subtle elevation effect */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 }
-
 .context-menu ul {
     list-style: none;
     margin: 0;
     padding: 0;
 }
-
 .context-menu ul li {
-    padding: 5px 15px; /* Spacing for each menu item */
+    padding: 5px 15px;
     cursor: pointer;
 }
-
 .context-menu ul li:hover {
-    background-color: #f0f0f0; /* Background color when hovering over a menu item */
+    background-color: #f0f0f0;
 }
-
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
   text-align: center;
@@ -55,9 +49,9 @@
       height: 100vh;
       overflow-y: auto;
     }
-    #dtBasicSupplierInventory {
+    #dtBasicExample1 {
       width: 100%;
-      font-size: 12px;
+      font-size: 16px;
     }
     th.nowrap-td {
       white-space: nowrap;
@@ -70,7 +64,7 @@
 @section('content')
 <div class="card-body">
                         <div class="table-responsive" >
-                            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
+                            <table id="dtBasicExample1" class="table table-bordered">
                             <thead class="bg-soft-secondary">
                                <tr>
                                 <th style="width:205px;" id="vehicle_id">Ref No</th>
@@ -443,7 +437,6 @@
                             </div>
     </tbody>
 </table>
- <!-- Context menu HTML -->
  <div id="contextMenu" class="context-menu">
         <ul>
             <li><a href="#" id="openOption">Open</a></li>
@@ -693,20 +686,15 @@ $(document).ready(function() {
             { data: 'bl_dms_uploading', name: 'bl_dms_uploading' },
             @endif
         ],
-        fixedHeader: true, // Enable fixed headers
     });
     $('#dtBasicExample1 tbody').on('contextmenu', 'tr', function(e) {
-        e.preventDefault(); // Prevent the default right-click menu
-
-        // Get the row data and ID
+        e.preventDefault();
         var rowData = table.row(this).data();
         var rowId = rowData.id;
         var posX = e.pageX - 75;
     var posY = e.pageY - 70;
         showContextMenu(posX, posY, rowId);
     });
-
-    // Handle context menu option clicks
     $('#openOption').on('click', function() {
         var rowId = $('#contextMenu').data('row-id');
         if (rowId !== undefined) {
@@ -718,9 +706,7 @@ $(document).ready(function() {
 
     $('#createSoOption').on('click', function() {
         var rowId = $('#contextMenu').data('row-id');
-        // Handle the "Create SO" action here with the rowId
         if (rowId !== undefined) {
-            // Example: Redirect to a Create SO page with the rowId
             var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
             window.location.href = url;
         }
@@ -729,21 +715,15 @@ $(document).ready(function() {
 
     $('#bookingOption').on('click', function() {
         var rowId = $('#contextMenu').data('row-id');
-        // Handle the "Booking" action here with the rowId
         if (rowId !== undefined) {
-            // Example: Redirect to a Booking page with the rowId
             var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
             window.location.href = url;
         }
         hideContextMenu();
     });
-
-    // Hide the context menu when clicking outside of it
     $(document).on('click', function() {
         hideContextMenu();
     });
-
-    // Function to show the context menu at the specified position
     function showContextMenu(x, y, rowId) {
         $('#contextMenu')
             .css({
@@ -753,12 +733,9 @@ $(document).ready(function() {
             .data('row-id', rowId)
             .show();
     }
-
-    // Function to hide the context menu
     function hideContextMenu() {
         $('#contextMenu').hide();
     }
-    // Attach a single-click event to the DataTable rows
     $('#dtBasicExample1 tbody').on('click', 'tr', function() {
                 var rowData = table.row(this).data();
                 var rowId = rowData.id;
@@ -771,7 +748,6 @@ $(document).ready(function() {
                 }
                 $(this).data('last-click', currentTime);
             });
-                 // Attach a context menu event to the DataTable rows
     var searchParams = {};
     var offset = 0;
     var length = 40;
