@@ -64,14 +64,14 @@
                         <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                         <input type="text" class="startyearpicker form-control widthinput"  name="brand[1][model][{{$j}}][model_year_start]"
-                               id="selectModelYearStart1Des{{$j}}" onkeydown="return false;"
+                               id="selectModelYearStart1Des{{$j}}" onkeydown="return false;" onchange=checkGreaterYear(1,1)
                              value="{{$kitModelLine->model_year_start}}"/>
                             <span id="modelYearStart1Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des{{$j}}">
                         <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                         <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][{{$j}}][model_year_end]"
-                               id="selectModelYearEnd1Des{{$j}}"  value="{{$kitModelLine->model_year_end}}" />
+                               id="selectModelYearEnd1Des{{$j}}"  value="{{$kitModelLine->model_year_end}}" onchange=checkGreaterYear(1,1) />
                             <span id="modelYearEnd1Error{{$j}}" class="modelYearEndError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
@@ -82,11 +82,6 @@
                 </div>
             @endforeach
            @else
-
-
-
-
-
 
                 <div class="row MoDesApndHere1" id="row-spare-part-brand-1-model-1">
                     <div class="col-xxl-4 col-lg-5 col-md-12" id="showDivdropDr1Des1" hidden>
@@ -115,13 +110,13 @@
                         <span class="error">* </span>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                         <input type="text" class="startyearpicker form-control widthinput"  name="brand[1][model][1][model_year_start]"
-                               id="selectModelYearStart1Des1" onkeydown="return false;" onchange=checkGreaterYear(this,1,1) value=""/>
+                               id="selectModelYearStart1Des1" onkeydown="return false;" onchange=checkGreaterYear(1,1) value=""/>
                             <span id="modelYearStart1Error1" class="modelYearStartError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop1Des1" hidden>
                         <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                         <input type="number" class="endyearpicker form-control widthinput"   name="brand[1][model][1][model_year_end]"
-                               id="selectModelYearEnd1Des1"  value="" onchange=checkGreaterYear(this,1,1)  />
+                               id="selectModelYearEnd1Des1"  value="" onchange=checkGreaterYear(1,1)  />
                             <span id="modelYearEnd1Error1" class="modelYearEndError invalid-feedback-lead"></span>
                     </div>
                     <div class="col-xxl-1 col-lg-1 col-md-12">
@@ -244,7 +239,7 @@
             // }
         });
         }
-        
+
 
         function sortDropDownListByText() {
             $("select").each(function() {
@@ -476,13 +471,13 @@
 
                             $(this).find('.model-year-start-dropdown').attr('id', 'showModelYearStartdrop' + indexNumber + 'Des' + modelIndex);
                             $(this).find('.startyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_start]');
-                            // $(this).find('.startyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                            $(this).find('.startyearpicker').attr('oninput', 'checkGreaterYear('+ indexNumber +','+modelIndex +')');
                             $(this).find('.startyearpicker').attr('id', 'selectModelYearStart'+ indexNumber +'Des'+ modelIndex);
                             $(this).find('.modelYearStartError').attr('id', 'modelYearStart'+ indexNumber +'Error' + modelIndex);
 
                             $(this).find('.model-year-end-dropdown').attr('id', 'showModelYearEnddrop' + indexNumber + 'Des' + modelIndex);
                             $(this).find('.endyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_end]');
-                            // $(this).find('.endyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                            $(this).find('.endyearpicker').attr('oninput', 'checkGreaterYear('+ indexNumber +','+modelIndex +')');
                             $(this).find('.endyearpicker').attr('id', 'selectModelYearEnd'+ indexNumber +'Des'+ modelIndex);
                             $(this).find('.modelYearEndError').attr('id', 'modelYearEnd'+ indexNumber +'Error' + modelIndex);
 
@@ -699,7 +694,7 @@
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                     <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;"
-                     onchange=checkGreaterYear(this,${supplier},${index})
+                     onchange=checkGreaterYear(${supplier},${index})
                     name="brand[${supplier}][model][${index}][model_year_start]"
                            id="selectModelYearStart${supplier}Des${index}" value=""/>
 
@@ -709,7 +704,7 @@
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                     <input type="text" class="endyearpicker form-control widthinput"
-                       onchange=checkGreaterYear(this,${supplier},${index})
+                       onchange=checkGreaterYear(${supplier},${index})
                        name="brand[${supplier}][model][${index}][model_year_end]"
                            id="selectModelYearEnd${supplier}Des${index}"  value=""/>
                     <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
@@ -1065,32 +1060,14 @@
 
     }
 
-    function checkGreaterYear(CurrentInput,i,j)
+    function checkGreaterYear(i,j)
     {
-        // alert("ok");
-        var id = CurrentInput.id
-        console.log(id);
-        var input = document.getElementById(id);
-        var val = input.value;
-        val = val.replace(/^0+|[^\d]/g, '');
-        input.value = val;
+
         var modelYearStart = $('#selectModelYearStart'+i+'Des'+ j).val();
         var modelYearEnd = $('#selectModelYearEnd'+i+'Des'+ j).val();
-        console.log(modelYearStart);
-        console.log(modelYearEnd);
-        if(modelYearStart == '')
-        {
-            $msg = "Model Year is required"
-            showModelYearStartError($msg,i,j);
-            formInputError = true;
-        }
-            // else if(inputModelYearStart.length != 4)
-            // {
-            //     $msg = "Model Year required 4 digits number"
-            //     showModelYearStartError($msg,i,j);
-            //     formInputError = true;
-        // }
-        else if(modelYearEnd != '' && modelYearStart.length != 4)
+
+
+        if(modelYearEnd != '' && modelYearEnd.length != 4)
         {
             $msg = "Model Year required 4 digits number"
             showModelYearEndError($msg,i,j);
