@@ -274,7 +274,6 @@
                 </div>
             </div>
         </div>
-
         <div class="tab-pane fade" id="supplier-approved-LOI">
             <div class="card-body">
                 <div class="table-responsive">

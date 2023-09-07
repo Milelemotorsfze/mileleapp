@@ -26,6 +26,274 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
+    @can('parts-procurement-dashboard')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('parts-procurement-dashboard');
+        @endphp
+        @if ($hasPermission)
+            <div class="row p-3">
+                <div class="col-xl-6">
+                    <div class="card ">
+                        <!-- card body -->
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">Accessories Selling Prices</h4>
+
+                        </div>
+                        <div class="portfolio">
+                            <ul class="nav nav-pills nav-fill" id="my-tab">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#accessory-selling-price-not-added">Without Selling Price </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-accessory-selling-price">Pending </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content"  >
+                            <div class="tab-pane fade show active" id="accessory-selling-price-not-added">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table  class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addoncewv Code</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pending-accessory-selling-price">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="specificTable" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>AddonCode</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">Kit</h4>
+
+                        </div>
+                        <div class="portfolio">
+                            <ul class="nav nav-pills nav-fill" id="my-tab">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#kit-selling-price-not-added">Without Selling Price </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-kit-selling-price">Pending </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content"  >
+                            <div class="tab-pane fade show active" id="kit-selling-price-not-added">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table  class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon  dcdsCode</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pending-kit-selling-price">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="specificTable" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>AddonCode</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- end tab content -->
+                </div>
+                <!-- end card body -->
+            </div>
+            <div class="row p-3">
+                <div class="col-xl-6">
+                    <div class="card ">
+                        <!-- card body -->
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">Spare Part Selling Prices</h4>
+
+                        </div>
+                        <div class="portfolio">
+                            <ul class="nav nav-pills nav-fill" id="my-tab">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-bs-toggle="pill" href="#spare-part-selling-price-not-added">Without Selling Price </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-spare-part-selling-price">Pending </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content"  >
+                            <div class="tab-pane fade show active" id="spare-part-selling-price-not-added">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table  class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addoncewv Code</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pending-spare-part-selling-price">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="specificTable" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>AddonCode</th>
+                                                <th>Addon Name</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td>P1</td>
+                                                <td>DCVd</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P2</td>
+                                                <td>HanDCDSif Azad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P3</td>
+                                                <td>Hanif SDFSFSAzad</td>
+                                                <td>16</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endcan
 @can('Calls-view')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -55,7 +323,7 @@
 <div id="chartContainer" style="width: 100%; height: 350px;">
     <canvas id="barChart"></canvas>
 </div>
-                                        
+
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -122,7 +390,7 @@
 @endif -->
               <div class="row">
               <div class="col-xl-5">
-                
+
               <div class="card card-h-100">
                                 <!-- card body -->
                                 <div class="card-body">
@@ -159,7 +427,7 @@
     @csrf
     <input type="hidden" name="start_date" id="start_date">
     <input type="hidden" name="end_date" id="end_date">
-</form> 
+</form>
                                     </div>
                                 </div><!-- end card header -->
                                 <div class="card-body px-0">
@@ -184,7 +452,7 @@
 </div>
                                             </div>
                                         </div>
-                                  
+
                                     </div>
                                     <!-- end tab content -->
                                 </div>
@@ -248,7 +516,7 @@
             $brand_name = $brands->brand_name;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($brand_name))}}</td>
 
 @php
@@ -259,7 +527,7 @@
           $model_line = $model_lines->model_line;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($model_line))}}</td>
                                                             <td>{{ ucwords(strtolower($rowsmonth->location))}}</td>
                                                             @php
@@ -304,7 +572,7 @@
                                                     $brand_name = $brands->brand_name;
                                                     }
                                                     }
-                                                    @endphp  
+                                                    @endphp
                                                     <td>{{ ucwords(strtolower($brand_name))}}</td>
                                                     @php
                                                     $model_line = '';
@@ -315,9 +583,9 @@
                                                     }
                                                     }
                                                     else{
-                                                     $model_line = $rowsweek->custom_brand_model;  
+                                                     $model_line = $rowsweek->custom_brand_model;
                                                     }
-                                                    @endphp  
+                                                    @endphp
                                                     <td>{{ ucwords(strtolower($model_line))}}</td>
                                                     <td>{{ ucwords(strtolower($rowsweek->location))}}</td>
                                                     @php
@@ -362,7 +630,7 @@
             $brand_name = $brands->brand_name;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($brand_name))}}</td>
 @php
     $model_line = '';
@@ -372,7 +640,7 @@
           $model_line = $model_lines->model_line;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($model_line))}}</td>
                                                             <td>{{ ucwords(strtolower($rowsyesterday->location))}}</td>
                                                             @php
@@ -424,26 +692,26 @@
                 @foreach ($variants as $variantsp)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ $variantsp->name }}</td> 
+                    <td>{{ $variantsp->name }}</td>
                     @php
                      $brand = DB::table('brands')->where('id', $variantsp->brands_id)->first();
                      $brand_name = $brand->brand_name;
-                     @endphp    
+                     @endphp
                     <td>{{ $brand_name }}</td>
                     @php
                      $model = DB::table('master_model_lines')->where('id', $variantsp->master_model_lines_id)->first();
                      $model_line = $model->model_line;
-                     @endphp 
+                     @endphp
                     <td>{{ $model_line }}</td>
-                    <td>{{ $variantsp->int_colour }}</td> 
+                    <td>{{ $variantsp->int_colour }}</td>
                     <td>{{ $variantsp->ext_colour }}</td>
                    <td><a data-placement="top" class="btn btn-sm btn-success" href="{{ route('variant_pictures.edit',$variantsp->id) }}"><i class="fa fa-camera" aria-hidden="true"></i></a>
-                   </td>        
+                   </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
+          </div>
           </div>
           </div>
           </div>
@@ -471,32 +739,33 @@
                 @foreach ($reels as $reels)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ $reels->name }}</td> 
+                    <td>{{ $reels->name }}</td>
                     @php
                      $brand = DB::table('brands')->where('id', $reels->brands_id)->first();
                      $brand_name = $brand->brand_name;
-                     @endphp    
+                     @endphp
                     <td>{{ $brand_name }}</td>
                     @php
                      $model = DB::table('master_model_lines')->where('id', $reels->master_model_lines_id)->first();
                      $model_line = $model->model_line;
-                     @endphp 
+                     @endphp
                     <td>{{ $model_line }}</td>
-                    <td>{{ $reels->int_colour }}</td> 
+                    <td>{{ $reels->int_colour }}</td>
                     <td>{{ $reels->ext_colour }}</td>
                     <td><a data-placement="top" class="btn btn-sm btn-info" href="{{ route('variant_pictures.editreels',$reels->id) }}"><i class="fa fa-film" aria-hidden="true"></i></a></td>
-                   </td>        
+                   </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
+          </div>
           </div>
           </div>
           </div>
                         </div>
                         @endif -->
                         <!-- end col -->
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
@@ -668,7 +937,7 @@ console.log("waqar");
 }
         });
     }
-    
+
     $('#leadsdis').daterangepicker({
         startDate: start,
         endDate: end,
@@ -681,7 +950,7 @@ console.log("waqar");
            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
     }, cb);
-    
+
     cb(start, end);
 });
 </script>

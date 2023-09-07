@@ -103,7 +103,7 @@ $variantsdays = DB::table('varaints as v')
               ->whereNull('vp.id')
               ->where('v.created_at', '>=', $last7Days)
               ->select('v.*', 'ac.*')
-              ->get();               
+              ->get();
 $countpendingpicturesdays = $variantsdays->count();
 $reelsdays = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
@@ -147,7 +147,7 @@ $totalleads = [
             'tension' => 0.1
         ]
     ]
-];    
+];
 $totalvariants = DB::table('available_colour')
 ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(*) as total'))
 ->groupBy('date')
@@ -176,9 +176,12 @@ $totalvariantss = [
             'tension' => 0.1
         ]
     ]
-]; 
-       return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData', 'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days', 'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays', 'countpendingreels', 'countpendingreelsdays'));
-    }  
+];
+       return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
+           'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
+           'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
+           'countpendingreels', 'countpendingreelsdays'));
+    }
     public function marketingupdatechart(Request $request)
     {
         $startdate = $request->input('start_date');
@@ -231,10 +234,10 @@ $totalvariantss = [
             'end_date' => $endDate,
             'data' => $data,
         ];
-    
+
         // Convert the array to JSON and return it as the response
         return response()->json($response);
-    }    
+    }
     public function leaddistruitiondetail(Request $request) {
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
@@ -247,5 +250,5 @@ $totalvariantss = [
         ->orderByDesc('call_count') // Order by call_count in descending order
         ->get();
         return view('calls.leaddistrubtion', compact('data'));
-    }    
+    }
 }
