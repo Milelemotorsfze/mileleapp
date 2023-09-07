@@ -61,7 +61,7 @@
               <thead>
                 <tr>
                   <th>No</th>
-                  <th>Purchase Price</th>
+                  <th>Selling Price</th>
                   <th>Status</th>
                   <th>Created Date And Time</th>
                   <th>Created By</th>

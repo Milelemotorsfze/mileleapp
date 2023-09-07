@@ -385,9 +385,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
                             @if($Kit->countArray > 0)
+                                @if(isset($Kit->least_price_vendor->supplierAddonDetails))
                                 @if($Kit->least_price_vendor->supplierAddonDetails->image)
                                     <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
+                                @endif
                                 @endif
                                 @else
                                 <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
@@ -406,7 +408,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         <span id="item_code_{{$i}}">
                                               {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code ?? 'NOT AVAILABLE' }}
                                         </span>
-                                    <input type="hidden" value="@if($Kit->countArray > 0)
+                                    <input type="hidden" value="@if($Kit->countArray > 0 &&  isset($Kit->least_price_vendor->supplierAddonDetails))
                                     {{ $Kit->least_price_vendor->supplierAddonDetails->id}}
                                     @else
                                 NOT AVAILABLE
