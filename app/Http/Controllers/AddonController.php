@@ -1383,13 +1383,16 @@ class AddonController extends Controller
         {
             $supplierId = [];
             $supplierId = SupplierAddons::where([
+                                            ['addon_details_id','=',$supplierAddon->addon_details_id],
                                             ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
                                             ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
                                             ['lead_time_min', '=', $supplierAddon->lead_time_min],
                                             ['lead_time_max', '=', $supplierAddon->lead_time_max],
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
+            // dd($supplierAddon->suppliers);
         }
+
         // $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
         //     ->where('addon_id', $addonDetails->addon_id)
         //     ->whereNotNull('description')->select('id','description')

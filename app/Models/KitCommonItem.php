@@ -59,11 +59,11 @@ class KitCommonItem extends Model
             ->pluck('addon_details_id')->toArray();
         $commonSPs = [];
         $commonSPs = array_intersect($addonDetailIds,$kitAddonDetails);
-
+// dd($commonSPs);
         $vendorMinPrice = SupplierAddons::whereIn('addon_details_id', $commonSPs)
            ->where('status', 'active')
            ->orderBy('purchase_price_aed','ASC')->first();
-
+// dd($vendorMinPrice);
         return $vendorMinPrice;
     }
     public function getKitItemVendorsAttribute() {
@@ -82,12 +82,12 @@ class KitCommonItem extends Model
 //        info($kitAddonDetails);
         $commonSPs = [];
         $commonSPs = array_intersect($addonDetailIds,$kitAddonDetails);
-//        info("common addondetails");
-//        info($commonSPs);
+    //    info("common addondetails");
+    //    info($commonSPs);
         $kitItemVendors = SupplierAddons::whereIn('addon_details_id', $commonSPs)
                             ->where('status', 'active')
                             ->get();
-//        info($kitItemVendors);
+    //    info($kitItemVendors);
         return $kitItemVendors;
     }
     public function getKitItemTotalPurchasePriceAttribute() {

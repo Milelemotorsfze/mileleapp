@@ -489,13 +489,18 @@ class KitCommonItemController extends Controller
             $modelDescSps = AddonTypes::whereIn('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
             $intersectArray = [];
             $intersectArray = array_intersect($modelDescSps,$itemSps);
+            // dd($intersectArray);
             $oneItem->countArray = count($intersectArray);
             $SpWithoutVendorIds = [];
             $SpWithoutVendorIds = AddonDetails::whereIn('id',$intersectArray)->doesntHave('AddonSuppliers')->pluck('id');
             $SpWithoutVendorPartNos = [];
             $SpWithoutVendorPartNos = SparePartsNumber::whereIn('addon_details_id',$SpWithoutVendorIds)->latest()->with('addondetails')->get();
             // $oneItem->latestPartNo = $SpWithoutVendorPartNos[0]->part_number;
-            $oneItem->latestPartNoSp = $SpWithoutVendorPartNos[0]->addondetails;
+            if(count($SpWithoutVendorPartNos) > 0)
+            {
+                $oneItem->latestPartNoSp = $SpWithoutVendorPartNos[0]->addondetails;
+            }
+           
             
             // dd($latestPartNoSp);
             $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
