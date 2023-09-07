@@ -13,4 +13,8 @@ class SparePartsNumber extends Model
         'addon_details_id',
         'part_number'
     ];
+    public function addondetails()
+    {
+        return $this->hasOne(AddonDetails::class,'id','addon_details_id');
+    }
 }
