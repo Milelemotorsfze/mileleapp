@@ -406,13 +406,32 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                                  {{--                                    {{ $Kit->item->addon_code }}--}}
                                         <span id="item_code_{{$i}}">
-                                              {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code ?? 'NOT AVAILABLE' }}
+
+                                        @if(count($Kit->addon_part_numbers) > 0)
+                                        {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code}}
+                                        @elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+                                        {{$Kit->latestPartNoSp->addon_code}}
+                                        @else
+                                        NOT AVAILABLE
+                                        @endif
+
+
+
+                                        <!-- @if($Kit->countArray > 0 &&  isset($Kit->least_price_vendor->supplierAddonDetails))
+                                    {{ $Kit->least_price_vendor->supplierAddonDetails->addon_code}}
+                                    @elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+                                    {{$Kit->latestPartNoSp}}
+                                NOT AVAILABLE {{$Kit->latestPartNoSp}}
+                                @endif -->
                                         </span>
-                                    <input type="hidden" value="@if($Kit->countArray > 0 &&  isset($Kit->least_price_vendor->supplierAddonDetails))
+                                        <!-- type="hidden"  -->
+                                    <input type="hidden" id="item-code-id-{{$i}}" 
+                                value="@if(count($Kit->addon_part_numbers)>0){{ $Kit->least_price_vendor->supplierAddonDetails->id}}@elseif(count($Kit->SpWithoutVendorPartNos)>0){{$Kit->latestPartNoSp->id}}@else NOT AVAILABLE @endif">
+                                <!-- @if($Kit->countArray > 0 &&  isset($Kit->least_price_vendor->supplierAddonDetails))
                                     {{ $Kit->least_price_vendor->supplierAddonDetails->id}}
                                     @else
                                 NOT AVAILABLE
-                                @endif" id="item-code-id-{{$i}}">
+                                @endif" id="item-code-id-{{$i}} -->
                                     </div>
 
                                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-5">
@@ -424,6 +443,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                             @foreach($Kit->addon_part_numbers as $partNumbers)
                                                 <option  value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
                                             @endforeach
+                                        </select>
+                                        @elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+                                        <select class="form-control widthinput" onchange="onChangePartNo(this, {{$i}})" autofocus id="part-number-{{$i}}">
+                                                @foreach($Kit->SpWithoutVendorPartNos as $partNumbers)
+                                                <option class="{{$partNumbers->addondetails->addon_code}}" data-id ="{{$partNumbers->addondetails->id}}"
+                                                 value="{{$partNumbers->id}}">{{$partNumbers->part_number}} </option>
+                                                @endforeach
                                         </select>
                                         @else
                                         NOT AVAILABLE
@@ -475,7 +501,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
                                     @foreach($Kit->kit_item_vendors as $itemVendor)
                                         <option  data-id="{{$itemVendor->id}}" value="{{$itemVendor->purchase_price_aed}}"
-                                            {{$itemVendor->supplier_id == $Kit->least_price_vendor->supplier_id ? 'selected' : ''}} >
+                                            {{$itemVendor->id == $Kit->least_price_vendor->id ? 'selected' : ''}} >
                                             {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                     @endforeach
 
@@ -518,6 +544,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @endif
                             @endcan
 
+                            @if(count($Kit->kit_item_vendors) > 0)
                             @can('supplier-new-purchase-price')
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-new-purchase-price']);
@@ -529,6 +556,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             </button>
                             @endif
                             @endcan
+                            @endif
 
                         @endif
 
@@ -837,6 +865,15 @@ $(document).ready(function () {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
       })
+      function onChangePartNo(current, index)
+      {
+        var sp  = $('#part-number-' + index + ' option[value='+current.value+']').attr('class');
+        var spId  = $('#part-number-' + index + ' option[value='+current.value+']').attr('data-id');
+        let span = document.getElementById("item_code_"+index);
+        let spanInputId = document.getElementById("item-code-id-"+index);
+        span.textContent = sp;
+        spanInputId.value = spId;
+      }
       function calculatePrice(current, index)
       {
         var CurrentPurchasePrice = 0;
