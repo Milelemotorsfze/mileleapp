@@ -1307,7 +1307,7 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
-        // AddonSuppliersUsed
+
         // one addon - multiple suppliers - suppliers cannot repeat
         $addonDetails = AddonDetails::where('id',$id)->with('partNumbers','AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
         $price = '';

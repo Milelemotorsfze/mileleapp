@@ -46,7 +46,7 @@ class KitCommonItem extends Model
             $addonDetailId = $vendorMinPrice->addon_details_id;
             $partNumbers = SparePartsNumber::where('addon_details_id', $addonDetailId)->get();
         }
-        
+
         return $partNumbers;
     }
     public function getLeastPriceVendorAttribute() {
@@ -57,7 +57,7 @@ class KitCommonItem extends Model
         $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
         $kitAddonDetails = AddonTypes::whereIn('model_number', $kitModelNumbers)
             ->pluck('addon_details_id')->toArray();
-            $commonSPs = [];
+        $commonSPs = [];
         $commonSPs = array_intersect($addonDetailIds,$kitAddonDetails);
        $vendorMinPrice = SupplierAddons::whereIn('addon_details_id', $commonSPs)
            ->where('status', 'active')
@@ -70,11 +70,13 @@ class KitCommonItem extends Model
         $kitItem = KitCommonItem::find($this->id);
 
         $addonDetailIds = AddonDetails::where('description', $this->item_id)
-            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id');
+            ->where('addon_id', $kitItem->item->addon_id)->where('addon_type_name','SP')->pluck('id')->toArray();
         $kitModelNumbers = AddonTypes::where('addon_details_id', $this->addon_details_id)->pluck('model_number');
-        $kitAddonDetails = AddonTypes::whereIn('addon_details_id', $addonDetailIds)->whereIn('model_number', $kitModelNumbers)
-                            ->pluck('addon_details_id');
-        $kitItemVendors = SupplierAddons::whereIn('addon_details_id', $kitAddonDetails)
+        $kitAddonDetails = AddonTypes::whereIn('model_number', $kitModelNumbers)
+                            ->pluck('addon_details_id')->toArray();
+        $commonSPs = [];
+        $commonSPs = array_intersect($addonDetailIds,$kitAddonDetails);
+        $kitItemVendors = SupplierAddons::whereIn('addon_details_id', $commonSPs)
                             ->where('status', 'active')
                             ->get();
 
