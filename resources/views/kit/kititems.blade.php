@@ -325,7 +325,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         Previous Purchase Price (AED)
         </div>
         <div class="labellist databack1 col-xxl-2 col-lg-2 col-md-2" style="margin-top:10px;">
-        <input type="text" class="form-control widthinput" placeholder="" value="{{ $previousPurchasePrice }}" id="previous_purchase_price" 
+        <input type="text" class="form-control widthinput" placeholder="" value="{{ $previousPurchasePrice }}" id="previous_purchase_price"
         name="previous_purchase_price" readonly>
         </div>
 
@@ -374,7 +374,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <div id="rowIndexCount" hidden value="5">{{$i=$i+1;}}</div>
             <!-- <div class="list2" id="addonbox"> -->
                 <!-- <div class="row related-addon">  -->
-                    
+
                     <div id="" class="each-addon col-xxl-4 col-lg-4 col-md-6 col-sm-12">
                         <div class="row">
                             <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
@@ -394,7 +394,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 @else
                                 <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
-                                
+
                                 @endif
                             </div>
                             <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
@@ -508,13 +508,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @if(count($Kit->kit_item_vendors) > 0)
                                 <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})"
                                         autofocus>
-                                       
+
                                     @foreach($Kit->kit_item_vendors as $itemVendor)
                                         <option  data-id="{{$itemVendor->id}}" value="{{$itemVendor->purchase_price_aed}}"
                                             {{$itemVendor->supplier_id == $Kit->least_price_vendor->supplier_id ? 'selected' : ''}} >
                                             {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                     @endforeach
-                                    
+
                                 </select>
                                 @else
                                         NOT AVAILABLE
@@ -547,6 +547,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
                             @endphp
                             @if ($hasPermission)
+
                             <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
                             data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Add New Vendor">
                             <i class="fa fa-plus" aria-hidden="true"></i>Add New Vendor</button>
@@ -572,15 +573,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
                         @endphp
                         @if ($hasPermission)
-                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" title="Add New Spare Part" 
+                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" title="Add New Spare Part"
                         href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
                         <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
                         </a>
                         @endif
                         @endcanany
-                       
+
                     </div>
-                    
+
                 <!-- </div> -->
             <!-- </div> -->
         @endforeach
@@ -848,8 +849,10 @@ $(document).ready(function () {
         var index = $(this).attr('data-index');
         var kit_id = $(this).attr('data-kit-id');
         var addonDetailId = $('#item-code-id-'+index).val();
+        // alert(addonDetailId);
+        // alert(kit_id);
 
-        url = '{{ url('addons/details/edit/') }}' + "/"+addonDetailId + "?kit_id="+kit_id
+        url = '{{ url('addons/details/edit') }}' + "/"+addonDetailId + "?kit_id="+kit_id
         window.location.href = url;
     });
 
@@ -935,7 +938,7 @@ $(document).ready(function () {
             if(previousPurchaseprice != "NOT AVAILABLE" && currentPurchasePrice != "NOT AVAILABLE" && previousPurchaseprice == currentPurchasePrice )
             {
                 e.preventDefault();
-            } 
+            }
                 if(currentSellingPrice == '' || currentSellingPrice == previousSellingPrice )
                 {
                     e.preventDefault();

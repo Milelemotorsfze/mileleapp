@@ -205,6 +205,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
 @endif
   <input type="hidden" id="start" value="0">
+  <input type="hidden" id="serial_number" value="0">
   <input type="hidden" id="rowperpage" value="{{ $rowperpage }}">
   <input type="hidden" id="totalrecords" value="{{$rowperpage}}">
   <input type="hidden" name="addon_type" id="addon_type" value="{{$data}}">
@@ -227,6 +228,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
+          $('#serial_number').val(0);
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
 
@@ -241,29 +243,32 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
+          $('#serial_number').val(0);
+
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
           if (BrandIds === undefined || BrandIds.length == 0) {
               $('#allBrandsFilter').prop("disabled", false);
               $('.allBrandsFilterClass').prop("disabled", false);
               $('#ModelLineDiv').show();
-              getRelatedModelLines(BrandIds)
+              getRelatedModelLines(BrandIds);
           } else {
               if (BrandIds.includes('yes')) {
                   $('.allBrandsFilterClass').prop("disabled", true);
                   $("#fltr-model-line option:selected").prop("selected", false);
                   $("#fltr-model-line").trigger('change.select2');
                   $('#ModelLineDiv').hide();
+                  if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                      fetchData(start,totalrecords);
+                      // $('.page-overlay').show();
+                  }
               }
               else {
                   $('#allBrandsFilter').prop("disabled", true);
                   getRelatedModelLines(BrandIds)
               }
           }
-          if($(window).scrollTop() + $(window).height() >= $(document).height()) {
-              fetchData(start,totalrecords);
-              // $('.page-overlay').show();
-          }
+
       });
 
       $('#fltr-model-line').change(function(e) {
@@ -274,6 +279,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
           $('#start').val(start);
           $('#totalrecords').val(totalrecords);
+          $('#serial_number').val(0);
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -317,44 +323,48 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $('.modal').addClass('modalhide');
     }
     function getRelatedModelLines(BrandIds)
-    {
-                  var ModelLineIds = $('#fltr-model-line').val();
-                  $.ajax({
-                    url:"{{url('getRelatedModelLines')}}",
-                    data: {
-                        BrandIds: BrandIds,
-                    },
-                    dataType: 'json',
-                    success: function(response){
-                      // console.log(response);
-                      $("#fltr-model-line").html("");
-                      let BrandModelLine   = [];
-                      BrandModelLine.push
-                          ({
-                              id: 'allmodellines',
-                              text: 'All Model Lines'
-                          });
-                      $.each(response,function(key,value)
-                      {
-                          BrandModelLine.push
-                          ({
-                              id: value.id,
-                              text: value.model_line
-                          });
-                      });
-                      $('#fltr-model-line').select2
-                      ({
-                          placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                          allowClear: true,
-                          data: BrandModelLine
-                      });
-                      if(ModelLineIds != null)
-                      {
-                        selectedModelLines(BrandModelLine,ModelLineIds);
-                      }
-                    }
+       {
+          var ModelLineIds = $('#fltr-model-line').val();
+          $.ajax({
+            url:"{{url('getRelatedModelLines')}}",
+            data: {
+                BrandIds: BrandIds,
+            },
+            dataType: 'json',
+            success: function(response){
+              // console.log(response);
+              $("#fltr-model-line").html("");
+              let BrandModelLine   = [];
+              BrandModelLine.push
+                  ({
+                      id: 'allmodellines',
+                      text: 'All Model Lines'
                   });
-    }
+              $.each(response,function(key,value)
+              {
+                  BrandModelLine.push
+                  ({
+                      id: value.id,
+                      text: value.model_line
+                  });
+              });
+              $('#fltr-model-line').select2
+              ({
+                  placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                  allowClear: true,
+                  data: BrandModelLine
+              });
+              if(ModelLineIds != null)
+              {
+                selectedModelLines(BrandModelLine,ModelLineIds);
+              }
+                if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                    fetchData(start,totalrecords);
+                    // $('.page-overlay').show();
+                }
+            }
+          });
+       }
     function selectedModelLines(BrandModelLine,ModelLineIds)
     {
       var setSelected = [];
@@ -370,7 +380,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
           }
         }
       }
-      $("#fltr-model-line").val(setSelected).trigger("change"); 
+      $("#fltr-model-line").val(setSelected).trigger("change");
   }
     function showAddonTable()
     {
@@ -386,6 +396,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
       $('#start').val(0);
       $('#totalrecords').val(0);
+      $('#serial_number').val(0);
 
         $(".each-addon-table-row").attr('hidden', true);
         if($(window).scrollTop() + $(window).height() >= $(document).height()) {
@@ -432,6 +443,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
         var BrandIds = $('#fltr-brand').val();
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
+        var serial_number = $('#serial_number').val();
+
         var rowperpage = Number($('#rowperpage').val());
         $('.overlay').show();
             $.ajax({
@@ -442,12 +455,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     AddonIds: AddonIds,
                     BrandIds: BrandIds,
                     ModelLineIds: ModelLineIds,
-                    isAddonBoxView:isAddonBoxView
+                    isAddonBoxView:isAddonBoxView,
+                    serial_number:serial_number
                 },
                 dataType: 'json',
                 success: function(response){
                     // $('.page-overlay').hide();
-
+                    $('#serial_number').val(response.serial_number);
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
                     $(".each-addon:last").after(response.addon_box_html).show().fadeIn("slow");

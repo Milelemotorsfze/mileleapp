@@ -105,8 +105,8 @@ class AddonController extends Controller
         {
             $addons = $addons->whereIn('addon_id',$request->AddonIds);
         }
-        info($request->BrandIds);
-        info($request->ModelLineIds);
+//        info($request->BrandIds);
+//        info($request->ModelLineIds);
 
         if($request->BrandIds)
         {
@@ -169,26 +169,23 @@ class AddonController extends Controller
         $addon1 = $addons->get();
 
         ////////////// filter end ////////////////
-        $latestSerialNumberloaded = $addon1->take($start)->pluck('id');
-        info("already loaded data");
-//        info($totalRowsloaded);
-        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $latestSerialNumberloaded)->count();
 
-        info('start');
-        info($start);
+
+//        info('start');
+//        info($start);
 
         if($start >= $addons->count()) {
-            info('addon null command');
-            $addons = [];
+//            info('addon null command');
+            $addons = [];-
             $data['addonIds'] = [];
         }else{
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
         }
 
         foreach($addons as $addon)
@@ -200,15 +197,9 @@ class AddonController extends Controller
 
         $html = "";
         // get the count of already loaded data to find the serial number :- add loop key to get S.No:
-        if($request->BrandIds && in_array('yes', $request->BrandIds)){
-            $i = $start;
-        } else if($request->ModelLineIds && in_array('yes', $request->ModelLineIds)){
-            $i = $start;
-        }else{
-            $i= $latestSerialNumberloaded ;
-        }
-//        info("latest 12 datas");
-//        info($addons->pluck('id'));
+
+        $i = $request->serial_number;
+
         foreach($addons as $value => $addon)
         {
             if($request->isAddonBoxView == 1)
@@ -505,8 +496,6 @@ class AddonController extends Controller
                 $data['addon_box_html'] = $html;
             }else{
                   if($addon->is_all_brands == 'yes') {
-//                      info("each loop id");
-//                      info($addon->id);
                     $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
                                         <td>'. ++$i. '</td>
                                           <td>';
@@ -740,6 +729,7 @@ class AddonController extends Controller
 
             }
         }
+        $data['serial_number'] = $i;
 
         return response($data);
     }
@@ -1317,7 +1307,7 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
-        // AddonSuppliersUsed
+
         // one addon - multiple suppliers - suppliers cannot repeat
         $addonDetails = AddonDetails::where('id',$id)->with('partNumbers','AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
         $price = '';
