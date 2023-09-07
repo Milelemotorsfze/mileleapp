@@ -328,25 +328,25 @@
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                                         </div>
                                     @endif
-                                    @if($addonsdata->part_number)
-                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                            Part Number
-                                        </div>
-                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                            {{$addonsdata->part_number}}
-                                        </div>
-                                    @endif
+{{--                                    @if($addonsdata->part_number)--}}
+{{--                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">--}}
+{{--                                            Part Number--}}
+{{--                                        </div>--}}
+{{--                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">--}}
+{{--                                            {{$addonsdata->part_number}}--}}
+{{--                                        </div>--}}
+{{--                                    @endif--}}
                                 </div>
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
                                 @if($addonsdata->image)
-                               
+
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                          alt="Addon Image"
                                          style="width:100%;">
                                @else
                                <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />   
+                                    style="width:100%; height:125px;" alt="Addon Image"  />
                                 @endif
                             </div>
                             @if($addonsdata->is_all_brands == 'yes')

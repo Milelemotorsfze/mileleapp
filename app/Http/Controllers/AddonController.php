@@ -176,7 +176,7 @@ class AddonController extends Controller
 
         if($start >= $addons->count()) {
 //            info('addon null command');
-            $addons = [];-
+            $addons = [];
             $data['addonIds'] = [];
         }else{
 //            info($addons->pluck('id'));
@@ -384,14 +384,14 @@ class AddonController extends Controller
                     $html .= '</div>';
 
                 }
-                if($addon->part_number) {
-                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                Part Number
-                                                            </div>
-                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                            '.$addon->part_number.'
-                                                            </div>';
-                }
+//                if($addon->part_number) {
+//                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+//                                                                Part Number
+//                                                            </div>
+//                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+//                                                            '.$addon->part_number.'
+//                                                            </div>';
+//                }
                 $html .=      '</div>
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
@@ -594,7 +594,7 @@ class AddonController extends Controller
                                       }
 
                       $html .= ' </td>
-                                        <td>'.$addon->part_number.'</td>
+
                                         <td>';
                                               $html.=    $this->tableAddSellingPrice($addon);
                                               $html.=    $this->actionPage($addon);
