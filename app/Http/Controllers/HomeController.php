@@ -183,7 +183,6 @@ $totalvariantss = [
       /////// parts procurment dashbaord ////////////
         $addonSellingPrices = AddonSellingPrice::with('addonDetails');
 
-
         $pendingSellingPrices = $addonSellingPrices->whereHas('addonDetails', function ($query){
                                                 $query->where('addon_type_name', 'P');
                                             })
@@ -191,17 +190,29 @@ $totalvariantss = [
                                             ->get();
 
         $addonSellingPricesIds = AddonSellingPrice::groupBy('addon_details_id')->pluck('addon_details_id');
-
         $withOutSellingPrices = AddonDetails::whereNotIn('id', $addonSellingPricesIds)
-                                                    ->where('addon_type_name', 'P')->get();
+                                              ->where('addon_type_name', 'P')->get();
 
         ////////// end /////////////////////
 
+        $recentlyAddedKits = AddonDetails::where('addon_type_name', 'K')
+                            ->orderBy('id','DESC')
+                            ->take(10)
+                            ->get();
+        $recentlyAddedAccessories = AddonDetails::where('addon_type_name', 'P')
+            ->orderBy('id','DESC')
+            ->take(10)
+            ->get();
+        $recentlyAddedSpareParts = AddonDetails::where('addon_type_name', 'SP')
+            ->orderBy('id','DESC')
+            ->take(10)
+            ->get();
 
        return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
-           'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices'));
+           'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices','recentlyAddedAccessories',
+            'recentlyAddedSpareParts','recentlyAddedKits'));
     }
     public function marketingupdatechart(Request $request)
     {
