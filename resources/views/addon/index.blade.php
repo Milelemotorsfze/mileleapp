@@ -247,7 +247,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
-          if (BrandIds === undefined || BrandIds.length == 0) {
+          if (BrandIds === undefined || BrandIds.length == 0) { 
               $('#allBrandsFilter').prop("disabled", false);
               $('.allBrandsFilterClass').prop("disabled", false);
               $('#ModelLineDiv').show();
@@ -260,7 +260,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
                   $('#ModelLineDiv').hide();
                   if($(window).scrollTop() + $(window).height() >= $(document).height()) {
                       fetchData(start,totalrecords);
-                      // $('.page-overlay').show();
                   }
               }
               else {

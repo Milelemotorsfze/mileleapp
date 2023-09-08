@@ -48,7 +48,12 @@ class AddonController extends Controller
         // dd('hi');
         $rowperpage = 12;
         $content = 'addon';
-        $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
+        $addonMasters = Addon::select('id','addon_type','name')->orderBy('name', 'ASC');
+        if($data != 'all')
+        {
+            $addonMasters = $addonMasters->where('addon_type',$data);
+        }
+        $addonMasters = $addonMasters->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
@@ -77,7 +82,7 @@ class AddonController extends Controller
     public function getRelatedModelLines(Request $request)
     {
         $modelLines = MasterModelLines::select('id','brand_id','model_line');
-        if(count($request->BrandIds) > 0)
+        if($request->BrandIds != '' && count($request->BrandIds) > 0)
         {
             $modelLines = $modelLines->whereIn('brand_id',$request->BrandIds);
         }
@@ -199,7 +204,8 @@ class AddonController extends Controller
         // get the count of already loaded data to find the serial number :- add loop key to get S.No:
 
         $i = $request->serial_number;
-
+        if(count($addon1) > 0)
+        {
         foreach($addons as $value => $addon)
         {
             if($request->isAddonBoxView == 1)
@@ -384,14 +390,14 @@ class AddonController extends Controller
                     $html .= '</div>';
 
                 }
-//                if($addon->part_number) {
-//                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-//                                                                Part Number
-//                                                            </div>
-//                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-//                                                            '.$addon->part_number.'
-//                                                            </div>';
-//                }
+                            //                if($addon->part_number) {
+                            //                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            //                                                                Part Number
+                            //                                                            </div>
+                            //                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                            //                                                            '.$addon->part_number.'
+                            //                                                            </div>';
+                            //                }
                 $html .=      '</div>
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
@@ -603,9 +609,9 @@ class AddonController extends Controller
                       $html .=              '</td>
                                         </tr>';
                 }else{
-//                      info("inside addon types");
-//                      info($addon->id);
-//                      info($addon->AddonTypes);
+            //                      info("inside addon types");
+            //                      info($addon->id);
+            //                      info($addon->AddonTypes);
                       $AddonTypes = AddonTypes::where('addon_details_id', $addon->id)->get();
                       foreach($AddonTypes as $key => $AddonTypes) {
 
@@ -730,7 +736,21 @@ class AddonController extends Controller
             }
         }
         $data['serial_number'] = $i;
-
+        }
+        else
+        {
+            if($request->isAddonBoxView == 1)
+            {               
+                $html .='<h6 style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $data['addon_box_html'] = $html;
+            }
+            else
+            {
+                $html .='<h6 style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $data['table_html'] = $html;
+            }
+            $data['serial_number'] = '';
+        }
         return response($data);
     }
 
