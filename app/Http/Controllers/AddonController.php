@@ -2304,7 +2304,10 @@ class AddonController extends Controller
         // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
-        return view('addon.kititems',compact('supplierAddonDetails'));
+        $previous = $next = '';
+        $previous = AddonDetails::where('addon_type_name',$supplierAddonDetails->addon_type_name)->where('id', '<', $id)->max('id');
+        $next = AddonDetails::where('addon_type_name',$supplierAddonDetails->addon_type_name)->where('id', '>', $id)->min('id');
+        return view('addon.kititems',compact('supplierAddonDetails','previous','next'));
     }
     public function statusChange(Request $request)
     {

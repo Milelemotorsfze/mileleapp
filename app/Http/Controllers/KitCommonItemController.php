@@ -525,8 +525,11 @@ class KitCommonItemController extends Controller
         if($previousSellingPriceHistory) {
            $previousSellingPrice = $previousSellingPriceHistory->selling_price;
         }
+        $previous = $next = '';
+        $previous = AddonDetails::where('addon_type_name','K')->where('id', '<', $id)->max('id');
+        $next = AddonDetails::where('addon_type_name','K')->where('id', '>', $id)->min('id');
         return view('kit.kititems',compact('supplierAddonDetails','previousPurchasePrice',
-        'previousSellingPrice','id'));
+        'previousSellingPrice','id','previous','next'));
     }
     public function getCommonKitItems(Request $request) {
 

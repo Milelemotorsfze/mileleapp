@@ -195,6 +195,12 @@ body {font-family: Arial, Helvetica, sans-serif;}
     <div class="card-header">
         <h4 class="card-title">
                 Kit Details</h4>
+                @if($previous != '')
+                <a  class="btn btn-sm btn-info float-first" href="{{ route('kit.kitItems',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+                @endif
+                @if($next != '')
+                <a  class="btn btn-sm btn-info float-first" href="{{ route('kit.kitItems',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                @endif
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
