@@ -384,17 +384,18 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 {{$Kit->item->Addon->name}} @if($Kit->item->description != '') - {{$Kit->item->description}} @endif
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-                            @if($Kit->countArray > 0)
-                                @if(isset($Kit->least_price_vendor->supplierAddonDetails))
-                                @if($Kit->least_price_vendor->supplierAddonDetails->image)
-                                    <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />
-                                @endif
-                                @endif
+                                @if($Kit->countArray > 0)
+                                    @if(isset($Kit->least_price_vendor->supplierAddonDetails))
+                                        @if($Kit->least_price_vendor->supplierAddonDetails->image)
+                                            <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
+                                            style="width:100%; height:125px;" alt="Addon Image"  />
+                                        @endif
+                                    @elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+                                    <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->latestPartNoSp->image) }}" class="image-click-class"
+                                            style="width:100%; height:125px;" alt="Addon Image"  />
+                                    @endif
                                 @else
-                                <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />
-
+                                    <img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class" style="width:100%; height:125px;" alt="Addon Image"  />
                                 @endif
                             </div>
                             <div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
@@ -438,6 +439,22 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         Part Number
                                     </div>
                                     <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
+                                        
+                                        <select class="form-control widthinput" onchange="onChangePartNo(this, {{$i}})" autofocus id="part-number-{{$i}}">
+                                            @if(count($Kit->addon_part_numbers) > 0)
+                                                @foreach($Kit->addon_part_numbers as $partNumbers)
+                                                    <option data-sup="yes" value="{{$partNumbers->id}}">{{$partNumbers->part_number}}</option>
+                                                @endforeach
+                                            @elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+                                                @foreach($Kit->SpWithoutVendorPartNos as $partNumbers)
+                                                    <option data-sup="no" value="{{$partNumbers->id}}" class="{{$partNumbers->addondetails->addon_code}}" data-id ="{{$partNumbers->addondetails->id}}">{{$partNumbers->part_number}} </option>
+                                                @endforeach
+                                            @else
+                                                <option>NOT AVAILABLE</option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <!-- <div class="labellist databack2 col-xxl-6 col-lg-6 col-md-6">
                                         @if(count($Kit->addon_part_numbers) > 0)
                                         <select class="form-control widthinput" autofocus id="part-number-{{$i}}">
                                             @foreach($Kit->addon_part_numbers as $partNumbers)
@@ -454,7 +471,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                         @else
                                         NOT AVAILABLE
                                         @endif
-                                    </div>
+                                    </div> -->
 
                                     <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6">
                                         Quantity
@@ -498,13 +515,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @if(count($Kit->kit_item_vendors) > 0)
                                 <select id="supplier_{{$i}}" name="supplier[{{$i}}]" class="form-control widthinput" onchange="calculatePrice(this, {{$i}})"
                                         autofocus>
-
+                                    @if(count($Kit->SpWithoutVendorPartNos) > 0)
+                                    <option data-id="not_available" value="not_available">SUPPLIER NOT AVAILABLE</option>
+                                    @endif
                                     @foreach($Kit->kit_item_vendors as $itemVendor)
                                         <option  data-id="{{$itemVendor->id}}" value="{{$itemVendor->purchase_price_aed}}"
                                             {{$itemVendor->id == $Kit->least_price_vendor->id ? 'selected' : ''}} >
                                             {{$itemVendor->Suppliers->supplier ?? ''}} ( {{$itemVendor->purchase_price_aed}} AED ) </option>
                                     @endforeach
-
                                 </select>
                                 @else
                                         NOT AVAILABLE
@@ -530,19 +548,35 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             @endcan
                             </div>
                         </div>
-                        @if($Kit->countArray > 0)
+                        <div class="row" >
+                            
+                        <div class="col-lg-12 col-md-12 col-sm-12 mb-1">
 
+                            @if($Kit->countArray > 0)
                             @canany(['addon-edit'])
                             @php
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
                             @endphp
                             @if ($hasPermission)
-
-                            <button type="button" class="btn btn-primary float-end spare-part-edit-button btn-sm"
+                            <button type="button" class="float-end btn btn-primary spare-part-edit-button btn-sm"
                             data-kit-id="{{ $Kit->addon_details_id }}" data-index="{{$i}}" title="Add New Vendor">
-                            <i class="fa fa-plus" aria-hidden="true"></i>Add New Vendor</button>
+                            <i class="fa fa-plus" aria-hidden="true"></i> Add New Vendor</button>
                             @endif
-                            @endcan
+                            @endcanany
+                            @endif
+
+                            @canany(['addon-create'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
+                            @endphp
+                            @if ($hasPermission)
+                            <a class="float-end btn btn-sm btn-success" title="Add New Spare Part"
+                            href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
+                            <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
+                            </a>
+                            @endif
+                            @endcanany
+
 
                             @if(count($Kit->kit_item_vendors) > 0)
                             @can('supplier-new-purchase-price')
@@ -550,28 +584,16 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-new-purchase-price']);
                             @endphp
                             @if ($hasPermission)
-                            <button type="button" id="price-show-button-{{$i}}" class="btn btn-warning btn-sm float-end purchase-price-edit-button"
-                                    style="margin-right: 5px;" is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
-                                    <i class="fa fa-plus"></i>New Purchase Price
+                            <button type="button" id="price-show-button-{{$i}}" class="float-end btn btn-warning btn-sm purchase-price-edit-button"
+                                     is-show="1" data-index="{{$i}}" title="Add New Purchase Price">
+                                    <i class="fa fa-plus"></i> New Purchase Price
                             </button>
                             @endif
                             @endcan
                             @endif
 
-                        @endif
-
-                        @canany(['addon-create'])
-                        @php
-                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
-                        @endphp
-                        @if ($hasPermission)
-                        <a style="float: right; margin-right:5px;" class="btn btn-sm btn-success" title="Add New Spare Part"
-                        href="{{ route('addon.create',['kit_item_id' => $Kit->id,'kit_id' => $id]) }}">
-                        <i class="fa fa-plus" aria-hidden="true"></i> New Spare Part
-                        </a>
-                        @endif
-                        @endcanany
-
+                        </div>
+                        </div>
                     </div>
 
                 <!-- </div> -->
@@ -773,8 +795,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
 <script type="text/javascript">
 // show image in large view
 var data = {!! json_encode($supplierAddonDetails) !!};
+var base_url = window.location.origin;
 var lengthKitItems = 0;
 $(document).ready(function () {
+    console.log(base_url);
             lengthKitItems = data.kit_items.length;
             var values = [];
             values = Array.from(document.querySelectorAll('.purchase_price')).map(input => input.value);
@@ -867,12 +891,17 @@ $(document).ready(function () {
       })
       function onChangePartNo(current, index)
       {
-        var sp  = $('#part-number-' + index + ' option[value='+current.value+']').attr('class');
-        var spId  = $('#part-number-' + index + ' option[value='+current.value+']').attr('data-id');
-        let span = document.getElementById("item_code_"+index);
-        let spanInputId = document.getElementById("item-code-id-"+index);
-        span.textContent = sp;
-        spanInputId.value = spId;
+        var datasup = $('#part-number-' + index + ' option[value='+current.value+']').attr('data-sup');
+        if(datasup == 'no')
+        {
+            var sp  = $('#part-number-' + index + ' option[value='+current.value+']').attr('class');
+            var spId  = $('#part-number-' + index + ' option[value='+current.value+']').attr('data-id');
+            let span = document.getElementById("item_code_"+index);
+            let spanInputId = document.getElementById("item-code-id-"+index);
+            span.textContent = sp;
+            spanInputId.value = spId;
+            //change image based on selected part numbers spare part image
+        }
       }
       function calculatePrice(current, index)
       {
@@ -880,45 +909,63 @@ $(document).ready(function () {
         var kit_quantity = $('#quantity_'+index).val();
         var item_price = $('#supplier_'+index).val();
         var id = $('#supplier_'+index).find('option:selected').attr('data-id');
-
-        $('#unit_price_'+index).val(item_price);
-        var item_total_price = kit_quantity * item_price;
-        $('#total_price_'+index).val(item_total_price);
-
-          $.ajax({
-              url: "{{url('getPartNumbers')}}",
-              type: "GET",
-              data:
-                  {
-                      id: id,
-                  },
-              dataType: "json",
-              success: function (data) {
-                  $('#item_code_'+index).text(data.item_code);
-                  $('#item-code-id-'+index).val(data.item_id);
-                  console.log(data.item_image);
-                  $("#addon-item-image-"+index).attr('src', data.item_image);
-                  $('#part-number-'+index).empty();
-                  var data = data.part_number;
-                  jQuery.each(data, function (key, value) {
-                      {{--var selectedId = '{{ $letterOfIndent->customer_id }}';--}}
-                      $('#part-number-'+index).append('<option value="' + value.id + ' " >' + value.part_number + '</option>');
-                  });
-              }
-          });
-
-        for(var i=1; i<=lengthKitItems; i++)
+        if(id == 'not_available')
         {
-            var quantity = 0;
-            var price = 0;
-            var totalItemPrice = 0;
-            quantity = $("#quantity_"+i).val();
-            price = $('#supplier_'+i).val();
-
-            totalItemPrice = quantity * price;
-            CurrentPurchasePrice = CurrentPurchasePrice + totalItemPrice;
+            $('#unit_price_'+index).val('NOT AVAILABLE');
+            $('#total_price_'+index).val('NOT AVAILABLE');
+            $('#item_code_'+index).text(data.kit_items[index-1].latestPartNoSp.addon_code);
+            $('#item-code-id-'+index).val(data.kit_items[index-1].latestPartNoSp.addon_id);
+            $('#part-number-'+index).empty();
+            var partNo = data.kit_items[index-1].SpWithoutVendorPartNos;
+            jQuery.each(partNo, function (key, value) {
+                $('#part-number-'+index).append('<option data-sup="no" value="'+ value.id +'" class="'+value.addondetails.addon_code+'" data-id="'+value.addondetails.id+'">'+value.part_number+'</option>');
+            });
+            document.getElementById('price-show-button-'+index).style.visibility='hidden';
+            var image = '';
+            var image = base_url+'/addon_image/'+data.kit_items[index-1].latestPartNoSp.image;
+            $("#addon-item-image-"+index).attr('src', image);
         }
-        document.getElementById("current_purchase_price").value = CurrentPurchasePrice;
+        else
+        {
+            $('#unit_price_'+index).val(item_price);
+            var item_total_price = kit_quantity * item_price;
+            $('#total_price_'+index).val(item_total_price);
+
+            $.ajax({
+                url: "{{url('getPartNumbers')}}",
+                type: "GET",
+                data:
+                    {
+                        id: id,
+                    },
+                dataType: "json",
+                success: function (data) {
+                    $('#item_code_'+index).text(data.item_code);
+                    $('#item-code-id-'+index).val(data.item_id);
+                    var image = data.item_image;
+                    $("#addon-item-image-"+index).attr('src', image);
+                    $('#part-number-'+index).empty();
+                    var data = data.part_number;
+                    jQuery.each(data, function (key, value) {
+                        {{--var selectedId = '{{ $letterOfIndent->customer_id }}';--}}
+                        $('#part-number-'+index).append('<option data-sup="yes" value="' + value.id + ' " >' + value.part_number + '</option>');
+                    });
+                }
+            });
+            document.getElementById('price-show-button-'+index).style.visibility='visible';
+            for(var i=1; i<=lengthKitItems; i++)
+            {
+                var quantity = 0;
+                var price = 0;
+                var totalItemPrice = 0;
+                quantity = $("#quantity_"+i).val();
+                price = $('#supplier_'+i).val();
+
+                totalItemPrice = quantity * price;
+                CurrentPurchasePrice = CurrentPurchasePrice + totalItemPrice;
+            }
+            document.getElementById("current_purchase_price").value = CurrentPurchasePrice;
+        }
       }
       $('form').on('submit', function (e)
         {
