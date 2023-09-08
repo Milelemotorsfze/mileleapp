@@ -73,4 +73,5 @@ class AddonDetails extends Model
     {
         return $this->hasOne(AddonDescription::class,'description','id');
     }
+
 }

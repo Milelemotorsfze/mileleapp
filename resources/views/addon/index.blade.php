@@ -247,7 +247,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
           $('.each-addon').attr('hidden', true);
           $(".each-addon-table-row").attr('hidden', true);
-          if (BrandIds === undefined || BrandIds.length == 0) { 
+          if (BrandIds === undefined || BrandIds.length == 0) {
               $('#allBrandsFilter').prop("disabled", false);
               $('.allBrandsFilterClass').prop("disabled", false);
               $('#ModelLineDiv').show();
@@ -448,6 +448,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         $('.overlay').show();
             $.ajax({
                 url:"{{url('getAddonlists')}}",
+                method:'GET',
                 data: {
                     start:start,
                     addon_type:addon_type,
@@ -457,6 +458,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     isAddonBoxView:isAddonBoxView,
                     serial_number:serial_number
                 },
+
                 dataType: 'json',
                 success: function(response){
                   var myEle = document.getElementById("noData");

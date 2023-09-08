@@ -34,81 +34,94 @@
             <div class="row p-3">
                 <div class="col-xl-6">
                     <div class="card ">
-                        <!-- card body -->
-                        <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Accessories Selling Prices</h4>
 
-                        </div>
-                        <div class="portfolio">
-                            <ul class="nav nav-pills nav-fill" id="my-tab">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#accessory-selling-price-not-added">Without Selling Price </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-accessory-selling-price">Pending </a>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-2">Selling Prices</h4>
+                            <select id="addon_type" name="addon_type"  class="form-control float-end p-2" style="width: 20%"  >
+                                <option value="P" >Accessories</option>
+                                <option value="SP" >Spare Parts</option>
+                                <option value="K">Kit</option>
+                            </select>
+                            <div class="flex-shrink-0">
+                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#selling-price-not-added" id="with-out-selling-price-tab" role="tab">
+                                            Without Selling Price
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#pending-selling-price" id="pending-price-tab" role="tab">
+                                            Pending
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- end nav tabs -->
+                            </div>
+                        </div><!-- end card header -->
                         <div class="tab-content"  >
-                            <div class="tab-pane fade show active" id="accessory-selling-price-not-added">
+                            <div class="tab-pane fade show active" id="selling-price-not-added">
                                 <div class="card-body">
                                     <div class="table-responsive">
-                                        <table  class="table table-striped table-bordered">
+                                        <table id="addon-without-selling-prices"  class="table table-striped table-bordered">
                                             <thead>
                                             <tr>
-                                                <th>Addoncewv Code</th>
+                                                <th>Addon Code</th>
                                                 <th>Addon Name</th>
-                                                <th>Requested By</th>
                                             </tr>
                                             </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
+                                            <tbody id="table-without-selling-price-body">
+                                            @if($withOutSellingPrices->count() > 0)
+                                                @foreach($withOutSellingPrices as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code }}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}
+                                                            @if($row->description) {{ ($row->AddonDescription->description ?? '') }} @endif
+
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade " id="pending-accessory-selling-price">
+                            <div class="tab-pane fade " id="pending-selling-price">
                                 <div class="card-body">
                                     <div class="table-responsive ">
-                                        <table id="specificTable" class="table table-striped table-bordered">
+                                        <table id="addon-pending-selling-prices" class="table table-striped table-bordered">
                                             <thead>
                                             <tr>
-                                                <th>AddonCode</th>
+                                                <th>Addon Code</th>
                                                 <th>Addon Name</th>
+                                                <th>Selling Price</th>
                                                 <th>Requested By</th>
                                             </tr>
                                             </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
+                                            <tbody id="table-pending-selling-price-body">
+
+                                            @if($pendingSellingPrices->count() > 0)
+                                                @foreach($pendingSellingPrices as $row)
+                                                    <tr>
+                                                        <td>{{$row->addonDetail->addon_code ?? ''}}</td>
+                                                        <td>{{$row->addonDetail->AddonName->name ?? ''}}
+                                                          {{ ($row->addonDetail->AddonDescription->description ?? '') }}
+                                                        </td>
+                                                        <td>{{$row->selling_price ?? ''}}</td>
+                                                        <td>{{$row->CreatedBy->name ?? ''}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -118,182 +131,10 @@
                     </div>
                 </div>
 
-                <div class="col-xl-6">
-                    <div class="card">
-                        <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Kit</h4>
-
-                        </div>
-                        <div class="portfolio">
-                            <ul class="nav nav-pills nav-fill" id="my-tab">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#kit-selling-price-not-added">Without Selling Price </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-kit-selling-price">Pending </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="tab-content"  >
-                            <div class="tab-pane fade show active" id="kit-selling-price-not-added">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table  class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon  dcdsCode</th>
-                                                <th>Addon Name</th>
-                                                <th>Requested By</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade " id="pending-kit-selling-price">
-                                <div class="card-body">
-                                    <div class="table-responsive ">
-                                        <table id="specificTable" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>AddonCode</th>
-                                                <th>Addon Name</th>
-                                                <th>Requested By</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end tab content -->
-                </div>
-                <!-- end card body -->
-            </div>
-            <div class="row p-3">
-                <div class="col-xl-6">
-                    <div class="card ">
-                        <!-- card body -->
-                        <div class="card-header align-items-center d-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">Spare Part Selling Prices</h4>
-
-                        </div>
-                        <div class="portfolio">
-                            <ul class="nav nav-pills nav-fill" id="my-tab">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-bs-toggle="pill" href="#spare-part-selling-price-not-added">Without Selling Price </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="pill" href="#pending-spare-part-selling-price">Pending </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="tab-content"  >
-                            <div class="tab-pane fade show active" id="spare-part-selling-price-not-added">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table  class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addoncewv Code</th>
-                                                <th>Addon Name</th>
-                                                <th>Requested By</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade " id="pending-spare-part-selling-price">
-                                <div class="card-body">
-                                    <div class="table-responsive ">
-                                        <table id="specificTable" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>AddonCode</th>
-                                                <th>Addon Name</th>
-                                                <th>Requested By</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>P1</td>
-                                                <td>DCVd</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P2</td>
-                                                <td>HanDCDSif Azad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            <tr>
-                                                <td>P3</td>
-                                                <td>Hanif SDFSFSAzad</td>
-                                                <td>16</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         @endif
-    @endcan
+        @endcan
+
 @can('Calls-view')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -412,22 +253,22 @@
                                             </div>
                                             </div>
                                             </div>
-<div class="col-xl-7">
+                        <div class="col-xl-7">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
                                     <div class="flex-shrink-0">
                                     <div style="position: relative; width: 100%; height: 5vh;">
-    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
-        <i class="fa fa-calendar"></i>&nbsp;
-        <span></span> <i class="fa fa-caret-down"></i>
-    </div>
-</div>
-<form id="date-range-form" method="POST">
-    @csrf
-    <input type="hidden" name="start_date" id="start_date">
-    <input type="hidden" name="end_date" id="end_date">
-</form>
+                                    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <form id="date-range-form" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="start_date" id="start_date">
+                                    <input type="hidden" name="end_date" id="end_date">
+                                </form>
                                     </div>
                                 </div><!-- end card header -->
                                 <div class="card-body px-0">
@@ -769,7 +610,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
+
 $(function() {
+
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         $('#start_date').val(start.format('YYYY-MM-DD'));
@@ -905,6 +748,7 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
     });
     </script>
     <script type="text/javascript">
+
 $(function() {
     var start = moment().subtract(29, 'days');
     var end = moment();
@@ -952,7 +796,11 @@ console.log("waqar");
     }, cb);
 
     cb(start, end);
+
+
 });
+
+
 </script>
     @endif
     @endcan
@@ -960,3 +808,54 @@ console.log("waqar");
     <link href="static/css/main.073c9b0a.css" rel="stylesheet">
     <script src="static/js/main.03fee2c2.js"></script> -->
 @endsection
+@push('scripts')
+    <script>
+
+        $("#addon_type").change(function(){
+
+            var addonType = $(this).val();
+
+            $.ajax
+            ({
+                url: 'addon-dashboard/sellingPriceFilter',
+                type: "GET",
+                dataType: "json",
+                data:{
+                    addon_type:addonType
+                },
+                success:function(response)
+                {
+                    var withOutSellingPrices = response.withOutSellingPrices;
+                    var pendingSellingPrices = response.pendingSellingPrices;
+                    console.log(pendingSellingPrices);
+                    $('#addon-without-selling-prices').DataTable().destroy();
+                    jQuery("#table-without-selling-price-body").empty();
+                    withOutSellingPrices.forEach(function(item) {
+                            var row = '<tr >' +
+                                '<td>' + item.addon_code + '</td>' +
+                                '<td>' + item.addon_name.name  + '</td>';
+
+                            jQuery("#table-without-selling-price-body").append(row);
+                        })
+                   jQuery("#addon-without-selling-prices").DataTable();
+
+                        ///// pending ///////
+                    $('#addon-pending-selling-prices').DataTable().destroy();
+                    jQuery("#table-pending-selling-price-body").empty();
+                    pendingSellingPrices.forEach(function(item) {
+                        var row = '<tr >' +
+                            '<td>' + item.addon_detail.addon_code + '</td>' +
+                            '<td>' + item.addon_detail.addon_name.name + '</td>'+
+                            '<td>' + item.selling_price + '</td>' +
+                            '<td>' + item.created_by.name + '</td>';
+
+                        jQuery("#table-pending-selling-price-body").append(row);
+                    })
+                    jQuery("#addon-pending-selling-prices").DataTable();
+                }
+            });
+
+
+        });
+    </script>
+@endpush

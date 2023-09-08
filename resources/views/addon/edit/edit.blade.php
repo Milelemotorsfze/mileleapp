@@ -242,15 +242,15 @@
                         </div>
                         <div class="col-xxl-1 col-lg-1 col-md-1">
 {{--                        @can('create-master-addon-description')--}}
-                            @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-master-addon-description']);
-                            @endphp
-                            @if ($hasPermission)
+{{--                            @php--}}
+{{--                                $hasPermission = Auth::user()->hasPermissionForSelectedRole(['create-master-addon-description']);--}}
+{{--                            @endphp--}}
+{{--                            @if ($hasPermission)--}}
                                 <a id="addnewDescriptionButton" data-toggle="popover" data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                         class="btn btn-sm btn-info" ><i class="fa fa-plus" aria-hidden="true"></i> Add New</a>
                                 <a id="descr-dropdown-button" data-toggle="popover" hidden data-trigger="hover" title="Create New Description" data-placement="top" style="float: right;"
                                         class="btn btn-sm btn-info" >Choose From List</a>
-                            @endif
+{{--                            @endif--}}
 {{--                            @endcan--}}
                         </div>
                     </div>
@@ -263,7 +263,7 @@
                         <div class="input-group">
 
                         <input id="purchase_price" type="number" min="0" step="any" class="form-control widthinput @error('purchase_price') is-invalid @enderror"
-                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed ?? '' }}" 
+                        name="purchase_price" placeholder="Least Purchase Price ( AED )" value="{{ $addonDetails->LeastPurchasePrices->purchase_price_aed ?? '' }}"
                         autocomplete="purchase_price" autofocus readonly>
                             <div class="input-group-append">
                                 <span class="input-group-text widthinput" id="basic-addon2">AED</span>
