@@ -459,7 +459,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 },
                 dataType: 'json',
                 success: function(response){
-                    // $('.page-overlay').hide();
+                  var myEle = document.getElementById("noData");
+                  if(myEle) {
+                      myEle.remove();;
+                  }
                     $('#serial_number').val(response.serial_number);
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
