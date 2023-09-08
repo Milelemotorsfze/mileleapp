@@ -740,7 +740,7 @@ class AddonController extends Controller
         else
         {
             if($request->isAddonBoxView == 1)
-            {               
+            {
                 $html .='<h6 style="text-align:center; padding-top:10px;">No data found !!</h6>';
                 $data['addon_box_html'] = $html;
             }

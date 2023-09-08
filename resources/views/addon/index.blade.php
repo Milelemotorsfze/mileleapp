@@ -358,7 +358,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 selectedModelLines(BrandModelLine,ModelLineIds);
               }
                 if($(window).scrollTop() + $(window).height() >= $(document).height()) {
-                    fetchData(start,totalrecords);
+                    fetchData(0,0);
                     // $('.page-overlay').show();
                 }
             }
@@ -436,10 +436,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
         onScroll();
     });
     function fetchData(start,totalrecords) {
-        var BrandIds = [];
+
         var isAddonBoxView = $('#is-addon-box-view').val();
         var AddonIds = $('#fltr-addon-code').val();
         var BrandIds = $('#fltr-brand').val();
+
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
         var serial_number = $('#serial_number').val();
@@ -460,6 +461,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 },
 
                 dataType: 'json',
+
                 success: function(response){
                     // $('.page-overlay').hide();
                     $('#serial_number').val(response.serial_number);
