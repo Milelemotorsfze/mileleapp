@@ -741,12 +741,12 @@ class AddonController extends Controller
         {
             if($request->isAddonBoxView == 1)
             {
-                $html .='<h6 style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
                 $data['addon_box_html'] = $html;
             }
             else
             {
-                $html .='<h6 style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
                 $data['table_html'] = $html;
             }
             $data['serial_number'] = '';
