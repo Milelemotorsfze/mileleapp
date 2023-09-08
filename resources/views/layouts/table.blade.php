@@ -76,6 +76,8 @@
             $('#kits-table').DataTable();
             $('#permission-table').DataTable();
             $('#module-table').DataTable();
+            $('#addon-pending-selling-prices').DataTable();
+            $('#addon-without-selling-prices').DataTable();
 
 
             // $('#suppliersList').DataTable();

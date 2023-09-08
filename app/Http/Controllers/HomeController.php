@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+use App\Models\AddonDetails;
+use App\Models\AddonSellingPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Calls;
@@ -177,10 +179,29 @@ $totalvariantss = [
         ]
     ]
 ];
+
+      /////// parts procurment dashbaord ////////////
+        $addonSellingPrices = AddonSellingPrice::with('addonDetails');
+
+
+        $pendingSellingPrices = $addonSellingPrices->whereHas('addonDetails', function ($query){
+                                                $query->where('addon_type_name', 'P');
+                                            })
+                                            ->where('status', AddonSellingPrice::SELLING_PRICE_STATUS_PENDING)
+                                            ->get();
+
+        $addonSellingPricesIds = AddonSellingPrice::groupBy('addon_details_id')->pluck('addon_details_id');
+
+        $withOutSellingPrices = AddonDetails::whereNotIn('id', $addonSellingPricesIds)
+                                                    ->where('addon_type_name', 'P')->get();
+
+        ////////// end /////////////////////
+
+
        return view('home', compact('totalleadscounttoday','totalvariantcounttoday','chartData',
            'rowsmonth', 'rowsyesterday', 'rowsweek', 'variants', 'reels', 'totalleads', 'totalleadscount','totalleadscount7days',
            'totalvariantss', 'totalvariantcount', 'totalvariantcount7days', 'countpendingpictures', 'countpendingpicturesdays',
-           'countpendingreels', 'countpendingreelsdays'));
+           'countpendingreels', 'countpendingreelsdays','pendingSellingPrices','withOutSellingPrices'));
     }
     public function marketingupdatechart(Request $request)
     {
@@ -250,5 +271,27 @@ $totalvariantss = [
         ->orderByDesc('call_count') // Order by call_count in descending order
         ->get();
         return view('calls.leaddistrubtion', compact('data'));
+    }
+
+    public function sellingPriceFilter(Request $request) {
+//        dd($request->all());
+        /////// parts procurment dashbaord ////////////
+        $addonSellingPrices = AddonSellingPrice::with('addonDetails','CreatedBy','addonDetail.AddonName');
+        $addonSellingPricesIds = AddonSellingPrice::groupBy('addon_details_id')->pluck('addon_details_id');
+
+        $pendingSellingPrices = $addonSellingPrices->whereHas('addonDetails', function ($query) use($request){
+            $query->where('addon_type_name', $request->addon_type);
+        })
+            ->where('status', AddonSellingPrice::SELLING_PRICE_STATUS_PENDING)
+            ->get();
+        $withOutSellingPrices = AddonDetails::with('AddonName')->whereNotIn('id', $addonSellingPricesIds)
+            ->where('addon_type_name', $request->addon_type)->get();
+
+        $data['pendingSellingPrices'] = $pendingSellingPrices;
+        $data['withOutSellingPrices'] = $withOutSellingPrices;
+
+        return response()->json($data);
+
+
     }
 }

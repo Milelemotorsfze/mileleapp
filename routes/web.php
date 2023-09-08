@@ -404,4 +404,11 @@ Route::get('/d', function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('modules', ModuleController::class);
     Route::resource('prospecting', ProspectingController::class);
-});
+
+    // DASHBOARD PARTS AND PROCURMENT
+
+    Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
+
+
+
+    });
