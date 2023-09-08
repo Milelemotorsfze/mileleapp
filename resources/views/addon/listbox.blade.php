@@ -434,7 +434,7 @@
                                         </button>
                                         <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
                                                 onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
-                                            View Less<i class="fa fa-arrow-down"></i>
+                                            View Less <i class="fa fa-arrow-up"></i>
                                         </button>
                                     </div>
                                 </div>

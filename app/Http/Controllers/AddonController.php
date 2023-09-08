@@ -484,7 +484,7 @@ class AddonController extends Controller
                                             </button>
                                             <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
                                              id="view-less-'.$addon->id.'" data-key="'.$value.'"  onclick="viewLess('.$addon->id.')">
-                                                View Less<i class="fa fa-arrow-down"></i>
+                                                View Less <i class="fa fa-arrow-up"></i>
                                             </button>
                                         </div>
                                     </div>';
