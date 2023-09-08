@@ -212,15 +212,7 @@ class AddonController extends Controller
             {
                 $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
                     <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="row">
-                            <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                                Addon Name
-                            </div>
-                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">';
-                if($addon->AddonName->name != '') {
-                    $html .= $addon->AddonName->name;
-                }
-                $html .=  '</div>';
+                        <div class="row">';
                 if($addon->additional_remarks) {
                     $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                                 Additional Remarks
@@ -232,6 +224,14 @@ class AddonController extends Controller
 
                 $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                                 <div class="row" style="padding-right:3px; padding-left:3px;">
+                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        Addon Name
+                                                    </div>
+                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                    if($addon->AddonName->name != '') {
+                                                        $html .= $addon->AddonName->name;
+                                                    }
+                                                        $html .=  '</div>
                                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                         Addon Code
                                                     </div>
@@ -740,7 +740,7 @@ class AddonController extends Controller
         else
         {
             if($request->isAddonBoxView == 1)
-            {
+            {               
                 $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
                 $data['addon_box_html'] = $html;
             }
