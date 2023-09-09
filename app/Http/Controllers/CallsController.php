@@ -578,11 +578,11 @@ return view('calls.resultbrand', compact('data'));
              else {
                 $salesPerson = User::where('name', $sales_person)->first();
                 if($salesPerson)
-                {
+                { 
                 $sales_person_id = $salesPerson->id;
                 }
                 else{
-                    $salesPerson === 'not correct';
+                    $salesPerson = 'not correct';
                 }
             }
             if ($source_name !== null) {
