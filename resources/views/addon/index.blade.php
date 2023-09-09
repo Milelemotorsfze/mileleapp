@@ -415,7 +415,14 @@ body {font-family: Arial, Helvetica, sans-serif;}
       addonBoxButton.hidden = true
         $('#is-addon-box-view').val(1);
         $('#start').val(0);
-        $('#totalrecords').val(12);
+        $('#totalrecords').val(0);
+        $('#serial_number').val(0);
+
+        $(".each-addon").attr('hidden', true);
+        if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            fetchData(0,0);
+            // $('.page-overlay').show();
+        }
     }
 
     function onScroll(){
@@ -426,7 +433,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
             var rowperpage = Number($('#rowperpage').val());
             start = start + rowperpage;
             if(start <= totalrecords) {
-                console.log("start value less add 12");
                 $('#start').val(start);
             }
             fetchData(start,totalrecords);
@@ -465,7 +471,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 success: function(response){
                   var myEle = document.getElementById("noData");
                   if(myEle) {
-                      myEle.remove();;
+                      myEle.remove();
                   }
                     $('#serial_number').val(response.serial_number);
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
