@@ -228,38 +228,6 @@
     });
 </script>
 <script>
-    function isDuplicateVIN(vin) {
-        var vinInputs = document.getElementsByName('vin[]');
-        var count = 0;
-        for (var i = 0; i < vinInputs.length; i++) {
-            if (vinInputs[i].value === vin) {
-                count++;
-            }
-            if (count > 1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Function to handle form submission
-    function validateForm() {
-        var vinInputs = document.getElementsByName('vin[]');
-        var uniqueVINs = [];
-        for (var i = 0; i < vinInputs.length; i++) {
-            var vin = vinInputs[i].value;
-            if (isDuplicateVIN(vin)) {
-                alert('Duplicate VINs are not allowed. Please select unique VINs.');
-                return false;
-            }
-            if (!uniqueVINs.includes(vin)) {
-                uniqueVINs.push(vin);
-            }
-        }
-        return true;
-    }
-</script>
-<script>
  $(document).ready(function () {
         $("#generate-button").click(function () {  // Bind to the Generate button's click event
             var selectedPOId = $("#po_number").val();  // Get the selected PO ID
@@ -275,11 +243,11 @@
                             <div class="col-lg-2 col-md-6" style="width: 12%;">
                                     <input type="text" name="vin[]" class="form-control" placeholder="VIN" readonly value="${vehicle.vin}">
                                 </div>
-                            <div class="col-lg-1 col-md-6" style="width: 6%;">
-                                    <input type="text" name="vin[]" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
+                                <div class="col-lg-1 col-md-6" style="width: 6%;">
+                                    <input type="text" class="form-control" placeholder="PO #" readonly value="${vehicle.po_number}">
                                 </div>
                                 <div class="col-lg-1 col-md-6"style="width: 6%;"> 
-                                    <input type="text" name="vin[]" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
+                                    <input type="text" class="form-control" placeholder="SO #" readonly value="${vehicle.so_number}">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                 <input type="text" class="form-control mb-1" readonly value="${vehicle.warehouseNames}">
@@ -314,21 +282,32 @@
 
                         $("#rows-containerpo").append(rowHtml);
                     });
-                    $(".remove-row-btn").on("click", function () {
-                        $(this).closest(".row").remove();
-                    });
+
+                    // Attach the remove-row event handler after adding the rows
+                    attachRemoveRowHandler();
                 },
                 error: function (error) {
                     console.error(error);
                 }
             });
         });
+
+        // Function to attach the remove-row event handler
+        function attachRemoveRowHandler() {
+            $(".remove-row-btn").on("click", function () {
+                $(this).closest(".row").remove();
+            });
+        }
+
+        // Attach the remove-row event handler on document load
+        attachRemoveRowHandler();
     });
 </script>
 <script>
  $(document).ready(function () {
         $("#generate-sobutton").click(function () {  // Bind to the Generate button's click event
             var selectedSOId = $("#so_number").val();  // Get the selected PO ID
+            console.log(selectedSOId);
             $.ajax({
                 type: "GET",
                 url: "{{ route('vehicles.getVehiclesDataformovementso') }}",

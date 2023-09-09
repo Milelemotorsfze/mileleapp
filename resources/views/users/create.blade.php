@@ -23,7 +23,7 @@
 					<div class="col-lg-6 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Name : </label>
                         {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
-                    </div>
+                    </div>                    
 					<div class="col-lg-6 col-md-6">
                         <label for="basicpill-firstname-input" class="form-label">Email : </label>
                         {!! Form::text('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
@@ -47,6 +47,11 @@
                 <option value="{{$role}}">{{$role}}</option>
                 @endforeach
             </select> -->
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-2">
+                        <label class="form-check-label" for="sales_rap">Sales RAP</label>                      
+                        <input class="form-check-input" name="sales_rap" type="checkbox" id="sales_rap" value="yes">
                     </div>
                     <!-- <form> -->
             <!-- <h4>Role :</h4>

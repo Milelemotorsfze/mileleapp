@@ -127,11 +127,13 @@ input[type=number]::-webkit-outer-spin-button
       Leads Info
     </h4>
       @can('sales-view')
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-    <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
+      <a class="btn btn-sm btn-success float-end" href="{{ route('dailyleads.create') }}" text-align: right>
         <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
       </a>
-
+      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-primary float-end" href="{{ route('booking.index') }}" text-align: right>
+        <i class="fa fa-info" aria-hidden="true"></i> Bookings
+      </a>
       <div class="clearfix"></div>
 <br>
     @endcan
@@ -152,7 +154,7 @@ input[type=number]::-webkit-outer-spin-button
         <a class="nav-link" data-bs-toggle="pill" href="#tab5">Negotiation</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Closed</a>
+        <a class="nav-link" data-bs-toggle="pill" href="#tab6">Sales Order</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
@@ -250,7 +252,8 @@ input[type=number]::-webkit-outer-spin-button
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Closed</a></li>
+      <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
       @endcan
     </ul>
@@ -337,7 +340,7 @@ input[type=number]::-webkit-outer-spin-button
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="ClosedModalLabel">Closed</h5>
+          <h5 class="modal-title" id="ClosedModalLabel">Sales Order</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -759,9 +762,9 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Negotiation Values</th>
                   <th>Negotiation Notes</th>
                   <th>View Re-Qoutation</th>
-                  <th>Closing Date</th>
-                  <th>Closing Values</th>
-                  <th>Closing Notes</th>
+                  <th>Sales Date</th>
+                  <th>Sales Values</th>
+                  <th>Sales Notes</th>
                   <th>So Number</th>
                 </tr>
               </thead>
@@ -830,7 +833,7 @@ $('#fileModal').on('hidden.bs.modal', function () {
     $('#fileViewer').attr('src', '');
 });
 function openModalfilen(filePath) {
-      const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
+  const baseUrl = "{{ asset('storage/') }}"; // The base URL to the public storage directory
     const fileUrl = baseUrl + '/' + filePath; // Add a slash between baseUrl and filePath
     console.log('File URL:', fileUrl); // Log the URL to the console
     $('#fileViewern').attr('src', fileUrl);
@@ -1107,12 +1110,12 @@ function savenegotiation() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
+          console.log('Negotiation saved successfully');
+          alert('Negotiation saved successfully');
           location.reload();
         } else {
-          console.error('Error saving Prospecting');
-          alert('Error saving Prospecting');
+          console.error('Error saving Negotiation');
+          alert('Error saving Negotiation');
         }
       } else {
         console.error('Request failed with status ' + xhr.status);
@@ -1157,8 +1160,8 @@ function savenegotiation() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
+          console.log('Sales Order saved successfully');
+          alert('Sales Order saved successfully');
           location.reload();
         } else {
           console.error('Error saving Prospecting');
@@ -1300,7 +1303,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1321,7 +1324,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1337,6 +1340,7 @@ function s2ab(s) {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -1346,7 +1350,8 @@ function s2ab(s) {
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1376,7 +1381,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1397,7 +1402,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1418,7 +1423,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1434,6 +1439,7 @@ function s2ab(s) {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -1442,7 +1448,8 @@ function s2ab(s) {
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1472,7 +1479,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1493,7 +1500,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1514,7 +1521,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1528,7 +1535,26 @@ function s2ab(s) {
 },
                 { data: 'qdate', name: 'qdate', searchable: false},
                 { data: 'ddealvalues', name: 'ddealvalues', searchable: false },
-                { data: 'qsalesnotes', name: 'qsalesnotes', searchable: false },
+                {
+    data: 'qsalesnotes',
+    name: 'qsalesnotes',
+    searchable: false,
+    render: function (data, type, row) {
+        const maxLength = 20;
+        const uniqueId = 'qsalesnotes_' + row.id;
+
+        if (data && data.length > maxLength) {
+            const truncatedText = data.substring(0, maxLength);
+            return `
+                <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
+                <span class="remarks-text" id="${uniqueId}_full" style="display: none;">${data}</span>
+                <a href="#" class="read-more-link" onclick="toggleRemarks('${uniqueId}')">Read More</a>
+            `;
+        } else {
+            return `<span class="remarks-text">${data}</span>`;
+        }
+    }
+},
                 {
     data: 'file_path',
     name: 'file_path',
@@ -1546,6 +1572,7 @@ function s2ab(s) {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -1553,7 +1580,8 @@ function s2ab(s) {
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1583,7 +1611,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1604,7 +1632,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1625,7 +1653,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1647,7 +1675,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1682,7 +1710,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'nsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1711,13 +1739,15 @@ function s2ab(s) {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
+                      const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
                             <div class="dropdown">
                                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Closed</a></li>
+                                <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
                             </div>`;
@@ -1747,7 +1777,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1768,7 +1798,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1789,7 +1819,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1811,7 +1841,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1846,7 +1876,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'nsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1881,7 +1911,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'csalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1918,7 +1948,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1939,7 +1969,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'salesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1960,7 +1990,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -1982,7 +2012,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'qsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -2017,7 +2047,7 @@ function s2ab(s) {
         const maxLength = 20;
         const uniqueId = 'nsalesnotes_' + row.id;
 
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>
@@ -2051,8 +2081,7 @@ function s2ab(s) {
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'rsalesnotes_' + row.id;
-
-        if (data.length > maxLength) {
+        if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
                 <span class="remarks-text" id="${uniqueId}_truncated">${truncatedText}</span>

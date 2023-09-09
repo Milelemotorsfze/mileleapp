@@ -36,7 +36,11 @@ namespace App\Http\Controllers;
 
     $input = $request->all();
     $input['password'] = Hash::make($input['password']);
-
+    if(isset($request->sales_rap))
+    {
+        $input['sales_rap'] = 'yes';
+    }
+// dd($input);
     $user = User::create($input);
 
     // Create a profile for the user and associate it with the user_id
