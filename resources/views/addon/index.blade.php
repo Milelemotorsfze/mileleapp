@@ -326,6 +326,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
     }
     function getRelatedModelLines(BrandIds)
        {
+           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+               fetchData(0,0);
+               // $('.page-overlay').show();
+           }
           var ModelLineIds = $('#fltr-model-line').val();
           $.ajax({
             url:"{{url('getRelatedModelLines')}}",
@@ -360,10 +364,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
               {
                 selectedModelLines(BrandModelLine,ModelLineIds);
               }
-                if($(window).scrollTop() + $(window).height() >= $(document).height()) {
-                    fetchData(0,0);
-                    // $('.page-overlay').show();
-                }
+
             }
           });
        }

@@ -26,6 +26,200 @@
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
+{{--   @can('parts-procurement-dashboard-view')--}}
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('parts-procurement-dashboard-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="row p-3">
+                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
+                    <div class="card " style="min-height: 550px;">
+                        <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Addon Selling Prices</h4>
+
+                            <select id="addon_type" name="addon_type"  class="form-control float-end p-2" style="width: 20%"  >
+                                <option value="P" >Accessories</option>
+                                <option value="SP" >Spare Parts</option>
+                                <option value="K">Kit</option>
+                            </select>
+                            <div class="flex-shrink-0">
+                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#selling-price-not-added" id="with-out-selling-price-tab" role="tab">
+                                            Without Selling Price
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#pending-selling-price" id="pending-price-tab" role="tab">
+                                            Pending
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- end nav tabs -->
+                            </div>
+                        </div><!-- end card header -->
+                        <div class="tab-content"  >
+                            <div class="tab-pane fade show active" id="selling-price-not-added">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="addon-without-selling-prices"  class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-without-selling-price-body">
+                                            @foreach($withOutSellingPrices as $row)
+                                                <tr>
+                                                    <td>{{$row->addon_code }}</td>
+                                                    <td>{{$row->AddonName->name ?? ''}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pending-selling-price">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="addon-pending-selling-prices" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                                <th>Selling Price</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-pending-selling-price-body">
+
+                                            @foreach($pendingSellingPrices as $row)
+                                                <tr>
+                                                    <td>{{$row->addonDetail->addon_code ?? ''}}</td>
+                                                    <td>{{$row->addonDetail->AddonName->name ?? ''}}</td>
+                                                    <td>{{$row->selling_price }}</td>
+                                                    <td>{{$row->CreatedBy->name ?? ''}}</td>
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
+                    <div class="card " style="min-height: 550px;">
+                        <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Recently Added Addons</h4>
+                            <div class="flex-shrink-0">
+                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#latest-accessories"  role="tab">
+                                            Accessories
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " data-bs-toggle="tab" href="#latest-spare-parts"  role="tab">
+                                            Spare Parts
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#latest-kits"  role="tab">
+                                            Kits
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- end nav tabs -->
+                            </div>
+                        </div><!-- end card header -->
+                        <div class="tab-content" >
+                            <div class="tab-pane fade show active" id="latest-accessories">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="table-latest-accessories" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+                                            @foreach($recentlyAddedAccessories as $row)
+                                                <tr>
+                                                    <td>{{$row->addon_code }}</td>
+                                                    <td>{{$row->AddonName->name ?? ''}}</td>
+                                                </tr>
+                                            @endforeach
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="latest-spare-parts">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="table-latest-spare-parts" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+                                            @foreach($recentlyAddedSpareParts as $row)
+                                                <tr>
+                                                    <td>{{$row->addon_code ?? ''}}</td>
+                                                    <td>{{$row->AddonName->name ?? ''}}</td>
+
+                                                </tr>
+                                            @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="latest-kits">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="table-latest-kits" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            @if($recentlyAddedKits->count() > 0)
+                                                @foreach($recentlyAddedKits as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code ?? ''}}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        @endif
+{{--    @endcan--}}
 @can('Calls-view')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
@@ -695,207 +889,6 @@ console.log("waqar");
 </script>
     @endif
     @endcan
-
-    <div class="row ">
-        @can('addon-selling-price-view')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-selling-price-view');
-            @endphp
-            @if ($hasPermission)
-                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
-                    <div class="card " style="min-height: 550px;">
-                        <div class="card-header align-items-center ">
-                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Addon Selling Prices</h4>
-
-                            <select id="addon_type" name="addon_type"  class="form-control float-end p-2" style="width: 20%"  >
-                                <option value="P" >Accessories</option>
-                                <option value="SP" >Spare Parts</option>
-                                <option value="K">Kit</option>
-                            </select>
-                            <div class="flex-shrink-0">
-                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-bs-toggle="tab" href="#selling-price-not-added" id="with-out-selling-price-tab" role="tab">
-                                            Without Selling Price
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#pending-selling-price" id="pending-price-tab" role="tab">
-                                            Pending
-                                        </a>
-                                    </li>
-                                </ul>
-                                <!-- end nav tabs -->
-                            </div>
-                        </div><!-- end card header -->
-                        <div class="tab-content"  >
-                            <div class="tab-pane fade show active" id="selling-price-not-added">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table id="addon-without-selling-prices"  class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon Code</th>
-                                                <th>Addon Name</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="table-without-selling-price-body">
-                                                @foreach($withOutSellingPrices as $row)
-                                                    <tr>
-                                                        <td>{{$row->addon_code }}</td>
-                                                        <td>{{$row->AddonName->name ?? ''}}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade " id="pending-selling-price">
-                                <div class="card-body">
-                                    <div class="table-responsive ">
-                                        <table id="addon-pending-selling-prices" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon Code</th>
-                                                <th>Addon Name</th>
-                                                <th>Selling Price</th>
-                                                <th>Requested By</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="table-pending-selling-price-body">
-
-                                                @foreach($pendingSellingPrices as $row)
-                                                    <tr>
-                                                        <td>{{$row->addonDetail->addon_code ?? ''}}</td>
-                                                        <td>{{$row->addonDetail->AddonName->name ?? ''}}</td>
-                                                        <td>{{$row->selling_price }}</td>
-                                                        <td>{{$row->CreatedBy->name ?? ''}}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        @endcan
-        @can('addon-view')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-view');
-            @endphp
-            @if ($hasPermission)
-                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
-                    <div class="card " style="min-height: 550px;">
-                        <div class="card-header align-items-center ">
-                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Recently Added Addons</h4>
-                            <div class="flex-shrink-0">
-                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" data-bs-toggle="tab" href="#latest-accessories"  role="tab">
-                                            Accessories
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link " data-bs-toggle="tab" href="#latest-spare-parts"  role="tab">
-                                            Spare Parts
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#latest-kits"  role="tab">
-                                            Kits
-                                        </a>
-                                    </li>
-                                </ul>
-                                <!-- end nav tabs -->
-                            </div>
-                        </div><!-- end card header -->
-                        <div class="tab-content" >
-                            <div class="tab-pane fade show active" id="latest-accessories">
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table id="table-latest-accessories" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon Code</th>
-                                                <th>Addon Name</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody >
-                                                @foreach($recentlyAddedAccessories as $row)
-                                                    <tr>
-                                                        <td>{{$row->addon_code }}</td>
-                                                        <td>{{$row->AddonName->name ?? ''}}</td>
-                                                    </tr>
-                                                @endforeach
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade " id="latest-spare-parts">
-                                <div class="card-body">
-                                    <div class="table-responsive ">
-                                        <table id="table-latest-spare-parts" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon Code</th>
-                                                <th>Addon Name</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody >
-                                                @foreach($recentlyAddedSpareParts as $row)
-                                                    <tr>
-                                                        <td>{{$row->addon_code ?? ''}}</td>
-                                                        <td>{{$row->AddonName->name ?? ''}}</td>
-
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade " id="latest-kits">
-                                <div class="card-body">
-                                    <div class="table-responsive ">
-                                        <table id="table-latest-kits" class="table table-striped table-bordered">
-                                            <thead>
-                                            <tr>
-                                                <th>Addon Code</th>
-                                                <th>Addon Name</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            @if($recentlyAddedKits->count() > 0)
-                                                @foreach($recentlyAddedKits as $row)
-                                                    <tr>
-                                                        <td>{{$row->addon_code ?? ''}}</td>
-                                                        <td>{{$row->AddonName->name ?? ''}}</td>
-                                                    </tr>
-                                                @endforeach
-                                            @else
-                                                <tr>
-                                                    <td colspan="4">No Data Available</td>
-                                                </tr>
-
-                                            @endif
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        @endcan
-    </div>
 
     <!-- <div id="root"></div>
     <link href="static/css/main.073c9b0a.css" rel="stylesheet">
