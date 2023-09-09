@@ -1,10 +1,10 @@
                                 @if($addonsdata->image)
                                
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
-                                         alt="Addon Image">
+                                         alt="Addon Image" style="max-height:159px; max-width:232px;">
                                @else
                                <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />
+                               style="max-height:159px; max-width:232px;" alt="Addon Image"  />
                                 @endif
                                 <script type="text/javascript">
                                     $(document).ready(function ()
