@@ -50,7 +50,7 @@
                     </div>
                     
                     <div class="col-lg-2 col-md-2">
-                        <label class="form-check-label" for="sales_rap">Sales RAP</label>                        
+                        <label class="form-check-label" for="sales_rap">Sales RAP</label>                      
                         <input class="form-check-input" name="sales_rap" type="checkbox" id="sales_rap" value="yes">
                     </div>
                     <!-- <form> -->
