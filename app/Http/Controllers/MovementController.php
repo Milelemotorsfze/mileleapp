@@ -111,8 +111,8 @@ class MovementController extends Controller
     $warehouses = Warehouse::select('id', 'name')->get();
     $movementsReferenceId = MovementsReference::max('id') + 1;
     $purchasing_order = PurchasingOrder::where('status', 'Approved')
-    ->whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id');
+    ->whereHas('vehicles', function ($query) {
+        $query->whereNull('gdn_id');
     })
     ->get();
     $po = PurchasingOrder::where('status', 'Approved')
@@ -124,8 +124,8 @@ class MovementController extends Controller
         $query->whereNotNull('gdn_id');
     })
     ->pluck('so_number');
-    $so = So::whereDoesntHave('vehicles', function ($query) {
-        $query->whereNotNull('gdn_id');
+    $so = So::whereHas('vehicles', function ($query) {
+        $query->whereNull('gdn_id');
     })
     ->get();
     $lastIdExists = MovementsReference::where('id', $movementsReferenceId - 1)->exists();
@@ -156,18 +156,18 @@ class MovementController extends Controller
         $gdnVins = [];
         $otherVins = [];
         foreach ($vin as $index => $value) {
-            if ($to[$index] !== '6') {
-                $vehicle = Vehicles::where('vin', $vin[$index])->first();
-                if ($vehicle) {
-                    if (!$vehicle->grn_id) {
-                        $grnVins[] = $vin[$index];
-                    } elseif ($to[$index] === '2') {
-                        $gdnVins[] = $vin[$index];
-                    } else {
-                        $otherVins[] = $vin[$index];
-                    }
+            if (array_key_exists($index, $from) && array_key_exists($index, $to)) {
+            $vehicle = Vehicles::where('vin', $vin[$index])->first();
+            if ($vehicle) {
+                if (($to[$index] === '1' && $from[$index] !== '3')) {
+                    $grnVins[] = $vin[$index];
+                } elseif ($to[$index] === '2') {
+                    $gdnVins[] = $vin[$index];
+                } else {
+                    $otherVins[] = $vin[$index];
                 }
             }
+        }
         }
         if (!empty($grnVins)) {
             $grn = new Grn();
@@ -187,17 +187,17 @@ class MovementController extends Controller
             $gdn->save();
             Vehicles::whereIn('vin', $gdnVins)->update(['gdn_id' => $gdnNumber]);
         }
-        foreach ($otherVins as $vinValue) {
-            $index = array_search($vinValue, $vin);
+        foreach ($vin as $index => $value) {
+            if (array_key_exists($index, $from) && array_key_exists($index, $to)) {    
             $movement = new Movement();
-            $movement->vin = $vinValue;
+            $movement->vin = $vin[$index];
             $movement->from = $from[$index];
             $movement->to = $to[$index];
             $movement->reference_id = $movementsReferenceId;
             $movement->save();
-            // Update latest location for the vehicle
-            Vehicles::where('vin', $vinValue)->update(['latest_location' => $to[$index]]);
+            Vehicles::where('vin', $vin[$index])->update(['latest_location' => $to[$index]]);
         }
+    }
         $data = Movement::get();
         $vehicles = Vehicles::whereNotNull('vin')
         ->where('status', '!=', 'cancel')
@@ -375,6 +375,7 @@ public function grnfilepost(Request $request)
             ->whereNull('gdn_id')
             ->where('payment_status', '=', 'Incoming Stock')
             ->pluck('id');
+        info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);
@@ -407,12 +408,14 @@ public function grnfilepost(Request $request)
     public function getVehiclesDataformovementso(Request $request)
     {
         $selectedSOId = $request->input('so_id');
+        info($selectedSOId);
         $vehicles = Vehicles::where('so_id', $selectedSOId)
             ->whereNotNull('vin')
             ->where('status', '!=', 'cancel')
             ->whereNull('gdn_id')
             ->where('payment_status', '=', 'Incoming Stock')
             ->pluck('id');
+            info($vehicles);
             $vehicleDetails = [];
             foreach($vehicles  as $key =>  $vehicle) {
                 $data = Vehicles::find($vehicle);

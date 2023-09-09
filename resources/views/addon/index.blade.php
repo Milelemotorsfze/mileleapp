@@ -161,7 +161,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
   <!-- <div class="page-overlay"></div> -->
   <div class="card-header">
     <form>
-      <input type="text", value="{{$data}}" id="data" hidden>
+      <input type="text" value="{{$data}}" id="data" hidden>
       <div class="row">
         <h6><center>Addon Filters</center></h6>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
@@ -175,7 +175,10 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
         <label class="col-form-label text-md-end">{{ __('Choose Brand Name') }}</label>
           <select id="fltr-brand" multiple="true" style="width: 100%;">
-          <option id="allBrandsFilter" value="yes">All Brands</option>
+              @if($data == 'P' || $data == 'all')
+                  <option id="allBrandsFilter" value="yes">All Brands</option>
+              @endif
+
             @foreach($brandMatsers as $brandMatser)
               <option class="allBrandsFilterClass" value="{{$brandMatser->id}}">{{$brandMatser->brand_name}}</option>
             @endforeach
@@ -453,6 +456,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
         var rowperpage = Number($('#rowperpage').val());
         $('.overlay').show();
+
             $.ajax({
                 url:"{{url('getAddonlists')}}",
                 method:'GET',
@@ -467,7 +471,6 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 },
 
                 dataType: 'json',
-
                 success: function(response){
                   var myEle = document.getElementById("noData");
                   if(myEle) {

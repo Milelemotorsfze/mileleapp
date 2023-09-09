@@ -46,7 +46,7 @@
 </div>
 <div class="d-none d-lg-block">
 <div class="dropdown d-inline-block" style="position: absolute; left: 0px; z-index: 500;">
-<img src="{{ asset('logo.jpg') }}" width="35" height="53" alt="Logo">
+<img src="{{ asset('logo.png') }}" width="35" height="53" alt="Logo">
 </div>
 </div>
     <div class="dropdown d-inline-block" style="position: absolute; right: 0px; z-index: 500;">

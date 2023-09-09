@@ -1,15 +1,35 @@
 @extends('layouts.table')
 <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
 <style>
-  div.dataTables_wrapper div.dataTables_info {
-  padding-top: 0px;
+#dtBasicExample1 tbody tr:hover {
+    background-color: #FFFFE0 !important;
+    cursor: pointer;
+}
+.context-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.context-menu ul li {
+    padding: 5px 15px;
+    cursor: pointer;
+}
+.context-menu ul li:hover {
+    background-color: #f0f0f0;
 }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
   text-align: center;
   vertical-align: middle;
 }
-    /* Hide the default "Show x entries" dropdown */
   #dtBasicExample1_length {
     display: none;
   }
@@ -23,15 +43,15 @@
       position: sticky!important;
       top: 0;
       background-color: rgb(194, 196, 204)!important;
-      z-index: 1; /* Ensure the table header is on top of other elements */
+      z-index: 2;
     }
     #table-responsive {
       height: 100vh;
       overflow-y: auto;
     }
-    #dtBasicSupplierInventory {
+    #dtBasicExample1 {
       width: 100%;
-      font-size: 12px;
+      font-size: 16px;
     }
     th.nowrap-td {
       white-space: nowrap;
@@ -44,7 +64,7 @@
 @section('content')
 <div class="card-body">
                         <div class="table-responsive" >
-                            <table id="dtBasicExample1" class="table table-striped table-editable table-edits table table-bordered">
+                            <table id="dtBasicExample1" class="table table-bordered">
                             <thead class="bg-soft-secondary">
                                <tr>
                                 <th style="width:205px;" id="vehicle_id">Ref No</th>
@@ -417,6 +437,13 @@
                             </div>
     </tbody>
 </table>
+ <div id="contextMenu" class="context-menu">
+        <ul>
+            <li><a href="#" id="openOption">Open</a></li>
+            <li><a href="#" id="createSoOption">Create SO</a></li>
+            <li><a href="#" id="bookingOption">Booking</a></li>
+        </ul>
+    </div>
 <script>
     Pusher.logToConsole = true;
     var pusher = new Pusher('243a287e00b3a38463a9', {
@@ -435,14 +462,11 @@ $(document).ready(function() {
                 success: function(updatedData) {
                     console.log('Updated data:', updatedData);
                     var table = $('#dtBasicExample1').DataTable();
-                    // Check if the row exists in the DataTable
                     var row = table.row('#' + id);
                     if (row.length > 0) {
                         var rowData = row.data();
                         console.log('Row data:', rowData);
                         row.data(updatedData);
-
-                        // Redraw the DataTable
                         table.draw(false);
                     } else {
                         console.warn('Row not found in DataTable.');
@@ -497,7 +521,7 @@ $(document).ready(function() {
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('ETA-timer-view'))
             {
-    data: null, // We're using 'null' here because we'll render the content directly in the 'render' function
+    data: null,
     name: 'eta',
     render: function(data, type, row) {
         if (row.estimation_date && row.grn_number === null) {
@@ -663,30 +687,83 @@ $(document).ready(function() {
             @endif
         ],
     });
-    var searchParams = {}; // To store column-specific search values
+    $('#dtBasicExample1 tbody').on('contextmenu', 'tr', function(e) {
+        e.preventDefault();
+        var rowData = table.row(this).data();
+        var rowId = rowData.id;
+        var posX = e.pageX - 75;
+    var posY = e.pageY - 70;
+        showContextMenu(posX, posY, rowId);
+    });
+    $('#openOption').on('click', function() {
+        var rowId = $('#contextMenu').data('row-id');
+        if (rowId !== undefined) {
+            var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
+            window.location.href = url;
+        }
+        hideContextMenu();
+    });
+
+    $('#createSoOption').on('click', function() {
+        var rowId = $('#contextMenu').data('row-id');
+        if (rowId !== undefined) {
+            var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
+            window.location.href = url;
+        }
+        hideContextMenu();
+    });
+
+    $('#bookingOption').on('click', function() {
+        var rowId = $('#contextMenu').data('row-id');
+        if (rowId !== undefined) {
+            var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
+            window.location.href = url;
+        }
+        hideContextMenu();
+    });
+    $(document).on('click', function() {
+        hideContextMenu();
+    });
+    function showContextMenu(x, y, rowId) {
+        $('#contextMenu')
+            .css({
+                top: y + 'px',
+                left: x + 'px'
+            })
+            .data('row-id', rowId)
+            .show();
+    }
+    function hideContextMenu() {
+        $('#contextMenu').hide();
+    }
+    $('#dtBasicExample1 tbody').on('click', 'tr', function() {
+                var rowData = table.row(this).data();
+                var rowId = rowData.id;
+                var currentTime = new Date().getTime();
+                var timeDiff = currentTime - ($(this).data('last-click') || 0);
+                if (timeDiff < 300) { 
+                    var url = '{{ route("vehicleslog.viewdetails", ":id") }}'.replace(':id', rowId);
+                    window.location.href = url;
+                } else {
+                }
+                $(this).data('last-click', currentTime);
+            });
+    var searchParams = {};
     var offset = 0;
     var length = 40;
     var isLoading = false;
-    var loadedRowsSet = new Set(); // Set to track loaded rows' identifiers
-
-    // Function to clear the loaded rows set
+    var loadedRowsSet = new Set();
     function clearLoadedRowsSet() {
         loadedRowsSet.clear();
     }
-
-    // Attach event listeners to input elements in table headers
     table.columns().every(function() {
     var column = this;
-    var searchColumn = $(column.header()).data('column'); // Get the data attribute
-
+    var searchColumn = $(column.header()).data('column');
     $('input', this.header()).on('keyup change', function() {
         if (column.search() !== this.value) {
             column.search(this.value).draw();
         }
-
-        // Update searchParams for the column
         searchParams[searchColumn] = this.value;
-
         offset = 0;
         loadedRowsSet.clear();
         loadMoreData();
@@ -700,21 +777,19 @@ $(document).ready(function() {
             return;
         }
         isLoading = true;
-
-        // Send search values along with other parameters
         $.ajax({
             url: '{{ route("vehicles.viewalls") }}',
             type: 'GET',
             data: {
                 offset: offset,
                 length: length,
-                columns: searchParams // Send search values
+                columns: searchParams
             },
             success: function(data) {
-                var newData = data.filter(row => !loadedRowsSet.has(row.id)); // Filter out existing rows
+                var newData = data.filter(row => !loadedRowsSet.has(row.id));
                 if (newData.length > 0) {
-                    table.rows.add(newData).draw(false); // Append new rows without clearing
-                    newData.forEach(row => loadedRowsSet.add(row.id)); // Update loaded rows set
+                    table.rows.add(newData).draw(false);
+                    newData.forEach(row => loadedRowsSet.add(row.id));
                     offset += length;
                 }
                 isLoading = false;
