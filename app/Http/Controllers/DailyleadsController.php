@@ -354,6 +354,7 @@ public function closed(Request $request)
     $Closed->created_at = now();
     $Closed->call_id = $request->callId;
     $Closed->save();
+    
     $call = Calls::findOrFail($request->callId);
     $call->status = 'Closed';
     $call->save();

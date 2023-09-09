@@ -2647,7 +2647,6 @@ public function viewalls(Request $request)
         if (!$vehicle) {
             return response()->json(['message' => 'Vehicle not found'], 404);
         }
-    
         // Modify the vehicle data here as needed...
         $vehicle->so_number = $vehicle->so ? $vehicle->so->so_number : '';
         $vehicle->so_date = $vehicle->so ? $vehicle->so->so_date : '';

@@ -50,6 +50,7 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\LoginActivityController;
 use App\Http\Controllers\KitCommonItemController;
 use App\Http\Controllers\ProspectingController;
+use App\Http\Controllers\BookingController;
 
 
 /*
@@ -381,6 +382,18 @@ Route::get('/d', function () {
     Route::get('vehicles/viewall', [VehiclesController::class, 'viewall'])->name('vehicles.viewall');
     Route::get('vehicles/viewalls', [VehiclesController::class, 'viewalls'])->name('vehicles.viewalls');
     Route::get('/get-updated-vehicle/{id}', [VehiclesController::class, 'getUpdatedVehicle'])->name('getUpdatedVehicle');
+
+    //booking
+    Route::get('booking/create/{call_id}', [BookingController::class, 'create'])->name('booking.create');
+    Route::get('/get-model-lines/booking/{brandId}', [BookingController::class, 'getModelLines'])->name('booking.getmodel');
+    Route::get('/get-variants/booking/{modelLineId}', [BookingController::class, 'getVariants'])->name('booking.getvariant');
+    Route::get('/get-interior-colors/{variantId}', [BookingController::class, 'getInteriorColors'])->name('booking.getInteriorColors');
+    Route::get('/get-exterior-colors/{variantId}', [BookingController::class, 'getExteriorColors'])->name('booking.getExteriorColors');
+    Route::get('/get-booking-vehicles/{variantId}/{interiorColorId?}/{exteriorColorId?}', [BookingController::class, 'getbookingvehicles'])->name('booking.getbookingvehicles');
+    Route::post('/submit-booking-request', [BookingController::class, 'store'])->name('booking.store');
+    Route::get('booking/info', [BookingController::class, 'index'])->name('booking.index');
+    Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');
+
 
     // Vendors
 
