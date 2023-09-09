@@ -190,7 +190,13 @@ body {font-family: Arial, Helvetica, sans-serif;}
                 Spare Parts
             @endif
                 Details</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                @if($previous != '')
+                <a  class="btn btn-sm btn-info float-first" href="{{ route('addon.kitItems',$previous) }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Previous Record</a>
+                @endif
+                @if($next != '')
+                <a  class="btn btn-sm btn-info float-first" href="{{ route('addon.kitItems',$next) }}" >Next Record <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                @endif
+                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
 

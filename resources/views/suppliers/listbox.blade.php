@@ -323,8 +323,8 @@
         </div>
       </div>
       <div class="overlay"></div>
-    @else
+  @else
       <h6 style="text-align:center; padding-top:10px;">No data found !!</h6>
-    @endif
+  @endif
   @endif
   

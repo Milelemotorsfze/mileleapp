@@ -48,7 +48,12 @@ class AddonController extends Controller
         // dd('hi');
         $rowperpage = 12;
         $content = 'addon';
-        $addonMasters = Addon::select('id','name')->orderBy('name', 'ASC')->get();
+        $addonMasters = Addon::select('id','addon_type','name')->orderBy('name', 'ASC');
+        if($data != 'all')
+        {
+            $addonMasters = $addonMasters->where('addon_type',$data);
+        }
+        $addonMasters = $addonMasters->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
@@ -74,65 +79,103 @@ class AddonController extends Controller
             'modelLineMasters','data','content','rowperpage','addonIds'));
 
     }
+    public function getRelatedModelLines(Request $request)
+    {
+        $modelLines = MasterModelLines::select('id','brand_id','model_line');
+        if($request->BrandIds != '' && count($request->BrandIds) > 0)
+        {
+            $modelLines = $modelLines->whereIn('brand_id',$request->BrandIds);
+        }
+        $modelLines = $modelLines->get();
+        return response()->json($modelLines);
+    }
     public function getAddonlists(Request $request) {
         $start = $request->start;
         $rowperpage = 12;
         $content = 'addon';
         // Fetch records
+        $addonIds = $addonsTableData = [];
         $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
                     ->orderBy('id','DESC');
+
         if($request->addon_type != 'all')
         {
-            $addons =  $addons->where('addon_type_name', $request->addon_type);
+            $addons = $addons->where('addon_type_name',$request->addon_type);
         }
-        /// filter
+        else
+        {
+            $addons = $addons->whereIn('addon_type_name',['P','SP','K']);
+        }
         if($request->AddonIds)
         {
-            $addons = $addons->whereIn('addon_id', $request->AddonIds);
+            $addons = $addons->whereIn('addon_id',$request->AddonIds);
         }
+//        info($request->BrandIds);
+//        info($request->ModelLineIds);
+
         if($request->BrandIds)
         {
             if(in_array('yes',$request->BrandIds))
             {
-//                info("all brands");
                 $addons = $addons->where('is_all_brands','yes');
-
             }
             else
             {
-//                $addons = $addons->where('is_all_brands','yes');
-                $addons = $addons->whereHas('AddonTypes', function($q) use($request) {
+                $addons = $addons->where('is_all_brands','yes');
+                $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
+                {
                     $q = $q->whereIn('brand_id',$request->BrandIds);
+                    if($request->ModelLineIds)
+                    {
+                        if(in_array('yes',$request->ModelLineIds))
+                        {
+                            $q = $q->orWhere('is_all_model_lines','yes');
+                        }
+                        else
+                        {
+                            $q->where( function ($query) use ($request)
+                            {
+                                $query = $query->whereIn('model_id',$request->ModelLineIds);
+                            });
+                        }
+                    }
                 });
             }
         }
-//        info($addons->count());
-        if($request->ModelLineIds)
+        elseif($request->ModelLineIds)
         {
-//            $addons = $addons->where('is_all_brands','yes');
-            $addons = $addons->whereHas('AddonTypes', function($q) use($request)
+            $addons = $addons->where('is_all_brands','yes');
+            $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
             {
-                if(in_array('yes', $request->ModelLineIds))
+                if(!in_array('yes',$request->ModelLineIds))
                 {
-//                    info("all model line search");
+                    $q = $q->whereIn('model_id',$request->ModelLineIds);
+                }else{
                     $q = $q->where('is_all_model_lines','yes');
-                }else
-                {
-//                    info("separate model line search");
-                    $q->where( function ($query) use ($request) {
-                        $query = $query->whereIn('model_id',$request->ModelLineIds);
-                    });
                 }
             });
         }
+        $fetchedAddonIds = $addons->pluck('id');
+        if(count($fetchedAddonIds) > 0 && $request->isAddonBoxView != 1)
+        {
+            $addons = AddonDetails::whereIn('id', $fetchedAddonIds)
+                ->with('AddonTypes', function ($q) use ($request) {
+                    if ($request->BrandIds) {
+                        $q = $q->whereIn('brand_id', $request->BrandIds);
+                    }
+                    if ($request->ModelLineIds) {
+                        $q = $q->whereIn('model_id', $request->ModelLineIds);
+                    }
+                    $q = $q->with('brands', 'modelLines', 'modelDescription')->get();
+                })
+                ->with('AddonName', 'SellingPrice', 'PendingSellingPrice');
 
+        }
         $addon1 = $addons->get();
 
         ////////////// filter end ////////////////
-        $totalRowsloaded = $addon1->take($start)->pluck('id');
-        $latestSerialNumberloaded = AddonTypes::whereIn('addon_details_id', $totalRowsloaded)->count();
-//        info("already loaded  data");
-//        info($latestSerialNumberloaded);
+
+
 //        info('start');
 //        info($start);
 
@@ -147,37 +190,29 @@ class AddonController extends Controller
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-
+//            info($addons->pluck('id'));
         }
+
         foreach($addons as $addon)
         {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
             $addon->LeastPurchasePrices = $price;
         }
+
         $html = "";
         // get the count of already loaded data to find the serial number :- add loop key to get S.No:
-        if($request->BrandIds && in_array('yes',$request->BrandIds)){
-            $i = $start;
-        }else{
-            $i= $latestSerialNumberloaded;
-        }
 
+        $i = $request->serial_number;
+        if(count($addon1) > 0)
+        {
         foreach($addons as $value => $addon)
         {
             if($request->isAddonBoxView == 1)
             {
                 $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
                     <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="row">
-                            <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                                Addon Name
-                            </div>
-                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">';
-                if($addon->AddonName->name != '') {
-                    $html .= $addon->AddonName->name;
-                }
-                $html .=  '</div>';
+                        <div class="row">';
                 if($addon->additional_remarks) {
                     $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                                 Additional Remarks
@@ -189,6 +224,14 @@ class AddonController extends Controller
 
                 $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                                 <div class="row" style="padding-right:3px; padding-left:3px;">
+                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        Addon Name
+                                                    </div>
+                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                                    if($addon->AddonName->name != '') {
+                                                        $html .= $addon->AddonName->name;
+                                                    }
+                                                        $html .=  '</div>
                                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                                         Addon Code
                                                     </div>
@@ -298,20 +341,22 @@ class AddonController extends Controller
                         }
                     }
                 }
-                $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                        Fixing Charge
-                                                                  </div>
-                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                if($addon->fixing_charges_included == 'yes') {
-                    $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
-                }
-                else {
-                    if($addon->fixing_charge_amount != '') {
-                        $html .=$addon->fixing_charge_amount .'AED';
+                if($addon->fixing_charges_included) {
+                    $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    Fixing Charge
+                                 </div>
+                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                    if($addon->fixing_charges_included == 'yes') {
+                        $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
                     }
+                    else {
+                        if($addon->fixing_charge_amount != '') {
+                            $html .=$addon->fixing_charge_amount .'AED';
+                        }
 
+                    }
+         $html .=    '</div>';
                 }
-                $html .=    '</div>';
 
                 if($addon->lead_time) {
                     $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -347,19 +392,19 @@ class AddonController extends Controller
                     $html .= '</div>';
 
                 }
-                if($addon->part_number) {
-                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                Part Number
-                                                            </div>
-                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                            '.$addon->part_number.'
-                                                            </div>';
-                }
+                            //                if($addon->part_number) {
+                            //                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                            //                                                                Part Number
+                            //                                                            </div>
+                            //                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                            //                                                            '.$addon->part_number.'
+                            //                                                            </div>';
+                            //                }
                 $html .=      '</div>
                                                     </div>
                                                     <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
                 $html.=    $this->ImagePage($addon);
-               
+
                 $html .='</div>';
 
                 if($addon->is_all_brands == 'yes') {
@@ -441,7 +486,7 @@ class AddonController extends Controller
                                             </button>
                                             <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
                                              id="view-less-'.$addon->id.'" data-key="'.$value.'"  onclick="viewLess('.$addon->id.')">
-                                                View Less<i class="fa fa-arrow-down"></i>
+                                                View Less <i class="fa fa-arrow-up"></i>
                                             </button>
                                         </div>
                                     </div>';
@@ -458,13 +503,12 @@ class AddonController extends Controller
                                 </div>';
                 $data['addon_box_html'] = $html;
             }else{
-
                   if($addon->is_all_brands == 'yes') {
                     $html .= ' <tr data-id="1" class="'.$addon->id.'_allbrands tr each-addon-table-row" id="'.$addon->id.'_allbrands">
                                         <td>'. ++$i. '</td>
                                           <td>';
                                           $html.=    $this->ImageTable($addon);
-                
+
                                                      $html .='</td>
                                           <td> '.$addon->AddonName->name.'</td>
                                            <td>';
@@ -547,27 +591,32 @@ class AddonController extends Controller
                                                       $html .= '</td>';
                                               }
                                           }
-
-                                    $html .= '<td>';
-                                      if($addon->fixing_charges_included == 'yes') {
-                                          $html .= ' <label class="badge badge-soft-success">Fixing Charge Included</label>';
-                                      }else{
-                                          if($addon->fixing_charge_amount != '') {
-                                              $html .= ''.$addon->fixing_charge_amount.' AED';
+                                      if($addon->fixing_charges_included) {
+                                          $html .= '<td>';
+                                          if($addon->fixing_charges_included == 'yes') {
+                                              $html .= ' <label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                          }else{
+                                              if($addon->fixing_charge_amount != '') {
+                                                  $html .= ''.$addon->fixing_charge_amount.' AED';
+                                              }
                                           }
+
+                                          $html .= ' </td>';
                                       }
 
-                      $html .= ' </td>
-                                        <td>'.$addon->part_number.'</td>
-                                        <td>';
+
+                         $html .=    '<td>';
                                               $html.=    $this->tableAddSellingPrice($addon);
                                               $html.=    $this->actionPage($addon);
-
 
                       $html .=              '</td>
                                         </tr>';
                 }else{
-                      foreach($addon->AddonTypes as $key => $AddonTypes) {
+            //                      info("inside addon types");
+            //                      info($addon->id);
+            //                      info($addon->AddonTypes);
+                      $AddonTypes = AddonTypes::where('addon_details_id', $addon->id)->get();
+                      foreach($AddonTypes as $key => $AddonTypes) {
 
                           $html .= '<tr data-id="1" class="';
                               if($AddonTypes->is_all_model_lines == 'yes') {
@@ -686,16 +735,32 @@ class AddonController extends Controller
                   }
 
                 $data['table_html'] = $html;
+
             }
         }
-
+        $data['serial_number'] = $i;
+        }
+        else
+        {
+            if($request->isAddonBoxView == 1)
+            {
+                $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $data['addon_box_html'] = $html;
+            }
+            else
+            {
+                $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
+                $data['table_html'] = $html;
+            }
+            $data['serial_number'] = '';
+        }
         return response($data);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    
+
     function ImageTable($addon) {
         $addonsdata = $addon;
         return view('addon.imageTable', compact('addonsdata'));
@@ -734,7 +799,7 @@ class AddonController extends Controller
         {
             $kititem = '';
             $kititem = KitCommonItem::where('id',$request->kit_item_id)->first();
-            $countBrandModelLines = 0; 
+            $countBrandModelLines = 0;
             if($kititem != '')
             {
                 $addonTypes = '';
@@ -743,7 +808,7 @@ class AddonController extends Controller
                 {
                     $kitBrand = $addonTypes->brand_id;
                     $countBrandModelLines = MasterModelLines::where('brand_id',$addonTypes->brand_id)->count();
-                }               
+                }
                 $kitModelLines = AddonTypes::where('addon_details_id',$kititem->addon_details_id)
                 ->groupBy('addon_details_id','model_id','model_year_start','model_year_end')
                 ->select('addon_details_id','model_id','model_year_start','model_year_end')
@@ -753,7 +818,7 @@ class AddonController extends Controller
                 $notAddedModelLines = $countBrandModelLines - $addedModelLines;
                 if(count($kitModelLines) > 0)
                 {
-                    foreach($kitModelLines as $kitModelLine)       
+                    foreach($kitModelLines as $kitModelLine)
                     {
                         $kitModelLine->allDescriptions = MasterModelDescription::where('model_line_id',$kitModelLine->model_id)->get();
                         $kitModelLine->Descriptions = AddonTypes::where([
@@ -839,6 +904,7 @@ class AddonController extends Controller
 //          else
 //         {
     $input = $request->all();
+
 //    info($input);
 //    dd($input);
     if($request->image)
@@ -910,8 +976,7 @@ class AddonController extends Controller
                     }
                 }
             }
-
-
+            $input['fixing_charge_amount'] = null;
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
             {
@@ -1265,7 +1330,7 @@ class AddonController extends Controller
     }
     public function editAddonDetails($id)
     {
-        // AddonSuppliersUsed
+
         // one addon - multiple suppliers - suppliers cannot repeat
         $addonDetails = AddonDetails::where('id',$id)->with('partNumbers','AddonTypes','AddonName','AddonSuppliers','SellingPrice','PendingSellingPrice')->first();
         $price = '';
@@ -1341,13 +1406,16 @@ class AddonController extends Controller
         {
             $supplierId = [];
             $supplierId = SupplierAddons::where([
+                                            ['addon_details_id','=',$supplierAddon->addon_details_id],
                                             ['purchase_price_aed', '=', $supplierAddon->purchase_price_aed],
                                             ['purchase_price_usd', '=', $supplierAddon->purchase_price_usd],
                                             ['lead_time_min', '=', $supplierAddon->lead_time_min],
                                             ['lead_time_max', '=', $supplierAddon->lead_time_max],
                                         ])->pluck('supplier_id');
             $supplierAddon->suppliers = Supplier::whereIn('id',$supplierId)->select('id','supplier')->get();
+            // dd($supplierAddon->suppliers);
         }
+
         // $descriptions = AddonDetails::where('addon_type_name', $addonDetails->addon_type_name)
         //     ->where('addon_id', $addonDetails->addon_id)
         //     ->whereNotNull('description')->select('id','description')
@@ -2061,6 +2129,7 @@ class AddonController extends Controller
             });
         }
         $addonIds = $addonIds->pluck('id');
+
         $data['addonsBox'] = $addonIds;
 
         if(count($addonIds) > 0)
@@ -2238,7 +2307,10 @@ class AddonController extends Controller
         // ->with('AddonSuppliers','AddonSuppliers.Suppliers','AddonSuppliers.Kit.addon.AddonName')
         // $supplierAddonDetails = SupplierAddons::where('addon_details_id',$id)->with('Suppliers','Kit.addon.AddonName','supplierAddonDetails.SellingPrice')->get();
         // dd($supplierAddonDetails);
-        return view('addon.kititems',compact('supplierAddonDetails'));
+        $previous = $next = '';
+        $previous = AddonDetails::where('addon_type_name',$supplierAddonDetails->addon_type_name)->where('id', '<', $id)->max('id');
+        $next = AddonDetails::where('addon_type_name',$supplierAddonDetails->addon_type_name)->where('id', '>', $id)->min('id');
+        return view('addon.kititems',compact('supplierAddonDetails','previous','next'));
     }
     public function statusChange(Request $request)
     {

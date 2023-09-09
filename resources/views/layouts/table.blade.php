@@ -76,6 +76,26 @@
             $('#kits-table').DataTable();
             $('#permission-table').DataTable();
             $('#module-table').DataTable();
+            $('#addon-pending-selling-prices').DataTable({
+                "pageLength": 5,
+                "dom": 'frtip',
+            });
+            $('#addon-without-selling-prices').DataTable({
+                "pageLength": 5,
+                "dom": 'frtip',
+            });
+            $('#table-latest-accessories').DataTable({
+                "pageLength": 5,
+                "dom": 'frtip',
+            });
+            $('#table-latest-spare-parts').DataTable({
+                "pageLength": 5,
+                "dom": 'frtip',
+            });
+            $('#table-latest-kits').DataTable({
+                "pageLength": 5,
+                "dom": 'frtip',
+            });
 
 
             // $('#suppliersList').DataTable();

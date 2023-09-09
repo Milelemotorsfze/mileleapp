@@ -149,15 +149,15 @@
                             <span class="error">* </span>
                             <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                             <input type="text" class="startyearpicker form-control widthinput"  name="brand[{{$i}}][model][{{$j}}][model_year_start]"
-                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value="2027"/>
+                                   id="selectModelYearStart{{$i}}Des{{$j}}" onkeydown="return false;" value="2027" onchange=checkGreaterYear(1,1) />
 
                             <span id="modelYearStart{{$i}}Error{{$j}}" class="modelYearStartError invalid-feedback-lead"></span>
                         </div>
                         <div class="col-xxl-1 col-lg-5 col-md-12 model-description-dropdown" id="showModelYearEnddrop{{$i}}Des{{$j}}" >
-                            
+
                             <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
                             <input type="text" class="endyearpicker  form-control widthinput" name="brand[{{$i}}][model][{{$j}}][model_year_end]"
-                                   id="selectModelYearEnd{{$i}}Des{{$j}}"  value="{{ $ModelLine->model_year_end }}"  />
+                                   id="selectModelYearEnd{{$i}}Des{{$j}}"  value="{{ $ModelLine->model_year_end }}"  onchange=checkGreaterYear(1,1) />
 
                             <span id="modelYearEnd{{$i}}Error{{$j}}" class="modelYearEndError invalid-feedback-lead"></span>
                         </div>
@@ -240,7 +240,7 @@
             }
         }
 
-       
+
         ///////////////////// dropdown /////////////
 
         var index = 1;
@@ -457,13 +457,13 @@
 
                     $(this).find('.model-year-start-dropdown').attr('id', 'showModelYearStartdrop' + indexNumber + 'Des' + modelIndex);
                     $(this).find('.startyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_start]');
-                    // $(this).find('.startyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                    $(this).find('.startyearpicker').attr('onchange', 'checkGreaterYear('+ indexNumber +','+modelIndex +')');
                     $(this).find('.startyearpicker').attr('id', 'selectModelYearStart'+ indexNumber +'Des'+ modelIndex);
                     $(this).find('.modelYearStartError').attr('id', 'modelYearStart'+ indexNumber +'Error' + modelIndex);
 
                     $(this).find('.model-year-end-dropdown').attr('id', 'showModelYearEnddrop' + indexNumber + 'Des' + modelIndex);
                     $(this).find('.endyearpicker').attr('name', 'brand['+ indexNumber +'][model][' + modelIndex + '][model_year_end]');
-                    // $(this).find('.endyearpicker').attr('oninput', 'checkGreaterYear(this,'+ indexNumber +','+modelIndex +')');
+                    $(this).find('.endyearpicker').attr('onchange', 'checkGreaterYear('+ indexNumber +','+modelIndex +')');
                     $(this).find('.endyearpicker').attr('id', 'selectModelYearEnd'+ indexNumber +'Des'+ modelIndex);
                     $(this).find('.modelYearEndError').attr('id', 'modelYearEnd'+ indexNumber +'Error' + modelIndex);
 
@@ -648,7 +648,7 @@
                     <span class="error">* </span>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year Start</label>
                     <input type="text" class="startyearpicker form-control widthinput" onkeydown="return false;"
-                    name="brand[${supplier}][model][${index}][model_year_start]"
+                    name="brand[${supplier}][model][${index}][model_year_start]" onchange=checkGreaterYear(1,1)
                            id="selectModelYearStart${supplier}Des${index}" value=""/>
 
                     <span id="modelYearStart${supplier}Error${index}" class="modelYearStartError invalid-feedback-lead"></span>
@@ -656,7 +656,7 @@
 
                 <div class="col-xxl-1 col-lg-1 col-md-12 model-year-end-dropdown" id="showModelYearEnddrop${supplier}Des${index}" hidden>
                     <label for="choices-single-default" class="form-label font-size-13">Model Year End</label>
-                    <input type="text" class="endyearpicker form-control widthinput"
+                    <input type="text" class="endyearpicker form-control widthinput" onchange=checkGreaterYear(1,1)
                     name="brand[${supplier}][model][${index}][model_year_end]"
                            id="selectModelYearEnd${supplier}Des${index}"  value=""/>
                     <span id="modelYearEnd${supplier}Error${index}" class="modelYearEndError invalid-feedback-lead"></span>
@@ -1013,6 +1013,62 @@
                 }
             }
         }
+    }
+    function checkGreaterYear(i,j)
+    {
+        var modelYearStart = $('#selectModelYearStart'+i+'Des'+ j).val();
+        var modelYearEnd = $('#selectModelYearEnd'+i+'Des'+ j).val();
+
+         if(modelYearEnd != '' && modelYearEnd.length != 4)
+        {
+            $msg = "Model Year required 4 digits number"
+            showModelYearEndError($msg,i,j);
+            formInputError = true;
+        }
+        else if(modelYearEnd != '' && modelYearStart != '')
+        {
+            if(Number(modelYearEnd) > 2050) {
+                $msg = "The Model Year should be between 2019-2050";
+                showModelYearEndError($msg,i,j);
+                formInputError = true;
+
+            }else if(Number(modelYearEnd) <= Number(modelYearStart))
+            {
+                removeModelYearStartError(i,j);
+                $msg = "Enter higher value than Model year Start"
+                showModelYearEndError($msg,i,j);
+                formInputError = true;
+            }else{
+                removeModelYearEndError(i,j);
+            }
+        }
+        else
+        {
+            removeModelYearStartError(i,j);
+        }
+
+
+        // if(id == 'selectModelYearStart'+i+'Des'+ j )
+        // {
+        //     if(modelYearStart == '')
+        //     {
+        //         $msg = "Model year is Required";
+        //         showModelYearStartError($msg,i,j);
+        //     }
+        //     else if(modelYearStart.length != 4)
+        //     {
+        //         $msg = "Model Year required 4 digits number";
+        //         showModelYearStartError($msg,i,j);
+        //     }
+        // }
+        // else if(id == 'selectModelYearEnd'+i+'Des'+ j )
+        // {
+        //     if(Number(inputModelYearEnd) < Number(inputModelYearStart))
+        //     {
+        //         showModelYearEndError(i,j);
+        //         formInputError = true;
+        //     }
+        // }
     }
     // function showModelNumberDropdown1(id,row)
     // {

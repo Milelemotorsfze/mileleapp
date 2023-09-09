@@ -481,7 +481,6 @@ class KitCommonItemController extends Controller
         foreach($supplierAddonDetails->KitItems as $oneItem)
         {
             $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
-
             $itemSps = [];
             $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id')->toArray();
             $itemModelDes = [];
@@ -490,11 +489,23 @@ class KitCommonItemController extends Controller
             $modelDescSps = AddonTypes::whereIn('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
             $intersectArray = [];
             $intersectArray = array_intersect($modelDescSps,$itemSps);
+            // dd($intersectArray);
             $oneItem->countArray = count($intersectArray);
-            // dd(count($intersectArray));
+            $SpWithoutVendorIds = [];
+            $SpWithoutVendorIds = AddonDetails::whereIn('id',$intersectArray)->doesntHave('AddonSuppliers')->pluck('id');
+            $SpWithoutVendorPartNos = [];
+            $SpWithoutVendorPartNos = SparePartsNumber::whereIn('addon_details_id',$SpWithoutVendorIds)->latest()->with('addondetails')->get();
+            // $oneItem->latestPartNo = $SpWithoutVendorPartNos[0]->part_number;
+            if(count($SpWithoutVendorPartNos) > 0)
+            {
+                $oneItem->latestPartNoSp = $SpWithoutVendorPartNos[0]->addondetails;
+            }
+           
+            
+            // dd($latestPartNoSp);
+            $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
         }
         $supplierAddonDetails->totalPrice = $totalPrice;
-
         $previousPurchsePriceHistory = KitPriceHistory::where('status', 'active')
                                         ->where('addon_details_id', $id)
                                         ->first();
@@ -513,11 +524,12 @@ class KitCommonItemController extends Controller
         $previousSellingPrice = '';
         if($previousSellingPriceHistory) {
            $previousSellingPrice = $previousSellingPriceHistory->selling_price;
-
         }
-
+        $previous = $next = '';
+        $previous = AddonDetails::where('addon_type_name','K')->where('id', '<', $id)->max('id');
+        $next = AddonDetails::where('addon_type_name','K')->where('id', '>', $id)->min('id');
         return view('kit.kititems',compact('supplierAddonDetails','previousPurchasePrice',
-        'previousSellingPrice','id'));
+        'previousSellingPrice','id','previous','next'));
     }
     public function getCommonKitItems(Request $request) {
 

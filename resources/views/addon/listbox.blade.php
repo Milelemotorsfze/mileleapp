@@ -149,7 +149,7 @@
 
                     <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="row">
-                            <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
+                            <!-- <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                 Addon Name
                             </div>
                             <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -159,7 +159,7 @@
                                 @endif
                             </div>
 
-                            {{--                            // not included--}}
+                            {{--                            // not included--}} -->
                             @if($addonsdata->additional_remarks)
                                 <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
                                     Additional Remarks
@@ -171,6 +171,14 @@
 
                             <div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                 <div class="row" style="padding-right:3px; padding-left:3px;">
+                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    Addon Name
+                                    </div>
+                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    @if($addonsdata->AddonName->name != '')
+                                    {{$addonsdata->AddonName->name}}
+                                    @endif
+                                    </div>
                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                         Addon Code
                                     </div>
@@ -283,18 +291,20 @@
                                             @endif
                                         @endif
                                     @endcan
-                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        Fixing Charge
-                                    </div>
-                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        @if($addonsdata->fixing_charges_included == 'yes')
-                                            <label class="badge badge-soft-success">Fixing Charge Included</label>
-                                        @else
-                                            @if($addonsdata->fixing_charge_amount != '')
-                                                {{$addonsdata->fixing_charge_amount}} AED
+                                    @if($addonsdata->fixing_charges_included)
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            Fixing Charge
+                                        </div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            @if($addonsdata->fixing_charges_included == 'yes')
+                                                <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                            @else
+                                                @if($addonsdata->fixing_charge_amount != '')
+                                                    {{$addonsdata->fixing_charge_amount}} AED
+                                                @endif
                                             @endif
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
 
                                     @if($addonsdata->lead_time)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -328,25 +338,23 @@
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                                         </div>
                                     @endif
-                                    @if($addonsdata->part_number)
-                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                            Part Number
-                                        </div>
-                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                            {{$addonsdata->part_number}}
-                                        </div>
-                                    @endif
+{{--                                    @if($addonsdata->part_number)--}}
+{{--                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">--}}
+{{--                                            Part Number--}}
+{{--                                        </div>--}}
+{{--                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">--}}
+{{--                                            {{$addonsdata->part_number}}--}}
+{{--                                        </div>--}}
+{{--                                    @endif--}}
                                 </div>
                             </div>
-                            <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">
+                            <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px; width:232px; height158px;">
                                 @if($addonsdata->image)
-                               
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
-                                         alt="Addon Image"
-                                         style="width:100%;">
+                                         alt="Addon Image" style="max-height:159px; max-width:232px;">
                                @else
                                <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                                    style="width:100%; height:125px;" alt="Addon Image"  />   
+                               style="max-height:159px; max-width:232px;" alt="Addon Image"  />
                                 @endif
                             </div>
                             @if($addonsdata->is_all_brands == 'yes')
@@ -426,7 +434,7 @@
                                         </button>
                                         <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
                                                 onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
-                                            View Less<i class="fa fa-arrow-down"></i>
+                                            View Less <i class="fa fa-arrow-up"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -463,8 +471,8 @@
         for(var i=0;i<=addonCount;i++) {
         var addonTypeCount = $('#addon-type-count-'+addonsIds[i]).val();
 
-        if(addonTypeCount > 5) {
-            for(var j=5;j<=addonTypeCount;j++) {
+        if(addonTypeCount > 3) {
+            for(var j=3;j<=addonTypeCount;j++) {
                 $('.addon-'+addonsIds[i]+'-brand-'+j).attr('hidden',true);
                 $('.addon-'+addonsIds[i]+'-model-line-'+j).attr('hidden',true);
                 $('.addon-'+addonsIds[i]+'-model-number-'+j).attr('hidden', true);
@@ -478,7 +486,7 @@
         var addonTypeCount = $('#addon-type-count-'+addonId).val();
         $('#view-more-'+addonId).attr('hidden', true);
         $('#view-less-'+addonId).attr('hidden', false);
-        for(var j=5;j<=addonTypeCount;j++) {
+        for(var j=3;j<=addonTypeCount;j++) {
             $('.addon-'+addonId+'-brand-'+j).attr('hidden',false);
             $('.addon-'+addonId+'-model-line-'+j).attr('hidden',false);
             $('.addon-'+addonId+'-model-number-'+j).attr('hidden', false);
@@ -491,7 +499,7 @@
         $('#view-more-'+addonId).attr('hidden', false);
         $('#view-less-'+addonId).attr('hidden', true);
 
-        for(var j=5;j<=addonTypeCount;j++) {
+        for(var j=3;j<=addonTypeCount;j++) {
             $('.addon-'+addonId+'-brand-'+j).attr('hidden',true);
             $('.addon-'+addonId+'-model-line-'+j).attr('hidden',true)
             $('.addon-'+addonId+'-model-number-'+j).attr('hidden', true);

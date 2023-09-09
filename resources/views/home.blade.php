@@ -55,7 +55,7 @@
 <div id="chartContainer" style="width: 100%; height: 350px;">
     <canvas id="barChart"></canvas>
 </div>
-                                        
+
                                     </div>
                                 </div><!-- end card body -->
                             </div><!-- end card -->
@@ -122,7 +122,7 @@
 @endif -->
               <div class="row">
               <div class="col-xl-5">
-                
+
               <div class="card card-h-100">
                                 <!-- card body -->
                                 <div class="card-body">
@@ -144,22 +144,22 @@
                                             </div>
                                             </div>
                                             </div>
-<div class="col-xl-7">
+                        <div class="col-xl-7">
                             <div class="card">
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
                                     <div class="flex-shrink-0">
                                     <div style="position: relative; width: 100%; height: 5vh;">
-    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
-        <i class="fa fa-calendar"></i>&nbsp;
-        <span></span> <i class="fa fa-caret-down"></i>
-    </div>
-</div>
-<form id="date-range-form" method="POST">
-    @csrf
-    <input type="hidden" name="start_date" id="start_date">
-    <input type="hidden" name="end_date" id="end_date">
-</form> 
+                                    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <form id="date-range-form" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="start_date" id="start_date">
+                                    <input type="hidden" name="end_date" id="end_date">
+                                </form>
                                     </div>
                                 </div><!-- end card header -->
                                 <div class="card-body px-0">
@@ -184,7 +184,7 @@
 </div>
                                             </div>
                                         </div>
-                                  
+
                                     </div>
                                     <!-- end tab content -->
                                 </div>
@@ -248,7 +248,7 @@
             $brand_name = $brands->brand_name;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($brand_name))}}</td>
 
 @php
@@ -259,7 +259,7 @@
           $model_line = $model_lines->model_line;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($model_line))}}</td>
                                                             <td>{{ ucwords(strtolower($rowsmonth->location))}}</td>
                                                             @php
@@ -304,7 +304,7 @@
                                                     $brand_name = $brands->brand_name;
                                                     }
                                                     }
-                                                    @endphp  
+                                                    @endphp
                                                     <td>{{ ucwords(strtolower($brand_name))}}</td>
                                                     @php
                                                     $model_line = '';
@@ -315,9 +315,9 @@
                                                     }
                                                     }
                                                     else{
-                                                     $model_line = $rowsweek->custom_brand_model;  
+                                                     $model_line = $rowsweek->custom_brand_model;
                                                     }
-                                                    @endphp  
+                                                    @endphp
                                                     <td>{{ ucwords(strtolower($model_line))}}</td>
                                                     <td>{{ ucwords(strtolower($rowsweek->location))}}</td>
                                                     @php
@@ -362,7 +362,7 @@
             $brand_name = $brands->brand_name;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($brand_name))}}</td>
 @php
     $model_line = '';
@@ -372,7 +372,7 @@
           $model_line = $model_lines->model_line;
         }
     }
-@endphp  
+@endphp
 <td>{{ ucwords(strtolower($model_line))}}</td>
                                                             <td>{{ ucwords(strtolower($rowsyesterday->location))}}</td>
                                                             @php
@@ -424,26 +424,26 @@
                 @foreach ($variants as $variantsp)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ $variantsp->name }}</td> 
+                    <td>{{ $variantsp->name }}</td>
                     @php
                      $brand = DB::table('brands')->where('id', $variantsp->brands_id)->first();
                      $brand_name = $brand->brand_name;
-                     @endphp    
+                     @endphp
                     <td>{{ $brand_name }}</td>
                     @php
                      $model = DB::table('master_model_lines')->where('id', $variantsp->master_model_lines_id)->first();
                      $model_line = $model->model_line;
-                     @endphp 
+                     @endphp
                     <td>{{ $model_line }}</td>
-                    <td>{{ $variantsp->int_colour }}</td> 
+                    <td>{{ $variantsp->int_colour }}</td>
                     <td>{{ $variantsp->ext_colour }}</td>
                    <td><a data-placement="top" class="btn btn-sm btn-success" href="{{ route('variant_pictures.edit',$variantsp->id) }}"><i class="fa fa-camera" aria-hidden="true"></i></a>
-                   </td>        
+                   </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
+          </div>
           </div>
           </div>
           </div>
@@ -471,36 +471,39 @@
                 @foreach ($reels as $reels)
                   <tr data-id="1">
                   <td>{{ ++$i }}</td>
-                    <td>{{ $reels->name }}</td> 
+                    <td>{{ $reels->name }}</td>
                     @php
                      $brand = DB::table('brands')->where('id', $reels->brands_id)->first();
                      $brand_name = $brand->brand_name;
-                     @endphp    
+                     @endphp
                     <td>{{ $brand_name }}</td>
                     @php
                      $model = DB::table('master_model_lines')->where('id', $reels->master_model_lines_id)->first();
                      $model_line = $model->model_line;
-                     @endphp 
+                     @endphp
                     <td>{{ $model_line }}</td>
-                    <td>{{ $reels->int_colour }}</td> 
+                    <td>{{ $reels->int_colour }}</td>
                     <td>{{ $reels->ext_colour }}</td>
                     <td><a data-placement="top" class="btn btn-sm btn-info" href="{{ route('variant_pictures.editreels',$reels->id) }}"><i class="fa fa-film" aria-hidden="true"></i></a></td>
-                   </td>        
+                   </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
-          </div>  
+          </div>
           </div>
           </div>
           </div>
                         </div>
                         @endif -->
                         <!-- end col -->
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
+
 $(function() {
+
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         $('#start_date').val(start.format('YYYY-MM-DD'));
@@ -636,6 +639,7 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
     });
     </script>
     <script type="text/javascript">
+
 $(function() {
     var start = moment().subtract(29, 'days');
     var end = moment();
@@ -668,7 +672,7 @@ console.log("waqar");
 }
         });
     }
-    
+
     $('#leadsdis').daterangepicker({
         startDate: start,
         endDate: end,
@@ -681,13 +685,302 @@ console.log("waqar");
            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
     }, cb);
-    
+
     cb(start, end);
+
+
 });
+
+
 </script>
     @endif
     @endcan
+
+    <div class="row ">
+        @can('addon-selling-price-view')
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-selling-price-view');
+            @endphp
+            @if ($hasPermission)
+                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
+                    <div class="card " style="min-height: 550px;">
+                        <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Addon Selling Prices</h4>
+
+                            <select id="addon_type" name="addon_type"  class="form-control float-end p-2" style="width: 20%"  >
+                                <option value="P" >Accessories</option>
+                                <option value="SP" >Spare Parts</option>
+                                <option value="K">Kit</option>
+                            </select>
+                            <div class="flex-shrink-0">
+                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#selling-price-not-added" id="with-out-selling-price-tab" role="tab">
+                                            Without Selling Price
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#pending-selling-price" id="pending-price-tab" role="tab">
+                                            Pending
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- end nav tabs -->
+                            </div>
+                        </div><!-- end card header -->
+                        <div class="tab-content"  >
+                            <div class="tab-pane fade show active" id="selling-price-not-added">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="addon-without-selling-prices"  class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-without-selling-price-body">
+                                            @if($withOutSellingPrices->count() > 0)
+                                                @foreach($withOutSellingPrices as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code }}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}
+                                                            @if($row->description) {{ ($row->AddonDescription->description ?? '') }} @endif
+
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="pending-selling-price">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="addon-pending-selling-prices" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                                <th>Selling Price</th>
+                                                <th>Requested By</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table-pending-selling-price-body">
+
+                                            @if($pendingSellingPrices->count() > 0)
+                                                @foreach($pendingSellingPrices as $row)
+                                                    <tr>
+                                                        <td>{{$row->addonDetail->addon_code ?? ''}}</td>
+                                                        <td>{{$row->addonDetail->AddonName->name ?? ''}}
+                                                            {{ ($row->addonDetail->AddonDescription->description ?? '') }}
+                                                        </td>
+                                                        <td>{{$row->selling_price ?? ''}}</td>
+                                                        <td>{{$row->CreatedBy->name ?? ''}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endcan
+        @can('addon-view')
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('addon-view');
+            @endphp
+            @if ($hasPermission)
+                <div class="col-xl-6 col-sm-12 col-md-12 col-xxl-6">
+                    <div class="card " style="min-height: 550px;">
+                        <div class="card-header align-items-center ">
+                            <h4 class="card-title mb-0 flex-grow-1 text-center mb-3">Recently Added Addons</h4>
+                            <div class="flex-shrink-0">
+                                <ul class="nav nav-tabs-custom rounded card-header-tabs" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" data-bs-toggle="tab" href="#latest-accessories"  role="tab">
+                                            Accessories
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link " data-bs-toggle="tab" href="#latest-spare-parts"  role="tab">
+                                            Spare Parts
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" data-bs-toggle="tab" href="#latest-kits"  role="tab">
+                                            Kits
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!-- end nav tabs -->
+                            </div>
+                        </div><!-- end card header -->
+                        <div class="tab-content" >
+                            <div class="tab-pane fade show active" id="latest-accessories">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="table-latest-accessories" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+                                            @if($recentlyAddedAccessories->count() > 0)
+                                                @foreach($recentlyAddedAccessories as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code }}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="latest-spare-parts">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="table-latest-spare-parts" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody >
+
+                                            @if($recentlyAddedSpareParts->count() > 0)
+                                                @foreach($recentlyAddedSpareParts as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code ?? ''}}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}</td>
+
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade " id="latest-kits">
+                                <div class="card-body">
+                                    <div class="table-responsive ">
+                                        <table id="table-latest-kits" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th>Addon Code</th>
+                                                <th>Addon Name</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            @if($recentlyAddedKits->count() > 0)
+                                                @foreach($recentlyAddedKits as $row)
+                                                    <tr>
+                                                        <td>{{$row->addon_code ?? ''}}</td>
+                                                        <td>{{$row->AddonName->name ?? ''}}</td>
+                                                    </tr>
+                                                @endforeach
+                                            @else
+                                                <tr>
+                                                    <td colspan="4">No Data Available</td>
+                                                </tr>
+
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endcan
+    </div>
+
     <!-- <div id="root"></div>
     <link href="static/css/main.073c9b0a.css" rel="stylesheet">
     <script src="static/js/main.03fee2c2.js"></script> -->
 @endsection
+@push('scripts')
+    <script>
+
+        $("#addon_type").change(function(){
+
+            var addonType = $(this).val();
+
+            $.ajax
+            ({
+                url: 'addon-dashboard/sellingPriceFilter',
+                type: "GET",
+                dataType: "json",
+                data:{
+                    addon_type:addonType
+                },
+                success:function(response)
+                {
+                    var withOutSellingPrices = response.withOutSellingPrices;
+                    var pendingSellingPrices = response.pendingSellingPrices;
+
+                    $('#addon-without-selling-prices').DataTable().destroy();
+                    $("#table-without-selling-price-body").empty();
+                    withOutSellingPrices.forEach(function(item) {
+                            var row = '<tr >' +
+                                '<td>' + item.addon_code + '</td>' +
+                                '<td>' + item.addon_name.name  + '</td>';
+
+                            $("#table-without-selling-price-body").append(row);
+                        })
+                   $("#addon-without-selling-prices").DataTable();
+
+                        ///// pending ///////
+                    $('#addon-pending-selling-prices').DataTable().destroy();
+                    $("#table-pending-selling-price-body").empty();
+                    pendingSellingPrices.forEach(function(item) {
+                        var row = '<tr >' +
+                            '<td>' + item.addon_detail.addon_code + '</td>' +
+                            '<td>' + item.addon_detail.addon_name.name + '</td>'+
+                            '<td>' + item.selling_price + '</td>' +
+                            '<td>' + item.created_by.name + '</td>';
+
+                        $("#table-pending-selling-price-body").append(row);
+                    })
+                    $("#addon-pending-selling-prices").DataTable();
+                }
+            });
+
+
+        });
+    </script>
+@endpush

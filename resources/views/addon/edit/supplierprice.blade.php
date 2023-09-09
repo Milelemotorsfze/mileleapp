@@ -170,9 +170,10 @@
         }
         $(document.body).on('click', ".removeButton", function (e)
         {
+            var addonType = $('#addon_type').val();
             var countRow = 0;
             var countRow = $(".supplierWithoutKit").find(".supplierWithoutKitApendHere").length;
-            if(countRow > 1)
+            if((countRow > 1 && addonType=='P')  || (countRow > 0 && addonType=='SP'))
             {
                 var indexNumber = $(this).attr('data-index');
                 $(this).closest('#row-'+indexNumber).find("option:selected").each(function() {

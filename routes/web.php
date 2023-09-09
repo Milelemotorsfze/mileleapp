@@ -123,6 +123,7 @@ Route::get('/d', function () {
     Route::post('createSellingPrice/{id}', [AddonController::class, 'createSellingPrice'])->name('addon.createSellingPrice');
     Route::post('addon/status-change', [AddonController::class, 'addonStatusChange'])->name('addon.status-change');
     Route::post('getKitItemsForAddon', [AddonController::class, 'getKitItemsForAddon']);
+    Route::get('getRelatedModelLines', [AddonController::class,'getRelatedModelLines'])->name('addon.getRelatedModelLines');
     Route::get('get_student_data', [SupplierAddonController::class,'get_student_data'])->name('addon.get_student_data');
     Route::resource('student', SupplierAddonController::class);
 
@@ -403,4 +404,11 @@ Route::get('/d', function () {
     Route::resource('permissions', PermissionController::class);
     Route::resource('modules', ModuleController::class);
     Route::resource('prospecting', ProspectingController::class);
-});
+
+    // DASHBOARD PARTS AND PROCURMENT
+
+    Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
+
+
+
+    });
