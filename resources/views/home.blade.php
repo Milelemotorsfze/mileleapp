@@ -740,22 +740,12 @@ console.log("waqar");
                                             </tr>
                                             </thead>
                                             <tbody id="table-without-selling-price-body">
-                                            @if($withOutSellingPrices->count() > 0)
                                                 @foreach($withOutSellingPrices as $row)
                                                     <tr>
                                                         <td>{{$row->addon_code }}</td>
-                                                        <td>{{$row->AddonName->name ?? ''}}
-                                                            @if($row->description) {{ ($row->AddonDescription->description ?? '') }} @endif
-
-                                                        </td>
+                                                        <td>{{$row->AddonName->name ?? ''}}</td>
                                                     </tr>
                                                 @endforeach
-                                            @else
-                                                <tr>
-                                                    <td colspan="4">No Data Available</td>
-                                                </tr>
-
-                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -775,23 +765,14 @@ console.log("waqar");
                                             </thead>
                                             <tbody id="table-pending-selling-price-body">
 
-                                            @if($pendingSellingPrices->count() > 0)
                                                 @foreach($pendingSellingPrices as $row)
                                                     <tr>
                                                         <td>{{$row->addonDetail->addon_code ?? ''}}</td>
-                                                        <td>{{$row->addonDetail->AddonName->name ?? ''}}
-                                                            {{ ($row->addonDetail->AddonDescription->description ?? '') }}
-                                                        </td>
-                                                        <td>{{$row->selling_price ?? ''}}</td>
+                                                        <td>{{$row->addonDetail->AddonName->name ?? ''}}</td>
+                                                        <td>{{$row->selling_price }}</td>
                                                         <td>{{$row->CreatedBy->name ?? ''}}</td>
                                                     </tr>
                                                 @endforeach
-                                            @else
-                                                <tr>
-                                                    <td colspan="4">No Data Available</td>
-                                                </tr>
-
-                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -844,19 +825,13 @@ console.log("waqar");
                                             </tr>
                                             </thead>
                                             <tbody >
-                                            @if($recentlyAddedAccessories->count() > 0)
                                                 @foreach($recentlyAddedAccessories as $row)
                                                     <tr>
                                                         <td>{{$row->addon_code }}</td>
                                                         <td>{{$row->AddonName->name ?? ''}}</td>
                                                     </tr>
                                                 @endforeach
-                                            @else
-                                                <tr>
-                                                    <td colspan="4">No Data Available</td>
-                                                </tr>
 
-                                            @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -873,8 +848,6 @@ console.log("waqar");
                                             </tr>
                                             </thead>
                                             <tbody >
-
-                                            @if($recentlyAddedSpareParts->count() > 0)
                                                 @foreach($recentlyAddedSpareParts as $row)
                                                     <tr>
                                                         <td>{{$row->addon_code ?? ''}}</td>
@@ -882,11 +855,6 @@ console.log("waqar");
 
                                                     </tr>
                                                 @endforeach
-                                            @else
-                                                <tr>
-                                                    <td colspan="4">No Data Available</td>
-                                                </tr>
-                                            @endif
                                             </tbody>
                                         </table>
                                     </div>

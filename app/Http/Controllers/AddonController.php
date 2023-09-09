@@ -110,8 +110,6 @@ class AddonController extends Controller
         {
             $addons = $addons->whereIn('addon_id',$request->AddonIds);
         }
-//        info($request->BrandIds);
-//        info($request->ModelLineIds);
 
         if($request->BrandIds)
         {
@@ -176,23 +174,23 @@ class AddonController extends Controller
         ////////////// filter end ////////////////
 
 
-//        info('start');
-//        info($start);
+        info('start');
+        info($start);
 
         if($start >= $addons->count()) {
-//            info('addon null command');
+            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
-//            info($addons->pluck('id'));
+            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-//            info($addons->pluck('id'));
+            info($addons->pluck('id'));
         }
-
+//        info($addons->count());
         foreach($addons as $addon)
         {
             $price = '';
