@@ -19,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'selected_role', // Add the selected_role column here
+        'sales_rap',
     ];
 
     protected $hidden = [

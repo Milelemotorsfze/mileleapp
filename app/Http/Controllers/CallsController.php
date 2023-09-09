@@ -578,7 +578,7 @@ return view('calls.resultbrand', compact('data'));
              else {
                 $salesPerson = User::where('name', $sales_person)->first();
                 if($salesPerson)
-                {
+                { 
                 $sales_person_id = $salesPerson->id;
                 }
                 else{
