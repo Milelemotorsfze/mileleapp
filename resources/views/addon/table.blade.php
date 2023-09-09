@@ -186,15 +186,17 @@
                                             </td>
                                         @endif
                                         @endcan
-                                        <td>
-                                            @if($addonsdata->fixing_charges_included == 'yes')
-                                                <label class="badge badge-soft-success">Fixing Charge Included</label>
-                                            @else
-                                                @if($addonsdata->fixing_charge_amount != '')
-                                                    {{$addonsdata->fixing_charge_amount}} AED
+                                        @if($addonsdata->fixing_charges_included)
+                                            <td>
+                                                @if($addonsdata->fixing_charges_included == 'yes')
+                                                    <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                                @else
+                                                    @if($addonsdata->fixing_charge_amount != '')
+                                                        {{$addonsdata->fixing_charge_amount}} AED
+                                                    @endif
                                                 @endif
-                                            @endif
-                                        </td>
+                                            </td>
+                                        @endif
                                         <td>
                                         @include('addon.action.tableAddSellingPrice')
                                         @include('addon.action.action')
@@ -319,15 +321,17 @@
                                                 </td>
                                             @endif
                                             @endcan
-                                            <td>
-                                                @if($addonsdata->fixing_charges_included == 'yes')
-                                                    <label class="badge badge-soft-success">Fixing Charge Included</label>
-                                                @else
-                                                    @if($addonsdata->fixing_charge_amount != '')
-                                                        {{$addonsdata->fixing_charge_amount}} AED
+                                            @if($addonsdata->fixing_charges_included)
+                                                <td>
+                                                    @if($addonsdata->fixing_charges_included == 'yes')
+                                                        <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                                    @else
+                                                        @if($addonsdata->fixing_charge_amount != '')
+                                                            {{$addonsdata->fixing_charge_amount}} AED
+                                                        @endif
                                                     @endif
-                                                @endif
-                                            </td>
+                                                </td>
+                                            @endif
                                             <td>{{$addonsdata->part_number}}</td>
                                             <td>
                                             @include('addon.action.modelAddonSellingPrice')

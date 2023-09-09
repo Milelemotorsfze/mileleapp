@@ -291,18 +291,20 @@
                                             @endif
                                         @endif
                                     @endcan
-                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        Fixing Charge
-                                    </div>
-                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        @if($addonsdata->fixing_charges_included == 'yes')
-                                            <label class="badge badge-soft-success">Fixing Charge Included</label>
-                                        @else
-                                            @if($addonsdata->fixing_charge_amount != '')
-                                                {{$addonsdata->fixing_charge_amount}} AED
+                                    @if($addonsdata->fixing_charges_included)
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            Fixing Charge
+                                        </div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            @if($addonsdata->fixing_charges_included == 'yes')
+                                                <label class="badge badge-soft-success">Fixing Charge Included</label>
+                                            @else
+                                                @if($addonsdata->fixing_charge_amount != '')
+                                                    {{$addonsdata->fixing_charge_amount}} AED
+                                                @endif
                                             @endif
-                                        @endif
-                                    </div>
+                                        </div>
+                                    @endif
 
                                     @if($addonsdata->lead_time)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">

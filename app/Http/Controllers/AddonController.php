@@ -341,20 +341,22 @@ class AddonController extends Controller
                         }
                     }
                 }
-                $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                        Fixing Charge
-                                                                  </div>
-                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                if($addon->fixing_charges_included == 'yes') {
-                    $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
-                }
-                else {
-                    if($addon->fixing_charge_amount != '') {
-                        $html .=$addon->fixing_charge_amount .'AED';
+                if($addon->fixing_charges_included) {
+                    $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                    Fixing Charge
+                                 </div>
+                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                    if($addon->fixing_charges_included == 'yes') {
+                        $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
                     }
+                    else {
+                        if($addon->fixing_charge_amount != '') {
+                            $html .=$addon->fixing_charge_amount .'AED';
+                        }
 
+                    }
+         $html .=    '</div>';
                 }
-                $html .=    '</div>';
 
                 if($addon->lead_time) {
                     $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -589,22 +591,23 @@ class AddonController extends Controller
                                                       $html .= '</td>';
                                               }
                                           }
-
-                                    $html .= '<td>';
-                                      if($addon->fixing_charges_included == 'yes') {
-                                          $html .= ' <label class="badge badge-soft-success">Fixing Charge Included</label>';
-                                      }else{
-                                          if($addon->fixing_charge_amount != '') {
-                                              $html .= ''.$addon->fixing_charge_amount.' AED';
+                                      if($addon->fixing_charges_included) {
+                                          $html .= '<td>';
+                                          if($addon->fixing_charges_included == 'yes') {
+                                              $html .= ' <label class="badge badge-soft-success">Fixing Charge Included</label>';
+                                          }else{
+                                              if($addon->fixing_charge_amount != '') {
+                                                  $html .= ''.$addon->fixing_charge_amount.' AED';
+                                              }
                                           }
+
+                                          $html .= ' </td>';
                                       }
 
-                      $html .= ' </td>
 
-                                        <td>';
+                         $html .=    '<td>';
                                               $html.=    $this->tableAddSellingPrice($addon);
                                               $html.=    $this->actionPage($addon);
-
 
                       $html .=              '</td>
                                         </tr>';
@@ -740,7 +743,7 @@ class AddonController extends Controller
         else
         {
             if($request->isAddonBoxView == 1)
-            {               
+            {
                 $html .='<h6 id="noData" style="text-align:center; padding-top:10px;">No data found !!</h6>';
                 $data['addon_box_html'] = $html;
             }
@@ -901,6 +904,7 @@ class AddonController extends Controller
 //          else
 //         {
     $input = $request->all();
+
 //    info($input);
 //    dd($input);
     if($request->image)
@@ -972,8 +976,7 @@ class AddonController extends Controller
                     }
                 }
             }
-
-
+            $input['fixing_charge_amount'] = null;
             $addon_details = AddonDetails::create($input);
             if($request->addon_type == 'SP')
             {

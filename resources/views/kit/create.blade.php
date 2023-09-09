@@ -144,7 +144,7 @@
                 <div class="col-xxl-9 col-lg-6 col-md-12">
                     <div class="row">
                     <input hidden id="addon_type" name="addon_type" class="form-control" value="K">
-                    <input type="hidden" name="fixing_charges_included" value="no">
+{{--                    <input type="hidden" name="fixing_charges_included" value="no">--}}
 
                         <!-- <div class="col-xxl-2 col-lg-6 col-md-12" >
                             <span class="error">* </span>
