@@ -395,6 +395,12 @@ Route::get('/d', function () {
     Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');
 
 
+
+
+
+
+
+
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');
@@ -411,6 +417,9 @@ Route::get('/d', function () {
     Route::get('/stock-count-filter',[VehiclesController::class, 'stockCountFilter'])->name('vehicle-stock-report.filter');
     // Master Data
 
+
+
+    
     Route::resource('brands', BrandController::class);
     Route::resource('model-lines', ModelLinesController::class);
     Route::resource('master-addons', MasterAddonController::class);
