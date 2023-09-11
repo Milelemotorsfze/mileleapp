@@ -221,25 +221,25 @@ class AddonController extends Controller
                 }
 
                 $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
-                                                <div class="row" style="padding-right:3px; padding-left:3px;">
-                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        Addon Name
-                                                    </div>
-                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                                    if($addon->AddonName->name != '') {
-                                                        $html .= $addon->AddonName->name;
-                                                    }
-                                                        $html .=  '</div>
-                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        Addon Code
-                                                    </div>
-                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        '. $addon->addon_code.'
-                                                    </div>
-                                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        Addon Type
-                                                    </div>
-                                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                <div class="row" style="padding-right:3px; padding-left:3px;">
+                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                        Addon Name
+                                    </div>
+                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                                    if($addon->AddonName->name != '') {
+                                        $html .= $addon->AddonName->name;
+                                    }
+                                        $html .=  '</div>
+                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                        Addon Code
+                                    </div>
+                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                        '. $addon->addon_code.'
+                                    </div>
+                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                        Addon Type
+                                    </div>
+                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
                 if($addon->addon_type_name == 'K'){
                     $html .=    'Kit';
                 }

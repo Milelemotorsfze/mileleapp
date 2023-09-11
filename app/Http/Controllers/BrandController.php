@@ -3,18 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Html\Builder;
 
 class BrandController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Builder $builder)
     {
-        $brands = Brand::orderBy('id','DESC')->get();
-        return view('brands.index', compact('brands'));
+        $brand = Brand::orderBy('id','DESC')->get();
+        if (request()->ajax()) {
+            return DataTables::of($brand)
+                ->editColumn('created_at', function($query) {
+                    return Carbon::parse($query->created_at)->format('d M Y');
+                })
+                ->editColumn('created_by', function($query) {
+
+                    return $query->CreatedBy->name ?? '';
+                })
+                ->addColumn('action', function(Brand $brand) {
+                    return view('brands.action',compact('brand'));
+                })
+                ->rawColumns(['action'])
+                ->toJson();
+        }
+
+        $html = $builder->columns([
+            ['data' => 'id', 'name' => 'id','title' => 'S.No'],
+            ['data' => 'brand_name', 'name' => 'brand_name','title' => 'Name'],
+            ['data' => 'created_at', 'name' => 'created_at','title' => 'Created At'],
+            ['data' => 'created_by', 'name' => 'created_by','title' => 'Created By'],
+            ['data' => 'action', 'name' => 'action','title' => 'Action'],
+
+        ]);
+
+        return view('brands.index', compact('html'));
     }
 
     /**

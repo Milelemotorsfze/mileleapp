@@ -24,36 +24,13 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <div class="table-responsive">
-            <table id="dtBasicExample3" class="table table-striped table-editable table-edits table">
-                <thead class="bg-soft-secondary">
-                <tr>
-                    <th>Ref No</th>
-                    <th>Brand</th>
-                    <th>Created By</th>
-                    <th>Created At</th>
-                </tr>
-                </thead>
-                <tbody>
-                <div hidden>{{$i=0;}}
-
-                @foreach ($brands as $key => $brand)
-                    <tr>
-                        <td>{{ ++$i }}</td>
-                        <td>{{ $brand->brand_name ?? ''}}</td>
-                        <td>{{ $brand->createdBy->name ?? '' }}</td>
-                        <td>{{ \Carbon\Carbon::parse($brand->created_at)->format('d-m-y')  }}</td>
-                        <td>
-                                <a data-placement="top" href="{{ route('brands.edit', $brand->id) }}" class="btn btn-info btn-sm"><i class="fa fa-edit"></i>
-                                </a>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
+    </div>
+    <div class="m-3">
+        {!! $html->table(['class' => 'table table-bordered table-striped table-responsive '], true) !!}
     </div>
 @endsection
-
+@push('scripts')
+    {!! $html->scripts() !!}
+@endpush
 
 

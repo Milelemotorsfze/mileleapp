@@ -48,7 +48,7 @@
                                     <td>{{ $activeStock->variant->brand->brand_name ?? '' }}</td>
                                     <td>{{ $activeStock->variant->master_model_lines->model_line ?? '' }}</td>
                                     <td>{{ $activeStock->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $activeStock->variant->name }}</td>
+                                    <td>{{ $activeStock->variant->name ?? '' }}</td>
                                     <td>{{ $activeStock->variant->detail ?? '' }}</td>
                                     <td>
                                         @if($activeStock->active_vehicle_price_status == 1)
@@ -95,7 +95,7 @@
                                     <td>{{ $InactiveStock->variant->master_model_lines->model_line ?? '' }}</td>
                                     <td>{{ $InactiveStock->variant->my ?? '' }}</td>
                                     <td>{{ $InactiveStock->variant->model_detail ?? '' }}</td>
-                                    <td>{{ $InactiveStock->variant->name }}</td>
+                                    <td>{{ $InactiveStock->variant->name ?? ''}}</td>
                                     <td>{{ $InactiveStock->variant->detail ?? '' }}</td>
                                     <td>
                                         @if($InactiveStock->inactive_vehicle_price_status == 1)
