@@ -2,19 +2,24 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
 <style>
-/* Center the sorting arrow vertically */
 .dataTables_wrapper .table>thead>tr>th.sorting {
   vertical-align: middle;
 }
   div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
+.days-dropdownf {
+    background: none; /* Remove background */
+    text-align: center; /* Center text horizontally */
+    width: 50px; /* Adjust the width as needed */
+    border: none; /* Remove border if desired */
+    outline: none; /* Remove outline on focus if desired */
+  }
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
   padding: 4px 8px 4px 8px;
   text-align: center;
   vertical-align: middle;
 }
-/* Circular button styles */
 .circle-button {
     display: inline-block;
     width: 20px;
@@ -24,9 +29,9 @@
     text-align: center;
     line-height: 20px;
     border-radius: 50%;
-    border: 1px solid #FFFF00; /* 2px solid yellow border */
+    border: 1px solid #FFFF00; 
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Add a smooth color transition */
+    transition: background-color 0.3s ease; 
 }
 .circle-button::before {
     content: '+';
@@ -41,19 +46,17 @@
     text-align: center;
     line-height: 20px;
     border-radius: 30%;
-    border: 1px solid #FFFF00; /* 2px solid yellow border */
+    border: 1px solid #FFFF00; 
     cursor: pointer;
-    transition: background-color 0.3s ease; /* Add a smooth color transition */
+    transition: background-color 0.3s ease;
 }
 .circle-buttonr::before {
     content: 'X';
     font-size: 16px;
 }
-
-/* Change the button color on hover */
 .circle-button:hover {
-    background-color: #45a049; /* Change to a different color on hover */
-    border: 2px solid #FFFFFF; /* Change the border color on hover */
+    background-color: #45a049;
+    border: 2px solid #FFFFFF;
 }
     </style>
 @php
@@ -87,6 +90,7 @@
             <thead class="bg-soft-secondary">
                         <tr>
                             <th>ID</th>
+                            <th>Status</th>
                             <th>VIN</th>
                             <th>Brand Name</th>
                             <th>Model Line</th>
@@ -162,6 +166,7 @@
             <thead class="bg-soft-secondary">
                         <tr>
                             <th>ID</th>
+                            <th>Status</th>
                             <th>VIN</th>
                             <th>Brand Name</th>
                             <th>Model Line</th>
@@ -284,11 +289,17 @@ var secondTable = $('#dtBasicExample2').DataTable({
             targets: -2,
             data: null,
             render: function (data, type, row) {
+                var callId = $('#call_id').val();
+                var isEditable = checkIfRowIsEditable(callId);
                 var options = '';
-                for (var i = 1; i <= 15; i++) {
-                    options += '<option value="' + i + '">' + i + '</option>';
+                if (isEditable) {
+                    for (var i = 1; i <= 15; i++) {
+                        options += '<option value="' + i + '">' + i + '</option>';
+                    }
+                    return '<select class="days-dropdown">' + options + '</select>';
+                } else {
+                    return '<input type="text" class="days-dropdownf" value="3" readonly>';
                 }
-                return '<select class="days-dropdown">' + options + '</select>';
             }
         }
     ]
@@ -401,6 +412,7 @@ $('#search-button').on('click', function() {
                 var addButton = '<button class="add-button" data-vehicle-id="' + vehicle.id + '">Add</button>';
                 return [
                     vehicle.id,
+                    vehicle.grn_status,
                     vehicle.vin,
                     vehicle.brand,
                     vehicle.model_line,
@@ -418,6 +430,7 @@ $('#search-button').on('click', function() {
                 data: data,
                 columns: [
                     { title: 'ID' },
+                    { title: 'Status' },
                     { title: 'VIN' },
                     { title: 'Brand Name' },
                     { title: 'Model Line' },
@@ -436,9 +449,23 @@ $('#search-button').on('click', function() {
         }
     });
 });
+function checkIfRowIsEditable(callId) {
+    var isEditable = false;
+    $.ajax({
+        type: 'GET',
+        url: '{{ route('booking.checkingso') }}', // Use the named route
+        data: { call_id: callId},
+        async: false,
+        success: function (response) {
+            isEditable = response.editable;
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
 
-//Second Table
-
+    return isEditable;
+}
     });
     </script>
 @endpush

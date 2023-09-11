@@ -766,6 +766,7 @@ input[type=number]::-webkit-outer-spin-button
                   <th>Sales Values</th>
                   <th>Sales Notes</th>
                   <th>So Number</th>
+                  <th>Booking Vehicles</th>
                 </tr>
               </thead>
             </table>
@@ -1924,6 +1925,17 @@ function s2ab(s) {
     }
 },
                 { data: 'so_number', name: 'so_number', searchable: false},
+                {
+    data: 'id',
+    name: 'id',
+    render: function (data, type, row) {
+        const bookingUrl = `{{ url('booking/create') }}/${data}`;
+        return `
+            <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking Vehicles">
+                <i class="fa fa-car" aria-hidden="true"></i>
+            </a>`;
+    }
+},
             ]
         });
         $('#dtBasicExample7').DataTable({

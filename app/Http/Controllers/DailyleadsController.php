@@ -13,6 +13,7 @@ use App\Models\Rejection;
 use App\Models\Closed;
 use App\Models\LeadSource;
 use App\Models\Brand;
+use App\Models\So;
 use App\Models\Prospecting;
 use App\Models\Salesdemand;
 use App\Models\Negotiation;
@@ -119,10 +120,15 @@ class DailyleadsController extends Controller
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(lead_closed.date, '%d-%b-%Y'), '') as cdate"),
                     DB::raw("IFNULL(lead_closed.sales_notes, '') as csalesnotes"),
-					DB::raw("IFNULL(lead_closed.so_number, '') as so_number"),
+                    DB::raw("IFNULL(lead_closed.so_id, '') as so_id"),
                     DB::raw("CONCAT(IFNULL(lead_closed.dealvalues, ''), ' ', IFNULL(lead_closed.currency, '')) as cdealvalues"),
                 );
                 $data->leftJoin('lead_closed', 'calls.id', '=', 'lead_closed.call_id');
+                $data->leftJoin('so', function ($join) {
+                    $join->on('lead_closed.so_id', '=', 'so.id')
+                         ->whereNotNull('lead_closed.so_id');
+                });
+                $data->addSelect(DB::raw("IFNULL(so.so_number, '') as so_number"));
             } elseif ($status === 'Rejected') {
                 $data->addSelect(
                     DB::raw("IFNULL(DATE_FORMAT(prospectings.date, '%d-%b-%Y'), '') as date"),
@@ -344,9 +350,20 @@ public function rejection(Request $request)
 
 public function closed(Request $request)
 {
+    $sonumber = $request->sonumber;
+    $so = So::where('so_number', $sonumber)->first();
+    if (!$so) {
+        $so = new So();
+        $so->so_number = $sonumber;
+        $so->sales_person_id = auth()->user()->id;
+        $so->so_date = $request->date;
+        $so->created_at = now();
+        $so->notes = $request->salesNotes;
+        $so->save();
+    }
     $Closed = new Closed();
     $Closed->date = $request->date;
-    $Closed->so_number = $request->sonumber;
+    $Closed->so_id = $so->id;
     $Closed->sales_notes = $request->salesNotes;
     $Closed->dealvalues = $request->dealvalues;
     $Closed->currency = $request->currency;
@@ -354,7 +371,6 @@ public function closed(Request $request)
     $Closed->created_at = now();
     $Closed->call_id = $request->callId;
     $Closed->save();
-    
     $call = Calls::findOrFail($request->callId);
     $call->status = 'Closed';
     $call->save();

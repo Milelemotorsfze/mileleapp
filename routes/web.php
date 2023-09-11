@@ -393,13 +393,8 @@ Route::get('/d', function () {
     Route::post('/submit-booking-request', [BookingController::class, 'store'])->name('booking.store');
     Route::get('booking/info', [BookingController::class, 'index'])->name('booking.index');
     Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');
-
-
-
-
-
-
-
+    Route::get('booking/checking-so', [BookingController::class, 'checkingso'])->name('booking.checkingso');
+    Route::post('/submit-extended', [BookingController::class, 'extended'])->name('booking.extended');
 
     // Vendors
 

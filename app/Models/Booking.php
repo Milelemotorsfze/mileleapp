@@ -16,5 +16,6 @@ class Booking extends Model
         'vehicle_id',
         'calls_id',
         'created_by',
+        'booking_requests_id',
     ];
 }

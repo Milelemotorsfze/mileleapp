@@ -16,7 +16,7 @@
       position: sticky!important;
       top: 0;
       background-color: rgb(194, 196, 204)!important;
-      z-index: 1; /* Ensure the table header is on top of other elements */
+      z-index: 1;
     }
     #table-responsive {
       height: 100vh;
@@ -116,14 +116,14 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalwsLabel">Approved and Rejected Booking ID: <span id="modalIdValuews"></span></h5>
+                <h5 class="modal-title" id="editModalwsLabel">Extended Time Booking ID: <span id="modalIdValuews"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="editForm">
                     <div class="mb-3">
                         <label for="days" class="form-label">Extended Days:</label>
-                        <select class="form-select" id="days" name="days">
+                        <select class="form-select" id="extendeddays" name="extendeddays">
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -142,17 +142,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="status" class="form-label">Status:</label>
-                        <select class="form-select" id="apstatus" name="apstatus">
-                            <option value="Approved">Approved</option>
-                            <option value="Rejected">Rejected</option>
-                        </select>
+                        <label for="status" class="form-label">Reason:</label>
+                        <input type="text" name="extendedreason" id="extendedreason" class="form-control">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="saveData()">Save changes</button>
+                <button type="button" class="btn btn-primary" onclick="saveDataext()">Save changes</button>
             </div>
         </div>
     </div>
@@ -164,7 +161,7 @@
             <table id="dtBasicExample1" class="table table-striped table-editable table-edits table-bordered">
             <thead class="bg-soft-secondary">
                 <tr>
-                  <th>Booking ID</th>
+                  <th>Booking Request ID</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>Date</th>
@@ -176,7 +173,12 @@
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
+                  @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                @endphp
+                                @if ($hasPermission)
                   <th>Action</th>
+                  @endif
                 </tr>
               </thead>
               <tbody>
@@ -204,7 +206,12 @@
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                @endphp
+                                @if ($hasPermission)
                   <th>Action</th>
+                  @endif
                 </tr>
               </thead>
               <tbody>
@@ -233,6 +240,12 @@
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                @endphp
+                                @if ($hasPermission)
+                  <th>Action</th>
+                  @endif 
                 </tr>
               </thead>
               <tbody>
@@ -277,7 +290,7 @@
             <table id="dtBasicExample5" class="table table-striped table-editable table-edits table table-bordered" style = "width:100%;">
             <thead class="bg-soft-secondary">
                 <tr>
-                <th>Booking ID</th>
+                <th>Booking Request ID</th>
                   <th>SO Number</th>
                   <th>Lead ID</th>
                   <th>Date</th>
@@ -289,6 +302,7 @@
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
+                  <th>Reason</th>
                 </tr>
               </thead>
               <tbody>
@@ -301,11 +315,10 @@
       </div>
     </div>
   </div>
-<!-- Modal for Editing Data -->
   <script>
         $(document).ready(function () {
-            const editModal = $('#editModal'); // Reference to the modal
-            const editModalws = $('#editModalws'); // Reference to the modal
+            const editModal = $('#editModal');
+            const editModalws = $('#editModalws');
         $('#dtBasicExample1').DataTable({
             processing: true,
             serverSide: true,
@@ -323,6 +336,7 @@
                 { data: 'interior_color', name: 'interior_color' },
                 { data: 'exterior_color', name: 'exterior_color' },
                 { data: 'days', name: 'days' },
+                @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
                     name: 'id',
@@ -333,6 +347,7 @@
                         </button>`;
                 }
                 },
+                @endif
             ]
         });
         $('#dtBasicExample2').DataTable({
@@ -351,6 +366,7 @@
                 { data: 'exterior_color', name: 'exterior_color' },
                 { data: 'booking_start_date', name: 'booking_start_date' },
                 { data: 'booking_end_date', name: 'booking_end_date' },
+                @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
                     name: 'id',
@@ -361,6 +377,7 @@
                         </button>`;
                 }
                 },
+                @endif
             ]
         });
         $('#dtBasicExample3').DataTable({
@@ -380,6 +397,18 @@
                 { data: 'exterior_color', name: 'exterior_color' },
                 { data: 'booking_start_date', name: 'booking_start_date' },
                 { data: 'booking_end_date', name: 'booking_end_date' },
+                @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (data, type, row) {
+                        return `
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}">
+                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        </button>`;
+                }
+                },
+                @endif
             ]
         });
         $('#dtBasicExample4').DataTable({
@@ -418,43 +447,30 @@
                 { data: 'interior_color', name: 'interior_color' },
                 { data: 'exterior_color', name: 'exterior_color' },
                 { data: 'days', name: 'days' },
+                { data: 'reason', name: 'reason' },
             ]
         });
-    // // Event handler for when the modal is about to be shown
-    // editModal.on('show.bs.modal', function (event) {
-    //     const button = $(event.relatedTarget);
-    //     const id = button.data('id');
-    //     const days = button.data('days');
-
-    //     // Populate the modal with the id and days values
-    //     $('#modalIdValue').text(id);
-    //     $('#days').val(days); // Set the selected value in the dropdown
-    // });
-        // Event handler for when the modal is about to be shown
         editModalws.on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         const id = button.data('id');
-
-        // Populate the modal with the id and days values
         $('#modalIdValuews').text(id);
     });
     $('#saveButton').on('click', function () {
-        saveData(); // Call the saveData function to handle the AJAX request
+        saveData();
     });
 });
 function saveData() {
-    const id = $('#modalIdValue').text();
-    const days = $('#days').val(); // Get the selected value from the dropdown
+    const id = $('#modalIdValuews').text();
+    const days = $('#days').val();
+    const reason = $('#reason').val();
     const status = $('#apstatus').val();
-
-    // Create an object to send as data in the AJAX request
     const data = {
         id: id,
         days: days,
+        reason: reason,
         status: status
     };
     var csrfToken = $('meta[name="csrf-token"]').attr('content');
-    // Make an AJAX POST request to your controller
     $.ajax({
         url: "{{ route('booking.approval') }}",
         method: 'POST',
@@ -470,7 +486,36 @@ function saveData() {
         }, 2000);
         },
         error: function (error) {
-            console.error(error);
+          alertify.error('Booking Already Existing');
+        }
+    });
+}
+function saveDataext() {
+    const id = $('#modalIdValuews').text();
+    const days = $('#extendeddays').val();
+    const reason = $('#extendedreason').val();
+    const data = {
+        id: id,
+        days: days,
+        reason: reason
+    };
+    var csrfToken = $('meta[name="csrf-token"]').attr('content');
+    $.ajax({
+        url: "{{ route('booking.extended') }}",
+        method: 'POST',
+        data: data,
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        },
+        success: function (response) {
+            $('#editModal').modal('hide');
+            alertify.success('Booking Update successfully');
+        setTimeout(function() {
+            window.location.reload();
+        }, 2000);
+        },
+        error: function (error) {
+          alertify.error('Booking Extended Error');
         }
     });
 }

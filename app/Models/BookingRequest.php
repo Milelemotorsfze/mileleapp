@@ -18,6 +18,6 @@ class BookingRequest extends Model
         'days',
         'process_by',
         'process_date',
-        'booking_requests_id',
+        'reason',
     ];
 }
