@@ -23,7 +23,6 @@ class BrandController extends Controller
                     return Carbon::parse($query->created_at)->format('d M Y');
                 })
                 ->editColumn('created_by', function($query) {
-
                     return $query->CreatedBy->name ?? '';
                 })
                 ->addColumn('action', function(Brand $brand) {

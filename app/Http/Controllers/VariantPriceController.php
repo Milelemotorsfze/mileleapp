@@ -101,8 +101,6 @@ class VariantPriceController extends Controller
             }
         }
 
-//        dd($activeStocks);
-
         return view('variant-prices.index', compact('activeStocks','InactiveStocks'));
     }
 

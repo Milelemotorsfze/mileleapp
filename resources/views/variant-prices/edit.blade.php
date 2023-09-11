@@ -44,7 +44,7 @@
                                     <label for="choices-single-default" class="form-label fw-bold"> Variant:</label>
                                 </div>
                                 <div class="col-lg-8 col-md-9 col-sm-12">
-                                    <span>{{ $vehicle->variant->name }}</span>
+                                    <span>{{ $vehicle->variant->name ?? '' }}</span>
                                 </div>
                             </div>
                             <div class="row">
