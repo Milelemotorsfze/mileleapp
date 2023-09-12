@@ -32,12 +32,33 @@ class DailyleadsController extends Controller
         $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
         if ($request->ajax()) {
             $status = $request->input('status');
+            $searchValue = $request->input('search.value');
             $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
                 ->where('status', $status)->where('sales_person', $id);
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
                 WHERE calls_requirement.lead_id = calls.id) as models_brands'));
+                if (!empty($searchValue)) {
+                    $data->where(function ($query) use ($searchValue) {
+                        $query->where('calls.name', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.created_at', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.email', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.phone', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.location', 'LIKE', "%$searchValue%")
+                            ->orWhere('calls.language', 'LIKE', "%$searchValue%")
+                            ->orWhereHas('callRequirement', function ($subquery) use ($searchValue) {
+                                $subquery->whereHas('masterModelLine', function ($subquery) use ($searchValue) {
+                                    $subquery->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                                        ->where(function ($subquery) use ($searchValue) {
+                                            $subquery->where('brands.brand_name', 'LIKE', "%$searchValue%")
+                                                ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
+                                        });
+                                });
+                            });
+                    });
+                }                                                         
             if ($status === 'Prospecting') {
                 $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
@@ -158,12 +179,14 @@ class DailyleadsController extends Controller
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
             }
             $data->groupBy('calls.id');
+            $result = $data->get();
+            \Log::info($result);  
             return DataTables::of($data)
                 ->addColumn('models_brands', function ($row) {
                     return $row->models_brands;
                 })
                 ->toJson();
-        }    
+        }   
         return view('dailyleads.index', compact('pendingdata'));
     }
     public function create()
@@ -308,14 +331,14 @@ public function prospecting($id)
 {
     $validatedData = $request->validate([
         'date' => 'required|date',
-        'dealValue' => 'required|numeric',
+        'dealValue' => 'nullable|numeric',
         'salesNotes' => 'nullable|string',
         'currency' => 'nullable|string',
     ]);
     $quotation = new quotation();
     $quotation->date = $validatedData['date'];
-    $quotation->deal_value = $validatedData['dealValue'];
-    $quotation->sales_notes = $validatedData['salesNotes'];
+    $quotation->deal_value = isset($validatedData['dealValue']) ? $validatedData['dealValue'] : '';
+    $quotation->sales_notes = isset($validatedData['salesNotes']) ? $validatedData['salesNotes'] : '';
     $quotation->currency = $validatedData['currency'];
     $quotation->created_by = auth()->user()->id;
     $quotation->created_at = now();
@@ -337,7 +360,7 @@ public function rejection(Request $request)
     $rejection = new Rejection();
     $rejection->date = $request->date;
     $rejection->Reason = $request->reason;
-    $rejection->sales_notes = $request->salesNotes;
+    $rejection->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
     $rejection->created_by = auth()->user()->id;
     $rejection->created_at = now();
     $rejection->call_id = $request->callId;
@@ -358,14 +381,14 @@ public function closed(Request $request)
         $so->sales_person_id = auth()->user()->id;
         $so->so_date = $request->date;
         $so->created_at = now();
-        $so->notes = $request->salesNotes;
+        $so->notes = $request->has('salesNotes') ? $request->salesNotes : '';
         $so->save();
     }
     $Closed = new Closed();
     $Closed->date = $request->date;
     $Closed->so_id = $so->id;
-    $Closed->sales_notes = $request->salesNotes;
-    $Closed->dealvalues = $request->dealvalues;
+    $Closed->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
+    $Closed->dealvalues = $request->has('dealvalues') ? $request->dealvalues : '';
     $Closed->currency = $request->currency;
     $Closed->created_by = auth()->user()->id;
     $Closed->created_at = now();
@@ -380,8 +403,8 @@ public function savenegotiation(Request $request)
 {
     $negotiation = new Negotiation();
     $negotiation->date = $request->date;
-    $negotiation->sales_notes = $request->salesNotes;
-    $negotiation->dealvalues = $request->dealvalues;
+    $negotiation->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
+    $negotiation->dealvalues = $request->has('dealvalues') ? $request->dealvalues : '';
     $negotiation->currency = $request->currency;
     $negotiation->created_by = auth()->user()->id;
     $negotiation->created_at = now();
@@ -406,7 +429,7 @@ public function saveprospecting(Request $request)
     ]);
     $prospecting = new Prospecting();
     $prospecting->date = $validatedData['date'];
-    $prospecting->salesnotes = $validatedData['salesNotes'];
+    $prospecting->salesnotes =  isset($validatedData['salesNotes']) ? $validatedData['salesNotes'] : '';
     $prospecting->created_by = auth()->user()->id;
     $prospecting->created_at = now();
     $prospecting->calls_id = $request->callId;
@@ -424,7 +447,7 @@ public function saveprospecting(Request $request)
     ]);
     $demands = new Salesdemand();
     $demands->date = $validatedData['date'];
-    $demands->salesnotes = $validatedData['salesNotes'];
+    $demands->salesnotes =  isset($validatedData['salesNotes']) ? $validatedData['salesNotes'] : '';
     $demands->created_by = auth()->user()->id;
     $demands->created_at = now();
     $demands->calls_id = $request->callId;

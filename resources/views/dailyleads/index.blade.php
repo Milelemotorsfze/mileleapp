@@ -1085,14 +1085,18 @@ function savenegotiation() {
   var date = document.getElementById('date-negotiation').value;
   var salesNotes = document.getElementById('sales-notes-negotiation').value;
   var dealvalues = document.getElementById('deal-value-input-negotiation').value;
-  var fileInput = document.getElementById('document-upload-negotiation');
   var currencySelect = document.getElementById('currency-select-negotiation');
+  
   if (date === '') {
     alert('Please select a date');
     return;
   }
-  if (fileInput.files.length === 0) {
-    alert('Please upload a document');
+  if (dealvalues === '') {
+    alert('Please Enter The Deal Value');
+    return;
+  }
+  if (salesNotes === '') {
+    alert('Please Enter the Current Notes');
     return;
   }
   var formData = new FormData();
@@ -1101,7 +1105,11 @@ function savenegotiation() {
   formData.append('salesNotes', salesNotes);
   formData.append('dealvalues', dealvalues);
   formData.append('currency', currencySelect.value);
-  formData.append('file', fileInput.files[0]);
+
+  var fileInput = document.getElementById('document-upload-negotiation');
+  if (fileInput.files.length > 0) {
+    formData.append('file', fileInput.files[0]);
+  }
   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.savenegotiation') }}', true);
@@ -1143,6 +1151,10 @@ function savenegotiation() {
   }
   if (sonumber === '') {
     alert('Please Enter the Correct SO');
+    return;
+  }
+  if (salesNotes === '') {
+    alert('Please Enter the Sales Notes Also');
     return;
   }
   var formData = new FormData();
@@ -1299,6 +1311,7 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
@@ -1340,6 +1353,7 @@ function s2ab(s) {
                 {
                     data: 'id',
                     name: 'id',
+                    searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
@@ -1377,6 +1391,7 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
@@ -1439,6 +1454,7 @@ function s2ab(s) {
                 {
                     data: 'id',
                     name: 'id',
+                    searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
@@ -1475,6 +1491,7 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
@@ -1559,6 +1576,7 @@ function s2ab(s) {
                 {
     data: 'file_path',
     name: 'file_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -1607,6 +1625,7 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
@@ -1691,6 +1710,7 @@ function s2ab(s) {
 {
     data: 'file_path',
     name: 'file_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -1726,6 +1746,7 @@ function s2ab(s) {
 {
     data: 'nfile_path',
     name: 'nfile_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -1739,6 +1760,7 @@ function s2ab(s) {
                 {
                     data: 'id',
                     name: 'id',
+                    searchable: false,
                     render: function (data, type, row) {
                       const bookingUrl = `{{ url('booking/create') }}/${data}`;
                         return `
@@ -1773,11 +1795,10 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
-        // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
-        const uniqueId = 'remarks_' + row.id; // Assuming you have a unique identifier for each row
-
+        const uniqueId = 'remarks_' + row.id;
         if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
@@ -1819,7 +1840,6 @@ function s2ab(s) {
     render: function (data, type, row) {
         const maxLength = 20;
         const uniqueId = 'dsalesnotes_' + row.id;
-
         if (data && data.length > maxLength) {
             const truncatedText = data.substring(0, maxLength);
             return `
@@ -1857,6 +1877,7 @@ function s2ab(s) {
 {
     data: 'file_path',
     name: 'file_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -1892,6 +1913,7 @@ function s2ab(s) {
 {
     data: 'nfile_path',
     name: 'nfile_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -1928,6 +1950,7 @@ function s2ab(s) {
                 {
     data: 'id',
     name: 'id',
+    searchable: false,
     render: function (data, type, row) {
         const bookingUrl = `{{ url('booking/create') }}/${data}`;
         return `
@@ -1955,6 +1978,7 @@ function s2ab(s) {
                 {
     data: 'remarks',
     name: 'remarks',
+    searchable: false,
     render: function (data, type, row) {
         // Set the maximum length for remarks before adding "Read More" link
         const maxLength = 20;
@@ -2039,6 +2063,7 @@ function s2ab(s) {
 {
     data: 'file_path',
     name: 'file_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `
@@ -2074,6 +2099,7 @@ function s2ab(s) {
 {
     data: 'nfile_path',
     name: 'nfile_path',
+    searchable: false,
     render: function (data, type, row) {
         if (data) {
             return `

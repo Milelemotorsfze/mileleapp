@@ -28,4 +28,8 @@ class Calls extends Model
         'customer_coming_type',
     ];
     public $timestamps = false;
+    public function callRequirement()
+    {
+        return $this->hasMany(CallsRequirement::class,'lead_id','id');
+    }
 }

@@ -15,4 +15,8 @@ class CallsRequirement extends Model
         'created_at',
     ];
     public $timestamps = false;
+    public function masterModelLine()
+    {
+        return $this->belongsTo(MasterModelLines::class,'model_line_id','id');
+    }
 }
