@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
     use Illuminate\Http\Request;
     use App\Http\Controllers\Controller;
     use App\Models\User;
+    use App\Models\Language;
+    use Illuminate\Support\Str;
+    use App\Models\EmpJob;
     use Spatie\Permission\Models\Role;
     use DB;
     use Hash;
+    use Illuminate\Support\Facades\Mail;
     use App\Models\Profile;
+    use App\Models\SalesPersonLaugauges;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Session;
     use Illuminate\Support\Arr;
@@ -23,31 +28,52 @@ namespace App\Http\Controllers;
         public function create()
         {
             $roles = Role::pluck('name','name')->all();
-            return view('users.create',compact('roles'));
+            $language = Language::pluck('name','name')->all();
+            return view('users.create',compact('roles', 'language'));
         }
         public function store(Request $request)
-{
+        {
     $this->validate($request, [
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
-        'password' => 'required|same:confirm-password',
         'roles' => 'required'
     ]);
-    $input = $request->all();
-    $input['password'] = Hash::make($input['password']);
-    if(isset($request->sales_rap))
-    {
-        $input['sales_rap'] = 'yes';
+    $user = new User();
+    $user->name = $request->input('name');
+    $user->email = $request->input('email');
+    $user->status = 'de-active';
+    $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
+    $user->save();
+    $empProfile = new Profile();
+    $empProfile->user_id = $user->id;
+    $empProfile->first_name = $request->input('name');
+    $empProfile->save();
+    $empJob = new EmpJob();
+    $empProfileId = $empProfile->id;
+    $empJob->emp_profile_id = $empProfileId;
+    $empJob->department = $request->input('department');
+    $empJob->designation = $request->input('designation');
+    $empJob->save();
+    if ($user->sales_rap === 'Yes') {
+        $languages = $request->input('lauguages');
+        foreach ($languages as $language) {
+            $salesPersonLanguage = new SalesPersonLaugauges();
+            $salesPersonLanguage->user_id = $user->id;
+            $salesPersonLanguage->language = $language;
+            $salesPersonLanguage->save();
+        }
     }
-    $user = User::create($input);
-    $profile = new Profile();
-    $profile->user_id = $user->id;
-    $profile->save();
     $user->assignRole($request->input('roles'));
+    // $token = Str::random(60);
+    // DB::table('password_reset_tokens')->insert([
+    //     'email' => $user->email,
+    //     'token' => Hash::make($token),
+    //     'created_at' => now(),
+    // ]);
+    // Mail::to($user->email)->send(new SetPasswordEmail($token));
     return redirect()->route('users.index')
         ->with('success','User created successfully');
 }
-
         public function show($id)
         {
             $user = User::find($id);
