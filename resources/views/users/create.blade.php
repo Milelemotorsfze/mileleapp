@@ -37,40 +37,17 @@
                         {!! Form::password('confirm-password', array('placeholder' => 'Confirm Password','class' => 'form-control')) !!}
                     </div>
 					<div class="col-lg-4 col-md-4">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Role : </label>
-                        {!! Form::select('roles[]', $roles,[], array('class' => 'form-control','multiple')) !!}
-                        <!-- <h4>Role :</h4> -->
-            <!-- <select class="country"
-                    multiple="true"
-                    style="width: 200px;">
-                    @foreach($roles as $role)
-                <option value="{{$role}}">{{$role}}</option>
-                @endforeach
-            </select> -->
-                    </div>
-                    
+    <label for="roles" class="form-label font-size-13 text-muted">Role :</label>
+    <select name="roles[]" id="roles" class="form-control" multiple>
+        @foreach($roles as $role)
+            <option value="{{ $role }}">{{ $role }}</option>
+        @endforeach
+    </select>
+</div>
                     <div class="col-lg-2 col-md-2">
                         <label class="form-check-label" for="sales_rap">Sales RAP</label>                      
                         <input class="form-check-input" name="sales_rap" type="checkbox" id="sales_rap" value="yes">
                     </div>
-                    <!-- <form> -->
-            <!-- <h4>Role :</h4>
-            <select class="country"
-                    multiple="true"
-                    style="width: 200px;">
-                <option value="1">India</option>
-                <option value="2">Japan</option>
-                <option value="3">France</option>
-            </select> -->
-            <!-- <h4>Selections using Chosen</h4>
-            <select class="country1" 
-                    multiple="true" 
-                    style="width: 200px;">
-                <option value="1">India</option>
-                <option value="2">Japan</option>
-                <option value="3">France</option>
-            </select> -->
-        <!-- </form> -->
 				</div>   
 			</div>   
 			<div class="col-lg-12 col-md-12">

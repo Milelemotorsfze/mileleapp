@@ -33,23 +33,17 @@ namespace App\Http\Controllers;
         'password' => 'required|same:confirm-password',
         'roles' => 'required'
     ]);
-
     $input = $request->all();
     $input['password'] = Hash::make($input['password']);
     if(isset($request->sales_rap))
     {
         $input['sales_rap'] = 'yes';
     }
-// dd($input);
     $user = User::create($input);
-
-    // Create a profile for the user and associate it with the user_id
     $profile = new Profile();
     $profile->user_id = $user->id;
     $profile->save();
-
     $user->assignRole($request->input('roles'));
-
     return redirect()->route('users.index')
         ->with('success','User created successfully');
 }
