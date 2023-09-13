@@ -36,7 +36,10 @@ namespace App\Http\Controllers;
     $this->validate($request, [
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
-        'roles' => 'required'
+        'roles' => 'required',
+        'department' => 'required',
+        'designation' => 'required',
+        'lauguages' => 'required',
     ]);
     $user = new User();
     $user->name = $request->input('name');
@@ -58,19 +61,12 @@ namespace App\Http\Controllers;
         $languages = $request->input('lauguages');
         foreach ($languages as $language) {
             $salesPersonLanguage = new SalesPersonLaugauges();
-            $salesPersonLanguage->user_id = $user->id;
+            $salesPersonLanguage->sales_person = $user->id;
             $salesPersonLanguage->language = $language;
             $salesPersonLanguage->save();
         }
     }
     $user->assignRole($request->input('roles'));
-    // $token = Str::random(60);
-    // DB::table('password_reset_tokens')->insert([
-    //     'email' => $user->email,
-    //     'token' => Hash::make($token),
-    //     'created_at' => now(),
-    // ]);
-    // Mail::to($user->email)->send(new SetPasswordEmail($token));
     return redirect()->route('users.index')
         ->with('success','User created successfully');
 }

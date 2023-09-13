@@ -48,17 +48,21 @@ class DailyleadsController extends Controller
                             ->orWhere('calls.custom_brand_model', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.location', 'LIKE', "%$searchValue%")
                             ->orWhere('calls.language', 'LIKE', "%$searchValue%")
-                            ->orWhereHas('callRequirement', function ($subquery) use ($searchValue) {
-                                $subquery->whereHas('masterModelLine', function ($subquery) use ($searchValue) {
-                                    $subquery->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
-                                        ->where(function ($subquery) use ($searchValue) {
-                                            $subquery->where('brands.brand_name', 'LIKE', "%$searchValue%")
-                                                ->orWhere('master_model_lines.model_line', 'LIKE', "%$searchValue%");
-                                        });
-                                });
-                            });
+                            ->orWhereExists(function ($subquery) use ($searchValue) {
+                                $subquery->select(DB::raw(1))
+                                    ->from('calls_requirement')
+                                    ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+                                    ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id')
+                                    ->whereRaw('calls_requirement.lead_id = calls.id')
+                                    ->where(function ($subquery) use ($searchValue) {
+                                        $subquery->whereRaw('LOWER(brands.brand_name) LIKE ?', ["%" . strtolower($searchValue) . "%"])
+                                            ->orWhereRaw('LOWER(master_model_lines.model_line) LIKE ?', ["%" . strtolower($searchValue) . "%"]);
+                                    });
+                            });                            
                     });
-                }                                                         
+                }      
+                info($data->toSql());
+info($data->getBindings());  
             if ($status === 'Prospecting') {
                 $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
@@ -179,14 +183,12 @@ class DailyleadsController extends Controller
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
             }
             $data->groupBy('calls.id');
-            $result = $data->get();
-            \Log::info($result);  
             return DataTables::of($data)
                 ->addColumn('models_brands', function ($row) {
                     return $row->models_brands;
                 })
                 ->toJson();
-        }   
+        }    
         return view('dailyleads.index', compact('pendingdata'));
     }
     public function create()

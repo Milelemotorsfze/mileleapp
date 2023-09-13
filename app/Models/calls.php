@@ -28,8 +28,15 @@ class Calls extends Model
         'customer_coming_type',
     ];
     public $timestamps = false;
-    public function callRequirement()
-    {
-        return $this->hasMany(CallsRequirement::class,'lead_id','id');
-    }
+    // public function callRequirement()
+    // {
+    //     return $this->hasMany(CallsRequirement::class,'lead_id','id');
+    // }
+    // public function modelsBrands()
+    // {
+    //     return $this->hasOne(CallsRequirement::class, 'lead_id', 'id')
+    //         ->selectRaw('GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ")')
+    //         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
+    //         ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id');
+    // }    
 }
