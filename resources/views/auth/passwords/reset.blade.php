@@ -7,6 +7,7 @@
         @csrf
         <div class="mb-3">
             <label class="form-label">Email Address</label>
+            <input type="hidden" name="token" value="{{$token}}">
             <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
             @error('email')
                 <span class="invalid-feedback" role="alert">
