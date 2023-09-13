@@ -18,4 +18,8 @@ class Booking extends Model
         'created_by',
         'booking_requests_id',
     ];
+    public function vehicle()
+    {
+        return $this->belongsTo(vehicles::class,'vehicle_id','id');
+    }
 }

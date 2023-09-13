@@ -20,4 +20,8 @@ class BookingRequest extends Model
         'process_date',
         'reason',
     ];
+    public function vehicle()
+    {
+        return $this->belongsTo(vehicles::class,'vehicle_id','id');
+    }
 }

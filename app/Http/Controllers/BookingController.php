@@ -110,6 +110,8 @@ public function store(Request $request)
     $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     if ($request->ajax()) {
         $status = $request->input('status');
+        $searchValue = $request->input('search.value');
+        info($searchValue);
         if($status === "New")
         {
         $data = BookingRequest::select([
@@ -122,12 +124,14 @@ public function store(Request $request)
                 'varaints.name as variant',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
                 'vehicles.so_id',
                 'so.so_number',
             ])
             ->leftJoin('vehicles', 'booking_requests.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -136,6 +140,26 @@ public function store(Request $request)
             ->where('booking_requests.status', $status);
             if ($hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
+            }
+            if (!empty($searchValue)) {
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.reason', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.calls_id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('vehicles.vin', 'like', '%' . $searchValue . '%')
+                    ->orWhere('brands.brand_name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('varaints.name', 'like', '%' . $searchValue . '%')
+                    ->orWhere('varaints.detail', 'like', '%' . $searchValue . '%')
+                    ->orWhere('so.so_number', 'like', '%' . $searchValue . '%')
+                    ->orWhereHas('vehicle.interior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhereHas('vehicle.exterior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhere('master_model_lines.model_line', 'like', '%' . $searchValue . '%');
+                });
             }
             $data = $data->groupBy('booking_requests.id');
         }
@@ -151,13 +175,15 @@ public function store(Request $request)
                 'varaints.name as variant',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
                 'vehicles.so_id',
                 'so.so_number',
             ])
             ->leftJoin('booking_requests', 'booking.booking_requests_id', '=', 'booking_requests.id')
             ->leftJoin('vehicles', 'booking.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -168,6 +194,27 @@ public function store(Request $request)
             if ($hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
+            if (!empty($searchValue)) {
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.calls_id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_start_date', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_end_date', 'like', '%' . $searchValue . '%')
+                        ->orWhere('vehicles.vin', 'like', '%' . $searchValue . '%')
+                        ->orWhere('brands.brand_name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.detail', 'like', '%' . $searchValue . '%')
+                        ->orWhere('so.so_number', 'like', '%' . $searchValue . '%')
+                        ->orWhereHas('vehicle.interior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhereHas('vehicle.exterior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhere('master_model_lines.model_line', 'like', '%' . $searchValue . '%');
+                });
+            }            
             $data = $data->groupBy('booking.id');
         }
         else if($status === "Approved With SO") {
@@ -182,13 +229,15 @@ public function store(Request $request)
                 'varaints.name as variant',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
                 'vehicles.so_id',
                 'so.so_number',
             ])
             ->leftJoin('booking_requests', 'booking.booking_requests_id', '=', 'booking_requests.id')
             ->leftJoin('vehicles', 'booking.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -200,6 +249,27 @@ public function store(Request $request)
             if ($hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
+            if (!empty($searchValue)) {
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.calls_id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_start_date', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_end_date', 'like', '%' . $searchValue . '%')
+                        ->orWhere('vehicles.vin', 'like', '%' . $searchValue . '%')
+                        ->orWhere('brands.brand_name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.detail', 'like', '%' . $searchValue . '%')
+                        ->orWhere('so.so_number', 'like', '%' . $searchValue . '%')
+                        ->orWhereHas('vehicle.interior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhereHas('vehicle.exterior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhere('master_model_lines.model_line', 'like', '%' . $searchValue . '%');
+                });
+            }  
             $data = $data->groupBy('booking.id');
         }
         else if($status === "Expire") {
@@ -214,13 +284,15 @@ public function store(Request $request)
                 'varaints.name as variant',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
                 'vehicles.so_id',
                 'so.so_number',
             ])
             ->leftJoin('booking_requests', 'booking.booking_requests_id', '=', 'booking_requests.id')
             ->leftJoin('vehicles', 'booking.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -231,6 +303,27 @@ public function store(Request $request)
             if ($hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
+            if (!empty($searchValue)) {
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.calls_id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_start_date', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking.booking_end_date', 'like', '%' . $searchValue . '%')
+                        ->orWhere('vehicles.vin', 'like', '%' . $searchValue . '%')
+                        ->orWhere('brands.brand_name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.detail', 'like', '%' . $searchValue . '%')
+                        ->orWhere('so.so_number', 'like', '%' . $searchValue . '%')
+                        ->orWhereHas('vehicle.interior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhereHas('vehicle.exterior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhere('master_model_lines.model_line', 'like', '%' . $searchValue . '%');
+                });
+            }  
             $data = $data->groupBy('booking.id');
         }
         else if($status === "Rejected") {
@@ -246,12 +339,14 @@ public function store(Request $request)
                 'varaints.name as variant',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
-                'vehicles.int_colour',
-                'vehicles.ex_colour',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
                 'vehicles.so_id',
                 'so.so_number',
             ])
             ->leftJoin('vehicles', 'booking_requests.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
             ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
             ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
@@ -261,31 +356,31 @@ public function store(Request $request)
             if ($hasEditSOPermission) {
                 $data = $data->where('booking_requests.created_by', Auth::id());
             }
+            if (!empty($searchValue)) {
+                $data->where(function ($query) use ($searchValue) {
+                    $query->where('booking_requests.days', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.id', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.reason', 'like', '%' . $searchValue . '%')
+                    ->orWhere('booking_requests.calls_id', 'like', '%' . $searchValue . '%')
+                        ->orWhere('vehicles.vin', 'like', '%' . $searchValue . '%')
+                        ->orWhere('brands.brand_name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.name', 'like', '%' . $searchValue . '%')
+                        ->orWhere('varaints.detail', 'like', '%' . $searchValue . '%')
+                        ->orWhere('so.so_number', 'like', '%' . $searchValue . '%')
+                        ->orWhereHas('vehicle.interior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhereHas('vehicle.exterior', function ($query) use ($searchValue) {
+                            $query->where('name', 'like', '%' . $searchValue . '%');
+                        })
+                        ->orWhere('master_model_lines.model_line', 'like', '%' . $searchValue . '%');
+                });
+            }
             $data = $data->groupBy('booking_requests.id');
         }
             return DataTables::of($data)
-            ->addColumn('created_by', function ($row) {
-                return User::find($row->created_by)->name ?? '';
-            })
-            ->addColumn('vin', function ($row) {
-                return $row->vin ?? '';
-            })
-            ->addColumn('so_number', function ($row) {
-                return $row->so_number ?? '';
-            })
-            ->addColumn('interior_color', function ($row) {
-                $colorCode = ColorCode::find($row->int_colour);
-                return $colorCode ? $colorCode->name : '';
-            })
-            ->addColumn('exterior_color', function ($row) {
-                $colorCode = ColorCode::find($row->ex_colour);
-                return $colorCode ? $colorCode->name : '';
-            })
-            ->addColumn('action', function ($row) {
-            })
             ->toJson();
     }
-
     return view('booking.index');
 }
 public function approval(Request $request)

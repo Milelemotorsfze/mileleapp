@@ -61,8 +61,6 @@ class DailyleadsController extends Controller
                             });                            
                     });
                 }      
-                info($data->toSql());
-info($data->getBindings());  
             if ($status === 'Prospecting') {
                 $data->addSelect(DB::raw("DATE_FORMAT(prospectings.date, '%d-%b-%Y') as date"), 'prospectings.salesnotes');
                 $data->leftJoin('prospectings', 'calls.id', '=', 'prospectings.calls_id');
@@ -183,7 +181,8 @@ info($data->getBindings());
                 $data->leftJoin('lead_rejection', 'calls.id', '=', 'lead_rejection.call_id');
             }
             $data->groupBy('calls.id');
-            return DataTables::of($data)
+            $results = $data->get();
+            return DataTables::of($results)
                 ->addColumn('models_brands', function ($row) {
                     return $row->models_brands;
                 })
