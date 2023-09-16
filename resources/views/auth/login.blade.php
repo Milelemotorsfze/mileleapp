@@ -48,9 +48,9 @@
                                             <div class="mb-3">
                                                 <label class="form-label">Username</label>
                                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-                                                @if(Session::has('error'))
+                                                <!-- @if(Session::has('error'))
                                                         <p class="alert paragraph-class">{{ Session::get('error') }}</p>
-                                                @endif
+                                                @endif -->
                                             </div>
                                             <div class="mb-3">
                                                 <div class="d-flex align-items-start">
