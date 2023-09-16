@@ -26,7 +26,7 @@
         @endif
     </div>
     <div class="m-3">
-        {!! $html->table(['class' => 'table table-bordered table-striped table-responsive '], true) !!}
+        {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
     </div>
 @endsection
 @push('scripts')

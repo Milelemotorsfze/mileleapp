@@ -35,7 +35,7 @@
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 text-muted">Steering</label>
+                        <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
                             <option value="LHS">LHS</option>
                             <option value='RHS'>RHS</option>
@@ -56,14 +56,25 @@
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
+                        <label for="basicpill-firstname-input" class="form-label">Variant</label>
+                       <select class="form-control" name="variant_id" id="variant_id">
+                           <option></option>
+                           @foreach($variants as $variant)
+                               <option value="{{ $variant->id }}">{{$variant->name}}</option>
+                           @endforeach
+                       </select>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in USD</label>
-                        <input type="number" class="form-control"  name="amount_uae">
+                        <input type="number" class="form-control"  name="amount_uae" min="0">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in EUR</label>
-                        <input type="number" class="form-control" name="amount_belgium">
+                        <input type="number" class="form-control" name="amount_belgium" min="0">
                     </div>
                 </div>
                 </br>
@@ -87,6 +98,9 @@
                 },
             },
         });
+        $("#variant_id").attr("data-placeholder","Choose Variant....  Or  Type Here To Search....");
+        $("#variant_id").select2();
+
     </script>
 @endpush
 
