@@ -34,7 +34,16 @@
                                             <h5 class="mb-0">Welcome Back !</h5>
                                             <p class="text-muted mt-2">Sign in to continue to Milele.</p>
                                         </div>
-                                        <form method="POST" action="{{ route('login') }}">
+                                        @if (session('success'))
+                                        <div class="alert alert-success" role="alert"> {{session('success')}} 
+                                        </div>
+                                        @endif
+
+                                        @if (session('error'))
+                                        <div class="alert alert-danger" role="alert"> {{session('error')}} 
+                                        </div>
+                                        @endif
+                                        <form method="POST" action="{{ route('otp.loginOtpGenerate') }}">
                                             @csrf
                                             <div class="mb-3">
                                                 <label class="form-label">Username</label>

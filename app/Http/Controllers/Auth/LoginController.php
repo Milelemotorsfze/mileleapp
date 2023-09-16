@@ -26,76 +26,56 @@ class LoginController extends Controller
     | to conveniently provide its functionality to your applications.
     |
     */
-public function login(Request $request){
-    if ($request->isMethod('post')) {
-        $data= $request->all();
-        $roles=[
-            'email' => 'required|email|max:255',
-            'password' => 'required',
-        ];
-        $customessage=[
-                'email.required' =>'Email is required',
-                'email.email' => 'Email is not vaild',
-            'password.required' => 'Password is required',
-        ];
-        $this->validate($request,$roles,$customessage);
-        
-        if(Auth::guard('web')->attempt(['email'=>$data['email'],'password'=>$data['password']])) {
-            
-            if(Auth::user()->status == 'active') 
-            {
-                $activity['ip'] = $request->ip();
-                $activity['user_id'] = Auth::id();
-                $activity['status'] = 'success';
-                LogActivity::create($activity);
-                // return redirect()->route('home');
-                // otp
-                # Validate Data
+    public function login(Request $request)
+    {
         $request->validate([
-            'email' => 'required|exists:users,email'
+            'user_id' => 'required|exists:users,id',
+            'otp' => 'required'
         ]);
-
-        # Generate An OTP
-        $verificationCode = $this->generateOtp($request->email);
-        $message = "Your OTP To Login is Send Successfully ";
-        // $message = "Your OTP To Login is - ".$verificationCode->otp;
-        # Return With OTP 
-
-        // $renderedData = view('email')->render();
-        // $data['id'] = $user->id;
-        $data['email'] = $request->email;
-        $data['name'] = 'Hello,';
-        $data['otp'] = $verificationCode->otp;
-        $template['from'] = 'no-reply@milele.com';
-        $template['from_name'] = 'Milele Matrix';
-        $subject = 'Milele Matrix Login OTP Code';
-        Mail::send(
-                "auth.otpemail",
-                ["data"=>$data] ,
-                function($msg) use ($data,$template,$subject) {
-                    $msg->to($data['email'], $data['name'])
-                        ->from($template['from'],$template['from_name'])
-                        ->subject($subject);
-                        // ->attachData($renderedData, 'name_of_attachment');
+        #Validation Logic
+        $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
+        $now = Carbon::now();
+        if(!$verificationCode) 
+        { 
+            return redirect()->back()->with('error', 'Your OTP is not correct');
+        }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
+        { 
+            return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
+        }
+        else
+        {
+            $user = User::whereId($request->user_id)->first();
+            if($user){
+                // Expire The OTP
+                $verificationCode->update([
+                    'expire_at' => Carbon::now()
+                ]);
+                if(Auth::guard('web')->attempt(['email'=>$request->email,'password'=>$request->password])) 
+                {               
+                    if(Auth::user()->status == 'active') 
+                    {
+                        $activity['ip'] = $request->ip();
+                        $activity['user_id'] = Auth::id();
+                        $activity['status'] = 'success';
+                        LogActivity::create($activity);
+                        return redirect()->route('home');
+                        info('login');
+                    }
+                    else
+                    {
+                        Session::flash('error','You are not Active by Admin');
+                        return view('auth.login');
+                    }               
+                } 
+                else 
+                {
+                    Session::flash('error','These credentials do not match our records.');
+                    return view('auth.login');
                 }
-            );
-
-        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message); 
-                // end otp
             }
-else{
-    Session::flash('error','You are not Active by Admin');
-    return view('auth.login');
-}
-            
-        } else {
-
-            Session::flash('error','These credentials do not match our records.');
-            return view('auth.login');
         }
     }
-    return view('auth.login');
-}
+
     use AuthenticatesUsers;
 
     /**
@@ -134,5 +114,37 @@ else{
             'otp' => rand(123456, 999999),
             'expire_at' => Carbon::now()->addMinutes(10)
         ]);
+    }
+    public function loginWithOtp(Request $request)
+    {
+
+//         #Validation
+//         $request->validate([
+//             'user_id' => 'required|exists:users,id',
+//             'otp' => 'required'
+//         ]);
+
+//         #Validation Logic
+//         $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
+//         $now = Carbon::now();
+//         if (!$verificationCode) {
+//             return redirect()->back()->with('error', 'Your OTP is not correct');
+//         }elseif($verificationCode && $now->isAfter($verificationCode->expire_at)){ 
+//             return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
+//         }
+//         $user = User::whereId($request->user_id)->first();
+//         if($user){
+//             // Expire The OTP
+//             $verificationCode->update([
+//                 'expire_at' => Carbon::now()
+//             ]);
+
+//             // Auth::login($user);
+// info('here');
+//             // return redirect('/home');
+//             $this->login($request);
+//             // return redirect()->route('login',[$request]);
+//         }
+//         return redirect()->route('otp.login')->with('error', 'Your Otp is not correct');
     }
 }

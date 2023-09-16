@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">{{ __('OTP Login') }}</div>
 
@@ -18,13 +18,15 @@
                     </div>
                     @endif
 
-                    <form method="POST" action="{{ route('otp.getlogin') }}">
+                    <form method="POST" action="{{ route('login') }}">
                         @csrf
                         <input type="hidden" name="user_id" value="{{$user_id}}" />
+                        <input type="hidden" name="email" value="{{$email}}" />
+                        <input type="hidden" name="password" value="{{$password}}" />
                         <div class="row mb-3">
-                            <label for="mobile_no" class="col-md-4 col-form-label text-md-end">{{ __('OTP') }}</label>
+                            <label for="mobile_no" class="col-md-12 col-form-label">{{ __('OTP') }}</label>
 
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <input id="otp" type="text" class="form-control @error('otp') is-invalid @enderror" name="otp" value="{{ old('otp') }}" required autocomplete="otp" autofocus placeholder="Enter OTP">
 
                                 @error('otp')
