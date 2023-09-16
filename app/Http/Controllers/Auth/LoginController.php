@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Cookie;
 use Jenssegers\Agent\Facades\Agent;
 use Session;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
 use App\Models\VerificationCode;
 use Carbon\Carbon;
 
@@ -43,6 +42,32 @@ public function login(Request $request){
         ];
         $this->validate($request,$roles,$customessage);
 
+
+        // calculate verification expiry date time
+        // get the latest login activeity of user
+        $user = User::where('email', $request->email)->first();
+        $macAddr = exec('getmac');
+        $userMacAdress = substr($macAddr, 0, 17);
+        $userCurrentBrowser = Agent::browser();
+
+        $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
+        // check the mac address change to check whether the device is changed or not
+        if($latestLoginActivity->mac_address != $userMacAdress) {
+            // redirect to otp verification
+        }elseif ($latestLoginActivity->browser != $userCurrentBrowser) {
+            // redirect to otp verification
+        }else{
+            // if device is not changed check the otp expiration date;
+            $otpExpirationDate = Carbon::today()->format('d/m/Y');
+            $currentDate = Carbon::now()->format('d/m/Y');
+            if($currentDate < $otpExpirationDate) {
+                // redirect to otp verification
+            }
+        }
+        // update the latest login activity of the user with current date time in otp_verification_expiry.
+
+        // update the existing date of expiry for log activity without otp.
+
         if(Auth::guard('web')->attempt(['email'=>$data['email'],'password'=>$data['password']])) {
 
             if(Auth::user()->status == 'active')
@@ -50,31 +75,34 @@ public function login(Request $request){
                 $activity['ip'] = $request->ip();
                 $activity['user_id'] = Auth::id();
                 $activity['status'] = 'success';
-                $macAddr = exec('getmac');
-                $activity['mac_address'] = substr($macAddr, 0, 17);
-//                $activity['browser_name'] = Agent::browser();
-//
-//                if (Agent::isMobile()) {
-//                    $activity['device_name'] = 'mobile';
-//                }else if (Agent::isDesktop()) {
-//                    $activity['device_name'] = 'desktop';
-//                }else if (Agent::isTablet()) {
-//                    $activity['device_name'] = 'tablet';
-//                }
+                $activity['mac_address'] = $userMacAdress;
+                $activity['browser_name'] = Agent::browser();
+
+                if (Agent::isMobile()) {
+                    $activity['device_name'] = 'mobile';
+                }else if (Agent::isDesktop()) {
+                    $activity['device_name'] = 'desktop';
+                }else if (Agent::isTablet()) {
+                    $activity['device_name'] = 'tablet';
+                }
 
                 LogActivity::create($activity);
                 // return redirect()->route('home');
                 // otp
                 # Validate Data
-        $request->validate([
-            'email' => 'required|exists:users,email'
-        ]);
+                $request->validate([
+                    'email' => 'required|exists:users,email'
+                ]);
 
-        # Generate An OTP
-        $verificationCode = $this->generateOtp($request->email);
-        $message = "Your OTP To Login is Send Successfully ";
-        // $message = "Your OTP To Login is - ".$verificationCode->otp;
-        # Return With OTP 
+
+            # Generate An OTP
+            $verificationCode = $this->generateOtp($request->email);
+            $message = "Your OTP To Login is Send Successfully ";
+            // $message = "Your OTP To Login is - ".$verificationCode->otp;
+
+
+
+                # Return With OTP
 
         // $renderedData = view('email')->render();
         // $data['id'] = $user->id;
@@ -95,7 +123,7 @@ public function login(Request $request){
                 }
             );
 
-        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message); 
+        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
                 // end otp
             }
     else{

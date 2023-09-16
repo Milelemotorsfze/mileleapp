@@ -29,7 +29,7 @@ class AuthOtpController extends Controller
         $verificationCode = $this->generateOtp($request->email);
         $message = "Your OTP To Login is Send Successfully ";
         // $message = "Your OTP To Login is - ".$verificationCode->otp;
-        # Return With OTP 
+        # Return With OTP
 
         // $renderedData = view('email')->render();
         // $data['id'] = $user->id;
@@ -50,7 +50,7 @@ class AuthOtpController extends Controller
                 }
             );
 
-        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message); 
+        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
     }
 
     public function generateOtp($email)
@@ -94,7 +94,7 @@ class AuthOtpController extends Controller
         $now = Carbon::now();
         if (!$verificationCode) {
             return redirect()->back()->with('error', 'Your OTP is not correct');
-        }elseif($verificationCode && $now->isAfter($verificationCode->expire_at)){ 
+        }elseif($verificationCode && $now->isAfter($verificationCode->expire_at)){
             return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
         }
         $user = User::whereId($request->user_id)->first();
