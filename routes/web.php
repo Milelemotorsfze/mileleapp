@@ -51,6 +51,7 @@ use App\Http\Controllers\LoginActivityController;
 use App\Http\Controllers\KitCommonItemController;
 use App\Http\Controllers\ProspectingController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\AuthOtpController;
 
 
 /*
@@ -71,6 +72,12 @@ Route::get('/d', function () {
     return view('addon.ff');
 });
     Auth::routes();
+    Route::controller(AuthOtpController::class)->group(function(){
+        Route::get('/otp/login', 'login')->name('otp.login');
+        // Route::post('/otp/generate', 'generate')->name('otp.generate');
+        Route::get('/otp/verification/{user_id}', 'verification')->name('otp.verification');
+        Route::post('/otp/login', 'loginWithOtp')->name('otp.getlogin');
+    });
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
