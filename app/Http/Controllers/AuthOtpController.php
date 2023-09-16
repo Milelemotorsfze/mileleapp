@@ -18,61 +18,61 @@ class AuthOtpController extends Controller
     }
 
     // Generate OTP
-    // public function generate(Request $request)
-    // {
-    //     # Validate Data
-    //     $request->validate([
-    //         'email' => 'required|exists:users,email'
-    //     ]);
+    public function generate(Request $request)
+    {
+        # Validate Data
+        $request->validate([
+            'email' => 'required|exists:users,email'
+        ]);
 
-    //     # Generate An OTP
-    //     $verificationCode = $this->generateOtp($request->email);
-    //     $message = "Your OTP To Login is Send Successfully ";
-    //     // $message = "Your OTP To Login is - ".$verificationCode->otp;
-    //     # Return With OTP 
+        # Generate An OTP
+        $verificationCode = $this->generateOtp($request->email);
+        $message = "Your OTP To Login is Send Successfully ";
+        // $message = "Your OTP To Login is - ".$verificationCode->otp;
+        # Return With OTP 
 
-    //     // $renderedData = view('email')->render();
-    //     // $data['id'] = $user->id;
-    //     $data['email'] = $request->email;
-    //     $data['name'] = 'Hello,';
-    //     $data['otp'] = $verificationCode->otp;
-    //     $template['from'] = 'no-reply@milele.com';
-    //     $template['from_name'] = 'Milele Matrix';
-    //     $subject = 'Milele Matrix Login OTP Code';
-    //     Mail::send(
-    //             "auth.otpemail",
-    //             ["data"=>$data] ,
-    //             function($msg) use ($data,$template,$subject) {
-    //                 $msg->to($data['email'], $data['name'])
-    //                     ->from($template['from'],$template['from_name'])
-    //                     ->subject($subject);
-    //                     // ->attachData($renderedData, 'name_of_attachment');
-    //             }
-    //         );
+        // $renderedData = view('email')->render();
+        // $data['id'] = $user->id;
+        $data['email'] = $request->email;
+        $data['name'] = 'Hello,';
+        $data['otp'] = $verificationCode->otp;
+        $template['from'] = 'no-reply@milele.com';
+        $template['from_name'] = 'Milele Matrix';
+        $subject = 'Milele Matrix Login OTP Code';
+        Mail::send(
+                "auth.otpemail",
+                ["data"=>$data] ,
+                function($msg) use ($data,$template,$subject) {
+                    $msg->to($data['email'], $data['name'])
+                        ->from($template['from'],$template['from_name'])
+                        ->subject($subject);
+                        // ->attachData($renderedData, 'name_of_attachment');
+                }
+            );
 
-    //     return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message); 
-    // }
+        return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message); 
+    }
 
-    // public function generateOtp($email)
-    // {
-    //     $user = User::where('email', $email)->first();
+    public function generateOtp($email)
+    {
+        $user = User::where('email', $email)->first();
 
-    //     # User Does not Have Any Existing OTP
-    //     $verificationCode = VerificationCode::where('user_id', $user->id)->latest()->first();
+        # User Does not Have Any Existing OTP
+        $verificationCode = VerificationCode::where('user_id', $user->id)->latest()->first();
 
-    //     $now = Carbon::now();
+        $now = Carbon::now();
 
-    //     if($verificationCode && $now->isBefore($verificationCode->expire_at)){
-    //         return $verificationCode;
-    //     }
+        if($verificationCode && $now->isBefore($verificationCode->expire_at)){
+            return $verificationCode;
+        }
 
-    //     // Create a New OTP
-    //     return VerificationCode::create([
-    //         'user_id' => $user->id,
-    //         'otp' => rand(123456, 999999),
-    //         'expire_at' => Carbon::now()->addMinutes(10)
-    //     ]);
-    // }
+        // Create a New OTP
+        return VerificationCode::create([
+            'user_id' => $user->id,
+            'otp' => rand(123456, 999999),
+            'expire_at' => Carbon::now()->addMinutes(10)
+        ]);
+    }
 
     public function verification($user_id)
     {
