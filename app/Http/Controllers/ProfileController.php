@@ -94,12 +94,12 @@ class ProfileController extends Controller
         $profile->last_name = $lastName;
         $profile->gender = $updatedInfo['gender'];
         $profile->nationality = $updatedInfo['nationality'];
-        $profile->religion = $updatedInfo['religion'];  
+        $profile->religion = $updatedInfo['religion'];
         $profile->passport_number = $updatedInfo['passportNumber'];
-        $profile->passport_issue_date = $updatedInfo['passportIssueDate']; 
-        $profile->passport_expiry_date = $updatedInfo['passportExpiryDate']; 
-        $profile->contact_number = $updatedInfo['contactNumber']; 
-        $profile->company_number = $updatedInfo['companyNumber']; 
+        $profile->passport_issue_date = $updatedInfo['passportIssueDate'];
+        $profile->passport_expiry_date = $updatedInfo['passportExpiryDate'];
+        $profile->contact_number = $updatedInfo['contactNumber'];
+        $profile->company_number = $updatedInfo['companyNumber'];
         $profile->save();
     return response()->json(['message' => 'Information updated successfully']);
     }
@@ -115,15 +115,15 @@ class ProfileController extends Controller
         $user->save();
         session()->flush();
         return response()->json(['success' => true]);
-    }    
+    }
     public function updatepictureInfo(Request $request)
 {
     if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
         $file = $request->file('picture');
-        
+
         // Specify the desired storage path
         $storagePath = 'profile_pic';
-        
+
         // Move the uploaded file to the desired storage directory
         $filePath = $file->move(public_path($storagePath), $file->getClientOriginalName());
 
@@ -165,7 +165,7 @@ class ProfileController extends Controller
     {
      $document = skill::findOrFail($id);
      $document->delete();
-     return redirect()->back()->with('success', 'Skill deleted successfully.');   
+     return redirect()->back()->with('success', 'Skill deleted successfully.');
     }
     public function saveDocument(Request $request)
 {
@@ -201,7 +201,7 @@ public function saveskill(Request $request)
     {
      $document = WorkingHistory::findOrFail($id);
      $document->delete();
-     return redirect()->back()->with('success', 'Skill deleted successfully.');   
+     return redirect()->back()->with('success', 'Skill deleted successfully.');
     }
     public function updatehistoryInfo(Request $request)
     {

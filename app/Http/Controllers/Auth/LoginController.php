@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LogActivity;
+use Illuminate\Support\Facades\Cookie;
+use Jenssegers\Agent\Facades\Agent;
 use Session;
 
 class LoginController extends Controller
@@ -35,22 +38,34 @@ public function login(Request $request){
             'password.required' => 'Password is required',
         ];
         $this->validate($request,$roles,$customessage);
-        
+
         if(Auth::guard('web')->attempt(['email'=>$data['email'],'password'=>$data['password']])) {
-            
-            if(Auth::user()->status == 'active') 
+
+            if(Auth::user()->status == 'active')
             {
                 $activity['ip'] = $request->ip();
                 $activity['user_id'] = Auth::id();
                 $activity['status'] = 'success';
+                $macAddr = exec('getmac');
+                $activity['mac_address'] = substr($macAddr, 0, 17);
+//                $activity['browser_name'] = Agent::browser();
+//
+//                if (Agent::isMobile()) {
+//                    $activity['device_name'] = 'mobile';
+//                }else if (Agent::isDesktop()) {
+//                    $activity['device_name'] = 'desktop';
+//                }else if (Agent::isTablet()) {
+//                    $activity['device_name'] = 'tablet';
+//                }
+
                 LogActivity::create($activity);
                 return redirect()->route('home');
             }
-else{
-    Session::flash('error','You are not Active by Admin');
-    return view('auth.login');
-}
-            
+    else{
+        Session::flash('error','You are not Active by Admin');
+        return view('auth.login');
+    }
+
         } else {
 
             Session::flash('error','These credentials do not match our records.');
@@ -66,7 +81,7 @@ else{
      *
      * @var string
      */
-    
+
     protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
