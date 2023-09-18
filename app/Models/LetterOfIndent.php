@@ -12,6 +12,7 @@ class LetterOfIndent extends Model
     public const LOI_CATEGORY_SPECIAL = "Special";
     public const LOI_SUBMISION_STATUS_NEW = "New";
     public const LOI_STATUS_SUPPLIER_APPROVED = "Supplier Approved";
+    public const LOI_STATUS_SUPPLIER_REJECTED = "Supplier Rejected";
     public const LOI_STATUS_PARTIAL_APPROVED = "Partialy Approved";
     public const LOI_STATUS_APPROVED = "Approved";
     public const LOI_STATUS_REJECTED = "Rejected";

@@ -2,6 +2,8 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Approve LOI</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -183,8 +185,8 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="col-12 text-center">
-                    <button class="btn btn-secondary" type="submit">Approve</button>
+                <div class="col-12 text-end">
+                    <button class="btn btn-primary" type="submit">Approve</button>
                 </div>
             @endif
             </form>

@@ -190,7 +190,7 @@
                             <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>
                         <div class="col-12 text-end mt-4">
-                            <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
+                            <button type="submit" class="btn btn-info"> <span class="fw-bold">Add New </span></button>
                             @if($letterOfIndentItems->count() > 0)
                                 <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
                                     <button type="button" class="btn btn-primary  btn-deal-item-submit" >

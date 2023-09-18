@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            @if($demandLists->count() > 0)
+
 {{--                 hide in small, medium(view)--}}
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
                     <div class="d-flex">
@@ -61,7 +61,7 @@
                                     <label for="basicpill-firstname-input" class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-4 col-md-5 col-sm-12">
-                                    <label for="basicpill-firstname-input" class="form-label">Varient</label>
+                                    <label for="basicpill-firstname-input" class="form-label">Variant</label>
                                 </div>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                 </div>
-
+            @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)
                 <div class="d-flex mt-3">
                     <div class="col-lg-7 col-md-9 col-sm-9 col-9">
@@ -182,14 +182,14 @@
                             </div>
 {{--                                hide in samll view--}}
                             <div class="col-lg-1 col-sm-12 col-xs-12 d-none d-sm-block">
-                                <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
+                                <button type="submit" class="btn btn-primary "><i class="fa fa-plus"></i> Add </button>
                             </div>
                         </div>
                     </div>
                 </div>
 {{--                // show only in xs or small view--}}
                 <div class="col-12 text-center d-block d-sm-none">
-                    <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
+                    <button type="submit" class="btn btn-primary "><i class="fa fa-plus"></i> Add </button>
                 </div>
                 <br/>
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
@@ -212,7 +212,7 @@
                 <br/>
             </form>
             <div class="col-12 text-end">
-                <button type="button" class="btn btn-dark " id="update-monthly-demands">Update Quantity</button>
+                <button type="button" class="btn btn-primary" id="update-monthly-demands">Update Quantity</button>
             </div>
         </div>
     </div>

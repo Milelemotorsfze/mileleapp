@@ -16,6 +16,7 @@
     <div class="card-header">
         <h4 class="card-title">
            Supplier LOI Info
+
         </h4>
     </div>
     <div class="card-body">
@@ -653,7 +654,7 @@
                 statusChange(id,status)
             })
             function statusChange(id,status) {
-                let url = '{{ route('warranty-brands.status-change') }}';
+                let url = '{{ route('letter-of-indents.supplier-approval') }}';
                 if(status == 'REJECTED') {
                         var message = 'Reject';
                     }else{
@@ -668,7 +669,6 @@
                         data: {
                             id: id,
                             status: status,
-
                             _token: '{{ csrf_token() }}'
                         },
                         success: function (data) {

@@ -196,5 +196,18 @@ class LOIItemsController extends Controller
 
         return redirect()->route('letter-of-indents.index')->with('success', 'LOI Item successfully approved with respective quantity');
     }
+    public function supplierApproval(Request $request) {
+
+        $LOI = LetterOfIndent::find($request->id);
+        if($request->status == 'REJECTED') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+        }elseif ($request->status == 'APPROVE') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+        }
+
+        $LOI->save();
+        return response(true);
+
+    }
 
 }

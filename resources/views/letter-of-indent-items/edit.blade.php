@@ -144,7 +144,7 @@
                                        @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
                             </div>
                             <div class="col-12 text-end mt-4">
-                                <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
+                                <button type="submit" class="btn btn-info"> <span class="fw-bold">Add New </span></button>
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>

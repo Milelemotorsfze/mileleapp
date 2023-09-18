@@ -133,12 +133,12 @@ class DemandController extends Controller
     }
     public function getVariant(Request $request)
     {
-        $data['variants'] = Varaint::with('masterModel')
-            ->whereHas('masterModel', function ($query) use($request) {
-                $query->where('sfx', $request->sfx);
-                $query->where('model', $request->model);
-            })
-            ->pluck('name');
+        $variantId = MasterModel::where('model', $request->model)
+                                    ->where('sfx', $request->sfx)
+                                    ->pluck('variant_id');
+        $data['variants'] = Varaint::whereIn('id', $variantId)
+                                     ->pluck('name');
+
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
                 ->whereHas('masterModel', function ($query) use($request) {
