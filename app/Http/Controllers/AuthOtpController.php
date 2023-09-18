@@ -61,8 +61,6 @@ class AuthOtpController extends Controller
                     }
                 }
 
-//                dd($userCurrentBrowser);
-                info("otp login prefered");
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
