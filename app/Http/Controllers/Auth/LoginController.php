@@ -40,7 +40,7 @@ class LoginController extends Controller
             return redirect()->back()->with('error', 'Your OTP is not correct');
         }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
         {
-            return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
+            return redirect()->route('login')->with('error', 'Your OTP has been expired');
         }
         else
         {
