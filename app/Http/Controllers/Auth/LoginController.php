@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LogActivity;
+
+use Jenssegers\Agent\Facades\Agent;
 use Session;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
@@ -30,48 +32,66 @@ class LoginController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'otp' => 'required'
+//            'otp' => 'required'
         ]);
         #Validation Logic
-        $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
-        $now = Carbon::now();
-        if(!$verificationCode)
-        {
-            return redirect()->back()->with('error', 'Your OTP is not correct');
-        }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
-        {
-            return redirect()->route('login')->with('error', 'Your OTP has been expired');
+        $user = User::whereId($request->user_id)->first();
+        if($request->otp) {
+            $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
+            $now = Carbon::now();
+            if(!$verificationCode)
+            {
+                return redirect()->back()->with('error', 'Your OTP is not correct');
+            }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
+            {
+                return redirect()->route('login')->with('error', 'Your OTP has been expired');
+            }else{
+                if($user) {
+                    // Expire The OTP
+                    $verificationCode->update([
+                        'expire_at' => Carbon::now()
+                    ]);
+                }
+            }
         }
-        else
-        {
-            $user = User::whereId($request->user_id)->first();
-            if($user){
+
+        if($user){
                 // Expire The OTP
-                $verificationCode->update([
-                    'expire_at' => Carbon::now()
-                ]);
-                if(Auth::guard('web')->attempt(['email'=>$request->email,'password'=>$request->password]))
+            if(Auth::guard('web')->attempt(['email'=>$request->email,'password'=>$request->password]))
+            {
+                if(Auth::user()->status == 'active')
                 {
-                    if(Auth::user()->status == 'active')
-                    {
-                        $activity['ip'] = $request->ip();
-                        $activity['user_id'] = Auth::id();
-                        $activity['status'] = 'success';
-                        LogActivity::create($activity);
-                        return redirect()->route('home');
-                        info('login');
+                    $macAddr = exec('getmac');
+                    $userMacAdress = substr($macAddr, 0, 17);
+                    if(Agent::isPhone() == 'phone') {
+                        $useDevice = 'phone';
+                    }elseif (Agent::isTablet() == 'tablet') {
+                        $useDevice = 'tablet';
+                    }elseif (Agent::isDesktop() == 'desktop') {
+                        $useDevice = 'desktop';
                     }
-                    else
-                    {
-                        Session::flash('error','You are not Active by Admin');
-                        return view('auth.login');
-                    }
+
+                    $activity['ip'] = $request->ip();
+                    $activity['user_id'] = Auth::id();
+                    $activity['status'] = 'success';
+                    $activity['mac_address'] = $userMacAdress;
+                    $activity['device_name'] = $useDevice ?? '';
+                    $activity['browser_name'] = Agent::browser();
+
+                    LogActivity::create($activity);
+                    return redirect()->route('home');
+
                 }
                 else
                 {
-                    Session::flash('error','These credentials do not match our records.');
+                    Session::flash('error','You are not Active by Admin');
                     return view('auth.login');
                 }
+            }
+            else
+            {
+                Session::flash('error','These credentials do not match our records.');
+                return view('auth.login');
             }
         }
     }

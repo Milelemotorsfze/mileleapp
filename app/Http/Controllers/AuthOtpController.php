@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogActivity;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Session;
+use Jenssegers\Agent\Facades\Agent;
 
 class AuthOtpController extends Controller
 {
@@ -32,6 +34,35 @@ class AuthOtpController extends Controller
                     'email' => 'required|exists:users,email',
                     'password' => 'required',
                 ]);
+
+                // calculate verification expiry date time
+                // get the latest login activeity of user
+                $macAddr = exec('getmac');
+                $userMacAdress = substr($macAddr, 0, 17);
+
+                $userCurrentBrowser = Agent::browser();
+                $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
+                    ->orderBy('id','DESC')->first();
+                // check opt table has entry
+                if($userLastOtpVerified) {
+                    $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
+                    // check the mac address change to check whether the device is changed or not
+                    if($latestLoginActivity->mac_address == $userMacAdress ) {
+                        if($latestLoginActivity->browser_name == $userCurrentBrowser) {
+
+                            $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
+                            $otpExpirationDate = $userLastOtpVerifiedDate->format('d/m/Y');
+                            $currentDate = Carbon::now()->format('d/m/Y');
+                            if($currentDate < $otpExpirationDate) {
+                                $request['user_id'] = $user->id;
+                                return(app('App\Http\Controllers\Auth\LoginController')->login($request));
+                            }
+                        }
+                    }
+                }
+
+//                dd($userCurrentBrowser);
+                info("otp login prefered");
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
@@ -67,7 +98,7 @@ class AuthOtpController extends Controller
             Session::flash('error','These credentials do not match our records.');
             return view('auth.login');
         }
-        return view('auth.login');
+//        return view('auth.login');
     }
     // Generate OTP
     public function generate(Request $request)
