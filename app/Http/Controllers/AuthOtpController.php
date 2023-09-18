@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
-use Session;
 
 class AuthOtpController extends Controller
 {
@@ -23,9 +22,9 @@ class AuthOtpController extends Controller
     public function loginOtpGenerate(Request $request)
     {
         $user = User::where('email',$request->email)->first();
-        if($user && Hash::check($request->password, $user->password)) 
-        {               
-            if('active' == $user->status) 
+        if($user && Hash::check($request->password, $user->password))
+        {
+            if('active' == $user->status)
             {
                 # Validate Data
                 $request->validate([
@@ -35,7 +34,7 @@ class AuthOtpController extends Controller
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
-                # Return With OTP 
+                # Return With OTP
                 $data['email'] = $request->email;
                 $data['name'] = 'Hello,';
                 $data['otp'] = $verificationCode->otp;
@@ -54,7 +53,7 @@ class AuthOtpController extends Controller
                     $user_id = Crypt::encryptString($verificationCode->user_id);
                     $email = Crypt::encryptString($request->email);
                     $password = Crypt::encryptString($request->password);
-                return redirect()->route('otp.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password])->with('success',  $message); 
+                return redirect()->route('otp.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password])->with('success',  $message);
             }
             else
             {
@@ -73,8 +72,8 @@ class AuthOtpController extends Controller
     public function generate(Request $request)
     {
         $user = User::where('email',$request->email)->first();
-        if($user) 
-        {  
+        if($user)
+        {
                  # Validate Data
                 $request->validate([
                     'email' => 'required|exists:users,email',
@@ -82,7 +81,7 @@ class AuthOtpController extends Controller
                 # Generate An OTP
                 $verificationCode = $this->generateOtp($request->email);
                 $message = "Your OTP To Login is Send Successfully ";
-                # Return With OTP 
+                # Return With OTP
                 $data['email'] = $request->email;
                 $data['name'] = 'Hello,';
                 $data['otp'] = $verificationCode->otp;
@@ -99,9 +98,9 @@ class AuthOtpController extends Controller
                                 // ->attachData($renderedData, 'name_of_attachment');
                         }
                     );
-                return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);         
-        } 
-        else 
+                return redirect()->route('otp.verification', ['user_id' => $verificationCode->user_id])->with('success',  $message);
+        }
+        else
         {
             Session::flash('error','This email do not match our records.');
             return view('otp.login');
@@ -141,5 +140,5 @@ class AuthOtpController extends Controller
         ]);
     }
 
-   
+
 }

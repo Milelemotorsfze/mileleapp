@@ -2,9 +2,9 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">
-           Brands
+            Master Models
         </h4>
-            <a  class="btn btn-sm btn-info float-end" href="{{ route('brands.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
+        <a  class="btn btn-sm btn-info float-end" href="{{ route('master-models.create') }}" ><i class="fa fa-plus" aria-hidden="true"></i> Create</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -26,7 +26,7 @@
         @endif
     </div>
     <div class="m-3">
-        {!! $html->table(['class' => 'table table-bordered table-striped table-responsive ']) !!}
+        {!! $html->table(['class' => 'table table-bordered table-striped table-responsive thead-dark']) !!}
     </div>
 @endsection
 @push('scripts')

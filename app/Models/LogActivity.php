@@ -12,7 +12,10 @@ class LogActivity extends Model
     protected $fillable = [
         'user_id',
         'status',
-        'ip'
+        'ip',
+        'mac_address',
+        'browser_name',
+        'device_name'
     ];
     public function logineUser()
     {

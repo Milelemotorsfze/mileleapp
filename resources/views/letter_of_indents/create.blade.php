@@ -143,8 +143,8 @@
                     </div>
                 </div>
                 <br>
-                <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark w-25" >Next</button>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary " >Next</button>
                 </div>
             </div>
         </form>

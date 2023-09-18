@@ -31,7 +31,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16">Customer</label>
+                        <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
                             <option> {{ $letterOfIndent->customer->name }}</option>
                         </select>
@@ -39,7 +39,7 @@
                 </div>
                 <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16 text-muted">LOI Category</label>
+                        <label for="choices-single-default" class="form-label font-size-13 ">LOI Category</label>
                         <select class="form-control" name="category" readonly >
                             <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                                 {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
@@ -54,26 +54,26 @@
                 </div>
                 <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16 text-muted">LOI Date</label>
+                        <label for="choices-single-default" class="form-label font-size-13 ">LOI Date</label>
                         <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16">Dealers</label>
+                        <label for="choices-single-default" class="form-label font-size-13">Dealers</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16">Shipping Method</label>
+                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
                     </div>
                 </div>
                 <div class="col-lg-1 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-16 ">Supplier</label>
+                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                     </div>
                 </div>
@@ -193,7 +193,7 @@
                             <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
                             @if($letterOfIndentItems->count() > 0)
                                 <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
-                                    <button type="button" class="btn btn-dark  btn-deal-item-submit" >
+                                    <button type="button" class="btn btn-primary  btn-deal-item-submit" >
                                         Next
                                     </button>
                                 </a>

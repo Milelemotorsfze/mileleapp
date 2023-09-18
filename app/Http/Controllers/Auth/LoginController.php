@@ -35,11 +35,11 @@ class LoginController extends Controller
         #Validation Logic
         $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
         $now = Carbon::now();
-        if(!$verificationCode) 
-        { 
+        if(!$verificationCode)
+        {
             return redirect()->back()->with('error', 'Your OTP is not correct');
         }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
-        { 
+        {
             return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
         }
         else
@@ -50,9 +50,9 @@ class LoginController extends Controller
                 $verificationCode->update([
                     'expire_at' => Carbon::now()
                 ]);
-                if(Auth::guard('web')->attempt(['email'=>$request->email,'password'=>$request->password])) 
-                {               
-                    if(Auth::user()->status == 'active') 
+                if(Auth::guard('web')->attempt(['email'=>$request->email,'password'=>$request->password]))
+                {
+                    if(Auth::user()->status == 'active')
                     {
                         $activity['ip'] = $request->ip();
                         $activity['user_id'] = Auth::id();
@@ -65,9 +65,9 @@ class LoginController extends Controller
                     {
                         Session::flash('error','You are not Active by Admin');
                         return view('auth.login');
-                    }               
-                } 
-                else 
+                    }
+                }
+                else
                 {
                     Session::flash('error','These credentials do not match our records.');
                     return view('auth.login');
@@ -83,7 +83,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    
+
     protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
@@ -129,7 +129,7 @@ class LoginController extends Controller
 //         $now = Carbon::now();
 //         if (!$verificationCode) {
 //             return redirect()->back()->with('error', 'Your OTP is not correct');
-//         }elseif($verificationCode && $now->isAfter($verificationCode->expire_at)){ 
+//         }elseif($verificationCode && $now->isAfter($verificationCode->expire_at)){
 //             return redirect()->route('otp.login')->with('error', 'Your OTP has been expired');
 //         }
 //         $user = User::whereId($request->user_id)->first();

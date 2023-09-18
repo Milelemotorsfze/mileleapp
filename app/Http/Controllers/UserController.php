@@ -1,18 +1,16 @@
 <?php
 namespace App\Http\Controllers;
 
+    use App\Models\EmpJob;
+    use App\Models\Language;
+    use App\Models\SalesPersonLaugauges;
     use Illuminate\Http\Request;
     use App\Http\Controllers\Controller;
     use App\Models\User;
-    use App\Models\Language;
-    use Illuminate\Support\Str;
-    use App\Models\EmpJob;
     use Spatie\Permission\Models\Role;
     use DB;
     use Hash;
-    use Illuminate\Support\Facades\Mail;
     use App\Models\Profile;
-    use App\Models\SalesPersonLaugauges;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Session;
     use Illuminate\Support\Arr;
@@ -134,7 +132,7 @@ namespace App\Http\Controllers;
             User::withTrashed()->find($id)->restore();
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
-        }        
+        }
         public function updateRole(Request $request, $roleId)
         {
         $user = Auth::user();

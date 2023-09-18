@@ -11,13 +11,13 @@
     #dtBasicExample2 {
         width: 100%;
     }
-  .wrapper 
+  .wrapper
   {
     display: table-cell;
     width: 100%;
     vertical-align: middle;
   }
-  .arrow-steps .step 
+  .arrow-steps .step
   {
     font-size: 14px;
     text-align: center;
@@ -37,7 +37,7 @@
     transition: background-color 0.2s ease;
   }
   .arrow-steps .step:after,
-  .arrow-steps .step:before 
+  .arrow-steps .step:before
   {
     content: " ";
     position: absolute;
@@ -51,22 +51,22 @@
     z-index: 2;
     transition: border-color 0.2s ease;
   }
-  .arrow-steps .step:before 
+  .arrow-steps .step:before
   {
     right: auto;
     left: 0;
     border-left: 17px solid #fff;
     z-index: 0;
   }
-  .arrow-steps .step:first-child:before 
+  .arrow-steps .step:first-child:before
   {
     border: none;
   }
-  .arrow-steps .step span 
+  .arrow-steps .step span
   {
     position: relative;
   }
-  .arrow-steps .step span:before 
+  .arrow-steps .step span:before
   {
     opacity: 0;
     content: "✔";
@@ -75,36 +75,36 @@
     left: -20px;
     transition: opacity 0.3s ease 0.5s;
   }
-  .arrow-steps .step.done span:before 
+  .arrow-steps .step.done span:before
   {
     opacity: 1;
   }
-  .arrow-steps .step.done 
+  .arrow-steps .step.done
   {
     background-color: #06ac77;
   }
-  .arrow-steps .step.done:after 
+  .arrow-steps .step.done:after
   {
     border-left: 17px solid #06ac77;
   }
-  .arrow-steps .step.current 
+  .arrow-steps .step.current
   {
     color: #fff;
     background-color: #5156be;
   }
-  .arrow-steps .step.current:after 
+  .arrow-steps .step.current:after
   {
     border-left: 17px solid #5156be;
   }
-  .arrow-steps .step.clicked 
+  .arrow-steps .step.clicked
   {
     background-color: #3498DB;
   }
-  .arrow-steps .step.clicked.current:after 
+  .arrow-steps .step.clicked.current:after
   {
     border-left: 17px solid #3498DB;
   }
-  @media (max-width: 765px) 
+  @media (max-width: 765px)
   {
     .arrow-steps .step {
       min-width: auto;
@@ -113,14 +113,14 @@
       margin-bottom: 10px;
     }
   }
-  input[type=number]::-webkit-inner-spin-button, 
+  input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-outer-spin-button 
-{ 
-    -webkit-appearance: none; 
+input[type=number]::-webkit-outer-spin-button
+{
+    -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none; 
-    margin: 0; 
+    appearance: none;
+    margin: 0;
 }
 </style>
     <h4 class="card-title">
@@ -159,7 +159,7 @@ input[type=number]::-webkit-outer-spin-button
       <li class="nav-item">
         <a class="nav-link" data-bs-toggle="pill" href="#tab7">Rejected</a>
       </li>
-    </ul>      
+    </ul>
   </div>
   <div class="tab-content">
     @can('sales-view')
@@ -193,7 +193,7 @@ input[type=number]::-webkit-outer-spin-button
                 <tr data-id="1">
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
-                    <td>{{ $calls->name }}</td>     
+                    <td>{{ $calls->name }}</td>
                     <td>
                     <div class="dropdown">
                     <a href="#" role="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -240,7 +240,7 @@ input[type=number]::-webkit-outer-spin-button
     $text = $calls->remarks;
     $remarks = preg_replace("#([^>])&nbsp;#ui", "$1 ", $text);
     @endphp
-    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>        
+    <td>{{ str_replace(['<p>', '</p>'], '', strip_tags($remarks)) }}</td>
                     <td>
                     <div class="dropdown">
     <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Adding Into Demand">
@@ -259,7 +259,7 @@ input[type=number]::-webkit-outer-spin-button
     </ul>
   </div>
                     </td>
-                    </td>       
+                    </td>
                   </tr>
                 @endforeach
               </tbody>
@@ -269,8 +269,8 @@ input[type=number]::-webkit-outer-spin-button
             </br>
             </br>
             </br>
-          </div>  
-        </div>  
+          </div>
+        </div>
       </div>
       <div class="modal fade" id="prospectingmodel" tabindex="-1" aria-labelledby="prospectingmodelLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -303,7 +303,7 @@ input[type=number]::-webkit-outer-spin-button
         </div>
       </div>
     </div>
-  </div> 
+  </div>
   <div class="modal fade" id="demandmodel" tabindex="-1" aria-labelledby="demandmodelLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -335,7 +335,7 @@ input[type=number]::-webkit-outer-spin-button
         </div>
       </div>
     </div>
-  </div> 
+  </div>
   <div class="modal fade" id="ClosedModal" tabindex="-1" aria-labelledby="ClosedModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -391,7 +391,7 @@ input[type=number]::-webkit-outer-spin-button
         </div>
       </div>
     </div>
-  </div> 
+  </div>
       <div class="modal fade" id="qualified" tabindex="-1" aria-labelledby="qualifiedLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -606,8 +606,8 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
+          </div>
+        </div>
       </div>
       @endcan
       @can('sales-view')
@@ -641,8 +641,8 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
+          </div>
+        </div>
           </div>
         @endcan
 		    @can('sales-view')
@@ -680,9 +680,9 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
-      </div> 
+          </div>
+        </div>
+      </div>
     @endcan
     @can('sales-view')
       <div class="tab-pane fade show" id="tab5">
@@ -723,9 +723,9 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
-      </div>  
+          </div>
+        </div>
+      </div>
     @endcan
     @can('sales-view')
       <div class="tab-pane fade show" id="tab6">
@@ -770,9 +770,9 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
-      </div>  
+          </div>
+        </div>
+      </div>
     @endcan
     @can('sales-view')
       <div class="tab-pane fade show" id="tab7">
@@ -815,9 +815,9 @@ input[type=number]::-webkit-outer-spin-button
                 </tr>
               </thead>
             </table>
-          </div>  
-        </div> 
-      </div>  
+          </div>
+        </div>
+      </div>
     @endcan
       </div><!-- end tab-content-->
     </div>
@@ -845,7 +845,7 @@ $('#fileModaln').on('hidden.bs.modal', function () {
 });
   jQuery(document).ready(function() {
     var steps = jQuery(".step");
-    var dataTable = null; 
+    var dataTable = null;
     steps.on("click", function() {
       var clickedStep = jQuery(this);
       var currentIndex = steps.index(clickedStep);
@@ -933,7 +933,7 @@ function saveprospecting() {
   formData.append('callId', callId);
   formData.append('date', date);
   formData.append('salesNotes', salesNotes);
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.saveprospecting') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
@@ -969,7 +969,7 @@ function savedemand() {
   formData.append('callId', callId);
   formData.append('date', date);
   formData.append('salesNotes', salesNotes);
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.savedemand') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
@@ -1005,12 +1005,12 @@ function saveQuotations() {
     alert('Please select a date');
     return;
   }
-  
+
   if (dealValue === '') {
     alert('Please enter the deal value');
     return;
   }
-  
+
   if (fileInput.files.length === 0) {
     alert('Please upload a document');
     return;
@@ -1022,7 +1022,7 @@ function saveQuotations() {
   formData.append('salesNotes', salesNotes);
   formData.append('currency', currencySelect.value);
   formData.append('file', fileInput.files[0]);
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.qoutations') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
@@ -1086,7 +1086,7 @@ function savenegotiation() {
   var salesNotes = document.getElementById('sales-notes-negotiation').value;
   var dealvalues = document.getElementById('deal-value-input-negotiation').value;
   var currencySelect = document.getElementById('currency-select-negotiation');
-  
+
   if (date === '') {
     alert('Please select a date');
     return;
@@ -1110,7 +1110,7 @@ function savenegotiation() {
   if (fileInput.files.length > 0) {
     formData.append('file', fileInput.files[0]);
   }
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.savenegotiation') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
@@ -1164,7 +1164,7 @@ function savenegotiation() {
   formData.append('dealvalues', dealvalues);
   formData.append('currency', currencySelect.value);
   formData.append('sonumber', sonumber);
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');  
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var xhr = new XMLHttpRequest();
   xhr.open('POST', '{{ route('sales.closed') }}', true);
   xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
@@ -1229,7 +1229,7 @@ $(document).ready(function () {
 
       selectWrapper.appendTo($(column.header()));
       $(column.header()).addClass('nowrap-td');
-      
+
       column.data().unique().sort().each(function(d, j) {
         if (columnId === 3) {  // Assuming the phone column is at index 2
           var phoneNumber = $(d).text().trim();  // Extract phone number
@@ -1238,7 +1238,7 @@ $(document).ready(function () {
     else if (columnId === 4) {  // Assuming the phone column is at index 2
           var Email = $(d).text().trim();  // Extract phone number
         select.append('<option value="' + Email + '">' + Email + '</option>');
-    } 
+    }
     else {
         select.append('<option value="' + d + '">' + d + '</option>');
     }
@@ -1786,6 +1786,7 @@ function s2ab(s) {
                 { data: 'created_at', name: 'created_at' },
                 { data: 'type', name: 'type' },
                 { data: 'name', name: 'name' },
+                // { data: 'brand', name: 'brand' },
                 { data: 'phone', name: 'phone' },
                 { data: 'email', name: 'email' },
                 { data: 'models_brands', name: 'models_brands' },

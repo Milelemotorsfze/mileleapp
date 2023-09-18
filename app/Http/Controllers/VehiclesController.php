@@ -118,7 +118,7 @@ class VehiclesController extends Controller
                                             foreach ($grn_remark as $grn_remark) {
                                                 if($grn_remark == "null")
                                                 {
-                                                    $query->orWhere('grn_remark', null);   
+                                                    $query->orWhere('grn_remark', null);
                                                 }
                                                 else{
                                                 $query->orWhere('grn_remark', 'LIKE', '%' . trim($grn_remark) . '%');
@@ -132,7 +132,7 @@ class VehiclesController extends Controller
                                                 foreach ($qc_remarks as $qc_remarks) {
                                                     if($qc_remarks == "null")
                                                     {
-                                                        $query->orWhere('qc_remarks', null);   
+                                                        $query->orWhere('qc_remarks', null);
                                                     }
                                                     else{
                                                     $query->orWhere('qc_remarks', 'LIKE', '%' . trim($qc_remarks) . '%');
@@ -146,7 +146,7 @@ class VehiclesController extends Controller
                                                     foreach ($pdi_date as $pdi_date) {
                                                         if($pdi_date == "null")
                                                         {
-                                                            $query->orWhere('pdi_date', null);   
+                                                            $query->orWhere('pdi_date', null);
                                                         }
                                                         else{
                                                         $query->orWhere('pdi_date', 'LIKE', '%' . trim($pdi_date) . '%');
@@ -160,7 +160,7 @@ class VehiclesController extends Controller
                                                         foreach ($pdi_remarks as $pdi_remarks) {
                                                             if($pdi_remarks == "null")
                                                             {
-                                                                $query->orWhere('pdi_remarks', null);   
+                                                                $query->orWhere('pdi_remarks', null);
                                                             }
                                                             else{
                                                             $query->orWhere('pdi_remarks', 'LIKE', '%' . trim($pdi_remarks) . '%');
@@ -174,7 +174,7 @@ class VehiclesController extends Controller
                                                             foreach ($extra_features as $extra_features) {
                                                                 if($extra_features == "null")
                                                                 {
-                                                                    $query->orWhere('extra_features', null);   
+                                                                    $query->orWhere('extra_features', null);
                                                                 }
                                                                 else{
                                                                 $query->orWhere('extra_features', 'LIKE', '%' . trim($extra_features) . '%');
@@ -188,7 +188,7 @@ class VehiclesController extends Controller
                                                 foreach ($inspection_date as $inspection_date) {
                                                     if($inspection_date == "null")
                                                     {
-                                                        $query->orWhere('inspection_date', null);   
+                                                        $query->orWhere('inspection_date', null);
                                                     }
                                                     else{
                                                     $query->orWhere('inspection_date', 'LIKE', '%' . trim($inspection_date) . '%');
@@ -1494,7 +1494,7 @@ class VehiclesController extends Controller
                         $documentLog->new_value = $newValue;
                         $documentLog->created_by = auth()->user()->id;
                         $documentLog->role = Auth::user()->selectedRole;
-                        $documentLog->save();  
+                        $documentLog->save();
                     }
                     else{
                     if ($oldValue !== $newValue) {
@@ -1589,8 +1589,8 @@ class VehiclesController extends Controller
                             $vehicleslog->new_value = $fieldValue;
                             $vehicleslog->created_by = auth()->user()->id;
                             $vehicleslog->save();
-                        }   
-                    } 
+                        }
+                    }
             else {
                 $oldValues = $vehicle->getAttributes();
                 $changes = [];
@@ -2397,200 +2397,200 @@ public function viewalls(Request $request)
         $length = $request->input('length', 40);
         $searchParams = $request->input('columns', []);
         info($searchParams);
-        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']); 
+        $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']);
         foreach ($searchParams as $column => $searchValue) {
             if ($searchValue !== null) {
                 // Apply the search condition for this column
-                if ($column === "po_number") { 
+                if ($column === "po_number") {
                     $query->whereHas('PurchasingOrder', function ($subQuery) use ($searchValue) {
                         $subQuery->where('po_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "po_date") { 
+                if ($column === "po_date") {
                     $query->whereHas('PurchasingOrder', function ($subQuery) use ($searchValue) {
                         $subQuery->where('po_date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "estimation_date") { 
+                if ($column === "estimation_date") {
                     $query->where('estimation_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "grn_number") { 
+                if ($column === "grn_number") {
                     $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('grn_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "grn_date") { 
+                if ($column === "grn_date") {
                     $query->whereHas('Grn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "netsuit_grn_number") { 
+                if ($column === "netsuit_grn_number") {
                     $query->where('netsuit_grn_number', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "netsuit_grn_date") { 
+                if ($column === "netsuit_grn_date") {
                     $query->where('netsuit_grn_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "inspection_date") { 
+                if ($column === "inspection_date") {
                     $query->where('inspection_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "grn_remark") { 
+                if ($column === "grn_remark") {
                     $query->where('grn_remark', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "qc_remarks") { 
+                if ($column === "qc_remarks") {
                     $query->where('qc_remarks', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "so_number") { 
+                if ($column === "so_number") {
                     $query->whereHas('So', function ($subQuery) use ($searchValue) {
                         $subQuery->where('so_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "so_date") { 
+                if ($column === "so_date") {
                     $query->whereHas('So', function ($subQuery) use ($searchValue) {
                         $subQuery->where('so_date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "reservation_start_date") { 
+                if ($column === "reservation_start_date") {
                     $query->where('reservation_start_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "reservation_end_date") { 
+                if ($column === "reservation_end_date") {
                     $query->where('reservation_end_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "pdi_date") { 
+                if ($column === "pdi_date") {
                     $query->where('pdi_date', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "pdi_remarks") { 
+                if ($column === "pdi_remarks") {
                     $query->where('pdi_remarks', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "gdn_number") { 
+                if ($column === "gdn_number") {
                     $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('gdn_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "gdn_date") { 
+                if ($column === "gdn_date") {
                     $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "gdn_date") { 
+                if ($column === "gdn_date") {
                     $query->whereHas('Gdn', function ($subQuery) use ($searchValue) {
                         $subQuery->where('date', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "brand") { 
+                if ($column === "brand") {
                     $query->whereHas('variant.brand', function ($subQuery) use ($searchValue) {
                         $subQuery->where('brand_name', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "model_line") { 
+                if ($column === "model_line") {
                     $query->whereHas('variant.master_model_lines', function ($subQuery) use ($searchValue) {
                         $subQuery->where('model_line', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "model_description") { 
+                if ($column === "model_description") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('model_detail', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "variant") { 
+                if ($column === "variant") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "variant_details") { 
+                if ($column === "variant_details") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('detail', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "vin") { 
+                if ($column === "vin") {
                     $query->where('vin', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "conversion") { 
+                if ($column === "conversion") {
                     $query->where('conversion', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "engine") { 
+                if ($column === "engine") {
                     $query->where('engine', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "model_year") { 
+                if ($column === "model_year") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('my', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "steering") { 
+                if ($column === "steering") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('steering', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "seats") { 
+                if ($column === "seats") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('seat', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "fuel_type") { 
+                if ($column === "fuel_type") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('fuel_type', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "gear") { 
+                if ($column === "gear") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('gear', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "int_colour") { 
+                if ($column === "int_colour") {
                     $query->whereHas('interior', function ($subQuery) use ($searchValue) {
                         $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "ex_colour") { 
+                if ($column === "ex_colour") {
                     $query->whereHas('exterior', function ($subQuery) use ($searchValue) {
                         $subQuery->where('name', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "upholestry") { 
+                if ($column === "upholestry") {
                     $query->whereHas('variant', function ($subQuery) use ($searchValue) {
                         $subQuery->where('upholestry', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "extra_features") { 
+                if ($column === "extra_features") {
                     $query->where('extra_features', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "ppmmyyy") { 
+                if ($column === "ppmmyyy") {
                     $query->where('ppmmyyy', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "territory") { 
+                if ($column === "territory") {
                     $query->where('territory', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "latest_location") { 
+                if ($column === "latest_location") {
                     $query->where('latest_location', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "warehouseremarks") { 
+                if ($column === "warehouseremarks") {
                     $query->whereHas('latestRemarkWarehouse', function ($subQuery) use ($searchValue) {
                         $subQuery->where('remark', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "price") { 
+                if ($column === "price") {
                     $query->where('price', 'LIKE', '%' . $searchValue . '%');
                 }
-                if ($column === "importdoc") { 
+                if ($column === "importdoc") {
                     $query->whereHas('document', function ($subQuery) use ($searchValue) {
                         $subQuery->where('importdoc', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "ownership") { 
+                if ($column === "ownership") {
                     $query->whereHas('document', function ($subQuery) use ($searchValue) {
                         $subQuery->where('ownership', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "documentwith") { 
+                if ($column === "documentwith") {
                     $query->whereHas('document', function ($subQuery) use ($searchValue) {
                         $subQuery->where('documentwith', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "bl_number") { 
+                if ($column === "bl_number") {
                     $query->whereHas('document', function ($subQuery) use ($searchValue) {
                         $subQuery->where('bl_number', 'LIKE', '%' . $searchValue . '%');
                     });
                 }
-                if ($column === "bl_dms_uploading") { 
+                if ($column === "bl_dms_uploading") {
                     $query->whereHas('document', function ($subQuery) use ($searchValue) {
                         $subQuery->where('bl_dms_uploading', 'LIKE', '%' . $searchValue . '%');
                     });
@@ -2641,9 +2641,9 @@ public function viewalls(Request $request)
         $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse'])
             ->select('id', 'status', 'vin', 'latest_location', 'ex_colour', 'int_colour', 'varaints_id', 'so_id', 'purchasing_order_id', 'grn_id', 'gdn_id', 'documents_id', 'estimation_date', 'netsuit_grn_number', 'netsuit_grn_date', 'inspection_date', 'grn_remark', 'qc_remarks', 'reservation_start_date', 'reservation_start_date', 'pdi_date', 'pdi_remarks', 'conversion', 'engine', 'extra_features', 'ppmmyyy', 'territory', 'price')
             ->where('id', $id);
-    
+
         $vehicle = $query->first();
-    
+
         if (!$vehicle) {
             return response()->json(['message' => 'Vehicle not found'], 404);
         }
@@ -2683,5 +2683,5 @@ public function viewalls(Request $request)
         $vehicle->salespersonname = $salespersonName;
     info($vehicle);
         return response()->json($vehicle);
-    }    
+    }
     }

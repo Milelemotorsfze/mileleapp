@@ -1,7 +1,8 @@
 @extends('layouts.main')
 @section('content')
     <div class="card-header">
-        <h4 class="card-title">Add New Demands</h4>
+        <h4 class="card-title">Add New Demand</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -32,9 +33,9 @@
                 <div class="row demand-div">
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label"> Supplier</label>
-                            <select class="form-control" autofocus name="supplier_id" id="supplier">
-                                <option value="" disabled>Select The Supplier</option>
+                            <label for="choices-single-default" class="form-label"> Vendor</label>
+                            <select class="form-control" autofocus name="supplier_id" id="vendor">
+                                <option value="" disabled>Select The Vendor</option>
                                 @foreach($suppliers as $supplier)
                                     <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
                                 @endforeach
@@ -60,8 +61,8 @@
                         </div>
                     </div>
                     </br>
-                    <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-dark " id="add-demand">Submit</button>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary " id="add-demand">Submit</button>
                     </div>
                 </div>
             </div>
@@ -69,4 +70,10 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        $("#vendor").attr("data-placeholder", "Choose Vendor....     Or     Type Here To Search....");
+        $("#vendor").select2({});
+    </script>
+@endpush
 
