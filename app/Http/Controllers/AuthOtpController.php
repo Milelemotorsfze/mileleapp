@@ -103,8 +103,8 @@ class AuthOtpController extends Controller
         } 
         else 
         {
-            Session::flash('error','These email do not match our records.');
-            return view('auth.login');
+            Session::flash('error','This email do not match our records.');
+            return view('otp.login');
         }
     }
 
