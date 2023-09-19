@@ -43,17 +43,23 @@ class AuthOtpController extends Controller
                 $userCurrentBrowser = Agent::browser();
                 $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
                     ->orderBy('id','DESC')->first();
+                info($userLastOtpVerified);
                 // check opt table has entry
                 if($userLastOtpVerified) {
                     $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
                     // check the mac address change to check whether the device is changed or not
                     if($latestLoginActivity->mac_address == $userMacAdress ) {
+                        info("mac address same");
                         if($latestLoginActivity->browser_name == $userCurrentBrowser) {
+                            info("browser name same");
 
                             $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
-                            $otpExpirationDate = $userLastOtpVerifiedDate->format('d/m/Y');
-                            $currentDate = Carbon::now()->format('d/m/Y');
-                            if($currentDate < $otpExpirationDate) {
+//                            $otpExpirationDate = $userLastOtpVerifiedDate->format('d/m/Y');
+                            info($userLastOtpVerifiedDate);
+                            $currentDate = Carbon::now();
+                            if($currentDate->isBefore($userLastOtpVerifiedDate)) {
+                                info("expiration  date NOT reached");
+
                                 $request['user_id'] = $user->id;
                                 return(app('App\Http\Controllers\Auth\LoginController')->login($request));
                             }
