@@ -160,6 +160,7 @@
                                            readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-3">
+{{--                                    Show LOI QTY as PFI QTY when inventory qty is > loi qty--}}
                                     <?php
                                         if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
                                             if($letterOfIndentItem->approved_quantity > 0) {

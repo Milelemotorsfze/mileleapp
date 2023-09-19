@@ -65,10 +65,14 @@ class LetterOfIndentController extends Controller
 
         $approvedLOIs = LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
+//            ->where('status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED)
+            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED);
+
         $rejectedLOIs =  LetterOfIndent::with('letterOfIndentItems','LOIDocuments')
             ->orderBy('id','DESC')
-            ->where('status', LetterOfIndent::LOI_STATUS_REJECTED);
+            ->where('status', LetterOfIndent::LOI_STATUS_REJECTED)
+            ->where('submission_status',LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED);
+
 
         if ($request->supplier_id)
         {
@@ -120,7 +124,7 @@ class LetterOfIndentController extends Controller
         $LOI = LetterOfIndent::where('customer_id', $request->customer_id)
             ->whereDate('date', Carbon::createFromFormat('Y-m-d', $request->date))
             ->where('category', $request->category)
-            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS_NEW)
+//            ->where('submission_status', LetterOfIndent::LOI_SUBMISION_STATUS_NEW)
             ->where('status', LetterOfIndent::LOI_STATUS_NEW)
             ->first();
         if (!$LOI)

@@ -201,8 +201,12 @@ class LOIItemsController extends Controller
         $LOI = LetterOfIndent::find($request->id);
         if($request->status == 'REJECTED') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+
         }elseif ($request->status == 'APPROVE') {
             $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+
         }
 
         $LOI->save();

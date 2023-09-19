@@ -72,7 +72,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealers</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Actions</th>
                         </tr>
@@ -88,7 +88,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
@@ -285,7 +285,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealers</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Milele Approval</th>
                             <th width="150px">Actions</th>
@@ -301,7 +301,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
@@ -425,7 +425,11 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="milele-partial-approved-LOI">
+        <div class="tab-pane fade" id="milele-partial-approved-LOI"
+
+
+
+        >
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -436,7 +440,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Approval</th>
                             <th>PFI</th>
@@ -453,7 +457,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
@@ -588,7 +592,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th width="150px">Actions</th>
                         </tr>
@@ -603,7 +607,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
@@ -731,7 +735,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Review</th>
                             <th width="100px">Actions</th>
@@ -747,7 +751,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <th>{{ $letterOfIndent->review }}</th>
                                 <td>

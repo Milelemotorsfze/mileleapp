@@ -35,6 +35,7 @@ class PFIController extends Controller
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', true)
                                         ->get();
+//        dd($approvedPfiItems);
         $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', false)
@@ -59,6 +60,7 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
+//        dd($request->all());
         $request->validate([
             'pfi_reference_number' => 'required',
             'pfi_date' => 'required',
@@ -113,7 +115,7 @@ class PFIController extends Controller
             $approvedLoiItem->pfi_id = $pfi->id;
             $approvedLoiItem->save();
         }
-
+        DB::commit();
         $pdf = new Fpdi();
         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
 
@@ -132,10 +134,18 @@ class PFIController extends Controller
         $pfi->save();
         Storage::put('PFI_document_withsign/'.$signedFileName, $pdf->output());
         $pdf->Output();
-        DB::commit();
+
 //        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
+    public function uniqueCheckPfiReferenceNumber(Request $request) {
 
+        $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)->first();
+        if($pfi) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * Display the specified resource.
      */

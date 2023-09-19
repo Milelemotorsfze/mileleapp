@@ -165,7 +165,7 @@
                                     <div class="col-lg-2 col-md-2">
                                         <button type="button" class="btn btn-info btn-sm add-now" data-id="{{ $pendingPfiItem->id }}"
                                                 data-action="ADD">
-                                            Add Now
+                                            Add Pfi
                                         </button>
                                     </div>
                                 </div>
@@ -181,7 +181,7 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">PFI No</label>
-                           <input type="text" class="form-control" autofocus name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
+                           <input type="text" class="form-control" id="pfi-reference-number" autofocus name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
@@ -216,7 +216,7 @@
                 <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                 @if($approvedPfiItems->count() > 0)
                     <div class="col-12 text-center">
-                        <button type="submit" class="btn btn-dark">Finish</button>
+                        <button type="submit" class="btn btn-primary">Finish</button>
                     </div>
                 @endif
             </form>
@@ -269,6 +269,15 @@
            rules: {
                pfi_reference_number: {
                    required: true,
+                   // remote: {
+                   //     url: "pfi/reference-number-unique-check",
+                   //     type: "GET",
+                   //     data: {
+                   //         pfi_reference_number: function() {
+                   //             return $( "#pfi-reference-number" ).val();
+                   //         }
+                   //     }
+                   // }
                },
                pfi_date: {
                    required: true,
