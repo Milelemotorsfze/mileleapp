@@ -144,7 +144,10 @@
                                        @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
                             </div>
                             <div class="col-12 text-end mt-4">
-                                <button type="submit" class="btn btn-info"> <span class="fw-bold">Add New </span></button>
+                                <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
+                                <a href="{{ route('letter-of-indent-documents.edit', $letterOfIndent->id)}}">
+                                    <button type="button" class="btn btn-primary  btn-deal-item-submit">Next</button>
+                                </a>
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>
@@ -155,9 +158,7 @@
         </form>
         <br>
         <div class="col-lg-12 col-md-12">
-            <a href="{{ route('letter-of-indent-documents.edit', $letterOfIndent->id)}}">
-                <button type="button" class="btn btn-dark btnright btn-deal-item-submit">Next</button>
-            </a>
+
         </div>
         <div class="row" id="deal-doc-upload-div" hidden>
             <div class="col-2">

@@ -131,7 +131,7 @@
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id">
                             <div class="col-lg-6 col-md-6">
-                                <button type="submit" class="btn btn-dark  add-deal-document">Upload & Add New Item</button>
+                                <button type="submit" class="btn btn-info  add-deal-document">Upload & Add New Item</button>
                             </div>
                         </div>
                     </div>
@@ -185,8 +185,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 text-end">
-            <a href="{{ route('letter-of-indents.index') }}"> <button type="button" class="btn btn-dark">Finish</button></a>
+        <div class="col-12 ">
+            <a href="{{ route('letter-of-indents.index') }}"> <button type="button" class="btn btn-primary">Finish</button></a>
         </div>
     </div>
 @endsection

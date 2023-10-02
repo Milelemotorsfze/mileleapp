@@ -87,24 +87,26 @@
             </div>
         </div>
             <div class="row">
-            <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
-                <div class="col-lg-12">
-                    <div class="row">
-                        <div class="col-lg-3 col-md-3">
-                            <label class="form-label">Model</label>
-                        </div>
-                        <div class="col-lg-2 col-md-2">
-                            <label  class="form-label">SFX</label>
-                        </div>
-                        <div class="col-lg-3 col-md-3">
-                            <label class="form-label">Varient</label>
-                        </div>
-                        <div class="col-lg-2 col-md-2">
-                            <label class="form-label">Quantity</label>
+                @if($pendingPfiItems->count() > 0 || $approvedPfiItems->count() > 0)
+                    <div class="d-flex d-none d-lg-block d-xl-block d-xxl-block">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3">
+                                    <label class="form-label">Model</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2">
+                                    <label  class="form-label">SFX</label>
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <label class="form-label">Varient</label>
+                                </div>
+                                <div class="col-lg-2 col-md-2">
+                                    <label class="form-label">Quantity</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                @endif
             @if($approvedPfiItems->count() > 0)
                 @foreach($approvedPfiItems as $value => $approvedPfiItem)
                     <div class="d-flex">
@@ -180,8 +182,9 @@
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">PFI No</label>
-                           <input type="text" class="form-control" id="pfi-reference-number" autofocus name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
+                            <label for="choices-single-default" class="form-label">PFI Number</label>
+                           <input type="text" class="form-control" id="pfi-reference-number" autofocus placeholder="Enter PFI Number"
+                                  name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
@@ -193,7 +196,7 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Amount</label>
-                            <input type="number" class="form-control" name="amount" min="0" >
+                            <input type="number" class="form-control" name="amount" min="0" placeholder="Enter Amount">
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">

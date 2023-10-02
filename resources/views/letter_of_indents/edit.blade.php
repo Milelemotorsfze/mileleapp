@@ -130,7 +130,7 @@
                 </div>
                 <br>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark " >Update & Next</button>
+                    <button type="submit" class="btn btn-info " >Update & Next</button>
                 </div>
             </div>
         </form>

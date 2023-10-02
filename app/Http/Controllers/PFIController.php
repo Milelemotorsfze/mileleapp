@@ -35,7 +35,6 @@ class PFIController extends Controller
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', true)
                                         ->get();
-//        dd($approvedPfiItems);
         $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
                                         ->whereNull('pfi_id')
                                         ->where('is_pfi_created', false)
@@ -132,6 +131,7 @@ class PFIController extends Controller
         $signedFileName = 'signed_'.time().'.'.$extension;
         $pfi->pfi_document_with_sign = $signedFileName;
         $pfi->save();
+
         Storage::put('PFI_document_withsign/'.$signedFileName, $pdf->output());
         $pdf->Output();
 
