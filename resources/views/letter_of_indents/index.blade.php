@@ -209,15 +209,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx  ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -359,15 +359,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -516,15 +516,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? '' }}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -659,15 +659,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model }}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx  }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -798,19 +798,19 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                            <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->quantity }}" readonly class="form-control">
                                                                         </div>
                                                                     </div>
                                                                 </div>

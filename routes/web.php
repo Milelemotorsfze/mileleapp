@@ -121,7 +121,7 @@ Route::get('/d', function () {
 
     // addon scroll list route
 
-        Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
+    Route::get('getAddonlists', [AddonController::class,'getAddonlists'])->name('addon.getAddonlists');
 
 
     Route::post('getAddonCodeAndDropdown', [AddonController::class, 'getAddonCodeAndDropdown'])->name('addon.getAddonCodeAndDropdown');
