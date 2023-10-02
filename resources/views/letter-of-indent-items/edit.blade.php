@@ -75,15 +75,15 @@
                             <div class="row">
                                 <div class="col-lg-3 col-md-3">
                                     <label class="form-label d-block d-sm-none">Model</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->model }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-2">
                                     <label class="form-label d-block d-sm-none">SFX</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-3 col-md-4">
                                     <label class="form-label d-block d-sm-none">Variant</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-2">
                                     <label class="form-label d-block d-sm-none">Quantity</label>
@@ -248,7 +248,7 @@
                     var data = data.variants;
                     $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ value +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
                     });
                 }
             });

@@ -22,7 +22,10 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(Varaint::class,'variant_name','name');
     }
-
+    public function masterModel()
+    {
+        return $this->belongsTo(MasterModel::class);
+    }
     public function getSteeringAttribute()
     {
        $mastermodel = MasterModel::where('model',$this->model)

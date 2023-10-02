@@ -108,13 +108,10 @@ class DemandController extends Controller
                 $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->get();
                 $addedModelIds = [];
                 foreach ($loiItems as $loiItem) {
-                    $model = MasterModel::where('model', $loiItem->model)
-                        ->where('sfx', $loiItem->sfx)->first();
-                    $addedModelIds[] = $model->id;
+                    $addedModelIds[] = $loiItem->master_model_id;
                 }
-
                 $data = $data->whereNotIn('id', $addedModelIds)
-                        ->whereIn('id', $supplierInventoriesModels);
+                            ->whereIn('id', $supplierInventoriesModels);
             }
             if($request->module == 'Demand')
             {
@@ -137,7 +134,7 @@ class DemandController extends Controller
                                     ->where('sfx', $request->sfx)
                                     ->pluck('variant_id');
         $data['variants'] = Varaint::whereIn('id', $variantId)
-                                     ->pluck('name');
+                                     ->pluck('name','id');
 
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
