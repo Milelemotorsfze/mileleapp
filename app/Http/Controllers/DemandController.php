@@ -84,10 +84,10 @@ class DemandController extends Controller
         }
         $addedModelIds = [];
         foreach ($demandLists as $demandList) {
-            $model = MasterModel::where('model', $demandList->model)
-                ->where('sfx', $demandList->sfx)
-                ->first();
-            $addedModelIds[] = $model->id;
+//            $model = MasterModel::where('model', $demandList->model)
+//                ->where('sfx', $demandList->sfx)
+//                ->first();
+            $addedModelIds[] = $demandList->master_model_id;
         }
         $models = MasterModel::whereNotIn('model',$addedModelIds)
                             ->groupBy('model')->get();
@@ -118,9 +118,7 @@ class DemandController extends Controller
                 $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
                 $addedModelIds = [];
                 foreach ($demandLists as $demandList) {
-                    $model = MasterModel::where('model', $demandList->model)
-                        ->where('sfx', $demandList->sfx)->first();
-                    $addedModelIds[] = $model->id;
+                    $addedModelIds[] = $demandList->master_model_id;
                 }
                 $data = $data->whereNotIn('id', $addedModelIds);
             }

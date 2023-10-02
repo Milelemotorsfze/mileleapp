@@ -86,23 +86,21 @@
                         <div class="row">
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                <input type="text" value="{{ $demandList->model }}"  readonly class="form-control" >
+                                <input type="text" value="{{ $demandList->masterModel->model ?? ''}}"  readonly class="form-control" >
                             </div>
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->sfx ?? ''}}" readonly class="form-control">
                             </div>
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Varient</label>
-                                <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->variant->name ?? '' }}" readonly class="form-control">
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-9 col-md-3 col-sm-3 col-3">
                         <div class="row" style="margin-left: 10px">
-
                             @foreach($months as $key => $month)
-
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
                                     <label class="d-lg-none d-xl-none d-xxl-none"> {{ $month }} </label>
 {{--                                    @foreach($demandList->fiveMonthDemands[$key] as $key => $monthlyDemand)--}}
@@ -157,15 +155,15 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">SFX</label>
                                 <select class="form-select text-dark" name="sfx" id="sfx" >
                                     <option></option>
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">Variant</label>
-                                <select class="form-select variant text-dark" name="variant_name" id="variant-name" >
+                                <select class="form-select variant text-dark" name="variant" id="variant-name" >
                                     <option ></option>
                                 </select>
                             </div>
@@ -186,15 +184,15 @@
                                 <input type="text" class="form-control mb-3" readonly value="" id="total"  name="total">
                             </div>
 {{--                                hide in samll view--}}
-                            <div class="col-lg-1 col-sm-12 col-xs-12 d-none d-sm-block">
-                                <button type="submit" class="btn btn-primary "><i class="fa fa-plus"></i> Add </button>
+                            <div class="col-lg-2 col-sm-12 col-xs-12 d-none d-sm-block">
+                                <button type="submit" class="btn btn-info ">  Add  </button>
                             </div>
                         </div>
                     </div>
                 </div>
 {{--                // show only in xs or small view--}}
                 <div class="col-12 text-center d-block d-sm-none">
-                    <button type="submit" class="btn btn-primary "><i class="fa fa-plus"></i> Add </button>
+                    <button type="submit" class="btn btn-info "> Add   </button>
                 </div>
                 <br/>
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
@@ -249,7 +247,7 @@
                 sfx: {
                     required: true,
                 },
-                variant_name: {
+                variant: {
                     required: true,
                 },
             },
@@ -281,7 +279,7 @@
                 },
                 success:function (data) {
                     $('select[name="sfx"]').empty();
-                    $('select[name="variant_name"]').empty();
+                    $('select[name="variant"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
@@ -306,10 +304,10 @@
                 },
                 success:function (data) {
                     var data = data.variants
-                    $('select[name="variant_name"]').empty();
+                    $('select[name="variant"]').empty();
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant_name"]').append('<option value="'+ value +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
                     });
                 }
             });
@@ -359,8 +357,9 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function (data) {
-                    // location.reload();
-                    window.location.href = redirect_url;
+                    location.reload();
+                    alertify.success('Quantity Updated Successfully.');
+                    // window.location.href = redirect_url;
                 }
             });
         });

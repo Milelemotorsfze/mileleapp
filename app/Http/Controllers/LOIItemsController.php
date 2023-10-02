@@ -73,9 +73,9 @@ class LOIItemsController extends Controller
             $masterModel = MasterModel::where('sfx', $request->sfx)
                 ->where('model', $request->model)
                 ->where('variant_id', $variant->id)->first();
+            $LoiItem->master_model_id = $masterModel->id ?? '';
         }
 
-        $LoiItem->master_model_id = $masterModel->id ?? '';
         $LoiItem->quantity = $request->quantity;
         $LoiItem->save();
 

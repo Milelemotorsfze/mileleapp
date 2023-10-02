@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DemandList;
+use App\Models\MasterModel;
 use App\Models\MonthlyDemand;
+use App\Models\Varaint;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,21 +35,24 @@ class DemandListController extends Controller
      */
     public function store(Request $request)
     {
-//       return $request->all();
-        info("reached");
-
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',
-            'variant_name' => 'required',
+            'variant' => 'required',
         ]);
 
         DB::beginTransaction();
         $demadList = new DemandList();
         $demadList->demand_id = $request->demand_id;
-        $demadList->model = $request->model;
-        $demadList->sfx = $request->sfx;
-        $demadList->variant_name = $request->variant_name;
+        $variant = Varaint::find($request->variant);
+
+        if($variant) {
+            $masterModel = MasterModel::where('sfx', $request->sfx)
+                ->where('model', $request->model)
+                ->where('variant_id', $variant->id)->first();
+            $demadList->master_model_id = $masterModel->id ?? '';
+        }
+
         $demadList->created_by = Auth::id();
         $demadList->save();
 
