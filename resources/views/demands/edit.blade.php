@@ -100,26 +100,31 @@
                     </div>
                     <div class="col-lg-9 col-md-3 col-sm-3 col-3">
                         <div class="row" style="margin-left: 10px">
+
                             @foreach($months as $key => $month)
+
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
                                     <label class="d-lg-none d-xl-none d-xxl-none"> {{ $month }} </label>
 {{--                                    @foreach($demandList->fiveMonthDemands[$key] as $key => $monthlyDemand)--}}
-                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity }}" id="demand-quantity-{{$value}}-{{$key}}"
-                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
+{{--                                    {{ $demandList->fiveMonthDemands[$key]->quantity }}--}}
+                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity  ?? 0}}" id="demand-quantity-{{$value}}-{{$key}}"
+                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly
+                                                   oninput="validity.valid||(value='');" step="1" />
 {{--                                    @endforeach--}}
                                 </div>
                             @endforeach
-                            @if($demandList->fiveMonthDemands->count() < 5)
-                                    <?php
-                                    $count = $demandList->fiveMonthDemands->count();
-                                    ?>
-                                @for($i = $count; $i < 5 ;$i++)
-                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
-                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
-                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
-                                    </div>
-                                @endfor
-                            @endif
+{{--                            {{$demandList->fiveMonthDemands }}--}}
+{{--                            @if($demandList->fiveMonthDemands->count() < 5)--}}
+{{--                                    <?php--}}
+{{--                                    $count = $demandList->fiveMonthDemands->count();--}}
+{{--                                    ?>--}}
+{{--                                @for($i = $count; $i < 5 ;$i++)--}}
+{{--                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">--}}
+{{--                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"--}}
+{{--                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />--}}
+{{--                                    </div>--}}
+{{--                                @endfor--}}
+{{--                            @endif--}}
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12" >
                                     <label class="d-lg-none d-xl-none d-xxl-none">Total </label>
                                     <input type="number" class="form-control mb-3" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
@@ -200,9 +205,9 @@
                             <div class="row">
                                 @foreach($months as $key => $month)
                                     <div class="col-lg-1 col-md-1 col-sm-12">
-                                  <span id="monthly-total-{{$key}}">
-                                      {{ $totalYearlyQuantities[$key] }}
-                                  </span>
+                                          <span id="monthly-total-{{$key}}">
+                                              {{ $totalYearlyQuantities[$key] }}
+                                          </span>
                                     </div>
                                 @endforeach
                             </div>
