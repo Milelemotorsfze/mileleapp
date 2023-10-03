@@ -22,7 +22,10 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(Varaint::class,'variant_name','name');
     }
-
+    public function masterModel()
+    {
+        return $this->belongsTo(MasterModel::class);
+    }
     public function getSteeringAttribute()
     {
        $mastermodel = MasterModel::where('model',$this->model)
@@ -44,10 +47,10 @@ class LetterOfIndentItem extends Model
     }
     public function getInventoryQuantityAttribute()
     {
-        $mastermodel = MasterModel::where('model', $this->model)
-            ->where('sfx', $this->sfx)
-            ->first();
-        $modelId = $mastermodel->id;
+//        $mastermodel = MasterModel::where('model', $this->model)
+//            ->where('sfx', $this->sfx)
+//            ->first();
+        $modelId = $this->mster_model_id;
 
         $inventoryCount = SupplierInventory::with('masterModel')
             ->whereHas('masterModel', function ($query) use($modelId){

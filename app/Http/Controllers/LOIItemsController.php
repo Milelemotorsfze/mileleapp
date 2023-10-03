@@ -8,6 +8,7 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\SupplierInventory;
+use App\Models\Varaint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -31,12 +32,10 @@ class LOIItemsController extends Controller
 
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
                     ->get();
+
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
-            $model = MasterModel::where('model', $loiItem->model)
-                ->where('sfx', $loiItem->sfx)
-                ->first();
-            $addedModelIds[] = $model->id;
+            $addedModelIds[] = $loiItem->master_model_id;
         }
 
         $supplierInventoriesModels = SupplierInventory::with('masterModel')
@@ -69,14 +68,19 @@ class LOIItemsController extends Controller
         $LoiItem = new LetterOfIndentItem();
 
         $LoiItem->letter_of_indent_id  = $request->letter_of_indent_id;
-        $LoiItem->model = $request->model;
-        $LoiItem->sfx = $request->sfx;
-        $LoiItem->variant_name = $request->variant;
+        $variant = Varaint::find($request->variant);
+        if($variant) {
+            $masterModel = MasterModel::where('sfx', $request->sfx)
+                ->where('model', $request->model)
+                ->where('variant_id', $variant->id)->first();
+            $LoiItem->master_model_id = $masterModel->id ?? '';
+        }
+
         $LoiItem->quantity = $request->quantity;
         $LoiItem->save();
 
         if($request->page_name == 'EDIT-PAGE') {
-            return redirect()->route('letter-of-indent-items.edit',$request->letter_of_indent_id);
+            return redirect()->route('letter-of-indent-items.edit', $request->letter_of_indent_id);
 
         }
         return redirect()->route('letter-of-indent-items.create',['id' => $request->letter_of_indent_id]);
@@ -104,10 +108,7 @@ class LOIItemsController extends Controller
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $id)->get();
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
-            $model = MasterModel::where('model', $loiItem->model)
-                ->where('sfx', $loiItem->sfx)
-                ->first();
-            $addedModelIds[] = $model->id;
+            $addedModelIds[] = $loiItem->master_model_id;
         }
 
         $supplierInventoriesModels = SupplierInventory::with('masterModel')
@@ -118,7 +119,7 @@ class LOIItemsController extends Controller
             ->groupBy('master_model_id')
             ->pluck('master_model_id');
 
-        $models = MasterModel::whereIn('id',$supplierInventoriesModels)->get();
+        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->get();
 
         return view('letter-of-indent-items.edit', compact('letterOfIndent','letterOfIndentItems','models'));
     }
@@ -155,7 +156,6 @@ class LOIItemsController extends Controller
 
         DB::beginTransaction();
         // loi status change based on approval quantity
-
 
         foreach ($quantities as $key => $quantity) {
             $letterOfIndentId = $letterOfIndentItems[$key]['id'];
@@ -195,6 +195,23 @@ class LOIItemsController extends Controller
         DB::commit();
 
         return redirect()->route('letter-of-indents.index')->with('success', 'LOI Item successfully approved with respective quantity');
+    }
+    public function supplierApproval(Request $request) {
+
+        $LOI = LetterOfIndent::find($request->id);
+        if($request->status == 'REJECTED') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_REJECTED;
+
+        }elseif ($request->status == 'APPROVE') {
+            $LOI->status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+            $LOI->submission_status = LetterOfIndent::LOI_STATUS_SUPPLIER_APPROVED;
+
+        }
+
+        $LOI->save();
+        return response(true);
+
     }
 
 }

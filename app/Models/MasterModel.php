@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class MasterModel extends Model
 {
     use HasFactory;
-    public function Variant()
+    public function variant()
     {
-        return $this->hasOne(Varaint::class,'master_models_id');
+        return $this->belongsTo(Varaint::class,'variant_id','id');
     }
     public function supplierInventories()
     {

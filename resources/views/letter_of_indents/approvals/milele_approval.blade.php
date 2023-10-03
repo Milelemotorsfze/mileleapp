@@ -2,6 +2,8 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Approve LOI</h4>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{url()->previous()}}"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -132,15 +134,15 @@
                             <div class="row">
                                 <div class="col-lg-3 col-md-4">
                                     <label class="form-label d-lg-none d-xl-none">Model</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->model ?? '' }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-4">
                                     <label class="form-label d-lg-none d-xl-none">SFX</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx ?? ''}}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-3 col-md-4">
                                     <label class="form-label d-lg-none d-xl-none">Variant</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-3">
                                     <label class="form-label d-lg-none d-xl-none">LOI Qty</label>
@@ -158,6 +160,7 @@
                                            readonly class="form-control">
                                 </div>
                                 <div class="col-lg-1 col-md-3">
+{{--                                    Show LOI QTY as PFI QTY when inventory qty is > loi qty--}}
                                     <?php
                                         if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
                                             if($letterOfIndentItem->approved_quantity > 0) {
@@ -183,8 +186,8 @@
                         </div>
                     </div>
                 @endforeach
-                <div class="col-12 text-center">
-                    <button class="btn btn-secondary" type="submit">Approve</button>
+                <div class="col-12 text-end">
+                    <button class="btn btn-primary" type="submit">Approve</button>
                 </div>
             @endif
             </form>

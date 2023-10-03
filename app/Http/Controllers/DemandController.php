@@ -84,10 +84,10 @@ class DemandController extends Controller
         }
         $addedModelIds = [];
         foreach ($demandLists as $demandList) {
-            $model = MasterModel::where('model', $demandList->model)
-                ->where('sfx', $demandList->sfx)
-                ->first();
-            $addedModelIds[] = $model->id;
+//            $model = MasterModel::where('model', $demandList->model)
+//                ->where('sfx', $demandList->sfx)
+//                ->first();
+            $addedModelIds[] = $demandList->master_model_id;
         }
         $models = MasterModel::whereNotIn('model',$addedModelIds)
                             ->groupBy('model')->get();
@@ -108,22 +108,17 @@ class DemandController extends Controller
                 $loiItems = LetterOfIndentItem::where('letter_of_indent_id', $request->letter_of_indent_id)->get();
                 $addedModelIds = [];
                 foreach ($loiItems as $loiItem) {
-                    $model = MasterModel::where('model', $loiItem->model)
-                        ->where('sfx', $loiItem->sfx)->first();
-                    $addedModelIds[] = $model->id;
+                    $addedModelIds[] = $loiItem->master_model_id;
                 }
-
                 $data = $data->whereNotIn('id', $addedModelIds)
-                        ->whereIn('id', $supplierInventoriesModels);
+                            ->whereIn('id', $supplierInventoriesModels);
             }
             if($request->module == 'Demand')
             {
                 $demandLists = DemandList::where('demand_id', $request->demand_id)->get();
                 $addedModelIds = [];
                 foreach ($demandLists as $demandList) {
-                    $model = MasterModel::where('model', $demandList->model)
-                        ->where('sfx', $demandList->sfx)->first();
-                    $addedModelIds[] = $model->id;
+                    $addedModelIds[] = $demandList->master_model_id;
                 }
                 $data = $data->whereNotIn('id', $addedModelIds);
             }
@@ -133,12 +128,12 @@ class DemandController extends Controller
     }
     public function getVariant(Request $request)
     {
-        $data['variants'] = Varaint::with('masterModel')
-            ->whereHas('masterModel', function ($query) use($request) {
-                $query->where('sfx', $request->sfx);
-                $query->where('model', $request->model);
-            })
-            ->pluck('name');
+        $variantId = MasterModel::where('model', $request->model)
+                                    ->where('sfx', $request->sfx)
+                                    ->pluck('variant_id');
+        $data['variants'] = Varaint::whereIn('id', $variantId)
+                                     ->pluck('name','id');
+
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
                 ->whereHas('masterModel', function ($query) use($request) {

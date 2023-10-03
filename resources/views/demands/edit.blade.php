@@ -48,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            @if($demandLists->count() > 0)
+
 {{--                 hide in small, medium(view)--}}
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
                     <div class="d-flex">
@@ -61,7 +61,7 @@
                                     <label for="basicpill-firstname-input" class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-4 col-md-5 col-sm-12">
-                                    <label for="basicpill-firstname-input" class="form-label">Varient</label>
+                                    <label for="basicpill-firstname-input" class="form-label">Variant</label>
                                 </div>
                             </div>
                         </div>
@@ -79,22 +79,22 @@
                         </div>
                     </div>
                 </div>
-
+            @if($demandLists->count() > 0)
                 @foreach($demandLists as $value => $demandList)
                 <div class="d-flex mt-3">
                     <div class="col-lg-7 col-md-9 col-sm-9 col-9">
                         <div class="row">
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                <input type="text" value="{{ $demandList->model }}"  readonly class="form-control" >
+                                <input type="text" value="{{ $demandList->masterModel->model ?? ''}}"  readonly class="form-control" >
                             </div>
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                <input type="text" value="{{ $demandList->sfx }}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->sfx ?? ''}}" readonly class="form-control">
                             </div>
                             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Varient</label>
-                                <input type="text" value="{{ $demandList->variant_name }}" readonly class="form-control">
+                                <input type="text" value="{{ $demandList->masterModel->variant->name ?? '' }}" readonly class="form-control">
                             </div>
                         </div>
                     </div>
@@ -104,22 +104,25 @@
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
                                     <label class="d-lg-none d-xl-none d-xxl-none"> {{ $month }} </label>
 {{--                                    @foreach($demandList->fiveMonthDemands[$key] as $key => $monthlyDemand)--}}
-                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity }}" id="demand-quantity-{{$value}}-{{$key}}"
-                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly oninput="validity.valid||(value='');" step="1" />
+{{--                                    {{ $demandList->fiveMonthDemands[$key]->quantity }}--}}
+                                            <input type="number" value="{{ $demandList->fiveMonthDemands[$key]->quantity  ?? 0}}" id="demand-quantity-{{$value}}-{{$key}}"
+                                                   min="0" class="form-control demand-list-quantity-{{ $key }}" readonly
+                                                   oninput="validity.valid||(value='');" step="1" />
 {{--                                    @endforeach--}}
                                 </div>
                             @endforeach
-                            @if($demandList->fiveMonthDemands->count() < 5)
-                                    <?php
-                                    $count = $demandList->fiveMonthDemands->count();
-                                    ?>
-                                @for($i = $count; $i < 5 ;$i++)
-                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">
-                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"
-                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />
-                                    </div>
-                                @endfor
-                            @endif
+{{--                            {{$demandList->fiveMonthDemands }}--}}
+{{--                            @if($demandList->fiveMonthDemands->count() < 5)--}}
+{{--                                    <?php--}}
+{{--                                    $count = $demandList->fiveMonthDemands->count();--}}
+{{--                                    ?>--}}
+{{--                                @for($i = $count; $i < 5 ;$i++)--}}
+{{--                                    <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12">--}}
+{{--                                        <input type="number" value="0" id="demand-quantity-{{$value}}-{{$i}}" min="0"--}}
+{{--                                               class="form-control demand-list-quantity-{{ $i }}"  oninput="validity.valid||(value='');" step="1" />--}}
+{{--                                    </div>--}}
+{{--                                @endfor--}}
+{{--                            @endif--}}
                                 <div class="col-lg-1 col-md-12 col-sm-12 col-xs-12" >
                                     <label class="d-lg-none d-xl-none d-xxl-none">Total </label>
                                     <input type="number" class="form-control mb-3" readonly value="{{ $demandList->fiveMonthDemands()->sum('quantity') }}" >
@@ -152,15 +155,15 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">SFX</label>
                                 <select class="form-select text-dark" name="sfx" id="sfx" >
                                     <option></option>
                                 </select>
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
                                 <label  class="form-label d-lg-none d-xl-none d-xxl-none mt-3">Variant</label>
-                                <select class="form-select variant text-dark" name="variant_name" id="variant-name" >
+                                <select class="form-select variant text-dark" name="variant" id="variant-name" >
                                     <option ></option>
                                 </select>
                             </div>
@@ -181,15 +184,15 @@
                                 <input type="text" class="form-control mb-3" readonly value="" id="total"  name="total">
                             </div>
 {{--                                hide in samll view--}}
-                            <div class="col-lg-1 col-sm-12 col-xs-12 d-none d-sm-block">
-                                <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
+                            <div class="col-lg-2 col-sm-12 col-xs-12 d-none d-sm-block">
+                                <button type="submit" class="btn btn-info ">  Add  </button>
                             </div>
                         </div>
                     </div>
                 </div>
 {{--                // show only in xs or small view--}}
                 <div class="col-12 text-center d-block d-sm-none">
-                    <button type="submit" class="btn btn-success "><i class="fa fa-plus"></i> Add </button>
+                    <button type="submit" class="btn btn-info "> Add   </button>
                 </div>
                 <br/>
                 <div class="d-none d-lg-block d-xl-block d-xxl-block">
@@ -200,9 +203,9 @@
                             <div class="row">
                                 @foreach($months as $key => $month)
                                     <div class="col-lg-1 col-md-1 col-sm-12">
-                                  <span id="monthly-total-{{$key}}">
-                                      {{ $totalYearlyQuantities[$key] }}
-                                  </span>
+                                          <span id="monthly-total-{{$key}}">
+                                              {{ $totalYearlyQuantities[$key] }}
+                                          </span>
                                     </div>
                                 @endforeach
                             </div>
@@ -212,7 +215,7 @@
                 <br/>
             </form>
             <div class="col-12 text-end">
-                <button type="button" class="btn btn-dark " id="update-monthly-demands">Update Quantity</button>
+                <button type="button" class="btn btn-primary" id="update-monthly-demands">Update Quantity</button>
             </div>
         </div>
     </div>
@@ -244,7 +247,7 @@
                 sfx: {
                     required: true,
                 },
-                variant_name: {
+                variant: {
                     required: true,
                 },
             },
@@ -276,7 +279,7 @@
                 },
                 success:function (data) {
                     $('select[name="sfx"]').empty();
-                    $('select[name="variant_name"]').empty();
+                    $('select[name="variant"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
@@ -301,10 +304,10 @@
                 },
                 success:function (data) {
                     var data = data.variants
-                    $('select[name="variant_name"]').empty();
+                    $('select[name="variant"]').empty();
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant_name"]').append('<option value="'+ value +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
                     });
                 }
             });
@@ -354,8 +357,9 @@
                     _token: '{{ csrf_token() }}'
                 },
                 success: function (data) {
-                    // location.reload();
-                    window.location.href = redirect_url;
+                    location.reload();
+                    alertify.success('Quantity Updated Successfully.');
+                    // window.location.href = redirect_url;
                 }
             });
         });

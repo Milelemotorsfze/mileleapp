@@ -1,11 +1,11 @@
 @extends('layouts.main')
 @section('content')
     {{--    @php--}}
-    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-create');--}}
+    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-edit');--}}
     {{--    @endphp--}}
     {{--    @if ($hasPermission)--}}
     <div class="card-header">
-        <h4 class="card-title">Add New Models</h4>
+        <h4 class="card-title">Edit Master Model</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -30,51 +30,52 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form id="form-create" action="{{ route('master-models.store') }}" method="POST" >
+        <form id="form-update" action="{{ route('master-models.update', $masterModel->id) }}" method="POST" >
+            @method('PUT')
             @csrf
             <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Steering</label>
                         <select class="form-control" data-trigger name="steering" >
-                            <option value="LHS">LHS</option>
-                            <option value='RHS'>RHS</option>
+                            <option value="LHS" {{ $masterModel->steering == "LHS" ? 'selected' : " "}} >LHS</option>
+                            <option value="RHS"  {{ $masterModel->steering == "RHS" ? 'selected' : " "}} >RHS</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Model</label>
-                        <input type="text" class="form-control" name="model">
+                        <input type="text" class="form-control" value="{{ $masterModel->model }}" name="model">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">SFX</label>
-                        <input type="text" class="form-control"  name="sfx">
+                        <input type="text" class="form-control" value="{{ $masterModel->sfx }}" name="sfx">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Variant</label>
-                       <select class="form-control" name="variant_id" id="variant_id">
-                           <option></option>
-                           @foreach($variants as $variant)
-                               <option value="{{ $variant->id }}">{{$variant->name}}</option>
-                           @endforeach
-                       </select>
+                        <select class="form-control" name="variant_id" id="variant_id">
+                            <option></option>
+                            @foreach($variants as $variant)
+                                <option value="{{ $variant->id }}" {{$masterModel->variant_id == $variant->id ? 'selected' : " "}}>{{$variant->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in USD</label>
-                        <input type="number" class="form-control"  name="amount_uae" min="0">
+                        <input type="number" class="form-control"  name="amount_uae" min="0" value="{{ $masterModel->amount_uae }}">
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="mb-3">
                         <label for="basicpill-firstname-input" class="form-label">Amount in EUR</label>
-                        <input type="number" class="form-control" name="amount_belgium" min="0">
+                        <input type="number" class="form-control" name="amount_belgium" min="0" value="{{ $masterModel->amount_belgium }}">
                     </div>
                 </div>
                 </br>
@@ -89,7 +90,7 @@
 @endsection
 @push('scripts')
     <script>
-        $("#form-create").validate({
+        $("#form-update").validate({
             ignore: [],
             rules: {
                 steering: {
@@ -120,7 +121,6 @@
         $('#variant_id').on('change',function() {
             $('#variant_id-error').hide();
         })
-
     </script>
 @endpush
 

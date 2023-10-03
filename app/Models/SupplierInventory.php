@@ -66,6 +66,7 @@ class SupplierInventory extends Model
         $modelId = $this->master_model_id;
         $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->whereNull('eta_import');
 
         if (!empty(request()->start_date) && !empty(request()->end_date)) {

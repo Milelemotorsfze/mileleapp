@@ -26,4 +26,8 @@ class DemandList extends Model
 
         return $this->hasMany(MonthlyDemand::class);
     }
+    public function masterModel() {
+
+        return $this->belongsTo(MasterModel::class);
+    }
 }

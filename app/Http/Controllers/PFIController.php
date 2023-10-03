@@ -59,6 +59,7 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
+//        dd($request->all());
         $request->validate([
             'pfi_reference_number' => 'required',
             'pfi_date' => 'required',
@@ -99,41 +100,52 @@ class PFIController extends Controller
         $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
 
         $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
-
+        // status change in LOI table by checking quantity of pfi created untill now
         if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
         }else{
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
         }
         $letterOfIndent->save();
-
+        // update pfiId FOR EACH ADDED ITEM
         foreach ($currentlyApprovedItems as $currentlyApprovedItem)
         {
             $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem->id);
             $approvedLoiItem->pfi_id = $pfi->id;
             $approvedLoiItem->save();
         }
-
+        DB::commit();
         $pdf = new Fpdi();
         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+
         for ($i=1; $i <= $pageCount; $i++)
         {
             $pdf->AddPage();
             $tplIdx = $pdf->importPage($i);
             $pdf->useTemplate($tplIdx);
-            if($i==1) {
+            if($i==$pageCount) {
                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
             }
         }
 
         $signedFileName = 'signed_'.time().'.'.$extension;
-        $pdf->pfi_document_with_sign = $signedFileName;
-        $pdf->save();
-        $pdf->Output( public_path($destination.'/'.$signedFileName), 'F');
+        $pfi->pfi_document_with_sign = $signedFileName;
+        $pfi->save();
+
+        Storage::put('PFI_document_withsign/'.$signedFileName, $pdf->output());
         $pdf->Output();
+
 //        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
     }
+    public function uniqueCheckPfiReferenceNumber(Request $request) {
 
+        $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)->first();
+        if($pfi) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * Display the specified resource.
      */

@@ -72,7 +72,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealers</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Actions</th>
                         </tr>
@@ -88,7 +88,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
@@ -209,15 +209,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx  ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -240,7 +240,7 @@
                                     </div>
                                 </div>
                                 <div class="modal fade" id="view-loi-docs-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                    <div class="modal-dialog  modal-dialog-scrollable">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h1 class="modal-title fs-5" id="exampleModalLabel"> LOI Documents</h1>
@@ -285,7 +285,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealers</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Milele Approval</th>
                             <th width="150px">Actions</th>
@@ -301,7 +301,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
@@ -359,15 +359,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -425,7 +425,11 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="milele-partial-approved-LOI">
+        <div class="tab-pane fade" id="milele-partial-approved-LOI"
+
+
+
+        >
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -436,7 +440,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Approval</th>
                             <th>PFI</th>
@@ -453,7 +457,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
@@ -512,15 +516,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? '' }}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -588,7 +592,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th width="150px">Actions</th>
                         </tr>
@@ -603,7 +607,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
@@ -655,15 +659,15 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model }}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx  }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -731,7 +735,7 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-                            <th>Submission Status</th>
+{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Review</th>
                             <th width="100px">Actions</th>
@@ -747,7 +751,7 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-                                <td>{{ $letterOfIndent->submission_status }}</td>
+{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <th>{{ $letterOfIndent->review }}</th>
                                 <td>
@@ -794,19 +798,19 @@
                                                                     <div class="row mt-3">
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                            <input type="text" value="{{ $LOIItem->model }}" readonly class="form-control" >
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                         </div>
                                                                         <div class="col-lg-3 col-md-12 col-sm-12">
                                                                             <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                            <input type="text" value="{{ $LOIItem->sfx  }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-4 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                            <input type="text" value="{{ $LOIItem->variant_name }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                         </div>
                                                                         <div class="col-lg-2 col-md-12 col-sm-12">
                                                                             <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
-                                                                            <input type="text" value="{{ $LOIItem->quantity }}" readonly class="form-control">
+                                                                            <input type="text" value="{{ $LOIItem->masterModel->quantity }}" readonly class="form-control">
                                                                         </div>
                                                                     </div>
                                                                 </div>

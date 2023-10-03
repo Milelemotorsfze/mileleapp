@@ -19,6 +19,7 @@ class MasterModelController extends Controller
     public function index(Builder $builder)
     {
         $masterModel = MasterModel::orderBy('id','DESC')->get();
+
         if (request()->ajax()) {
             return DataTables::of($masterModel)
                 ->editColumn('created_at', function($query) {
@@ -26,6 +27,9 @@ class MasterModelController extends Controller
                 })
                 ->editColumn('created_by', function($query) {
                     return $query->CreatedBy->name ?? '';
+                })
+                ->editColumn('variant_id', function($query) {
+                    return $query->variant->name ?? '';
                 })
                 ->addColumn('action', function(MasterModel $masterModel) {
                     return view('master-models.action',compact('masterModel'));
@@ -39,6 +43,7 @@ class MasterModelController extends Controller
             ['data' => 'steering', 'name' => 'steering','title' => 'Steering'],
             ['data' => 'model', 'name' => 'model','title' => 'Model'],
             ['data' => 'sfx', 'name' => 'sfx','title' => 'SFX'],
+            ['data' => 'variant_id', 'name' => 'variant_id','title' => 'Variant'],
             ['data' => 'amount_uae', 'name' => 'amount_uae','title' => 'Amount in UAE '],
             ['data' => 'amount_belgium', 'name' => 'amount_belgium','title' => 'Amount in Belgium '],
             ['data' => 'action', 'name' => 'action','title' => 'Action'],
@@ -102,8 +107,10 @@ class MasterModelController extends Controller
      */
     public function edit(string $id)
     {
-        $model = MasterModel::find($id);
-        return view('master-models.edit', compact('model'));
+        $masterModel = MasterModel::find($id);
+        $variants = Varaint::all();
+
+        return view('master-models.edit', compact('masterModel','variants'));
     }
 
     /**
@@ -119,7 +126,7 @@ class MasterModelController extends Controller
 
         $isAlreadyExist = MasterModel::where('model', $request->model)
                             ->where('sfx', $request->sfx)
-                            ->whereNotIn('id',$id)->first();
+                            ->whereNot('id',$id)->first();
         if($isAlreadyExist) {
             return  redirect()->back()->withErrors('This Model and Sfx is already existing');
         }
@@ -135,7 +142,7 @@ class MasterModelController extends Controller
         $model->updated_by = Auth::id();
         $model->save();
 
-        return redirect()->route('master-models.index')->with('success','Model Created Successfully.');
+        return redirect()->route('master-models.index')->with('success','Model Updated Successfully.');
     }
 
     /**

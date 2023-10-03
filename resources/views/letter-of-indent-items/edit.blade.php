@@ -75,15 +75,15 @@
                             <div class="row">
                                 <div class="col-lg-3 col-md-3">
                                     <label class="form-label d-block d-sm-none">Model</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->model }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->model }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-2">
                                     <label class="form-label d-block d-sm-none">SFX</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->sfx }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-3 col-md-4">
                                     <label class="form-label d-block d-sm-none">Variant</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-2">
                                     <label class="form-label d-block d-sm-none">Quantity</label>
@@ -144,7 +144,10 @@
                                        @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
                             </div>
                             <div class="col-12 text-end mt-4">
-                                <button type="submit" class="btn btn-success"> <span class="fw-bold">Add New </span></button>
+                                <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
+                                <a href="{{ route('letter-of-indent-documents.edit', $letterOfIndent->id)}}">
+                                    <button type="button" class="btn btn-primary  btn-deal-item-submit">Next</button>
+                                </a>
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         </div>
@@ -155,9 +158,7 @@
         </form>
         <br>
         <div class="col-lg-12 col-md-12">
-            <a href="{{ route('letter-of-indent-documents.edit', $letterOfIndent->id)}}">
-                <button type="button" class="btn btn-dark btnright btn-deal-item-submit">Next</button>
-            </a>
+
         </div>
         <div class="row" id="deal-doc-upload-div" hidden>
             <div class="col-2">
@@ -247,7 +248,7 @@
                     var data = data.variants;
                     $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ value +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
                     });
                 }
             });
