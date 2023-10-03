@@ -21,7 +21,7 @@ class PFIController extends Controller
      */
     public function index()
     {
-        $pfis = PFI::all();
+        $pfis = PFI::orderBy('id','DESC')->get();
         return view('pfi.index', compact('pfis'));
     }
 
@@ -133,9 +133,9 @@ class PFIController extends Controller
         $pfi->save();
 
         Storage::put('PFI_document_withsign/'.$signedFileName, $pdf->output());
-        $pdf->Output();
+//        $pdf->Output();
 
-//        return redirect()->route('letter-of-indents.index')->with('message', 'PFI created successfully');
+        return redirect()->route('pfi.index')->with('message', 'PFI created Successfully');
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
 

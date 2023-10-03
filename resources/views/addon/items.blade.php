@@ -28,7 +28,8 @@
                                             <span class="error">* </span>
                                             <label for="choices-single-default" class="form-label font-size-13 ">Purchase Price In AED</label>
                                             <div class="input-group">
-                                            <input readonly name="kitSupplierAndPrice[1][supplier_addon_purchase_price_in_aed]" id="Supplier1TotalPriceAED" oninput="inputNumberAbs(this)" class="leastPurchasePriceAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
+                                            <input readonly name="kitSupplierAndPrice[1][supplier_addon_purchase_price_in_aed]" id="Supplier1TotalPriceAED"
+                                                   oninput="inputNumberAbs(this)" class="leastPurchasePriceAED form-control widthinput @error('addon_purchase_price') is-invalid @enderror" placeholder="" value="{{ old('addon_purchase_price') }}"  autocomplete="addon_purchase_price" autofocus onkeyup="calculateUSD(1)">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                                     </div>

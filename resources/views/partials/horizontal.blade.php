@@ -467,6 +467,17 @@
                                         </div>
                                     </div>
                                 @endcan
+                                @can('demand-create')
+                                    <div class="dropdown">
+                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                            <span data-key="t-utility">PFI</span>
+                                            <div class="arrow-down"></div>
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                            <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
+                                        </div>
+                                    </div>
+                                @endcan
                             </div>
                         </li>
                         @endif

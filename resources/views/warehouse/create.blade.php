@@ -29,25 +29,25 @@
       text-align: center;
     }
   }
-.error 
+.error
     {
         color: #FF0000;
     }
-    .iti 
-    { 
-        width: 100%; 
+    .iti
+    {
+        width: 100%;
     }
     label {
   display: inline-block;
   margin-right: 10px;
 }
-input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none; 
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
     -moz-appearance: none;
-    appearance: none; 
-    margin: 0; 
+    appearance: none;
+    margin: 0;
 }
 .error-text{
     color: #FF0000;
@@ -63,8 +63,8 @@ input[type=number]::-webkit-outer-spin-button {
         <h4 class="card-title">New Purchasing Order</h4>
         <div class="row">
             <p><span style="float:right;" class="error">* Required Field</span></p>
-			</div> 
-        <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a> 
+			</div>
+        <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
     <div class="col-lg-12">
@@ -113,10 +113,10 @@ input[type=number]::-webkit-outer-spin-button {
         </div>
     </div>
     <div id="variantRowsContainer" style="display: none;">
-    <div class="bar">Stock Vehicles</div>
-<div class="col-lg-12">
-  <div id="flashMessage"></div>
-</div>
+        <div class="bar">Stock Vehicles</div>
+        <div class="col-lg-12">
+          <div id="flashMessage"></div>
+        </div>
     <div class="row">
         <div class="col-lg-1 col-md-6">
             <label for="brandInput" class="form-label">Variants:</label>
@@ -142,7 +142,7 @@ input[type=number]::-webkit-outer-spin-button {
         <div class="col-lg-1 col-md-6">
             <label for="exColour" class="form-label">Territory:</label>
         </div>
-       
+
         <div class="col-lg-1 col-md-6">
             <label for="QTY" class="form-label">VIN:</label>
         </div>
@@ -256,19 +256,19 @@ $(document).ready(function() {
             var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
             var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
             // Populate Exterior Colors dropdown
-var exColourDropdown = exColourCol.find('select');
-for (var id in exColours) {
-    if (exColours.hasOwnProperty(id)) {
-        exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
-}
-}
-// Populate Interior Colors dropdown
-var intColourDropdown = intColourCol.find('select');
-for (var id in intColours) {
-    if (intColours.hasOwnProperty(id)) {
-        intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
-    }
-}
+            var exColourDropdown = exColourCol.find('select');
+            for (var id in exColours) {
+                if (exColours.hasOwnProperty(id)) {
+                    exColourDropdown.append($('<option></option>').attr('value', id).text(exColours[id]));
+            }
+        }
+        // Populate Interior Colors dropdown
+        var intColourDropdown = intColourCol.find('select');
+        for (var id in intColours) {
+            if (intColours.hasOwnProperty(id)) {
+                intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
+            }
+        }
             newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, vinCol, removeBtn);
             $('#variantRowsContainer').append(newRow);
         }
@@ -327,7 +327,7 @@ for (var id in intColours) {
     var matchFound = false;
     for (var i = 0; i < options.length; i++) {
       var option = options[i];
-      
+
       if (inputValue === option.value) {
         matchFound = true;
         break;
@@ -369,7 +369,7 @@ for (var id in intColours) {
         alert('Duplicate VIN values found. Please ensure all VIN values are unique.');
         return false;
       }
-      
+
       var allBlank = vinValues.every(function(value) {
         return value.trim() === '';
       });
