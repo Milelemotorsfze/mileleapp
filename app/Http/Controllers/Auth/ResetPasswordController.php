@@ -5,6 +5,14 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Session;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use App\Models\VerificationCode;
+use Carbon\Carbon;
+use Hash;
 
 class ResetPasswordController extends Controller
 {
@@ -27,4 +35,111 @@ class ResetPasswordController extends Controller
      * @var string
      */
     protected $redirectTo = RouteServiceProvider::HOME;
+    public function createPassword($email)
+    {
+        $email= Crypt::decryptString($email); 
+        return view('auth.createPassword', compact('email'));
+    }
+    public function storePassword(Request $request)
+    {
+        #Validation Logic
+        $verificationCode   = VerificationCode::where('user_id', $request->user_id)->where('otp', $request->otp)->first();
+        $now = Carbon::now();
+        if(!$verificationCode)
+        {
+            return redirect()->back()->with('error', 'Your OTP is not correct');
+        }elseif($verificationCode && $now->isAfter($verificationCode->expire_at))
+        {
+            return redirect()->route('login')->with('error', 'Your OTP has been expired');
+        }
+        else
+        {
+            $user = User::whereId($request->user_id)->first();
+            if($user){
+                // Expire The OTP
+                $verificationCode->update([
+                    'expire_at' => Carbon::now()
+                ]);
+                $user = User::where('email',$request->email)->first();
+                    $user->password = Hash::make($request->password);
+                    $user->save();
+                    return redirect()->route('home')->with('success', 'Password Created Successfully');
+            }
+        }
+    }
+    public function createPasswordOtpGenerate(Request $request)
+    {
+        # Validate Data
+        $request->validate([
+            'email' => 'required|exists:users,email',
+            'password' => 'required',
+            'password_confirmation' =>'required'
+        ]);
+        if($request->password == $request->password_confirmation)
+        {
+                # Generate An OTP
+                $verificationCode = $this->generateOtp($request->email);
+                $message = "Your OTP To Login is Send Successfully ";
+                # Return With OTP
+                $data['email'] = $request->email;
+                $data['name'] = 'Hello,';
+                $data['otp'] = $verificationCode->otp;
+                $template['from'] = 'no-reply@milele.com';
+                $template['from_name'] = 'Milele Matrix';
+                $subject = 'Milele Matrix Password Creation OTP Code';
+                Mail::send(
+                        "auth.otpemail",
+                        ["data"=>$data] ,
+                        function($msg) use ($data,$template,$subject) {
+                            $msg->to($data['email'], $data['name'])
+                                ->from($template['from'],$template['from_name'])
+                                ->subject($subject);
+                        }
+                    );
+                    $user_id = Crypt::encryptString($verificationCode->user_id);
+                    $email = Crypt::encryptString($request->email);
+                    $password = Crypt::encryptString($request->password);
+                    $password_confirmation = Crypt::encryptString($request->password_confirmation);
+                return redirect()->route('createPassword.verification', ['user_id' => $user_id, 'email'=>$email,'password'=>$password,'password_confirmation',$password_confirmation])->with('success',  $message);
+        }
+        else
+        {
+            Session::flash('error','Password and confirm password are not match');
+            return redirect()->back();
+        }
+        return redirect()->back();
+    }
+    public function generateOtp($email)
+    {
+        $user = User::where('email', $email)->first();
+
+        # User Does not Have Any Existing OTP
+        $verificationCode = VerificationCode::where('user_id', $user->id)->latest()->first();
+
+        $now = Carbon::now();
+
+        if($verificationCode && $now->isBefore($verificationCode->expire_at)){
+            return $verificationCode;
+        }
+
+        // Create a New OTP
+        return VerificationCode::create([
+            'user_id' => $user->id,
+            'otp' => rand(123456, 999999),
+            'expire_at' => Carbon::now()->addMinutes(10)
+        ]);
+    }
+    public function verification($user_id,$email, $password, $password_confirmation)
+    {
+        $user_id= Crypt::decryptString($user_id);
+        // $password_confirmation= Crypt::decryptString($password_confirmation);
+        $email= Crypt::decryptString($email);
+        $password= Crypt::decryptString($password);
+        return view('auth.create-password-otp-verification')->with([
+            'user_id' => $user_id,
+            // 'password_confirmation' => $password_confirmation,
+            'email' => $email,
+            'password' => $password,
+        ]);
+    }
 }

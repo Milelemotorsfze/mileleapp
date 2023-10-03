@@ -38,7 +38,7 @@
                 <div class="col-md-4">
                     <label for="department" class="form-label">Department</label>
                     <select name="department" id="department" class="form-select">
-                    <option value="" selected disabled>Select Department</option>
+                        <option value="" selected disabled>Select Department</option>
                         <option value="Admin">Admin</option>
                         <option value="HR">HR</option>
                         <option value="Logistics">Logistics</option>
@@ -49,7 +49,7 @@
                         <option value="QC">QC</option>
                         <option value="Procurement">Procurement</option>
                         <option value="Warehouse">Warehouse</option>
-                </select>
+                    </select>
                 </div>
                 <div class="col-md-4">
         <label for="lauguages" class="form-label">Lauguages</label>

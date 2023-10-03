@@ -55,6 +55,8 @@ use App\Http\Controllers\ProspectingController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AuthOtpController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+
 
 /*
 /*
@@ -79,13 +81,18 @@ Route::get('/d', function () {
         Route::post('/otp/generate', 'generate')->name('otp.generate');
         Route::post('/login/otp/generate', 'loginOtpGenerate')->name('otp.loginOtpGenerate');
         Route::get('/otp/verification/{user_id}/{email}/{password}', 'verification')->name('otp.verification');
-        // Route::post('/otp/login', 'loginWithOtp')->name('otp.getlogin');
+    });
+    Route::controller(ResetPasswordController::class)->group(function(){
+        Route::get('/password/create/{email}', 'createPassword')->name('user.createPassword');
+        Route::post('/password/store', 'storePassword')->name('password.store');
+        Route::post('user-register', 'register')->name('users.register');
+        Route::post('/createPassword/otp/generate', 'createPasswordOtpGenerate')->name('otp.createPasswordOtpGenerate');
+        Route::get('createPassword/otp/verification/{user_id}/{email}/{password}/{password_confirmation}', 'verification')->name('createPassword.verification');
     });
     Route::post('/otp/login', [LoginController::class, 'loginWithOtp'])->name('otp.getlogin');
     Route::group(['middleware' => ['auth','checkstatus']], function() {
     // Dashboard
     Route::get('/', [HomeController::class, 'index'])->name('home');
-    Route::post('user-register', [App\Http\Controllers\Auth\RegisterController::class,'register'])->name('users.register');
     //Profile
     Route::resource('profile', ProfileController::class);
     Route::post('/update-login-info', [ProfileController::class, 'updateLoginInfo'])->name('profile.updateLoginInfo');
