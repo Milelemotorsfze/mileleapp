@@ -114,15 +114,15 @@
                             <div class="row mt-2">
                                 <div class="col-lg-3 col-md-6">
                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->model }}" readonly class="form-control mb-2">
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->model ?? '' }}" readonly class="form-control mb-2">
                                 </div>
                                 <div class="col-lg-2 col-md-6">
                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->sfx }}" readonly class="form-control mb-2">
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->sfx ?? '' }}" readonly class="form-control mb-2">
                                 </div>
                                 <div class="col-lg-3 col-md-6">
                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                    <input type="text" value="{{ $approvedPfiItem->letterOfIndentItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-4">
                                     <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>
@@ -150,15 +150,15 @@
                                 <div class="row mt-2">
                                     <div class="col-lg-3 col-md-3">
                                         <label class="form-label d-block d-sm-none">Model</label>
-                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->model }}" readonly class="form-control mb-2">
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->model ?? ''}}" readonly class="form-control mb-2">
                                     </div>
                                     <div class="col-lg-2 col-md-2">
                                         <label class="form-label d-block d-sm-none">SFX</label>
-                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->sfx }}" readonly class="form-control mb-2">
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->sfx ?? ''}}" readonly class="form-control mb-2">
                                     </div>
                                     <div class="col-lg-3 col-md-3">
                                         <label class="form-label d-block d-sm-none">Variant</label>
-                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                        <input type="text" value="{{ $pendingPfiItem->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-2 col-md-2">
                                         <label class="form-label d-block d-sm-none">Quantity</label>

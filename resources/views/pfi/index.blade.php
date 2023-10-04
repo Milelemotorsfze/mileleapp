@@ -42,6 +42,7 @@
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
                                 View PFI Items
                             </button>
+                            <a href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}"  class="btn btn-primary btn-sm"> Add PO </a>
                             <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-xl">
                                     <div class="modal-content">
@@ -100,15 +101,15 @@
                                                                 <div class="row mt-3">
                                                                     <div class="col-lg-3 col-md-12 col-sm-12">
                                                                         <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
-                                                                        <input type="text" value="{{ $approvedItem->letterOfIndentItem->model }}" readonly class="form-control" >
+                                                                        <input type="text" value="{{ $approvedItem->letterOfIndentItem->masterModel->model ?? ''}}" readonly class="form-control" >
                                                                     </div>
                                                                     <div class="col-lg-3 col-md-12 col-sm-12">
                                                                         <label  class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
-                                                                        <input type="text" value="{{$approvedItem->letterOfIndentItem->sfx  }}" readonly class="form-control">
+                                                                        <input type="text" value="{{$approvedItem->letterOfIndentItem->masterModel->sfx ?? '' }}" readonly class="form-control">
                                                                     </div>
                                                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                                                         <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
-                                                                        <input type="text" value="{{ $approvedItem->letterOfIndentItem->variant_name }}" readonly class="form-control">
+                                                                        <input type="text" value="{{ $approvedItem->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly class="form-control">
                                                                     </div>
                                                                     <div class="col-lg-2 col-md-12 col-sm-12">
                                                                         <label class="form-label d-lg-none d-xl-none d-xxl-none">Quantity</label>

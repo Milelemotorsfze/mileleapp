@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\DemandPlanningPurchaseOrderController;
 use App\Http\Controllers\MasterAddonController;
 use App\Http\Controllers\MasterModelController;
 use App\Http\Controllers\ModelLinesController;
@@ -218,6 +219,7 @@ Route::get('/d', function () {
 //    Route::post('pfi/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
     Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
+    Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);
 
     // Supplier Inventories
     Route::resource('supplier-inventories', SupplierInventoryController::class)->except('show');

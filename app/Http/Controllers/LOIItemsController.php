@@ -161,21 +161,23 @@ class LOIItemsController extends Controller
             $letterOfIndentId = $letterOfIndentItems[$key]['id'];
             $letterOfIndentItem = LetterOfIndentItem::find($letterOfIndentId);
 
-            $masterModel = MasterModel::where('model', $letterOfIndentItem->model)
-                ->where('sfx', $letterOfIndentItem->sfx)->first();
+//            $masterModel = MasterModel::where('model', $letterOfIndentItem->model)
+//                ->where('sfx', $letterOfIndentItem->sfx)->first();
             // update approved qty in loi item table
             $letterOfIndentItem->approved_quantity = $letterOfIndentItem->approved_quantity + $quantity;
             $letterOfIndentItem->save();
 
             // add approved details in approvedLOIitem table
-            $approvedLOIItem = new ApprovedLetterOfIndentItem();
-            $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentId;
-            $approvedLOIItem->quantity = $quantity;
-            $approvedLOIItem->created_by = Auth::id();
-            $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
-            $approvedLOIItem->save();
+            if($quantity > 0) {
+                $approvedLOIItem = new ApprovedLetterOfIndentItem();
+                $approvedLOIItem->letter_of_indent_item_id = $letterOfIndentId;
+                $approvedLOIItem->quantity = $quantity;
+                $approvedLOIItem->created_by = Auth::id();
+                $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
+                $approvedLOIItem->save();
+            }
 
-            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $masterModel->id)
+            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $letterOfIndentItem->master_model_id)
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                 ->whereNull('eta_import')
