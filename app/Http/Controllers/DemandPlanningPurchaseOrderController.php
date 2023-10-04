@@ -24,6 +24,8 @@ class DemandPlanningPurchaseOrderController extends Controller
      */
     public function create(Request $request)
     {
+        $approvedLOIItem = ApprovedLetterOfIndentItem::find($request->id);
+        $vendor = $approvedLOIItem->letterOfIndentItem->LOI->supplier_id ?? '';
 //        return $request->all();
         $vendors = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query){
@@ -36,7 +38,8 @@ class DemandPlanningPurchaseOrderController extends Controller
             ->get();
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
-        return view('purchase-order.create', compact('vendors','pfiVehicleVariants','exColours','intColours'));
+        return view('purchase-order.create', compact('vendors','pfiVehicleVariants',
+            'exColours','intColours','vendor'));
     }
 
     /**

@@ -62,12 +62,7 @@
                 @csrf
                 <input type="hidden" name="po_from" value="DEMAND_PLANNING">
                 <div class="row">
-                    <div class="col-lg-2 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13">PO Name</label>
-                            <input type="text" name="po_name" class="form-control" placeholder="Enter PO Name" value="{{old('po_name')}}">
-                        </div>
-                    </div>
+                    <input type="hidden" value="{{ $vendor }}" name="vendors_id">
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13 ">PO Number</label>
@@ -78,29 +73,11 @@
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13 ">PO Date</label>
-                            <input type="date" name="po_date" id="po_date" class="form-control" placeholder="Enter PO Date" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            <input type="date" name="po_date" id="po_date" class="form-control" placeholder="Enter PO Date"
+                                   value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                             <span id="poNumberError" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <div class="mb-3">
-                            <label for="choices-single-default" class="form-label font-size-13 ">Vendor</label>
-                            <select class="form-control" name="vendors_id" id="vendors_id" >
-                                @foreach($vendors as $vendor)
-                                    <option value="{{$vendor->id}}"> {{$vendor->supplier}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-{{--                    <div class="col-lg-3 col-md-6 col-sm-12">--}}
-{{--                        <div class="mb-3">--}}
-{{--                            <label for="choices-single-default" class="form-label font-size-13 ">PO Type</label>--}}
-{{--                            <select class="form-control" name="po_type" id="po_type" >--}}
-{{--                                <option value="Normal"> Normal</option>--}}
-{{--                                <option value="Payment Adjustment"> Payment Adjustment</option>--}}
-{{--                            </select>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
                 </div>
                 <div id="variantRowsContainer" style="display: none;">
                     <div class="bar">Stock Vehicles</div>
@@ -135,7 +112,6 @@
                         </div>
                     </div>
                     </div>
-
                 <div class="bar">Add New Vehicles Into Stock</div>
                 <div class="row">
                     <div class="row">
@@ -177,7 +153,7 @@
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" id="quantity-{{$key}}"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"  class="form-control"
+                                <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"  class="form-control"
                                        value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
                                 <span class="QuantityError-{{$key}} text-danger"></span>
                             </div>
@@ -220,7 +196,16 @@
             var exColours = <?= json_encode($exColours) ?>;
             var intColours = <?= json_encode($intColours) ?>;
             for (var i = 0; i < variantQuantity; i++) {
+                checkQuantity(i);
                 var qty = $('#quantity-'+i).val();
+                console.log("row"+i);
+                console.log(qty);
+                var actualQuantity = $('#quantity-'+i).attr('data-quantity');
+                console.log(actualQuantity);
+                var remaingQuantity = parseInt(actualQuantity) - parseInt(qty);
+                $('#quantity-'+i).attr('data-quantity',remaingQuantity);
+                console.log(remaingQuantity);
+                $('#quantity-'+i).val(remaingQuantity);
                 var selectedVariant = $('#variant-id-'+i).val();
                 var brand = $('#brand-'+i).val();
                 var masterModelLine = $('#master-model-line-'+i).val();
