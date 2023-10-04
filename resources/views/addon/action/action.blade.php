@@ -1,42 +1,36 @@
-
-@if($addonsdata->addon_type_name == 'K')
-    <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$addonsdata->id) }}">
-            <i class="fa fa-eye" aria-hidden="true"></i>
-    </a>
-@else
-    @can('addon-view')
+@can('addon-view')
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
     @endphp
     @if ($hasPermission)
-        <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$addonsdata->id) }}">
-            <i class="fa fa-eye" aria-hidden="true"></i>
-        </a>
+        @if($addonsdata->addon_type_name == 'K')
+            <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$addonsdata->id) }}">
+                    <i class="fa fa-eye" aria-hidden="true"></i>
+            </a>
+        @else
+            <a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$addonsdata->id) }}">
+                <i class="fa fa-eye" aria-hidden="true"></i>
+            </a>
+        @endif
     @endif
-    @endcan
-@endif
-
-@if($addonsdata->addon_type_name == 'K')
-
-    <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('kit.editDetails',$addonsdata->id) }}">
-        <i class="fa fa-edit" aria-hidden="true"></i>
-    </a>
-
-
-@else
-
-@can('addon-edit')
-@php
-$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
-@endphp
-@if ($hasPermission)
-    <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
-        <i class="fa fa-edit" aria-hidden="true"></i>
-    </a>
-@endif
 @endcan
+@can('addon-edit')
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
+    @endphp
+        @if ($hasPermission)
+            @if($addonsdata->addon_type_name == 'K')
+                <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('kit.editDetails',$addonsdata->id) }}">
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+                </a>
 
-@endif
+            @else
+                <a title="Edit Addon Details" class="btn btn-sm btn-info" href="{{ route('addon.editDetails',$addonsdata->id) }}">
+                    <i class="fa fa-edit" aria-hidden="true"></i>
+                </a>
+       @endif
+    @endif
+@endcan
 
 @can('view-addon-selling-price-history')
 @php
