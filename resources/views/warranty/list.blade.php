@@ -21,8 +21,10 @@
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-sales-view']);
                     @endphp
                     @if ($hasPermission)
-                        <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" href="{{ route('warranty.view') }}" text-align: right>
+                        <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" title="Warranty View" href="{{ route('warranty.view') }}" text-align: right>
                             <i class="fa fa-table" aria-hidden="true"></i></a>
+                        <a style="float: right;margin-right: 2px" class="btn btn-sm btn-primary" title="Warranty Premium Lists" href="{{ route('warranty.index') }}" text-align: right>
+                            <i class="fa fa-list-ul" aria-hidden="true"></i></a>
                     @endif
                 @endcan
             </div>

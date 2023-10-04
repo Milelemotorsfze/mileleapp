@@ -12,18 +12,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-list']);
     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-create']);
     @endphp
     @if ($hasPermission)
-      <a style="float: right;" class="btn btn-sm btn-success" href="{{ route('warranty.create') }}" text-align: right>
+      <a style="float: right;" class="btn btn-sm btn-success" title="Create Warranty" href="{{ route('warranty.create') }}" text-align: right>
       <i class="fa fa-plus" aria-hidden="true"></i> New Warranty</a>
     @endif
     @endcan
-      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-primary" href="{{ route('warranty.list') }}" text-align: right>
+      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-primary" title="Warranty Brand Lists" href="{{ route('warranty.list') }}" text-align: right>
           <i class="fa fa-list" aria-hidden="true"></i></a>
       @can('warranty-sales-view')
       @php
       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-sales-view']);
       @endphp
       @if ($hasPermission)
-      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" href="{{ route('warranty.view') }}" text-align: right>
+      <a style="float: right;margin-right: 2px" class="btn btn-sm btn-info" title="Warranty View"  href="{{ route('warranty.view') }}" text-align: right>
       <i class="fa fa-table" aria-hidden="true"></i></a>
       @endif
       @endcan
