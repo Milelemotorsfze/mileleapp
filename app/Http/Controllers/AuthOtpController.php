@@ -37,8 +37,8 @@ class AuthOtpController extends Controller
 
                 // calculate verification expiry date time
                 // get the latest login activeity of user
-                $macAddr = exec('getmac');
-                $userMacAdress = substr($macAddr, 0, 17);
+//                $macAddr = exec('getmac');
+//                $userMacAdress = substr($macAddr, 0, 17);
 
                 $userCurrentBrowser = Agent::browser();
                 $userLastOtpVerified = VerificationCode::where('user_id', $user->id)
@@ -48,22 +48,35 @@ class AuthOtpController extends Controller
                 if($userLastOtpVerified) {
                     $latestLoginActivity = LogActivity::where('user_id', $user->id)->orderBy('id','DESC')->first();
                     // check the mac address change to check whether the device is changed or not
-                    if($latestLoginActivity->mac_address == $userMacAdress ) {
+//                    if($latestLoginActivity->mac_address == $userMacAdress ) {
                         info("mac address same");
-                        if($latestLoginActivity->browser_name == $userCurrentBrowser) {
-                            info("browser name same");
+                    if($latestLoginActivity) {
+//                        if($latestLoginActivity->mac_address == $userMacAdress ) {
+                        // check the platform same or not
+                        if (Agent::isPhone() == 'phone') {
+                            $userDevice = 'phone';
+                        } elseif (Agent::isTablet() == 'tablet') {
+                            $userDevice = 'tablet';
+                        } elseif (Agent::isDesktop() == 'desktop') {
+                            $userDevice = 'desktop';
+                        }
+//                        info("mac address same");
+                        if ($latestLoginActivity->device_name == $userDevice) {
+                            if ($latestLoginActivity->browser_name == $userCurrentBrowser) {
+                                info("browser name same");
 
-                            $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
-//                            $otpExpirationDate = $userLastOtpVerifiedDate->format('d/m/Y');
-                            info($userLastOtpVerifiedDate);
-                            $currentDate = Carbon::now();
-                            if($currentDate->isBefore($userLastOtpVerifiedDate)) {
-                                info("expiration  date NOT reached");
+                                $userLastOtpVerifiedDate = Carbon::parse($userLastOtpVerified->created_at)->addDays(30);
+                                info($userLastOtpVerifiedDate);
+                                $currentDate = Carbon::now();
+                                if ($currentDate->isBefore($userLastOtpVerifiedDate)) {
+                                    info("expiration  date NOT reached");
 
-                                $request['user_id'] = $user->id;
-                                return(app('App\Http\Controllers\Auth\LoginController')->login($request));
+                                    $request['user_id'] = $user->id;
+                                    return (app('App\Http\Controllers\Auth\LoginController')->login($request));
+                                }
                             }
                         }
+//                    }
                     }
                 }
 

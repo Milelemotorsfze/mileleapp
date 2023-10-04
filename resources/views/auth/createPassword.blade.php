@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-@section('content')  
+@section('content')
     <div class="text-center">
         <h5 class="mb-0">Create Password</h5>
     </div>
@@ -19,7 +19,7 @@
                 <div class="flex-grow-1">
                     <label class="form-label">Password</label>
                 </div>
-            </div>                                          
+            </div>
             <div class="input-group auth-pass-inputgroup">
                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
                 @error('password')
@@ -35,7 +35,7 @@
                 <div class="flex-grow-1">
                     <label class="form-label">Confirm Password</label>
                 </div>
-            </div>                                             
+            </div>
             <div class="input-group auth-pass-inputgroup">
                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                 @error('password')
@@ -49,8 +49,7 @@
         <div class="mb-3">
             <button type="submit" class="btn btn-primary">
                 {{ __('Create Password') }}
-            </button>                    
-        </div>                                       
+            </button>
+        </div>
     </form>
 @endsection
-                                   

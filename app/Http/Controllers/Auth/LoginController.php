@@ -61,8 +61,8 @@ class LoginController extends Controller
             {
                 if(Auth::user()->status == 'active')
                 {
-                    $macAddr = exec('getmac');
-                    $userMacAdress = substr($macAddr, 0, 17);
+//                    $macAddr = exec('getmac');
+//                    $userMacAdress = substr($macAddr, 0, 17);
                     if(Agent::isPhone() == 'phone') {
                         $useDevice = 'phone';
                     }elseif (Agent::isTablet() == 'tablet') {
@@ -74,7 +74,7 @@ class LoginController extends Controller
                     $activity['ip'] = $request->ip();
                     $activity['user_id'] = Auth::id();
                     $activity['status'] = 'success';
-                    $activity['mac_address'] = $userMacAdress;
+//                    $activity['mac_address'] = $userMacAdress;
                     $activity['device_name'] = $useDevice ?? '';
                     $activity['browser_name'] = Agent::browser();
 

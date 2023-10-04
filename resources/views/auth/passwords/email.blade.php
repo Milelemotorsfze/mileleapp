@@ -1,5 +1,5 @@
 @extends('layouts.auth')
-@section('content')  
+@section('content')
     <div class="text-center">
         <h5 class="mb-0">Reset Password</h5>
         @if (session('status'))
@@ -8,6 +8,15 @@
             </div>
         @endif
     </div>
+    @if (session('success'))
+        <div class="alert alert-success" role="alert"> {{session('success')}}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert"> {{session('error')}}
+        </div>
+    @endif
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
         <div class="mb-3">
@@ -18,11 +27,11 @@
                     <strong>{{ $message }}</strong>
                 </span>
             @enderror
-        </div>                                 
+        </div>
         <div class="mb-3">
             <button type="submit" class="btn btn-primary btn-sm">
                 {{ __('Send Password Reset Link') }}
-            </button>                             
+            </button>
         </div>
     </form>
 @endsection

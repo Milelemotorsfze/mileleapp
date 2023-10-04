@@ -9,12 +9,12 @@
 
                 <div class="card-body">
                     @if (session('success'))
-                    <div class="alert alert-success" role="alert"> {{session('success')}} 
+                    <div class="alert alert-success" role="alert"> {{session('success')}}
                     </div>
                     @endif
 
                     @if (session('error'))
-                    <div class="alert alert-danger" role="alert"> {{session('error')}} 
+                    <div class="alert alert-danger" role="alert"> {{session('error')}}
                     </div>
                     @endif
 
@@ -23,6 +23,8 @@
                         <input type="hidden" name="user_id" value="{{$user_id}}" />
                         <input type="hidden" name="email" value="{{$email}}" />
                         <input type="hidden" name="password" value="{{$password}}" />
+{{--                        <input type="hidden" name="token" value="{{$token}}" />--}}
+
                         <div class="row mb-3">
                             <label for="mobile_no" class="col-md-12 col-form-label">{{ __('OTP') }}</label>
 
@@ -36,8 +38,6 @@
                                 @enderror
                             </div>
                         </div>
-
-
 
                         <div class="row mb-0">
                             <div class="col-md-8 offset-md-4">
