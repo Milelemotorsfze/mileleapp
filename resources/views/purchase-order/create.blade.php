@@ -60,6 +60,7 @@
         @endif
             <form action="{{ route('purchasing-order.store') }}" method="POST" id="po-create-form">
                 @csrf
+                <input type="hidden" name="po_from" value="DEMAND_PLANNING">
                 <div class="row">
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
@@ -289,10 +290,12 @@
             },
             success: function(response) {
                 $('#poNumberError').hide().text('');
+                formValid = true;
             },
             error: function(xhr) {
                 if (xhr.status === 422) {
                     $('#poNumberError').text("PO Number Already Existing");
+                    formValid = false;
                 }
             }
         });

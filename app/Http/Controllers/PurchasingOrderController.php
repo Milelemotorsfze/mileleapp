@@ -273,6 +273,9 @@ class PurchasingOrderController extends Controller
         $purchasinglog->created_by = auth()->user()->id;
         $purchasinglog->role = Auth::user()->selectedRole;
         $purchasinglog->save();
+        if($request->po_from == 'DEMAND_PLANNING') {
+
+        }
     }
     }
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
