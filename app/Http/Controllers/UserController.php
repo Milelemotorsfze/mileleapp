@@ -14,6 +14,10 @@ namespace App\Http\Controllers;
     use Illuminate\Support\Facades\Auth;
     use Illuminate\Support\Facades\Session;
     use Illuminate\Support\Arr;
+    use Illuminate\Support\Str;
+    use Illuminate\Support\Facades\Mail;
+    use Carbon\Carbon;
+    use Illuminate\Support\Facades\Crypt;
     class UserController extends Controller
     {
         public function index(Request $request)
@@ -31,43 +35,60 @@ namespace App\Http\Controllers;
         }
         public function store(Request $request)
         {
-    $this->validate($request, [
-        'name' => 'required',
-        'email' => 'required|email|unique:users,email',
-        'roles' => 'required',
-        'department' => 'required',
-        'designation' => 'required',
-        'lauguages' => 'required',
-    ]);
-    $user = new User();
-    $user->name = $request->input('name');
-    $user->email = $request->input('email');
-    $user->status = 'de-active';
-    $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
-    $user->save();
-    $empProfile = new Profile();
-    $empProfile->user_id = $user->id;
-    $empProfile->first_name = $request->input('name');
-    $empProfile->save();
-    $empJob = new EmpJob();
-    $empProfileId = $empProfile->id;
-    $empJob->emp_profile_id = $empProfileId;
-    $empJob->department = $request->input('department');
-    $empJob->designation = $request->input('designation');
-    $empJob->save();
-    if ($user->sales_rap === 'Yes') {
-        $languages = $request->input('lauguages');
-        foreach ($languages as $language) {
-            $salesPersonLanguage = new SalesPersonLaugauges();
-            $salesPersonLanguage->sales_person = $user->id;
-            $salesPersonLanguage->language = $language;
-            $salesPersonLanguage->save();
+            $this->validate($request, [
+                'name' => 'required',
+                'email' => 'required|email|unique:users,email',
+                'roles' => 'required',
+                'department' => 'required',
+                'designation' => 'required',
+                'lauguages' => 'required',
+            ]);
+            $user = new User();
+            $user->name = $request->input('name');
+            $user->email = $request->input('email');
+            $user->status = 'active';
+            $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
+            $user->save();
+            $empProfile = new Profile();
+            $empProfile->user_id = $user->id;
+            $empProfile->first_name = $request->input('name');
+            $empProfile->save();
+            $empJob = new EmpJob();
+            $empProfileId = $empProfile->id;
+            $empJob->emp_profile_id = $empProfileId;
+            $empJob->department = $request->input('department');
+            $empJob->designation = $request->input('designation');
+            $empJob->save();
+            if ($user->sales_rap === 'Yes') {
+                $languages = $request->input('lauguages');
+                foreach ($languages as $language) {
+                    $salesPersonLanguage = new SalesPersonLaugauges();
+                    $salesPersonLanguage->sales_person = $user->id;
+                    $salesPersonLanguage->language = $language;
+                    $salesPersonLanguage->save();
+                }
+            }
+            $user->assignRole($request->input('roles'));
+            $data['email'] = $user->email;
+            $data['emailEncrypt'] = Crypt::encryptString($user->email);
+            $data['name'] = $user->name;
+            $template['from'] = 'no-reply@milele.com';
+            $template['from_name'] = 'Milele Matrix';
+            $subject = 'Milele Matrix Password Creation';
+            Mail::send(
+                    "auth.createPasswordMail",
+                    ["data"=>$data] ,
+                    function($msg) use ($data,$template,$subject) {
+                        $msg->to($data['email'], $data['name'])
+                            ->from($template['from'],$template['from_name'])
+                            ->subject($subject);
+                    }
+                );
+
+
+            return redirect()->route('users.index')
+                ->with('success','User created successfully');
         }
-    }
-    $user->assignRole($request->input('roles'));
-    return redirect()->route('users.index')
-        ->with('success','User created successfully');
-}
         public function show($id)
         {
             $user = User::find($id);
