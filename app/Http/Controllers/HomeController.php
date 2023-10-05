@@ -5,6 +5,7 @@ use App\Models\AddonSellingPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Calls;
+use Illuminate\Support\Facades\Auth;
 use App\Models\AvailableColour;
 use Carbon\Carbon;
 
@@ -250,26 +251,37 @@ $totalvariantss = [
     public function leaddistruition(Request $request) {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $data = DB::table('calls')
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+    
+        $query = DB::table('calls')
             ->join('users', 'calls.sales_person', '=', 'users.id')
-            ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name, COUNT(calls.id) AS call_count')
-            ->whereDate('calls.created_at', '>=', $startDate)
+            ->selectRaw('DATE(calls.created_at) AS call_date, users.name AS sales_person_name');
+        if ($hasPermission) {
+            $query->selectRaw('SUM(CASE WHEN calls.source = 6 THEN 1 ELSE 0 END) AS call_count_6');
+            $query->selectRaw('SUM(CASE WHEN calls.source = 16 THEN 1 ELSE 0 END) AS call_count_16');
+            $query->selectRaw('SUM(CASE WHEN calls.source = 35 THEN 1 ELSE 0 END) AS call_count_35');
+            $query->selectRaw('SUM(CASE WHEN calls.source = 40 THEN 1 ELSE 0 END) AS call_count_40');
+            $query->selectRaw('SUM(CASE WHEN calls.source = 27 THEN 1 ELSE 0 END) AS call_count_27');
+            $query->selectRaw('SUM(CASE WHEN calls.source NOT IN (6, 16, 35, 40, 27) THEN 1 ELSE 0 END) AS call_count');
+        } else {
+            $query->selectRaw('COUNT(calls.id) AS call_count');
+        }
+        $query->whereDate('calls.created_at', '>=', $startDate)
             ->whereDate('calls.created_at', '<=', $endDate)
-            ->groupBy('call_date', 'sales_person_name')
-            ->orderByDesc('call_count') // Order by call_count in descending order
-            ->limit(7)
-            ->get();
-            info($data);
-        // Create an associative array that includes the query result, startDate, and endDate
+            ->groupBy('call_date', 'sales_person_name'); 
+        if ($hasPermission) {
+            $query->orderByDesc('calls.id');
+        } else {
+            $query->orderByDesc('call_count');
+        }
+        $data = $query->get();
         $response = [
             'start_date' => $startDate,
             'end_date' => $endDate,
             'data' => $data,
         ];
-
-        // Convert the array to JSON and return it as the response
         return response()->json($response);
-    }
+    }    
     public function leaddistruitiondetail(Request $request) {
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');

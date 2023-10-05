@@ -20,6 +20,14 @@ class VehicleApprovalRequests extends Model
         'new_sales_person'
 
     ];
+    protected $fillable = [
+        'vehicle_id',
+        'field',
+        'old_value',
+        'new_value',
+         'status',
+        'inspection_id'
+    ];
     public function vehicle() {
         return $this->belongsTo(Vehicles::class,'vehicle_id','id');
     }
