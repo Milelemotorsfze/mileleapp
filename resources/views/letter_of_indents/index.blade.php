@@ -425,11 +425,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade" id="milele-partial-approved-LOI"
-
-
-
-        >
+        <div class="tab-pane fade" id="milele-partial-approved-LOI">
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="milele-partial-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
@@ -465,9 +461,11 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class=" btn btn-info btn-sm" >Add PFI</button>
-                                    </a>
+                                    @if($letterOfIndent->is_pfi_pending_for_loi == true)
+                                        <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                            <button type="button" class=" btn btn-info btn-sm" >Add PFI</button>
+                                        </a>
+                                    @endif
                                 </td>
                                 <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
@@ -610,9 +608,11 @@
 {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
-                                    <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class="btn btn-info btn-sm" >Add PFI</button>
-                                    </a>
+                                    @if($letterOfIndent->is_pfi_pending_for_loi == true)
+                                        <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
+                                            <button type="button" class="btn btn-info btn-sm" >Add PFI</button>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>
                                     </a>

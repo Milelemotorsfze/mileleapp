@@ -22,7 +22,8 @@ class LetterOfIndent extends Model
 
     protected $appends = [
         'total_loi_quantity',
-        'total_approved_quantity'
+        'total_approved_quantity',
+        'is_pfi_pending_for_loi'
     ];
 
     public function customer()
@@ -57,5 +58,16 @@ class LetterOfIndent extends Model
             return 0;
         }
         return $letterOfIndentItemApprovedQty;
+    }
+    public function getIsPfiPendingForLoiAttribute() {
+        $approvedloiItem = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $this->id);
+
+        if($approvedloiItem->count() > 0) {
+            $isPfiPending = $approvedloiItem->whereNull('pfi_id')->get();
+            if($isPfiPending->count() > 0) {
+                return true;
+            }
+        }
+         return false;
     }
 }
