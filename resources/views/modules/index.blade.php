@@ -50,7 +50,11 @@
                         <tr>
                             <td>{{ ++$i }}</td>
                             <td>{{ $module->name ?? ''}}</td>
-                            <td>{{\Carbon\Carbon::parse($module->created_at)->format('d-m-y') }}</td>
+                            <td>
+                                @if($module->created_at)
+                                    {{ \Carbon\Carbon::parse($module->created_at)->format('d M y') }}
+                                @endif
+                            </td>
                             <td>
                             @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-module-edit');

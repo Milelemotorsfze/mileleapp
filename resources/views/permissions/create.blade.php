@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('content')
+
+    @can('master-permission-create')
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-permission-create');
     @endphp
@@ -62,6 +64,7 @@
         </form>
     </div>
     @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>

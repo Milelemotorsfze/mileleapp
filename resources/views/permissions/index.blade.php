@@ -1,5 +1,11 @@
 @extends('layouts.table')
 @section('content')
+
+    @can('master-permission-list')
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['master-permission-list']);
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">List Permissions</h4>
             @php
@@ -62,6 +68,8 @@
             </table>
         </div>
     </div>
+    @endif
+    @endcan
 
 @endsection
 

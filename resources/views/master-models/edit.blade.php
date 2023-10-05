@@ -1,9 +1,10 @@
 @extends('layouts.main')
 @section('content')
-    {{--    @php--}}
-    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-edit');--}}
-    {{--    @endphp--}}
-    {{--    @if ($hasPermission)--}}
+    @can('master-model-edit')
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-edit');
+    @endphp
+    @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Edit Master Model</h4>
     </div>
@@ -86,7 +87,8 @@
         </form>
     </div>
     </div>
-    {{--    @endif--}}
+    @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>

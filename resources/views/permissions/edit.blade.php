@@ -1,5 +1,7 @@
 @extends('layouts.main')
 @section('content')
+
+    @can('master-permission-edit')
     @php
         $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-permission-edit');
     @endphp
@@ -57,6 +59,7 @@
         </form>
     </div>
     @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>
