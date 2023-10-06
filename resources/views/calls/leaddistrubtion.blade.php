@@ -71,14 +71,13 @@
   </style>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
-  @endphp
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['Calls-modified', 'approve-reservation']);
+@endphp
   @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
     Lead Distribution
     </h4>
-    @can('Calls-view')
   </div>
   <div class="tab-content">
         <div class="card-body">
@@ -104,7 +103,6 @@
           </div>  
         </div>  
       </div>  
-    @endcan
       </div>
   </div>
   <script type="text/javascript">

@@ -57,7 +57,10 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AuthOtpController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-
+use App\Http\Controllers\InspectionController;
+use App\Http\Controllers\ApprovalsController;
+use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\VariantRequests;
 
 /*
 /*
@@ -283,6 +286,8 @@ Route::get('/d', function () {
      Route::get('vehicle-pictures/variant-details', [VehiclePicturesController::class,'getVariantDetail'])->name('vehicle-pictures.variant-details');
      Route::resource('vehicle-pictures', VehiclePicturesController::class);
      Route::post('getVinForVehicle', [VehiclePicturesController::class, 'getVinForVehicle']);
+     Route::get('vehicle_pictures/pending', [VehiclePicturesController::class,'pending'])->name('vehicle_pictures.pending');
+     Route::post('vehicle_pictures/saving', [VehiclePicturesController::class,'saving'])->name('vehicle_pictures.saving');
 
 
      // Variants
@@ -418,6 +423,38 @@ Route::get('/d', function () {
     Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');
     Route::get('booking/checking-so', [BookingController::class, 'checkingso'])->name('booking.checkingso');
     Route::post('/submit-extended', [BookingController::class, 'extended'])->name('booking.extended');
+
+    //Inspection
+    Route::resource('inspection', InspectionController::class);
+    Route::get('reinspection/reshow/{id}', [InspectionController::class, 'reshow'])->name('reinspection.reshow');
+    Route::get('inspection/instock/{id}', [InspectionController::class, 'instock'])->name('inspection.instock');
+    Route::resource('approvalsinspection', ApprovalsController::class);
+    Route::resource('incident', IncidentController::class);
+    Route::post('incident/saving', [IncidentController::class,'updatestatus'])->name('incidentupdate.updatestatus');
+    Route::resource('variantrequests', VariantRequests::class);
+    Route::get('/check-variant', [VariantRequests::class, 'checkVariant']);
+    Route::post('approvalsinspection/update-status', [ApprovalsController::class, 'updateStatus'])->name('approvalsinspection.updateStatus');
+    Route::post('approvalsinspection/updateinspectionupdates', [ApprovalsController::class, 'updateinspectionupdates'])->name('approvalsinspection.updateinspectionupdates');
+    Route::post('approvalsinspection/updateextraitems', [ApprovalsController::class, 'updateextraitems'])->name('approvalsinspection.updateextraitems');
+    Route::post('approvalsinspection/updateincident', [ApprovalsController::class, 'updateincident'])->name('approvalsinspection.updateincident');
+    Route::post('approvalsinspection/savevariantsd', [ApprovalsController::class, 'savevariantsd'])->name('approvalsinspection.savevariantsd');
+    Route::get('/check-org-variant', [VariantRequests::class, 'checkVariantorg']);
+    Route::post('/approve-inspection', [ApprovalsController::class, 'approveInspection'])->name('approveInspection');
+    Route::post('/reinspectionrequest', [InspectionController::class, 'reinspectionrequest'])->name('reinspectionrequest');
+    Route::put('/resinspection/{id}', [InspectionController::class, 'reupdate'])->name('inspection.reupdate');
+    Route::get('approvalsinspection/reshow/{approvalsreinspection}', [ApprovalsController::class, 'approvalsreinspection'])->name('reinspection.approvalsreinspection');
+    Route::get('incident/showre/{id}', [IncidentController::class, 'showre'])->name('incident.showre');
+    Route::post('incident/reinspectionsforapp', [IncidentController::class, 'reinspectionsforapp'])->name('incident.reinspectionsforapp');
+    Route::get('/get-incident-works/{incidentId}', [IncidentController::class, 'getIncidentWorks']);
+    Route::post('incident/approvals', [IncidentController::class,'approvals'])->name('incidentupdate.approvals');
+    Route::put('/dailyinspection/{vehicle}', [InspectionController::class, 'routineUpdate'])->name('dailyinspection.routainupdate');
+    Route::get('/routine-inspection/{vehicleId}', [ApprovalsController::class, 'getRoutineInspectionData']);
+    Route::post('inspectionretuinapp/approvals', [ApprovalsController::class,'approvalsrotein'])->name('inspectionapprovalroten.approvalsrotein');
+    Route::post('pdiinspection', [InspectionController::class,'pdiinspection'])->name('pdi.pdiinspection');
+    Route::get('/get-vehicle-extra-items/{vehicle_id}', [InspectionController::class, 'getVehicleExtraItems']);
+    Route::get('/pdi-inspection/{vehicleId}', [ApprovalsController::class, 'getpdiInspectionData']);
+    Route::post('inspectionpdiapp/approvals', [ApprovalsController::class,'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
+    Route::get('incidents/updatevehicledetails', [IncidentController::class, 'updatevehicledetails'])->name('incident.updatevehicledetails');
 
     // Vendors
 
