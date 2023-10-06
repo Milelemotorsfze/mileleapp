@@ -1,34 +1,28 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use App\Models\Varaint;
 use App\Models\VehiclePicture;
 use App\Models\Vehicles;
+use App\Models\MasterModelLines;
+use App\Models\Inspection;
+use App\Models\ColorCode;
 use Illuminate\Http\Request;
 
 class VehiclePicturesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $vehiclePictures = VehiclePicture::orderBy('id','DESC')->get();
         return view('vehicle_pictures.index',compact('vehiclePictures'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $vins = Vehicles::whereNotNull('vin')->get();
         return view('vehicle_pictures.create',compact('vins'));
     }
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -162,4 +156,85 @@ class VehiclePicturesController extends Controller
         $data = $data->get();
         return response()->json($data);
     }
+    public function pending(Request $request)
+{
+    if ($request->ajax()) {
+        $status = $request->input('status');
+        $data = Inspection::select([
+                'inspection.id',
+                'vehicles.id as vehicle_id', // Include the vehicle ID
+                'vehicles.vin',
+                DB::raw('GROUP_CONCAT(inspection.stage SEPARATOR ", ") as stages'),
+                DB::raw('GROUP_CONCAT(DATE_FORMAT(inspection.created_at, "%d-%b-%Y") SEPARATOR ", ") as created_at_formatted'),
+                'varaints.name as variant',
+                'varaints.model_detail',
+                'varaints.detail',
+                'master_model_lines.model_line',
+                'int_color.name as interior_color',
+                'ex_color.name as exterior_color',
+                'purchasing_order.po_number',
+                'grn.grn_number',
+                DB::raw('GROUP_CONCAT(vehicle_pictures.vehicle_picture_link SEPARATOR ", ") as links'),
+                'so.so_number',
+                DB::raw('(SELECT GROUP_CONCAT(field) FROM vehicle_detail_approval_requests WHERE inspection_id = inspection.id) as changing_fields')
+            ])
+            ->leftJoin('vehicles', 'inspection.vehicle_id', '=', 'vehicles.id')
+            ->leftJoin('purchasing_order', 'vehicles.purchasing_order_id', '=', 'purchasing_order.id')
+            ->leftJoin('grn', 'vehicles.grn_id', '=', 'grn.id')
+            ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+            ->leftJoin('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->leftJoin('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+            ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+            ->leftJoin('vehicle_pictures', function ($join) {
+                $join->on('inspection.vehicle_id', '=', 'vehicle_pictures.vehicle_id')
+                     ->whereRaw('inspection.stage = vehicle_pictures.category');
+            });
+            if ($status === 'Pending') {
+                $data->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_pictures')
+                    ->whereRaw('vehicle_pictures.vehicle_id = inspection.vehicle_id')
+                    ->whereRaw('vehicle_pictures.category = inspection.stage');
+            });
+        }
+        elseif ($status === 'Submitted') {
+            $data->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('vehicle_pictures')
+                    ->whereRaw('vehicle_pictures.vehicle_id = inspection.vehicle_id')
+                    ->whereRaw('vehicle_pictures.category = inspection.stage');
+            });
+        }
+        $data = $data->groupBy('vehicles.id');
+        return DataTables::of($data)->toJson();
+    }
+
+    return view('vehicle_pictures.pending');
+}
+public function saving(Request $request)
+{
+    $request->validate([
+        'vehicleId' => 'required|integer',
+        'links' => 'required|array',
+        'links.*.stage' => 'required|string',
+        'links.*.link' => 'nullable|string',
+    ]);
+    try {
+        $vehicleId = $request->input('vehicleId');
+        $links = $request->input('links');
+        foreach ($links as $linkData) {
+            $stage = $linkData['stage'];
+            $link = $linkData['link'];
+            $vehiclepictures = New VehiclePicture();
+            $vehiclepictures->vehicle_id =$vehicleId;
+            $vehiclepictures->vehicle_picture_link =$link;
+            $vehiclepictures->category =$stage;
+            $vehiclepictures->save();   
+        }
+        return response()->json(['message' => 'Links saved successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to save links'], 500);
+    }
+}
 }

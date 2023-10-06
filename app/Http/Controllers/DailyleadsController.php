@@ -192,7 +192,7 @@ class DailyleadsController extends Controller
     }
     public function create()
     {
-        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->whereIn('id', [6, 16, 35, 40])->get();
         $countries = CountryListFacade::getList('en');
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         return view('dailyleads.create', compact('countries', 'modelLineMasters', 'LeadSource'));

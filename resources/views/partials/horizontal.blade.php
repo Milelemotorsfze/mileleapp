@@ -397,7 +397,33 @@
                     </li>
                     @endif
                     @endcan
+                    @can('part-input-incident')
                     @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('part-input-incident');
+                    @endphp
+                    @if ($hasPermission)
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('incident.index') }}" id="topnav-more" role="button">
+                            <i data-feather="check-circle"></i>
+                            <span data-key="t-extra-pages">Inspection</span>
+                        </a>
+                    </li>
+                    @endif
+                    @endcan
+                    @can('inspection-edit')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-edit');
+                    @endphp
+                    @if ($hasPermission)
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle arrow-none" href="{{ route('inspection.index') }}" id="topnav-more" role="button">
+                            <i data-feather="check-circle"></i>
+                            <span data-key="t-extra-pages">Inspection</span>
+                        </a>
+                    </li>
+                    @endif
+                    @endcan
+                    <!-- @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('vehicles-picture-view');
                     @endphp
                     @if ($hasPermission)
@@ -407,7 +433,7 @@
                             <span data-key="t-extra-pages">QC Pictures Upload</span>
                         </a>
                     </li>
-                    @endif
+                    @endif -->
                     @can('demand-list')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');

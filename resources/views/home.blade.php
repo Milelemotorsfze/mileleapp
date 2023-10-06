@@ -21,11 +21,16 @@
     text-decoration: none;
     border-radius: 4px;
     margin-top: 10px;
-    float: right; /* This will move the link to the right side */
+    float: right;
+}
+.total-row {
+    font-weight: bold;
+    color: black;
 }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @section('content')
+
 {{--   @can('parts-procurement-dashboard-view')--}}
         @php
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('parts-procurement-dashboard-view');
@@ -219,7 +224,6 @@
             </div>
         @endif
 {{--    @endcan--}}
-@can('Calls-view')
 @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
                     @endphp
@@ -313,6 +317,77 @@
                         </div>
                     </div>
 @endif -->
+@endif
+@php
+                                      $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
+                                      @endphp
+                                      @if ($hasPermission)
+<div class="row">
+<div class="col-xl-12">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
+                                    <div class="flex-shrink-0">
+                                    <div style="position: relative; width: 100%; height: 5vh;">
+                                    <div id="leadsdis" style="position: absolute; top: 10px; right: 10px; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 280px; text-align: right;">
+                                        <i class="fa fa-calendar"></i>&nbsp;
+                                        <span></span> <i class="fa fa-caret-down"></i>
+                                    </div>
+                                </div>
+                                <form id="date-range-form" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="start_date" id="start_date">
+                                    <input type="hidden" name="end_date" id="end_date">
+                                </form>
+                                    </div>
+                                </div><!-- end card header -->
+                                <div class="card-body px-0">
+                                            <div class="table-responsive px-3">
+                                                <table id="dtBasicExample1" class="table table-striped table-bordered">
+                                                <thead class="bg-soft-secondary">
+                                                    <th id="dateColumn">
+                                                    Date
+                                                    </th>
+                                                    <th id="sales_person">
+                                                    Sales Person
+                                                    </th>
+                                                    <th>
+                                                    Marketing Leads
+                                                    </th>
+                                                    <th>
+                                                    Additional Leads
+                                                    </th>
+                                                    <th>
+                                                    Emails
+                                                    </th>
+                                                    <th>
+                                                    Calls
+                                                    </th>
+                                                    <th>
+                                                    Walking Customer
+                                                    </th>
+                                                    <th>
+                                                    Direct Reference
+                                                    </th>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                                <div id="totalRowContainer"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <!-- end tab content -->
+                                </div>
+                                <!-- end card body -->
+                            </div>
+</div>
+@endif
+@php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-view');
+                    @endphp
+                    @if ($hasPermission)
               <div class="row">
               <div class="col-xl-5">
 
@@ -357,7 +432,7 @@
                                 </div><!-- end card header -->
                                 <div class="card-body px-0">
                                             <div class="table-responsive px-3">
-                                                <table id="specificTable" class="table table-striped table-bordered">
+                                                <table id="dtBasicExample1" class="table table-striped table-bordered">
                                                 <thead>
                                                     <th>
                                                     Date
@@ -690,13 +765,11 @@
                         </div>
                         @endif -->
                         <!-- end col -->
-
+@endif
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js" defer></script>
     <script src="{{ asset('js/moment.min.js') }}"></script>
     <script>
-
 $(function() {
-
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         $('#start_date').val(start.format('YYYY-MM-DD'));
@@ -831,17 +904,44 @@ var ctx = document.getElementById('totalvariantss').getContext('2d');
         }
     });
     </script>
-    <script type="text/javascript">
-
+<script type="text/javascript">
 $(function() {
-    var start = moment().subtract(29, 'days');
+    var start = moment().subtract(6, 'days');
     var end = moment();
-    function cb(start, end) {
-        $('#leadsdis span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-console.log("waqar");
-        // Send selected dates to the controller
+    var table = $('#dtBasicExample1').DataTable({
+        "searching": true,
+        @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
+        "paging": false,
+        "pageLength": -1,
+        @else
+        "paging": true,
+        "pageLength": 7,
+        @endif
+    });
+    function populateFilterDropdowns() {
+    $('#dtBasicExample1 thead select').remove();
+    table.columns().every(function () {
+        var column = this;
+        var columnIndex = column[0][0];
+        var columnName = $(column.header()).text().trim();
+        if (columnName) {
+            var select = $('<select class="form-control my-1"><option value="">All</option></select>')
+                .appendTo($(column.header()))
+                .on('change', function () {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    table.column(columnIndex)
+                        .search(val ? '^' + val + '$' : '', true, false)
+                        .draw();
+                });
+            column.data().unique().sort().each(function (d, j) {
+                select.append('<option value="' + d + '">' + d + '</option>');
+            });
+        }
+    });
+}
+    function loadDataAndPopulateFilters(start, end) {
         $.ajax({
-            url: '{{ route('homemarketing.leaddistruition') }}',  // Update this URL with your Laravel route
+            url: '{{ route('homemarketing.leaddistruition') }}',
             method: 'POST',
             data: {
                 _token: '{{ csrf_token() }}',
@@ -849,46 +949,76 @@ console.log("waqar");
                 end_date: end.format('YYYY-MM-DD'),
             },
             success: function(response) {
-    var tbody = $('#specificTable tbody');
-    tbody.empty();
+                table.clear().draw();
+                var totalCallCount = 0;
+                var totalCallCount27 = 0;
+                var totalCallCount16 = 0;
+                var totalCallCount6 = 0;
+                var totalCallCount35 = 0;
+                var totalCallCount40 = 0;
+                $.each(response.data, function(index, item) {
+                    var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
+                    var row = [
+                        formattedDate,
+                        item.sales_person_name,
+                        item.call_count,
+                    ];
+                    if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
+                        row.push(
+                            item.call_count_27,
+                            item.call_count_16,
+                            item.call_count_6,
+                            item.call_count_35,
+                            item.call_count_40
+                        );
+                        totalCallCount += parseInt(item.call_count);
+                        totalCallCount27 += parseInt(item.call_count_27);
+                        totalCallCount16 += parseInt(item.call_count_16);
+                        totalCallCount6 += parseInt(item.call_count_6);
+                        totalCallCount35 += parseInt(item.call_count_35);
+                        totalCallCount40 += parseInt(item.call_count_40);
+                    }
+                    table.row.add(row).draw(false);
+                });
+                populateFilterDropdowns();
 
-    $.each(response.data, function(index, item) {
-        var formattedDate = moment(item.call_date).format('DD-MMM-YYYY');
-        tbody.append('<tr><td>' + formattedDate + '</td><td>' + item.sales_person_name + '</td><td>' + item.call_count + '</td></tr>');
-    });
-
-    $('#startDate').text('Start Date: ' + response.start_date);
-    $('#endDate').text('End Date: ' + response.end_date);
-
-    var readMoreLink = '<a href="{{ route("homemarketing.leaddistruitiondetails") }}?start_date=' + response.start_date + '&end_date=' + response.end_date + '">Read More</a>';
-    $('#readMoreLinkContainer').html(readMoreLink);
-}
+                if ({{ Auth::user()->hasPermissionForSelectedRole('approve-reservation') ? 'true' : 'false' }}) {
+                    var totalRow = [
+                        'Total',
+                        '',
+                        totalCallCount,
+                        totalCallCount27,
+                        totalCallCount16,
+                        totalCallCount6,
+                        totalCallCount35,
+                        totalCallCount40
+                    ];
+                    var totalRowNode = table.row.add(totalRow).draw(false).node();
+                    $(totalRowNode).addClass('total-row');
+                }
+            }
         });
     }
-
+    loadDataAndPopulateFilters(start, end);
     $('#leadsdis').daterangepicker({
         startDate: start,
         endDate: end,
         ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         }
-    }, cb);
+    }, function(selectedStart, selectedEnd) {
+        $('#leadsdis span').html(selectedStart.format('MMMM D, YYYY') + ' - ' + selectedEnd.format('MMMM D, YYYY'));
+        loadDataAndPopulateFilters(selectedStart, selectedEnd);
+    });
 
-    cb(start, end);
-
-
+    $('#leadsdis span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
 });
-
-
 </script>
-    @endif
-    @endcan
-
     <!-- <div id="root"></div>
     <link href="static/css/main.073c9b0a.css" rel="stylesheet">
     <script src="static/js/main.03fee2c2.js"></script> -->

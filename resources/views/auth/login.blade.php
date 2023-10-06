@@ -6,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Milele" name="description" />
         <meta content="Milele" name="author" />
-        <!-- App favicon -->
         <link rel="shortcut icon" href="assets/images/favicon.ico">
         @include('partials.head-css')
         <style>
@@ -14,6 +13,48 @@
             {
                 color: red;
             }
+            .custom-color-button {
+    background-color: #012b4d;
+    color: #ffffff; 
+    border: none; 
+}
+.custom-color-button:hover {
+    background-color: #216da4;
+}
+@media (max-width: 767px) {
+    .side-image-container {
+        display: none;
+    }
+
+    .mobile-logo-container {
+        display: block;
+        text-align: center; /* Center the mobile logo horizontally */
+    }
+}
+
+/* For screens larger than md (medium) size, hide the mobile logo and show the side image */
+@media (min-width: 768px) {
+    .side-image-container {
+        display: block;
+    }
+
+    .mobile-logo-container {
+        display: none;
+    }
+}
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.logo-img {
+    max-height: 590px;
+    max-width: 544px;
+    width: 100%;
+    height: auto;
+}
         </style>
     </head>
         @include('partials.body')
@@ -29,6 +70,9 @@
                                         <a href="/" class="d-block auth-logo">
                                         </a>
                                     </div>
+                                    <div class="mobile-logo-container d-block d-md-none">
+            <img src="mobile-logo.png" class="mobile-logo-img">
+        </div>
                                     <div class="auth-content my-auto">
                                         <div class="text-center">
                                             <h5 class="mb-0">Welcome Back !</h5>
@@ -90,7 +134,7 @@
                                                 
                                             </div>
                                             <div class="mb-3">
-                                                <button type="submit" class="btn btn-primary w-100 waves-effect waves-light">
+                                            <button type="submit" class="btn btn-primary w-100 waves-effect waves-light custom-color-button">
                                                     {{ __('Login') }}
                                                 </button>
                                             </div>
@@ -102,14 +146,16 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- end auth full page content -->
                     </div>
-                    <!-- end col -->
-                    <div class="col-xxl-9 col-lg-8 col-md-7">
+                    <div class="col-xxl-9 col-lg-8 col-md-7 side-image-container d-none d-md-block">
                         <div class="auth-bg pt-md-5 p-4 d-flex">
-                            <div class="bg-overlay bg-primary">
-							<img src="bgm.png"><span class="logo-txt"></span>
-							</div>
+                        <center>
+            <div class="bg-overlay bg-primary">
+                <div class="logo-container">
+                    <img src="bgm.png" class="logo-img">
+                </div>
+            </div>
+        </center>
                             <ul class="bg-bubbles">
                                 <li></li>
                                 <li></li>
@@ -122,7 +168,6 @@
                                 <li></li>
                                 <li></li>
                             </ul>
-                            <!-- end bubble effect -->
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-xl-7">
                                     <div class="p-0 p-sm-4 px-xl-0">
@@ -132,27 +177,18 @@
                                                 <button type="button" data-bs-target="#reviewcarouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
                                                 <button type="button" data-bs-target="#reviewcarouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
                                             </div>
-                                            <!-- end carouselIndicators -->
                                             <div class="carousel-inner">
-											
                                             </div>
-                                            <!-- end carousel-inner -->
                                         </div>
-                                        <!-- end review carousel -->
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- end col -->
                 </div>
-                <!-- end row -->
             </div>
-            <!-- end container fluid -->
         </div>
-        <!-- JAVASCRIPT -->
         @include('partials.vendor-scripts')
-        <!-- password addon init -->
         <script src="js/pages/pass-addon.init.js"></script>
     </body>
 </html>
