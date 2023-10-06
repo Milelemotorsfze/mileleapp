@@ -5,7 +5,6 @@
             $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-create');
         @endphp
         @if ($hasPermission)
-
             <div class="card-header">
                 <h4 class="card-title">Add New Variant</h4>
                 @can('variants-list')
