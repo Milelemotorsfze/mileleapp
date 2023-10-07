@@ -345,7 +345,7 @@
 					</li>
                     @endif
                     @endcan
-                    @can('stock-full-view')
+                    <!-- @can('stock-full-view')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
                     @endphp
@@ -357,7 +357,7 @@
                         </a>
 					</li>
                     @endif
-                    @endcan
+                    @endcan -->
                     <!-- @can('edit-po-details')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-details');

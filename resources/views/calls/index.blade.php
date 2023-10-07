@@ -551,6 +551,9 @@ function s2ab(s) {
 }
   var dataTableb = $('#dtBasicExample2').DataTable({
   pageLength: 10,
+  columnDefs: [
+    { type: 'date', targets: [1] }
+  ],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
@@ -586,6 +589,9 @@ function s2ab(s) {
   });
   var dataTablec = $('#dtBasicExample3').DataTable({
   pageLength: 10,
+  columnDefs: [
+    { type: 'date', targets: [1] }
+  ],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
@@ -621,6 +627,9 @@ function s2ab(s) {
   });
   var dataTabled = $('#dtBasicExample4').DataTable({
   pageLength: 10,
+  columnDefs: [
+    { type: 'date', targets: [1] }
+  ],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;

@@ -325,6 +325,11 @@
 <div class="row">
 <div class="col-xl-12">
                             <div class="card">
+                            <div class="col-lg-6">
+                                <a class="btn btn-sm btn-success" href="{{ route('calls.addnewleads') }}" text-align: right>
+        <i class="fa fa-plus" aria-hidden="true"></i> Add New Lead
+      </a>
+</div>
                                 <div class="card-header align-items-center d-flex">
                                     <h4 class="card-title mb-0 flex-grow-1">Lead Distribution</h4>
                                     <div class="flex-shrink-0">

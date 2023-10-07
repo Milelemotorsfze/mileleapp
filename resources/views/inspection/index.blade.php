@@ -56,10 +56,10 @@
       <a class="btn btn-sm btn-primary float-end" href="{{ route('incident.index') }}" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Incident Vehicles
       </a>
-      <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
-      <a class="btn btn-sm btn-primary float-end" href="{{ route('vehicle-pictures.index') }}" text-align: right>
+      <!-- <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
+      <a class="btn btn-sm btn-primary float-end" href="{{ route('modification.index') }}" text-align: right>
         <i class="fa fa-wrench" aria-hidden="true"></i> Modification Vehicles
-      </a>
+      </a> -->
       <p class="float-end">&nbsp;&nbsp;&nbsp;</p>
     <h4 class="card-title">
      Inspection Info

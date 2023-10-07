@@ -910,4 +910,225 @@ public function downloadRejected($filename)
         return redirect()->route('calls.createbulk')->with('error', 'File not found.');
     }
 }
+public function addnewleads()
+    {
+        $countries = CountryListFacade::getList('en');
+        $Language = Language::get();
+        $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
+        $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        return view('calls.sscreate', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
+    }
+    public function storeleads(Request $request)
+    { 
+        $this->validate($request, [
+            'phone' => 'nullable|required_without:email',
+            'email' => 'nullable|required_without:phone|email',           
+            'location' => 'required',
+            'milelemotors' => 'required',
+            'language' => 'required',
+            'model_line_ids' => 'array',
+            'model_line_ids.*' => 'distinct',
+            'type' => 'required',
+            'sales_person_id' => ($request->input('sales-option') == "manual-assign") ? 'required' : '',
+        ]);      
+        if ($request->input('sales-option') == "auto-assign") {
+        $excluded_user_ids = User::where('sales_rap', 'Yes')->pluck('id')->toArray();
+        $email = $request->input('email');
+        $phone = $request->input('phone');
+        $language = $request->input('language');
+        $sales_persons = ModelHasRoles::where('role_id', 7)
+        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+        ->where('users.status', 'active')
+        ->get();
+        $sales_person_id = null;
+        $existing_email_count = null;
+        $existing_phone_count = null;
+        $existing_language_count = null;
+        foreach ($sales_persons as $sales_person) {
+            if ($language == "English") {
+                $existing_email_count = Calls::where('email', $email)
+                ->whereIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('email')
+                ->count();
+                $cleanedPhone = ltrim($phone, '+');
+                $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                ->whereIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('phone')
+                ->count();
+                if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                if($existing_email_count > 0)
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                              ->whereIn('sales_person', $excluded_user_ids)
+                              ->orWhere('email', $email);
+                    })
+                    ->where(function ($query) {
+                        $query->WhereNotNull('email');
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }else
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereIn('sales_person', $excluded_user_ids);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }
+            }
+                else
+                {
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                    ->where('role_id', 7)
+                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                    ->where('users.status', 'active')
+                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                    ->where('calls.status', 'New')
+                    ->groupBy('calls.sales_person')
+                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                }
+            } 
+            else {
+                $existing_email_count = Calls::where('email', $email)
+                ->whereIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('email')
+                ->count();
+                $cleanedPhone = ltrim($phone, '+');
+                $existing_phone_count = Calls::where('phone', 'LIKE', '%' . $cleanedPhone)
+                ->whereIn('sales_person', $excluded_user_ids)
+                ->whereNotNull('phone')
+                ->count();
+                if ($existing_email_count > 0 || $existing_phone_count > 0) {
+                if($existing_email_count > 0)
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)
+                                ->whereIn('sales_person', $excluded_user_ids)
+                              ->orWhere('email', $email);
+                    })
+                    ->where(function ($query) {
+                        $query->WhereNotNull('email');
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }else
+                {
+                    $sales_person = Calls::where(function ($query) use ($cleanedPhone, $email, $excluded_user_ids) {
+                        $query->where('phone', 'LIKE', '%' . $cleanedPhone)->whereIn('sales_person', $excluded_user_ids);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+                $sales_person_id = $sales_person->sales_person;
+                break;
+                }
+            }
+                else
+                {
+                $sales_person_languages = SalesPersonLaugauges::whereIn('sales_person', $sales_persons->pluck('model_id'))
+                ->where('language', $language)
+                ->get();
+                $existing_language_count = $sales_person_languages->count();     
+                if ($existing_language_count === 1) {
+                    $sales_person = $sales_person_languages->first();
+                    $sales_person_id = $sales_person->sales_person;
+                    break;
+                }
+                elseif ($existing_language_count > 1) {
+                    $sales_person_ids = $sales_person_languages->pluck('sales_person');
+                     $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                                        ->where('role_id', 7)
+                                        ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                                        ->where('users.status', 'active')
+                                        ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                                        ->join('sales_person_laugauges', 'model_has_roles.model_id', '=', 'sales_person_laugauges.sales_person')
+                                        ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                                        ->where('calls.status', 'New')
+                                        ->whereIn('model_has_roles.model_id', $sales_person_ids)
+                                        ->where('sales_person_laugauges.language', $language)
+                                        ->groupBy('calls.sales_person')
+                                        ->orderByRaw('COUNT(calls.id) ASC')
+                                        ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                    break;
+                    }
+                else{
+                    $lowest_lead_sales_person = ModelHasRoles::select('model_id')
+                    ->where('role_id', 7)
+                    ->join('users', 'model_has_roles.model_id', '=', 'users.id')
+                    ->where('users.status', 'active')
+                    ->join('calls', 'model_has_roles.model_id', '=', 'calls.sales_person')
+                    ->where('calls.status', 'New')
+                    ->whereIn('model_has_roles.model_id', $excluded_user_ids)
+                    ->groupBy('calls.sales_person')
+                    ->orderByRaw('COUNT(calls.id) ASC')
+                    ->first();
+                    $sales_person_id = $lowest_lead_sales_person->model_id;
+                }
+                }
+            }
+            }
+        }
+    else{
+        $sales_person_id = $request->input('sales_person_id');
+    }
+        $date = Carbon::now();
+        $date->setTimezone('Asia/Dubai');
+        $formattedDate = $date->format('Y-m-d H:i:s');
+        $dataValue = LeadSource::where('source_name', $request->input('milelemotors'))->value('id');
+        $data = [
+            'name' => $request->input('name'),
+            'source' => $dataValue,
+            'email' => $request->input('email'),
+            'type' => $request->input('type'),
+            'sales_person' => $sales_person_id,
+            'remarks' => $request->input('remarks'),
+            'location' => $request->input('location'),
+            'phone' => $request->input('phone'),
+            'custom_brand_model' => $request->input('custom_brand_model'),
+            'language' => $request->input('language'),
+            'created_at' => $formattedDate,
+            'created_by' => Auth::id(),
+            'status' => "New",
+        ];
+        $model = new Calls($data);
+        $model->save();
+        $lastRecord = Calls::where('created_by', $data['created_by'])
+                   ->orderBy('id', 'desc')
+                   ->first();
+        $table_id = $lastRecord->id;
+        $modelLineIds = $request->input('model_line_ids');
+
+if ($modelLineIds[0] !== null) {
+foreach ($modelLineIds as $modelLineId) {
+    $datacalls = [
+        'lead_id' => $table_id,
+        'model_line_id' => $modelLineId,
+        'created_at' => $formattedDate
+    ];
+
+    $model = new CallsRequirement($datacalls);
+    $model->save();
+}
+}
+        $logdata = [
+            'table_name' => "calls",
+            'table_id' => $table_id,
+            'user_id' => Auth::id(),
+            'action' => "Create",
+        ];
+        $model = new Logs($logdata);
+        $model->save();
+        return redirect()->route('home')->with('success', 'Lead Record created successfully');
+    }
 }

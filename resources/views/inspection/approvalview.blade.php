@@ -183,6 +183,7 @@
             </div>
             </div>
             <hr>
+            @if($inspection->stage != "Incident")
             <div class="modal fade inspection-modal" id="inspectiondetail" tabindex="-1" aria-labelledby="inspectiondetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -339,6 +340,7 @@
 </div>
 @endif
 </div>
+@endif
 <br>
 <h5>Inspection Remarks</h5>
 <div class="row">
@@ -364,6 +366,7 @@
 </div>
 </div>
 @endif
+@if($inspection->stage != "Incident")
 @if(!$changevariant && !$newvariant)
 <div class="button-containerinner">
             <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Add Or Change Variant</a>
@@ -1159,6 +1162,7 @@
 </div>
 </div>
 @endif
+@endif
 @if($Incident)
 <br>
 <hr>
@@ -1389,10 +1393,12 @@
 <a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve')">
     <i class="fa fa-check" aria-hidden="true"></i> Approve Inspection
 </a>
+@if($inspection->stage != "Incident")
 @if($inspection->status == "Pending")
 <a style="float: right; margin-right: 10px;" class="btn btn-danger" onclick="setButtonValue('reinspect')">
     <i class="fa fa-times" aria-hidden="true"></i> Re Inspection
 </a>
+@endif
 @endif
 </br>
 </div>

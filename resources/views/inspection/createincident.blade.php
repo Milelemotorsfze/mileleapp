@@ -14,15 +14,16 @@
 <div class="col-md-6">
 <div class="row">
 <div class="col-md-4">
+<form action="{{ route('incident.createincidents') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 <label><strong>Vehicle Identification Number:</strong></label>
 </div>
-<div class="col-md-4">
-<select id="vinSelect" style="width: 100%;">
+<div class="col-md-6">
+<select id="vinSelect" name="vin" style="width: 100%;">
 <option value="" disabled selected>Select The VIN</option>
         @foreach($vehicle as $v)
         <option value="{{$v->vin}}">{{$v->vin}}</option>
         @endforeach
-        <!-- Add more options if needed -->
     </select>              
 </div>
 </div>
@@ -58,7 +59,7 @@
                     <label><strong>Model Detail</strong></label>
 </div>
 <div class="col-md-8">
-                   <span id="modeldetail"></span> 
+                   <span id="detail"></span> 
 </div>
 </div>
 </div>
@@ -68,7 +69,7 @@
                     <label><strong>Variant</strong></label>
 </div>
 <div class="col-md-8">
-                   
+<span id="variantname"></span> 
 </div>
 </div>
 </div>
@@ -78,7 +79,7 @@
                     <label><strong>Model Year</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="my"></span>     
 </div>
 </div>
 </div>
@@ -88,7 +89,7 @@
                     <label><strong>Variant Detail</strong></label>
 </div>
 <div class="col-md-8">
-                   
+<span id="variantdetail"></span>     
 </div>
 </div>
 </div>
@@ -98,7 +99,7 @@
                     <label><strong>Steering</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="steering"></span>  
 </div>
 </div>
 </div>
@@ -108,7 +109,7 @@
                     <label><strong>Seats</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="seats"></span>         
 </div>
 </div>
 </div>
@@ -118,7 +119,7 @@
                     <label><strong>Fuel Type</strong></label>
 </div>
 <div class="col-md-8">
-                   
+<span id="fuel_type"></span>              
 </div>
 </div>
 </div>
@@ -128,7 +129,7 @@
                     <label><strong>Transmission</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="gearbox"></span>          
 </div>
 </div>
 </div>
@@ -138,7 +139,7 @@
                     <label><strong>Production Year</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="py"></span>               
 </div>
 </div>
 </div>
@@ -148,7 +149,7 @@
                     <label><strong>Interior Color</strong></label>
 </div>
 <div class="col-md-8">
-                    
+<span id="interiorColorName"></span>                
 </div>
 </div>
 </div>
@@ -158,7 +159,7 @@
                                 <label><strong>Exterior Color</strong></label>
             </div>
             <div class="col-md-8">
-                            
+            <span id="exteriorColorName"></span>          
             </div>
             </div>
             </div>
@@ -264,6 +265,7 @@
     </div>
 </div>
      </br>
+     <hr>
                     <div class="row">
                         <div class="col-md-12">
                             <label>Remarks</label>
@@ -399,6 +401,17 @@ $(document).ready(function () {
             success: function (response) {
                 $('#brand').text(response.brand);
                 $('#modelline').text(response.modelLine);
+                $('#variantdetail').text(response.detail);
+                $('#detail').text(response.modeldetail);
+                $('#variantname').text(response.name);
+                $('#my').text(response.my);
+                $('#steering').text(response.steering);
+                $('#seats').text(response.seat);
+                $('#fuel_type').text(response.fuel_type);
+                $('#gearbox').text(response.gearbox);
+                $('#py').text(response.py);
+                $('#interiorColorName').text(response.interiorColorName);
+                $('#exteriorColorName').text(response.exteriorColorName);
             },
             error: function () {
                 alert('Error fetching vehicle details.');

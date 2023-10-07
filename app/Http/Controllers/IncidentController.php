@@ -291,15 +291,24 @@ public function updatevehicledetails(Request $request)
         
         if ($vehicle) {
             $variant = Varaint::find($vehicle->varaints_id);
+            $vehicle = Varaint::find($vehicle->id);
             $interiorColor = ColorCode::find($vehicle->int_colour);
             $exteriorColor = ColorCode::find($vehicle->ex_colour);
-            $brand = Brand::find($variant->brand_id);
+            $brand = Brand::find($variant->brands_id);
             $modelLine = MasterModelLines::find($variant->master_model_lines_id);
-            $interiorColorName = $interiorColor ? $interiorColor->pluck('name') : null;
-            $exteriorColorName = $exteriorColor ? $exteriorColor->pluck('name') : null;
-            $brandName = $brand ? $brand->pluck('brand_name') : null;
-            $modelLineName = $modelLine ? $modelLine->pluck('model_line') : null;
-            info($modelLineName);
+            $brandName = $brand ? $brand->brand_name : null;
+            $modelLineName = $modelLine ? $modelLine->model_line : null;
+            $detail = $variant ? $variant->detail : null;
+            $name = $variant ? $variant->name : null;
+            $my = $variant ? $variant->my : null;
+            $modeldetail = $variant ? $variant->model_detail : null;
+            $steering = $variant ? $variant->steering : null;
+            $seat = $variant ? $variant->seat : null;
+            $fuel_type = $variant ? $variant->fuel_type : null;
+            $gearbox = $variant ? $variant->gearbox : null;
+            $py = $vehicle ? $vehicle->ppmmyyy : null;
+            $interiorColorName = $interiorColor ? $interiorColor->name : null;
+            $exteriorColorName = $exteriorColor ? $exteriorColor->name : null;
             $vehicleDetails = [
                 'brand' => $brandName,
                 'modelLine' => $modelLineName,
@@ -307,10 +316,74 @@ public function updatevehicledetails(Request $request)
                 'exteriorColor' => $exteriorColorName,
                 'variant' => $variant,
                 'vehicle' => $vehicle,
+                'detail' => $detail,
+                'name' => $name,
+                'my' => $my,
+                'steering' => $steering,
+                'modeldetail' => $modeldetail,
+                'seat' => $seat,
+                'fuel_type' => $fuel_type,
+                'gearbox' => $gearbox,
+                'py' => $py,
+                'interiorColorName' => $interiorColorName,
+                'exteriorColorName' => $exteriorColorName,
             ];
             return response()->json($vehicleDetails);
         } else {
             return response()->json(['error' => 'Vehicle not found']);
         }        
+    }
+    public function createincidents(Request $request)
+    {
+        $canvasImageDataURL = $request->input('canvas_image');
+        $vin = $request->input('vin');
+        info($vin);
+        $vehicle = Vehicles::where('vin', $vin)->first();
+        $inspection = New Inspection();
+        $inspection->status = "Pending";
+        $inspection->vehicle_id =  $vehicle->id;
+        $inspection->created_by =  Auth::id();
+        $inspection->remark =  $request->input('remarks');
+        $inspection->stage =  "Incident";
+        $inspection->save();
+        $canvasImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $canvasImageDataURL));
+        $filename = 'canvas_image_' . uniqid() . '.png';
+        $directory = public_path('qc');
+        File::makeDirectory($directory, $mode = 0777, true, true);
+        File::put($directory . '/' . $filename, $canvasImageData);
+    $reasons = [
+        'overspeed',
+        'weather',
+        'vehicle_defects',
+        'negligence',
+        'sudden_halt',
+        'road_defects',
+        'fatigue',
+        'no_safety_distance',
+        'using_gsm',
+        'overtaking',
+        'wrong_action',
+    ];
+    $selectedReasons = [];
+    foreach ($reasons as $reason) {
+        if ($request->has($reason)) {
+            $selectedReasons[] = $reason;
+        }
+    }
+        $incidentData = [
+            'vehicle_id' => $vehicle->id,
+            'type' => $request->input('incidenttype'),
+            'narration' => $request->input('narration'),
+            'detail' => $request->input('damageDetails'),
+            'driven_by' => $request->input('drivenBy'),
+            'responsivity' => $request->input('responsibility'),
+            'inspection_id' => $inspection->id,
+            'file_path' => $filename,
+            'created_by' => Auth::id(),
+            'status' => "Pending",
+            'reason' => implode(', ', $selectedReasons),
+        ];
+        Incident::create($incidentData);
+        return redirect()->route('incident.index')->with('success', 'Incident Submit For Approval successfully');
     }
 }
