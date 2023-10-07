@@ -1,9 +1,10 @@
 @extends('layouts.main')
 @section('content')
-    {{--    @php--}}
-    {{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-create');--}}
-    {{--    @endphp--}}
-    {{--    @if ($hasPermission)--}}
+    @can('create-master-models')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
+        @endphp
+        @if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Add New Models</h4>
     </div>
@@ -85,7 +86,8 @@
         </form>
     </div>
     </div>
-    {{--    @endif--}}
+        @endif
+        @endcan
 @endsection
 @push('scripts')
     <script>

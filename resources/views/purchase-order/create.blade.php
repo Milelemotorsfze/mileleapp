@@ -133,28 +133,29 @@
                     </div>
                     @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
                         <div class="row">
+                            <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
                             <div class="col-lg-2 col-md-6">
-                                <input type="text" placeholder="Select Variants" name="variant[]" list="variantslist"
+                                <input type="text" placeholder="Select Variants"   list="variantslist"
                                        class="form-control mb-1" id="variant-id-{{$key}}" autocomplete="off"
                                        data-id="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id}}"
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly>
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="text"  name="brands_id" class="form-control" placeholder="Brand" id="brand-{{$key}}"
+                                <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                             </div>
                             <div class="col-lg-3 col-md-6">
-                                <input type="text" name="master_model_lines_id" class="form-control" id="master-model-line-{{$key}}"
+                                <input type="text"  class="form-control" id="master-model-line-{{$key}}"
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                        placeholder="Model Line" readonly>
                             </div>
                             <div class="col-lg-4 col-md-6">
-                                <input type="text" id="variant-detail-{{$key}}" name="details" class="form-control"  placeholder="Variants Detail" readonly
+                                <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
                             </div>
                             <div class="col-lg-1 col-md-6">
-                                <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"  class="form-control"
-                                       value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
+                                <input type="number" id="quantity-{{$key}}" min="0"  oninput="checkQuantity({{$key}})" data-quantity="{{$pfiVehicleVariant->quantity}}"
+                                       class="form-control" value="{{ $pfiVehicleVariant->quantity }}" placeholder="QTY">
                                 <span class="QuantityError-{{$key}} text-danger"></span>
                             </div>
                         </div>

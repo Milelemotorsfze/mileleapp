@@ -100,6 +100,7 @@ class PFIController extends Controller
         $letterOfIndent = LetterOfIndent::find($request->letter_of_indent_id);
 
         $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
+
         // status change in LOI table by checking quantity of pfi created untill now
         if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
             $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;

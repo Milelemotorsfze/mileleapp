@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApprovedLetterOfIndentItem;
+use App\Models\LOIItemPurchaseOrder;
 use App\Models\PurchasingOrder;
 use App\Models\PurchasingOrderItems;
 use Illuminate\Http\Request;
@@ -14,6 +16,7 @@ use App\Models\User;
 use App\Models\Vehicleslog;
 use Carbon\Carbon;
 use App\Models\ModelHasRoles;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Carbon\CarbonTimeZone;
 use App\Models\Purchasinglog;
@@ -239,44 +242,58 @@ class PurchasingOrderController extends Controller
         $territory = $request->input('territory');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
-        if ($variantName === null && $key === $count - 1) {
-        continue;
-        }
-        $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
-        $vin = $vins[$key];
-        $ex_colour = $ex_colours[$key];
-        $int_colour = $int_colours[$key];
-        $estimation_arrival = $estimated_arrival[$key];
-        $territorys = $territory[$key];
-        $vehicle = new Vehicles();
-        $vehicle->varaints_id = $variantId;
-        $vehicle->vin = $vin;
-        $vehicle->ex_colour = $ex_colour;
-        $vehicle->int_colour = $int_colour;
-        $vehicle->estimation_date = $estimation_arrival;
-        $vehicle->territory = $territorys;
-        $vehicle->purchasing_order_id = $purchasingOrderId;
-        $vehicle->status = "Not Approved";
-        $vehicle->save();
-        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
-        $currentDateTime = Carbon::now($dubaiTimeZone);
-        $purchasinglog = new Purchasinglog();
-        $purchasinglog->time = now()->toTimeString();
-        $purchasinglog->date = now()->toDateString();
-        $purchasinglog->status = 'PO Created';
-        $purchasinglog->purchasing_order_id = $purchasingOrderId;
-        $purchasinglog->variant = $variantId;
-        $purchasinglog->estimation_date = $estimation_arrival;
-        $purchasinglog->territory = $territorys;
-        $purchasinglog->ex_colour = $ex_colour;
-        $purchasinglog->int_colour = $int_colour;
-        $purchasinglog->created_by = auth()->user()->id;
-        $purchasinglog->role = Auth::user()->selectedRole;
-        $purchasinglog->save();
-        if($request->po_from == 'DEMAND_PLANNING') {
+            if ($variantName === null && $key === $count - 1) {
+            continue;
+            }
+            $variantId = Varaint::where('name', $variantName)->pluck('id')->first();
+            $vin = $vins[$key];
+            $ex_colour = $ex_colours[$key];
+            $int_colour = $int_colours[$key];
+            $estimation_arrival = $estimated_arrival[$key];
+            $territorys = $territory[$key];
+            $vehicle = new Vehicles();
+            $vehicle->varaints_id = $variantId;
+            $vehicle->vin = $vin;
+            $vehicle->ex_colour = $ex_colour;
+            $vehicle->int_colour = $int_colour;
+            $vehicle->estimation_date = $estimation_arrival;
+            $vehicle->territory = $territorys;
+            $vehicle->purchasing_order_id = $purchasingOrderId;
+            $vehicle->status = "Not Approved";
+            $vehicle->save();
+            $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+            $currentDateTime = Carbon::now($dubaiTimeZone);
+            $purchasinglog = new Purchasinglog();
+            $purchasinglog->time = now()->toTimeString();
+            $purchasinglog->date = now()->toDateString();
+            $purchasinglog->status = 'PO Created';
+            $purchasinglog->purchasing_order_id = $purchasingOrderId;
+            $purchasinglog->variant = $variantId;
+            $purchasinglog->estimation_date = $estimation_arrival;
+            $purchasinglog->territory = $territorys;
+            $purchasinglog->ex_colour = $ex_colour;
+            $purchasinglog->int_colour = $int_colour;
+            $purchasinglog->created_by = auth()->user()->id;
+            $purchasinglog->role = Auth::user()->selectedRole;
+            $purchasinglog->save();
+            if($request->po_from == 'DEMAND_PLANNING') {
+               $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
+               info("approve loi id");
+               info($loiItemsOfPurcahseOrders);
+                $variantsQuantity = array_count_values($variantNames);
+                info($variantsQuantity);
 
+               foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
+                   $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
+                   $variant = $approvedLoiItem->letterOfIndentItem->masterModel->variant->name;
+                    $loiPurchaseOrder = new LOIItemPurchaseOrder();
+                    $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
+                    $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
+                    $loiPurchaseOrder->quantity = $variantsQuantity[$variant] ?? '';
+                    $loiPurchaseOrder->save();
+               }
+            }
         }
-    }
     }
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }
@@ -313,7 +330,7 @@ class PurchasingOrderController extends Controller
     $vehicles = Vehicles::where('purchasing_order_id', $id)->get();
     $vendorsname = Supplier::where('id', $purchasingOrder->vendors_id)->value('supplier');
     return view('warehouse.edit', compact('purchasingOrder', 'variants', 'vehicles', 'vendorsname'));
-}
+    }
     /**
      * Update the specified resource in storage.
      */

@@ -1,9 +1,10 @@
 @extends('layouts.main')
 @section('content')
-{{--    @php--}}
-{{--        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-create');--}}
-{{--    @endphp--}}
-{{--    @if ($hasPermission)--}}
+    @can('master-model-lines-create')
+    @php
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-lines-create');
+    @endphp
+    @if ($hasPermission)
         <div class="card-header">
             <h4 class="card-title">Add Model Line</h4>
         </div>
@@ -53,18 +54,19 @@
                         </div>
                         </br>
                         <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-dark ">Submit</button>
+                            <button type="submit" class="btn btn-primary ">Submit</button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
         </div>
-{{--    @endif--}}
+    @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>
-        
+
         $('#brand_id').select2({
             placeholder: "Choose Brand"
         })

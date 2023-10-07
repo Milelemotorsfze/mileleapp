@@ -7,6 +7,13 @@
 }
     </style>
 @section('content')
+
+    @can('variants-edit')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('variants-edit');
+        @endphp
+        @if ($hasPermission)
+
     <div class="card-header">
         <h4 class="card-title">Edit Variant</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -151,7 +158,7 @@
                     </div>
                 </div>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-dark">Submit</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
             </div>
         </form>
@@ -227,7 +234,7 @@
         $old_values = $modelold->model_line;
         $modelnew = DB::table('master_model_lines')->where('id', $variantlog->new_value)->first();
         $new_values = $modelnew->model_line;
-    @endphp 
+    @endphp
     <td>{{ $old_values }}</td>
     <td>{{ $new_values }}</td>
 @else
@@ -241,6 +248,8 @@
         </div>
     </div>
     </div>
+        @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>

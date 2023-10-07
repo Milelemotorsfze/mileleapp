@@ -1,9 +1,11 @@
 @extends('layouts.main')
 @section('content')
-{{--@php--}}
-{{--    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');--}}
-{{--@endphp--}}
-{{--@if ($hasPermission)--}}
+
+@can('master-brand-create')
+@php
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-brand-create');
+@endphp
+@if ($hasPermission)
     <div class="card-header">
         <h4 class="card-title">Add Brand</h4>
     </div>
@@ -49,7 +51,8 @@
         </form>
     </div>
     </div>
-{{--@endif--}}
+@endif
+@endcan
 @endsection
 @push('scripts')
     <script>
