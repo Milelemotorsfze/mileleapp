@@ -656,6 +656,17 @@
                                     <span data-key="t-extra-pages">View All</span>
                                 </a>
                             </li>
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
+                        @endphp
+                        @if ($hasPermission)
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="{{ route('logisticsdocuments.index') }}" id="topnav-more" role="button">
+                                    <i data-feather="list"></i>
+                                    <span data-key="t-extra-pages">Documents</span>
+                                </a>
+                            </li>
+                            @endif
                 </ul>
             </div>
         </nav>

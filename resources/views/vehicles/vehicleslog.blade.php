@@ -672,7 +672,7 @@
 
     @endphp
          @if($hasPermissionInspectionApprove || $hasPermissionVehicleDetailApprove || $hasPermissionSOApprove || $hasPermissionEngineApprove)
-        <div class="card">
+        <!-- <div class="card">
             <div class="card-header">
                 <h4 class="card-title">Vehicle Detail Approval Requests</h4>
             </div>
@@ -919,7 +919,7 @@
                         </table>
                     </div>
                 </div>
-        </div>
+        </div> -->
         @endif
         <div class="card">
             <div class="card-header">

@@ -15,5 +15,4 @@ class Document extends Model
         'document_with',
         'bl_status',
     ];
-    public $timestamps = false;
 }

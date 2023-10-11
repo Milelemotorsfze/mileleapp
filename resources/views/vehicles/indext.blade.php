@@ -210,6 +210,10 @@
                                     <input type="text" data-search-column="sales_remarks" id="sales_remarks" placeholder="Search">
                                     </th>
                                 @endif
+                                @php
+                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
+                                @endphp
+                                @if ($hasPermission)
                                 <th data-column="pdi_date" id="pdi_date" class="nowrap-td">
                                 PDI Inspection Date
                                     <br>
@@ -220,10 +224,6 @@
                                     <br>
                                     <input type="text" data-search-column="pdi_remarks" id="pdi_remarks" placeholder="Search">
                                     </th>
-                                @php
-                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('gdn-view');
-                                @endphp
-                                @if ($hasPermission)
                                 <th data-column="gdn_number" id="gdn_number" class="nowrap-td">
                                 GDN Number
                                     <br>
@@ -437,13 +437,13 @@
                             </div>
     </tbody>
 </table>
- <div id="contextMenu" class="context-menu">
+ <!-- <div id="contextMenu" class="context-menu">
         <ul>
             <li><a href="#" id="openOption">Open</a></li>
             <li><a href="#" id="createSoOption">Create SO</a></li>
             <li><a href="#" id="bookingOption">Booking</a></li>
         </ul>
-    </div>
+    </div> -->
 <script>
     Pusher.logToConsole = true;
     var pusher = new Pusher('243a287e00b3a38463a9', {
@@ -627,10 +627,10 @@ $(document).ready(function() {
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('so-remarks'))
             { data: 'latest_remark_sales', name: 'latest_remark_sales' },
-            { data: 'pdi_date', name: 'pdi_date' },
-            { data: 'pdi_remarks', name: 'pdi_remarks' },
             @endif
             @if (Auth::user()->hasPermissionForSelectedRole('gdn-view'))
+            { data: 'pdi_date', name: 'pdi_date' },
+            { data: 'pdi_remarks', name: 'pdi_remarks' },
             { data: 'gdn_number', name: 'gdn_number' },
             { data: 'gdn_date', name: 'gdn_date' },
             @endif

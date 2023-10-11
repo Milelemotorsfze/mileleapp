@@ -62,7 +62,7 @@ use App\Http\Controllers\ApprovalsController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\VariantRequests;
 use App\Http\Controllers\ModificationController;
-
+use App\Http\Controllers\DocumentController;
 /*
 /*
 |--------------------------------------------------------------------------
@@ -489,4 +489,8 @@ Route::get('/d', function () {
 
     Route::get('addon-dashboard/sellingPriceFilter',[HomeController::class, 'sellingPriceFilter'])->name('addon-dashboard.filter');
 
+    //Logistics
+    Route::resource('logisticsdocuments', DocumentController::class);
+    Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
+    Route::post('logisticsdocuments/sendingbl', [DocumentController::class, 'updatedocbl'])->name('logisticsdocuments.updatedocbl');
     });
