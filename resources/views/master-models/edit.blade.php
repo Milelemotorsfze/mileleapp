@@ -1,8 +1,8 @@
 @extends('layouts.main')
 @section('content')
-    @can('master-model-edit')
+    @can('edit-master-models')
     @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole('master-model-edit');
+        $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-master-models');
     @endphp
     @if ($hasPermission)
     <div class="card-header">
