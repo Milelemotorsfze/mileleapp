@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="col-lg-3 col-md-4">
                                     <label class="form-label d-block d-sm-none">Variant</label>
-                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name }}" readonly class="form-control">
+                                    <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name ?? '' }}" readonly class="form-control">
                                 </div>
                                 <div class="col-lg-2 col-md-2">
                                     <label class="form-label d-block d-sm-none">Quantity</label>

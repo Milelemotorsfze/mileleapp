@@ -439,7 +439,7 @@
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Approval</th>
-                            <th>PFI</th>
+{{--                            <th>PFI</th>--}}
                             <th width="150px">Actions</th>
                         </tr>
                         </thead>
@@ -460,14 +460,13 @@
                                         <button type="button" class=" btn btn-primary btn-sm" >Approve</button>
                                     </a>
                                 </td>
+
                                 <td>
                                     @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                         <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                                             <button type="button" class=" btn btn-info btn-sm" >Add PFI</button>
                                         </a>
                                     @endif
-                                </td>
-                                <td>
                                     <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
                                         <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>
                                     </a>

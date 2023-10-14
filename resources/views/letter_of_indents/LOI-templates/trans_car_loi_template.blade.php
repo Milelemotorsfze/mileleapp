@@ -110,7 +110,7 @@
                     <td >{{ $key + 1 }}</td>
                     <td>
                         <p> {{ $letterOfIndentItem->variant_name }} {{ $letterOfIndentItem->Variant->engine_type ?? ''}} {{ $letterOfIndentItem->steering }}</p>
-                        <p>Make: {{$letterOfIndentItem->Variant->brand->brand_name ?? ''}}</p>
+                        <p>Make: {{$letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}</p>
                         <p>Model: </p>
                     </td>
                     <td >{{$letterOfIndentItem->quantity}}</td>

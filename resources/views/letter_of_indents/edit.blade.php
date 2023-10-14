@@ -75,7 +75,7 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Supplier</label>
+                        <label for="choices-single-default" class="form-label">Vendor</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
                             <option value="" disabled>Select The Supplier</option>
                             @foreach($suppliers as $supplier)

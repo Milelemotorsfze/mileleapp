@@ -62,7 +62,7 @@
                     <table>
                         <tr>
                             <td>
-                                <img src="{{ url('bgm-min.png') }}" height="50px" width="300px" ><span class="logo-txt"></span>
+                                <img src="{{ url('bgm-old.png') }}" height="50px" width="250px" ><span class="logo-txt"></span>
                             </td>
                             <td style="text-align: end">
                                 <h1 style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
@@ -129,8 +129,8 @@
                             <tr>
                                 <td>{{$letterOfIndentItem->quantity}}</td>
                                 <td>
-                                    {{ strtoupper($letterOfIndentItem->steering) }}, {{ strtoupper($letterOfIndentItem->Variant->brand->brand_name) ?? ''}},
-                                    {{ strtoupper($letterOfIndentItem->variant_name) }},{{ strtoupper($letterOfIndentItem->Variant->engine_type) ?? ''}}
+                                    {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
+                                    {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }},{{ strtoupper($letterOfIndentItem->masterModel->variant->engine_type) ?? ''}}
                                 </td>
                                 <td class="hide">3</td>
                                 <td class="hide">3</td>

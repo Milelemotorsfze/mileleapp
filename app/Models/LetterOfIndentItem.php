@@ -50,7 +50,7 @@ class LetterOfIndentItem extends Model
 //        $mastermodel = MasterModel::where('model', $this->model)
 //            ->where('sfx', $this->sfx)
 //            ->first();
-        $modelId = $this->mster_model_id;
+        $modelId = $this->master_model_id;
 
         $inventoryCount = SupplierInventory::with('masterModel')
             ->whereHas('masterModel', function ($query) use($modelId){

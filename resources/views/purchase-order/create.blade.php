@@ -66,7 +66,7 @@
                     <div class="col-lg-2 col-md-6 col-sm-12">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label font-size-13 ">PO Number</label>
-                            <input type="text" name="po_number" id="po_number" class="form-control" placeholder="Enter PO Number" value="{{old('po_number')}}">
+                            <input type="text" name="po_number" id="po_number" required class="form-control" placeholder="Enter PO Number" value="{{old('po_number')}}">
                             <span id="poNumberError" class="text-danger"></span>
                         </div>
                     </div>
@@ -118,13 +118,13 @@
                         <div class="col-lg-2 col-md-6">
                             <label for="brandInput" class="form-label">Variant:</label>
                         </div>
-                        <div class="col-lg-1 col-md-6">
+                        <div class="col-lg-2 col-md-6">
                             <label for="QTY" class="form-label">Brand:</label>
                         </div>
                         <div class="col-lg-3 col-md-6">
                             <label for="QTY" class="form-label">Model Line:</label>
                         </div>
-                        <div class="col-lg-4 col-md-6">
+                        <div class="col-lg-3 col-md-6">
                             <label for="QTY" class="form-label">Variant Detail:</label>
                         </div>
                         <div class="col-lg-1 col-md-6">
@@ -140,7 +140,7 @@
                                        data-id="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant_id}}"
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->name ?? ''}}" readonly>
                             </div>
-                            <div class="col-lg-1 col-md-6">
+                            <div class="col-lg-2 col-md-6">
                                 <input type="text"   class="form-control" placeholder="Brand" id="brand-{{$key}}"
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}" readonly>
                             </div>
@@ -149,7 +149,7 @@
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? ''}}"
                                        placeholder="Model Line" readonly>
                             </div>
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <input type="text" id="variant-detail-{{$key}}" class="form-control"  placeholder="Variants Detail" readonly
                                        value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->variant->detail ?? ''}}">
                             </div>
