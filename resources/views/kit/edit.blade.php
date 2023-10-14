@@ -580,9 +580,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	       {
 	           var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 
-	           // for(var i=1;i<= indexValue;i++) {
-	           //     uniqueCheckKit(i);
-	           // }
+	           for(var i=1;i<= indexValue;i++) {
+	               uniqueCheckKit(i);
+	           }
 	           // fetch addon existing detils
 	           var id = $('#addon_id').val();
 	           if(id != '')
@@ -1446,46 +1446,46 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 
 </script>
 <script type="text/javascript">
-	{{--function uniqueCheckKit(index) {--}}
+	function uniqueCheckKit(index) {
 
-	{{--    var addon_id = $('#addon_id').val();--}}
-	{{--    var addonType = $('#addon_type').val();--}}
-	{{--    var brand = $('#selectBrand').val();--}}
-	{{--    var modelLine = $('#selectModelLine'+index).val();--}}
-	{{--    var modelNumber = $('#selectModelNumber'+index).val();--}}
+	    var addon_id = $('#addon_id').val();
+	    var addonType = $('#addon_type').val();
+	    var brand = $('#selectBrand').val();
+	    var modelLine = $('#selectModelLine'+index).val();
+	    var modelNumber = $('#selectModelNumber'+index).val();
 
-	{{--    $.ajax({--}}
-	{{--        url: "{{url('getUniqueKits')}}",--}}
-	{{--        type: "GET",--}}
-	{{--        data:--}}
-	{{--            {--}}
-	{{--                addon_id: addon_id[0],--}}
-	{{--                addonType:addonType,--}}
-	{{--                brand:brand[0],--}}
-	{{--                model_line:modelLine[0],--}}
-	{{--                model_number:modelNumber,--}}
-	{{--                index:index,--}}
-	{{--                id: '{{$addonDetails->id}}'--}}
+	    $.ajax({
+	        url: "{{url('getUniqueKits')}}",
+	        type: "GET",
+	        data:
+	            {
+	                addon_id: addon_id[0],
+	                addonType:addonType,
+	                brand:brand[0],
+	                model_line:modelLine[0],
+	                model_number:modelNumber,
+	                index:index,
+	                id: '{{$addonDetails->id}}'
 
-	{{--            },--}}
-	{{--        dataType: 'json',--}}
-	{{--        success: function (data) {--}}
-	{{--            if(data.count > 0 ) {--}}
-	{{--                var modelNumber = "";--}}
-	{{--                if(data.model_number) {--}}
-	{{--                    var modelNumber = data.model_number;--}}
-	{{--                }--}}
-	{{--                $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";--}}
-	{{--                showModelLineError($msg,data.index);--}}
+	            },
+	        dataType: 'json',
+	        success: function (data) {
+	            if(data.count > 0 ) {
+	                var modelNumber = "";
+	                if(data.model_number) {
+	                    var modelNumber = data.model_number;
+	                }
+	                $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
+	                showModelLineError($msg,data.index);
 
-	{{--            }else{--}}
-	{{--                $msg = "";--}}
-	{{--                removeModelLineError($msg,data.index);--}}
+	            }else{
+	                $msg = "";
+	                removeModelLineError($msg,data.index);
 
-	{{--            }--}}
-	{{--        }--}}
-	{{--    });--}}
-	{{--}--}}
+	            }
+	        }
+	    });
+	}
 
 	var existingAddonTypeCount = {{ $existingAddonTypes->count() }};
 	var lengthExistingModels = '';
@@ -1515,7 +1515,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        var index = $(this).attr('data-index');
 	        // optionDisable(index, value);
 	        hideOption(index,value);
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 	     // function optionDisable(index, value){
 	     //     var currentId = 'selectModelLine'+index;
@@ -1532,7 +1532,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        var data = e.params.data;
 	        $('#selectModelNumber'+index).empty();
 	        appendOption(index,data)
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	        // optionEnable(currentId,data);
 
 	    });
@@ -1558,7 +1558,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-numbers", function (e) {
 	        var type = 'MODEL_NUMBER';
@@ -1585,7 +1585,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 	     // function optionEnable(currentId,data) {
 	     //     if(data == 'allmodellines') {

@@ -504,9 +504,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        {
 	       var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 
-	        // for(var i=1;i<= indexValue;i++) {
-	        //     uniqueCheckKit(i);
-	        // }
+	        for(var i=1;i<= indexValue;i++) {
+	            uniqueCheckKit(i);
+	        }
 
 	        // fetch addon existing detils
 	        var id = $('#addon_id').val();
@@ -606,45 +606,45 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            var addon_id = $('#addon_id').val();
 	            var addonType = $('#addon_type').val();
 	            var brand = $('#brand').val();
-	        {{--    $.ajax({--}}
-	        {{--        url: "{{url('getUniqueKits')}}",--}}
-	        {{--        type: "GET",--}}
-	        {{--        async: false,--}}
-	        {{--        cache: false,--}}
-	        {{--        data:--}}
-	        {{--            {--}}
-	        {{--                addon_id: addon_id[0],--}}
-	        {{--                addonType: addonType,--}}
-	        {{--                brand: brand[0],--}}
-	        {{--                model_line: inputModelLines[0],--}}
-	        {{--                model_number: inputModelNumber,--}}
-	        {{--                index: i,--}}
-	        {{--            },--}}
-	        {{--        dataType: 'json',--}}
-	        {{--        success: function (data) {--}}
-	        {{--            if (data.count > 0) {--}}
-	        {{--                var modelNumber = "";--}}
-	        {{--                if (data.model_number) {--}}
-	        {{--                    var modelNumber = data.model_number;--}}
-	        {{--                }--}}
-	        {{--                $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";--}}
-	        {{--                showModelLineError($msg, data.index);--}}
-	        {{--                var count = data.count;--}}
-	        {{--                isExistingUniqueCounts.push(count);--}}
-	        {{--            } else {--}}
-	        {{--                $msg = "";--}}
-	        {{--                removeModelLineError($msg, data.index);--}}
-	        {{--                isExistingUniqueCounts.pop();--}}
-	        {{--            }--}}
-	        {{--        }--}}
-	        {{--    });--}}
+	            $.ajax({
+	                url: "{{url('getUniqueKits')}}",
+	                type: "GET",
+	                async: false,
+	                cache: false,
+	                data:
+	                    {
+	                        addon_id: addon_id[0],
+	                        addonType: addonType,
+	                        brand: brand[0],
+	                        model_line: inputModelLines[0],
+	                        model_number: inputModelNumber,
+	                        index: i,
+	                    },
+	                dataType: 'json',
+	                success: function (data) {
+	                    if (data.count > 0) {
+	                        var modelNumber = "";
+	                        if (data.model_number) {
+	                            var modelNumber = data.model_number;
+	                        }
+	                        $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
+	                        showModelLineError($msg, data.index);
+	                        var count = data.count;
+	                        isExistingUniqueCounts.push(count);
+	                    } else {
+	                        $msg = "";
+	                        removeModelLineError($msg, data.index);
+	                        isExistingUniqueCounts.pop();
+	                    }
+	                }
+	            });
 	        }
-	        {{--var uniqueValueCount = isExistingUniqueCounts.length;--}}
-	        {{--if(uniqueValueCount > 0) {--}}
-	        {{--    formInputError = true;--}}
-	        {{--}else{--}}
-	        {{--    formInputError = false;--}}
-	        {{--}--}}
+	        var uniqueValueCount = isExistingUniqueCounts.length;
+	        if(uniqueValueCount > 0) {
+	            formInputError = true;
+	        }else{
+	            formInputError = false;
+	        }
 	    }
 
 	    var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
@@ -1414,44 +1414,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	// }
 </script>
 <script type="text/javascript">
-	{{--function uniqueCheckKit(index) {--}}
+	function uniqueCheckKit(index) {
 
-	{{--    var addon_id = $('#addon_id').val();--}}
-	{{--    var addonType = $('#addon_type').val();--}}
-	{{--    var brand = $('#brand').val();--}}
-	{{--    var modelLine = $('#selectModelLine'+index).val();--}}
-	{{--    var modelNumber = $('#selectModelNumber'+index).val();--}}
+	    var addon_id = $('#addon_id').val();
+	    var addonType = $('#addon_type').val();
+	    var brand = $('#brand').val();
+	    var modelLine = $('#selectModelLine'+index).val();
+	    var modelNumber = $('#selectModelNumber'+index).val();
 
-	{{--    $.ajax({--}}
-	{{--        url: "{{url('getUniqueKits')}}",--}}
-	{{--        type: "GET",--}}
-	{{--        data:--}}
-	{{--            {--}}
-	{{--                addon_id: addon_id[0],--}}
-	{{--                addonType:addonType,--}}
-	{{--                brand:brand[0],--}}
-	{{--                model_line:modelLine[0],--}}
-	{{--                model_number:modelNumber,--}}
-	{{--                index:index,--}}
-	{{--            },--}}
-	{{--        dataType: 'json',--}}
-	{{--        success: function (data) {--}}
-	{{--            if(data.count > 0 ) {--}}
-	{{--                var modelNumber = "";--}}
-	{{--                if(data.model_number) {--}}
-	{{--                    var modelNumber = data.model_number;--}}
-	{{--                }--}}
-	{{--                $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";--}}
-	{{--                showModelLineError($msg,data.index);--}}
+	    $.ajax({
+	        url: "{{url('getUniqueKits')}}",
+	        type: "GET",
+	        data:
+	            {
+	                addon_id: addon_id[0],
+	                addonType:addonType,
+	                brand:brand[0],
+	                model_line:modelLine[0],
+	                model_number:modelNumber,
+	                index:index,
+	            },
+	        dataType: 'json',
+	        success: function (data) {
+	            if(data.count > 0 ) {
+	                var modelNumber = "";
+	                if(data.model_number) {
+	                    var modelNumber = data.model_number;
+	                }
+	                $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
+	                showModelLineError($msg,data.index);
 
-	{{--            }else{--}}
-	{{--                $msg = "";--}}
-	{{--                removeModelLineError($msg,data.index);--}}
+	            }else{
+	                $msg = "";
+	                removeModelLineError($msg,data.index);
 
-	{{--            }--}}
-	{{--        }--}}
-	{{--    });--}}
-	{{--}--}}
+	            }
+	        }
+	    });
+	}
 
 	$(document).ready(function ()
 	{
@@ -1472,7 +1472,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        // optionDisable(index, value);
 	        hideOption(index,value);
 
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 
 	    });
 
@@ -1501,7 +1501,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-numbers", function (e) {
 	        // e.preventDefault();
@@ -1530,7 +1530,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            getItemsDropdown(type);
 	        }
 
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-lines", function (e) {
 	        var index = $(this).attr('data-index');
@@ -1539,7 +1539,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        $('#selectModelNumber'+index).empty();
 	        appendOption(index,data);
 
-	        // uniqueCheckKit(index);
+	        uniqueCheckKit(index);
 	    });
 
 	    function hideOption(index,value) {
