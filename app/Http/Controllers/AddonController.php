@@ -98,14 +98,6 @@ class AddonController extends Controller
         $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
                     ->orderBy('id','DESC');
 
-        if($request->addon_type != 'all')
-        {
-            $addons = $addons->where('addon_type_name',$request->addon_type);
-        }
-        else
-        {
-            $addons = $addons->whereIn('addon_type_name',['P','SP','K']);
-        }
         if($request->AddonIds)
         {
             $addons = $addons->whereIn('addon_id',$request->AddonIds);
@@ -153,6 +145,15 @@ class AddonController extends Controller
                 }
             });
         }
+        if($request->addon_type == 'all')
+        {
+            $addons = $addons->whereIn('addon_type_name',['P','SP','K']);
+
+        } else {
+
+            $addons = $addons->where('addon_type_name',$request->addon_type);
+        }
+
         $fetchedAddonIds = $addons->pluck('id');
         if(count($fetchedAddonIds) > 0 && $request->isAddonBoxView != 1)
         {
@@ -170,25 +171,26 @@ class AddonController extends Controller
 
         }
         $addon1 = $addons->get();
+//        info($addon1);
 
         ////////////// filter end ////////////////
 
-
-        info('start');
-        info($start);
+//
+//        info('start');
+//        info($start);
 
         if($start >= $addons->count()) {
-            info('addon null command');
+//            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
         }else{
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
             $addons = $addons->skip($start)
                 ->take($rowperpage)->get();
 
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-            info($addons->pluck('id'));
+//            info($addons->pluck('id'));
         }
 //        info($addons->count());
         foreach($addons as $addon)
