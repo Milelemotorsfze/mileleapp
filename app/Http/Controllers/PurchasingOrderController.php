@@ -165,7 +165,7 @@ class PurchasingOrderController extends Controller
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingfellow($status)
-{
+    {
     $userId = auth()->user()->id;
     $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
         ->where('status', $status)
@@ -188,7 +188,7 @@ class PurchasingOrderController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
+    {
     $vendors = Supplier::whereHas('vendorCategories', function ($query) {
         $query->where('category', 'Vehicles');
     })->get();

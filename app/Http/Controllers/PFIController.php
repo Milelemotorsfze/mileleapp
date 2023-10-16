@@ -34,7 +34,6 @@ class PFIController extends Controller
             }else{
                $pfi->is_po_active = true;
             }
-
         }
         return view('pfi.index', compact('pfis'));
     }
