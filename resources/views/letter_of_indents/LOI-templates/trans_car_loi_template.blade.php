@@ -41,6 +41,8 @@
             <input type="hidden" name="height" id="total-height" value="">
             <input type="hidden" name="width" id="width" value="">
             <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
+            <input type="hidden" name="type" value="TRANS_CAR">
+
             <input type="hidden" name="download" value="1">
         <div class="text-end mt-3">
 {{--            <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}

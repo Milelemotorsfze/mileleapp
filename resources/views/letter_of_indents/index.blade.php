@@ -74,6 +74,7 @@
                             <th>Dealers</th>
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
+                            <th>LOI</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -91,12 +92,23 @@
 {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
+                                    <select class="form-control" onchange="location = this.value;">
+                                        <option>Select Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                         Trans Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                    </select>
+                                </td>
+                                <td>
                                     <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
                                         <button type="button" class="btn btn-primary btn-sm "><i class="fa fa-edit"></i></button>
                                     </a>
-                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>
-                                    </a>
+
+{{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
+{{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
+{{--                                    </a>--}}
                                     <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject-LOI-{{$letterOfIndent->id}}">
                                         Reject
                                     </button>
