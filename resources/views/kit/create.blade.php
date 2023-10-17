@@ -155,11 +155,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 					<label for="addon_type" class="col-form-label text-md-end">{{ __('Addon Type') }}</label>
 					</div>
 					<div class="col-xxl-4 col-lg-6 col-md-12" >
-					
+
 					<input class="form-control" value="Kit" readonly>
 					<input id="addon_type_show" type="text" class="form-control" hidden readonly onclick=showAlert()>
 					<span id="AddonTypeError" class="required-class invalid-feedback"></span>
-					
+
 					<span id="addon_type_required" class="email-phone required-class paragraph-class"></span>
 					</div> -->
 				<div class="col-xxl-2 col-lg-6 col-md-12">
@@ -474,7 +474,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            }
 	        });
 	    })
-	
+
 	    $.ajaxSetup
 	    ({
 	        headers:
@@ -489,7 +489,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    $("#addon_id").select2({
 	        maximumSelectionLength: 1,
 	    });
-	
+
 	    $('#brandModelNumberId').hide();
 	    $('#brand').change(function()
 	    {
@@ -503,11 +503,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	     $('#addon_id').change(function()
 	        {
 	       var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-	
+
 	        for(var i=1;i<= indexValue;i++) {
 	            uniqueCheckKit(i);
 	        }
-	
+
 	        // fetch addon existing detils
 	        var id = $('#addon_id').val();
 	        if(id != '')
@@ -567,14 +567,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    var inputAddonName = $('#addon_id').val();
 	    var inputBrand = $('#brand').val();
 	    var formInputError = false;
-	
+
 	    if(inputAddonType == '')
 	    {
 	        $msg = "Addon Type is required";
 	        showAddonTypeError($msg);
 	        formInputError = true;
 	    }
-	
+
 	    if(inputBrand == '')
 	    {
 	        $msg = "Brand is required";
@@ -602,7 +602,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                showModelNumberError($msg,i);
 	                formInputError = true;
 	            }
-	
+
 	            var addon_id = $('#addon_id').val();
 	            var addonType = $('#addon_type').val();
 	            var brand = $('#brand').val();
@@ -646,9 +646,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            formInputError = false;
 	        }
 	    }
-	
+
 	    var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-	
+
 	    for (let i = 1; i <= KitItemIndex; i++)
 	    {
 	        var inputKitItem = $('#mainItem'+i).val();
@@ -706,7 +706,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	function validationOnKeyUp(clickInput,index)
 	{
 	    var kitItemQuantity = clickInput.value;
-	
+
 	    if(kitItemQuantity == '')
 	    {
 	        $msg = "Quantity is required";
@@ -715,7 +715,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        $msg = "";
 	        removeKitItemQuantityError($msg,index)
 	    }
-	
+
 	}
 	function showSupplierTypeError($msg)
 	{
@@ -783,14 +783,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	}
 	function showKitItemQuantityError($msg,i)
 	{
-	
+
 	    document.getElementById("KitItemQuantityError"+i).textContent=$msg;
 	    document.getElementById("mainQuantity"+i).classList.add("is-invalid");
 	    document.getElementById("KitItemQuantityError"+i).classList.add("paragraph-class");
 	}
 	function removeKitItemQuantityError($msg,i)
 	{
-	
+
 	    document.getElementById("KitItemQuantityError"+i).textContent=$msg;
 	    document.getElementById("mainQuantity"+i).classList.remove("is-invalid");
 	    document.getElementById("KitItemQuantityError"+i).classList.remove("paragraph-class");
@@ -975,7 +975,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	//     document.getElementById("fixing_charge_amount").classList.remove("is-invalid");
 	//     document.getElementById("fixingChargeAmountError1").classList.remove("paragraph-class");
 	// }
-	
+
 	function showNewAddonYearError($msg)
 	{
 	    document.getElementById("newAddonYearError").textContent=$msg;
@@ -1111,7 +1111,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	{{--                        maximumSelectionLength: 1,--}}
 	{{--                    });--}}
 	{{--                }--}}
-	
+
 	{{--                $("#suppliers1").html("");--}}
 	{{--                myarray1 = data.suppliers;--}}
 	{{--                var size1= myarray1.length;--}}
@@ -1134,7 +1134,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	{{--                        // maximumSelectionLength: 1,--}}
 	{{--                    });--}}
 	{{--                }--}}
-	
+
 	{{--            }--}}
 	{{--        });--}}
 	{{--    }--}}
@@ -1152,7 +1152,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    // create new addon and list new addon in addon list
 	    var year = $('#kit_year').val();
 	    var kiloMeter = $('#kit_km').val();
-	
+
 	    if(year == '' || kiloMeter == '')
 	    {
 	        if(year == '') {
@@ -1193,7 +1193,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                    $('#addnewAddonButton').hide();
 	                    $('#kit_year').val("");
 	                    $('#kit_km').val("");
-	
+
 	                    $msg = "";
 	                    removeNewAddonKMError($msg);
 	                    removeNewAddonYearError($msg);
@@ -1415,13 +1415,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 </script>
 <script type="text/javascript">
 	function uniqueCheckKit(index) {
-	
+
 	    var addon_id = $('#addon_id').val();
 	    var addonType = $('#addon_type').val();
 	    var brand = $('#brand').val();
 	    var modelLine = $('#selectModelLine'+index).val();
 	    var modelNumber = $('#selectModelNumber'+index).val();
-	
+
 	    $.ajax({
 	        url: "{{url('getUniqueKits')}}",
 	        type: "GET",
@@ -1443,16 +1443,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                }
 	                $msg = "This Addon,Brand,Model Line and Model Number("+ modelNumber +") Combination is existing";
 	                showModelLineError($msg,data.index);
-	
+
 	            }else{
 	                $msg = "";
 	                removeModelLineError($msg,data.index);
-	
+
 	            }
 	        }
 	    });
 	}
-	
+
 	$(document).ready(function ()
 	{
 	    $("#brand").attr("data-placeholder","Choose Brand Name....     Or     Type Here To Search....");
@@ -1461,25 +1461,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    });
 	    $("#selectModelNumber1").attr("data-placeholder","Choose Model Number....     Or     Type Here To Search....");
 	    $("#selectModelNumber1").select2({
-	
+
 	    });
-	
+
 	    var index = 1;
-	
+
 	    $(document.body).on('select2:select', ".model-lines", function (e) {
 	        var value = $(this).val();
 	        var index = $(this).attr('data-index');
 	        // optionDisable(index, value);
 	        hideOption(index,value);
-	
+
 	        uniqueCheckKit(index);
-	
+
 	    });
-	
+
 	    $(document.body).on('select2:select', ".model-numbers", function (e) {
 	        e.preventDefault();
 	        var index = $(this).attr('data-index');
-	
+
 	        var type = 'MODEL_NUMBER';
 	        var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
 	        var KitItems = [];
@@ -1507,7 +1507,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        // e.preventDefault();
 	        var value = e.params.data.id;
 	        var index = $(this).attr('data-index');
-	
+
 	        var type = 'MODEL_NUMBER';
 	        var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
 	        var KitItems = [];
@@ -1529,7 +1529,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	
+
 	        uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-lines", function (e) {
@@ -1538,10 +1538,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        // optionEnable(currentId,data);
 	        $('#selectModelNumber'+index).empty();
 	        appendOption(index,data);
-	
+
 	        uniqueCheckKit(index);
 	    });
-	
+
 	    function hideOption(index,value) {
 	        var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 	        for (var i = 1; i <= indexValue; i++) {
@@ -1561,7 +1561,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    }
 	    function addOption(id,text) {
 	        var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-	
+
 	        for(var i=1;i<=indexValue;i++) {
 	            $('#selectModelLine'+i).append($('<option>', {value: id, text :text}))
 	        }
@@ -1639,7 +1639,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                                    id="selectModelNumber${index}" onchange="showValidationErrors(${index})"  multiple="true" style="width: 100%;"  >
 	                                    </select>
 	                                    <span id="ModelNumberError${index}" class="ModelNumberError invalid-feedback"></span>
-	
+
 	                                </div>
 	                                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
 	                                    <a class="btn_round removeButtonbrandModelLineDiscription" data-index="${index}" id="removeButton${index}">
@@ -1649,7 +1649,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                            </div>
 	                        </div>
 	                    `);
-	
+
 	                    let modelLinesData   = [];
 	                    $.each(data,function(key,value)
 	                    {
@@ -1659,7 +1659,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                            text: value.model_line
 	                        });
 	                    });
-	
+
 	                    $("#selectModelLine"+index).select2
 	                    ({
 	                        placeholder: 'Choose Model Line....     Or     Type Here To Search....',
@@ -1667,7 +1667,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                        data: modelLinesData,
 	                        maximumSelectionLength: 1,
 	                    });
-	
+
 	                    $('#selectModelNumber'+index).select2
 	                    ({
 	                        placeholder:"Choose Model Number....     Or     Type Here To Search....",
@@ -1678,7 +1678,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        });
 	    });
 	    function removeModelLineItems(indexNumber) {
-	
+
 	        var countRow = 0;
 	        var countRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 	        if(countRow > 1)
@@ -1690,16 +1690,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            // $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).find("option:selected").each(function() {
 	                var id = $('#selectModelLine'+indexNumber).val();
 	                var text = $('#selectModelLine'+indexNumber).find(':selected').text();
-	
+
 	            if(id != '') {
 	                addOption(id,text)
 	            }
-	
+
 	            // });
 	            $('.removeButtonbrandModelLineDiscription').closest('#row-'+indexNumber).remove();
 	            // model-lines
 	            $('.brandModelLineDiscriptionApendHere').each(function(i) {
-	
+
 	                var index = +i + +1;
 	                $(this).attr('id','row-'+index);
 	                $(this).find('.brands').attr('onchange', 'selectBrand(this.id,'+index+')');
@@ -1710,17 +1710,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                $(this).find('.model-lines').attr('data-index',index);
 	                $(this).find('.model-lines').attr('onchange','selectModelLineDescipt('+index+')');
 	                $(this).find('.ModelLineError').attr('id','ModelLineError'+index);
-	
+
 	                $(this).find('.model-numbers').attr('name','brandModel['+ index +'][model_number][]');
 	                $(this).find('.model-numbers').attr('id','selectModelNumber'+index);
 	                $(this).find('.model-numbers').attr('data-index',index);
 	                $(this).find('.model-numbers').attr('onchange','showValidationErrors('+index+')');
 	                $(this).find('.ModelNumberError').attr('id','ModelNumberError'+index);
 	                $(this).find('.model-number-div').attr('id','showDivModelNumber'+index);
-	
+
 	                $(this).find('.removeButtonbrandModelLineDiscription').attr('data-index',index);
 	                $(this).find('.removeButtonbrandModelLineDiscription').attr('id','removeButton'+index);
-	
+
 	                $("#selectModelLine"+index).attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
 	                $("#selectModelLine"+index).select2({
 	                    maximumSelectionLength:1
@@ -1739,9 +1739,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            }).set({title:"Can't Remove Brand And Model Lines"})
 	        }
 	    }
-	
+
 	});
-	
+
 	function selectBrand(id,row)
 	{
 	    var index = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
@@ -1750,13 +1750,13 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    {
 	        if(index == row) {
 	            showRelatedModal(value,row);
-	
+
 	        }else {
 	            for(var i = 1;i<=index;i++) {
 	                showRelatedModal(value,i);
 	            }
 	        }
-	
+
 	        $msg = "";
 	        removeBrandError($msg);
 	    }
@@ -1821,7 +1821,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                });
 	            }
 	        });
-	
+
 	    }
 	}
 	function showValidationErrors(index) {
@@ -1845,7 +1845,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    showDivModelNumber.hidden = false;
 	    let removeButton = document.getElementById('removeButton'+row);
 	    removeButton.hidden = false;
-	
+
 	    let showaddtrim = document.getElementById('showaddtrim');
 	    showaddtrim.hidden = false
 	    $.ajax
@@ -1857,7 +1857,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        {
 	            $("#selectModelLine"+row).html("");
 	            let BrandModelLine   = [];
-	
+
 	            $.each(data,function(key,value)
 	            {
 	                BrandModelLine.push
@@ -1883,7 +1883,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	}
 	function removeRelatedModal()
 	{
-	
+
 	    // let showDivdrop = document.getElementById('showDivdrop'+row);
 	    // showDivdrop.hidden = true
 	    // let showDivModelNumber = document.getElementById('showDivModelNumber'+row);
@@ -1894,22 +1894,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    for(var i=1;i<=index;i++) {
 	        $('#selectModelLine'+i).empty();
 	        $('#selectModelNumber'+i).empty();
-	
+
 	    }
 	    let showaddtrim = document.getElementById('showaddtrim');
 	    showaddtrim.hidden = true
 	}
-	
+
 	// function hideModelNumberDropdown(id,row)
 	// {
 	//     let showPartNumber = document.getElementById('showModelNumberdrop'+row);
 	//     showPartNumber.hidden = true
 	// }
 	function getItemsDropdown(type) {
-	
+
 	    var indexValue =  $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 	    var countRow = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-	
+
 	    var selectedAddonModelNumbers = [];
 	    for(let i=1; i<=indexValue; i++)
 	    {
@@ -1919,7 +1919,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            selectedAddonModelNumbers.push(value);
 	        });
 	    }
-	
+
 	    var selectedItems = [];
 	    for(let j=1; j<= countRow; j++)
 	    {
@@ -1928,7 +1928,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            selectedItems.push(item);
 	        }
 	    }
-	
+
 	    $.ajax({
 	        url: "{{url('getCommonKitItems')}}",
 	        type: "GET",
@@ -1953,12 +1953,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                }
 	                addonDropdownData.push
 	                ({
-	
+
 	                    id: value.id,
 	                    text: value.addon.name +' - '+ description
 	                });
 	            });
-	
+
 	            for(let i=1; i<= countRow; i++)
 	            {
 	                $('#mainItem'+i).select2
@@ -2036,7 +2036,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            $(this).find('.removeMainItem').attr('data-index', index);
 	            $(this).find('.KitItemError').attr('id','KitItemError'+index);
 	            $(this).find('.kitItemQuantityError').attr('id','kitItemQuantityError'+index);
-	
+
 	            $('#mainItem'+index).select2
 	            ({
 	                placeholder:"Choose Items....     Or     Type Here To Search....",
@@ -2079,7 +2079,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                         placeholder="Enter Quantity" autocomplete="addon_purchase_price_in_usd" autofocus
 	                         oninput="validity.valid||(value='1');" required >
 	                          <span id="kitItemQuantityError${index}" class="kitItemQuantityError invalid-feedback"></span>
-	
+
 	                    </div>
 	                <div class="form-group col-xxl-1 col-lg-1 col-md-1 add_del_btn_outer">
 	                    <a id="removeMainItem${index}" class="btn_round removeMainItem" data-index="${index}">

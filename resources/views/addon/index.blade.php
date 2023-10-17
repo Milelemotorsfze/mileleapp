@@ -453,6 +453,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
         var ModelLineIds = $('#fltr-model-line').val();
         var addon_type = $('#addon_type').val();
+
         var serial_number = $('#serial_number').val();
 
         var rowperpage = Number($('#rowperpage').val());

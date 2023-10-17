@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('approved_loi_id')->unsigned()->index()->nullable();
             $table->foreign('approved_loi_id')->references('id')->on('approved_letter_of_indent_items');
             $table->bigInteger('purchase_order_id')->unsigned()->index()->nullable();
-            $table->foreign('purchase_order_id')->references('id')->on('purchase_order');
+            $table->foreign('purchase_order_id')->references('id')->on('purchasing_order');
             $table->integer('quantity');
             $table->timestamps();
         });

@@ -36,6 +36,10 @@ class DemandPlanningPurchaseOrderController extends Controller
             ->where('pfi_id', $request->id)
             ->groupBy('letter_of_indent_item_id')
             ->get();
+        foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
+            $alreadyAddedQuantity = $pfiVehicleVariant->loiPurchaseOrder->quantity ?? 0;
+            $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
+        }
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
         return view('purchase-order.create', compact('vendors','pfiVehicleVariants',

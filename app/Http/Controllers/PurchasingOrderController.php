@@ -276,24 +276,20 @@ class PurchasingOrderController extends Controller
             $purchasinglog->created_by = auth()->user()->id;
             $purchasinglog->role = Auth::user()->selectedRole;
             $purchasinglog->save();
+        }
             if($request->po_from == 'DEMAND_PLANNING') {
-               $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
-               info("approve loi id");
-               info($loiItemsOfPurcahseOrders);
+                $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
                 $variantsQuantity = array_count_values($variantNames);
-                info($variantsQuantity);
-
-               foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
-                   $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
-                   $variant = $approvedLoiItem->letterOfIndentItem->masterModel->variant->name;
+                foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
+                    $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
+                    $variant = $approvedLoiItem->letterOfIndentItem->masterModel->variant->name;
                     $loiPurchaseOrder = new LOIItemPurchaseOrder();
                     $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
                     $loiPurchaseOrder->purchase_order_id = $purchasingOrderId;
                     $loiPurchaseOrder->quantity = $variantsQuantity[$variant] ?? '';
                     $loiPurchaseOrder->save();
-               }
+                }
             }
-        }
     }
     return redirect()->route('purchasing-order.index')->with('success', 'PO Created successfully!');
     }

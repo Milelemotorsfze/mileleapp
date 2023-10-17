@@ -362,7 +362,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 		<div class="card" id="partNumberDiv" hidden>
 			<div class="card-header">
 				<h4 class="card-title">
-					<span class="error">* </span> Part Numbers 
+					<span class="error">* </span> Part Numbers
 				</h4>
 			</div>
 			<div class="card-body">
@@ -504,7 +504,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        var addonType = $('#addon_type').val();
 	        if(addonType == 'P') {
 	            uniqueCheckAccessories();
-	
+
 	        }else if(addonType == 'SP') {
 	            uniqueCheckSpareParts();
 	        }
@@ -517,14 +517,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            if(!value) {
 	                uniqueCheckAccessories();
 	            }else {
-	
+
 	                var indexValue =  $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
 	                for(var i=1;i<=indexValue;i++){
 	                    var $msg = "";
 	                   removeBrandError($msg,i);
 	                }
 	            }
-	
+
 	        }else if(addonType == 'SP') {
 	            if(!value) {
 	                uniqueCheckSpareParts();
@@ -540,10 +540,10 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            }
 	        }
 	    });
-	
+
 	    $("#descr-dropdown-button").click(function () {
-	
-	
+
+
 	        $('#description-text').attr('hidden', true);
 	        $('#select-description').attr('hidden', false);
 	        $("#addnewDescriptionButton").attr('hidden', false);
@@ -553,7 +553,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        removeAddonDescriptionError();
 	        formInputError = false;
 	    });
-	
+
 	    $("#addon_type").change(function () {
 	        var addonType = $(this).val();
 	        $('#description').empty();
@@ -573,7 +573,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            }
 	        });
 	    })
-	
+
 	    $.ajaxSetup
 	    ({
 	        headers:
@@ -614,12 +614,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        }
 	    });
 	    // $("#supplierArray1").select2();
-	
-	
+
+
 	    $('#addon_id').change(function () {
 	        var id = $('#addon_id').val();
 	        // fetch addon existing detils
-	
+
 	        if (id != '') {
 	            $('#addnewAddonButton').hide();
 	            $.ajax
@@ -763,7 +763,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        addonDescriptionUniqueCheck();
 	        if(addonType == 'P') {
 	            uniqueCheckAccessories();
-	
+
 	        }else if(addonType == 'SP') {
 	            uniqueCheckSpareParts();
 	        }
@@ -788,7 +788,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    var id = $('#addon_id').val();
 	    var description = $('#description-text').val();
 	    var addonType = $('#addon_type').val();
-	
+
 	    let url = '{{ route('addon.getUniqueAddonDescription') }}';
 	    $.ajax({
 	        type: "GET",
@@ -798,7 +798,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            addon_id: id,
 	            description: description,
 	            addonType:addonType
-	
+
 	        },
 	        success: function (data) {
 	            if (data > 0) {
@@ -859,7 +859,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            }
 	        });
 	    }
-	
+
 	    var uniqueValueCount = uniqueCounts.length;
 	    if(uniqueValueCount > 0) {
 	        formInputError = true;
@@ -915,17 +915,17 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                            var count = data.count;
 	                            isExistingUniqueCounts.push(count);
 	                        }else{
-	
+
 	                            removeSPModelLineError(data.i,data.j);
 	                            isExistingUniqueCounts.pop();
 	                        }
 	                    }
 	                });
 	            }
-	
+
 	        }
 	    }
-	
+
 	    var uniqueValueCount = isExistingUniqueCounts.length;
 	    if(uniqueValueCount > 0) {
 	        formInputError = true;
@@ -933,7 +933,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        formInputError = false;
 	    }
 	}
-	
+
 	$('form').on('submit', function (e)
 	{
 	    sub ='2';
@@ -943,7 +943,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    // removeModelYearEndError();
 	    if(inputAddonType == 'P') {
 	        uniqueCheckAccessories();
-	
+
 	    }else if(inputAddonType == 'SP') {
 	        uniqueCheckSpareParts();
 	    }
@@ -1008,7 +1008,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                    formInputError = true;
 	                }
 	            }
-	
+
 	            var countBrandRow = 0;
 	            countBrandRow = $(".brandMoDescrip").find(".brandMoDescripApendHere").length;
 	            for (let i = 1; i <= countBrandRow; i++)
@@ -1070,7 +1070,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                                $msg = "The Model Year should be between 2019-2050";
 	                                showModelYearEndError($msg,i,j);
 	                                formInputError = true;
-	
+
 	                            }else if(Number(inputModelYearEnd) <= Number(inputModelYearStart))
 	                            {
 	                                removeModelYearStartError(i,j);
@@ -1085,7 +1085,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                        {
 	                            removeModelYearStartError(i,j);
 	                        }
-	
+
 	                    }
 	                }
 	            }
@@ -1115,9 +1115,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                    }
 	                }
 	            }
-	
+
 	        }
-	
+
 	    }
 	    if(inputAddonName == '')
 	    {
@@ -1125,7 +1125,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        showAddonNameError($msg);
 	        formInputError = true;
 	    }
-	
+
 	    if(fixingCharge == 'no')
 	    {
 	        var inputFixingChargeAmount = $('#fixing_charge_amount').val();
@@ -1154,7 +1154,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        $('#addon_id').removeAttr('disabled');
 	        $('#selectBrandMo1').removeAttr('disabled');
 	        var elts = document.getElementsByClassName("disabledModelLine");
-	
+
 	        for(var e = 0; e < elts.length; e++) { // For each element
 	        var elt = elts[e];
 	        elt.removeAttribute("disabled");
@@ -1333,7 +1333,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    document.getElementById("description-text").classList.remove("is-invalid");
 	    document.getElementById("addonDescriptionError").classList.remove("paragraph-class");
 	}
-	
+
 	function showFixingChargeAmountError($msg)
 	{
 	    document.getElementById("fixingChargeAmountError1").textContent=$msg;
@@ -1387,8 +1387,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        removeAddonTypeError($msg);
 	        showAddonTypeDependsData(value);
 	        $("#purchase_price").val('');
-	
-	
+
+
 	        $.ajax
 	        ({
 	            url:"{{url('getAddonCodeAndDropdown')}}",
@@ -1452,7 +1452,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                //         // maximumSelectionLength: 1,
 	                //     });
 	                // }
-	
+
 	            }
 	        });
 	    }

@@ -129,8 +129,8 @@
                 <tr>
                     <td>{{$letterOfIndentItem->quantity}}</td>
                     <td>
-                        {{ strtoupper($letterOfIndentItem->steering) }}, {{ strtoupper($letterOfIndentItem->Variant->brand->brand_name) ?? ''}},
-                        {{ strtoupper($letterOfIndentItem->variant_name) }},{{ strtoupper($letterOfIndentItem->Variant->engine_type) ?? ''}}
+                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
+                        {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }},{{ strtoupper($letterOfIndentItem->masterModel->variant->engine_type) ?? ''}}
                     </td>
                     <td class="hide">3</td>
                     <td class="hide">3</td>

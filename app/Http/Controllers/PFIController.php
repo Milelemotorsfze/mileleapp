@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
+use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,19 @@ class PFIController extends Controller
     public function index()
     {
         $pfis = PFI::orderBy('id','DESC')->get();
+        foreach ($pfis as $pfi) {
+            $approvedLOIItemIds = ApprovedLetterOfIndentItem::where('pfi_id', $pfi->id)->pluck('id');
+            $pfiTotalQuantity = ApprovedLetterOfIndentItem::where('pfi_id', $pfi->id)->sum('quantity');
+
+            $totalPoCreatedQuantity = LOIItemPurchaseOrder::whereIn('approved_loi_id', $approvedLOIItemIds)
+                                        ->sum('quantity');
+            if($pfiTotalQuantity == $totalPoCreatedQuantity) {
+               $pfi->is_po_active = false;
+            }else{
+               $pfi->is_po_active = true;
+            }
+
+        }
         return view('pfi.index', compact('pfis'));
     }
 
