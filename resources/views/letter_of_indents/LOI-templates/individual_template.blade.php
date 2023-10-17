@@ -38,7 +38,6 @@
         }
     </style>
 
-
     <div class="container" style="padding-bottom: 0px;">
         <div class="content" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
             <form action="{{ route('letter-of-indents.generate-loi') }}">
@@ -49,14 +48,12 @@
                 <input type="hidden" name="download" value="1">
 
                 <div class="text-end mb-3">
-                    {{--                    <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}
+                    <a  class="btn  btn-info float-end " style="margin-left: 10px;" href="{{ url()->previous() }}" >
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                     <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
-                    {{--                    </a>--}}
                     </button>
                 </div>
             </form>
-
-{{--            <h4 class="center" style="text-decoration: underline;color: black">Letter of Intent for Automotive Purchase</h4>--}}
 
             <p class="last">Date:{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('d/m/Y')}} </p>
             <p> <span class="fw-bold">Subject: </span> Letter of Intent to Purchase Vehicle</p>

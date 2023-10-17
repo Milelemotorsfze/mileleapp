@@ -164,7 +164,7 @@ class LetterOfIndentController extends Controller
             if($request->download == 1) {
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else if($request->type == 'MILELE_CAR'){
@@ -174,7 +174,7 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-               return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+               return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         } else if($request->type == 'BUSINESS'){
@@ -184,7 +184,7 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
         }
@@ -195,7 +195,7 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
         }

@@ -93,7 +93,7 @@
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
                                     <select class="form-control" onchange="location = this.value;">
-                                        <option>Select Template</option>
+                                        <option value="">Select Template</option>
                                         <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
                                          Trans Car Template</option>
                                         <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>

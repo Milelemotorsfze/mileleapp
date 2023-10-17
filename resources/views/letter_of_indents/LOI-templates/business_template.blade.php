@@ -21,19 +21,11 @@
             /*background-color: #0a58ca;*/
 
         }
-        {{--.overlay-image {--}}
-        {{--    position: absolute;--}}
-        {{--    top: {{ $height }}px;--}}
-        {{--    left: {{ $width }}px;--}}
-        {{--    z-index: 1;--}}
-        {{--}--}}
-
         .last{
             text-align: end;
             margin-left: 20px;
         }
     </style>
-
 
     <div class="container" style="padding-bottom: 0px;">
         <div class="content" style="padding-right: 0px;padding-left: 0px;margin-top: 10px">
@@ -45,9 +37,9 @@
                 <input type="hidden" name="download" value="1">
 
                 <div class="text-end mb-3">
-                    {{--                    <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}
+                    <a  class="btn  btn-info float-end " style="margin-left: 10px;" href="{{ url()->previous() }}" >
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
                     <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
-                    {{--                    </a>--}}
                     </button>
                 </div>
             </form>
