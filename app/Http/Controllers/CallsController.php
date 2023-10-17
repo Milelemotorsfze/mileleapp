@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Calls;
+use App\Models\UserActivities;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,10 @@ class CallsController extends Controller
         $convertedleads = Calls::where('status', 'Prospecting')->orwhere('status', 'New Demand')->orwhere('status', 'Quoted')->orwhere('status', 'Negotiation')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         $convertedso = Calls::where('status','Closed')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
         $convertedrejection = Calls::where('status','Rejected')->where(function ($query) {$query->where('customer_coming_type', '')->orWhereNull('customer_coming_type');})->get(); 
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Call & Lead Info";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return view('calls.index',compact('data','convertedleads', 'convertedso','convertedrejection'));
     }
     /**
@@ -50,6 +55,10 @@ class CallsController extends Controller
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return view('calls.create', compact('countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
     }
     /**
@@ -265,6 +274,10 @@ foreach ($modelLineIds as $modelLineId) {
         ];
         $model = new Logs($logdata);
         $model->save();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Store New Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return redirect()->route('calls.index')
         ->with('success','Call Record created successfully');
     }
@@ -290,7 +303,10 @@ $data = Calls::orderBy('status', 'DESC')
     ->whereIn('id', $callIds)
     ->whereIn('status', ['new', 'active'])
     ->get();
-
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "View The Most Lead Brand And Models";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
 return view('calls.resultbrand', compact('data'));
 }
     /**
@@ -304,7 +320,10 @@ return view('calls.resultbrand', compact('data'));
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
         $sales_persons = ModelHasRoles::where('role_id', 7)->get();
-        
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Edit Page of Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return view('calls.edit', compact('calls','countries', 'modelLineMasters', 'LeadSource', 'sales_persons', 'Language'));
     }
 
@@ -371,6 +390,10 @@ return view('calls.resultbrand', compact('data'));
         ];
         $model = new Logs($logdata);
         $model->save();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Edit the Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return redirect()->route('calls.index')
         ->with('success','Call Record created successfully');
     }
@@ -388,6 +411,10 @@ return view('calls.resultbrand', compact('data'));
             $callRequirement->delete();
         }
     }
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Delete The Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     return response()->json(['message' => 'Item deleted successfully']);
 }
     public function getmodelline(Request $request)
@@ -401,6 +428,10 @@ return view('calls.resultbrand', compact('data'));
     {
         $countries = CountryListFacade::getList('en');
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Create Bulk Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return view('calls.createbulk', compact('countries','LeadSource'));
     }
     public function uploadingbulk(Request $request)
@@ -720,6 +751,10 @@ return view('calls.resultbrand', compact('data'));
                 'fileLink' => route('download.rejected', ['filename' => 'rejected_records.xlsx']),
             ]);                    
         }
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create Bulk Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return redirect()->route('calls.index')
             ->with('success', "Data uploaded successfully! From the total " . (count($rows)) . " records, {$acceptedCount} records are accepted & {$rejectedCount} records are rejected.");
     } else {
@@ -746,7 +781,10 @@ return view('calls.resultbrand', compact('data'));
         'emailCount' => $emailCount,
         'customerNames' => $customerNames,
     ];
-    
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Checking The Existing Customer";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     return response()->json($data);
 }
 public function checkExistenceupdatecalls(Request $request)
@@ -779,7 +817,10 @@ public function checkExistenceupdatecalls(Request $request)
         'emailCount' => $emailCount,
         'customerNames' => $customerNames,
     ];
-    
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Existing Customer Check List Full";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     return response()->json($data);
 }
 public function sendDetails(Request $request)
@@ -808,6 +849,10 @@ public function updaterow(Request $request)
 }
 public function simplefile()
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Export Simple File for Bulk Leads";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $filePath = storage_path('app/public/sample/calls.xlsx'); // Path to the Excel file
 
     if (file_exists($filePath)) {
@@ -822,11 +867,19 @@ public function simplefile()
 }
 public function varinatinfo()
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Variants Info Page";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $Variants = AvailableColour::get();   
     return view('variants.vairantinfo', compact('Variants'));
 }
 public function createnewvarinats()
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Variants";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $interiorColors = [
         'Black', 'Dark Gray', 'Light Gray', 'Beige', 'Tan', 'Cream',
         'Brown', 'Ivory', 'White', 'Red', 'Blue', 'Green',
@@ -875,6 +928,10 @@ public function createnewvarinats()
     return view('variants.add_new_variants', compact('interiorColors', 'exteriorColors'));
 }
 public function storenewvarinats(Request $request) {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Show New Variants";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $variantName = $request->input('name');
     $existingVariant = Varaint::where('name', $variantName)->first();
     if ($existingVariant) {
@@ -903,6 +960,10 @@ public function storenewvarinats(Request $request) {
 }
 public function downloadRejected($filename)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Download Rejected Lead List CSV";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $filePath = storage_path('app/public/' . $filename);
     if (file_exists($filePath)) {
         return response()->download($filePath);
@@ -912,6 +973,10 @@ public function downloadRejected($filename)
 }
 public function addnewleads()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Add New Lead Page Open";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $countries = CountryListFacade::getList('en');
         $Language = Language::get();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->get();
@@ -921,6 +986,10 @@ public function addnewleads()
     }
     public function storeleads(Request $request)
     { 
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $this->validate($request, [
             'phone' => 'nullable|required_without:email',
             'email' => 'nullable|required_without:phone|email',           

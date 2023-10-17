@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Vehicles;
+use App\Models\UserActivities;
 use App\Models\Document;
 use App\Events\DataUpdatedEvent;
 use App\Models\Documentlog;
@@ -19,6 +20,10 @@ class DocumentController extends Controller
      */
     public function index(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "View the Document Section";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
@@ -152,6 +157,10 @@ class DocumentController extends Controller
      */
     public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Document";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
         $vehicleId = $request->input('vehicleId');
@@ -209,6 +218,10 @@ class DocumentController extends Controller
      */
     public function updatedocbl(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the BL Number";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicleId = $request->input('vehicleId');
         $documentId = $request->input('documentId');
         $blnumber = $request->input('blnumber');
@@ -234,6 +247,10 @@ class DocumentController extends Controller
      */
     public function updatedoc(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the documents";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
         $vehicleId = $request->input('vehicleId');

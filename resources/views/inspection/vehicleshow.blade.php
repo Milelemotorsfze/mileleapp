@@ -352,21 +352,21 @@
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_1" name="sparewheel">
                     <label for="loss_item_1">Spare Wheel</label>
-                    <input type="text" class="form-control" name="sparewheel_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="sparewheel_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_2" name="jack">
                     <label for="loss_item_2">Jack</label>
-                    <input type="text" class="form-control" name="jack_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="jack_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_3" name="wheel">
                     <label for="loss_item_3">Wheel Spanner</label>
-                    <input type="text" class="form-control" name="wheel_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="wheel_qty" placeholder="Qty">
                 </li>
             </ul>
         </div>
@@ -375,21 +375,21 @@
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_4" name="firstaid">
                     <label for="loss_item_4">First Aid Kit / Packing Box</label>
-                    <input type="text" class="form-control" name="firstaid_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="firstaid_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_5" name="floor_mat">
                     <label for="loss_item_5">Floor Mat</label>
-                    <input type="text" class="form-control" name="floor_mat_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="floor_mat_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_6" name="service_book">
                     <label for="loss_item_6">Service Book & Manual</label>
-                    <input type="text" class="form-control" name="service_book_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="service_book_qty" placeholder="Qty">
                 </li>
             </ul>
         </div>
@@ -405,14 +405,14 @@
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_8" name="wheelrim">
                     <label for="loss_item_8">Wheel Rim / Tyres</label>
-                    <input type="text" class="form-control" name="wheelrim_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="wheelrim_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_9" name="fire_extinguisher">
                     <label for="loss_item_9">Fire Extinguisher</label>
-                    <input type="text" class="form-control" name="fire_extinguisher_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="fire_extinguisher_qty" placeholder="Qty">
                 </li>
             </ul>
         </div>
@@ -421,21 +421,21 @@
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_10" name="sd_card">
                     <label for="loss_item_10">SD Card / Remote / H Phones</label>
-                    <input type="text" class="form-control" name="sd_card_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="sd_card_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_11" name="ac_system">
                     <label for="loss_item_11">A/C System</label>
-                    <input type="text" class="form-control" name="ac_system_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="ac_system_qty" placeholder="Qty">
                 </li>
                 </div>
         <div class="col-md-2">
                 <li class="list-group-item">
                     <input type="checkbox" id="loss_item_12" name="dash_board">
                     <label for="loss_item_12">Dash Board / T Screen / LCD</label>
-                    <input type="text" class="form-control" name="dash_board_qty" placeholder="Qty">
+                    <input type="hidden" class="form-control" name="dash_board_qty" placeholder="Qty">
                 </li>
             </ul>
         </div>

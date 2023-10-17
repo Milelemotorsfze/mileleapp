@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Models\AddonDetails;
+use App\Models\UserActivities;
 use App\Models\AddonSellingPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,10 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open the DashBoard";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $calls = DB::table('calls')
     ->select('calls.source', 'calls.location', 'lead_source.source_name')
     ->join('lead_source', 'calls.source', '=', 'lead_source.id')
@@ -78,7 +83,6 @@ class HomeController extends Controller
     ->orderByDesc('count')
     ->limit(8)
     ->get();
-    // dd($rowsmonth);
     $variants = DB::table('varaints as v')
               ->join('available_colour as ac', 'v.id', '=', 'ac.varaint_id')
               ->leftJoin('variants_pictures as vp', 'ac.id', '=', 'vp.available_colour_id')
@@ -283,6 +287,10 @@ $totalvariantss = [
         return response()->json($response);
     }    
     public function leaddistruitiondetail(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "View the Lead Distrubution Details";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         $data = DB::table('calls')
@@ -297,6 +305,10 @@ $totalvariantss = [
     }
 
     public function sellingPriceFilter(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Selling Price Filter";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
 //        dd($request->all());
         /////// parts procurment dashbaord ////////////
         $addonSellingPrices = AddonSellingPrice::with('addonDetails','CreatedBy','addonDetail.AddonName');

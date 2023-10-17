@@ -33,7 +33,7 @@
   </style>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['sales-view', 'approve-reservation']);
   @endphp
   @if ($hasPermission)
   <div class="card-header">
@@ -141,6 +141,14 @@
                             <option value="15">15</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+            <label for="status" class="form-label">Original End Date:</label>
+            <span id="originalEndDateValue"></span>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Updated End Date:</label>
+            <span id="updatedEndDateValue"></span>
+        </div>
                     <div class="mb-3">
                         <label for="status" class="form-label">Reason:</label>
                         <input type="text" name="extendedreason" id="extendedreason" class="form-control">
@@ -373,8 +381,8 @@
                     name: 'id',
                     render: function (data, type, row) {
                         return `
-                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}" data-end-date="${row.booking_end_date}">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>`;
                 }
                 },
@@ -408,8 +416,8 @@
                     name: 'id',
                     render: function (data, type, row) {
                         return `
-                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}" data-end-date="${row.booking_end_date}">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>`;
                 }
                 },
@@ -456,19 +464,37 @@
             ]
         });
         editModalws.on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget);
-        const id = button.data('id');
-        $('#modalIdValuews').text(id);
+    const button = $(event.relatedTarget);
+    const id = button.data('id');
+    const originalEndDate = new Date(button.data('end-date'));
+    $('#modalIdValuews').text(id);
+    $('#originalEndDateValue').text(formatDate(originalEndDate));
+    $('#extendeddays').change(function () {
+        const days = parseInt($(this).val());
+        if (!isNaN(days)) {
+            const newEndDate = new Date(originalEndDate);
+            newEndDate.setDate(newEndDate.getDate() + days);
+            $('#updatedEndDateValue').text(formatDate(newEndDate));
+        }
     });
+    function formatDate(date) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+});
     $('#saveButton').on('click', function () {
         saveData();
     });
 });
 function saveData() {
-    const id = $('#modalIdValuews').text();
+    const id = $('#modalIdValue').text();
     const days = $('#days').val();
     const reason = $('#reason').val();
     const status = $('#apstatus').val();
+    console.log(id);
     const data = {
         id: id,
         days: days,

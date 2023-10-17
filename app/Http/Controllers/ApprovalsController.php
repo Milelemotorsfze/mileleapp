@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\UserActivities;
 use App\Events\DataUpdatedEvent;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,10 @@ class ApprovalsController extends Controller
      */
     public function index(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open The Approval Section";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         if ($request->ajax()) {
             $status = $request->input('status');
             if($status == "reparingapproval"){
@@ -141,6 +146,10 @@ class ApprovalsController extends Controller
      */
     public function show($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open the Approval Page For Approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $inspection = Inspection::find($id);
     $vehicle = Vehicles::find($inspection->vehicle_id);
     $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
@@ -209,12 +218,20 @@ class ApprovalsController extends Controller
     }
     public function updateStatus(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved the Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $inspectionId = $request->input('inspectionId');
         VehicleApprovalRequests::where('inspection_id', $inspectionId)->whereNot('field', 'New Variant')->whereNot('field', 'Variant Change')
             ->update(['status' => 'Approved']);
         return response()->json(['message' => 'Status updated successfully']);
     }
     public function updateinspectionupdates(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update Inspection Basic Detail";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $inspection_id = $request->input('inspection_id');
         $engine = $request->input('engine');
         $vin = $request->input('vin');
@@ -257,6 +274,10 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function updateextraitems(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update Extra Items In Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicle_id = $request->input('vehicle_id');
         $data = $request->except('_token', 'vehicle_id');
         foreach ($data as $item_name => $itemData) {
@@ -284,6 +305,10 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }    
     public function updateincident(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Incident";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $canvasImageDataURL = $request->input('canvas_image');
         $canvasImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $canvasImageDataURL));
         $filename = 'canvas_image_' . uniqid() . '.png';
@@ -310,6 +335,10 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function savevariantsd(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Variant";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $variantType = $request->input('variantType');
         $variantname = $request->input('variantname');
         $modeldetail = $request->input('modeldetail');
@@ -444,6 +473,10 @@ class ApprovalsController extends Controller
         return response()->json(['message' => 'Data saved successfully']);
     }
     public function approveInspection(Request $request) {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved The Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $currentDate = Carbon::now();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
@@ -475,7 +508,7 @@ class ApprovalsController extends Controller
             VehicleApprovalRequests::where('inspection_id', $inspectionId)
             ->where('status', 'Pending')
             ->update(['status' => 'approved']);
-            $incident = Incident::find($inspectionId);
+        $incident = Incident::where('inspection_id', $inspectionId)->first();
             if($incident)
             {
             $incident->status = "approved";
@@ -605,6 +638,10 @@ class ApprovalsController extends Controller
     }
     public function getRoutineInspectionData($vehicleId)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open the Routine Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $routineInspectionData = RoutineInspection::select('check_items', 'spec', 'condition', 'remarks')
             ->where('inspection_id', $vehicleId)
             ->get();
@@ -629,6 +666,10 @@ class ApprovalsController extends Controller
     }
     public function approvalsrotein(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved the routain inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $currentDate = Carbon::now();
         $inspectionId = $request->input('inspectionid');
         $inspection = Inspection::find($inspectionId);
@@ -646,6 +687,10 @@ class ApprovalsController extends Controller
     }
     public function getpdiInspectionData($vehicleId)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open The PDI Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $PdiInspectionData = Pdi::select('checking_item', 'qty', 'remarks', 'status', 'reciving', 'reciving_qty')
                             ->where('inspection_id', $vehicleId)
                             ->get();
@@ -676,6 +721,10 @@ class ApprovalsController extends Controller
     }
     public function approvalspdi(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved The PDI Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
         $currentDateTime = Carbon::now($dubaiTimeZone);
         $currentDate = Carbon::now();

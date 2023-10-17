@@ -9,6 +9,7 @@ use App\Models\Vehicles;
 use App\Models\VehicleExtraItems;
 use App\Models\VehicleApprovalRequests;
 use App\Models\Varaint;
+use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Brand;
 use App\Models\VehiclePicture;
@@ -29,6 +30,10 @@ class IncidentController extends Controller
      */
     public function index(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "View Incident Information";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
@@ -167,6 +172,10 @@ class IncidentController extends Controller
      */
     public function create()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Incident Page Opening";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $vehicle = Vehicles::whereNotNull('vin')->get();
         return view('inspection.createincident', compact('vehicle')); 
     }
@@ -212,6 +221,10 @@ class IncidentController extends Controller
     }
     public function updatestatus(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Status of Part Procurmenet into Incident";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $currentDate = Carbon::now();
     $IncidentId = $request->input('IncidentId');
     $part_po_number = $request->input('part_po_number');
@@ -232,6 +245,10 @@ class IncidentController extends Controller
 }
 public function showre($id)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "View the Re-inspection Report Create";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $Incident = Incident::findOrFail($id);
     $inspection = Inspection::findOrFail($Incident->inspection_id);
     $vehicle = Vehicles::findOrFail($Incident->vehicle_id);
@@ -244,6 +261,10 @@ public function showre($id)
 }
 public function reinspectionsforapp(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Submit the Re-inspection report for approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $currentDate = Carbon::now();
     $Incidentid = $request->input('Incidentid');
     foreach ($request->input('work') as $key => $work) {
@@ -278,6 +299,10 @@ public function getIncidentWorks($incidentId)
 }
 public function approvals(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved the Incident Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $incidents = $request->input('incidentId');
     $incidentsapprove = Incident::findOrFail($incidents);
     $incidentsapprove->status = "Repaired Completed";
@@ -335,6 +360,10 @@ public function updatevehicledetails(Request $request)
     }
     public function createincidents(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create Incident";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $canvasImageDataURL = $request->input('canvas_image');
         $vin = $request->input('vin');
         info($vin);

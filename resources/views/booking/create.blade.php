@@ -298,7 +298,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
                     }
                     return '<select class="days-dropdown">' + options + '</select>';
                 } else {
-                    return '<input type="text" class="days-dropdownf" value="3" readonly>';
+                    return '<input type="text" class="days-dropdown" value="3" readonly>';
                 }
             }
         }

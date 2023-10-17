@@ -1,6 +1,5 @@
 @extends('layouts.main')
 <script src="https://unpkg.com/konva@9.2.1/konva.min.js"></script>
- 
 @section('content')
 <div class="card-header">
     <h4 class="card-title">
@@ -156,7 +155,6 @@
                     <thead>
                         <tr>
                             <th>Checkitems</th>
-                            <th>Spec</th>
                             <th>Condition</th>
                             <th>Remarks</th>
                         </tr>
@@ -165,9 +163,6 @@
                         <tr>
                             <td>
                                 <span>Battery Inspection<br>(Check the battery voltage before starting the engine)</span>
-                            </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_battery">
                             </td>
                             <td>
                             <select class="form-control" name="condition_battery">
@@ -183,9 +178,7 @@
                             <td>
                                 <span>Tyre Pressure Inspection</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_tyre_pressure">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_tyre_pressure">
                                 <option value="Ok">Ok</option>
@@ -200,9 +193,7 @@
                             <td>
                                 <span>Under Hood Inspection</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_under_hood">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_under_hood">
                                 <option value="Ok">Ok</option>
@@ -217,9 +208,7 @@
                             <td>
                                 <span>Starting & Warming</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_starting" value="5 Mints">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_starting">
                                 <option value="Ok">Ok</option>
@@ -234,9 +223,7 @@
                             <td>
                                 <span>A/C Operation (Cool & Hot)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_ac" value="2 Mints">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_ac">
                                 <option value="Ok">Ok</option>
@@ -251,9 +238,7 @@
                             <td>
                                 <span>Exterior Inspection & Protective Cover Condition</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_exterior_inspection">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_exterior_inspection">
                                 <option value="Ok">Ok</option>
@@ -268,9 +253,7 @@
                             <td>
                                 <span>Interior Inspection & Protective Cover Condition</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_interior_inspection">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_interior_inspection">
                                 <option value="Ok">Ok</option>
@@ -285,9 +268,7 @@
                             <td>
                                 <span>Move the Vehicle <br>(To Change the tyre position on ground)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_vehicle_move">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_vehicle_move">
                                 <option value="Ok">Ok</option>
@@ -302,9 +283,7 @@
                             <td>
                                 <span>Paint (Overall)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_paint">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_paint">
                                 <option value="Ok">Ok</option>
@@ -319,9 +298,7 @@
                             <td>
                                 <span>Bumper Front</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_bumper">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_bumper">
                                 <option value="Ok">Ok</option>
@@ -336,9 +313,7 @@
                             <td>
                                 <span>Grill</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_grill">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_grill">
                                 <option value="Ok">Ok</option>
@@ -353,9 +328,7 @@
                             <td>
                                 <span>Light Front</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_light_front">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_light_front">
                                 <option value="Ok">Ok</option>
@@ -370,9 +343,7 @@
                             <td>
                                 <span>Hood</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_hood">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_hood">
                                 <option value="Ok">Ok</option>
@@ -387,9 +358,7 @@
                             <td>
                                 <span>Windshield</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_windshield">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_windshield">
                                 <option value="Ok">Ok</option>
@@ -404,9 +373,7 @@
                             <td>
                                 <span>Wipers</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_wipers">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_wipers">
                                 <option value="Ok">Ok</option>
@@ -421,9 +388,7 @@
                             <td>
                                 <span>Fender Front Left</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_fender_front_left">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_fender_front_left">
                                 <option value="Ok">Ok</option>
@@ -438,9 +403,7 @@
                             <td>
                                 <span>Tire / Rim Front Left</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_tire_rim_front_left">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_tire_rim_front_left">
                                 <option value="Ok">Ok</option>
@@ -455,9 +418,7 @@
                             <td>
                                 <span>Side Step Left (if Applicable)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_side_step_left">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_side_step_left">
                                 <option value="Ok">Ok</option>
@@ -472,9 +433,7 @@
                             <td>
                                 <span>Door Front Left (Check Handles)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_door_front_left">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_door_front_left">
                                 <option value="Ok">Ok</option>
@@ -489,9 +448,7 @@
                             <td>
                                 <span>Mirror Door Driver</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_mirror_door_driver">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_mirror_door_driver">
                                 <option value="Ok">Ok</option>
@@ -506,9 +463,7 @@
                             <td>
                                 <span>Roof / A-pillars Left</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_roof">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_roof">
                                 <option value="Ok">Ok</option>
@@ -523,9 +478,7 @@
                             <td>
                                 <span>Door Rear Left (Check Handles)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_door_rear_left">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_door_rear_left">
                                 <option value="Ok">Ok</option>
@@ -540,9 +493,7 @@
                             <td>
                                 <span>Fender Rear Left</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_fender_rear_left">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_fender_rear_left">
                                 <option value="Ok">Ok</option>
@@ -557,9 +508,7 @@
                             <td>
                                 <span>Bed / Box</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_bed_box">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_bed_box">
                                 <option value="Ok">Ok</option>
@@ -574,9 +523,7 @@
                             <td>
                                 <span>Tailgate (Check Handles)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_tailgate">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_tailgate">
                                 <option value="Ok">Ok</option>
@@ -591,9 +538,7 @@
                             <td>
                                 <span>Lights Rear</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_light_rear">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_light_rear">
                                 <option value="Ok">Ok</option>
@@ -608,9 +553,7 @@
                             <td>
                                 <span>Bumper Rear</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_bumper_rear">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_bumper_rear">
                                 <option value="Ok">Ok</option>
@@ -625,9 +568,7 @@
                             <td>
                                 <span>Underbody Parts (Muffler / Tank)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_underbody_parts">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_underbody_parts">
                                 <option value="Ok">Ok</option>
@@ -642,9 +583,7 @@
                             <td>
                                 <span>Fender Rear Right</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_fender_rear_right">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_fender_rear_right">
                                 <option value="Ok">Ok</option>
@@ -659,9 +598,7 @@
                             <td>
                                 <span>Tire / Rim Rear Left</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_tire_rim_rear_left">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_tire_rim_rear_left">
                                 <option value="Ok">Ok</option>
@@ -676,9 +613,7 @@
                             <td>
                                 <span>Door Rear Right (Check Handles)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_door_rear_right">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_door_rear_right">
                                 <option value="Ok">Ok</option>
@@ -693,9 +628,7 @@
                             <td>
                                 <span>Roof / A-pillars Right</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_pillar_right">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_pillar_right">
                                 <option value="Ok">Ok</option>
@@ -710,9 +643,7 @@
                             <td>
                                 <span>Mirror Door Passenger</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_mirror_door_passenger">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_mirror_door_passenger">
                                 <option value="Ok">Ok</option>
@@ -727,9 +658,7 @@
                             <td>
                                 <span>Door Front Right(Check Handles)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_door_front_right">
-                            </td>
+                            
                             <td>
                             <select class="form-control" name="condition_door_front_right">
                                 <option value="Ok">Ok</option>
@@ -744,9 +673,7 @@
                             <td>
                                 <span>Side Steps Right (If applicable)</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_side_steps_right">
-                            </td>
+                          
                             <td>
                             <select class="form-control" name="condition_side_steps_right">
                                 <option value="Ok">Ok</option>
@@ -761,9 +688,7 @@
                             <td>
                                 <span>Fender Front Right</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_fender_front_right">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_fender_front_right">
                                 <option value="Ok">Ok</option>
@@ -778,9 +703,7 @@
                             <td>
                                 <span>Tire /  Rim Front Right</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_tire_rim_front_right">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_tire_rim_front_right">
                                 <option value="Ok">Ok</option>
@@ -795,9 +718,7 @@
                             <td>
                                 <span>Radio Antenna</span>
                             </td>
-                            <td style="width:100px;">
-                                <input type="text" class="form-control" name="spec_radio_antenna">
-                            </td>
+                           
                             <td>
                             <select class="form-control" name="condition_radio_antenna">
                                 <option value="Ok">Ok</option>

@@ -785,7 +785,7 @@ $(document).ready(function() {
                 length: length,
                 columns: searchParams
             },
-            success: function(data) {
+            success: function(data) {     
                 var newData = data.filter(row => !loadedRowsSet.has(row.id));
                 if (newData.length > 0) {
                     table.rows.add(newData).draw(false);
