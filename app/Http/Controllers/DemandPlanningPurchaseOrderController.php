@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\ColorCode;
+use App\Models\LOIItemPurchaseOrder;
 use App\Models\Supplier;
 use App\Models\SupplierType;
 use Illuminate\Http\Request;
@@ -26,7 +27,6 @@ class DemandPlanningPurchaseOrderController extends Controller
     {
         $approvedLOIItem = ApprovedLetterOfIndentItem::find($request->id);
         $vendor = $approvedLOIItem->letterOfIndentItem->LOI->supplier_id ?? '';
-//        return $request->all();
         $vendors = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query){
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -37,7 +37,8 @@ class DemandPlanningPurchaseOrderController extends Controller
             ->groupBy('letter_of_indent_item_id')
             ->get();
         foreach ($pfiVehicleVariants as $pfiVehicleVariant) {
-            $alreadyAddedQuantity = $pfiVehicleVariant->loiPurchaseOrder->quantity ?? 0;
+            $alreadyAddedQuantity = LOIItemPurchaseOrder::where('approved_loi_id', $pfiVehicleVariant->id)
+                ->sum('quantity');
             $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
         }
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();

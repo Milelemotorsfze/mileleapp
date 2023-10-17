@@ -13,6 +13,7 @@
             overflow: hidden;
         }
     </style>
+
     <div class="card-header">
         <h4 class="card-title">
            Supplier LOI Info

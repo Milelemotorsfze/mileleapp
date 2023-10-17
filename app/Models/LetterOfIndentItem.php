@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LetterOfIndentItem extends Model
 {
     use HasFactory;
-    public $timestamps = false;
+//    public $timestamps = false;
     protected $appends = [
         'steering',
         'balance_quantity',
@@ -52,10 +52,7 @@ class LetterOfIndentItem extends Model
 //            ->first();
         $modelId = $this->master_model_id;
 
-        $inventoryCount = SupplierInventory::with('masterModel')
-            ->whereHas('masterModel', function ($query) use($modelId){
-                $query->where('id', $modelId);
-            })
+        $inventoryCount = SupplierInventory::where('master_model_id', $modelId)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->count();
