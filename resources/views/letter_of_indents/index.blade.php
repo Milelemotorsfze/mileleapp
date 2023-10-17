@@ -109,9 +109,9 @@
 {{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
 {{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
 {{--                                    </a>--}}
-                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject-LOI-{{$letterOfIndent->id}}">
-                                        Reject
-                                    </button>
+{{--                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject-LOI-{{$letterOfIndent->id}}">--}}
+{{--                                        Reject--}}
+{{--                                    </button>--}}
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                         View LOI Items
                                     </button>
@@ -119,72 +119,72 @@
                                         View LOI Docs
                                     </button>
                                 </td>
-                                <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog ">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reject LOI</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body p-3">
-                                                <div class="col-lg-12">
-                                                    <div class="row">
-                                                        <div class="col-12">
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-center">Customer</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Category</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"
-                                                                           readonly class="form-control">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row mt-2">
-                                                                <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Reason</label>
-                                                                </div>
-                                                                <div class="col-lg-10 col-md-12 col-sm-12">
-                                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>
-                                                                </div>
-                                                            </div>
-                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">
-                                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary  status-reject-button">Submit</button>
+{{--                                <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
+{{--                                    <div class="modal-dialog ">--}}
+{{--                                        <div class="modal-content">--}}
+{{--                                            <div class="modal-header">--}}
+{{--                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reject LOI</h1>--}}
+{{--                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="modal-body p-3">--}}
+{{--                                                <div class="col-lg-12">--}}
+{{--                                                    <div class="row">--}}
+{{--                                                        <div class="col-12">--}}
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-center">Customer</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">Category</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"--}}
+{{--                                                                           readonly class="form-control">--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            <div class="row mt-2">--}}
+{{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
+{{--                                                                    <label class="form-label font-size-13 text-muted">Reason</label>--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
+{{--                                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">--}}
+{{--                                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                            <div class="modal-footer">--}}
+{{--                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>--}}
+{{--                                                <button type="button" class="btn btn-primary  status-reject-button">Submit</button>--}}
 
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
                                 <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                         <div class="modal-content">
@@ -300,6 +300,7 @@
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Milele Approval</th>
+                            <th>LOI</th>
                             <th width="150px">Actions</th>
                         </tr>
                         </thead>
@@ -323,10 +324,17 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class="btn btn-primary btn-sm">
-                                            LOI PDF</button>
-                                    </a>
+                                    <select class="form-control" onchange="location = this.value;">
+                                        <option value="">Select Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                            Trans Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                    </select>
+                                </td>
+                                <td>
+
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-supplier-approved-loi-items-{{$letterOfIndent->id}}">
                                         View LOI Items
                                     </button>
@@ -451,7 +459,7 @@
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Approval</th>
-{{--                            <th>PFI</th>--}}
+                            <th>LOI</th>
                             <th width="150px">Actions</th>
                         </tr>
                         </thead>
@@ -472,16 +480,25 @@
                                         <button type="button" class=" btn btn-primary btn-sm" >Approve</button>
                                     </a>
                                 </td>
-
+                                <td>
+                                    <select class="form-control" onchange="location = this.value;">
+                                        <option value="">Select Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                            Trans Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                    </select>
+                                </td>
                                 <td>
                                     @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                         <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                                             <button type="button" class=" btn btn-info btn-sm" >Add PFI</button>
                                         </a>
                                     @endif
-                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>
-                                    </a>
+{{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
+{{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
+{{--                                    </a>--}}
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-partial-approved-loi-items-{{$letterOfIndent->id}}">
                                         View LOI Items
                                     </button>
@@ -603,6 +620,7 @@
                             <th>Dealer</th>
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
+                            <th>LOI</th>
                             <th width="150px">Actions</th>
                         </tr>
                         </thead>
@@ -619,14 +637,24 @@
 {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
                                 <td>
+                                    <select class="form-control" onchange="location = this.value;">
+                                        <option value="">Select Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'TRANS_CAR' ]) }}">
+                                            Trans Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'MILELE_CAR' ]) }}">Milele Car Template</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'BUSINESS' ]) }}">Business</option>
+                                        <option value="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id,'type' => 'INDIVIDUAL' ]) }}">Individual</option>
+                                    </select>
+                                </td>
+                                <td>
                                     @if($letterOfIndent->is_pfi_pending_for_loi == true)
                                         <a href="{{ route('pfi.create',['id' => $letterOfIndent->id ]) }}">
                                             <button type="button" class="btn btn-info btn-sm" >Add PFI</button>
                                         </a>
                                     @endif
-                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>
-                                    </a>
+{{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
+{{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
+{{--                                    </a>--}}
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-approved-loi-items-{{$letterOfIndent->id}}">
                                         View LOI Items
                                     </button>
@@ -749,6 +777,7 @@
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             <th>Review</th>
+
                             <th width="100px">Actions</th>
                         </tr>
                         </thead>

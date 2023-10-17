@@ -18,9 +18,9 @@
     <h4 class="card-title">
       Vendors Info
     </h4>
-    @canany(['demand-planning-supplier-create', 'addon-supplier-create', 'vendor-edit'])
+    @canany(['addon-supplier-create', 'vendor-edit'])
     @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-create','addon-supplier-create', 'vendor-edit']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create', 'vendor-edit']);
     @endphp
     @if ($hasPermission)
       <a class="btn btn-sm btn-success float-end" href="{{ route('suppliers.create') }}" text-align: right>
@@ -68,7 +68,7 @@
                     @endphp
                     @if ($hasPermission)
                     <th>Categories</th>
-                    <th>Sub Categories</th>                    
+                    <th>Sub Categories</th>
                     <th>Person Contact By</th>
                     <th>Contact Person</th>
                     <th>Email</th>
@@ -228,7 +228,7 @@
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-list']);
                     @endphp
-                    @if ($hasPermission)                   
+                    @if ($hasPermission)
                     <th>Categories</th>
                     <th>Sub Categories</th>
                     <th>Person Contact By</th>
@@ -289,7 +289,7 @@
                               </label>
                             @endforeach
                           @endif
-                        </td>                       
+                        </td>
                         <td>{{ $supplier->person_contact_by }}</td>
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->email }}</td>

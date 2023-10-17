@@ -73,10 +73,10 @@ class SupplierController extends Controller
     {
         $paymentMethods = DB::table('payment_methods')->get();
         $addons = AddonDetails::select('id','addon_code','addon_id')->with('AddonName')->get();
-        if(Auth::user()->hasPermissionTo('demand-planning-supplier-create') && !Auth::user()->hasPermissionTo('addon-supplier-create'))
-        {
-            return view('demand_planning_suppliers.create');
-        }
+//        if(Auth::user()->hasPermissionTo('demand-planning-supplier-create') && !Auth::user()->hasPermissionTo('addon-supplier-create'))
+//        {
+//            return view('demand_planning_suppliers.create');
+//        }
         $users = User::select('id','name')->get();
         return view('suppliers.create',compact('paymentMethods','addons','users'));
     }

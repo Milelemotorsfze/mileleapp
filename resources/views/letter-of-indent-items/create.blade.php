@@ -29,7 +29,7 @@
                 </div>
             @endif
             <div class="row">
-                <div class="col-lg-3 col-md-4 col-sm-12">
+                <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13">Customer</label>
                         <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
@@ -71,9 +71,9 @@
                         <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
                     </div>
                 </div>
-                <div class="col-lg-1 col-md-4 col-sm-12">
+                <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13 ">Supplier</label>
+                        <label for="choices-single-default" class="form-label font-size-13 ">Vendor</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                     </div>
                 </div>
