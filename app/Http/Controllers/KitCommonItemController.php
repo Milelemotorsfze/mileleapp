@@ -626,4 +626,75 @@ class KitCommonItemController extends Controller
 
         return response($data);
     }
+    public function storeKitItems(Request $request)
+    {
+        $requestModelDescriptions = [];
+        if(count($request->ModelLineDescriptionArr) > 0) {
+            foreach($request->ModelLineDescriptionArr[0] as $brandModel) {
+                array_push($requestModelDescriptions, $brandModel);
+            }
+        }
+        $requestItemIds = [];
+        if(count($request->mainItem) > 0) {
+            $mainItem = $request->mainItem;
+            $count = count($request->mainItem);
+            for($i=0; $i<$count; $i++) {
+                array_push($requestItemIds, $mainItem[$i][0][0]);
+            }
+        }
+        $isExist = AddonDetails::where([['addon_type_name','=','K'],
+                                        ['addon_id','=',$request->addon_id],
+                                        ['is_all_brands','=','no']
+                                        ])->whereHas('AddonTypes', function($query) use($request) {
+                                        $query->where('brand_id','=',$request->brand_id);
+                                    });
+                                    if($request->currentKitId) {
+                                        $isExist = $isExist->where('id','!=',$request->currentKitId);
+                                    }
+                                    $isExist = $isExist->select('id')->get(); 
+        $isSameKitExist = 'no';
+        $existingSameKitId = '';
+        foreach($isExist as $oneKit) {
+            $kititems = KitCommonItem::where('addon_details_id',$oneKit->id)->select('addon_details_id','item_id')->get();
+            $kititemsArr = [];
+            foreach($kititems as $kititem) {
+                array_push($kititemsArr, $kititem->item_id);
+            }
+            $result1 = array_diff( $kititemsArr,$requestItemIds);
+            $result2 = array_diff( $requestItemIds,$kititemsArr);
+            if(count($result1) == 0 && count($result2) == 0) {
+                $isSameItemQuantityExist = 'yes';
+                for($i=0; $i<$count; $i++) {
+                    $quantity = '';
+                    $quantity = KitCommonItem::where([['addon_details_id','=',$oneKit->id],
+                                                    ['item_id','=',$mainItem[$i][0][0]],
+                                                    ['quantity','=',$mainItem[$i][1]],
+                                                ])->first();
+                    if($quantity == '') {
+                        $isSameItemQuantityExist = 'no';
+                    }else {                       
+                        $existingSameKitId = $quantity->addon_details_id;
+                    }
+                } 
+                if($isSameItemQuantityExist ==  'yes') {
+                    $isSameKitExist = 'yes';
+                }            
+            }
+        }
+        if($isSameKitExist == 'yes') {
+            if($existingSameKitId != '')
+            {
+                $existingModelDescriptions = AddonTypes::where('addon_details_id',$existingSameKitId)->pluck('model_number');
+                $existingModelDescriptionsArr = [];
+                foreach($existingModelDescriptions as $existingModelDescription) {
+                    array_push($existingModelDescriptionsArr, $existingModelDescription);
+                }
+                $result = array_intersect($existingModelDescriptionsArr, $requestModelDescriptions);
+                $alreadyExisting = MasterModelDescription::whereIn('id',$requestModelDescriptions)->select('model_description')->get();
+            }
+            return response()->json(['error' => 'Same kit existing']);
+        }else{
+            return response()->json(['success' => 'This is a new kit']);
+        }
+    }
 }
