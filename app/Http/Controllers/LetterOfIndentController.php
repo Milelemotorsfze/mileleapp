@@ -157,26 +157,47 @@ class LetterOfIndentController extends Controller
         $letterOfIndent = LetterOfIndent::where('id',$request->id)->first();
         $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
-        if ($letterOfIndent->dealers == 'Trans Cars') {
+        if ($request->type == 'TRANS_CAR') {
             $height = $request->height;
             $width = $request->width;
 
             if($request->download == 1) {
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
-        }else{
+        }else if($request->type == 'MILELE_CAR'){
             if($request->download == 1) {
                 $height = $request->height;
                 $width = $request->width;
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-               return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+               return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
+        } else if($request->type == 'BUSINESS'){
+            if($request->download == 1) {
+                $height = $request->height;
+                $width = $request->width;
+
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
+                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+            }
+            return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
+        }
+        else {
+            if($request->download == 1) {
+                $height = $request->height;
+                $width = $request->width;
+
+                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
+                    compact('letterOfIndent','letterOfIndentItems','height','width'));
+                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+            }
+            return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
         }
 
 //        $pdfFile = PDF::loadView('letter_of_indents.loi_document', compact('letterOfIndent','letterOfIndentItems'));

@@ -41,21 +41,23 @@
             <input type="hidden" name="height" id="total-height" value="">
             <input type="hidden" name="width" id="width" value="">
             <input type="hidden" name="id" value="{{ $letterOfIndent->id }}">
+            <input type="hidden" name="type" value="TRANS_CAR">
+
             <input type="hidden" name="download" value="1">
         <div class="text-end mt-3">
-{{--            <a href="{{  route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ,'download' => true]) }}">--}}
-                <button type="submit" class="btn btn-primary "> Download <i class="fa fa-download"></i></button>
-
+            <a  class="btn  btn-info float-end " style="margin-left: 10px;" href="{{ url()->previous() }}" >
+                <i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+            <button type="submit" class="btn btn-primary mr-3"> Download <i class="fa fa-download"></i></button>
         </div>
         </form>
-        <img src="{{  url('trans_car_logo.png') }}"  alt="logo" style="width: 100px;height: 100px; margin-left: auto;display: block;
+        <img src="{{  url('images/trans_car_logo.png') }}"  alt="logo" style="width: 100px;height: 100px; margin-left: auto;display: block;
             margin-right: auto;">
         </span>
         <h4 class="fw-bold text-center pt-3">TRANSCARS</h4>
         <p class="text-center ">Convention Center, JAFZA, Dubai, United Arab Emirates </p>
-        <p class="text-center">Email: qeneral@transcars.net</p>
-        <p class="text-center ">Website: www.transcars.net</p>
-        <h4 class="fw-bold text-center ">QUOTATION </h4>
+        <p class="text-center">Email: <span style="text-decoration: underline;">general@transcars.net</span></p>
+        <p class="text-center ">Website:<span style="text-decoration: underline;"> www.transcars.net </span></p>
+        <h4 class="fw-bold text-center" style="margin-top: 20px;">QUOTATION </h4>
         <p class="fw-bold text-center">VAT TRN NO. 100057598400003</p>
         <br>
         <div class="card border-dark border-3 mb-2" >
@@ -109,9 +111,10 @@
                 <tr >
                     <td >{{ $key + 1 }}</td>
                     <td>
-                        <p> {{ $letterOfIndentItem->variant_name }} {{ $letterOfIndentItem->Variant->engine_type ?? ''}} {{ $letterOfIndentItem->steering }}</p>
+                        <p style="font-weight: bold"> {{ $letterOfIndentItem->masterModel->variant->name ?? '' }} {{ $letterOfIndentItem->masterModel->variant->engine_type ?? ''}}
+                            {{ $letterOfIndentItem->masterModel->steering }}</p>
                         <p>Make: {{$letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}</p>
-                        <p>Model: </p>
+                        <p>Model: {{$letterOfIndentItem->masterModel->variant->my}}</p>
                     </td>
                     <td >{{$letterOfIndentItem->quantity}}</td>
                     <td class="bg-light-grey " ></td>
@@ -157,7 +160,7 @@
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
 
-        var imageHeight = height - 200;
+        var imageHeight = height - 180;
         $('#total-height').val(imageHeight);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');

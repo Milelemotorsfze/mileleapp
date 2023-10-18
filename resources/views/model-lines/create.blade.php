@@ -54,7 +54,7 @@
                         </div>
                         </br>
                         <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary ">Submit</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </div>
                 </div>
