@@ -177,8 +177,8 @@
                       $hasPermission = Auth::user()->hasPermissionForSelectedRole(['demand-planning-supplier-edit','addon-supplier-edit', 'vendor-edit']);
                       @endphp
                       @if ($hasPermission)
-                        <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
-                          href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                        <!-- <a data-toggle="popover" data-trigger="hover" title="Edit" data-placement="top" class="btn btn-sm btn-info"
+                          href="{{ route('suppliers.edit',$supplier->id) }}"><i class="fa fa-edit" aria-hidden="true"></i></a> -->
                       @endif
                       @endcanany
                       @can('addon-supplier-delete')

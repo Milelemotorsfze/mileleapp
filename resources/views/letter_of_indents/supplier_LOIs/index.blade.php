@@ -25,7 +25,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Supplier</label>
+                        <label for="choices-single-default" class="form-label">Vendor</label>
                         <select class="form-control" autofocus  name="supplier_id"  id="supplier" required>
                             <option></option>
                             @foreach($suppliers as $supplier)
@@ -70,7 +70,7 @@
                             <th>S.NO</th>
                             <th>Date</th>
                             <th>Customer</th>
-                            <th>Supplier</th>
+                            <th>Vendor</th>
                             <th>Category</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
@@ -234,7 +234,7 @@
                                                             </div>
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
                                                                 </div>
                                                                 <div class="col-lg-10 col-md-12 col-sm-12">
                                                                     <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
@@ -300,7 +300,7 @@
                                                             </div>
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
                                                                 </div>
                                                                 <div class="col-lg-10 col-md-12 col-sm-12">
                                                                     <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
@@ -341,7 +341,7 @@
                     <table id="supplier-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>supplier</th>
+                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
@@ -481,7 +481,7 @@
                     <table id="supplier-rejected-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>supplier</th>
+                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
@@ -625,7 +625,7 @@
             $(document).ready(function () {
 
             $("#supplier").select2({
-                placeholder:'Select Supplier'
+                placeholder:'Select Vendor'
             })
             $("#form-search").validate({
             rules: {

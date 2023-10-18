@@ -512,6 +512,22 @@
                                         </div>
                                     </div>
                                 @endcan
+                                    @can('create-customer')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-customer');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <div class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">Customer</span>
+                                                    <div class="arrow-down"></div>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                    <a href="{{route('customers.index')}}" class="dropdown-item" data-key="t-login">List Customer </a>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endcan
                             </div>
                         </li>
                         @endif

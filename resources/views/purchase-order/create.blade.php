@@ -30,9 +30,9 @@
             border-radius: 10px;
         }
     </style>
-    @can('create-po-details')
+    @can('create-demand-planning-po')
         @php
-            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-po-details');
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
         @endphp
         @if ($hasPermission)
         <div class="card-header">
@@ -96,7 +96,7 @@
                             <div class="col-lg-1 col-md-6">
                                 <label for="QTY" class="form-label">Model Line:</label>
                             </div>
-                            <div class="col-lg-3 col-md-6">
+                            <div class="col-lg-2 col-md-6">
                                 <label for="QTY" class="form-label">Variants Detail:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
@@ -107,6 +107,9 @@
                             </div>
                             <div class="col-lg-1 col-md-6">
                                 <label for="exColour" class="form-label">Estimated Arrival:</label>
+                            </div>
+                            <div class="col-lg-1 col-md-6">
+                                <label for="engineNumber" class="form-label">Engine Number:</label>
                             </div>
                             <div class="col-lg-1 col-md-6">
                                 <label for="exColour" class="form-label">Territory:</label>
@@ -277,12 +280,13 @@
                     var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" id="variant-id"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
                     var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
                     var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
-                    var detailCol = $('<div class="col-lg-3 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
+                    var detailCol = $('<div class="col-lg-2 col-md-6"><input type="text" name="detail[]" value="' + detail + '" class="form-control" readonly></div>');
                     var exColourCol = $('<div class="col-lg-1 col-md-6"><select name="ex_colour[]" class="form-control"><option value="">Exterior Color</option></select></div>');
                     var intColourCol = $('<div class="col-lg-1 col-md-6"><select name="int_colour[]" class="form-control"><option value="">Interior Color</option></select></div>');
                     var vinCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="vin[]" class="form-control" placeholder="VIN"></div>');
                     var estimatedCol = $('<div class="col-lg-1 col-md-6"><input type="date" name="estimated_arrival[]" class="form-control"></div>');
                     var territory = $('<div class="col-lg-1 col-md-6"><input type="text" name="territory[]" class="form-control"></div>');
+                    var engineNumber = $('<div class="col-lg-1 col-md-6"><input type="text" name="engine_number[]" class="form-control"></div>');
                     var removeBtn = $('<div class="col-lg-1 col-md-6"><button type="button" data-variant-id="'+ variantId +'" class="btn btn-danger remove-row-btn"><i class="fas fa-times"></i></button></div>');
                     // Populate Exterior Colors dropdown
                     var exColourDropdown = exColourCol.find('select');
@@ -298,7 +302,7 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, vinCol, removeBtn);
+                    newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, engineNumber, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
                 }
             }

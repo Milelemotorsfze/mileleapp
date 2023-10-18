@@ -46,9 +46,14 @@
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-pfi-items-{{$pfi->id}}">
                                         View PFI Items
                                     </button>
-                                    @if( $pfi->is_po_active == true)
+                                    @can('create-demand-planning-po')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-demand-planning-po');
+                                        @endphp
+                                        @if ($hasPermission)
                                         <a href="{{ route('demand-planning-purchase-orders.create', ['id' => $pfi->id]) }}"  class="btn btn-primary btn-sm"> Add PO </a>
-                                    @endif
+                                        @endif
+                                    @endcan
                                     <div class="modal fade " id="view-pfi-docs-{{$pfi->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-xl">
                                             <div class="modal-content">
