@@ -1,43 +1,33 @@
 @extends('layouts.main')
 <style>
-	.paragraph-class
-	{
-	color: red;
-	font-size:11px;
+	.paragraph-class {
+		color: red;
+		font-size:11px;
 	}
-	.required-class
-	{
-	font-size:11px;
+	.required-class {
+		font-size:11px;
 	}
-</style>
-<style>
-	.modal-xl
-	{
-	max-width: 99% !important;
+	.modal-xl {
+		max-width: 99% !important;
 	}
-	#blah
-	{
-	width: 300px;
-	height: 300px;
+	#blah {
+		width: 300px;
+		height: 300px;
 	}
-	#showImage
-	{
-	width: auto;
-	height: auto;
-	max-width:1200px;
+	#showImage {
+		width: auto;
+		height: auto;
+		max-width:1200px;
 	}
-	@media only screen and (max-device-width: 480px)
-	{
-	#showImage
-	{
-	width: 100%;
-	height: 100%;
-	}
-	#blah
-	{
-	width: 200px;
-	height: 200px;
-	}
+	@media only screen and (max-device-width: 480px) {
+		#showImage {
+			width: 100%;
+			height: 100%;
+		}
+		#blah {
+			width: 200px;
+			height: 200px;
+		}
 	}
 	@media only screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)
 	{
@@ -498,6 +488,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	   var imageExist = data.image;
 	   $(document).ready(function ()
 	   {
+		var currentKitId = data.id;
 	       if(imageExist != null)
 	           {
 	               imageIsOkay = true;
@@ -580,9 +571,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	       {
 	           var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 
-	           for(var i=1;i<= indexValue;i++) {
-	               uniqueCheckKit(i);
-	           }
+	        //    for(var i=1;i<= indexValue;i++) {
+	        //        uniqueCheckKit(i);
+	        //    }
 	           // fetch addon existing detils
 	           var id = $('#addon_id').val();
 	           if(id != '')
@@ -672,6 +663,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	           isExistingUniqueCounts = [];
 
 	           countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
+			   var ModelLineDescriptionArr = [];
 	           for (let i = 1; i <= countBrandRow; i++)
 	           {
 	               var inputModelLines = '';
@@ -689,45 +681,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	                   $msg = "Model Number is required";
 	                   showModelNumberError($msg,i);
 	                   formInputError = true;
-	               }
+	               }else {
+					ModelLineDescriptionArr.push(inputModelNumber);
+				}
 
 	               var addon_id = $('#addon_id').val();
 	               var addonType = $('#addon_type').val();
 	               var brand = $('#selectBrand').val();
 
-	               {{--$.ajax({--}}
-	               {{--    url: "{{url('getUniqueKits')}}",--}}
-	               {{--    type: "GET",--}}
-	               {{--    async: false,--}}
-	               {{--    cache: false,--}}
-	               {{--    data:--}}
-	               {{--        {--}}
-	               {{--            addon_id: addon_id[0],--}}
-	               {{--            addonType: addonType,--}}
-	               {{--            brand: brand[0],--}}
-	               {{--            model_line: inputModelLines[0],--}}
-	               {{--            model_number: inputModelNumber,--}}
-	               {{--            index: i,--}}
-	               {{--            id: '{{$addonDetails->id}}'--}}
-	               {{--        },--}}
-	               {{--    dataType: 'json',--}}
-	               {{--    success: function (data) {--}}
-	               {{--        if (data.count > 0) {--}}
-	               {{--            var modelNumber = "";--}}
-	               {{--            if (data.model_number) {--}}
-	               {{--                var modelNumber = data.model_number;--}}
-	               {{--            }--}}
-	               {{--            $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";--}}
-	               {{--            showModelLineError($msg, data.index);--}}
-	               {{--            var count = data.count;--}}
-	               {{--            isExistingUniqueCounts.push(count);--}}
-	               {{--        } else {--}}
-	               {{--            $msg = "";--}}
-	               {{--            removeModelLineError($msg, data.index);--}}
-	               {{--            isExistingUniqueCounts.pop();--}}
-	               {{--        }--}}
-	               {{--    }--}}
-	               {{--});--}}
 	           }
 
 	           // var uniqueValueCount = isExistingUniqueCounts.length;
@@ -739,7 +700,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	       }
 
 	       var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-
+		   var mainItem = [];
 	       for (let i = 1; i <= KitItemIndex; i++)
 	       {
 	           var inputKitItem = $('#mainItem'+i).val();
@@ -756,6 +717,11 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	               showKitItemQuantityError($msg,i);
 	               formInputError = true;
 	           }
+			   if(inputKitItem != '' && inputKitQuantity != '')
+			{
+				mainItem.push([inputKitItem, inputKitQuantity]);
+
+			}
 	       }
 
 	       // if(fixingCharge == 'no')
@@ -773,6 +739,36 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	           formInputError = true;
 	           document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
 	       }
+		   if(formInputError == false) {
+			var status = '';
+			$.ajax({
+	                url: "{{url('kit/items/store')}}",
+	                type: "POST",
+	                async: false,
+	                cache: false,
+	                data:
+	                    {
+	                        addon_id: addon_id[0],
+	                        ModelLineDescriptionArr: ModelLineDescriptionArr,
+	                        brand_id: brand[0],
+	                        mainItem: mainItem,
+							currentKitId:currentKitId
+	                    },
+	                dataType: 'json',
+	                success: function (data) {
+						
+	                    if (data.success) {
+	                        status = 'success';
+	                    } else {
+	                        status = 'error';
+	                    }
+	                }
+	            });
+				if(status == 'error') {
+					formInputError = true;
+					alert('This kit is already existing');
+				}
+		}
 	       if(formInputError == true)
 	       {
 	           e.preventDefault();
@@ -1298,6 +1294,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	           {
 	               $('#blah').hide();
 	               document.getElementById("addonImageError").textContent='Allowed Extensions are : *.' + allowedExtension.join(', *.');
+				   imageIsOkay = false;
 	           }
 	           else
 	           {
@@ -1312,6 +1309,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	                       $('#blah').attr('src', e.target.result);
 	                   };
 	                   reader.readAsDataURL(input.files[0]);
+					   imageIsOkay = true;
 	               }
 	           }
 	       }
@@ -1515,7 +1513,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        var index = $(this).attr('data-index');
 	        // optionDisable(index, value);
 	        hideOption(index,value);
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 	     // function optionDisable(index, value){
 	     //     var currentId = 'selectModelLine'+index;
@@ -1532,7 +1530,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        var data = e.params.data;
 	        $('#selectModelNumber'+index).empty();
 	        appendOption(index,data)
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	        // optionEnable(currentId,data);
 
 	    });
@@ -1558,7 +1556,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-numbers", function (e) {
 	        var type = 'MODEL_NUMBER';
@@ -1585,7 +1583,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 	     // function optionEnable(currentId,data) {
 	     //     if(data == 'allmodellines') {

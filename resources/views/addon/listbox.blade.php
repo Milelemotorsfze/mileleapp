@@ -424,7 +424,7 @@
                                     @endif
                                 @endforeach
                             @endif
-                            @if($addonsdata->AddonTypes->count() > 5)
+                            @if($addonsdata->AddonTypes->count() > 3)
                                 <div class="row justify-content-center mt-1">
                                     <div class="col-lg-3 col-md-12 col-sm-12">
                                         <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
