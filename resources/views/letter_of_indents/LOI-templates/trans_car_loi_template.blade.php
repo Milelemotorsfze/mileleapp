@@ -13,7 +13,7 @@
             width: 100%;
         }
         #vehicle-details td, th{
-            border: 3px solid #1c1b1b;
+            border: 2px solid #1c1b1b;
             text-align: left;
             padding-left: 8px;
 
@@ -60,7 +60,7 @@
         <h4 class="fw-bold text-center" style="margin-top: 20px;">QUOTATION </h4>
         <p class="fw-bold text-center">VAT TRN NO. 100057598400003</p>
         <br>
-        <div class="card border-dark border-3 mb-2" >
+        <div class="card border-dark border-2 mb-2" >
             <table id="basic-details" >
                 <tr>
                     <td class="fw-bold">CUSTOMER:</td>
@@ -111,10 +111,10 @@
                 <tr >
                     <td >{{ $key + 1 }}</td>
                     <td>
-                        <p style="font-weight: bold"> {{ $letterOfIndentItem->masterModel->variant->name ?? '' }} {{ $letterOfIndentItem->masterModel->variant->engine_type ?? ''}}
-                            {{ $letterOfIndentItem->masterModel->steering }}</p>
+                        <p style="font-weight: bold"> {{ $letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '' }} {{ $letterOfIndentItem->masterModel->variant->engine_type ?? ''}}
+                            {{ $letterOfIndentItem->masterModel->variant->fuel_type ?? ''}} {{ $letterOfIndentItem->masterModel->steering }}</p>
                         <p>Make: {{$letterOfIndentItem->masterModel->variant->brand->brand_name ?? ''}}</p>
-                        <p>Model: {{$letterOfIndentItem->masterModel->variant->my}}</p>
+                        <p>Model: {{$letterOfIndentItem->masterModel->variant->my}} Brand New Zero km</p>
                     </td>
                     <td >{{$letterOfIndentItem->quantity}}</td>
                     <td class="bg-light-grey " ></td>
@@ -126,7 +126,7 @@
             </tr>
             <tr>
                 <td> </td>
-                <td>{{ $letterOfIndent->shipment_method }} - Shipment Method </td>
+                <td>CNF - Shipment Method </td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -138,7 +138,7 @@
                     <p class="fw-bold">VAT NOT APPLICABLE (EXPORT BILL) </p>
                     <p>NET TOTAL VALUE (USD) TOTAL </p>
                     <p>INVOICE VALUE (AED) </p>
-                    <img src="{{ url('milele_seal.png') }}" class="overlay-image" style="height: 125px;width: 150px">
+                    <img src="{{ url('images/trans_car_seal.png') }}" class="overlay-image" style="height: 125px;width: 150px">
                 </td>
                 <td class="bg-light-grey"> </td>
                 <td class="bg-light-grey"></td>
@@ -160,7 +160,7 @@
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
 
-        var imageHeight = height - 180;
+        var imageHeight = height - 150;
         $('#total-height').val(imageHeight);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');

@@ -112,7 +112,6 @@
             </div>
         @endif
         @endcan
-
 @endsection
 @push('scripts')
     <script>
@@ -132,7 +131,6 @@
             rules: {
                 start_date: {
                     required: true,
-
                 },
                 end_date: {
                     required: true,

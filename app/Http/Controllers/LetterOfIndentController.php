@@ -116,7 +116,7 @@ class LetterOfIndentController extends Controller
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-            'shipment_method' => 'required',
+//            'shipment_method' => 'required',
             'dealers' => 'required',
             'supplier_id' => 'required'
         ]);
@@ -134,7 +134,7 @@ class LetterOfIndentController extends Controller
             $LOI->date = Carbon::createFromFormat('Y-m-d', $request->date);
             $LOI->category = $request->category;
             $LOI->dealers = $request->dealers;
-            $LOI->shipment_method = $request->shipment_method;
+//            $LOI->shipment_method = $request->shipment_method;
             $LOI->supplier_id = $request->supplier_id;
             $LOI->submission_status = LetterOfIndent::LOI_SUBMISION_STATUS_NEW;
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
@@ -285,7 +285,7 @@ class LetterOfIndentController extends Controller
             'customer_id' => 'required',
             'category' => 'required',
             'date' => 'required',
-            'shipment_method' => 'required',
+//            'shipment_method' => 'required',
             'dealers' => 'required',
             'supplier_id' => 'required'
         ]);
@@ -297,7 +297,7 @@ class LetterOfIndentController extends Controller
         $LOI->category = $request->category;
         $LOI->dealers = $request->dealers;
         $LOI->supplier_id = $request->supplier_id;
-        $LOI->shipment_method = $request->shipment_method;
+//        $LOI->shipment_method = $request->shipment_method;
         $LOI->save();
 
         return redirect()->route('letter-of-indent-items.edit', $id);

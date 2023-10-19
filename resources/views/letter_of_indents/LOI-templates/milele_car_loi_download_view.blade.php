@@ -3,7 +3,7 @@
 <html>
 <head>
     <style>
-        @page { size: 700pt }
+        /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
             background-color: #f6f5f5;
@@ -131,8 +131,13 @@
                 <tr>
                     <td>{{$letterOfIndentItem->quantity}}</td>
                     <td>
-                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
-                        {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }},{{ strtoupper($letterOfIndentItem->masterModel->variant->engine_type) ?? ''}}
+                        {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, BRAND NEW, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
+                        {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '') }},
+                        {{ strtoupper($letterOfIndentItem->masterModel->variant->fuel_type) ?? ''}}
+                        @if($letterOfIndentItem->masterModel->variant->engine != '')
+                            , ENGINE {{ strtoupper($letterOfIndentItem->masterModel->variant->engine) ?? ''}}
+                        @endif
+                        - SPECIFICATION ATTACHED IN APPENDIX
                     </td>
                     <td class="hide" style="border: none">3</td>
                     <td class="hide" style="border: none">3</td>
@@ -140,7 +145,7 @@
             @endforeach
             <tr>
                 <td></td>
-                <td>{{ $letterOfIndent->shipment_method }} SHIPMENT AND TRANSPORTATION</td>
+                <td>CNF - SHIPMENT AND TRANSPORTATION</td>
                 <td class="hide" style="border: none"></td>
                 <td class="hide" style="border: none"></td>
             </tr>
