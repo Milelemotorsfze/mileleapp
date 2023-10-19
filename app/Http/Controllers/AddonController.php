@@ -111,38 +111,40 @@ class AddonController extends Controller
             }
             else
             {
-                $addons = $addons->where('is_all_brands','yes');
-                $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
-                {
-                    $q = $q->whereIn('brand_id',$request->BrandIds);
-                    if($request->ModelLineIds)
-                    {
-                        if(in_array('yes',$request->ModelLineIds))
-                        {
-                            $q = $q->orWhere('is_all_model_lines','yes');
-                        }
-                        else
-                        {
-                            $q->where( function ($query) use ($request)
-                            {
-                                $query = $query->whereIn('model_id',$request->ModelLineIds);
-                            });
-                        }
-                    }
+                $addons = $addons->where(function ($query) use($request) {
+                    $query->where('is_all_brands','yes')
+                          ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
+                          {
+                              $q = $q->whereIn('brand_id',$request->BrandIds);
+                              if($request->ModelLineIds)
+                              {
+                                  if(in_array('yes',$request->ModelLineIds))
+                                  {
+                                      $q = $q->orWhere('is_all_model_lines','yes');
+                                  }
+                                  else
+                                  {
+                                      $q->where( function ($query) use ($request)
+                                      {
+                                          $query = $query->whereIn('model_id',$request->ModelLineIds);
+                                      });
+                                  }
+                              }
+                          });
                 });
             }
         }
         elseif($request->ModelLineIds)
         {
-            $addons = $addons->where('is_all_brands','yes');
-            $addons = $addons->orWhereHas('AddonTypes', function($q) use($request)
-            {
-                if(!in_array('yes',$request->ModelLineIds))
-                {
-                    $q = $q->whereIn('model_id',$request->ModelLineIds);
-                }else{
-                    $q = $q->where('is_all_model_lines','yes');
-                }
+            $addons = $addons->where(function ($query) use($request) {
+                $query->where('is_all_brands','yes')
+                      ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
+                      {
+                        if(!in_array('yes',$request->ModelLineIds))
+                        {
+                            $q = $q->whereIn('model_id',$request->ModelLineIds);
+                        }
+                      });
             });
         }
         if($request->addon_type == 'all')
@@ -2076,6 +2078,9 @@ class AddonController extends Controller
     }
     public function addonFilters(Request $request)
     {
+        $request['Data'] = 'SP';
+        $request['AddonIds1'] = ['329'];
+        $request['BrandIds'] = ['25'];
         $addonIds = $addonsTableData = [];
         if($request->Data != 'all')
         {
@@ -2097,36 +2102,68 @@ class AddonController extends Controller
             }
             else
             {
-                $addonIds = $addonIds->where('is_all_brands','yes');
-                $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
-                {
-                    $q = $q->whereIn('brand_id',$request->BrandIds);
-                    if($request->ModelLineIds)
-                    {
-                        if(in_array('yes',$request->ModelLineIds))
-                        {
-                            $q = $q->orWhere('is_all_model_lines','yes');
-                        }
-                        else
-                        {
-                            $q->where( function ($query) use ($request)
-                            {
-                                $query = $query->whereIn('model_id',$request->ModelLineIds);
-                            });
-                        }
-                    }
+                // $addonIds = $addonIds->where('is_all_brands','yes');
+                // $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
+                // {
+                //     $q = $q->whereIn('brand_id',$request->BrandIds);
+                //     if($request->ModelLineIds)
+                //     {
+                //         if(in_array('yes',$request->ModelLineIds))
+                //         {
+                //             $q = $q->orWhere('is_all_model_lines','yes');
+                //         }
+                //         else
+                //         {
+                //             $q->where( function ($query) use ($request)
+                //             {
+                //                 $query = $query->whereIn('model_id',$request->ModelLineIds);
+                //             });
+                //         }
+                //     }
+                // });
+                $addonIds = $addonIds->where(function ($query) use($request) {
+                    $query->where('is_all_brands','yes')
+                          ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
+                          {
+                              $q = $q->whereIn('brand_id',$request->BrandIds);
+                              if($request->ModelLineIds)
+                              {
+                                  if(in_array('yes',$request->ModelLineIds))
+                                  {
+                                      $q = $q->orWhere('is_all_model_lines','yes');
+                                  }
+                                  else
+                                  {
+                                      $q->where( function ($query) use ($request)
+                                      {
+                                          $query = $query->whereIn('model_id',$request->ModelLineIds);
+                                      });
+                                  }
+                              }
+                          });
                 });
+
             }
         }
         elseif($request->ModelLineIds)
         {
-            $addonIds = $addonIds->where('is_all_brands','yes');
-            $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
-            {
-                if(!in_array('yes',$request->ModelLineIds))
-                {
-                    $q = $q->whereIn('model_id',$request->ModelLineIds);
-                }
+            // $addonIds = $addonIds->where('is_all_brands','yes');
+            // $addonIds = $addonIds->orWhereHas('AddonTypes', function($q) use($request)
+            // {
+            //     if(!in_array('yes',$request->ModelLineIds))
+            //     {
+            //         $q = $q->whereIn('model_id',$request->ModelLineIds);
+            //     }
+            // });
+            $addonIds = $addonIds->where(function ($query) use($request) {
+                $query->where('is_all_brands','yes')
+                      ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
+                      {
+                        if(!in_array('yes',$request->ModelLineIds))
+                        {
+                            $q = $q->whereIn('model_id',$request->ModelLineIds);
+                        }
+                      });
             });
         }
         $addonIds = $addonIds->pluck('id');
