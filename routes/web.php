@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DemandPlanningPurchaseOrderController;
 use App\Http\Controllers\MasterAddonController;
 use App\Http\Controllers\MasterModelController;
@@ -162,7 +163,8 @@ Route::get('/d', function () {
     Route::get('getCommonKitItems', [KitCommonItemController::class, 'getCommonKitItems'])->name('getCommonKitItems');
     Route::post('kit/priceStore', [KitCommonItemController::class, 'priceStore'])->name('kit.priceStore');
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
-
+    Route::post('kit/items/store', [KitCommonItemController::class, 'storeKitItems'])->name('kitItems.store');
+    
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);
@@ -483,7 +485,7 @@ Route::get('/d', function () {
     Route::resource('modules', ModuleController::class);
     Route::resource('prospecting', ProspectingController::class);
     Route::resource('master-models', MasterModelController::class);
-
+    Route::resource('customers', CustomerController::class);
 
     // DASHBOARD PARTS AND PROCURMENT
 

@@ -165,7 +165,7 @@ class PurchasingOrderController extends Controller
         return view('warehouse.index', compact('data'));
     }
     public function filterpendingfellow($status)
-{
+    {
     $userId = auth()->user()->id;
     $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)
         ->where('status', $status)
@@ -188,7 +188,7 @@ class PurchasingOrderController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
+    {
     $vendors = Supplier::whereHas('vendorCategories', function ($query) {
         $query->where('category', 'Vehicles');
     })->get();
@@ -239,6 +239,7 @@ class PurchasingOrderController extends Controller
         $ex_colours = $request->input('ex_colour');
         $int_colours = $request->input('int_colour');
         $estimated_arrival = $request->input('estimated_arrival');
+        $engine_number = $request->input('engine_number');
         $territory = $request->input('territory');
         $count = count($variantNames);
         foreach ($variantNames as $key => $variantName) {
@@ -250,6 +251,7 @@ class PurchasingOrderController extends Controller
             $ex_colour = $ex_colours[$key];
             $int_colour = $int_colours[$key];
             $estimation_arrival = $estimated_arrival[$key];
+            $engine = $engine_number[$key];
             $territorys = $territory[$key];
             $vehicle = new Vehicles();
             $vehicle->varaints_id = $variantId;
@@ -257,6 +259,7 @@ class PurchasingOrderController extends Controller
             $vehicle->ex_colour = $ex_colour;
             $vehicle->int_colour = $int_colour;
             $vehicle->estimation_date = $estimation_arrival;
+            $vehicle->engine = $engine;
             $vehicle->territory = $territorys;
             $vehicle->purchasing_order_id = $purchasingOrderId;
             $vehicle->status = "Not Approved";

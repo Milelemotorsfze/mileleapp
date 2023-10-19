@@ -419,7 +419,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 			<div class="col-lg-2 col-md-9 col-sm-12">
 				<span>{{ $AddonSuppliers->Suppliers->supplier}}</span>
 			</div>
-			<div class="col-lg-2 col-md-3 col-sm-12">
+			@can('supplier-addon-purchase-price-view')
+            @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+            @endphp
+            @if ($hasPermission)
+            <div class="col-lg-2 col-md-3 col-sm-12">
 				<label for="choices-single-default" class="form-label">Purchase Price In AED :</label>
 			</div>
 			<div class="col-lg-2 col-md-9 col-sm-12">
@@ -431,6 +436,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 			<div class="col-lg-2 col-md-9 col-sm-12">
 				<span>{{ $AddonSuppliers->purchase_price_usd}} USD</span>
 			</div>
+            @endif
+            @endcan
 			@if($supplierAddonDetails->addon_type_name == 'SP')
 			<div class="col-lg-2 col-md-3 col-sm-12">
 				<label for="choices-single-default" class="form-label">Quotation Date :</label>

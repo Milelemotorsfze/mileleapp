@@ -843,8 +843,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	                if(data.count > 0 ) {
 	                    var modelLine = "";
 	                    if(data.model_line) {
-	                      var  modelLine = data.model_line;
-	                        $msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
+							if(data.model_line == 'allmodellines') {
+								$msg = "This Addon,Description,Brand with All Model Lines Combination is existing";
+							}else{
+								var  modelLine = data.model_line;
+	                        	$msg = "This Addon,Description,Brand and model line("+ modelLine +") Combination is existing";
+							}
 	                    }else if(data.is_all_brands > 0) {
 	                        $msg = "This Addon,Description,Brand (all brands) Combination is existing";
 	                    }

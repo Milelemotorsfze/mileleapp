@@ -504,9 +504,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        {
 	       var indexValue = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
 
-	        for(var i=1;i<= indexValue;i++) {
-	            uniqueCheckKit(i);
-	        }
+	        // for(var i=1;i<= indexValue;i++) {
+	        //     uniqueCheckKit(i);
+	        // }
 
 	        // fetch addon existing detils
 	        var id = $('#addon_id').val();
@@ -584,90 +584,97 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    {
 	        isExistingUniqueCounts = [];
 	        countBrandRow = $(".brandModelLineDiscription").find(".brandModelLineDiscriptionApendHere").length;
-	        for (let i = 1; i <= countBrandRow; i++)
-	        {
+			var ModelLineDescriptionArr = [];
+	        for (let i = 1; i <= countBrandRow; i++) {
 	            var inputModelLines = '';
 	            var inputModelLines = $('#selectModelLine'+i).val();
-	            if(inputModelLines == '')
-	            {
+	            if(inputModelLines == '') {
 	                $msg = "Model Line is required";
 	                showModelLineError($msg,i);
 	                formInputError = true;
 	            }
 	            var inputModelNumber = '';
 	            var inputModelNumber = $('#selectModelNumber'+i).val();
-	            if(inputModelNumber == '')
-	            {
+	            if(inputModelNumber == '') {
 	                $msg = "Model Number is required";
 	                showModelNumberError($msg,i);
 	                formInputError = true;
-	            }
-
+	            }else {
+					ModelLineDescriptionArr.push(inputModelNumber);
+				}
 	            var addon_id = $('#addon_id').val();
 	            var addonType = $('#addon_type').val();
 	            var brand = $('#brand').val();
-	            $.ajax({
-	                url: "{{url('getUniqueKits')}}",
-	                type: "GET",
-	                async: false,
-	                cache: false,
-	                data:
-	                    {
-	                        addon_id: addon_id[0],
-	                        addonType: addonType,
-	                        brand: brand[0],
-	                        model_line: inputModelLines[0],
-	                        model_number: inputModelNumber,
-	                        index: i,
-	                    },
-	                dataType: 'json',
-	                success: function (data) {
-	                    if (data.count > 0) {
-	                        var modelNumber = "";
-	                        if (data.model_number) {
-	                            var modelNumber = data.model_number;
-	                        }
-	                        $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
-	                        showModelLineError($msg, data.index);
-	                        var count = data.count;
-	                        isExistingUniqueCounts.push(count);
-	                    } else {
-	                        $msg = "";
-	                        removeModelLineError($msg, data.index);
-	                        isExistingUniqueCounts.pop();
-	                    }
-	                }
-	            });
+	            // $.ajax({
+	            //     url: "{{url('getUniqueKits')}}",
+	            //     type: "GET",
+	            //     async: false,
+	            //     cache: false,
+	            //     data:
+	            //         {
+	            //             addon_id: addon_id[0],
+	            //             addonType: addonType,
+	            //             brand: brand[0],
+	            //             model_line: inputModelLines[0],
+	            //             model_number: inputModelNumber,
+	            //             index: i,
+	            //         },
+	            //     dataType: 'json',
+	            //     success: function (data) {
+	            //         if (data.count > 0) {
+	            //             var modelNumber = "";
+	            //             if (data.model_number) {
+	            //                 var modelNumber = data.model_number;
+	            //             }
+	            //             $msg = "This Addon,Brand,model line and model Description(" + modelNumber + ") Combination is existing";
+	            //             showModelLineError($msg, data.index);
+	            //             var count = data.count;
+	            //             isExistingUniqueCounts.push(count);
+	            //         } else {
+	            //             $msg = "";
+	            //             removeModelLineError($msg, data.index);
+	            //             isExistingUniqueCounts.pop();
+	            //         }
+	            //     }
+	            // });
 	        }
-	        var uniqueValueCount = isExistingUniqueCounts.length;
-	        if(uniqueValueCount > 0) {
-	            formInputError = true;
-	        }else{
-	            formInputError = false;
-	        }
+	        // var uniqueValueCount = isExistingUniqueCounts.length;
+	        // if(uniqueValueCount > 0) {
+	        //     formInputError = true;
+	        // }else{
+	        //     formInputError = false;
+	        // }
 	    }
-
 	    var KitItemIndex = $(".apendNewaMainItemHere").find(".kitMainItemRowForSupplier").length;
-
-	    for (let i = 1; i <= KitItemIndex; i++)
-	    {
+		var mainItem = [];
+	    for (let i = 1; i <= KitItemIndex; i++) {
+			var valueToPush = [];
 	        var inputKitItem = $('#mainItem'+i).val();
-	        if(inputKitItem == '')
-	        {
+	        if(inputKitItem == '') {
 	            $msg = "Kit Item is required";
 	            showKitItemError($msg,i);
 	            formInputError = true;
 	        }
+			// else {
+			// 	valueToPush["item"] = inputKitItem;
+			// }
 	        var inputKitQuantity = $('#mainQuantity'+i).val();
-	        if(inputKitQuantity == '')
-	        {
+	        if(inputKitQuantity == '') {
 	            $msg = "Quantity is required";
 	            showKitItemQuantityError($msg,i);
 	            formInputError = true;
 	        }
+			// else {
+			// 	valueToPush["quantity"] = inputKitQuantity;
+			// }
+			// mainItem.push(valueToPush);
+			if(inputKitItem != '' && inputKitQuantity != '')
+			{
+				mainItem.push([inputKitItem, inputKitQuantity]);
+
+			}
 	    }
-	    if(inputAddonName == '')
-	    {
+	    if(inputAddonName == '') {
 	        $msg = "Addon Name is required";
 	        showAddonNameError($msg);
 	        formInputError = true;
@@ -682,14 +689,42 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	    //         formInputError = true;
 	    //     }
 	    // }
-	    if(imageIsOkay == false)
-	    {
+	    if(imageIsOkay == false) {
 	        formInputError = true;
 	        document.getElementById("addonImageError").textContent='image with extension svg/jpeg/png/jpg/gif/bmp/tiff/jpe/jfif is required';
 	    }
-	    if(formInputError == true)
-	    {
-	        e.preventDefault();
+	    
+		if(formInputError == false) {
+			var status = '';
+			$.ajax({
+	                url: "{{url('kit/items/store')}}",
+	                type: "POST",
+	                async: false,
+	                cache: false,
+	                data:
+	                    {
+	                        addon_id: addon_id[0],
+	                        ModelLineDescriptionArr: ModelLineDescriptionArr,
+	                        brand_id: brand[0],
+	                        mainItem: mainItem,
+	                    },
+	                dataType: 'json',
+	                success: function (data) {
+						
+	                    if (data.success) {
+	                        status = 'success';
+	                    } else {
+	                        status = 'error';
+	                    }
+	                }
+	            });
+				if(status == 'error') {
+					formInputError = true;
+					alert('This kit is already existing');
+				}
+		}
+		if(formInputError == true) {
+			e.preventDefault(); 
 	    }
 	});
 	function KitItemValidations(clickInput, index) {
@@ -1472,7 +1507,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        // optionDisable(index, value);
 	        hideOption(index,value);
 
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 
 	    });
 
@@ -1501,7 +1536,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        }else{
 	            getItemsDropdown(type);
 	        }
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-numbers", function (e) {
 	        // e.preventDefault();
@@ -1530,7 +1565,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	            getItemsDropdown(type);
 	        }
 
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 	    $(document.body).on('select2:unselect', ".model-lines", function (e) {
 	        var index = $(this).attr('data-index');
@@ -1539,7 +1574,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-create']);
 	        $('#selectModelNumber'+index).empty();
 	        appendOption(index,data);
 
-	        uniqueCheckKit(index);
+	        // uniqueCheckKit(index);
 	    });
 
 	    function hideOption(index,value) {

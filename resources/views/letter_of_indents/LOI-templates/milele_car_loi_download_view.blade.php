@@ -42,11 +42,13 @@
             margin-left: 20px;
         }
         .hide{
-            background-color: #0f0f0f;
+            background-color: #000000;
             color: #0f0f0f;
         }
         .header{
-            background-color: #0f0f0f;
+            background-color: #000000;
+            padding-right: 10px;
+            padding-left: 10px;
         }.
     </style>
 
@@ -54,17 +56,17 @@
 <body>
 <div class="row" id="fullpage">
     <div class="content">
-        <div class="header">
+        <div class="header" >
             <table>
                 <tr>
                     <td>
-                        <img src="{{ public_path('bgm-min.png') }}" width="300px" height="100px" ><span class="logo-txt"></span>
+                        <img src="{{ public_path('images/milele_car_logo.png') }}" width="350px" height="100px" ><span class="logo-txt"></span>
                     </td>
                     {{--                <td style="color: #FFFFFF">--}}
                     {{--                    <h1 style="margin-bottom: 1px;font-size: 38px">Milele Motors</h1>--}}
                     {{--                    <h6 style="margin-top: 1px">Procuring,Sourcing & Stocking Motor Vehicles</h6>--}}
                     {{--                </td>--}}
-                    <td style="text-align: end">
+                    <td style="text-align: right;margin-left: 10px;">
                         <h1 style="color: #FFFFFF; font-size: 35px;">SALES ORDER</h1>
                     </td>
                 </tr>
@@ -90,29 +92,29 @@
             <tr>
                 <td class="">Dubai, U.A.E</td>
                 <td></td>
-                <td class="last ">Customer ID: <span class="hide">123455555</span></td>
+                <td class="last">Customer ID: <span class="hide">123455555</span></td>
             </tr>
             <tr>
-                <td class="left">+97143235991</td>
+                <td class="left">+971 43235991</td>
                 <td></td>
                 <td class="last">Sales Order Type: Sales Of Motor Vehicle</td>
             </tr>
             <tr>
                 <td>
                     <span style="margin-right: 50px;padding-right: 50px"> To </span>
-                    <span>
-                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)
-                            {{ $letterOfIndent->customer->name }}
-                        @else
-                            {{ $letterOfIndent->customer->company ?? ''}}
-                        @endif
-                        </span>
+{{--                    <span>--}}
+{{--                             @if($letterOfIndent->customer->type == \App\Models\Customer::CUSTOMER_TYPE_INDIVIDUAL)--}}
+{{--                            {{ $letterOfIndent->customer->name }}--}}
+{{--                        @else--}}
+{{--                            {{ $letterOfIndent->customer->company ?? ''}}--}}
+{{--                        @endif--}}
+{{--                        </span>--}}
                 </td>
             </tr>
             <tr>
                 <td>
                     <span style="margin-right: 55px;padding-right: 60px"> </span>
-                    <span style="background-color: black;font-size: 35px;color: black">zxdfdsgedgrg</span>
+                    <span style="background-color: black;font-size: 35px;color: black">zxdfdsiediri</span>
                 </td>
             </tr>
         </table>
@@ -132,15 +134,15 @@
                         {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
                         {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }},{{ strtoupper($letterOfIndentItem->masterModel->variant->engine_type) ?? ''}}
                     </td>
-                    <td class="hide">3</td>
-                    <td class="hide">3</td>
+                    <td class="hide" style="border: none">3</td>
+                    <td class="hide" style="border: none">3</td>
                 </tr>
             @endforeach
             <tr>
                 <td></td>
                 <td>{{ $letterOfIndent->shipment_method }} SHIPMENT AND TRANSPORTATION</td>
-                <td class="hide"></td>
-                <td class="hide"></td>
+                <td class="hide" style="border: none"></td>
+                <td class="hide" style="border: none"></td>
             </tr>
             <?php
             if($letterOfIndentItems->count() >= 2) {
@@ -156,8 +158,8 @@
                 <tr>
                     <td></td>
                     <td></td>
-                    <td class="hide"></td>
-                    <td class="hide"></td>
+                    <td class="hide" style="border: none"></td>
+                    <td class="hide" style="border: none"></td>
                 </tr>
             @endfor
 
@@ -189,13 +191,13 @@
             <tr style="background-color: #FFFFFF">
                 <td style="border: none">Signature
                 <span style="margin-left: 3px;margin-bottom: 10px">
-                    <img src="{{ public_path('sign.jpg') }}" style="height: 50px;width: 70px"></img></span>
+                    <img src="{{ public_path('images/sign.jpg') }}" style="height: 50px;width: 70px"></img></span>
                 </td>
                 <td style="border: none">
                     <img src="{{ public_path('milele_seal.png') }}" class="overlay-image" style="width: 150px; height: 150px;"></img>
                 </td>
                 <td style="border: none;text-align: end">TOTAL</td>
-                <td style="background-color: #0f0f0f;border: none" ></td>
+                <td style="background-color: #000000;border: none" ></td>
             </tr>
         </table>
     </div>

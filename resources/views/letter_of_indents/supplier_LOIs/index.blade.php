@@ -13,6 +13,7 @@
             overflow: hidden;
         }
     </style>
+
     <div class="card-header">
         <h4 class="card-title">
            Supplier LOI Info
@@ -24,7 +25,7 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Supplier</label>
+                        <label for="choices-single-default" class="form-label">Vendor</label>
                         <select class="form-control" autofocus  name="supplier_id"  id="supplier" required>
                             <option></option>
                             @foreach($suppliers as $supplier)
@@ -69,13 +70,20 @@
                             <th>S.NO</th>
                             <th>Date</th>
                             <th>Customer</th>
-                            <th>Supplier</th>
+                            <th>Vendor</th>
                             <th>Category</th>
                             <th>Submission Status</th>
                             <th>Approval Status</th>
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
-                            <th>Actions</th>
+                            @can('loi-supplier-approve')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                @endphp
+                                @if ($hasPermission)
+                                    <th>Actions</th>
+                                @endif
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -100,13 +108,20 @@
                                             data-bs-target="#view-new-loi-docs-{{$letterOfIndent->id}}">View
                                     </button>
                                 </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+                                @can('loi-supplier-approve')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <td>
+                                            <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
 
-                                    <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
-                                </td>
+                                            <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
+                                        </td>
+                                    @endif
+                                @endcan
                                 <div class="modal fade" id="view-new-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -233,7 +248,7 @@
                                                             </div>
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
                                                                 </div>
                                                                 <div class="col-lg-10 col-md-12 col-sm-12">
                                                                     <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
@@ -299,7 +314,7 @@
                                                             </div>
                                                             <div class="row mt-2">
                                                                 <div class="col-lg-2 col-md-12 col-sm-12">
-                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>
+                                                                    <label class="form-label font-size-13 text-muted">Vendor</label>
                                                                 </div>
                                                                 <div class="col-lg-10 col-md-12 col-sm-12">
                                                                     <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >
@@ -340,7 +355,7 @@
                     <table id="supplier-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>supplier</th>
+                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
@@ -480,7 +495,7 @@
                     <table id="supplier-rejected-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
-                            <th>supplier</th>
+                            <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
                             <th>Category</th>
@@ -624,7 +639,7 @@
             $(document).ready(function () {
 
             $("#supplier").select2({
-                placeholder:'Select Supplier'
+                placeholder:'Select Vendor'
             })
             $("#form-search").validate({
             rules: {

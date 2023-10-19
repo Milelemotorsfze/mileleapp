@@ -51,7 +51,15 @@
                   <th>No</th>
                   <th>Addon Name</th>
                   <th>Addon Code</th>
-                  <th>Current Purchase Price</th>
+                  @can('supplier-addon-purchase-price-view')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                    @endphp
+                    @if ($hasPermission)
+                    <th>Current Purchase Price</th>
+                    @endif
+                    @endcan
+                  
                   <th>Action</th>
                 </tr>
               </thead>
@@ -62,7 +70,16 @@
                     <td>{{++$i}}</td>
                     <td>{{$supplierAddon->supplierAddonDetails->AddonName->name ?? ''}}</td>
                     <td>{{$supplierAddon->supplierAddonDetails->addon_code ?? ''}}</td>
+                    
+                    @can('supplier-addon-purchase-price-view')
+                    @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
+                    @endphp
+                    @if ($hasPermission)
                     <td id="{{$supplierAddon->id}}">{{$supplierAddon->purchase_price_aed}} AED</td>
+                    @endif
+                    @endcan
+                    
                     <td>
                       @can('supplier-new-purchase-price')
                       @php

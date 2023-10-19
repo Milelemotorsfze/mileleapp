@@ -196,7 +196,7 @@
 @section('content')
 @canany(['demand-planning-supplier-create', 'addon-supplier-create', 'vendor-edit'])
 @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create', 'vendor-edit']);
+    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-create', 'vendor-edit','demand-planning-supplier-create']);
     @endphp
     @if ($hasPermission)
     <div class="card-header">
@@ -216,7 +216,6 @@
         @endif
 
         <form id="createSupplierForm" name="createSupplierForm" enctype="multipart/form-data" method="POST">
-
             @csrf
             <div class="row">
                 <p><span style="float:right;" class="error">* Required Field</span></p>
@@ -312,6 +311,7 @@
                                         <span id="garage" class="spanSub" hidden>Garage</span>
                                         <span id="spare_parts" class="spanSub" hidden>Spare Parts</span>
                                         <span id="warranty" class="spanSub" hidden>Warranty</span>
+
                                     </div>
                                 </div>
                             </div>
@@ -375,7 +375,7 @@
                                 </div>
                                 <div class="col-xxl-9 col-lg-6 col-md-12">
                                     <input id="contact_number" type="number" class="widthinput form-control @error('contact_number[full]') is-invalid @enderror"
-                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}" 
+                                           name="contact_number[main]" placeholder="Enter Contact Number" value="{{old('hiddencontact')}}"
                                             autocomplete="contact_number[main]" autofocus onkeyup="validationOnKeyUp(this)">
                                     <span id="contactRequired" class="contact_number required-class"></span>
                                 </div>
@@ -1721,13 +1721,13 @@
                                     $('#submit').html('Save');
                                     $('.overlay').hide();
                                 }else{
-                                    removeContactNumberError(); 
+                                    removeContactNumberError();
                                 }
                             }
                         });
                     }
                 }
-               
+
             }
             if(formInputError == false)
             {
