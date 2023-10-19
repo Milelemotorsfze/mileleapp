@@ -76,7 +76,14 @@
                             <th>Approval Status</th>
                             <th>LOI Items</th>
                             <th>LOI Documents</th>
-                            <th>Actions</th>
+                            @can('loi-supplier-approve')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                @endphp
+                                @if ($hasPermission)
+                                    <th>Actions</th>
+                                @endif
+                            @endcan
                         </tr>
                         </thead>
                         <tbody>
@@ -101,13 +108,20 @@
                                             data-bs-target="#view-new-loi-docs-{{$letterOfIndent->id}}">View
                                     </button>
                                 </td>
-                                <td>
-                                    <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
+                                @can('loi-supplier-approve')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <td>
+                                            <button type="button" class="btn btn-primary modal-button btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#approve-LOI-{{ $letterOfIndent->id }}" > Approve </button>
 
-                                    <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
-                                </td>
+                                            <button type="button" class="btn btn-danger modal-button btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#reject-LOI-{{$letterOfIndent->id}}"> Reject </button>
+                                        </td>
+                                    @endif
+                                @endcan
                                 <div class="modal fade" id="view-new-loi-items-{{$letterOfIndent->id}}" data-bs-backdrop="static"
                                      tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-xl modal-dialog-scrollable">
