@@ -297,7 +297,6 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealers</th>
-{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             @can('LOI-approve')
                                 @php
@@ -469,7 +468,6 @@
                             <th>Category</th>
                             <th>Supplier</th>
                             <th>Dealer</th>
-{{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
                             @can('LOI-approve')
                                 @php
