@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Prospecting;
 use App\Models\Fellowup;
+use App\Models\UserActivities;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use Illuminate\Http\RedirectResponse; // Import the RedirectResponse class
 use Illuminate\Support\Facades\Redirect; // You might need to import this if not already imported
@@ -32,6 +34,10 @@ class ProspectingController extends Controller
      */
     public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Store the Prospecting Against Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $prospectingmedium = $request->input('prospectingmedium');
         $call_id = $request->input('call_id');
         $prospectingtime = $request->input('prospectingtime');

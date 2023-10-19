@@ -545,6 +545,10 @@
         });
 });
     </script>
+    @php
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole('inspection-approve');
+  @endphp
+  @if ($hasPermission)  
 <script>
   $(document).ready(function () {
     var table1 = $('#dtBasicExample1').DataTable();
@@ -770,6 +774,7 @@ function approvedpdi() {
     });
 }
 </script>
+@endif
 @else
     @php
         redirect()->route('home')->send();

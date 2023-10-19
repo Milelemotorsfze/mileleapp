@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Profile;
 use App\Models\EmpDoc;
+use App\Models\UserActivities;
 use App\Models\EmpJob;
 use App\Models\CoreResponsibities;
 use App\Models\WorkingHistory;
@@ -24,6 +25,10 @@ class ProfileController extends Controller
     public function index()
 
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open User Profile";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $emp_profile = Profile::where('user_id', Auth::id())->first();
         $user = User::where('id', Auth::id())->first();
         $emp_doc = EmpDoc::where('emp_profile_id', $emp_profile->id)->get();
@@ -84,6 +89,10 @@ class ProfileController extends Controller
     }
     public function updateLoginInfo(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update Profile Login Info";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $updatedInfo = $request->input('updatedInfo');
         $profile = Profile::where('user_id', auth()->user()->id)->first();
         $fullName = $updatedInfo['fullName'];
@@ -105,6 +114,10 @@ class ProfileController extends Controller
     }
     public function updateEmailInfo(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update Email Information";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $user = Auth::user();
         $oldPassword = $request->input('oldPassword');
         $newPassword = $request->input('newPassword');
@@ -118,6 +131,10 @@ class ProfileController extends Controller
     }
     public function updatepictureInfo(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Profile Picture";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     if ($request->hasFile('picture') && $request->file('picture')->isValid()) {
         $file = $request->file('picture');
 
@@ -153,6 +170,10 @@ class ProfileController extends Controller
 }
     public function deleteDocument($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Delete the Profile Document";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $document = EmpDoc::findOrFail($id);
     $filePath = public_path($document->document_path);
     if (file_exists($filePath)) {
@@ -163,12 +184,20 @@ class ProfileController extends Controller
     }
     public function skillDocument($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "update the skills";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
      $document = skill::findOrFail($id);
      $document->delete();
      return redirect()->back()->with('success', 'Skill deleted successfully.');
     }
     public function saveDocument(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "save the profile documents";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $empProfileId = $request->input('emp_profile_id');
     $documentName = $request->input('document_name');
     $documentFile = $request->file('document_file');
@@ -187,6 +216,10 @@ class ProfileController extends Controller
 }
 public function saveskill(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "save the new skills profile";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $skillName = $request->input('name');
     $skillPercentage = $request->input('percentage');
     $empProfileId = $request->input('emp_profile_id');
@@ -205,6 +238,10 @@ public function saveskill(Request $request)
     }
     public function updatehistoryInfo(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "update the employee history";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $CompanyName = $request->input('CompanyName');
     $designation = $request->input('designation');
     $location = $request->input('location');
