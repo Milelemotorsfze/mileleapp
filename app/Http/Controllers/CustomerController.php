@@ -38,7 +38,6 @@ class CustomerController extends Controller
             'name' => 'required',
             'country' => 'required',
             'type' => 'required',
-
         ]);
 
         $customer = new Customer();
@@ -65,7 +64,10 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
-        //
+         $customer = Customer::find($id);
+         $countries = Country::pluck('name');
+
+         return view('customer.edit', compact('customer','countries'));
     }
 
     /**
@@ -73,7 +75,21 @@ class CustomerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required',
+            'country' => 'required',
+            'type' => 'required',
+        ]);
+
+        $customer = Customer::find($id);
+        $customer->name = $request->name;
+        $customer->company_name = $request->company_name;
+        $customer->country = $request->country;
+        $customer->type = $request->type;
+        $customer->address = $request->address;
+        $customer->save();
+
+        return redirect()->route('customers.index')->with('success','Customer Created Successfully.');
     }
 
     /**
