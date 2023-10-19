@@ -299,7 +299,14 @@
                             <th>Dealers</th>
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
-                            <th>Milele Approval</th>
+                            @can('LOI-approve')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
+                                @endphp
+                                @if ($hasPermission)
+                                    <th>Milele Approval</th>
+                                @endif
+                            @endcan
                             <th>LOI</th>
                             <th width="150px">Actions</th>
                         </tr>
@@ -314,15 +321,21 @@
                                 <td>{{ $letterOfIndent->category }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ $letterOfIndent->dealers }}</td>
-{{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
-                                <td>
-                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class=" btn btn-primary btn-sm" >
-                                             Partial Approval
-                                        </button>
-                                    </a>
-                                </td>
+                                @can('LOI-approve')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <td>
+                                            <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
+                                                <button type="button" class=" btn btn-primary btn-sm" >
+                                                     Partial Approval
+                                                </button>
+                                            </a>
+                                        </td>
+                                    @endif
+                                @endcan
                                 <td>
                                     <select class="form-control" onchange="location = this.value;">
                                         <option value="">Select Template</option>
@@ -458,7 +471,14 @@
                             <th>Dealer</th>
 {{--                            <th>Submission Status</th>--}}
                             <th>Approval Status</th>
-                            <th>Approval</th>
+                            @can('LOI-approve')
+                                @php
+                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
+                                @endphp
+                                @if ($hasPermission)
+                                    <th>Approval</th>
+                                @endif
+                            @endcan
                             <th>LOI</th>
                             <th width="150px">Actions</th>
                         </tr>
@@ -475,11 +495,18 @@
                                 <td>{{ $letterOfIndent->dealers }}</td>
 {{--                                <td>{{ $letterOfIndent->submission_status }}</td>--}}
                                 <td>{{ $letterOfIndent->status }}</td>
-                                <td>
-                                    <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
-                                        <button type="button" class=" btn btn-primary btn-sm" >Approve</button>
-                                    </a>
-                                </td>
+                                @can('LOI-approve')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-approve');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <td>
+                                            <a href="{{ route('letter-of-indents.milele-approval',['id' => $letterOfIndent->id ]) }}">
+                                                <button type="button" class=" btn btn-primary btn-sm" >Approve</button>
+                                            </a>
+                                        </td>
+                                    @endif
+                                @endcan
                                 <td>
                                     <select class="form-control" onchange="location = this.value;">
                                         <option value="">Select Template</option>
