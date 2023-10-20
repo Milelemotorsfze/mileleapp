@@ -145,11 +145,9 @@
                 <td class="bg-light-grey"></td>
             </tr>
         </table>
-    </div>
-
-    <div class="pb-2 ">
-        <div style="text-align: center;bottom: 0">
-            Note: If you have queries or concerns please feel free to contact us on the information provided above.
+        <div class="pb-2 ">
+            <div style="text-align: center;bottom: 0">
+                Note: If you have queries or concerns please feel free to contact us on the information provided above.
 
         </div>
     </div>

@@ -218,6 +218,24 @@
 </div>
 {{--    </div>--}}
 </div>
+<div class="container p-2">
+{{--    @foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument)--}}
+{{--        <div class="d-flex">--}}
+{{--            <div class="col-lg-12">--}}
+{{--                <div class="row p-2">--}}
+{{--                    <object data="http://yoursite.com/the.pdf" type="application/pdf" width="750px" height="750px">--}}
+{{--                        <embed src="http://yoursite.com/the.pdf" type="application/pdf">--}}
+{{--                        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="http://yoursite.com/the.pdf">Download PDF</a>.</p>--}}
+{{--                        </embed>--}}
+{{--                    </object>--}}
+{{--                    <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" type="application/pdf" width="100%" height="100%">--}}
+{{--                    </embed>--}}
+{{--                    --}}{{--                        <embed src=""  width="400" height="600"></embed>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
+{{--    @endforeach--}}
+</div>
 </body>
 </html>
 

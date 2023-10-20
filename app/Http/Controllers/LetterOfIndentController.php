@@ -164,7 +164,14 @@ class LetterOfIndentController extends Controller
             if($request->download == 1) {
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+
+                $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
+                $directory = public_path('LOI');
+                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                $pdfFile->save($directory . '/' . $filename);
+                $pdf = $this->pdfMerge($letterOfIndent->id);
+                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+
             }
             return view('letter_of_indents.LOI-templates.trans_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         }else if($request->type == 'MILELE_CAR'){
@@ -174,7 +181,14 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-               return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+
+                $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
+                $directory = public_path('LOI');
+                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                $pdfFile->save($directory . '/' . $filename);
+                $pdf = $this->pdfMerge($letterOfIndent->id);
+                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+
             }
             return view('letter_of_indents.LOI-templates.milele_car_loi_template', compact('letterOfIndent','letterOfIndentItems'));
         } else if($request->type == 'BUSINESS'){
@@ -184,7 +198,13 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+                $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
+                $directory = public_path('LOI');
+                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                $pdfFile->save($directory . '/' . $filename);
+                $pdf = $this->pdfMerge($letterOfIndent->id);
+                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+
             }
             return view('letter_of_indents.LOI-templates.business_template', compact('letterOfIndent','letterOfIndentItems'));
         }
@@ -195,50 +215,44 @@ class LetterOfIndentController extends Controller
 
                 $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.individual_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
-                return $pdfFile->download('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
+
+                $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
+                $directory = public_path('LOI');
+                \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+                $pdfFile->save($directory . '/' . $filename);
+                $pdf = $this->pdfMerge($letterOfIndent->id);
+                return $pdf->Output('LOI_'.date('Y_m_d').'.pdf','D');
+
             }
             return view('letter_of_indents.LOI-templates.individual_template', compact('letterOfIndent','letterOfIndentItems'));
         }
 
-//        $pdfFile = PDF::loadView('letter_of_indents.loi_document', compact('letterOfIndent','letterOfIndentItems'));
-//        return $pdfFile;
-//        Storage::disk('local')->makeDirectory('/GENERATE_LOI');
-//
-//        $path = 'storage/GENERATE_LOI/LOI_'.$letterOfIndent->id.'.pdf';
-//        $pdfFile->save($path);
-//
-//        $pdf = new Fpdi();
-//        $pdf->setSourceFile($path);
-//
-//        // Remove metadata and date from each page
-//        $pageCount = $pdf->setSourceFile($path);
-////        return $pageCount;
-//        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-//            $tplIdx = $pdf->importPage($pageNo);
-//            $pdf->AddPage();
-//            $pdf->useTemplate($tplIdx);
-//            // Remove metadata
-//            $pdf->SetTitle('');
-//            $pdf->SetAuthor('');
-//            $pdf->SetCreator('anna');
-//            $pdf->SetSubject( '');
-//            $pdf->SetKeywords( '');
-//
-//            // Remove the date
-//            $pdf->SetX('CreationDate', '01/05/2021');
-//        }
-//
-//        Storage::disk('local')->makeDirectory('/STORE_LOI');
-//
-//        $modifiedPdfPath = 'storage/STORE_LOI/LOI_'.$letterOfIndent->id.'.pdf';
-//        $pdf->Output($modifiedPdfPath, 'F');
+        return redirect()->back()->withErrors("error", "Something went wrong!Please try again");
 
-        // Download the modified PDF
+    }
+    public function pdfMerge($letterOfIndentId)
+    {
+        $letterOfIndent = LetterOfIndent::find($letterOfIndentId);
+        $filename = 'LOI_'.$letterOfIndentId.date('Y_m_d').'.pdf';
 
-        return $pdfFile->stream('LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf');
-//        return response()->download($modifiedPdfPath);
+        $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
 
+        $pdf->setPrintHeader(false);
+        $files[] = 'LOI/'.$filename;
 
+        foreach($letterOfIndent->LOIDocuments as $letterOfIndentDocument) {
+            $files[] = 'LOI-Documents/'.$letterOfIndentDocument->loi_document_file;
+        }
+        foreach ($files as $file) {
+            $pageCount = $pdf->setSourceFile($file);
+            for ($i=0; $i < $pageCount; $i++)
+            {
+                $pdf->AddPage();
+                $tplIdx = $pdf->importPage($i+1);
+                $pdf->useTemplate($tplIdx);
+            }
+        }
+        return $pdf;
     }
     public function approve(Request $request)
     {

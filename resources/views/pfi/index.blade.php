@@ -58,13 +58,13 @@
                                         <div class="modal-dialog modal-xl">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h1 class="modal-title fs-5" id="exampleModalLabel"> PFI Documents</h1>
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel"> PFI Document</h1>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="col-lg-12">
                                                       <div class="row p-2">
-                                                          <embed src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" height="400" >
+                                                          <embed src="{{ url('PFI_Document_with_sign/'.$pfi->pfi_document_with_sign) }}" height="400" >
                                                       </div>
                                                     </div>
                                                 </div>

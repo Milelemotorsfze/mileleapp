@@ -138,16 +138,17 @@ class PFIController extends Controller
             $tplIdx = $pdf->importPage($i);
             $pdf->useTemplate($tplIdx);
             if($i==$pageCount) {
+                if($letterOfIndent->dealers == 'Trans Car')
                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
             }
         }
 
         $signedFileName = 'signed_'.time().'.'.$extension;
+        $directory = public_path('PFI_Document_with_sign');
+        \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+        $pdf->Output($directory.'/'.$signedFileName,'F');
         $pfi->pfi_document_with_sign = $signedFileName;
         $pfi->save();
-
-        Storage::put('PFI_document_withsign/'.$signedFileName, $pdf->output());
-//        $pdf->Output();
 
         return redirect()->route('pfi.index')->with('message', 'PFI created Successfully');
     }
