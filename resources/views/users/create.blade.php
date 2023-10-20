@@ -45,6 +45,7 @@
                         <option value="Finance">Finance</option>
                         <option value="Demand & Planning">Demand & Planning</option>
                         <option value="IT">IT</option>
+                        <option value="Marketing">Marketing</option>
                         <option value="Sales">Sales</option>
                         <option value="QC">QC</option>
                         <option value="Procurement">Procurement</option>
@@ -71,7 +72,7 @@
         <label for="roles" class="form-label">Roles</label>
         <select name="roles[]" id="roles" class="form-select" multiple>
             @foreach($roles as $role)
-                <option value="{{ $role }}">{{ $role }}</option>
+                <option value="{{ $role->id }}">{{ $role->name }}</option>
             @endforeach
         </select>
     </div>

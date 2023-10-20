@@ -29,7 +29,7 @@ namespace App\Http\Controllers;
         }
         public function create()
         {
-            $roles = Role::pluck('name','name')->all();
+            $roles = Role::all();
             $language = Language::pluck('name','name')->all();
             return view('users.create',compact('roles', 'language'));
         }
@@ -48,6 +48,7 @@ namespace App\Http\Controllers;
             $user->email = $request->input('email');
             $user->status = 'active';
             $user->sales_rap = $request->has('sales_rap') ? 'Yes' : 'No';
+            $user->selected_role = $request->roles[0];
             $user->save();
             $empProfile = new Profile();
             $empProfile->user_id = $user->id;
@@ -68,7 +69,7 @@ namespace App\Http\Controllers;
                     $salesPersonLanguage->save();
                 }
             }
-            $user->assignRole($request->input('roles'));
+            $user->assignRole($request->roles[0]);
             $data['email'] = $user->email;
             $data['emailEncrypt'] = Crypt::encryptString($user->email);
             $data['name'] = $user->name;
