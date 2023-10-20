@@ -1348,6 +1348,8 @@
                     removeSubCategoryParts();
                 }else if(category == 'Other') {
                     $("#supplier_type option[value='Other']").remove();
+                    $("#supplier_type option[value='demand_planning']").remove();
+
                 }
             })
             $(document.body).on('select2:select', "#category", function (e) {
@@ -1363,6 +1365,8 @@
                 } else if(category == 'Other')
                 {
                     $('#supplier_type').append($('<option>', { value: 'Other', text: 'Other' }));
+                    $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
+
                 }
             })
             function appendSubCategoryVehicle() {
@@ -1377,7 +1381,6 @@
             function appendSubCategoryParts() {
                 $('#supplier_type').append($('<option>', { value: 'accessories', text: 'Accessories' }));
                 $('#supplier_type').append($('<option>', { value: 'freelancer', text: 'Freelancer' }));
-                // $('#supplier_type').append($('<option>', { value: 'demand_planning', text: 'Demand Planning' }));
                 $('#supplier_type').append($('<option>', { value: 'garage', text: 'Garage' }));
                 $('#supplier_type').append($('<option>', { value: 'spare_parts', text: 'Spare Parts' }));
                 $('#supplier_type').append($('<option>', { value: 'warranty', text: 'Warranty' }));
