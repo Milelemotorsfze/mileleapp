@@ -48,12 +48,22 @@ class AddonController extends Controller
         // dd('hi');
         $rowperpage = 12;
         $content = 'addon';
-        $addonMasters = Addon::select('id','addon_type','name')->orderBy('name', 'ASC');
-        if($data != 'all')
-        {
-            $addonMasters = $addonMasters->where('addon_type',$data);
-        }
-        $addonMasters = $addonMasters->get();
+        // $addonMasters = Addon::select('id','addon_type','name')->orderBy('name', 'ASC');
+        // if($data != 'all')
+        // {
+        //     $addonMasters = $addonMasters->where('addon_type',$data);
+        // }
+        // $addonMasters = $addonMasters->get();
+        $addonMasters = AddonDescription::with('Addon')->whereHas('Addon', function($q) use($data) {
+            if($data != 'all')
+            {
+                $q->where('addon_type',$data);
+            }
+        })->get();
+        // ->orderBy('name', 'ASC');
+        // dd($addonMasters);
+        // $addonMasters = $addonMasters->get();
+        
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
 
@@ -100,7 +110,7 @@ class AddonController extends Controller
 
         if($request->AddonIds)
         {
-            $addons = $addons->whereIn('addon_id',$request->AddonIds);
+            $addons = $addons->whereIn('description',$request->AddonIds);
         }
 
         if($request->BrandIds)
