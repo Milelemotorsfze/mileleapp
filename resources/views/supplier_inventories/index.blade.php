@@ -1,16 +1,26 @@
 @extends('layouts.table')
 @section('content')
-    <div class="card-header">
+    @can('supplier-inventory-list')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+        @endphp
+        @if ($hasPermission)
+        <div class="card-header">
         <h4 class="card-title">
             Inventory List
         </h4>
     </div>
-    <div class="card-body">
+        <div class="card-body">
         @can('supplier-inventory-edit')
-        <div class="ml-auto">
-            <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
-        </div>
-            <br>
+            @php
+                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+            @endphp
+            @if ($hasPermission)
+                <div class="ml-auto">
+                    <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
+                </div>
+                <br>
+            @endif
         @endcan
         <div class="table-responsive" >
             <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-condensed" style="">
@@ -84,36 +94,9 @@
             </table>
         </div>
     </div>
-    <script type="text/javascript">
-        {{--$(document).ready(function () {--}}
-        {{--    $('.inventory-collapse').click(function() {--}}
-        {{--       let masterModelId = $(this).attr('data-id');--}}
-        {{--        let model = $(this).attr('data-model');--}}
-        {{--        let sfx = $(this).attr('data-sfx');--}}
-        {{--        let key = $(this).attr('data-key');--}}
-        {{--       let url = '{{ route('supplier-inventories.get-child-rows') }}';--}}
-        {{--        $.ajax({--}}
-        {{--            type: "GET",--}}
-        {{--            url: url,--}}
-        {{--            dataType: "json",--}}
-        {{--            data: {--}}
-        {{--                master_model_id: masterModelId--}}
-        {{--            },--}}
-        {{--            success:function (data) {--}}
-        {{--                $('.row-add').empty();--}}
-        {{--                $i =0;--}}
-        {{--                jQuery.each(data, function(i,item){--}}
-        {{--                    console.log(item.chasis);--}}
-        {{--                    $('.row-add').append('<tr>','<td>'+ ++$i +'</td>','<td>'+model+'</td>','<td>'+sfx+'</td>','<td>'+item.chasis+'</td>','</tr>','</br>');--}}
+        @endif
+        @endcan
 
-        {{--                     //.appendTo('#records_table');--}}
-        {{--                });--}}
-        {{--            }--}}
-        {{--        });--}}
-        {{--    })--}}
-
-        {{--});--}}
-    </script>
 @endsection
 
 

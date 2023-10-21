@@ -30,170 +30,179 @@
             background-color: #e5beb2;
         }
     </style>
-    <div class="card-header">
-        <h4 class="card-title">Inventory File Comparision</h4>
-    </div>
-    <div class="card-body">
-        @if(Session::has('message'))
-            <div class="alert alert-danger">
-                {{Session::get('message')}}
-            </div>
-        @endif
-        @if (Session::has('error'))
-            <div class="alert alert-danger" >
-                <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
-                {{ Session::get('error') }}
-            </div>
-        @endif
-        @if (count($errors) > 0)
-            <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br>
-                <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <form id="form-compare" action="{{ route('supplier-inventories.file-comparision-report') }}">
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">Supplier</label>
-                        <select class="form-control" autofocus name="supplier_id" id="supplier">
-                            <option value="" disabled>Select The Supplier</option>
-                            @foreach($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted"> Dealers</label>
-                        <select class="form-control" data-trigger name="whole_sales" id="wholesaler">
-                            <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
-                                {{ ( request()->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ) ? 'selected' : '' }}>
-                                Trans Cars
-                            </option>
-                            <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}"
-                                {{ ( request()->whole_sales == \App\Models\SupplierInventory::DEALER_MILELE_MOTORS ) ? 'selected' : '' }}>
-                                Milele Motors
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">First File</label>
-                        <select class="form-control text-dark first" required data-trigger name="first_file" id="first-file">
-                            <option value="" disabled>First File</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label text-muted">Second File</label>
-                        <select class="form-control text-dark" required  name="second_file" id="second-file" >
-                            <option value="" disabled>Second File</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-dark mt-4 compare-button "> Compare </button>
-                <a href="{{ route('supplier-inventories.file-comparision') }}">
-                    <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
-                </a>
-            </div>
-            </br>
-        </form>
-        <div class="container report-div" >
-               <h2 style="text-align: center">Supplier Inventory Reports</h2>
-               <table class="new-row">
-                   <tr>
-                       <td colspan="5" class="heading">Newly Added Rows - {{ count($newlyAddedRows) }}</td>
-                   </tr>
-                   <tr>
-                       <th>Model</th>
-                       <th>SFX</th>
-                       <th>Chasis</th>
-                       <th>Engine Number</th>
-                       <th>Color Code</th>
-                   </tr>
-                   @foreach($newlyAddedRows as $newlyAddedRow)
-                       <tr>
-                           <td>{{ $newlyAddedRow['model'] }}</td>
-                           <td>{{ $newlyAddedRow['sfx'] }}</td>
-                           <td>{{ $newlyAddedRow['chasis'] }}</td>
-                           <td>{{ $newlyAddedRow['engine_number'] }}</td>
-                           <td>{{ $newlyAddedRow['color_code'] }}</td>
-                       </tr>
-                   @endforeach
-                   @if(!$newlyAddedRows)
-                       <tr>
-                           <td colspan="5" style="text-align: center" >No data Added</td>
-                       </tr>
-                   @endif
-               </table>
-               <br><br>
-               <table class="updated-row">
-                   <tr>
-                       <td colspan="5" class="heading">Updated Added Rows - {{ count($updatedRows) }}</td>
-                   </tr>
-                   <tr>
-                       <th>Model</th>
-                       <th>SFX</th>
-                       <th>Chasis</th>
-                       <th>Engine Number</th>
-                       <th>Color Code</th>
-                   </tr>
-                   @foreach($updatedRows as $updatedRow)
-                       <tr>
-                           <td>{{ $updatedRow['model'] }}</td>
-                           <td>{{ $updatedRow['sfx'] }}</td>
-                           <td>{{ $updatedRow['chasis'] }}</td>
-                           <td>{{ $updatedRow['engine_number'] }}</td>
-                           <td>{{ $updatedRow['color_code'] }}</td>
-                       </tr>
-                   @endforeach
-                   @if(!$updatedRows)
-                       <tr>
-                           <td colspan="5" style="text-align: center" >No data Updated</td>
-                       </tr>
-                   @endif
-               </table>
-               <br><br>
-               <table class="deleted-row">
-                   <tr>
-                       <td colspan="5" class="heading">Deleted Rows - {{ count($deletedRows) }}</td>
-                   </tr>
-                   <tr>
-                       <th>Model</th>
-                       <th>SFX</th>
-                       <th>Chasis</th>
-                       <th>Engine Number </th>
-                       <th>Color Code</th>
-                   </tr>
+    @can('supplier-inventory-report-view')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-report-view');
+        @endphp
+        @if ($hasPermission)
+            <div class="card-header">
+                <h4 class="card-title">Inventory File Comparision</h4>
+                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
-                   @foreach($deletedRows as $deletedRow)
-                       <tr>
-                           <td>{{ $deletedRow['model'] }}</td>
-                           <td>{{ $deletedRow['sfx'] }}</td>
-                           <td>{{ $deletedRow['chasis']  }}</td>
-                           <td>{{ $deletedRow['engine_number'] }}</td>
-                           <td>{{ $deletedRow['color_code'] }}</td>
-                       </tr>
-                   @endforeach
-                   @if(!$deletedRows)
-                       <tr>
-                           <td colspan="5" style="text-align: center" >No data Deleted</td>
-                       </tr>
-                   @endif
-               </table>
             </div>
-    </div>
+            <div class="card-body">
+                @if(Session::has('message'))
+                    <div class="alert alert-danger">
+                        {{Session::get('message')}}
+                    </div>
+                @endif
+                @if (Session::has('error'))
+                    <div class="alert alert-danger" >
+                        <button type="button" class="btn-close p-0 close" data-dismiss="alert"></button>
+                        {{ Session::get('error') }}
+                    </div>
+                @endif
+                @if (count($errors) > 0)
+                    <div class="alert alert-danger">
+                        <strong>Whoops!</strong> There were some problems with your input.<br>
+                        <button type="button" class="btn-close p-0 close text-end" data-dismiss="alert"></button>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <form id="form-compare" action="{{ route('supplier-inventories.file-comparision-report') }}">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">Supplier</label>
+                                <select class="form-control" autofocus name="supplier_id" id="supplier">
+                                    <option value="" disabled>Select The Supplier</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted"> Dealers</label>
+                                <select class="form-control" data-trigger name="whole_sales" id="wholesaler">
+                                    <option value="{{ \App\Models\SupplierInventory::DEALER_TRANS_CARS }}"
+                                        {{ ( request()->whole_sales == \App\Models\SupplierInventory::DEALER_TRANS_CARS ) ? 'selected' : '' }}>
+                                        Trans Cars
+                                    </option>
+                                    <option value="{{\App\Models\SupplierInventory::DEALER_MILELE_MOTORS}}"
+                                        {{ ( request()->whole_sales == \App\Models\SupplierInventory::DEALER_MILELE_MOTORS ) ? 'selected' : '' }}>
+                                        Milele Motors
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">First File</label>
+                                <select class="form-control text-dark first" required data-trigger name="first_file" id="first-file">
+                                    <option value="" disabled>First File</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <div class="mb-3">
+                                <label for="choices-single-default" class="form-label text-muted">Second File</label>
+                                <select class="form-control text-dark" required  name="second_file" id="second-file" >
+                                    <option value="" disabled>Second File</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-dark mt-4 compare-button "> Compare </button>
+                        <a href="{{ route('supplier-inventories.file-comparision') }}">
+                            <button type="button" class="btn btn-dark mt-4 "> Refresh </button>
+                        </a>
+                    </div>
+                    </br>
+                </form>
+                <div class="container report-div" >
+                       <h2 style="text-align: center">Supplier Inventory Reports</h2>
+                       <table class="new-row">
+                           <tr>
+                               <td colspan="5" class="heading">Newly Added Rows - {{ count($newlyAddedRows) }}</td>
+                           </tr>
+                           <tr>
+                               <th>Model</th>
+                               <th>SFX</th>
+                               <th>Chasis</th>
+                               <th>Engine Number</th>
+                               <th>Color Code</th>
+                           </tr>
+                           @foreach($newlyAddedRows as $newlyAddedRow)
+                               <tr>
+                                   <td>{{ $newlyAddedRow['model'] }}</td>
+                                   <td>{{ $newlyAddedRow['sfx'] }}</td>
+                                   <td>{{ $newlyAddedRow['chasis'] }}</td>
+                                   <td>{{ $newlyAddedRow['engine_number'] }}</td>
+                                   <td>{{ $newlyAddedRow['color_code'] }}</td>
+                               </tr>
+                           @endforeach
+                           @if(!$newlyAddedRows)
+                               <tr>
+                                   <td colspan="5" style="text-align: center" >No data Added</td>
+                               </tr>
+                           @endif
+                       </table>
+                       <br><br>
+                       <table class="updated-row">
+                           <tr>
+                               <td colspan="5" class="heading">Updated Added Rows - {{ count($updatedRows) }}</td>
+                           </tr>
+                           <tr>
+                               <th>Model</th>
+                               <th>SFX</th>
+                               <th>Chasis</th>
+                               <th>Engine Number</th>
+                               <th>Color Code</th>
+                           </tr>
+                           @foreach($updatedRows as $updatedRow)
+                               <tr>
+                                   <td>{{ $updatedRow['model'] }}</td>
+                                   <td>{{ $updatedRow['sfx'] }}</td>
+                                   <td>{{ $updatedRow['chasis'] }}</td>
+                                   <td>{{ $updatedRow['engine_number'] }}</td>
+                                   <td>{{ $updatedRow['color_code'] }}</td>
+                               </tr>
+                           @endforeach
+                           @if(!$updatedRows)
+                               <tr>
+                                   <td colspan="5" style="text-align: center" >No data Updated</td>
+                               </tr>
+                           @endif
+                       </table>
+                       <br><br>
+                       <table class="deleted-row">
+                           <tr>
+                               <td colspan="5" class="heading">Deleted Rows - {{ count($deletedRows) }}</td>
+                           </tr>
+                           <tr>
+                               <th>Model</th>
+                               <th>SFX</th>
+                               <th>Chasis</th>
+                               <th>Engine Number </th>
+                               <th>Color Code</th>
+                           </tr>
+
+                           @foreach($deletedRows as $deletedRow)
+                               <tr>
+                                   <td>{{ $deletedRow['model'] }}</td>
+                                   <td>{{ $deletedRow['sfx'] }}</td>
+                                   <td>{{ $deletedRow['chasis']  }}</td>
+                                   <td>{{ $deletedRow['engine_number'] }}</td>
+                                   <td>{{ $deletedRow['color_code'] }}</td>
+                               </tr>
+                           @endforeach
+                           @if(!$deletedRows)
+                               <tr>
+                                   <td colspan="5" style="text-align: center" >No data Deleted</td>
+                               </tr>
+                           @endif
+                       </table>
+                    </div>
+            </div>
+        @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>

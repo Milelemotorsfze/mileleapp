@@ -72,7 +72,7 @@
                     </table>
                 </div>
                 <div style="background-color: #f6f5f5">
-                    <b><p style="padding-left: 5px;font-weight: bold">Milele Motors FZCO</p></b>
+                    <b><p style="padding-left: 5px;font-weight: bold;padding-top: 10px">Milele Motors FZCO</p></b>
                     <table id="so-details">
                         <tr>
                             <td class="left">VAT TRN - 100057588400003</td>
@@ -128,11 +128,15 @@
                         </tr>
                         @foreach($letterOfIndentItems as $letterOfIndentItem)
                             <tr>
-                                zcccdfs
                                 <td>{{$letterOfIndentItem->quantity}}</td>
                                 <td>
-                                    {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
-                                    {{ strtoupper($letterOfIndentItem->masterModel->variant->name) }},{{ strtoupper($letterOfIndentItem->masterModel->variant->engine_type) ?? ''}}
+                                    {{ strtoupper($letterOfIndentItem->masterModel->steering) }}, BRAND NEW, {{ strtoupper($letterOfIndentItem->masterModel->variant->brand->brand_name) ?? ''}},
+                                    {{ strtoupper($letterOfIndentItem->masterModel->variant->master_model_lines->model_line ?? '') }},
+                                    {{ strtoupper($letterOfIndentItem->masterModel->variant->fuel_type) ?? ''}}
+                                    @if($letterOfIndentItem->masterModel->variant->engine != '')
+                                        , ENGINE {{ strtoupper($letterOfIndentItem->masterModel->variant->engine) ?? ''}}
+                                    @endif
+                                    - SPECIFICATION ATTACHED IN APPENDIX
                                 </td>
                                 <td style="background-color: black;color: black" >0</td>
                                 <td style="background-color: black;color: black" >0</td>
@@ -140,7 +144,7 @@
                         @endforeach
                         <tr>
                             <td></td>
-                            <td>{{ $letterOfIndent->shipment_method }} SHIPMENT AND TRANSPORTATION</td>
+                            <td>CNF - SHIPMENT AND TRANSPORTATION</td>
                             <td  style="background-color: black;color: black"></td>
                             <td  style="background-color: black;color: black"></td>
                         </tr>
@@ -220,14 +224,14 @@
         var height = document.getElementById('full-page').offsetHeight;
         var tableFooterHeight = document.getElementById('footer-table').offsetHeight;
 
-        const values = ["200", "500", "300", "400"];
+        const values = ["200", "290", "300", "400", "350"];
         const random = Math.floor(Math.random() * values.length);
         var imageWidth = values[random];
 
         var headerHeight = (6 * tableFooterHeight);
 
         var imageHeight = height - headerHeight;
-        $('#total-height').val(imageHeight - 100);
+        $('#total-height').val(imageHeight - 80);
         $('#width').val(imageWidth);
         $('.overlay-image').css('left', imageWidth+'px');
         $('.overlay-image').css('top', imageHeight+'px' )

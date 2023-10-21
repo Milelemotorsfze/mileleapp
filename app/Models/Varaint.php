@@ -16,10 +16,10 @@ class Varaint extends Model
     {
         return $this->hasOne(AvailableColour::class, 'varaint_id');
     }
-//    public function masterModel()
-//    {
-//        return $this->belongsTo(MasterModel::class,'master_models_id');
-//    }
+    public function masterModel()
+    {
+        return $this->hasOne(MasterModel::class,'variant_id');
+    }
     public function master_model_lines()
     {
         return $this->belongsTo(MasterModelLines::class,'master_model_lines_id');

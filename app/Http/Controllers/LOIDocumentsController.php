@@ -7,6 +7,8 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentDocument;
 use App\Models\LetterOfIndentItem;
 use Illuminate\Http\Request;
+use Imagick;
+use Spatie\PdfToImage\Pdf;
 
 class LOIDocumentsController extends Controller
 {
@@ -36,10 +38,9 @@ class LOIDocumentsController extends Controller
      */
     public function store(Request $request)
     {
-//        return $request->letter_of_indent_id;
-//        $request->validate([
-//            'files' => 'required'
-//        ]);
+        $request->validate([
+            'files' => 'required'
+        ]);
 
         if ($request->has('files'))
         {
@@ -49,7 +50,6 @@ class LOIDocumentsController extends Controller
                 $fileName = time().'.'.$extension;
                 $destinationPath = 'LOI-Documents';
                 $file->move($destinationPath, $fileName);
-
                 $LoiDocument = new LetterOfIndentDocument();
 
                 $LoiDocument->loi_document_file = $fileName;
