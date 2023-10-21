@@ -12,5 +12,8 @@ class Demand extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
-
+    public function CreatedBy()
+    {
+        return $this->hasOne(User::class,'id','created_by');
+    }
 }
