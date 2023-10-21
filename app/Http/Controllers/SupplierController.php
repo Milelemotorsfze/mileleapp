@@ -77,7 +77,7 @@ class SupplierController extends Controller
 //        {
 //            return view('demand_planning_suppliers.create');
 //        }
-        $users = User::select('id','name')->get();
+        $users = User::where('id','!=','16')->select('id','name')->get();
         return view('suppliers.create',compact('paymentMethods','addons','users'));
     }
 
