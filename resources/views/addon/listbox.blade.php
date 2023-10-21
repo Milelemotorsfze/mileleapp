@@ -160,14 +160,7 @@
                             </div>
 
                             {{--                            // not included--}} -->
-                            @if($addonsdata->additional_remarks)
-                                <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                                    Additional Remarks
-                                </div>
-                                <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
-                                    {{$addonsdata->additional_remarks}}
-                                </div>
-                            @endif
+                            
 
                             <div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                 <div class="row" style="padding-right:3px; padding-left:3px;">
@@ -176,7 +169,10 @@
                                     </div>
                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
                                     @if($addonsdata->AddonName->name != '')
-                                    {{$addonsdata->AddonName->name}}
+                                    {{$addonsdata->AddonName->name}} 
+                                    @if(isset($addonsdata->AddonDescription))
+                                    @if($addonsdata->AddonDescription->description != '')- {{$addonsdata->AddonDescription->description}}@endif
+                                    @endif
                                     @endif
                                     </div>
                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
@@ -338,14 +334,14 @@
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                                         </div>
                                     @endif
-{{--                                    @if($addonsdata->part_number)--}}
-{{--                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">--}}
-{{--                                            Part Number--}}
-{{--                                        </div>--}}
-{{--                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">--}}
-{{--                                            {{$addonsdata->part_number}}--}}
-{{--                                        </div>--}}
-{{--                                    @endif--}}
+                                    @if($addonsdata->additional_remarks)
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            Additional Remarks
+                                        </div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                            {{$addonsdata->additional_remarks}}
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px; width:232px; height158px;">
@@ -357,6 +353,7 @@
                                style="max-height:159px; max-width:232px;" alt="Addon Image"  />
                                 @endif
                             </div>
+                            
                             @if($addonsdata->is_all_brands == 'yes')
                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
                                     Brand

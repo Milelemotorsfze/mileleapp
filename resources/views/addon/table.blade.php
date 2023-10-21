@@ -109,7 +109,11 @@
                                     @endif
 
                                         </td>
-                                        <td>{{$addonsdata->AddonName->name}}</td>
+                                        <td>{{$addonsdata->AddonName->name}} 
+                                        @if(isset($addonsdata->AddonDescription))
+                                        @if($addonsdata->AddonDescription->description != '')- {{$addonsdata->AddonDescription->description}}@endif
+                                        @endif
+                                        </td>
                                         <td>
                                             @if($addonsdata->addon_type_name == 'K')
                                                 <label class="badge badge-soft-success">Kit</label>
@@ -226,6 +230,9 @@
                                             </td>
                                             <td>
                                                 {{$addonsdata->AddonName->name}}
+                                                @if(isset($addonsdata->AddonDescription))
+                                                @if($addonsdata->AddonDescription->description != '')- {{$addonsdata->AddonDescription->description}}@endif
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($addonsdata->addon_type_name == 'K')

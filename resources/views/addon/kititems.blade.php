@@ -293,16 +293,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 				@endif
 				@if($supplierAddonDetails->addon_type_name == "SP")
 				<div class="col-lg-6 col-md-6 col-sm-12">
-					<label for="choices-single-default" class="form-label"> Model Year :</label>
-				</div>
-				<div class="col-lg-6 col-md-9 col-sm-12">
-					<span>{{ $supplierAddonDetails->model_year_start}} 
-					@if($supplierAddonDetails->model_year_start != '' && $supplierAddonDetails->model_year_start < $supplierAddonDetails->model_year_end)
-					- {{$supplierAddonDetails->model_year_end}}
-					@endif
-					</span>
-				</div>
-				<div class="col-lg-6 col-md-6 col-sm-12">
 					<label for="choices-single-default" class="form-label"> Part Numbers :</label>
 				</div>
 				<div class="col-lg-6 col-md-9 col-sm-12">
@@ -326,22 +316,25 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 					<span>All Brands</span>
 				</div>
 				@elseif($supplierAddonDetails->is_all_brands == 'no')
-				<div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+				<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3">
 					<center>Brand</center>
 				</div>
-				<div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
+				<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3">
 					<center>Model Line</center>
 				</div>
 				<div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4">
 					<center>Model Description</center>
 				</div>
+				<div class="labellist labeldesign col-xxl-2 col-lg-2 col-md-2">
+					<center>Model Year</center>
+				</div>
 				@foreach($supplierAddonDetails->AddonTypes as $AddonTypes)
 				<div class="divcolorclass" value="5" hidden>
 				</div>
-				<div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
+				<div class="divcolor labellist databack1 col-xxl-3 col-lg-3 col-md-3">
 					{{$AddonTypes->brands->brand_name}}
 				</div>
-				<div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
+				<div class="divcolor labellist databack1 col-xxl-3 col-lg-3 col-md-3">
 					@if($AddonTypes->is_all_model_lines == 'yes')
 					All Model Lines
 					@else
@@ -350,6 +343,12 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 				</div>
 				<div class="divcolor labellist databack1 col-xxl-4 col-lg-4 col-md-4">
 					{{$AddonTypes->modelDescription->model_description ?? ''}}
+				</div>
+				<div class="divcolor labellist databack1 col-xxl-2 col-lg-2 col-md-2">
+				{{ $AddonTypes->model_year_start}} 
+					@if($AddonTypes->model_year_start != '' && $AddonTypes->model_year_start < $AddonTypes->model_year_end)
+					- {{$AddonTypes->model_year_end}}
+					@endif
 				</div>
 				@endforeach
 				@endif
