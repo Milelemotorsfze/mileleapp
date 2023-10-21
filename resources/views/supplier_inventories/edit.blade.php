@@ -2,6 +2,8 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Add / Update Supplier Inventory Record</h4>
+        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+
     </div>
     <div class="card-body">
             @if (Session::has('error'))
@@ -68,7 +70,7 @@
             </div>
 
             <div class="col-12 text-center">
-                <button type="submit" class="btn btn-dark "> Upload </button>
+                <button type="submit" class="btn btn-primary "> Upload </button>
             </div>
         </form>
     </div>

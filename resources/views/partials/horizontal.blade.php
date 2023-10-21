@@ -471,7 +471,15 @@
                                                 <div class="arrow-down"></div>
                                             </a>
                                             <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                                <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                                @can('demand-list')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('demands.index')}}" class="dropdown-item" data-key="t-login">Demand Lists </a>
+                                                    @endif
+                                                @endcan
+                                                    <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
                                             </div>
                                         </div>
                                     @endif

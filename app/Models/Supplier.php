@@ -139,7 +139,8 @@ class Supplier extends Model
                 elseif ($vendorCategories[0] == Supplier::SUPPLIER_CATEGORY_OTHER)
                 {
                     $otherSubCategories = [
-                        'Other' => 'Other'
+                        'Other' => 'Other',
+                        'demand_planning' => 'Demand Planning'
                     ];
                     return $otherSubCategories;
                 }

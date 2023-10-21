@@ -7,23 +7,25 @@
         @if ($hasPermission)
         <div class="card-header">
         <h4 class="card-title">
-            Inventory List
+            Inventory Lists
         </h4>
+            @can('supplier-inventory-edit')
+                @php
+                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-edit');
+                @endphp
+                @if ($hasPermission)
+                    <div class="ml-auto float-end">
+                        <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
+                        <a href="{{ url('inventory/sample_supplier_inventory.csv') }}" class="btn btn-info me-md-2" target="_blank"><i class="fa fa-download" ></i> Sample Template</a>
+                    </div>
+                    <br>
+                @endif
+            @endcan
     </div>
         <div class="card-body">
-        @can('supplier-inventory-edit')
-            @php
-                $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
-            @endphp
-            @if ($hasPermission)
-                <div class="ml-auto">
-                    <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
-                </div>
-                <br>
-            @endif
-        @endcan
+
         <div class="table-responsive" >
-            <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-condensed" style="">
+            <table id="dtBasicSupplierInventory" class="table table-striped table-editable table-edits table table-condensed" >
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
@@ -82,11 +84,7 @@
                                 <br>
                             @endforeach
                         </td>
-{{--                    </tr>--}}
                     <div class="collapse accordion-collapse row-add" id="get-child-rows-{{$key}}" data-key="{{$key}}" data-bs-parent=".table">
-{{--                        @foreach($supplierInventory)--}}
-
-{{--                        @endforeach--}}
                     </div>
 
                 @endforeach

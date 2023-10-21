@@ -17,7 +17,8 @@ class DemandController extends Controller
 {
     public function index()
     {
-
+        $demands = Demand::orderBy('id','DESC')->get();
+        return view('demands.index', compact('demands'));
     }
     public function create()
     {
