@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\UserActivityController;
 class ModuleController extends Controller
 {
     /**
@@ -14,6 +14,7 @@ class ModuleController extends Controller
     public function index()
     {
         $modules = Modules::orderBy('id','DESC')->get();
+        (new UserActivityController)->createActivity('Open Modules Listing');
         return view('modules.index', compact('modules'));
     }
 
@@ -37,7 +38,7 @@ class ModuleController extends Controller
         $module = new Modules();
         $module->name = $request->name;
         $module->save();
-
+        (new UserActivityController)->createActivity('Modules Created');
         return redirect()->route('modules.index')->with('success','Module Created Successfully.');
     }
 
@@ -73,7 +74,7 @@ class ModuleController extends Controller
 
         $module->name = $request->name;
         $module->save();
-
+        (new UserActivityController)->createActivity('Modules Updated');
         return redirect()->route('modules.index')->with('success','Module Updated Successfully.');
     }
 
