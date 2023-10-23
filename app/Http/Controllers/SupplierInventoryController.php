@@ -15,17 +15,40 @@ use Maatwebsite\Excel\Validators\ValidationException;
 
 class SupplierInventoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
             ->whereNull('eta_import')
             ->groupBy('master_model_id')
-            ->orderBy('id','desc')
+            ->orderBy('id','desc');
+
+        $suppliers = Supplier::with('supplierTypes')
+            ->whereHas('supplierTypes', function ($query) {
+                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+            })
+            ->where('status', Supplier::SUPPLIER_STATUS_ACTIVE)
             ->get();
 
-        return view('supplier_inventories.index', compact('supplierInventories'));
+        if($request->supplier_id){
+            $supplierInventories = $supplierInventories->where('supplier_id', $request->supplier_id);
+        }
+        if($request->dealers){
+            $supplierInventories = $supplierInventories->where('whole_sales', $request->dealers);
+        }
+
+        $supplierInventories = $supplierInventories->get();
+        foreach ($supplierInventories as $supplierInventory) {
+            $supplierInventory->childRows =  SupplierInventory::with('masterModel')
+                ->where('master_model_id', $supplierInventory->master_model_id)
+                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->whereNull('eta_import')
+                ->orderBy('id','desc')
+                ->get();
+        }
+        return view('supplier_inventories.index', compact('supplierInventories','suppliers'));
     }
     public function create()
     {
@@ -962,8 +985,6 @@ class SupplierInventoryController extends Controller
 
         return view('supplier_inventories.list', compact('supplierInventories','startDate','endDate'));
     }
-
-
     public function getDate(Request $request)
     {
         $supplierInventoryDates = SupplierInventory::where('supplier_id', $request->supplier_id)
@@ -972,5 +993,14 @@ class SupplierInventoryController extends Controller
             ->pluck('date_of_entry');
 
         return $supplierInventoryDates;
+    }
+    public function getSupplierInventories(Request $request) {
+        $supplierInventories = SupplierInventory::where('master_model_id', $request->master_model_id)
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('eta_import')
+            ->get();
+
+        return response()->json($supplierInventories);
     }
 }

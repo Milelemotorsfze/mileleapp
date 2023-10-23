@@ -46,7 +46,8 @@ class SupplierInventory extends Model
     {
         $modelId = $this->master_model_id;
         $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY);
+            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+            ->whereNull('eta_import');
         if (!empty(request()->start_date) && !empty(request()->end_date)) {
             $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
             $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
@@ -57,6 +58,12 @@ class SupplierInventory extends Model
 
         if (!$supplierInventories) {
              return 0;
+        }
+        if(request()->supplier_id){
+            $supplierInventories = $supplierInventories->where('supplier_id', request()->supplier_id);
+        }
+        if(request()->dealers){
+            $supplierInventories = $supplierInventories->where('whole_sales', request()->dealers);
         }
          return $supplierInventories->count();
     }

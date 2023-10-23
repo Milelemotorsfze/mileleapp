@@ -180,14 +180,15 @@ class LOIItemsController extends Controller
                 $approvedLOIItem->letter_of_indent_id = $letterOfIndent->id;
                 $approvedLOIItem->save();
             }
+            // Supplier inventory will be unlisted when DELIVERY NOTE (DN) came
 
-            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $letterOfIndentItem->master_model_id)
-                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                ->whereNull('eta_import')
-                ->take($quantity)
-                ->pluck('id');
-            SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
+//            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $letterOfIndentItem->master_model_id)
+//                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//                ->whereNull('eta_import')
+//                ->take($quantity)
+//                ->pluck('id');
+//            SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
         }
 
         if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
