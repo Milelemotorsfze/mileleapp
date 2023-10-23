@@ -345,7 +345,7 @@
 					</li>
                     @endif
                     @endcan
-                    @can('stock-full-view')
+                    <!-- @can('stock-full-view')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('stock-full-view');
                     @endphp
@@ -357,7 +357,7 @@
                         </a>
 					</li>
                     @endif
-                    @endcan
+                    @endcan -->
                     <!-- @can('edit-po-details')
                     @php
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-details');
@@ -747,6 +747,28 @@
                                     <span data-key="t-extra-pages">View All</span>
                                 </a>
                             </li>
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
+                        @endphp
+                        @if ($hasPermission)
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="{{ route('logisticsdocuments.index') }}" id="topnav-more" role="button">
+                                    <i data-feather="list"></i>
+                                    <span data-key="t-extra-pages">Documents</span>
+                                </a>
+                            </li>
+                            @endif
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['approve-reservation']);
+                        @endphp
+                        @if ($hasPermission)
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="{{ route('booking.index') }}" id="topnav-more" role="button">
+                                    <i data-feather="list"></i>
+                                    <span data-key="t-extra-pages">Booking</span>
+                                </a>
+                            </li>
+                            @endif
                 </ul>
             </div>
         </nav>

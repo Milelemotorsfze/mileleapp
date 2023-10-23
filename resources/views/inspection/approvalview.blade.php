@@ -183,6 +183,7 @@
             </div>
             </div>
             <hr>
+            @if($inspection->stage != "Incident")
             <div class="modal fade inspection-modal" id="inspectiondetail" tabindex="-1" aria-labelledby="inspectiondetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -339,6 +340,7 @@
 </div>
 @endif
 </div>
+@endif
 <br>
 <h5>Inspection Remarks</h5>
 <div class="row">
@@ -364,6 +366,7 @@
 </div>
 </div>
 @endif
+@if($inspection->stage != "Incident")
 @if(!$changevariant && !$newvariant)
 <div class="button-containerinner">
             <a class="btn btn-sm btn-primary" href="#" onclick="Newvariant('{{ $inspection->id }}')">Add Or Change Variant</a>
@@ -387,11 +390,11 @@
     @if ($extraItems->contains('item_name', 'sparewheel'))
         <input type="checkbox" id="sparewheel" name="sparewheel" checked>
         <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="number" name="sparewheel_qty" value="{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}" placeholder="Qty">
+        <input class="form-control" type="hidden" name="sparewheel_qty" value="{{ $extraItems->where('item_name', 'sparewheel')->first()->qty }}" placeholder="Qty">
     @else
         <input type="checkbox" id="sparewheel" name="sparewheel">
         <label for="sparewheel">Spare Wheel</label>
-        <input class="form-control" type="number" name="sparewheel_qty" placeholder="Qty">
+        <input class="form-control" type="hidden" name="sparewheel_qty" placeholder="Qty">
     @endif
 </li>
                 </div>
@@ -400,11 +403,11 @@
                 @if ($extraItems->contains('item_name', 'jack'))
                     <input type="checkbox" id="jack" name="jack" checked>
                     <label for="jack">Jack</label>
-                    <input class="form-control" type="number" name="jack_qty" value="{{ $extraItems->where('item_name', 'jack')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="jack_qty" value="{{ $extraItems->where('item_name', 'jack')->first()->qty }}" placeholder="Qty">
                 @else
                 <input type="checkbox" id="jack" name="jack">
                     <label for="jack">Jack</label>
-                    <input class="form-control" type="number" name="jack_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="jack_qty" placeholder="Qty">
                 @endif
                 </li>
                 </div>
@@ -413,11 +416,11 @@
                 @if ($extraItems->contains('item_name', 'wheel'))
                     <input type="checkbox" id="wheel" name="wheel" checked>
                     <label for="wheel">Wheel Spanner</label>
-                    <input class="form-control" type="number" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="wheel_qty" value="{{ $extraItems->where('item_name', 'wheel')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheel" name="wheel">
                     <label for="wheel">Wheel Spanner</label>
-                    <input  class="form-control" type="number" name="wheel_qty" placeholder="Qty">
+                    <input  class="form-control" type="hidden" name="wheel_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -428,11 +431,11 @@
                 @if ($extraItems->contains('item_name', 'firstaid'))
                     <input type="checkbox" id="firstaid" name="firstaid" checked>
                     <label for="firstaid">First Aid Kit / Packing Box</label>
-                    <input class="form-control" type="number" name="firstaid_qty" value="{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="firstaid_qty" value="{{ $extraItems->where('item_name', 'firstaid')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="firstaid" name="firstaid">
                     <label for="firstaid">First Aid Kit / Packing Box</label>
-                    <input  class="form-control" type="number" name="firstaid_qty" placeholder="Qty">
+                    <input  class="form-control" type="hidden" name="firstaid_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -441,11 +444,11 @@
                 @if ($extraItems->contains('item_name', 'floor_mat'))
                     <input type="checkbox" id="floor_mat" name="floor_mat" checked>
                     <label for="floor_mat">Floor Mat</label>
-                    <input class="form-control" type="number" name="floor_mat_qty" value="{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="floor_mat_qty" value="{{ $extraItems->where('item_name', 'floor_mat')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="floor_mat" name="floor_mat">
                     <label for="floor_mat">Floor Mat</label>
-                    <input class="form-control" type="number" name="floor_mat_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="floor_mat_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -454,11 +457,11 @@
                 @if ($extraItems->contains('item_name', 'service_book'))
                     <input type="checkbox" id="service_book" name="service_book" checked>
                     <label for="service_book">Service Book & Manual</label>
-                    <input class="form-control" type="number" name="service_book_qty" value="{{ $extraItems->where('item_name', 'service_book')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="service_book_qty" value="{{ $extraItems->where('item_name', 'service_book')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="service_book" name="service_book">
                     <label for="service_book">Service Book & Manual</label>
-                    <input class="form-control" type="number" name="service_book_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="service_book_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -469,11 +472,11 @@
                 @if ($extraItems->contains('item_name', 'keys'))
                     <input type="checkbox" id="keys" name="keys" checked>
                     <label for="keys">Keys / Qty</label>
-                    <input class="form-control" type="number" name="keys_qty" value="{{ $extraItems->where('item_name', 'keys')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="text" name="keys_qty" value="{{ $extraItems->where('item_name', 'keys')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="keys" name="keys">
                     <label for="keys">Keys / Qty</label>
-                    <input class="form-control" type="number" name="keys_qty" placeholder="Qty">
+                    <input class="form-control" type="text" name="keys_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -482,11 +485,11 @@
                 @if ($extraItems->contains('item_name', 'wheelrim'))
                     <input type="checkbox" id="wheelrim" name="wheelrim" checked>
                     <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="number" name="wheelrim_qty" value="{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="wheelrim_qty" value="{{ $extraItems->where('item_name', 'wheelrim')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="wheelrim" name="wheelrim">
                     <label for="wheelrim">Wheel Rim / Tyres</label>
-                    <input class="form-control" type="number" name="wheelrim_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="wheelrim_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -495,11 +498,11 @@
                 @if ($extraItems->contains('item_name', 'fire_extinguisher'))
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher" checked>
                     <label for="fire_extinguisher">Fire Extinguisher</label>
-                    <input class="form-control" type="number" name="fire_extinguisher_qty" value="{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="fire_extinguisher_qty" value="{{ $extraItems->where('item_name', 'fire_extinguisher')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="fire_extinguisher" name="fire_extinguisher">
                     <label for="fire_extinguisher">Fire Extinguisher</label>
-                    <input class="form-control" type="number" name="fire_extinguisher_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="fire_extinguisher_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -510,11 +513,11 @@
                 @if ($extraItems->contains('item_name', 'sd_card'))
                     <input type="checkbox" id="sd_card" name="sd_card" checked>
                     <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="number" name="sd_card_qty" value="{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="sd_card_qty" value="{{ $extraItems->where('item_name', 'sd_card')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="sd_card" name="sd_card">
                     <label for="sd_card">SD Card / Remote / H Phones</label>
-                    <input class="form-control" type="number" name="sd_card_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="sd_card_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -523,11 +526,11 @@
                 @if ($extraItems->contains('item_name', 'ac_system'))
                     <input type="checkbox" id="ac_system" name="ac_system" checked>
                     <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="number" name="ac_system_qty" value="{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="ac_system_qty" value="{{ $extraItems->where('item_name', 'ac_system')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="ac_system" name="ac_system">
                     <label for="ac_system">A/C System</label>
-                    <input class="form-control" type="number" name="ac_system_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="ac_system_qty" placeholder="Qty">
                     @endif
                 </li>
                 </div>
@@ -536,11 +539,11 @@
                 @if ($extraItems->contains('item_name', 'dash_board'))
                     <input type="checkbox" id="dash_board" name="dash_board" checked>
                     <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="number" name="dash_board_qty" value="{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="dash_board_qty" value="{{ $extraItems->where('item_name', 'dash_board')->first()->qty }}" placeholder="Qty">
                     @else
                     <input type="checkbox" id="dash_board" name="dash_board">
                     <label for="dash_board">Dash Board / T Screen / LCD</label>
-                    <input class="form-control" type="number" name="dash_board_qty" placeholder="Qty">
+                    <input class="form-control" type="hidden" name="dash_board_qty" placeholder="Qty">
                     @endif
                 </li>
             </ul>
@@ -635,7 +638,7 @@
                 <li class="list-group-item">
                 @if ($extraItems->contains('item_name', 'keys'))
                     <i class="fas fa-check-circle text-success"></i>
-                    <span>{{ $extraItems->where('item_name', 'keys')->first()->qty }} Qty - </span>
+                    <span>{{ $extraItems->where('item_name', 'keys')->first()->qty }} - </span>
                 @else
                     <i class="fas fa-times-circle text-danger"></i>
                 @endif
@@ -1159,6 +1162,7 @@
 </div>
 </div>
 @endif
+@endif
 @if($Incident)
 <br>
 <hr>
@@ -1389,10 +1393,12 @@
 <a style="float: right;" class="btn btn-success" onclick="setButtonValue('approve')">
     <i class="fa fa-check" aria-hidden="true"></i> Approve Inspection
 </a>
+@if($inspection->stage != "Incident")
 @if($inspection->status == "Pending")
 <a style="float: right; margin-right: 10px;" class="btn btn-danger" onclick="setButtonValue('reinspect')">
     <i class="fa fa-times" aria-hidden="true"></i> Re Inspection
 </a>
+@endif
 @endif
 </br>
 </div>

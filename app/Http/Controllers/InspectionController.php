@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\UserActivities;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Vehicles;
@@ -29,6 +30,10 @@ class InspectionController extends Controller
 {
     public function index(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
@@ -257,6 +262,10 @@ class InspectionController extends Controller
     }
     public function show($id) 
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Pending Inspection for inspect";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $vehicle = Vehicles::find($id);
     if (!$vehicle) {
         abort(404); 
@@ -274,6 +283,10 @@ class InspectionController extends Controller
     }
     public function update(Request $request, $id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Update the Pending Inspection Submit for Approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
             $vehicle = Vehicles::find($id);
             $inspections = new Inspection();
             $inspections->vehicle_id = $id;
@@ -461,6 +474,10 @@ class InspectionController extends Controller
     }
     public function reshow($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Re-Inspection the Vehicles";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $inspection = Inspection::find($id);
     $vehicle = Vehicles::find($inspection->vehicle_id);
     $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
@@ -585,6 +602,10 @@ class InspectionController extends Controller
     }
     public function routineUpdate(Request $request, $vehicle)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Submit the routine inspection for approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $inspection = new Inspection();
         $inspection->status = "Pending";
         $inspection->vehicle_id = $vehicle;
@@ -594,7 +615,6 @@ class InspectionController extends Controller
         $inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Battery Inspection";
-        $routine_inspection->spec = $request->input('spec_battery');
         $routine_inspection->condition = $request->input('condition_battery');
         $routine_inspection->remarks = $request->input('remarks_battery');
         $routine_inspection->inspection_id = $inspection->id;
@@ -602,7 +622,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Tyre Pressure Inspection";
-        $routine_inspection->spec = $request->input('spec_tyre_pressure');
         $routine_inspection->condition= $request->input('condition_tyre_pressure');
         $routine_inspection->remarks = $request->input('remarks_tyre_pressure');
         $routine_inspection->inspection_id = $inspection->id;
@@ -610,7 +629,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Under Hood Inspection";
-        $routine_inspection->spec = $request->input('spec_under_hood');
         $routine_inspection->condition = $request->input('condition_under_hood');
         $routine_inspection->remarks = $request->input('remarks_under_hood');
         $routine_inspection->inspection_id = $inspection->id;
@@ -618,7 +636,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Starting & Warming";
-        $routine_inspection->spec = $request->input('spec_starting');
         $routine_inspection->condition = $request->input('condition_starting');
         $routine_inspection->remarks = $request->input('remarks_starting');
         $routine_inspection->inspection_id = $inspection->id;
@@ -626,7 +643,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "A/C Operation (Cool & Hot)";
-        $routine_inspection->spec = $request->input('spec_ac');
         $routine_inspection->condition = $request->input('condition_ac');
         $routine_inspection->remarks = $request->input('remarks_ac');
         $routine_inspection->inspection_id = $inspection->id;
@@ -634,7 +650,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Exterior Inspection & Protective Cover Condition";
-        $routine_inspection->spec = $request->input('spec_exterior_inspection');
         $routine_inspection->condition = $request->input('condition_exterior_inspection');
         $routine_inspection->remarks = $request->input('remarks_exterior_inspection');
         $routine_inspection->inspection_id = $inspection->id;
@@ -642,7 +657,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Interior Inspection & Protective Cover Condition";
-        $routine_inspection->spec = $request->input('spec_interior_inspection');
         $routine_inspection->condition = $request->input('condition_interior_inspection');
         $routine_inspection->remarks = $request->input('remarks_interior_inspection');
         $routine_inspection->inspection_id = $inspection->id;
@@ -650,7 +664,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Move the Vehicle";
-        $routine_inspection->spec = $request->input('spec_vehicle_move');
         $routine_inspection->condition = $request->input('condition_vehicle_move');
         $routine_inspection->remarks = $request->input('remarks_vehicle_move');
         $routine_inspection->inspection_id = $inspection->id;
@@ -658,7 +671,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Paint (Overall)";
-        $routine_inspection->spec = $request->input('spec_paint');
         $routine_inspection->condition = $request->input('condition_paint');
         $routine_inspection->remarks = $request->input('remarks_paint');
         $routine_inspection->inspection_id = $inspection->id;
@@ -666,7 +678,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Bumper Front";
-        $routine_inspection->spec = $request->input('spec_bumper');
         $routine_inspection->condition = $request->input('condition_bumper');
         $routine_inspection->remarks = $request->input('remarks_bumper');
         $routine_inspection->inspection_id = $inspection->id;
@@ -674,7 +685,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Grill";
-        $routine_inspection->spec = $request->input('spec_grill');
         $routine_inspection->condition = $request->input('condition_grill');
         $routine_inspection->remarks = $request->input('remarks_grill');
         $routine_inspection->inspection_id = $inspection->id;
@@ -682,7 +692,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Light Front";
-        $routine_inspection->spec = $request->input('spec_light_front');
         $routine_inspection->condition = $request->input('condition_light_front');
         $routine_inspection->remarks = $request->input('remarks_light_front');
         $routine_inspection->inspection_id = $inspection->id;
@@ -690,7 +699,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Hood";
-        $routine_inspection->spec = $request->input('spec_hood');
         $routine_inspection->condition = $request->input('condition_hood');
         $routine_inspection->remarks = $request->input('remarks_hood');
         $routine_inspection->inspection_id = $inspection->id;
@@ -698,7 +706,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Windshield";
-        $routine_inspection->spec = $request->input('spec_windshield');
         $routine_inspection->condition = $request->input('condition_windshield');
         $routine_inspection->remarks = $request->input('remarks_windshield');
         $routine_inspection->inspection_id = $inspection->id;
@@ -706,7 +713,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Wipers";
-        $routine_inspection->spec = $request->input('spec_wipers');
         $routine_inspection->condition = $request->input('condition_wipers');
         $routine_inspection->remarks = $request->input('remarks_wipers');
         $routine_inspection->inspection_id = $inspection->id;
@@ -714,7 +720,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Fender Front Left";
-        $routine_inspection->spec = $request->input('spec_fender_front_left');
         $routine_inspection->condition = $request->input('condition_fender_front_left');
         $routine_inspection->remarks = $request->input('remarks_fender_front_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -722,7 +727,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Tire / Rim Front Left";
-        $routine_inspection->spec = $request->input('spec_tire_rim_front_left');
         $routine_inspection->condition = $request->input('condition_tire_rim_front_left');
         $routine_inspection->remarks = $request->input('remarks_tire_rim_front_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -730,7 +734,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Side Step Left (if Applicable)";
-        $routine_inspection->spec = $request->input('spec_side_step_left');
         $routine_inspection->condition = $request->input('condition_side_step_left');
         $routine_inspection->remarks = $request->input('remarks_side_step_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -738,7 +741,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Door Front Left (Check Handles)";
-        $routine_inspection->spec = $request->input('spec_door_front_left');
         $routine_inspection->condition = $request->input('condition_door_front_left');
         $routine_inspection->remarks = $request->input('remarks_door_front_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -746,7 +748,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Mirror Door Driver";
-        $routine_inspection->spec = $request->input('spec_mirror_door_driver');
         $routine_inspection->condition = $request->input('condition_mirror_door_driver');
         $routine_inspection->remarks = $request->input('remarks_mirror_door_driver');
         $routine_inspection->inspection_id = $inspection->id;
@@ -754,7 +755,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Roof / A-pillars Left";
-        $routine_inspection->spec = $request->input('spec_roof');
         $routine_inspection->condition = $request->input('condition_roof');
         $routine_inspection->remarks = $request->input('remarks_roof');
         $routine_inspection->inspection_id = $inspection->id;
@@ -762,7 +762,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Door Rear Left (Check Handles)";
-        $routine_inspection->spec = $request->input('spec_door_rear_left');
         $routine_inspection->condition = $request->input('condition_door_rear_left');
         $routine_inspection->remarks = $request->input('remarks_door_rear_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -770,7 +769,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Fender Rear Left";
-        $routine_inspection->spec = $request->input('spec_fender_rear_left');
         $routine_inspection->condition = $request->input('condition_fender_rear_left');
         $routine_inspection->remarks = $request->input('remarks_fender_rear_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -778,7 +776,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Bed / Box";
-        $routine_inspection->spec = $request->input('spec_bed_box');
         $routine_inspection->condition = $request->input('condition_bed_box');
         $routine_inspection->remarks = $request->input('remarks_bed_box');
         $routine_inspection->inspection_id = $inspection->id;
@@ -786,7 +783,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Tailgate (Check Handles)";
-        $routine_inspection->spec = $request->input('spec_tailgate');
         $routine_inspection->condition = $request->input('condition_tailgate');
         $routine_inspection->remarks = $request->input('remarks_tailgate');
         $routine_inspection->inspection_id = $inspection->id;
@@ -794,7 +790,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Lights Rear";
-        $routine_inspection->spec = $request->input('spec_light_rear');
         $routine_inspection->condition = $request->input('condition_light_rear');
         $routine_inspection->remarks = $request->input('remarks_light_rear');
         $routine_inspection->inspection_id = $inspection->id;
@@ -802,7 +797,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Bumper Rear";
-        $routine_inspection->spec = $request->input('spec_bumper_rear');
         $routine_inspection->condition = $request->input('condition_bumper_rear');
         $routine_inspection->remarks = $request->input('remarks_bumper_rear');
         $routine_inspection->inspection_id = $inspection->id;
@@ -810,7 +804,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Underbody Parts (Muffler / Tank)";
-        $routine_inspection->spec = $request->input('spec_underbody_parts');
         $routine_inspection->condition = $request->input('condition_underbody_parts');
         $routine_inspection->remarks = $request->input('remarks_underbody_parts');
         $routine_inspection->inspection_id = $inspection->id;
@@ -818,7 +811,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Fender Rear Right";
-        $routine_inspection->spec = $request->input('spec_fender_rear_right');
         $routine_inspection->condition = $request->input('condition_fender_rear_right');
         $routine_inspection->remarks = $request->input('remarks_fender_rear_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -826,7 +818,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Tire / Rim Rear Left";
-        $routine_inspection->spec = $request->input('spec_tire_rim_rear_left');
         $routine_inspection->condition = $request->input('condition_tire_rim_rear_left');
         $routine_inspection->remarks = $request->input('remarks_tire_rim_rear_left');
         $routine_inspection->inspection_id = $inspection->id;
@@ -834,7 +825,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Door Rear Right (Check Handles)";
-        $routine_inspection->spec = $request->input('spec_door_rear_right');
         $routine_inspection->condition = $request->input('condition_door_rear_right');
         $routine_inspection->remarks = $request->input('remarks_door_rear_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -842,7 +832,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Roof / A-pillars Right";
-        $routine_inspection->spec = $request->input('spec_pillar_right');
         $routine_inspection->condition = $request->input('condition_pillar_right');
         $routine_inspection->remarks = $request->input('remarks_pillar_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -850,7 +839,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Mirror Door Passenger";
-        $routine_inspection->spec = $request->input('spec_mirror_door_passenger');
         $routine_inspection->condition = $request->input('condition_mirror_door_passenger');
         $routine_inspection->remarks = $request->input('remarks_mirror_door_passenger');
         $routine_inspection->inspection_id = $inspection->id;
@@ -858,7 +846,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Door Front Right(Check Handles)";
-        $routine_inspection->spec = $request->input('spec_door_front_right');
         $routine_inspection->condition = $request->input('condition_door_front_right');
         $routine_inspection->remarks = $request->input('remarks_door_front_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -866,7 +853,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Side Steps Right (If applicable)";
-        $routine_inspection->spec = $request->input('spec_side_steps_right');
         $routine_inspection->condition = $request->input('condition_side_steps_right');
         $routine_inspection->remarks = $request->input('remarks_side_steps_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -874,7 +860,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Fender Front Right";
-        $routine_inspection->spec = $request->input('spec_fender_front_right');
         $routine_inspection->condition = $request->input('condition_fender_front_right');
         $routine_inspection->remarks = $request->input('remarks_fender_front_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -882,7 +867,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Tire /  Rim Front Right";
-        $routine_inspection->spec = $request->input('spec_tire_rim_front_right');
         $routine_inspection->condition = $request->input('condition_tire_rim_front_right');
         $routine_inspection->remarks = $request->input('remarks_tire_rim_front_right');
         $routine_inspection->inspection_id = $inspection->id;
@@ -890,7 +874,6 @@ class InspectionController extends Controller
         $routine_inspection->save();
         $routine_inspection = New RoutineInspection();
         $routine_inspection->check_items = "Radio Antenna";
-        $routine_inspection->spec = $request->input('spec_radio_antenna');
         $routine_inspection->condition = $request->input('condition_radio_antenna');
         $routine_inspection->remarks = $request->input('remarks_radio_antenna');
         $routine_inspection->inspection_id = $inspection->id;
@@ -957,6 +940,10 @@ class InspectionController extends Controller
     }
     public function pdiinspection(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Submit the PDI Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
        $vehicle_id =  $request->input('vehicle_id');
        $inspection = New Inspection();
        $inspection->status = "Pending";

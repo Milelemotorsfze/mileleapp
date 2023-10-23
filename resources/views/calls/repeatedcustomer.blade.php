@@ -1,14 +1,13 @@
 @extends('layouts.table')
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('Calls-modified');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['Calls-modified', 'approve-reservation']);
   @endphp
   @if ($hasPermission)
   <div class="card-header">
     <h4 class="card-title">
      Repeated Customers Info
     </h4>
-    @can('Calls-view')
   </div>
   <div class="tab-content">
         <div class="card-body">
@@ -90,7 +89,6 @@
           </div>  
         </div>  
       </div>  
-    @endcan
       </div>
   </div>
   @else

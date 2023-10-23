@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\LeadSource;
 use Illuminate\Support\Facades\Auth;
+use App\Models\UserActivities;
 use Illuminate\Http\Request;
 
 class LeadSourceController extends Controller
@@ -13,6 +14,10 @@ class LeadSourceController extends Controller
      */
     public function index()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open Lead Source Information";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $data = LeadSource::orderBy('status','ASC')->get();
         return view('calls.lead_source',compact('data'));
     }
@@ -22,6 +27,10 @@ class LeadSourceController extends Controller
      */
     public function create()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open lead Source Create Page";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         return view('calls.lead_source_create'); 
     }
 
@@ -30,6 +39,10 @@ class LeadSourceController extends Controller
      */
     public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create New Lead Source";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $this->validate($request, [
             'source_name' => 'required',
         ], [
@@ -65,6 +78,10 @@ class LeadSourceController extends Controller
      */
     public function edit($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Edit Page Open Lead Source";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $record = LeadSource::findOrFail($id);
     return view('calls.lead_source_edit', ['record' => $record]);
     }
@@ -74,6 +91,10 @@ class LeadSourceController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Edit the Lead Source";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $record = LeadSource::findOrFail($id);
         $source_name = $request->input('source_name');
     

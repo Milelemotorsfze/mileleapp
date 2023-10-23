@@ -9,11 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB; // Import the DB facade here
-
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles, SoftDeletes;
-
     protected $fillable = [
         'name',
         'email',
@@ -21,12 +19,10 @@ class User extends Authenticatable
         'selected_role', // Add the selected_role column here
         'sales_rap',
     ];
-
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
@@ -58,5 +54,9 @@ class User extends Authenticatable
         }
 
         return false;
+    }
+    public function empProfile()
+    {
+        return $this->hasOne(Profile::class, 'user_id');
     }
 }

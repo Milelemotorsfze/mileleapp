@@ -12,6 +12,8 @@ class BookingRequest extends Model
     protected $fillable = [
         'date',
         'vehicle_id',
+        'etd',
+        'bookingnotes',
         'calls_id',
         'created_by',
         'status',

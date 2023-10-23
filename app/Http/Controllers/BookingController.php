@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\UserActivities;
 use App\Models\Brand;
 use App\Events\DataUpdatedEvent;
 use App\Models\User;
@@ -24,32 +25,56 @@ class BookingController extends Controller
 {
     public function create($call_id)
 {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Create Booking";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $brands = Brand::all();
     return view('booking.create', compact('call_id', 'brands'));
 }
     public function getModelLines(Request $request, $brandId)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Get the Model into booking section";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $modelLines = MasterModelLines::where('brand_id', $brandId)->pluck('model_line', 'id');
         return response()->json($modelLines);
     }
 
     public function getVariants(Request $request, $modelLineId)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Get the Variant into Booking Section";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $variants = Varaint::where('master_model_lines_id', $modelLineId)->pluck('name', 'id');
         return response()->json($variants);
     }
     public function getInteriorColors(Request $request, $variantId)
 {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Get the Colour interior Booking Section";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $colors = ColorCode::where('belong_to', 'int')->pluck('name', 'id');
     return response()->json($colors);
 }
 public function getExteriorColors(Request $request, $variantId)
 {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Get the Exterior Colour Into Booking Sector";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $colors = ColorCode::where('belong_to', 'ex')->pluck('name', 'id');
     return response()->json($colors);
 }
 public function getbookingvehicles($variantId, $interiorColorId = null, $exteriorColorId = null)
 {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Shifting the Vehicle into Booking List";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $today = now();
     $query = Vehicles::select([
         'vehicles.vin as vin',
@@ -58,6 +83,7 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
         'master_model_lines.model_line',
         'varaints.name as variant_name',
         'varaints.detail as variant_detail',
+        'model_detail as model_detail',
         'interior_color_code.name as interior_color',
         'exterior_color_code.name as exterior_color',
         \DB::raw('CASE WHEN vehicles.grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
@@ -86,18 +112,26 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
 }
 public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Store the Booking Vehicle";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $date = $request->input('date');
         $callId = $request->input('call_id');
+        $bookingnotes = $request->input('bookingnotes');
+        $etd = $request->input('etd');
         $selectedData = json_decode($request->input('selectedData'), true);
         foreach ($selectedData as $item) {
-            $vehicleId = $item['vehicleId'];
-    $days = $item['days'];
-    info('Vehicle ID: ' . $vehicleId);
-    info('Days: ' . $days);
+        $vehicleId = $item['vehicleId'];
+        $days = $item['days'];
+        info('Vehicle ID: ' . $vehicleId);
+        info('Days: ' . $days);
             BookingRequest::create([
                 'date' => $date,
                 'status' => "New",
                 'calls_id' => $callId,
+                'bookingnotes' => $bookingnotes,
+                'etd' => $etd,
                 'created_by' => Auth::id(),
                 'vehicle_id' => $vehicleId,
                 'days' => $days,
@@ -107,6 +141,10 @@ public function store(Request $request)
     }
     public function index(Request $request)
 {
+    $useractivities =  New UserActivities();
+    $useractivities->activity = "Booking Approval Section View";
+    $useractivities->users_id = Auth::id();
+    $useractivities->save();
     $hasEditSOPermission = Auth::user()->hasPermissionForSelectedRole('edit-so');
     if ($request->ajax()) {
         $status = $request->input('status');
@@ -119,9 +157,12 @@ public function store(Request $request)
                 'booking_requests.calls_id',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
                 'booking_requests.days',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'vehicles.vin',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -167,12 +208,15 @@ public function store(Request $request)
             $status = "Approved";
             $data = Booking::select([
                 'booking.id',
-                'booking.booking_start_date',
-                'booking.booking_end_date',
+                DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
+                DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
                 'brands.brand_name',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -189,6 +233,7 @@ public function store(Request $request)
             ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
             ->leftJoin('users', 'booking.created_by', '=', 'users.id')
             ->leftJoin('so', 'vehicles.so_id', '=', 'so.id')
+            ->whereNull('vehicles.so_id')
             ->where('booking_requests.status', $status)
             ->whereDate('booking.booking_end_date', '>=', now());
             if ($hasEditSOPermission) {
@@ -221,12 +266,15 @@ public function store(Request $request)
             $status = "Approved";
             $data = Booking::select([
                 'booking.id',
-                'booking.booking_start_date',
-                'booking.booking_end_date',
+                DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
+                DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -276,12 +324,15 @@ public function store(Request $request)
             $status = "Approved";
             $data = Booking::select([
                 'booking.id',
-                'booking.booking_start_date',
-                'booking.booking_end_date',
+                DB::raw("DATE_FORMAT(booking.booking_start_date, '%d-%b-%Y') as booking_start_date"),
+                DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -335,8 +386,11 @@ public function store(Request $request)
                 'booking_requests.days',
                 'booking_requests.reason',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -385,11 +439,16 @@ public function store(Request $request)
 }
 public function approval(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved the Vehicle Booking";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $id = $request->input('id');
         $days = $request->input('days');
         $status = $request->input('status');
         $reason = $request->input('reason');
         $bookingRequest = BookingRequest::find($id);
+        info($id);
         $today = now();
         if($status === "Approved"){
         $vehicle_id = $bookingRequest->vehicle_id;
@@ -450,6 +509,10 @@ public function approval(Request $request)
     }
     public function extended(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Extended the Time of the Booking Vehicles";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $id = $request->input('id');
         $days = $request->input('days');
         info($id);
@@ -472,5 +535,5 @@ public function approval(Request $request)
             $booking->save();
         }
         return response()->json(['message' => 'Booking Status Update successfully'], 200);
-    }       
+    }    
 }

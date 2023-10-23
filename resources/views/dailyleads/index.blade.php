@@ -134,6 +134,9 @@ input[type=number]::-webkit-outer-spin-button
       <a class="btn btn-sm btn-primary float-end" href="{{ route('booking.index') }}" text-align: right>
         <i class="fa fa-info" aria-hidden="true"></i> Bookings
       </a>
+      <!-- <a class="btn btn-sm btn-primary float-end" href="" text-align: right>
+        <i class="fa fa-info" aria-hidden="true"></i> Bookings (Coming Soon)
+      </a> -->
       <div class="clearfix"></div>
 <br>
     @endcan
@@ -250,9 +253,10 @@ input[type=number]::-webkit-outer-spin-button
     @can('sales-view')
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
-      <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
+      <li><a class="dropdown-item" href="{{ route('qoutation.proforma_invoice', ['callId' => $calls->id]) }}">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
-      <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li>
+      <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
+      <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
       <li><a class="dropdown-item" href="#" onclick="openModalclosed('{{ $calls->id }}')">Sales Order</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalr('{{ $calls->id }}')">Rejected</a></li>
       @endcan
@@ -1206,6 +1210,10 @@ $(document).ready(function () {
   $('.select2').select2();
   var dataTable = $('#dtBasicExample1').DataTable({
   pageLength: 10,
+  columnDefs: [
+    { type: 'date', targets: [0] },
+  ],
+  order: [[0, 'desc']],
   initComplete: function() {
     this.api().columns().every(function(d) {
       var column = this;
@@ -1365,7 +1373,6 @@ function s2ab(s) {
                                     <li><a class="dropdown-item" href="#" onclick="openModald(${data})">Demand</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -1465,7 +1472,6 @@ function s2ab(s) {
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModal(${data})">Quotation</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -1599,7 +1605,7 @@ function s2ab(s) {
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="openModalqualified(${data})">Negotiation</a></li>
-                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                    <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -1769,7 +1775,7 @@ function s2ab(s) {
                                     <i class="fa fa-bars" aria-hidden="true"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="${bookingUrl}">Booking Vehicles</a></li>
+                                <li><a class="dropdown-item" href="${bookingUrl}">Booking</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalclosed(${data})">Sales Order</a></li>
                                     <li><a class="dropdown-item" href="#" onclick="openModalr(${data})">Rejected</a></li>
                                 </ul>
@@ -1955,7 +1961,7 @@ function s2ab(s) {
     render: function (data, type, row) {
         const bookingUrl = `{{ url('booking/create') }}/${data}`;
         return `
-            <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking Vehicles">
+            <a class="btn btn-sm btn-info" href="${bookingUrl}" title="Booking">
                 <i class="fa fa-car" aria-hidden="true"></i>
             </a>`;
     }

@@ -19,6 +19,7 @@ use App\Models\ModelHasRoles;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Carbon\CarbonTimeZone;
+use App\Models\UserActivities;
 use App\Models\Purchasinglog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +31,10 @@ class PurchasingOrderController extends Controller
      */
     public function index()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Purchasing Order Index Page View";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $userId = auth()->user()->id;
         $data = PurchasingOrder::with('purchasing_order_items')->where('created_by', $userId)->get();
         return view('warehouse.index', compact('data'));
@@ -188,7 +193,11 @@ class PurchasingOrderController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
+{
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Creating Purchasing Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $vendors = Supplier::whereHas('vendorCategories', function ($query) {
         $query->where('category', 'Vehicles');
     })->get();
@@ -205,6 +214,10 @@ class PurchasingOrderController extends Controller
      */
     public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Store the Purchasing Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $poNumber = $request->input('po_number');
         $existingPO = PurchasingOrder::where('po_number', $poNumber)->first();
         if ($existingPO) {
@@ -301,6 +314,10 @@ class PurchasingOrderController extends Controller
      */
     public function show($id)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Show The Purchasing Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $variants = Varaint::join('brands', 'varaints.brands_id', '=', 'brands.id')
         ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
         ->select('varaints.*', 'brands.brand_name', 'master_model_lines.model_line')

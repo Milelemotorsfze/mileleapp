@@ -33,7 +33,7 @@
   </style>
 @section('content')
 @php
-  $hasPermission = Auth::user()->hasPermissionForSelectedRole('sales-view');
+  $hasPermission = Auth::user()->hasPermissionForSelectedRole(['sales-view', 'approve-reservation']);
   @endphp
   @if ($hasPermission)
   <div class="card-header">
@@ -142,6 +142,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
+            <label for="status" class="form-label">Original End Date:</label>
+            <span id="originalEndDateValue"></span>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Updated End Date:</label>
+            <span id="updatedEndDateValue"></span>
+        </div>
+                    <div class="mb-3">
                         <label for="status" class="form-label">Reason:</label>
                         <input type="text" name="extendedreason" id="extendedreason" class="form-control">
                     </div>
@@ -168,11 +176,14 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -200,12 +211,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -234,12 +248,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -268,12 +285,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -297,12 +317,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
                   <th>Reason</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,6 +338,9 @@
       </div>
     </div>
   </div>
+  @php
+    $routeUrl = route('booking.leadspage', ['calls_id' => ':calls_id']);
+@endphp
   <script>
         $(document).ready(function () {
             const editModal = $('#editModal');
@@ -326,16 +352,26 @@
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking_requests.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking_requests.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
@@ -357,24 +393,34 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved Without SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
                         return `
-                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}" data-end-date="${row.booking_end_date}">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>`;
                 }
                 },
@@ -392,24 +438,34 @@
             columns: [
                 { data: 'id', name: 'booking.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
                     name: 'id',
                     render: function (data, type, row) {
                         return `
-                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}">
-                            <i class="fa fa-bars" aria-hidden="true"></i>
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editModalws" data-id="${data}" data-end-date="${row.booking_end_date}">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
                         </button>`;
                 }
                 },
@@ -423,16 +479,26 @@
             columns: [
                 { data: 'id', name: 'booking.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
             ]
         });
         $('#dtBasicExample5').DataTable({
@@ -442,33 +508,61 @@
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking_requests.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
                 { data: 'reason', name: 'booking_requests.reason' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
             ]
         });
         editModalws.on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget);
-        const id = button.data('id');
-        $('#modalIdValuews').text(id);
+    const button = $(event.relatedTarget);
+    const id = button.data('id');
+    const originalEndDate = new Date(button.data('end-date'));
+    $('#modalIdValuews').text(id);
+    $('#originalEndDateValue').text(formatDate(originalEndDate));
+    $('#extendeddays').change(function () {
+        const days = parseInt($(this).val());
+        if (!isNaN(days)) {
+            const newEndDate = new Date(originalEndDate);
+            newEndDate.setDate(newEndDate.getDate() + days);
+            $('#updatedEndDateValue').text(formatDate(newEndDate));
+        }
     });
+    function formatDate(date) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+});
     $('#saveButton').on('click', function () {
         saveData();
     });
 });
 function saveData() {
-    const id = $('#modalIdValuews').text();
+    const id = $('#modalIdValue').text();
     const days = $('#days').val();
     const reason = $('#reason').val();
     const status = $('#apstatus').val();
+    console.log(id);
     const data = {
         id: id,
         days: days,

@@ -2400,7 +2400,6 @@ public function viewalls(Request $request)
         $query = Vehicles::with(['So', 'PurchasingOrder', 'Grn', 'Gdn', 'variant', 'document', 'warehouse', 'interior', 'exterior', 'variant.brand', 'variant.master_model_lines', 'So.salesperson', 'latestRemarkSales', 'latestRemarkWarehouse']);
         foreach ($searchParams as $column => $searchValue) {
             if ($searchValue !== null) {
-                // Apply the search condition for this column
                 if ($column === "po_number") {
                     $query->whereHas('PurchasingOrder', function ($subQuery) use ($searchValue) {
                         $subQuery->where('po_number', 'LIKE', '%' . $searchValue . '%');

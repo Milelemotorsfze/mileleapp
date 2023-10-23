@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model
+class UserActivities extends Model
 {
     use HasFactory;
-    protected $table = 'documents';
+    protected $table = 'user_activities';
     protected $fillable = [
-        'import_type',
-        'owership',
-        'document_with',
-        'bl_status',
+        'activity',
+        'users_id',
+        'created_at'
     ];
 }

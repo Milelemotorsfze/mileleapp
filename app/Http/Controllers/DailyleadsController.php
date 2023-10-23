@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dailyleads;
 use Illuminate\Support\Facades\DB;
+use App\Models\UserActivities;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Calls;
 use App\Models\CallsRequirement;
@@ -28,13 +29,17 @@ class DailyleadsController extends Controller
 {
     public function index(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Open the Daily Leads Section";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $id = Auth::user()->id;
-        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
+        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->orderBy('created_by', 'desc')->get();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
             $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
-                ->where('status', $status)->where('sales_person', $id);
+                ->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
@@ -192,6 +197,10 @@ class DailyleadsController extends Controller
     }
     public function create()
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Create the New Direct Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $LeadSource = LeadSource::select('id','source_name')->orderBy('source_name', 'ASC')->where('status','active')->whereIn('id', [6, 16, 35, 40])->get();
         $countries = CountryListFacade::getList('en');
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
@@ -203,6 +212,10 @@ class DailyleadsController extends Controller
      */
     public function store(Request $request)
     {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Store the New Direct Lead";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
         $modelLineIdsRaw = $request->input('model_line_ids');
         $modelLineIds = json_decode($modelLineIdsRaw, true);
         $modelLineIds = array_map('strval', $modelLineIds);
@@ -296,6 +309,10 @@ class DailyleadsController extends Controller
     }
     public function processStep(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead Status";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $status = $request->input('status');
     $calls = Calls::where('status', $status)->get();
 
@@ -330,6 +347,10 @@ public function prospecting($id)
    
     public function qoutations(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead to Qoutation";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $validatedData = $request->validate([
         'date' => 'required|date',
         'dealValue' => 'nullable|numeric',
@@ -358,6 +379,10 @@ public function prospecting($id)
 }
 public function rejection(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the lead into Rejection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $rejection = new Rejection();
     $rejection->date = $request->date;
     $rejection->Reason = $request->reason;
@@ -374,6 +399,10 @@ public function rejection(Request $request)
 
 public function closed(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the lead into Sales Order";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $sonumber = $request->sonumber;
     $so = So::where('so_number', $sonumber)->first();
     if (!$so) {
@@ -402,6 +431,10 @@ public function closed(Request $request)
 }
 public function savenegotiation(Request $request)
 {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead into Negotiation";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $negotiation = new Negotiation();
     $negotiation->date = $request->date;
     $negotiation->sales_notes = $request->has('salesNotes') ? $request->salesNotes : '';
@@ -424,6 +457,10 @@ public function savenegotiation(Request $request)
 }
 public function saveprospecting(Request $request)
 	{
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change the Lead into Prospecting";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $validatedData = $request->validate([
         'date' => 'required|date',
         'salesNotes' => 'nullable|string',
@@ -442,6 +479,10 @@ public function saveprospecting(Request $request)
 	}
     public function savedemand(Request $request)
 	{
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Change Lead into Demand";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
     $validatedData = $request->validate([
         'date' => 'required|date',
         'salesNotes' => 'nullable|string',
@@ -458,4 +499,8 @@ public function saveprospecting(Request $request)
     $call->save();
     return response()->json(['success' => true]);
 	}
+    public function leadspage($calls_id)
+    {
+    dd($calls_id);
+    }  
 }
