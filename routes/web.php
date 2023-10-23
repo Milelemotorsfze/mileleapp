@@ -64,6 +64,8 @@ use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\VariantRequests;
 use App\Http\Controllers\ModificationController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\ProformaInvoiceController;
+
 /*
 /*
 |--------------------------------------------------------------------------
@@ -428,6 +430,7 @@ Route::get('/d', function () {
     Route::post('/submit-approval', [BookingController::class, 'approval'])->name('booking.approval');
     Route::get('booking/checking-so', [BookingController::class, 'checkingso'])->name('booking.checkingso');
     Route::post('/submit-extended', [BookingController::class, 'extended'])->name('booking.extended');
+    Route::get('booking/{calls_id}', [DailyleadsController::class, 'leadspage'])->name('booking.leadspage');
 
     //Inspection
     Route::resource('inspection', InspectionController::class);
@@ -495,4 +498,7 @@ Route::get('/d', function () {
     Route::resource('logisticsdocuments', DocumentController::class);
     Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
     Route::post('logisticsdocuments/sendingbl', [DocumentController::class, 'updatedocbl'])->name('logisticsdocuments.updatedocbl');
+
+    //Profoma Invoice
+    Route::get('/proforma_invoice/{callId}', [ProformaInvoiceController::class, 'proforma_invoice'])->name('qoutation.proforma_invoice');
     });

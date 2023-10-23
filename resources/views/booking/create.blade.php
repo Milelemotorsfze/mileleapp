@@ -94,6 +94,7 @@
                             <th>VIN</th>
                             <th>Brand Name</th>
                             <th>Model Line</th>
+                            <th>Model Details</th>
                             <th>Variant Name</th>
                             <th>Variant Detail</th>
                             <th>Interior Color</th>
@@ -107,9 +108,19 @@
                 </table>
             </div>
 			</div> 
-           
         </div>
         <br>
+        <div class="row">
+        <div class="col-lg-2">
+            <label for="etd">ETD (Estimated Time of Delivery)</label>
+            <input type="date" id="etd" name="etd" class="form-control">
+        </div>
+        <div class="col-lg-10">
+            <label for="remarks">Booking Notes</label>
+            <input type="text" id="bookingnotes" name="bookingnotes" class="form-control">
+        </div>
+    </div>
+</br>
         <div class="col-lg-12 col-md-12">
     <input type="submit" id="submit-button" name="submit" value="Submit" style="float: right;" class="btn btn-success" />
 </div> 
@@ -170,6 +181,7 @@
                             <th>VIN</th>
                             <th>Brand Name</th>
                             <th>Model Line</th>
+                            <th>Model Details</th>
                             <th>Variant Name</th>
                             <th>Variant Detail</th>
                             <th>Interior Color</th>
@@ -334,10 +346,14 @@ secondTable.rows().every(function() {
 });
 var dateValue = $('#name').val();
 var callIdValue = $('#call_id').val();
+var etd = $('#etd').val();
+var bookingnotes = $('#bookingnotes').val();
 var requestData = {
     selectedData: JSON.stringify(selectedData),
     date: dateValue,
-    call_id: callIdValue
+    call_id: callIdValue,
+    bookingnotes: bookingnotes,
+    etd: etd
 };
 console.log(requestData);
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -385,7 +401,6 @@ $('#search-button').on('click', function() {
     var variantId = $('#variant').val();
     var interiorColorId = $('#interior_color').val();
     var exteriorColorId = $('#exterior_color').val();
-
     if (!variantId) {
         alert("Please select a variant before searching.");
         return;
@@ -416,6 +431,7 @@ $('#search-button').on('click', function() {
                     vehicle.vin,
                     vehicle.brand,
                     vehicle.model_line,
+                    vehicle.model_detail,
                     vehicle.variant_name,
                     vehicle.variant_detail,
                     vehicle.interior_color,
@@ -434,6 +450,7 @@ $('#search-button').on('click', function() {
                     { title: 'VIN' },
                     { title: 'Brand Name' },
                     { title: 'Model Line' },
+                    { title: 'Model Detail' },
                     { title: 'Variant Name' },
                     { title: 'Variant Detail' },
                     { title: 'Interior Color' },

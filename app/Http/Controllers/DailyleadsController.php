@@ -34,12 +34,12 @@ class DailyleadsController extends Controller
         $useractivities->users_id = Auth::id();
         $useractivities->save();
         $id = Auth::user()->id;
-        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->get();
+        $pendingdata = Calls::where('status', 'New')->where('sales_person', $id)->orderBy('created_by', 'desc')->get();
         if ($request->ajax()) {
             $status = $request->input('status');
             $searchValue = $request->input('search.value');
             $data = Calls::select(['calls.id', DB::raw("DATE_FORMAT(calls.created_at, '%d-%b-%Y') as created_at"), 'calls.type', 'calls.name', 'calls.phone', 'calls.email', 'calls.custom_brand_model', 'calls.location', 'calls.language', DB::raw("REPLACE(REPLACE(calls.remarks, '<p>', ''), '</p>', '') as remarks")])
-                ->where('status', $status)->where('sales_person', $id);
+                ->where('status', $status)->where('sales_person', $id)->orderBy('created_at', 'desc');
             $data->addSelect(DB::raw('(SELECT GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ") FROM calls_requirement
                 JOIN master_model_lines ON calls_requirement.model_line_id = master_model_lines.id
                 JOIN brands ON master_model_lines.brand_id = brands.id
@@ -499,4 +499,8 @@ public function saveprospecting(Request $request)
     $call->save();
     return response()->json(['success' => true]);
 	}
+    public function leadspage($calls_id)
+    {
+    dd($calls_id);
+    }  
 }

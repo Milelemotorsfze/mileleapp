@@ -83,6 +83,7 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
         'master_model_lines.model_line',
         'varaints.name as variant_name',
         'varaints.detail as variant_detail',
+        'model_detail as model_detail',
         'interior_color_code.name as interior_color',
         'exterior_color_code.name as exterior_color',
         \DB::raw('CASE WHEN vehicles.grn_id IS NULL THEN "Incoming" ELSE "Arrived" END as grn_status')
@@ -117,6 +118,8 @@ public function store(Request $request)
         $useractivities->save();
         $date = $request->input('date');
         $callId = $request->input('call_id');
+        $bookingnotes = $request->input('bookingnotes');
+        $etd = $request->input('etd');
         $selectedData = json_decode($request->input('selectedData'), true);
         foreach ($selectedData as $item) {
         $vehicleId = $item['vehicleId'];
@@ -127,6 +130,8 @@ public function store(Request $request)
                 'date' => $date,
                 'status' => "New",
                 'calls_id' => $callId,
+                'bookingnotes' => $bookingnotes,
+                'etd' => $etd,
                 'created_by' => Auth::id(),
                 'vehicle_id' => $vehicleId,
                 'days' => $days,
@@ -152,9 +157,12 @@ public function store(Request $request)
                 'booking_requests.calls_id',
                 DB::raw("DATE_FORMAT(booking_requests.date, '%d-%b-%Y') as date"),
                 'booking_requests.days',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'vehicles.vin',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -205,7 +213,10 @@ public function store(Request $request)
                 'booking.calls_id',
                 'vehicles.vin',
                 'brands.brand_name',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -259,8 +270,11 @@ public function store(Request $request)
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -314,8 +328,11 @@ public function store(Request $request)
                 DB::raw("DATE_FORMAT(booking.booking_end_date, '%d-%b-%Y') as booking_end_date"),
                 'booking.calls_id',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -369,8 +386,11 @@ public function store(Request $request)
                 'booking_requests.days',
                 'booking_requests.reason',
                 'vehicles.vin',
+                'booking_requests.bookingnotes',
+                'booking_requests.etd',
                 'brands.brand_name',
                 'varaints.name as variant',
+                'varaints.model_detail as model_detail',
                 'varaints.detail as variant_details',
                 'master_model_lines.model_line',
                 'int_color.name as interior_color',
@@ -515,5 +535,5 @@ public function approval(Request $request)
             $booking->save();
         }
         return response()->json(['message' => 'Booking Status Update successfully'], 200);
-    }       
+    }    
 }

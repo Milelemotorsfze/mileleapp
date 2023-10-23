@@ -176,11 +176,14 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -208,12 +211,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -242,12 +248,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                   @php
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole('approve-reservation');
                                 @endphp
@@ -276,12 +285,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Start Date</th>
                   <th>End Date</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -305,12 +317,15 @@
                   <th>VIN</th>
                   <th>Brand</th>
                   <th>Model Line</th>
+                  <th>Model Detail</th>
                   <th>Variant Name</th>
                   <th>Variant Detail</th>
                   <th>Interior Color</th>
                   <th>Exterior Color</th>
                   <th>Days</th>
                   <th>Reason</th>
+                  <th>ETD</th>
+                  <th>Booking Notes</th>
                 </tr>
               </thead>
               <tbody>
@@ -323,6 +338,9 @@
       </div>
     </div>
   </div>
+  @php
+    $routeUrl = route('booking.leadspage', ['calls_id' => ':calls_id']);
+@endphp
   <script>
         $(document).ready(function () {
             const editModal = $('#editModal');
@@ -334,16 +352,26 @@
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking_requests.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking_requests.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
@@ -365,16 +393,26 @@
             ajax: "{{ route('booking.index', ['status' => 'Approved Without SO']) }}",
             columns: [
                 { data: 'id', name: 'booking.id' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
@@ -400,16 +438,26 @@
             columns: [
                 { data: 'id', name: 'booking.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
                 @if (Auth::user()->hasPermissionForSelectedRole('approve-reservation'))
                 {
                     data: 'id',
@@ -431,16 +479,26 @@
             columns: [
                 { data: 'id', name: 'booking.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'booking_start_date', name: 'booking.booking_start_date' },
                 { data: 'booking_end_date', name: 'booking.booking_end_date' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
             ]
         });
         $('#dtBasicExample5').DataTable({
@@ -450,17 +508,27 @@
             columns: [
                 { data: 'id', name: 'booking_requests.id' },
                 { data: 'so_number', name: 'so.so_number' },
-                { data: 'calls_id', name: 'booking_requests.calls_id' },
+                {
+            data: 'calls_id',
+            name: 'booking.calls_id',
+            render: function (data, type, row) {
+                var dynamicUrl = "{!! $routeUrl !!}".replace(':calls_id', data);
+                return '<a href="' + dynamicUrl + '">' + data + '</a>';
+            }
+        },
                 { data: 'date', name: 'date' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'brand_name', name: 'brands.brand_name' },
                 { data: 'model_line', name: 'master_model_lines.model_line' },
+                { data: 'model_detail', name: 'varaints.model_detail' },
                 { data: 'variant', name: 'varaints.name' },
                 { data: 'variant_details', name: 'varaints.detail' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
                 { data: 'days', name: 'booking_requests.days' },
                 { data: 'reason', name: 'booking_requests.reason' },
+                { data: 'etd', name: 'booking_requests.etd' },
+                { data: 'bookingnotes', name: 'booking_requests.bookingnotes' },
             ]
         });
         editModalws.on('show.bs.modal', function (event) {
