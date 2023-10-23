@@ -17,11 +17,15 @@ class DemandController extends Controller
 {
     public function index()
     {
+        (new UserActivityController)->createActivity('Open Demand List Section');
+
         $demands = Demand::orderBy('id','DESC')->get();
         return view('demands.index', compact('demands'));
     }
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Demand Create Section');
+
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -32,6 +36,8 @@ class DemandController extends Controller
     }
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('New Demand Created');
+
         $this->validate($request, [
             'whole_saler' => 'required',
             'steering' => 'required',
@@ -56,6 +62,8 @@ class DemandController extends Controller
     }
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open Demand Edit Page');
+
         $cu = date('n') - 2;
         $ru   = $cu + 4;
         $totalYearlyQuantities = [];

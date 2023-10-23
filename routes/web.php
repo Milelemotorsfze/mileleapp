@@ -202,7 +202,7 @@ Route::get('/d', function () {
     // Demand & Planning Module
 
     // suppliers
-    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
+//    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');

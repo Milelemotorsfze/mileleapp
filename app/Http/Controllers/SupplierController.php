@@ -37,6 +37,8 @@ class SupplierController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open Vendor Listing Section');
+
         $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')
             ->whereHas('supplierTypes', function ($query){
                 $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -71,6 +73,8 @@ class SupplierController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Vendor Create Section');
+
         $paymentMethods = DB::table('payment_methods')->get();
         $addons = AddonDetails::select('id','addon_code','addon_id')->with('AddonName')->get();
 //        if(Auth::user()->hasPermissionTo('demand-planning-supplier-create') && !Auth::user()->hasPermissionTo('addon-supplier-create'))
@@ -161,6 +165,8 @@ class SupplierController extends Controller
     }
     public function show(Supplier $supplier)
     {
+        (new UserActivityController)->createActivity('Open Vendor View Section');
+
         $rowperpage = $data = '';
         $content = '';
         $addon1 =  $supplierTypes = '';
@@ -217,6 +223,8 @@ class SupplierController extends Controller
 //            $supplier = Supplier::findOrFail($supplier->id);
 //            return view('demand_planning_suppliers.edit', compact('supplier'));
 //        }
+        (new UserActivityController)->createActivity('Open Vendor Edit Section');
+
         $paymentMethods = DB::table('payment_methods')->get();
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)
@@ -403,6 +411,8 @@ class SupplierController extends Controller
     {
         // dd($request->all());
         $payment_methods_id = $addon_id = [];
+        (new UserActivityController)->createActivity('Created Vendor');
+
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [
             'supplier' => 'required',
@@ -936,7 +946,7 @@ class SupplierController extends Controller
     }
     public function updateDetails(Request $request)
     {
-// dd($request->deletedDocuments);
+        (new UserActivityController)->createActivity('Updated Vendor Details');
         $payment_methods_id = $addon_id = [];
         $authId = Auth::id();
         $validator = Validator::make($request->all(), [

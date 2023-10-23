@@ -11,6 +11,8 @@ class MonthlyDemandsController extends Controller
 {
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('Demand Monthly Quantity Updated');
+
         $months = [];
         $years = [];
         $currentMonth = date('n') - 2;

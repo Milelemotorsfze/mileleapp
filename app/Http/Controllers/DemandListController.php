@@ -35,6 +35,8 @@ class DemandListController extends Controller
      */
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('Demand Items Added');
+
         $this->validate($request, [
             'model' => 'required',
             'sfx' => 'required',

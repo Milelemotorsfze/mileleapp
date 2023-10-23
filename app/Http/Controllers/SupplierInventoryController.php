@@ -17,6 +17,8 @@ class SupplierInventoryController extends Controller
 {
     public function index(Request $request)
     {
+        (new UserActivityController)->createActivity('Open Supplier Inventory List Page');
+
         $supplierInventories = SupplierInventory::with('masterModel')
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
@@ -32,6 +34,7 @@ class SupplierInventoryController extends Controller
             ->get();
 
         if($request->supplier_id){
+
             $supplierInventories = $supplierInventories->where('supplier_id', $request->supplier_id);
         }
         if($request->dealers){
@@ -52,6 +55,8 @@ class SupplierInventoryController extends Controller
     }
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Supplier Inventory Create Page');
+
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -64,6 +69,8 @@ class SupplierInventoryController extends Controller
 
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('Added Supplier Inventories');
+
         $request->validate([
             'whole_sales' => 'required',
             'supplier_id' =>' required',
@@ -574,6 +581,8 @@ class SupplierInventoryController extends Controller
         }
     }
     public function FileComparision(Request $request) {
+        (new UserActivityController)->createActivity('Open Supplier Inventories File Comparison Page');
+
         $newlyAddedRows = [];
         $deletedRows = [];
         $updatedRows = [];
@@ -589,6 +598,8 @@ class SupplierInventoryController extends Controller
     }
     public function FileComparisionReport(Request $request)
     {
+        (new UserActivityController)->createActivity('Supplier Inventories File Compared');
+
         $request->validate([
             'first_file' => 'date',
             'second_file' =>' date|after:first_file',
@@ -612,11 +623,11 @@ class SupplierInventoryController extends Controller
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
-//            ->whereNull('eta_import')
+            ->whereNull('eta_import')
             ->get();
         $secondFileRowDetails = SupplierInventory::whereDate('date_of_entry', $request->second_file)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//            ->whereNull('eta_import')
+            ->whereNull('eta_import')
             ->where('supplier_id', $request->supplier_id)
             ->where('whole_sales', $request->whole_sales)
             ->get();
@@ -628,8 +639,8 @@ class SupplierInventoryController extends Controller
                 ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                 ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                 ->where('supplier_id', $request->supplier_id)
-                ->where('whole_sales', $request->whole_sales);
-//                            ->whereNull('eta_import');
+                ->where('whole_sales', $request->whole_sales)
+                ->whereNull('eta_import');
             if ($supplierInventories->count() <= 0) {
                 // model and sfx not existing in Suplr Invtry => new row
                 $newlyAddedRows[$i]['model'] = $masterModel->model;
@@ -649,7 +660,7 @@ class SupplierInventoryController extends Controller
                     $isNullChaisis = SupplierInventory::whereDate('date_of_entry', $request->first_file)
                         ->where('master_model_id', $secondFileRowDetail['master_model_id'])
                         ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                                    ->whereNull('eta_import')
+                        ->whereNull('eta_import')
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
                         ->whereNull('chasis');
@@ -765,7 +776,7 @@ class SupplierInventoryController extends Controller
                         ->where('whole_sales', $request->whole_sales)
                         ->whereNotIn('id', $chasisUpdatedRowIds)
                         ->whereNull('chasis')
-//                                    ->whereNull('eta_import')
+                         ->whereNull('eta_import')
                         ->count();
                     $modelSfxValuePair = $masterModel->model."_".$masterModel->sfx;
                     $countblankchasis[] = $modelSfxValuePair;
@@ -914,8 +925,8 @@ class SupplierInventoryController extends Controller
                 ->where('engine_number', $firstFileRowDetail['engine_number'])
                 ->where('color_code', $firstFileRowDetail['color_code'])
                 ->where('pord_month', $firstFileRowDetail['pord_month'])
-                ->where('po_arm', $firstFileRowDetail['po_arm']);
-
+                ->where('po_arm', $firstFileRowDetail['po_arm'])
+                ->whereNull('eta_import');
                 $firstFileRow = $masterModel->model."_".$masterModel->sfx."_".$firstFileRowDetail['chasis']."_".
                                 $firstFileRowDetail['engine_number']."_".$firstFileRowDetail['color_code']."_".
                                 $firstFileRowDetail['pord_month']."_". $firstFileRowDetail['po_arm'];

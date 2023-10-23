@@ -364,7 +364,7 @@
                     @endphp
                     @if ($hasPermission)
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle arrow-none" href="{{ route('demand-planning-suppliers.create') }}" id="topnav-more" role="button">
+                        <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="sliders"></i>
                             <span data-key="t-extra-pages">Supplier</span>
                         </a>

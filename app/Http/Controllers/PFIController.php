@@ -22,6 +22,8 @@ class PFIController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open PFI List Section');
+
         $pfis = PFI::orderBy('id','DESC')->get();
         foreach ($pfis as $pfi) {
             $approvedLOIItemIds = ApprovedLetterOfIndentItem::where('pfi_id', $pfi->id)->pluck('id');
@@ -43,6 +45,8 @@ class PFIController extends Controller
      */
     public function create(Request $request)
     {
+        (new UserActivityController)->createActivity('Open PFI Create Page');
+
         $letterOfIndent = LetterOfIndent::findOrFail($request->id);
         $approvedPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $request->id)
                                         ->whereNull('pfi_id')
@@ -72,7 +76,8 @@ class PFIController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+        (new UserActivityController)->createActivity('New PFI Created');
+
         $request->validate([
             'pfi_reference_number' => 'required',
             'pfi_date' => 'required',
