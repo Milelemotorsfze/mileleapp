@@ -461,17 +461,34 @@
                                 @endif
                                 @endcan
                                 @can('demand-create')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Demand</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-create');
+                                    @endphp
+                                    @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Demand</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('demand-list')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-list');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('demands.index')}}" class="dropdown-item" data-key="t-login">Demand Lists </a>
+                                                    @endif
+                                                @endcan
+                                                    <a href="{{route('demands.create')}}" class="dropdown-item" data-key="t-login">Add New Demand </a>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 @endcan
                                 @can('LOI-list')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                                    @endphp
+                                    @if ($hasPermission)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility">LOI</span>
@@ -479,29 +496,78 @@
                                         </a>
                                         <div class="dropdown-menu" aria-labelledby="topnav-auth">
                                             @can('LOI-create')
-                                                <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <a href="{{route('letter-of-indents.create')}}" class="dropdown-item" data-key="t-login">Add New LOI</a>
+                                                @endif
                                             @endcan
                                             @can('LOI-list')
-                                                <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Info</a>
-                                                <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-list');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <a href="{{route('letter-of-indents.index')}}" class="dropdown-item" data-key="t-login">LOI Lists</a>
+                                                @endif
+                                            @endcan
+                                            @can('loi-supplier-approve')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('loi-supplier-approve');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <a href="{{route('letter-of-indents.get-suppliers-LOIs')}}" class="dropdown-item" data-key="t-login">Supplier LOIs </a>
+                                                @endif
                                             @endcan
                                         </div>
                                     </div>
+                                    @endif
                                 @endcan
-                                @can('supplier-inventory-list')
-                                    <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
-                                            <span data-key="t-utility">Supplier Inventory</span>
-                                            <div class="arrow-down"></div>
-                                        </a>
-                                        <div class="dropdown-menu" aria-labelledby="topnav-auth">
-                                            <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
-                                            <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
-                                            <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                    @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter','supplier-inventory-report-view'])
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-inventory-list','supplier-inventory-edit',
+                                            'supplier-inventory-list-with-date-filter','supplier-inventory-report-view']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                <span data-key="t-utility">Supplier Inventory</span>
+                                                <div class="arrow-down"></div>
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                @can('supplier-inventory-list')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
+                                                    @endif
+                                                @endcan
+                                                @can('supplier-inventory-list-with-date-filter')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
+                                                        @endif
+                                                @endcan
+                                               @can('supplier-inventory-report-view')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-report-view');
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <a href="{{route('supplier-inventories.file-comparision')}}" class="dropdown-item" data-key="t-login">File Comparison</a>
+                                                    @endif
+                                               @endcan
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 @endcan
-                                @can('demand-create')
+                                @can('PFI-list')
+                                    @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-list');
+                                    @endphp
+                                    @if ($hasPermission)
                                     <div class="dropdown">
                                         <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
                                             <span data-key="t-utility">PFI</span>
@@ -511,6 +577,7 @@
                                             <a href="{{route('pfi.index')}}" class="dropdown-item" data-key="t-login">List PFI </a>
                                         </div>
                                     </div>
+                                    @endif
                                 @endcan
                                     @can('create-customer')
                                         @php

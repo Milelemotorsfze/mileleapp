@@ -1,8 +1,13 @@
 @extends('layouts.main')
 @section('content')
-    <div class="card-header">
-        <h4 class="card-title">Add New LOI Items</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+    @can('LOI-create')
+        @php
+            $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-create');
+        @endphp
+        @if ($hasPermission)
+        <div class="card-header">
+            <h4 class="card-title">Add New LOI Items</h4>
+            <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
     </div>
     <div class="card-body">
@@ -67,12 +72,6 @@
                 </div>
                 <div class="col-lg-2 col-md-4 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label font-size-13">Shipping Method</label>
-                        <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-12">
-                    <div class="mb-3">
                         <label for="choices-single-default" class="form-label font-size-13 ">Vendor</label>
                         <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                     </div>
@@ -92,7 +91,7 @@
                                     <label  class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-4 col-md-4 col-sm-12">
-                                    <label class="form-label">Variant</label>
+                                    <label class="form-label">LOI Description</label>
                                 </div>
                                 <div class="col-lg-1 col-md-2 col-sm-12">
                                    <label class="form-label">Quantity</label>
@@ -115,8 +114,8 @@
                                         <input type="text" value="{{ $letterOfIndentItem->masterModel->sfx }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-4 col-md-4 col-sm-12">
-                                        <label class="form-label d-block d-sm-none">Variant</label>
-                                        <input type="text" value="{{ $letterOfIndentItem->masterModel->variant->name }}" readonly class="form-control">
+                                        <label class="form-label d-block d-sm-none">LOI Description</label>
+                                        <input type="text" value="{{ $letterOfIndentItem->loi_description }}" readonly class="form-control">
                                     </div>
                                     <div class="col-lg-1 col-md-2 col-sm-12">
                                         <label class="form-label d-block d-sm-none">Quantity</label>
@@ -136,76 +135,78 @@
                     @endforeach
                 @endif
 
-            <form id="form-letter-of-indent-items" action="{{ route('letter-of-indent-items.store') }}" method="POST" >
-                @csrf
-                <div class="row mt-3" >
-                <div class="d-flex">
-                    <div class="col-lg-12 col-md-12">
-                        <div class="row">
-                            <div class="col-lg-3 col-md-3 sm-mt-20 col-sm-12">
-                                <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model</label>
-                                <select class="form-select text-dark" name="model" id="model" autofocus>
-                                    <option value="" >Select Model</option>
-                                    @foreach($models as $model)
-                                        <option value="{{ $model->model }}">{{ $model->model }}</option>
-                                    @endforeach
-                                </select>
-                                @error('model')
-                                    <span >
-                                        <strong >{{ $message }}</strong>
-                                    </span>
-                                @enderror
+                <form id="form-letter-of-indent-items" action="{{ route('letter-of-indent-items.store') }}" method="POST" >
+                    @csrf
+                    <div class="row mt-3" >
+                    <div class="d-flex">
+                        <div class="col-lg-12 col-md-12">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-3 sm-mt-20 col-sm-12">
+                                    <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Model</label>
+                                    <select class="form-select text-dark" name="model" id="model" autofocus>
+                                        <option value="" >Select Model</option>
+                                        @foreach($models as $model)
+                                            <option value="{{ $model->model }}">{{ $model->model }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('model')
+                                        <span >
+                                            <strong >{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-2 col-md-2 sm-mt-20 col-sm-12 mb-3">
+                                    <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">SFX</label>
+                                    <select class="form-select text-dark" name="sfx" id="sfx" >
+                                        <option value="">Select SFX</option>
+                                    </select>
+                                    @error('sfx')
+                                    <div role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
+                                    <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">LOI Description</label>
+                                    <select class="form-select text-dark" name="variant" id="variant">
+                                        <option value="">Select LOI Description</option>
+                                    </select>
+                                </div>
+                                <div class="col-lg-1 col-md-2 col-sm-12">
+                                    <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Quantity</label>
+                                    <input type="number" name="quantity" placeholder="Quantity" maxlength="5" class="form-control text-dark"
+                                           step="1" oninput="validity.valid||(value='');" min="0" >
+                                </div>
+                                <div class="col-lg-1 md-mt-20 col-sm-12">
+                                    <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
+                                        Inventory Quantity
+                                    </label>
+                                </div>
+                                <div class="col-lg-1 col-md-2 md-mt-20 col-sm-12">
+                                    <label class="form-label d-lg-none d-xl-none d-xxl-none">Inventory Qty</label>
+                                    <input type="number" readonly id="inventory-quantity" value="" class="form-control" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
+                                </div>
+                                <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                             </div>
-                            <div class="col-lg-2 col-md-2 sm-mt-20 col-sm-12 mb-3">
-                                <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">SFX</label>
-                                <select class="form-select text-dark" name="sfx" id="sfx" >
-                                    <option value="">Select SFX</option>
-                                </select>
-                                @error('sfx')
-                                <div role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </div>
-                                @enderror
+                            <div class="col-12 text-end mt-4">
+                                <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
+                                @if($letterOfIndentItems->count() > 0)
+                                    <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
+                                        <button type="button" class="btn btn-primary  btn-deal-item-submit" >
+                                            Next
+                                        </button>
+                                    </a>
+                                @endif
                             </div>
-                            <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
-                                <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Variant</label>
-                                <select class="form-select text-dark" name="variant" id="variant">
-                                    <option value="">Select Variant</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-1 col-md-2 col-sm-12">
-                                <label class="form-label @if($letterOfIndentItems->count() > 0) d-block d-sm-none @endif">Quantity</label>
-                                <input type="number" name="quantity" placeholder="Quantity" maxlength="5" class="form-control text-dark"
-                                       step="1" oninput="validity.valid||(value='');" min="0" >
-                            </div>
-                            <div class="col-lg-1 md-mt-20 col-sm-12">
-                                <label class="form-label d-none d-lg-block d-xl-block d-xxl-block" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
-                                    Inventory Quantity
-                                </label>
-                            </div>
-                            <div class="col-lg-1 col-md-2 md-mt-20 col-sm-12">
-                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Inventory Qty</label>
-                                <input type="number" readonly id="inventory-quantity" value="" class="form-control" @if($letterOfIndentItems->count() <= 0) style="margin-top: 30px" @endif >
-                            </div>
-                            <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
-                        </div>
-                        <div class="col-12 text-end mt-4">
-                            <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
-                            @if($letterOfIndentItems->count() > 0)
-                                <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
-                                    <button type="button" class="btn btn-primary  btn-deal-item-submit" >
-                                        Next
-                                    </button>
-                                </a>
-                            @endif
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
-            <br>
+            </form>
+                <br>
 
-    </div>
+        </div>
+        @endif
+    @endcan
 @endsection
 @push('scripts')
     <script>
@@ -277,12 +278,13 @@
                 },
                 success:function (data) {
                     $('select[name="variant"]').empty();
-                    $('#variant').html('<option value=""> Select Variant </option>');
+                    $('#variant').html('<option value=""> Select LOI Description </option>');
                     let quantity = data.quantity;
                     var data = data.variants;
                     $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ value.id +'">'+ value.name +" -  (" + value.master_model.steering +" "
+                            + value.master_model_lines.model_line +" " + value.engine  + " " + value.fuel_type +" )" + +'</option>');
                     });
                 }
             });

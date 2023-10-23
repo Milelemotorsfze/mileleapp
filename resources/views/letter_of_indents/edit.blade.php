@@ -119,15 +119,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Shipping Method</label>
-                        <select class="form-control" data-trigger name="shipment_method">
-                            <option value="CNF" {{ 'CNF' == $letterOfIndent->shipment_method ? 'selected' : '' }}>CNF</option>
-                            <option value="X work" {{ 'X work' == $letterOfIndent->shipment_method ? 'selected' : '' }}>X work</option>
-                        </select>
-                    </div>
-                </div>
                 <br>
                 <div class="col-12 text-center">
                     <button type="submit" class="btn btn-info " >Update & Next</button>

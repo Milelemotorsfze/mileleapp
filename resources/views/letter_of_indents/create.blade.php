@@ -128,20 +128,6 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3 col-sm-12">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Shipping Method</label>
-                        <select class="form-control" data-trigger name="shipment_method">
-                            <option value="CNF">CNF</option>
-                            <option value="X work">X work</option>
-                        </select>
-                        @error('shipment_method')
-                        <span role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                        @enderror
-                    </div>
-                </div>
                 <br>
                 <div class="col-12 text-end">
                     <button type="submit" class="btn btn-primary " >Next</button>
@@ -174,9 +160,6 @@
                 },
                 dealers:{
                     required:true
-                },
-                shipment_method:{
-                    required: true
                 }
             },
         });

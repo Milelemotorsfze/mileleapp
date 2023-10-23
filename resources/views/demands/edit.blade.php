@@ -307,7 +307,7 @@
                     $('select[name="variant"]').empty();
                     $('#variant-name').html('<option value=""> Select Variant </option>');
                     jQuery.each(data, function(key,value){
-                        $('select[name="variant"]').append('<option value="'+ key +'">'+ value +'</option>');
+                        $('select[name="variant"]').append('<option value="'+ value.id +'">'+ value.name +'</option>');
                     });
                 }
             });

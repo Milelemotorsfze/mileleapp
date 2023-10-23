@@ -36,6 +36,8 @@ class LOIItemsController extends Controller
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
             $addedModelIds[] = $loiItem->master_model_id;
+            $loiItem->loi_description = $loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->engine
+            ." ".$loiItem->fuel_type;
         }
 
         $supplierInventoriesModels = SupplierInventory::with('masterModel')
@@ -109,6 +111,8 @@ class LOIItemsController extends Controller
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
             $addedModelIds[] = $loiItem->master_model_id;
+            $loiItem->loi_description = $loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->engine
+                ." ".$loiItem->fuel_type;
         }
 
         $supplierInventoriesModels = SupplierInventory::with('masterModel')

@@ -90,14 +90,6 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="mb-3">
-                        <label for="choices-single-default" class="form-label">Shipping Method</label>
-                        <select class="form-control" name="shipment_method" readonly>
-                            <option> {{ $letterOfIndent->shipment_method }}</option>
-                        </select>
-                    </div>
-                </div>
             </div>
                 <div class="row d-none d-lg-block d-xl-block d-xxl-block">
                     <div class="d-flex">

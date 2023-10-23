@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,63 +20,31 @@ use App\Models\AddonDescription;
 use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
-
-
-class AddonController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index($data)
-    {
-        // $addons = AddonDetails::select('id','image')->get();
-        // foreach($addons as $addon)
-        // {
-        //     $file = '';
-        //     $file = public_path().'/addon_image/'.$addon->image;
-        //                         if (@getimagesize($file)) {
-        //                             // dd('file exist');
-        //                         }
-        //                         else
-        //                         {
-        //                             $updateAddon = AddonDetails::where('id',$addon->id)->first();
-        //                             $updateAddon->image = NULL;
-        //                             $updateAddon->update();
-        //                         }
-        // }
-        // dd('hi');
+class AddonController extends Controller {
+    public function index($data) {
         $rowperpage = 12;
         $content = 'addon';
-        $addonMasters = Addon::select('id','addon_type','name')->orderBy('name', 'ASC');
-        if($data != 'all')
-        {
-            $addonMasters = $addonMasters->where('addon_type',$data);
-        }
-        $addonMasters = $addonMasters->get();
+        $addonMasters = AddonDescription::with('Addon')->whereHas('Addon', function($q) use($data) {
+            if($data != 'all') {
+                $q->where('addon_type',$data);
+            }
+        })->get();
         $brandMatsers = Brand::select('id','brand_name')->orderBy('brand_name', 'ASC')->get();
         $modelLineMasters = MasterModelLines::select('id','brand_id','model_line')->orderBy('model_line', 'ASC')->get();
-
-        $addon1 = AddonDetails::orderBy('id', 'DESC');
-
-        if($data != 'all')
-        {
+        $addon1 = AddonDetails::with('AddonDescription');
+        if($data != 'all') {
             $addon1 = $addon1->where('addon_type_name',$data);
         }
-//        $addon1 = $addon1->orderBy('id', 'DESC')->get();
-        $addon1 = $addon1->orderBy('id', 'DESC')->take($rowperpage)->get();
+        $addon1 = $addon1->orderBy('updated_at', 'DESC')->take($rowperpage)->get();
         $addonIds = $addon1->pluck('id');
         $addonIds = json_decode($addonIds);
-//        dd($addonIds);
-        foreach($addon1 as $addon)
-        {
+        foreach($addon1 as $addon) {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
             $addon->LeastPurchasePrices = $price;
         }
-
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
             'modelLineMasters','data','content','rowperpage','addonIds'));
-
     }
     public function getRelatedModelLines(Request $request)
     {
@@ -93,182 +60,118 @@ class AddonController extends Controller
         $start = $request->start;
         $rowperpage = 12;
         $content = 'addon';
-        // Fetch records
         $addonIds = $addonsTableData = [];
-        $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')
-                    ->orderBy('id','DESC');
-
-        if($request->AddonIds)
-        {
-            $addons = $addons->whereIn('addon_id',$request->AddonIds);
+        $addons = AddonDetails::with('AddonTypes','AddonTypes.modelDescription')->orderBy('updated_at','DESC');
+        if($request->AddonIds) {
+            $addons = $addons->whereIn('description',$request->AddonIds);
         }
-
-        if($request->BrandIds)
-        {
-            if(in_array('yes',$request->BrandIds))
-            {
+        if($request->BrandIds) {
+            if(in_array('yes',$request->BrandIds)) {
                 $addons = $addons->where('is_all_brands','yes');
             }
-            else
-            {
+            else {
                 $addons = $addons->where(function ($query) use($request) {
-                    $query->where('is_all_brands','yes')
-                          ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
-                          {
-                              $q = $q->whereIn('brand_id',$request->BrandIds);
-                              if($request->ModelLineIds)
-                              {
-                                  if(in_array('yes',$request->ModelLineIds))
-                                  {
-                                      $q = $q->orWhere('is_all_model_lines','yes');
-                                  }
-                                  else
-                                  {
-                                      $q->where( function ($query) use ($request)
-                                      {
-                                          $query = $query->whereIn('model_id',$request->ModelLineIds);
-                                      });
-                                  }
-                              }
-                          });
+                    $query->where('is_all_brands','yes')->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request) {
+                        $q = $q->whereIn('brand_id',$request->BrandIds);
+                        if($request->ModelLineIds) {
+                            if(in_array('yes',$request->ModelLineIds)) {
+                                $q = $q->orWhere('is_all_model_lines','yes');
+                            }
+                            else {
+                                $q->where( function ($query) use ($request) {
+                                    $query = $query->whereIn('model_id',$request->ModelLineIds);
+                                });
+                            }
+                        }
+                    });
                 });
             }
         }
-        elseif($request->ModelLineIds)
-        {
+        elseif($request->ModelLineIds) {
             $addons = $addons->where(function ($query) use($request) {
-                $query->where('is_all_brands','yes')
-                      ->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request)
-                      {
-                        if(!in_array('yes',$request->ModelLineIds))
-                        {
-                            $q = $q->whereIn('model_id',$request->ModelLineIds);
-                        }
-                      });
+                $query->where('is_all_brands','yes')->orWhere('is_all_brands','no')->whereHas('AddonTypes', function($q) use($request) {
+                    if(!in_array('yes',$request->ModelLineIds)) {
+                        $q = $q->whereIn('model_id',$request->ModelLineIds);
+                    }
+                });
             });
         }
-        if($request->addon_type == 'all')
-        {
+        if($request->addon_type == 'all') {
             $addons = $addons->whereIn('addon_type_name',['P','SP','K']);
-
-        } else {
-
+        }
+        else {
             $addons = $addons->where('addon_type_name',$request->addon_type);
         }
-
         $fetchedAddonIds = $addons->pluck('id');
-        if(count($fetchedAddonIds) > 0 && $request->isAddonBoxView != 1)
-        {
-            $addons = AddonDetails::whereIn('id', $fetchedAddonIds)
-                ->with('AddonTypes', function ($q) use ($request) {
-                    if ($request->BrandIds) {
-                        $q = $q->whereIn('brand_id', $request->BrandIds);
-                    }
-                    if ($request->ModelLineIds) {
-                        $q = $q->whereIn('model_id', $request->ModelLineIds);
-                    }
-                    $q = $q->with('brands', 'modelLines', 'modelDescription')->get();
-                })
-                ->with('AddonName', 'SellingPrice', 'PendingSellingPrice');
-
+        if(count($fetchedAddonIds) > 0 && $request->isAddonBoxView != 1) {
+            $addons = AddonDetails::whereIn('id', $fetchedAddonIds)->orderBy('updated_at', 'DESC')->with('AddonTypes', function ($q) use ($request) {
+                if ($request->BrandIds) {
+                    $q = $q->whereIn('brand_id', $request->BrandIds);
+                }
+                if ($request->ModelLineIds) {
+                    $q = $q->whereIn('model_id', $request->ModelLineIds);
+                }
+                $q = $q->with('brands', 'modelLines', 'modelDescription')->get();
+            })->with('AddonName', 'SellingPrice', 'PendingSellingPrice','AddonDescription');
         }
         $addon1 = $addons->get();
-//        info($addon1);
-
-        ////////////// filter end ////////////////
-
-//
-//        info('start');
-//        info($start);
-
         if($start >= $addons->count()) {
-//            info('addon null command');
             $addons = [];
             $data['addonIds'] = [];
-        }else{
-//            info($addons->pluck('id'));
-            $addons = $addons->skip($start)
-                ->take($rowperpage)->get();
-
+        }
+        else {
+            $addons = $addons->skip($start)->take($rowperpage)->get();
             $addonIds = $addons->pluck('id');
             $data['addonIds'] = json_decode($addonIds);
-//            info($addons->pluck('id'));
         }
-//        info($addons->count());
-        foreach($addons as $addon)
-        {
+        foreach($addons as $addon) {
             $price = '';
             $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
             $addon->LeastPurchasePrices = $price;
         }
-
         $html = "";
-        // get the count of already loaded data to find the serial number :- add loop key to get S.No:
-
         $i = $request->serial_number;
-        if(count($addon1) > 0)
-        {
-        foreach($addons as $value => $addon)
-        {
-            if($request->isAddonBoxView == 1)
-            {
-                $html .= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
-                    <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
-                        <div class="row">';
-                if($addon->additional_remarks) {
-                    $html .= '<div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                Additional Remarks
-                                            </div>
-                                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                '.$addon->additional_remarks.'
-                                            </div>';
+        if(count($addon1) > 0) {
+            foreach($addons as $value => $addon) {
+            if($request->isAddonBoxView == 1) {
+                $html.= '<input type="hidden" id="addon-type-count-'.$addon->id.'" value="'.$addon->AddonTypes->count().'">
+                        <div id="'.$addon->id.'" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
+                            <div class="row">';
+                $html.=         '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
+                                    <div class="row" style="padding-right:3px; padding-left:3px;">
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Addon Name</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                if($addon->AddonName->name != '') {
+                    $html .= $addon->AddonName->name;
+                    if(isset($addon->AddonDescription)){
+                        if($addon->AddonDescription->description != '') {
+                            $html.=         ' - '.$addon->AddonDescription->description;
+                        }
+                    }
                 }
-
-                $html .=  '<div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
-                                <div class="row" style="padding-right:3px; padding-left:3px;">
-                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        Addon Name
-                                    </div>
-                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
-                                    if($addon->AddonName->name != '') {
-                                        $html .= $addon->AddonName->name;
-                                    }
-                                        $html .=  '</div>
-                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        Addon Code
-                                    </div>
-                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        '. $addon->addon_code.'
-                                    </div>
-                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                        Addon Type
-                                    </div>
-                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                $html.=                 '</div>
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Addon Code</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'. $addon->addon_code.'</div>
+                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Addon Type</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
                 if($addon->addon_type_name == 'K'){
-                    $html .=    'Kit';
+                    $html.=                 'Kit';
                 }
                 elseif($addon->addon_type_name == 'P') {
-                    $html .=   'Accessories';
+                    $html.=                 'Accessories';
                 }
                 elseif($addon->addon_type_name == 'SP') {
-                    $html .=  'Spare Parts';
+                    $html.=                 'Spare Parts';
                 }
-                $html .= '</div>';
-
+                    $html.=             '</div>';
                 if($content == '') {
-                    if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '')
-                    {
-                        $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                            Lead Time
-                                                                      </div>
-                                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                        '.$addon->PurchasePrices->lead_time_min.'';
-
-                        if($addon->PurchasePrices->lead_time_max != '' &&
-                            $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
-                            $html .=   '- '.$addon->PurchasePrices->lead_time_max.'';
+                    if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '') {
+                        $html.=         '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Lead Time</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->PurchasePrices->lead_time_min.'';
+                        if($addon->PurchasePrices->lead_time_max != '' && $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                            $html.=         '- '.$addon->PurchasePrices->lead_time_max.'';
                         }
-                        $html .= '</div>';
+                        $html.=         '</div>';
                     }
                 }
                 if($content == '') {
@@ -277,15 +180,10 @@ class AddonController extends Controller
                             if( Auth::user()->hasPermissionTo('supplier-addon-purchase-price-view')) {
                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
                                 if ($hasPermission) {
-                                    $html .=    '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                        Purchase Price
-                                                                        </div>
-                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                            '.$addon->PurchasePrices->purchase_price_aed.' AED
-                                                                        </div>';
+                                    $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Purchase Price</div>
+                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->PurchasePrices->purchase_price_aed.' AED</div>';
                                 }
                             }
-
                         }
                     }
                 }
@@ -293,12 +191,8 @@ class AddonController extends Controller
                     if($addon->addon_type_name == 'SP') {
                         if($addon->PurchasePrices!= null) {
                             if($addon->PurchasePrices->updated_at != '') {
-                                $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                                Quotation Date
-                                                                            </div>
-                                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                                '.$addon->PurchasePrices->updated_at.'
-                                                                            </div>';
+                                $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Quotation Date</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->PurchasePrices->updated_at.'</div>';
                             }
                         }
                     }
@@ -308,12 +202,8 @@ class AddonController extends Controller
                         if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
                             if ($hasPermission) {
-                                $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                            Least Purchase Price
-                                                                         </div>
-                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                            '.$addon->least_purchase_price->purchase_price_aed.' AED
-                                                                        </div>';
+                                $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Least Purchase Price</div>
+                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->least_purchase_price->purchase_price_aed.' AED</div>';
                             }
                         }
                     }
@@ -322,134 +212,90 @@ class AddonController extends Controller
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
                     if($hasPermission) {
                         if($addon->SellingPrice!= null OR $addon->PendingSellingPrice!= null) {
-                            $html .=  '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                        Selling Price
-                                                                        </div>
-                                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                            $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Selling Price</div>
+                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
                             if($addon->SellingPrice!= null) {
                                 if($addon->SellingPrice->selling_price != '') {
-                                    $html .= $addon->SellingPrice->selling_price . 'AED';
-                                } elseif($addon->PendingSellingPrice!= null)
-                                {
-                                    if($addon->PendingSellingPrice->selling_price != '')
-                                    {
-                                        $html .=  $addon->PendingSellingPrice->selling_price .'AED
-                                                                                            </br>
-                                                                                            <label class="badge badge-soft-danger">Approval Awaiting</label>';
+                                    $html.= $addon->SellingPrice->selling_price . 'AED';
+                                } 
+                                elseif($addon->PendingSellingPrice!= null){
+                                    if($addon->PendingSellingPrice->selling_price != ''){
+                                        $html.= $addon->PendingSellingPrice->selling_price .'AED
+                                            </br>
+                                            <label class="badge badge-soft-danger">Approval Awaiting</label>';
                                     }
                                 }
                             }
-                            $html .= '</div>';
+                            $html.= '</div>';
                         }
                     }
                 }
                 if($addon->fixing_charges_included) {
-                    $html .= '  <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                    Fixing Charge
-                                 </div>
-                  <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                    $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Fixing Charge</div>
+                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
                     if($addon->fixing_charges_included == 'yes') {
-                        $html .= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
+                        $html.= '<label class="badge badge-soft-success">Fixing Charge Included</label>';
                     }
                     else {
                         if($addon->fixing_charge_amount != '') {
-                            $html .=$addon->fixing_charge_amount .'AED';
+                            $html.=$addon->fixing_charge_amount .'AED';
                         }
-
                     }
-         $html .=    '</div>';
+                    $html.= '</div>';
                 }
-
                 if($addon->lead_time) {
-                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                Lead Time
-                                                            </div>
-                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
+                    $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Lead Time</div>
+                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">';
                     if($content == '') {
                         if($addon->PurchasePrices->lead_time_min != '' OR $addon->PurchasePrices->lead_time_max != '') {
-                            $html .= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                                    Lead Time
-                                                                                  </div>
-                                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">;
-                                                                                    '.$addon->PurchasePrices->lead_time_min.'';
-                            if($addon->PurchasePrices->lead_time_max != '' &&
-                                $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
-                                $html .=   '-'.$addon->PurchasePrices->lead_time_max.' Days';
-
+                            $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Lead Time</div>
+                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">;'.$addon->PurchasePrices->lead_time_min.'';
+                            if($addon->PurchasePrices->lead_time_max != '' && $addon->PurchasePrices->lead_time_min < $addon->PurchasePrices->lead_time_max) {
+                                $html.= '-'.$addon->PurchasePrices->lead_time_max.' Days';
                             }
-                            $html .= '</div>';
+                            $html.= '</div>';
                         }
                     }
-                    $html .= '</div>';
+                    $html.=     '</div>';
                 }
                 if($addon->model_year_start OR $addon->model_year_end) {
-                    $html .=   '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                    Model Year
-                                                                </div>
-                                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                                '.$addon->model_year_start.'';
+                    $html.=     '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Model Year</div>
+                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->model_year_start.'';
                     if($addon->model_year_end != '' && $addon->model_year_start != $addon->model_year_end){
-                        $html .= '- '.$addon->model_year_end.'';
+                        $html.= '- '.$addon->model_year_end.'';
                     }
-                    $html .= '</div>';
-
+                    $html.=     '</div>';
                 }
-                            //                if($addon->part_number) {
-                            //                    $html .= ' <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                            //                                                                Part Number
-                            //                                                            </div>
-                            //                                                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                            //                                                            '.$addon->part_number.'
-                            //                                                            </div>';
-                            //                }
-                $html .=      '</div>
-                                                    </div>
-                                                    <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
-                $html.=    $this->ImagePage($addon);
-
-                $html .='</div>';
-
+                if($addon->additional_remarks) {
+                    $html.= '<div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">Additional Remarks</div>
+                            <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">'.$addon->additional_remarks.'</div>';
+                }
+                $html.= '</div>
+                    </div>
+                    <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px;">';
+                $html.=$this->ImagePage($addon);
+                $html.='</div>';
                 if($addon->is_all_brands == 'yes') {
-                    $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
-                                                        Brand
-                                                    </div>
-                                                    <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                                                        All Brands
-                                                    </div>';
-                }else{
+                    $html.= '<div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">Brand</div>
+                            <div class="labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">All Brands</div>';
+                }
+                else    {
                     if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
-                        $html .= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
-                                                            <center>Brand</center>
-                                                            </div>
-                                                            <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
-                                                                <center>
-                                                                    Model Line
-                                                                </center>
-                                                            </div>
-                                                            <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-                                                                <center>
-                                                                    Model Description
-                                                                </center>
-                                                            </div>';
-                    }else{
-                        $html .= ' <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                                                                <center>Brand</center>
-                                                            </div>
-                                                            <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                                                                <center>
-                                                                    Model Line
-                                                                </center>
-                                                            </div>';
+                        $html.= '<div class="labellist labeldesign col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3"><center>Brand</center></div>
+                                <div class="labellist labeldesign col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4"><center>Model Line</center></div>
+                                <div class="labellist labeldesign col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5"><center>Model Description</center></div>';
+                    }
+                    else{
+                        $html.= '<div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6"><center>Brand</center></div>
+                                <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6"><center>Model Line</center></div>';
                     }
                     foreach($addon->AddonTypes as $key =>$AddonTypes) {
-                        $html .= ' <div class="divcolorclass" value="5" hidden>
-                                                        </div>';
-
+                        $html.= '<div class="divcolorclass" value="5" hidden></div>';
                         if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'K') {
-                            $html .= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
-                                                            '.$AddonTypes->brands->brand_name.'
-                                                            </div>
-                                                         <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-line-'.$key.' col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">';
+                            $html.= '<div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-brand-'.$key.' col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                        '.$AddonTypes->brands->brand_name.'
+                                    </div>
+                                    <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-line-'.$key.' col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">';
                             if(isset($AddonTypes->modelLines->model_line)) {
                                 $html .= $AddonTypes->modelLines->model_line;
                             }
@@ -457,11 +303,11 @@ class AddonController extends Controller
                                 $html .= ' All Model Lines';
                             }
                             $html .= '</div>
-                                                            <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-                                                                '.$AddonTypes->modelDescription->model_description.'
-                                                                </div>';
-
-                        }else{
+                                    <div class="testtransform divcolor labellist databack1 addon-'.$addon->id.'-model-number-'.$key.' col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                        '.$AddonTypes->modelDescription->model_description.'
+                                    </div>';
+                        }
+                        else{
                             $html .= ' <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
                                                             '.$AddonTypes->brands->brand_name.'
                                                             </div>
@@ -512,7 +358,16 @@ class AddonController extends Controller
                                           $html.=    $this->ImageTable($addon);
 
                                                      $html .='</td>
-                                          <td> '.$addon->AddonName->name.'</td>
+                                          <td> ';
+                                          if($addon->AddonName->name != '') {
+                                            $html .= $addon->AddonName->name;
+                                            if(isset($addon->AddonDescription)){
+                                                if($addon->AddonDescription->description != '') {
+                                                    $html.=         ' - '.$addon->AddonDescription->description;
+                                                }
+                                            }
+                                        }
+                                          $html .=  '</td>
                                            <td>';
                                                 if($addon->addon_type_name == 'K') {
                                                     $html .= '<label class="badge badge-soft-success">Kit</label>';
@@ -631,7 +486,16 @@ class AddonController extends Controller
                                         <td>';
                                         $html.=    $this->ImageTable($addon);
                                                 $html .= '</td>
-                                        <td>'. $addon->AddonName->name.'</td>
+                                        <td>';
+                                        if($addon->AddonName->name != '') {
+                                            $html .= $addon->AddonName->name;
+                                            if(isset($addon->AddonDescription)){
+                                                if($addon->AddonDescription->description != '') {
+                                                    $html.=         ' - '.$addon->AddonDescription->description;
+                                                }
+                                            }
+                                        }
+                                        $html .=  '</td>
                                         <td>';
                                           if($addon->addon_type_name == 'K') {
                                               $html .=   '<label class="badge badge-soft-success">Kit</label>';

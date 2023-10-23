@@ -77,7 +77,7 @@ class SupplierController extends Controller
 //        {
 //            return view('demand_planning_suppliers.create');
 //        }
-        $users = User::select('id','name')->get();
+        $users = User::where('id','!=','16')->select('id','name')->get();
         return view('suppliers.create',compact('paymentMethods','addons','users'));
     }
 
@@ -212,11 +212,11 @@ class SupplierController extends Controller
     public function edit(Supplier $supplier)
     {
         $supplierTypes = [];
-        if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
-        {
-            $supplier = Supplier::findOrFail($supplier->id);
-            return view('demand_planning_suppliers.edit', compact('supplier'));
-        }
+//        if(Auth::user()->hasPermissionTo('demand-planning-supplier-list') && !Auth::user()->hasPermissionTo('addon-supplier-list'))
+//        {
+//            $supplier = Supplier::findOrFail($supplier->id);
+//            return view('demand_planning_suppliers.edit', compact('supplier'));
+//        }
         $paymentMethods = DB::table('payment_methods')->get();
         $primaryPaymentMethod = SupplierAvailablePayments::where('supplier_id',$supplier->id)->where('is_primary_payment_method','yes')->first();
         $otherPaymentMethods = SupplierAvailablePayments::where('supplier_id',$supplier->id)

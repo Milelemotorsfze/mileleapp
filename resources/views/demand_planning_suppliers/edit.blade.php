@@ -1,7 +1,7 @@
 @extends('layouts.main')
 @section('content')
     <div class="card-header">
-        <h4 class="card-title">Add New Supplier</h4>
+        <h4 class="card-title">eDIT New Supplier</h4>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)

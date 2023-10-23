@@ -80,12 +80,6 @@
                     </div>
                     <div class="col-lg-4 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label">Shipping Method</label>
-                            <input type="text" class="form-control" value="{{ $letterOfIndent->shipment_method }}" readonly>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                        <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Supplier</label>
                             <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                         </div>

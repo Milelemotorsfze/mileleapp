@@ -127,7 +127,7 @@
                         <div class="row">
                             <div class="col-lg-3 col-md-6">
                                 <input type="file" name="files[]" class="form-control mb-3" multiple
-                                      autofocus id="file-upload" accept="application/pdf, image/*">
+                                      autofocus id="file-upload" accept="application/pdf">
                             </div>
                             <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id">
                             <div class="col-lg-6 col-md-6">
@@ -253,11 +253,11 @@
             rules: {
                 "files[]": {
                     required: true,
-                    extension: "pdf|png|jpg|jpeg|svg"
+                    extension: "pdf"
                 },
                 messages: {
                     file: {
-                        extension: "File type not allowed.Please refer file type here..(eg: pdf|png|jpg|jpeg|svg..)"
+                        extension: "Please upload pdf file"
                     }
                 }
             },

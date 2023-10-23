@@ -168,7 +168,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
         <label class="col-form-label text-md-end">{{ __('Choose Addon Name') }}</label>
           <select id="fltr-addon-code" multiple="true" style="width: 100%;">
             @foreach($addonMasters as $addonMaster)
-              <option value="{{$addonMaster->id}}">{{$addonMaster->name}}</option>
+              <option value="{{$addonMaster->id}}">{{$addonMaster->addon->name}} @if($addonMaster->description != '')- {{$addonMaster->description}} @endif</option>
             @endforeach
           </select>
         </div>
