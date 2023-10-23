@@ -4,22 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Addon;
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\UserActivityController;
 class MasterAddonController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $accessories = Addon::where('addon_type', 'P')->select('id','name','created_by','created_at')->orderBy('updated_at','DESC')->get();
         $spareParts = Addon::where('addon_type', 'SP')->select('id','name','created_by','created_at')->orderBy('updated_at','DESC')->get();
         $kits = Addon::where('addon_type', 'K')->orderBy('updated_at','DESC')->get();
         if($request->page != 'EDIT') {
             $addonType = 'P';
-        }else{
+        }
+        else {
             $addonType = $request->addonType;
         }
+        (new UserActivityController)->createActivity('Open Master Addon');
         return view('masterAddon.index', compact('accessories','spareParts','kits','addonType'));
     }
 
@@ -77,6 +78,7 @@ class MasterAddonController extends Controller
 
         $addon->save();
         $page = 'EDIT';
+        (new UserActivityController)->createActivity('Update Master Addon');
         return redirect()->route('master-addons.index',compact('addonType','page'))->with('success','Addon updated successfully.');
     }
 
