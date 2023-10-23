@@ -6,7 +6,7 @@ use App\Models\Brand;
 use App\Models\MasterModelLines;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\UserActivityController;
 class ModelLinesController extends Controller
 {
     /**
@@ -15,6 +15,7 @@ class ModelLinesController extends Controller
     public function index()
     {
         $modelLines = MasterModelLines::orderBy('id','DESC')->get();
+        (new UserActivityController)->createActivity('Open Master Model Lines');
         return view('model-lines.index', compact('modelLines'));
     }
 
@@ -43,7 +44,7 @@ class ModelLinesController extends Controller
         $modelLine->model_line = $request->model_line;
         $modelLine->created_by = Auth::id();
         $modelLine->save();
-
+        (new UserActivityController)->createActivity('New Master Model Line Created');
         return redirect()->route('model-lines.index')->with('success','Model Line Created Successfully.');
     }
 
@@ -81,7 +82,7 @@ class ModelLinesController extends Controller
         $modelLine->model_line = $request->model_line;
         $modelLine->updated_by = Auth::id();
         $modelLine->save();
-
+        (new UserActivityController)->createActivity('Master Model Line Updated');
         return redirect()->route('model-lines.index')->with('success','Model Line Updated Successfully.');
     }
 
