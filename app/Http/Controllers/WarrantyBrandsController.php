@@ -10,7 +10,7 @@ use App\Models\WarrantySellingPriceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use App\Http\Controllers\UserActivityController;
 class WarrantyBrandsController extends Controller
 {
     /**
@@ -76,6 +76,7 @@ class WarrantyBrandsController extends Controller
                 $warrantyBrand->price = $request->price;
                 $warrantyBrand->updated_by = Auth::id();
                 $warrantyBrand->save();
+                (new UserActivityController)->createActivity('Warranty Purchase Price Updated');
                 DB::commit();
             }
             return redirect()->route('warranty.show', $warrantyBrand->warranty_premiums_id)->with('success','Warranty Price Updated Successfully.');
@@ -102,6 +103,7 @@ class WarrantyBrandsController extends Controller
                $warrantySellingPriceHistory->status_updated_by = Auth::id();
                $warrantySellingPriceHistory->status = 'pending';
                $warrantySellingPriceHistory->save();
+               (new UserActivityController)->createActivity('Warranty Selling Price updated');
            }
            return redirect()->route('warranty.show', $warrantyBrand->warranty_premiums_id)->with('success','Warranty Selling Price send for Approval');
        }
@@ -114,7 +116,7 @@ class WarrantyBrandsController extends Controller
     {
         $warrantyBrand = WarrantyBrands::findOrFail($id);
         $warrantyBrand->delete();
-
+        (new UserActivityController)->createActivity('Warranty Deleted');
         return response(true);
     }
     public function updateSellingPrice(Request $request)
@@ -128,6 +130,7 @@ class WarrantyBrandsController extends Controller
            $warrantyBrand->selling_price = $request->updated_price;
            $warrantyBrand->is_selling_price_Approved = '1';
            $warrantyBrand->save();
+           (new UserActivityController)->createActivity('Warranty Selling Price Approved');
         }
         elseif($status == 'rejected')
         {
@@ -137,6 +140,7 @@ class WarrantyBrandsController extends Controller
                 $warrantyBrand->selling_price = $request->updated_price;
                 $warrantyBrand->is_selling_price_Approved = '2';
                 $warrantyBrand->save();
+                (new UserActivityController)->createActivity('Warranty Selling Price Rejected');
             }
         }
         $warrantyPriceHistory->status = $request->status;

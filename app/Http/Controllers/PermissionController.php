@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-
+use App\Http\Controllers\UserActivityController;
 class PermissionController extends Controller
 {
     /**
@@ -17,6 +17,7 @@ class PermissionController extends Controller
     public function index()
     {
         $permissions = Permission::orderBy('id','DESC')->get();
+        (new UserActivityController)->createActivity('Open Permissions Listing');
         return view('permissions.index', compact('permissions'));
     }
 
@@ -64,7 +65,7 @@ class PermissionController extends Controller
         ];
 
         DB::table('role_has_permissions')->insert($data);
-
+        (new UserActivityController)->createActivity('New Permission Created');
         return redirect()->route('permissions.index')->with('success','Permissions Created Successfully.');
     }
 
@@ -100,7 +101,7 @@ class PermissionController extends Controller
         $permission->module_id = $request->module_id;
         $permission->description = $request->description;
         $permission->save();
-
+        (new UserActivityController)->createActivity('Permission Updated');
         return redirect()->route('permissions.index')->with('success','Permissions Updated Successfully.');
     }
 
