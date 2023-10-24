@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Demand;
 use App\Models\DemandList;
 use App\Models\LetterOfIndent;
+use App\Models\LetterOfIndentDocument;
 use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\Supplier;
@@ -140,6 +141,23 @@ class LetterOfIndentController extends Controller
             $LOI->status = LetterOfIndent::LOI_STATUS_NEW;
             $LOI->created_by = Auth::id();
             $LOI->save();
+
+        }
+
+        if ($request->has('files'))
+        {
+            foreach ($request->file('files') as $key => $file)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $fileName = $key.time().'.'.$extension;
+                $destinationPath = 'LOI-Documents';
+                $file->move($destinationPath, $fileName);
+                $LoiDocument = new LetterOfIndentDocument();
+
+                $LoiDocument->loi_document_file = $fileName;
+                $LoiDocument->letter_of_indent_id = $LOI->id;
+                $LoiDocument->save();
+            }
         }
 
         return redirect()->route('letter-of-indent-items.create',['id' => $LOI->id]);
@@ -313,8 +331,23 @@ class LetterOfIndentController extends Controller
         $LOI->supplier_id = $request->supplier_id;
 //        $LOI->shipment_method = $request->shipment_method;
         $LOI->save();
+        if ($request->has('files'))
+        {
+            foreach ($request->file('files') as $key => $file)
+            {
+                $extension = $file->getClientOriginalExtension();
+                $fileName = $key.time().'.'.$extension;
+                $destinationPath = 'LOI-Documents';
+                $file->move($destinationPath, $fileName);
+                $LoiDocument = new LetterOfIndentDocument();
 
-        return redirect()->route('letter-of-indent-items.edit', $id);
+                $LoiDocument->loi_document_file = $fileName;
+                $LoiDocument->letter_of_indent_id = $LOI->id;
+                $LoiDocument->save();
+            }
+        }
+
+        return redirect()->back()->with('success','LOI Details updated successfully.');
     }
 
     /**

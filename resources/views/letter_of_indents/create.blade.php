@@ -1,5 +1,11 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        iframe {
+            min-height: 300px;
+            max-height: 500px;
+        }
+    </style>
     <div class="card-header">
         <h4 class="card-title">Add New LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -29,7 +35,7 @@
                 {{ Session::get('success') }}
             </div>
         @endif
-        <form id="form-create" action="{{ route('letter-of-indents.store') }}" method="POST" >
+        <form id="form-create" action="{{ route('letter-of-indents.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-lg-3 col-md-3 col-sm-12">
@@ -100,9 +106,9 @@
                 </div>
                 <div class="col-lg-3 col-md-3 col-sm-12">
                     <div class="mb-3">
-                        <label for="choices-single-default" class="form-label ">Supplier</label>
+                        <label for="choices-single-default" class="form-label ">Vendor</label>
                         <select class="form-control" data-trigger name="supplier_id" id="supplier">
-                            <option value="" disabled>Select The Supplier</option>
+                            <option value="" disabled>Select The Vendor</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}">{{ $supplier->supplier }}</option>
                             @endforeach
@@ -128,17 +134,69 @@
                         @enderror
                     </div>
                 </div>
+                <div class="col-lg-3 col-md-3 col-sm-12">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">LOI Document</label>
+                        <input type="file" name="files[]" id="file-upload" class="form-control text-dark" multiple
+                               autofocus accept="application/pdf">
+                    </div>
+                </div>
                 <br>
+                <div class="row mb-3">
+                    <div class="col-lg-6 col-md-12 col-sm-12 mb-3">
+                        <div id="file-preview">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-lg-4 col-md-12 col-sm-12">
+                        <div id="image-preview">
+
+                        </div>
+                    </div>
+                </div>
                 <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary " >Next</button>
+                    <button type="submit" class="btn btn-primary" >Next<i class="fa fa-arrow-right"></i> </button>
                 </div>
             </div>
+
         </form>
     </div>
     </div>
 @endsection
 @push('scripts')
     <script>
+        const fileInputLicense = document.querySelector("#file-upload");
+        const previewFile = document.querySelector("#file-preview");
+        const previewImage = document.querySelector("#image-preview");
+        fileInputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile.firstChild) {
+                previewFile.removeChild(previewFile.firstChild);
+            }
+            while (previewImage.firstChild) {
+                previewImage.removeChild(previewImage.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewImage.appendChild(image);
+                }
+            }
+        });
         getCustomers();
         $("#form-create").validate({
             ignore: [],
@@ -160,6 +218,14 @@
                 },
                 dealers:{
                     required:true
+                },
+                "files[]": {
+                    extension: "pdf"
+                },
+                messages: {
+                    file: {
+                        extension: "Please upload pdf file"
+                    }
                 }
             },
         });

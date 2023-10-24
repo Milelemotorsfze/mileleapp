@@ -150,9 +150,7 @@
                                     </div>
                                     <div class="col-12 text-end mt-4">
                                         <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
-                                        <a href="{{ route('letter-of-indent-documents.edit', $letterOfIndent->id)}}">
-                                            <button type="button" class="btn btn-primary  btn-deal-item-submit">Next</button>
-                                        </a>
+                                        <a href="{{ route('letter-of-indents.index') }}"> <button type="button" class="btn btn-primary">Finish</button></a>
                                     </div>
                                     <input type="hidden" value="{{ $letterOfIndent->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                                 </div>

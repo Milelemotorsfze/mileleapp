@@ -1,5 +1,15 @@
 @extends('layouts.main')
 @section('content')
+    <style>
+        iframe {
+            min-height: 300px;
+            max-height: 500px;
+        }
+        .modal-content{
+            width: 1000px;
+            height: 550px;
+        }
+    </style>
     <div class="card-header">
         <h4 class="card-title">Edit LOI</h4>
         <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
@@ -27,7 +37,7 @@
                     {{ Session::get('success') }}
                 </div>
             @endif
-        <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" >
+        <form action="{{ route('letter-of-indents.update', $letterOfIndent->id) }}" method="POST" enctype="multipart/form-data" id="form-doc-upload">
             @csrf
             @method('PUT')
             <div class="row">
@@ -119,16 +129,106 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-lg-3 col-md-3">
+                    <div class="mb-3">
+                        <label for="choices-single-default" class="form-label">LOI Document</label>
+                        <input type="file" name="files[]" class="form-control mb-3" multiple
+                               autofocus id="file-upload" accept="application/pdf">
+                    </div>
+                </div>
+                @foreach($letterOfIndent->LOIDocuments as $key => $letterOfIndentDocument)
+                    <div class="row p-2">
+                        <div class="col-12">
+                            File {{ $key + 1 }}
+                            <button type="button" class="btn btn-primary btn-sm pl-2" data-bs-toggle="modal" data-bs-target="#show-document-{{$letterOfIndentDocument->id}}">
+                                View
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm loi-doc-button-delete"
+                                    data-id="{{ $letterOfIndentDocument->id }}" data-url="{{ route('letter-of-indent-documents.destroy', $letterOfIndentDocument->id) }}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal mb-5 justify-content-center" id="show-document-{{$letterOfIndentDocument->id}}"  aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-xl ">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">LOI Document</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="d-flex">
+                                        <div class="col-lg-12">
+                                            <div class="row p-2">
+                                                <embed src="{{ url('/LOI-Documents/'.$letterOfIndentDocument->loi_document_file) }}" style="height: 400px">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+                <div class="row">
+                    <div class="col-6">
+                        <div id="file-preview">
+
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div id="image-preview">
+
+                        </div>
+                    </div>
+                </div>
                 <br>
                 <div class="col-12 text-center">
-                    <button type="submit" class="btn btn-info " >Update & Next</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('letter-of-indent-items.edit', $letterOfIndent->id) }}" >
+                        <button type="button" class="btn btn-info"><i class="fa fa-arrow-right"></i> Next</button>
+                    </a>
                 </div>
             </div>
         </form>
     </div>
 @endsection
 @push('scripts')
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+    <script type="text/javascript">
+
+        const fileInputLicense = document.querySelector("#file-upload");
+        const previewFile = document.querySelector("#file-preview");
+        const previewImage = document.querySelector("#image-preview");
+        fileInputLicense.addEventListener("change", function(event) {
+            const files = event.target.files;
+            while (previewFile.firstChild) {
+                previewFile.removeChild(previewFile.firstChild);
+            }
+            while (previewImage.firstChild) {
+                previewImage.removeChild(previewImage.firstChild);
+            }
+            for (let i = 0; i < files.length; i++)
+            {
+                const file = files[i];
+                if (file.type.match("application/pdf"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const iframe = document.createElement("iframe");
+                    iframe.src = objectUrl;
+                    previewFile.appendChild(iframe);
+                }
+                else if (file.type.match("image/*"))
+                {
+                    const objectUrl = URL.createObjectURL(file);
+                    const image = new Image();
+                    image.src = objectUrl;
+                    previewImage.appendChild(image);
+                }
+            }
+        });
+
             getCustomers();
             $('#country').select2({
                 placeholder: 'Select Country'
@@ -162,6 +262,42 @@
                     }
                 });
             }
+        $('.loi-doc-button-delete').on('click',function(){
+            let id = $(this).attr('data-id');
+            let url =  $(this).attr('data-url');
+            var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                if (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        dataType: "json",
+                        data: {
+                            _method: 'DELETE',
+                            id: 'id',
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success:function (data) {
+                            location.reload();
+                            alertify.success('Item Deleted successfully.');
+                        }
+                    });
+                }
+            }).set({title:"Delete Item"})
+        });
+
+        $("#form-doc-upload").validate({
+            ignore: [],
+            rules: {
+                "files[]": {
+                    extension: "pdf"
+                },
+                messages: {
+                    file: {
+                        extension: "Please upload pdf file"
+                    }
+                }
+            },
+        });
         // })
     </script>
 @endpush
