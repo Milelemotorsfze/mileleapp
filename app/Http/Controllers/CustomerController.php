@@ -15,6 +15,8 @@ class CustomerController extends Controller
      */
     public function index()
     {
+        (new UserActivityController)->createActivity('Open Customer List Page');
+
         $customers = Customer::all();
         return view('customer.index', compact('customers'));
     }
@@ -24,6 +26,8 @@ class CustomerController extends Controller
      */
     public function create()
     {
+        (new UserActivityController)->createActivity('Open Customer Create Page');
+
         $countries = Country::pluck('name');
         return view('customer.create', compact('countries'));
 
@@ -34,6 +38,8 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        (new UserActivityController)->createActivity('New Customer Created');
+
         $this->validate($request, [
             'name' => 'required',
             'country' => 'required',
@@ -64,6 +70,8 @@ class CustomerController extends Controller
      */
     public function edit(string $id)
     {
+        (new UserActivityController)->createActivity('Open Customer Edit Page');
+
          $customer = Customer::find($id);
          $countries = Country::pluck('name');
 
@@ -75,6 +83,8 @@ class CustomerController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        (new UserActivityController)->createActivity('Customer Detail Updated');
+
         $this->validate($request, [
             'name' => 'required',
             'country' => 'required',

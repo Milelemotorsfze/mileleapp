@@ -25,6 +25,8 @@ class DemandPlanningPurchaseOrderController extends Controller
      */
     public function create(Request $request)
     {
+        (new UserActivityController)->createActivity('Open Purchase Order create Section');
+
         $approvedLOIItem = ApprovedLetterOfIndentItem::find($request->id);
         $vendor = $approvedLOIItem->letterOfIndentItem->LOI->supplier_id ?? '';
         $vendors = Supplier::with('supplierTypes')

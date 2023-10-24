@@ -44,7 +44,7 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="mb-3">
                         <label for="choices-single-default" class="form-label ">Customer Type</label>
-                        <select class="form-control"name="customer_type" readonly>
+                        <select class="form-control" name="customer_type" readonly>
                             <option>{{  $letterOfIndent->customer->type ?? '' }}</option>
                         </select>
                     </div>

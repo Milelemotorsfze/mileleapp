@@ -256,7 +256,7 @@
                     $('select[name="sfx"]').empty();
                     $('select[name="variant"]').empty();
                     $('#sfx').html('<option value=""> Select SFX </option>');
-                    $('#variant').html('<option value=""> Select Variant </option>');
+                    $('#variant').html('<option value=""> Select LOI Description </option>');
                     jQuery.each(data, function(key,value){
                         $('select[name="sfx"]').append('<option value="'+ value +'">'+ value +'</option>');
                     });
@@ -284,7 +284,7 @@
                     $('#inventory-quantity').val(quantity);
                     jQuery.each(data, function(key,value){
                         $('select[name="variant"]').append('<option value="'+ value.id +'">'+ value.name +" -  (" + value.master_model.steering +" "
-                            + value.master_model_lines.model_line +" " + value.engine  + " " + value.fuel_type +" )" + +'</option>');
+                            + value.master_model_lines.model_line +" " + value.engine  + " " + value.fuel_type +" )" +'</option>');
                     });
                 }
             });

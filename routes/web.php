@@ -202,7 +202,7 @@ Route::get('/d', function () {
     // Demand & Planning Module
 
     // suppliers
-    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
+//    Route::resource('demand-planning-suppliers', DemandPlanningSupplierController::class);
 
     // Demands
     Route::get('demand-planning/get-sfx', [DemandController::class,'getSFX'])->name('demand.get-sfx');
@@ -236,6 +236,7 @@ Route::get('/d', function () {
     Route::get('supplier-inventories/file-comparision-report', [SupplierInventoryController::class,'FileComparisionReport'])
         ->name('supplier-inventories.file-comparision-report');
     Route::get('supplier-inventories/get-dates', [SupplierInventoryController::class,'getDate'])->name('supplier-inventories.get-dates');
+//    Route::get('supplier-inventories/get-supplier-inventories', [SupplierInventoryController::class,'getSupplierInventories'])->name('supplier-inventories.get-child-rows');
 
     //BL Module
     Route::resource('blform', BlFormController::class);
