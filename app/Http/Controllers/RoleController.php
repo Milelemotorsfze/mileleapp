@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\Modules;
 use DB;
-
+use App\Http\Controllers\UserActivityController;
 class RoleController extends Controller
 {
 
@@ -42,7 +42,7 @@ class RoleController extends Controller
 
         $role = Role::create(['name' => $request->input('name')]);
         $role->syncPermissions($request->input('permission'));
-
+        (new UserActivityController)->createActivity('New Role Created');
         return redirect()->route('roles.index')
                         ->with('success','Role created successfully');
     }
@@ -80,7 +80,7 @@ class RoleController extends Controller
         $role->save();
 
         $role->syncPermissions($request->input('permission'));
-
+        (new UserActivityController)->createActivity('Role Updated');
         return redirect()->route('roles.index')
                         ->with('success','Role updated successfully');
     }
@@ -88,6 +88,7 @@ class RoleController extends Controller
     public function delete($id)
     {
         DB::table("roles")->where('id',$id)->delete();
+        (new UserActivityController)->createActivity('Role Deleted');
         return redirect()->route('roles.index')
                         ->with('success','Role deleted successfully');
     }

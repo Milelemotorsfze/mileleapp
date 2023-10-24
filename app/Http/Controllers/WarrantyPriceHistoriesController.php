@@ -7,7 +7,7 @@ use App\Models\WarrantyPriceHistory;
 use App\Models\WarrantySellingPriceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\UserActivityController;
 class WarrantyPriceHistoriesController extends Controller
 {
     /**
@@ -78,7 +78,7 @@ class WarrantyPriceHistoriesController extends Controller
         $warrantyPriceHistory->updated_price = $request->selling_price;
         $warrantyPriceHistory->updated_by = Auth::id();
         $warrantyPriceHistory->save();
-
+        (new UserActivityController)->createActivity('Warranty Selling Price Updated');
         return redirect()->back()->with('success','Selling Price Updated successfully.');
 
     }

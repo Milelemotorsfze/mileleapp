@@ -28,15 +28,10 @@ use App\Imports\SupplierAddonImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\HeadingRowImport;
+use App\Http\Controllers\UserActivityController;
 
-
-class SupplierController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
+class SupplierController extends Controller {
+    public function index() {
         $suppliers = Supplier::with('supplierAddons.supplierAddonDetails','paymentMethods.PaymentMethods','supplierTypes')
             ->whereHas('supplierTypes', function ($query){
                 $query->whereNot('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
@@ -331,7 +326,7 @@ class SupplierController extends Controller
         VendorDocument::where('supplier_id', $id)->delete();
 
         $supplier->delete();
-
+        (new UserActivityController)->createActivity('Vendor Deleted');
         DB::commit();
         return response(true);
     }
@@ -600,6 +595,7 @@ class SupplierController extends Controller
                                         }
                                     }
                                     $data['successStore'] = true;
+                                    (new UserActivityController)->createActivity('Vendor Created');
                                     return response()->json(['success' => true,'data' => $data], 200);
                                 }
                             }
@@ -692,6 +688,7 @@ class SupplierController extends Controller
                         }
                     }
                     $data['successStore'] = true;
+                    (new UserActivityController)->createActivity('Vendor Created');
                     return response()->json(['success' => true,'data' => $data], 200);
                 }
             }
@@ -765,6 +762,7 @@ class SupplierController extends Controller
                     }
                 }
                 $data['successStore'] = true;
+                (new UserActivityController)->createActivity('Vendor Created');
                 return response()->json(['success' => true,'data' => $data], 200);
             }
 
@@ -1138,6 +1136,7 @@ class SupplierController extends Controller
                                         }
                                     }
                                     $data['successStore'] = true;
+                                    (new UserActivityController)->createActivity('Vendor Updated');
                                     return response()->json(['success' => true,'data' => $data], 200);
                                 }
                             }
@@ -1230,6 +1229,7 @@ class SupplierController extends Controller
                         }
                     }
                     $data['successStore'] = true;
+                    (new UserActivityController)->createActivity('Vendor Updated');
                     return response()->json(['success' => true,'data' => $data], 200);
                 }
             }
@@ -1311,7 +1311,8 @@ class SupplierController extends Controller
                         }
                     }
                 }
-                $data['successStore'] = true;
+                $data['successStore'] = true;                                
+                (new UserActivityController)->createActivity('Vendor Updated');
                 return response()->json(['success' => true,'data' => $data], 200);
             }
         }
@@ -1398,6 +1399,7 @@ class SupplierController extends Controller
 //                }
 //            }
             $data['successStore'] = true;
+            (new UserActivityController)->createActivity('Vendor Updated');
             return response()->json(['success' => true,'data' => $data], 200);
         }
     }

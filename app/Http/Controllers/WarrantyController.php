@@ -13,73 +13,58 @@ use App\Models\Brand;
 use App\Models\WarrantyPremiums;
 use App\Models\WarrantyBrands;
 use Illuminate\Support\Facades\DB;
-
+use App\Http\Controllers\UserActivityController;
 class WarrantyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-
+    public function index() {
         $premiums = WarrantyPremiums::with('PolicyName')
                     ->orderBy('id','desc')->get();
         return view('warranty.index', compact('premiums'));
     }
-    public function list()
-    {
+    public function list() {
         $warrantyBrands = WarrantyBrands::with('brand','country','premium')
             ->orderBy('id','desc')->get();
-
         return view('warranty.list', compact('warrantyBrands'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    public function create() {
         $policyNames = MasterWarrantyPolicies::select('id','name')->get();
         $brands = Brand::select('id','brand_name')->get();
         $brandRegions = BrandRegion::select('id','name')->get();
-
         $suppliers = Supplier::with('supplierTypes')
             ->whereHas('supplierTypes', function ($query) {
                 $query->where('supplier_type', Supplier::SUPPLIER_TYPE_WARRANTY);
             })
             ->get();
-
         return view('warranty.create', compact('policyNames','brands','suppliers','brandRegions'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $authId = Auth::id();
         $input = $request->all();
         $input['created_by'] = $authId;
         $input['extended_warranty_milage'] =  $input['is_open_milage'] == 'no' ? $input['extended_warranty_milage'] : NULL;
         $premium = WarrantyPremiums::create($input);
-        if($request->brandPrice)
-        {
+        if($request->brandPrice) {
             $inputbrandPrice['created_by'] = $authId;
             $inputbrandPrice['warranty_premiums_id'] = $premium->id;
-            if(count($request->brandPrice) > 0)
-            {
-                foreach($request->brandPrice as $brandPrice)
-                {
+            if(count($request->brandPrice) > 0) {
+                foreach($request->brandPrice as $brandPrice) {
                     $inputbrandPrice['price'] = $brandPrice['purchase_price'];
                     $inputbrandPrice['selling_price'] = $brandPrice['selling_price'];
                     $inputbrandPrice['brand_region_id'] = $brandPrice['country'];
-
-                    if(isset($brandPrice['brands']))
-                    {
-                        if(count($brandPrice['brands']) > 0)
-                        {
-                            foreach($brandPrice['brands'] as $brandData)
-                            {
+                    if(isset($brandPrice['brands'])) {
+                        if(count($brandPrice['brands']) > 0) {
+                            foreach($brandPrice['brands'] as $brandData) {
                                 $inputbrandPrice['brand_id'] = $brandData;
                                 $inputbrandPrice['is_selling_price_approved'] = '0';
                                 $createBrandPrice = WarrantyBrands::create($inputbrandPrice);
@@ -105,6 +90,7 @@ class WarrantyController extends Controller
                 }
             }
         }
+        (new UserActivityController)->createActivity('Warranty Created');
         return redirect()->route('warranty.index')->with('success','Warranty created successfully');
     }
     /**
@@ -149,7 +135,6 @@ class WarrantyController extends Controller
         $alreadyAddedBrands = Brand::whereIn('id', $alreadyAddedBrandIds)->get();
         $isOpenMilage = $premium->is_open_milage;
         $brandRegions = BrandRegion::select('id','name')->get();
-
         return view('warranty.edit', compact('premium','brands','policyNames','suppliers','warrantyBrands',
             'alreadyAddedBrands','isOpenMilage','existingBrands','brandRegions'));
     }
@@ -290,6 +275,7 @@ class WarrantyController extends Controller
                 $del = $del->delete();
             }
         }
+        (new UserActivityController)->createActivity('Warranty Updated');
         return redirect()->route('warranty.index')->with('success','Warranty updated successfully');
     }
 
@@ -302,6 +288,7 @@ class WarrantyController extends Controller
         DB::beginTransaction();
             WarrantyBrands::where('warranty_premiums_id', $id)->delete();
             $warranty->delete();
+            (new UserActivityController)->createActivity('Warranty Deleted');
         DB::commit();
 
         return response(true);

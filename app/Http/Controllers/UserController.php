@@ -18,6 +18,7 @@ namespace App\Http\Controllers;
     use Illuminate\Support\Facades\Mail;
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Crypt;
+    use App\Http\Controllers\UserActivityController;
     class UserController extends Controller
     {
         public function index(Request $request)
@@ -85,8 +86,7 @@ namespace App\Http\Controllers;
                             ->subject($subject);
                     }
                 );
-
-
+            (new UserActivityController)->createActivity('User Created');
             return redirect()->route('users.index')
                 ->with('success','User created successfully');
         }
@@ -122,12 +122,14 @@ namespace App\Http\Controllers;
             $user->update($input);
             DB::table('model_has_roles')->where('model_id',$id)->delete();
             $user->assignRole($request->input('roles'));
+            (new UserActivityController)->createActivity('User Updated');
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
         public function delete($id)
         {
             User::find($id)->delete();
+            (new UserActivityController)->createActivity('User Deleted');
             return redirect()->route('users.index')
                             ->with('success','User deleted successfully');
         }
@@ -136,6 +138,7 @@ namespace App\Http\Controllers;
             $user = User::find($id);
             $user->status = 'inactive';
             $user->update();
+            (new UserActivityController)->createActivity('Make User Inactive');
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
@@ -145,6 +148,7 @@ namespace App\Http\Controllers;
            $user = User::find($id);
            $user->status = 'active';
            $user->update();
+           (new UserActivityController)->createActivity('Make User Active');
            return redirect()->route('users.index')
                            ->with('success','User updated successfully');
         }
@@ -152,6 +156,7 @@ namespace App\Http\Controllers;
         public function restore($id)
         {
             User::withTrashed()->find($id)->restore();
+            (new UserActivityController)->createActivity('Restore User');
             return redirect()->route('users.index')
                             ->with('success','User updated successfully');
         }
