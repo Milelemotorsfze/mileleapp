@@ -78,6 +78,7 @@ public function getbookingvehicles($variantId, $interiorColorId = null, $exterio
     $today = now();
     $query = Vehicles::select([
         'vehicles.vin as vin',
+        'vehicles.price as price',
         'vehicles.id',
         'brands.brand_name as brand',
         'master_model_lines.model_line',
