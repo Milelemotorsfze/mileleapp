@@ -159,7 +159,6 @@ class PFIController extends Controller
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
 //         return $request->all();
-        info("test");
         $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)->first();
         if($pfi) {
             return response(true);

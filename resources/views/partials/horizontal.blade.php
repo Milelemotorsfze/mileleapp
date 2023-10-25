@@ -543,14 +543,14 @@
                                                         <a href="{{route('supplier-inventories.index')}}" class="dropdown-item" data-key="t-login">Supplier Inventory</a>
                                                     @endif
                                                 @endcan
-                                                @can('supplier-inventory-list-with-date-filter')
-                                                    @php
-                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');
-                                                    @endphp
-                                                    @if ($hasPermission)
-                                                        <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>
-                                                        @endif
-                                                @endcan
+{{--                                                @can('supplier-inventory-list-with-date-filter')--}}
+{{--                                                    @php--}}
+{{--                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-list-with-date-filter');--}}
+{{--                                                    @endphp--}}
+{{--                                                    @if ($hasPermission)--}}
+{{--                                                        <a href="{{route('supplier-inventories.lists')}}" class="dropdown-item" data-key="t-login">Date Filter</a>--}}
+{{--                                                        @endif--}}
+{{--                                                @endcan--}}
                                                @can('supplier-inventory-report-view')
                                                     @php
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('supplier-inventory-report-view');
