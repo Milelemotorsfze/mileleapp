@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-//        'pfi/reference-number-unique-check'
+        '/reference-number-unique-check'
     ];
 }
