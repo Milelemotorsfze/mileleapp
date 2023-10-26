@@ -1098,6 +1098,5 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 	                e.preventDefault();
 	            }
 	        });
-	      
 </script>
 @endsection
