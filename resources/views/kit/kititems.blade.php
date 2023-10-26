@@ -1080,15 +1080,23 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 	            currentPurchasePrice = $("#current_purchase_price").val();
 	            previousSellingPrice = $("#previous_selling_price").val();
 	            currentSellingPrice = $("#current_selling_price").val();
+				if(currentPurchasePrice != '' || currentPurchasePrice != 'NOT AVAILABLE') {
+					if(currentSellingPrice != '') {
+						if(Number(currentPurchasePrice) > Number(currentSellingPrice)) {
+							alert('New selling price must be greater than current purchase price');
+							e.preventDefault();
+						}
+					}
+				}
 	            var values = [];
 	            if(previousPurchaseprice != "NOT AVAILABLE" && currentPurchasePrice != "NOT AVAILABLE" && previousPurchaseprice == currentPurchasePrice )
 	            {
 	                e.preventDefault();
 	            }
-	                if(currentSellingPrice == '' || currentSellingPrice == previousSellingPrice )
-	                {
-	                    e.preventDefault();
-	                }
+	            if(currentSellingPrice == '' || currentSellingPrice == previousSellingPrice)
+	            {
+	                e.preventDefault();
+	            }
 	        });
 	      
 </script>
