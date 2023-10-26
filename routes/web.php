@@ -65,6 +65,7 @@ use App\Http\Controllers\VariantRequests;
 use App\Http\Controllers\ModificationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProformaInvoiceController;
+use App\Http\Controllers\ApprovalAwaitingController;
 
 /*
 /*
@@ -501,5 +502,15 @@ Route::get('/d', function () {
     Route::post('logisticsdocuments/sendingbl', [DocumentController::class, 'updatedocbl'])->name('logisticsdocuments.updatedocbl');
 
     //Profoma Invoice
-    Route::get('/proforma_invoice/{callId}', [ProformaInvoiceController::class, 'proforma_invoice'])->name('qoutation.proforma_invoice');
+    Route::controller(ProformaInvoiceController::class)->group(function(){
+        Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
+        Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
+        // Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
+        // Route::get('/get-booking-vehicles/{variantId}/{interiorColorId?}/{exteriorColorId?}', [BookingController::class, 'getbookingvehicles'])->name('booking.getbookingvehicles');
+
+    });
+    // ApprovalAwaitingController
+    Route::controller(ApprovalAwaitingController::class)->group(function(){
+        Route::get('/addon-approval-awaiting/{type}', 'addonApprovalAwaiting')->name('addon.approval');
+    });
     });
