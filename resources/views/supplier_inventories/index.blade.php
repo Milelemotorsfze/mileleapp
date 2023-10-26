@@ -60,6 +60,8 @@
                 <thead class="bg-soft-secondary">
                 <tr>
                     <th>S.NO</th>
+                    <th>Vendor</th>
+                    <th>Dealer</th>
                     <th>Model</th>
                     <th>SFX</th>
                     <th>Variant</th>
@@ -77,6 +79,9 @@
                         data-id="{{$supplierInventory->master_model_id}}" data-model="{{$supplierInventory->masterModel->model ?? ''}}"
                         data-sfx="{{ $supplierInventory->masterModel->sfx ?? ''}}" >
                         <td>{{ ++$i }}</td>
+
+                        <td>{{ $supplierInventory->supplier->supplier ?? ''}}</td>
+                        <td>{{ $supplierInventory->whole_sales ?? ''}}</td>
                         <td>{{ $supplierInventory->masterModel->model ?? '' }}</td>
                         <td>{{ $supplierInventory->masterModel->sfx ?? '' }}</td>
                         <td>{{ $supplierInventory->masterModel->variant->name ?? 'Variant Listed But Blanked' }}</td>
