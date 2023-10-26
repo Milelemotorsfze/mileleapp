@@ -225,7 +225,7 @@ Route::get('/d', function () {
     Route::post('letter-of-indent-item/approve', [LOIItemsController::class, 'approveLOIItem'])->name('approve-loi-items');
 
     // PFI
-//    Route::post('pfi/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
+    Route::post('/reference-number-unique-check',[PFIController::class,'uniqueCheckPfiReferenceNumber']);
     Route::resource('pfi', PFIController::class);
     Route::get('add-pfi', [PFIController::class,'addPFI'])->name('add_pfi');
     Route::resource('demand-planning-purchase-orders', DemandPlanningPurchaseOrderController::class);

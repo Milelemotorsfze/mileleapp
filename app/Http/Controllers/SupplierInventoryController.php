@@ -104,44 +104,44 @@ class SupplierInventoryController extends Controller
                 $num = count($filedata);
                 if ($i > 0 && $num == $numberOfFields)
                 {
-                    info("inside while loop");
+//                    info("inside while loop");
                     $supplier_id = $request->input('supplier_id');
                     $country = $request->input('country');
-                    info($filedata[6]);
+//                    info($filedata[6]);
                     $colourcode = $filedata[5];
                     if($colourcode) {
-                        info("test ok");
-                        info($colourcode);
+//                        info("test ok");
+//                        info($colourcode);
                         $colourcodecount = strlen($colourcode);
-                        info($colourcodecount);
+//                        info($colourcodecount);
 
                         if ($colourcodecount == 5) {
-                            info("colr code count is 5");
+//                            info("colr code count is 5");
                             $extcolour = substr($colourcode, 0, 3);
-                            info($extcolour);
+//                            info($extcolour);
                         }
                         if ($colourcodecount == 4) {
-                            info("colr code count is 4");
+//                            info("colr code count is 4");
 
                             $altercolourcode = "0" . $colourcode;
                             $extcolour = substr($altercolourcode, 0, 3);
-                            info($extcolour);
+//                            info($extcolour);
                         }
                         if($extcolour) {
-                            info("exterior clr");
-                            info($extcolour);
+//                            info("exterior clr");
+//                            info($extcolour);
                             $parentColors = ColorCode::where('code', $extcolour)
                                 ->where('belong_to', ColorCode::EXTERIOR)
                                 ->first();
-                            info("parent clrs".$parentColors);
+//                            info("parent clrs".$parentColors);
                             if ($parentColors)
                             {
                                 $code_nameex = $parentColors->parent;
                             }
                         }
                     }
-                    info($code_nameex);
-                    info("clr name");
+//                    info($code_nameex);
+//                    info("clr name");
                     $colourname = $code_nameex;
                     $uploadFileContents[$i]['steering'] = $filedata[0];
                     $uploadFileContents[$i]['model'] = $filedata[1];

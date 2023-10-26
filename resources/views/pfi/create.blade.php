@@ -97,7 +97,7 @@
                                             <label  class="form-label">SFX</label>
                                         </div>
                                         <div class="col-lg-3 col-md-3">
-                                            <label class="form-label">Varient</label>
+                                            <label class="form-label">Variant</label>
                                         </div>
                                         <div class="col-lg-2 col-md-2">
                                             <label class="form-label">Quantity</label>
@@ -182,8 +182,9 @@
                             <div class="col-lg-3 col-md-6">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">PFI Number</label>
-                                   <input type="text" class="form-control" id="pfi-reference-number" autofocus placeholder="Enter PFI Number"
+                                   <input type="text" class="form-control" id="pfi_reference_number" autofocus placeholder="Enter PFI Number"
                                           name="pfi_reference_number" value="{{ old('pfi_reference_number') }}">
+                                    <span id="pfi-error" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6">
@@ -218,7 +219,7 @@
                         <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         @if($approvedPfiItems->count() > 0)
                             <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary">Finish</button>
+                                <button type="submit" class="btn btn-primary btn-submit">Finish</button>
                             </div>
                         @endif
                     </form>
@@ -269,19 +270,35 @@
                }
            });
        }
-       $("#form-create").validate({
+        $('#pfi_reference_number').keyup(function(){
+
+                $.ajax({
+                    type:"POST",
+                    async: false,
+                    url: "/reference-number-unique-check", // script to validate in server side
+                    data: {pfi_reference_number:  $('#pfi_reference_number').val()},
+                    success: function(data) {
+                       console.log(data);
+                       if(data == true) {
+                           $('#pfi_reference_number').addClass('is-invalid');
+                           $('#pfi-error').text("PFI Number already existing");
+                           $('.btn-submit').attr('disabled', true);
+                       }else{
+                           $('#pfi_reference_number').removeClass('is-invalid');
+                           $('#pfi-error').text(" ");
+                           $('.btn-submit').attr('disabled', false);
+
+                       }
+                    }
+                });
+            },
+        );
+
+        $("#form-create").validate({
+           ignore: [],
            rules: {
                pfi_reference_number: {
                    required: true,
-                   // remote: {
-                   //     url: "pfi/reference-number-unique-check",
-                   //     type: "GET",
-                   //     data: {
-                   //         pfi_reference_number: function() {
-                   //             return $( "#pfi-reference-number" ).val();
-                   //         }
-                   //     }
-                   // }
                },
                pfi_date: {
                    required: true,
@@ -293,13 +310,10 @@
                    required:true,
                    extension: 'pdf'
                },
-               messages: {
-                   file: {
-                       extension: "Please upload valid pdf file"
-                   }
-               }
-           }
+           },
+
        });
+
     </script>
 @endpush
 

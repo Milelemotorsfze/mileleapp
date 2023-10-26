@@ -158,12 +158,12 @@ class PFIController extends Controller
         return redirect()->route('pfi.index')->with('message', 'PFI created Successfully');
     }
     public function uniqueCheckPfiReferenceNumber(Request $request) {
-
+//         return $request->all();
         $pfi = PFI::where('pfi_reference_number', $request->pfi_reference_number)->first();
         if($pfi) {
-            return true;
+            return response(true);
         }else{
-            return false;
+            return response(false);
         }
     }
     /**

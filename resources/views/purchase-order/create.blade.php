@@ -358,7 +358,7 @@
         }).get();
 
         if (variantIds.length === 0) {
-            alertify.alert('Please select at least one variant').set({title:"Alert !"});
+            alertify.alert('Please select variant quantity and and add vehicles.').set({title:"Alert !"});
             formValid = false;
         }else{
             // alert("variant is there");
