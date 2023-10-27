@@ -2029,6 +2029,9 @@ class AddonController extends Controller {
                 ->where('addon_id', $request->addon_id)
                 ->where('description', $description)
                 ->where('addon_type_name', $request->addonType);
+                if($request->id) {
+                    $isExisting = $isExisting->whereNot('id',$request->id);
+                }
            $data['is_all_brands'] = $isExisting->count();
         }
         else {
