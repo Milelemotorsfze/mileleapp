@@ -911,9 +911,8 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-edit']);
 	                    showBrandError($msg,data.index);
 	                    var count = data.count;
 	                    uniqueCounts.push(count);
-	                    // alert(formInputError);
-	
-	                }else{
+	                }
+					else{
 	                    $msg = "";
 	                    removeBrandError($msg,data.index);
 	                    uniqueCounts.pop();

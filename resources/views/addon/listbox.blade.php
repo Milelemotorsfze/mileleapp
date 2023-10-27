@@ -262,7 +262,7 @@
                                         @endif
                                     @else
                                         @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
-                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                            @if(isset($addonsdata->LeastPurchasePrices->purchase_price_aed))
                                                 @can('addon-least-purchase-price-view')
                                                     @php
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);

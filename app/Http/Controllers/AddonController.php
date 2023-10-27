@@ -81,7 +81,12 @@ class AddonController extends Controller {
                     }
                     $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
                 }
-                $addon->LeastPurchasePrices = $totalPrice;
+                if($totalPrice != 0) {
+                    $addon->LeastPurchasePrices = $totalPrice;
+                }
+                else {
+                    $addon->LeastPurchasePrices = '';
+                }
             } 
         }
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
@@ -193,7 +198,12 @@ class AddonController extends Controller {
                     }
                     $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
                 }
-                $addon->LeastPurchasePrices = $totalPrice;
+                if($totalPrice != 0) {
+                    $addon->LeastPurchasePrices = $totalPrice;
+                }
+                else {
+                    $addon->LeastPurchasePrices = '';
+                }
             }
         }
         $html = "";
@@ -265,7 +275,7 @@ class AddonController extends Controller {
                     }
                 }
                 if($addon->addon_type_name == 'SP' OR $addon->addon_type_name == 'P') {
-                    if($addon->LeastPurchasePrices->purchase_price_aed != '') {
+                    if(isset($addon->LeastPurchasePrices->purchase_price_aed)) {
                         if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
                             if ($hasPermission) {
@@ -497,7 +507,7 @@ class AddonController extends Controller {
                                               $html .= '  <td>'.$addon->PurchasePrices->updated_at.'</td>';
                                           }
                                           if($addon->LeastPurchasePrices!= null) {
-                                              if($addon->LeastPurchasePrices->purchase_price_aed != '') {
+                                              if(isset($addon->LeastPurchasePrices->purchase_price_aed)) {
                                                   if( Auth::user()->hasPermissionTo('addon-least-purchase-price-view')) {
                                                       if (Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view'])) {
                                                           $html .= ' <td>'.$addon->LeastPurchasePrices->purchase_price_aed.' AED</td>';
