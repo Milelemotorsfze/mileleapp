@@ -18,10 +18,10 @@ class LetterOfIndentItem extends Model
     {
         return $this->belongsTo(LetterOfIndent::class,'letter_of_indent_id');
     }
-    public function Variant()
-    {
-        return $this->belongsTo(Varaint::class,'variant_name','name');
-    }
+//    public function Variant()
+//    {
+//        return $this->belongsTo(Varaint::class,'variant_name','name');
+//    }
     public function masterModel()
     {
         return $this->belongsTo(MasterModel::class);

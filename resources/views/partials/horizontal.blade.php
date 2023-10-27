@@ -182,7 +182,7 @@
                     @endif
                     @endcanany
 
-                    
+
 
                             @canany(['warranty-create', 'warranty-list','addon-create','accessories-list','spare-parts-list','kit-list'])
                             @php
@@ -557,6 +557,38 @@
                                     </div>
                                     @endif
                                 @endcan
+                                    @can('list-master-models')
+                                        @php
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
+                                        @endphp
+                                        @if ($hasPermission)
+                                            <div class="dropdown">
+                                                <a class="dropdown-item dropdown-toggle arrow-none" href="#" id="topnav-utility" role="button">
+                                                    <span data-key="t-utility">Master Model</span>
+                                                    <div class="arrow-down"></div>
+                                                </a>
+                                                <div class="dropdown-menu" aria-labelledby="topnav-auth">
+                                                    @can('create-master-models')
+                                                        @php
+                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-master-models');
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                            <a href="{{route('master-models.create')}}" class="dropdown-item" data-key="t-login">Add New</a>
+                                                        @endif
+                                                    @endcan
+                                                    @can('list-master-models')
+                                                        @php
+                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-master-models');
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                            <a href="{{route('master-models.index')}}" class="dropdown-item" data-key="t-login"> Lists</a>
+                                                        @endif
+                                                    @endcan
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endcan
+
                                     @canany(['supplier-inventory-list','supplier-inventory-edit','supplier-inventory-list-with-date-filter','supplier-inventory-report-view'])
                                         @php
                                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-inventory-list','supplier-inventory-edit',
@@ -613,9 +645,9 @@
                                     </div>
                                     @endif
                                 @endcan
-                                    @can('create-customer')
+                                    @can('list-customer')
                                         @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-customer');
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
                                         @endphp
                                         @if ($hasPermission)
                                             <div class="dropdown">

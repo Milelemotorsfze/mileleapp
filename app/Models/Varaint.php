@@ -33,9 +33,15 @@ class Varaint extends Model
         $variant = Varaint::find($this->id);
         $vehicles = Vehicles::where('varaints_id', $this->id)->get();
         if($vehicles->count() <= 0) {
-            $loiItem = LetterOfIndentItem::where('variant_name', $variant->name)->get();
+            $loiItem = LetterOfIndentItem::with('masterModel')
+                ->whereHas('masterModel', function ($query) use($variant) {
+                $query->where('variant_id', $variant->id);
+                })->get();
             if($loiItem->count() <= 0) {
-                $demandLists = DemandList::where('variant_name', $variant->name)->get();
+                $demandLists = DemandList::with('masterModel')
+                    ->whereHas('masterModel', function ($query) use($variant) {
+                        $query->where('variant_id', $variant->id);
+                    })->get();;
                 if($demandLists->count() <= 0) {
                     $availableColors = AvailableColour::where('varaint_id', $this->id)->get();
                     if($availableColors->count() <= 0) {
