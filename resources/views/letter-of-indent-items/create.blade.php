@@ -7,7 +7,7 @@
         @if ($hasPermission)
         <div class="card-header">
             <h4 class="card-title">Add New LOI Items</h4>
-            <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+            <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
     </div>
     <div class="card-body">
@@ -190,13 +190,11 @@
                             </div>
                             <div class="col-12 text-end mt-4">
                                 <button type="submit" class="btn btn-info"> <span class="fw-bold">Save & Add New </span></button>
-                                @if($letterOfIndentItems->count() > 0)
-                                    <a class="text-white" href="{{ route('letter-of-indent-documents.create',['letter_of_indent_id' => request()->id ])}}">
+                                    <a class="text-white" href="{{ route('letter-of-indents.index')}}">
                                         <button type="button" class="btn btn-primary  btn-deal-item-submit" >
-                                            Next
+                                            Finish
                                         </button>
                                     </a>
-                                @endif
                             </div>
                         </div>
                     </div>

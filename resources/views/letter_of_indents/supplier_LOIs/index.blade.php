@@ -355,6 +355,7 @@
                     <table id="supplier-approved-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
+                            <th>S.No:</th>
                             <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
@@ -370,6 +371,7 @@
                         </div>
                         @foreach ($approvedLOIs as $key => $letterOfIndent)
                             <tr>
+                                <td> {{ ++$i }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
@@ -495,6 +497,7 @@
                     <table id="supplier-rejected-LOI-table" class="table table-striped table-editable table-edits table table-condensed" >
                         <thead class="bg-soft-secondary">
                         <tr>
+                            <th>S.No:</th>
                             <th>Vendor</th>
                             <th>Date</th>
                             <th>Customer</th>
@@ -511,6 +514,7 @@
                         </div>
                         @foreach ($rejectedLOIs as $key => $letterOfIndent)
                             <tr>
+                                <td> {{ ++$i }}</td>
                                 <td>{{ $letterOfIndent->supplier->supplier }}</td>
                                 <td>{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}</td>
                                 <td>{{ $letterOfIndent->customer->name ?? '' }}</td>
