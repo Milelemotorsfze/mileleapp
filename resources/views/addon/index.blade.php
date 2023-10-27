@@ -219,7 +219,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     $(document).ready(function ()
     {
       // console.log(addon[0]);
-      $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
+      $("#fltr-addon-code").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
       $("#fltr-addon-code").select2();
       $("#fltr-brand").attr("data-placeholder","Choose Brand....    Or     Type Here To Search....");
       $("#fltr-brand").select2();

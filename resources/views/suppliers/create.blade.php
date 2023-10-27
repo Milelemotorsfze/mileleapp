@@ -1270,7 +1270,7 @@
             $('#addon_1').select2({
                 allowClear: true,
                 minimumResultsForSearch: -1,
-                placeholder:"Choose Addon Code....     Or     Type Here To Search....",
+                placeholder:"Choose Addon Name....     Or     Type Here To Search....",
             });
             $("#supplier_type").attr("data-placeholder","Choose Sub Category....     Or     Type Here To Search....");
             $("#supplier_type").select2();

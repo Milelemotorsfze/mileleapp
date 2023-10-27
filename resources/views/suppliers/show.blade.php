@@ -553,7 +553,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
         var data = {!! json_encode($supplier) !!};
         $(document).ready(function ()
         {
-            // $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
+            // $("#adoon").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
             // $("#adoon").select2();
         });
          // show image in large view
