@@ -20,5 +20,8 @@ class MasterModelLines extends Model
     {
         return $this->belongsTo(User::class,'updated_by','id');
     }
-    
+    public function addons()
+    {
+        return $this->hasMany(AddonTypes::class,'model_id','id');
+    }
 }

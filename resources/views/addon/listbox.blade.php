@@ -146,34 +146,20 @@
         <div class="list2" id="addonbox">
             <div class="row related-addon">
                 @foreach($addon1 as $value => $addonsdata)
-
                     <div id="{{$addonsdata->id}}" class="each-addon col-xxl-4 col-lg-6 col-md-6 col-sm-12 col-12">
                         <div class="row">
-                            <!-- <div class="widthClass labellist labeldesign col-xxl-3 col-lg-6 col-md-6 col-sm-12 col-12">
-                                Addon Name
-                            </div>
-                            <div class="testtransform widthData labellist databack1 col-xxl-9 col-lg-6 col-md-6 col-sm-12 col-12">
-                                {{--                                // condition chcek not included--}}
-                                @if($addonsdata->AddonName->name != '')
-                                    {{$addonsdata->AddonName->name}}
-                                @endif
-                            </div>
-
-                            {{--                            // not included--}} -->
-                            
-
                             <div class="col-xxl-7 col-lg-7 col-md-12 col-sm-12 col-12">
                                 <div class="row" style="padding-right:3px; padding-left:3px;">
                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                    Addon Name
+                                        Addon Name
                                     </div>
                                     <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                    @if($addonsdata->AddonName->name != '')
-                                    {{$addonsdata->AddonName->name}} 
-                                    @if(isset($addonsdata->AddonDescription))
-                                    @if($addonsdata->AddonDescription->description != '')- {{$addonsdata->AddonDescription->description}}@endif
-                                    @endif
-                                    @endif
+                                        @if($addonsdata->AddonName->name != '')
+                                            {{$addonsdata->AddonName->name}} 
+                                            @if(isset($addonsdata->AddonDescription))
+                                                @if($addonsdata->AddonDescription->description != '')- {{$addonsdata->AddonDescription->description}}@endif
+                                            @endif
+                                        @endif
                                     </div>
                                     <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                         Addon Code
@@ -193,8 +179,8 @@
                                             Spare Parts
                                         @endif
                                     </div>
-
-                                    @if($content == '')@if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
+                                    @if($content == '')
+                                        @if($addonsdata->PurchasePrices->lead_time_min != '' OR $addonsdata->PurchasePrices->lead_time_max != '')
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                             Lead Time
                                         </div>
@@ -203,13 +189,10 @@
                                             @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
                                                 - {{$addonsdata->PurchasePrices->lead_time_max}}
                                             @endif
-
                                             Days
-
                                         </div>
+                                        @endif
                                     @endif
-                                    @endif
-
                                     @if($content == '')
                                         @if($addonsdata->PurchasePrices!= null)
                                             @if($addonsdata->PurchasePrices->purchase_price_aed != '')
@@ -218,48 +201,98 @@
                                                         $hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-view']);
                                                     @endphp
                                                     @if ($hasPermission)
-                                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                            Purchase Price
-                                                        </div>
-                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                            {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
-                                                        </div>
+                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        Purchase Price
+                                                    </div>
+                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        {{$addonsdata->PurchasePrices->purchase_price_aed}} AED
+                                                    </div>
                                                     @endif
                                                 @endcan
                                             @endif
                                         @endif
                                     @endif
-
                                     @if($content == '')
                                         @if($addonsdata->addon_type_name == 'SP')
                                             @if($addonsdata->PurchasePrices!= null)
                                                 @if($addonsdata->PurchasePrices->updated_at != '')
-                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        Quotation Date
-                                                    </div>
-                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        {{$addonsdata->PurchasePrices->updated_at}}
-                                                    </div>
+                                                <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                    Quotation Date
+                                                </div>
+                                                <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                    {{$addonsdata->PurchasePrices->updated_at}}
+                                                </div>
                                                 @endif
                                             @endif
                                         @endif
-                                    @endif
-
-                                    @if($addonsdata->least_purchase_price != null)
-                                        @if($addonsdata->least_purchase_price->purchase_price_aed != '')
-                                            @can('addon-least-purchase-price-view')
-                                                @php
-                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
-                                                @endphp
-                                                @if ($hasPermission)
-                                                    <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        Least Purchase Price
-                                                    </div>
-                                                    <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
-                                                        {{$addonsdata->least_purchase_price->purchase_price_aed}} AED
-                                                    </div>
+                                        @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
+                                            @if($addonsdata->least_purchase_price != null)
+                                                @if($addonsdata->least_purchase_price->purchase_price_aed != '')
+                                                    @can('addon-least-purchase-price-view')
+                                                        @php
+                                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                        @endphp
+                                                        @if ($hasPermission)
+                                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            Least Purchase Price
+                                                        </div>
+                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            {{$addonsdata->least_purchase_price->purchase_price_aed}} AED
+                                                        </div>
+                                                        @endif
+                                                    @endcan
                                                 @endif
-                                            @endcan
+                                            @endif
+                                        @else
+                                            @if($addonsdata->LeastPurchasePrices != '')
+                                                @can('addon-least-purchase-price-view')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            Least Purchase Price
+                                                        </div>
+                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        {{$addonsdata->LeastPurchasePrices}} AED
+                                                        </div>
+                                                    @endif
+                                                @endcan
+                                            @endif
+                                        @endif
+                                    @else
+                                        @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
+                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                                @can('addon-least-purchase-price-view')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            Least Purchase Price
+                                                        </div>
+                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
+                                                        </div>
+                                                    @endif
+                                                @endcan
+                                            @endif
+                                        @else
+                                            @if($addonsdata->LeastPurchasePrices != '')
+                                                @can('addon-least-purchase-price-view')
+                                                    @php
+                                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
+                                                    @endphp
+                                                    @if ($hasPermission)
+                                                        <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                            Least Purchase Price
+                                                        </div>
+                                                        <div class="labellist databack1 col-xxl-7 col-lg-6 col-md-6 col-sm-12 col-12">
+                                                        {{$addonsdata->LeastPurchasePrices}} AED
+                                                        </div>
+                                                    @endif
+                                                @endcan
+                                            @endif
                                         @endif
                                     @endif
                                     @can('addon-selling-price-view')
@@ -301,7 +334,6 @@
                                             @endif
                                         </div>
                                     @endif
-
                                     @if($addonsdata->lead_time)
                                         <div class="labellist labeldesign col-xxl-5 col-lg-6 col-md-6 col-sm-12 col-12">
                                             Lead Time
@@ -317,9 +349,7 @@
                                                         @if($addonsdata->PurchasePrices->lead_time_max != '' && $addonsdata->PurchasePrices->lead_time_min < $addonsdata->PurchasePrices->lead_time_max)
                                                             - {{$addonsdata->PurchasePrices->lead_time_max}}
                                                         @endif
-
                                                         Days
-
                                                     </div>
                                                 @endif
                                             @endif
@@ -347,13 +377,12 @@
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px; width:232px; height158px;">
                                 @if($addonsdata->image)
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
-                                         alt="Addon Image" style="max-height:159px; max-width:232px;">
-                               @else
-                               <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
-                               style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    alt="Addon Image" style="max-height:159px; max-width:232px;">
+                                @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
                                 @endif
                             </div>
-                            
                             @if($addonsdata->is_all_brands == 'yes')
                                 <div class="labellist labeldesign col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6 col-6">
                                     Brand
@@ -386,52 +415,51 @@
                                         </center>
                                     </div>
                                 @endif
-
                                 <input type="hidden" id="addon-type-count-{{$addonsdata->id}}" value="{{$addonsdata->AddonTypes->count()}}">
-                                @foreach($addonsdata->AddonTypes as $key =>$AddonTypes)
-                                    <div class="divcolorclass" value="5" hidden>
+                            @foreach($addonsdata->AddonTypes as $key =>$AddonTypes)
+                                <div class="divcolorclass" value="5" hidden>
+                                </div>
+                                @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'K')
+                                    <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                        {{$AddonTypes->brands->brand_name}}
                                     </div>
-                                    @if($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'K')
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-brand-{{$key}} col-xxl-3 col-lg-3 col-md-3 col-sm-3 col-3">
-                                            {{$AddonTypes->brands->brand_name}}
-                                        </div>
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-line-{{$key}} col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
-                                            @if(isset($AddonTypes->modelLines->model_line))
-                                                {{$AddonTypes->modelLines->model_line}}
-                                            @endif
-                                            @if($AddonTypes->is_all_model_lines == 'yes')
-                                                All Model Lines
-                                            @endif
-                                        </div>
-                                        <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-number-{{$key}} col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
-                                            {{$AddonTypes->modelDescription->model_description ?? ''}}
-                                        </div>
-                                    @else
-                                        <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                                            {{$AddonTypes->brands->brand_name}}
-                                        </div>
-                                        <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
-                                            @if(isset($AddonTypes->modelLines->model_line))
-                                                {{$AddonTypes->modelLines->model_line}}
-                                            @endif
-                                            @if($AddonTypes->is_all_model_lines == 'yes')
-                                                All Model Lines
-                                            @endif
-                                        </div>
-                                    @endif
-                                @endforeach
+                                    <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-line-{{$key}} col-xxl-4 col-lg-4 col-md-4 col-sm-4 col-4">
+                                        @if(isset($AddonTypes->modelLines->model_line))
+                                            {{$AddonTypes->modelLines->model_line}}
+                                        @endif
+                                        @if($AddonTypes->is_all_model_lines == 'yes')
+                                            All Model Lines
+                                        @endif
+                                    </div>
+                                    <div class="testtransform divcolor labellist databack1 addon-{{$addonsdata->id}}-model-number-{{$key}} col-xxl-5 col-lg-5 col-md-5 col-sm-5 col-5">
+                                        {{$AddonTypes->modelDescription->model_description ?? ''}}
+                                    </div>
+                                @else
+                                    <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                        {{$AddonTypes->brands->brand_name}}
+                                    </div>
+                                    <div class="testtransform divcolor labellist databack1 col-xxl-6 col-lg-6 col-md-6 col-sm-6 col-6">
+                                        @if(isset($AddonTypes->modelLines->model_line))
+                                            {{$AddonTypes->modelLines->model_line}}
+                                        @endif
+                                        @if($AddonTypes->is_all_model_lines == 'yes')
+                                            All Model Lines
+                                        @endif
+                                    </div>
+                                @endif
+                            @endforeach
                             @endif
                             @if($addonsdata->AddonTypes->count() > 3)
                                 <div class="row justify-content-center mt-1">
                                     <div class="col-lg-3 col-md-12 col-sm-12">
                                         <button title="View More Model Descriptions" class="btn btn-sm btn-info view-more text-center"
-                                                onclick="viewMore({{$addonsdata->id}})"
-                                                id="view-more-{{$addonsdata->id}}"  data-key="{{$key}}" >
-                                            View More <i class="fa fa-arrow-down"></i>
+                                            onclick="viewMore({{$addonsdata->id}})"
+                                            id="view-more-{{$addonsdata->id}}"  data-key="{{$key}}" >
+                                        View More <i class="fa fa-arrow-down"></i>
                                         </button>
                                         <button title="View More Model Descriptions" hidden class="btn btn-sm btn-info view-less text-center"
-                                                onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
-                                            View Less <i class="fa fa-arrow-up"></i>
+                                            onclick="viewLess({{$addonsdata->id}})"     id="view-less-{{$addonsdata->id}}" data-key="{{$key}}" >
+                                        View Less <i class="fa fa-arrow-up"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -440,7 +468,6 @@
                         </br>
                         <div class="row" style="position: absolute; bottom: 3px; right: 5px;">
                             <div class="col-xxl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-
                                 @include('addon.action.addsellingprice')
                                 @include('addon.action.action')
                             </div>
