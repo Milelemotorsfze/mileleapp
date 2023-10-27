@@ -42,6 +42,10 @@ class AddonTypes extends Model
     {
         return $this->hasMany(AddonTypes::class,'brand_id','id');
     }
+    public function Addons()
+    {
+        return $this->hasMany(AddonDetails::class,'id','addon_details_id');
+    }
     public function getKitModelNumbersAttribute() {
         $addonType = AddonTypes::find($this->id);
         $modelDescriptions = [];
@@ -66,4 +70,5 @@ class AddonTypes extends Model
         }
         return $modelDescriptions;
     }
+
 }
