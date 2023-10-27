@@ -645,9 +645,9 @@
                                     </div>
                                     @endif
                                 @endcan
-                                    @can('create-customer')
+                                    @can('list-customer')
                                         @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('create-customer');
+                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('list-customer');
                                         @endphp
                                         @if ($hasPermission)
                                             <div class="dropdown">
