@@ -2,8 +2,9 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Add / Update Supplier Inventory Record</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-
+        <a  class="btn btn-sm btn-info float-end " href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a href="{{ url('inventory/sample_supplier_inventory.csv') }}" class="btn btn-info btn-sm  float-end" style="margin-right: 5px" target="_blank">
+            <i class="fa fa-download" ></i> Sample Template</a>
     </div>
     <div class="card-body">
             @if (Session::has('error'))
@@ -62,7 +63,7 @@
                     <label class="form-label"></label>
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="is_add_new" id="is_add_new" {{ old('is_add_new') ? 'checked' : '' }} />
-                        <label class="form-check-label" for="remember-check">
+                        <label class="form-check-label" for="is_add_new">
                             Is Adding New Supplier List ?
                         </label>
                     </div>

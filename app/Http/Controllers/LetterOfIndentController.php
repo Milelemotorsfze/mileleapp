@@ -11,7 +11,7 @@ use App\Models\LetterOfIndentItem;
 use App\Models\MasterModel;
 use App\Models\Supplier;
 use App\Models\SupplierInventory;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -180,7 +180,7 @@ class LetterOfIndentController extends Controller
             $width = $request->width;
 
             if($request->download == 1) {
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
+                $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.trans_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
 
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
@@ -197,7 +197,7 @@ class LetterOfIndentController extends Controller
                 $height = $request->height;
                 $width = $request->width;
 
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
+                $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.milele_car_loi_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
 
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
@@ -214,7 +214,7 @@ class LetterOfIndentController extends Controller
                 $height = $request->height;
                 $width = $request->width;
 
-                $pdfFile = PDF::loadView('letter_of_indents.LOI-templates.business_download_view',
+                $pdfFile = Pdf::loadView('letter_of_indents.LOI-templates.business_download_view',
                     compact('letterOfIndent','letterOfIndentItems','height','width'));
                 $filename = 'LOI_'.$letterOfIndent->id.date('Y_m_d').'.pdf';
                 $directory = public_path('LOI');

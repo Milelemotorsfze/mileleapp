@@ -7,7 +7,7 @@ use App\Models\ColorCode;
 use App\Models\MasterModel;
 use App\Models\Supplier;
 use App\Models\SupplierInventory;
-use Barryvdh\DomPDF\Facade\PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -206,7 +206,7 @@ class SupplierInventoryController extends Controller
             $newModels = array_map("unserialize", array_unique(array_map("serialize", $newModels)));
             if(count($newModels) > 0 || count($newModelsWithSteerings) > 0)
             {
-                $pdf = PDF::loadView('supplier_inventories.new_models', compact('newModels', 'newModelsWithSteerings'));
+                $pdf = Pdf::loadView('supplier_inventories.new_models', compact('newModels', 'newModelsWithSteerings'));
                 return $pdf->download('New_Models_'.date('Y_m_d').'.pdf');
                 // show error msg
             } else
@@ -545,7 +545,7 @@ class SupplierInventoryController extends Controller
                         $supplierInventory->save();
                     }
 
-                    $pdf = PDF::loadView('supplier_inventories.reports', compact('newlyAddedRows',
+                    $pdf = Pdf::loadView('supplier_inventories.reports', compact('newlyAddedRows',
                         'updatedRows','deletedRows'));
                     return $pdf->download('report.pdf');
 
