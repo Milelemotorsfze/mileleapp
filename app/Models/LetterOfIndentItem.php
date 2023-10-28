@@ -47,14 +47,15 @@ class LetterOfIndentItem extends Model
     }
     public function getInventoryQuantityAttribute()
     {
-//        $mastermodel = MasterModel::where('model', $this->model)
-//            ->where('sfx', $this->sfx)
-//            ->first();
-        $modelId = $this->master_model_id;
+        $masterModel = MasterModel::find($this->master_model_id);
+        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+            ->where('model', $masterModel->model)
+            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
 
-        $inventoryCount = SupplierInventory::where('master_model_id', $modelId)
+        $inventoryCount = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('eta_import')
             ->count();
 
         return $inventoryCount;

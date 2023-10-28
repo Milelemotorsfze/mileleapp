@@ -228,17 +228,23 @@ class SupplierInventoryController extends Controller
                     }
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
-                        $model = MasterModel::where('model', $uploadFileContent['model'])
+//                        $model = MasterModel::where('model', $uploadFileContent['model'])
+//                            ->where('sfx', $uploadFileContent['sfx'])
+//                            ->where('steering', $uploadFileContent['steering'])
+//                            ->first();
+//                        $modelId = $model->id;
+
+                        $modelIds = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
-                            ->first();
-                        $modelId = $model->id;
-                        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
+                            ->pluck('id')->toArray();
+                        // after having eta import data their is no cahnges for data of thata ro.so consider the data without eta import for inventory
+                        $supplierInventories = SupplierInventory::whereIn('master_model_id', $modelIds)
                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier_id', $request->supplier_id)
-                            ->where('whole_sales', $request->whole_sales);
-//                            ->whereNull('eta_import');
+                            ->where('whole_sales', $request->whole_sales)
+                            ->whereNull('eta_import');
 
                         if ($supplierInventories->count() <= 0)
                         {
@@ -254,11 +260,14 @@ class SupplierInventoryController extends Controller
                                 // Store the Count into Update the Row with data
                                 $supplierInventory = $supplierInventories->where('chasis', $uploadFileContent['chasis'])
                                     ->first();
-                                $isNullChaisis = SupplierInventory::where('master_model_id', $modelId)
+                                $isNullChaisis = SupplierInventory::whereIn('master_model_id', $modelIds)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//                                    ->whereNull('eta_import')
+                                    ->where('supplier_id', $request->supplier_id)
+                                    ->where('whole_sales', $request->whole_sales)
+                                    ->whereNull('eta_import')
                                     ->whereNull('chasis');
+
                                 if (!$supplierInventory) {
                                     //adding new row simply
                                     if (!empty($isNullChaisis->first())) {
@@ -346,14 +355,14 @@ class SupplierInventoryController extends Controller
                                 }
                             } else
                             {
-                                $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
+                                $nullChaisisCount = SupplierInventory::whereIn('master_model_id', $modelIds)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                     ->where('supplier_id', $request->supplier_id)
                                     ->where('whole_sales', $request->whole_sales)
                                     ->whereNotIn('id', $chasisUpdatedRowIds)
                                     ->whereNull('chasis')
-//                                    ->whereNull('eta_import')
+                                    ->whereNull('eta_import')
                                     ->count();
                                 $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
                                 $countblankchasis[] = $modelSfxValuePair;
@@ -451,20 +460,20 @@ class SupplierInventoryController extends Controller
                         $excelRows = [];
                         foreach ($uploadFileContents as $uploadFileContent)
                         {
-                            $model = MasterModel::where('model', $uploadFileContent['model'])
-                                ->where('sfx', $uploadFileContent['sfx'])
-                                ->where('steering',$uploadFileContent['steering'])
-                                ->first();
+//                            $model = MasterModel::where('model', $uploadFileContent['model'])
+//                                ->where('sfx', $uploadFileContent['sfx'])
+//                                ->where('steering',$uploadFileContent['steering'])
+//                                ->first();
                             $isExistSupplier = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
-                                ->where('master_model_id', $model->id)
+                                ->whereIn('master_model_id', $modelIds)
                                 ->where('chasis', $uploadFileContent['chasis'])
                                 ->where('engine_number', $uploadFileContent['engine_number'])
                                 ->where('color_code', $uploadFileContent['color_code'])
                                 ->where('pord_month', $uploadFileContent['pord_month'])
                                 ->where('po_arm', $uploadFileContent['po_arm'])
-//                                ->whereNull('eta_import')
+                                ->whereNull('eta_import')
                                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
                             if ($isExistSupplier->count() > 0)
                             {
@@ -512,6 +521,7 @@ class SupplierInventoryController extends Controller
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
+                        ->whereNull('eta_import')
                         ->get();
                     if ($preivousDatas->count() > 0) {
                         foreach ($preivousDatas as $preivousData)
@@ -1005,13 +1015,19 @@ class SupplierInventoryController extends Controller
 
         return $supplierInventoryDates;
     }
-    public function getSupplierInventories(Request $request) {
-        $supplierInventories = SupplierInventory::where('master_model_id', $request->master_model_id)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->whereNull('eta_import')
-            ->get();
-
-        return response()->json($supplierInventories);
-    }
+//    public function getSupplierInventories(Request $request) {
+//
+//        $masterModel = MasterModel::find($this->master_model_id);
+//        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+//            ->where('model', $masterModel->model)
+//            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+//
+//        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->whereNull('eta_import')
+//            ->get();
+//
+//        return response()->json($supplierInventories);
+//    }
 }
