@@ -142,8 +142,7 @@ class DemandController extends Controller
                                     ->pluck('variant_id');
         $data['variants'] = Varaint::with('master_model_lines','masterModel')->whereIn('id', $variantId)
                                      ->get();
-
-
+        
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')
                 ->whereHas('masterModel', function ($query) use($request) {

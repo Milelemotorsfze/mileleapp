@@ -41,7 +41,10 @@ class SupplierInventory extends Model
     {
         return $this->belongsTo(MasterModel::class);
     }
-
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
     public function getTotalQuantityAttribute()
     {
         $masterModel = MasterModel::find($this->master_model_id);
@@ -101,11 +104,14 @@ class SupplierInventory extends Model
 
     public function getColorCodesAttribute()
     {
-        $modelId = $this->master_model_id;
+        $masterModel = MasterModel::find($this->master_model_id);
+
         $supplierInventories =  DB::table('supplier_inventories')
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
-            ->where('master_models.id', '=', $modelId)
+            ->where('master_models.steering', $masterModel->steering)
+            ->where('master_models.model', $masterModel->model)
+            ->where('master_models.sfx', $masterModel->sfx)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->whereNull('eta_import')
             ->groupBy('color_code');
