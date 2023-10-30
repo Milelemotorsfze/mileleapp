@@ -1326,7 +1326,7 @@ class SupplierController extends Controller
                         }
                     }
                 }
-                $data['successStore'] = true;                                
+                $data['successStore'] = true;
                 (new UserActivityController)->createActivity('Vendor Updated');
                 return response()->json(['success' => true,'data' => $data], 200);
             }

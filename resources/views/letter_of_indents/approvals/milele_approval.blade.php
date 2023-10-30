@@ -102,7 +102,7 @@
                                     <label  class="form-label">SFX</label>
                                 </div>
                                 <div class="col-lg-3 col-md-6">
-                                    <label class="form-label">Varient</label>
+                                    <label class="form-label">Variant</label>
                                 </div>
                                 <div class="col-lg-1 col-md-3">
                                     <label class="form-label">LOI Qty</label>
@@ -159,21 +159,22 @@
     {{--                                    Show LOI QTY as PFI QTY when inventory qty is > loi qty--}}
                                         <?php
                                             if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
-                                                if($letterOfIndentItem->approved_quantity > 0) {
-                                                    $count = $letterOfIndentItem->balance_quantity;
-                                                }else{
-                                                    $count = $letterOfIndentItem->inventory_quantity;
+                                                $count = $letterOfIndentItem->inventory_quantity;
+                                                if($count <= 0){
+                                                    $count = 0;
                                                 }
+
                                             }else{
 
                                                 $count = $letterOfIndentItem->quantity;
                                             }
                                             ?>
+{{--                                        {{ $count }}--}}
+
                                         <label class="form-label d-lg-none d-xl-none">PFI Qty</label>
                                         <select name="quantities[]" class="form-control approve-quantity" id="quantity-{{$key}}" data-key="{{$key}}"
                                         data-balance-qty="{{$letterOfIndentItem->balance_quantity}}" data-inventory-qty="{{ $letterOfIndentItem->inventory_quantity }}">
                                             @for($i=0;$i <= $count;$i++)
-
                                                 <option> {{ $i }} </option>
                                             @endfor
                                         </select> </br>

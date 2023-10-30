@@ -16,7 +16,6 @@
                 @if ($hasPermission)
                     <div class="ml-auto float-end">
                         <a href="{{ route('supplier-inventories.create') }}" class="btn btn-primary me-md-2">Upload CSV File</a>
-                        <a href="{{ url('inventory/sample_supplier_inventory.csv') }}" class="btn btn-info me-md-2" target="_blank"><i class="fa fa-download" ></i> Sample Template</a>
                     </div>
                     <br>
                 @endif

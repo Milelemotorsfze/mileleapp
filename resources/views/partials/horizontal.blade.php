@@ -481,9 +481,9 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                @can('demand-planning-supplier-create')
+                                @can('demand-planning-supplier-list')
                                     @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-create');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-list');
                                     @endphp
                                     @if ($hasPermission)
                                     <div class="dropdown">

@@ -104,13 +104,6 @@ class DemandController extends Controller
     }
     public function getSFX(Request $request)
     {
-        $supplierInventoriesModels = SupplierInventory::with('masterModel')
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
-            ->groupBy('master_model_id')
-            ->pluck('master_model_id');
-
         $data = MasterModel::where('model', $request->model);
             if ($request->module == 'LOI')
             {
@@ -119,6 +112,14 @@ class DemandController extends Controller
                 foreach ($loiItems as $loiItem) {
                     $addedModelIds[] = $loiItem->master_model_id;
                 }
+                $supplierInventoriesModels = SupplierInventory::with('masterModel')
+                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                    ->whereNull('eta_import')
+                    ->whereNull('status')
+                    ->groupBy('master_model_id')
+                    ->pluck('master_model_id');
+
                 $data = $data->whereNotIn('id', $addedModelIds)
                             ->whereIn('id', $supplierInventoriesModels);
             }
@@ -142,7 +143,6 @@ class DemandController extends Controller
                                     ->pluck('variant_id');
         $data['variants'] = Varaint::with('master_model_lines','masterModel')->whereIn('id', $variantId)
                                      ->get();
-
 
         if ($request->module == 'LOI') {
             $inventory = SupplierInventory::with('masterModel')

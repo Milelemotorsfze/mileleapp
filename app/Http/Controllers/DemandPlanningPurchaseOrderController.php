@@ -29,11 +29,11 @@ class DemandPlanningPurchaseOrderController extends Controller
 
         $approvedLOIItem = ApprovedLetterOfIndentItem::find($request->id);
         $vendor = $approvedLOIItem->letterOfIndentItem->LOI->supplier_id ?? '';
-        $vendors = Supplier::with('supplierTypes')
-            ->whereHas('supplierTypes', function ($query){
-                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
-            })
-            ->get();
+//        $vendors = Supplier::with('supplierTypes')
+//            ->whereHas('supplierTypes', function ($query){
+//                $query->where('supplier_type', Supplier::SUPPLIER_TYPE_DEMAND_PLANNING);
+//            })
+//            ->get();
         $pfiVehicleVariants = ApprovedLetterOfIndentItem::select('*', DB::raw('sum(quantity) as quantity'))
             ->where('pfi_id', $request->id)
             ->groupBy('letter_of_indent_item_id')
@@ -43,9 +43,10 @@ class DemandPlanningPurchaseOrderController extends Controller
                 ->sum('quantity');
             $pfiVehicleVariant->quantity = $pfiVehicleVariant->quantity - $alreadyAddedQuantity;
         }
+
         $exColours = ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
         $intColours = ColorCode::where('belong_to', 'int')->pluck('name', 'id')->toArray();
-        return view('purchase-order.create', compact('vendors','pfiVehicleVariants',
+        return view('purchase-order.create', compact('pfiVehicleVariants',
             'exColours','intColours','vendor'));
     }
 

@@ -157,7 +157,7 @@
                     </div>
                 </div>
                 <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary" >Next<i class="fa fa-arrow-right"></i> </button>
+                    <button type="submit" class="btn btn-primary" >Next<i class="fa fa-arrow-right " style="margin-left: 3px;"></i> </button>
                 </div>
             </div>
 

@@ -41,11 +41,18 @@ class SupplierInventory extends Model
     {
         return $this->belongsTo(MasterModel::class);
     }
-
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
+    }
     public function getTotalQuantityAttribute()
     {
-        $modelId = $this->master_model_id;
-        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
+        $masterModel = MasterModel::find($this->master_model_id);
+        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+            ->where('model', $masterModel->model)
+            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+
+        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->whereNull('eta_import');
         if (!empty(request()->start_date) && !empty(request()->end_date)) {
@@ -70,19 +77,24 @@ class SupplierInventory extends Model
 
     public function getActualQuantityAttribute()
     {
-        $modelId = $this->master_model_id;
-        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
+        $masterModel = MasterModel::find($this->master_model_id);
+        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+            ->where('model', $masterModel->model)
+            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+
+        $supplierInventories = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->whereNull('eta_import');
+            ->whereNull('eta_import')
+            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
 
         if (!empty(request()->start_date) && !empty(request()->end_date)) {
             $startDate = Carbon::parse(request()->start_date)->format('Y-m-d');
             $endDate =  Carbon::parse(request()->end_date)->format('Y-m-d');
             $supplierInventories = $supplierInventories->whereBetween('date_of_entry',[$startDate,$endDate]);
-        }else{
-            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
         }
+//        else{
+//            $supplierInventories = $supplierInventories->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
+//        }
 
         if (!$supplierInventories) {
             return 0;
@@ -92,11 +104,14 @@ class SupplierInventory extends Model
 
     public function getColorCodesAttribute()
     {
-        $modelId = $this->master_model_id;
+        $masterModel = MasterModel::find($this->master_model_id);
+
         $supplierInventories =  DB::table('supplier_inventories')
             ->select(DB::raw('count(color_code) AS color_code_count, color_code'))
             ->join('master_models',  'supplier_inventories.master_model_id', '=','master_models.id')
-            ->where('master_models.id', '=', $modelId)
+            ->where('master_models.steering', $masterModel->steering)
+            ->where('master_models.model', $masterModel->model)
+            ->where('master_models.sfx', $masterModel->sfx)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->whereNull('eta_import')
             ->groupBy('color_code');
