@@ -25,12 +25,18 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                     </div>
                     <div class="col-lg-12 col-md-12 col-sm-12">
                       <div class="input-group">
-                        <input id="selling_price_a_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput" name="selling_price" 
+                        @if($addonsdata->addon_type_name == 'K')
+                          <input id="least_purchase_price_a_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices ?? ''}} " hidden>
+                        @elseif($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
+                          <input id="least_purchase_price_a_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices->purchase_price_aed ?? ''}}" hidden>
+                        @endif
+                        <input id="selling_price_a_{{$addonsdata->id}}" oninput="inputNumberAbs(this,{{$addonsdata->id}},'a')" class="form-control widthinput" name="selling_price" 
                         placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                         <div class="input-group-append">
                           <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                         </div>
                       </div>
+                      <span id="a_error_{{$addonsdata->id}}" class="error required-class paragraph-class" style="color:#fd625e; font-size:13px;"></span>
                     </div>
                   </div>
                 </div>
@@ -38,7 +44,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary btn-sm createAddonId">Submit</button>
+              <button type="submit" id="submit_a_{{$addonsdata->id}}" class="btn btn-primary btn-sm createAddonId">Submit</button>
             </div>
           </div>
         </form>
@@ -51,7 +57,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
     </button>
     <div class="modal fade" id="edit-selling-price-{{$addonsdata->SellingPrice->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog ">
-        <form id="form-update2_{{$addonsdata->id}}" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}" method="POST" >
+        <form id="form-update2_{{$addonsdata->id}}" class="" action="{{ route('addon.newSellingPriceRequest', $addonsdata->SellingPrice->id) }}" method="POST" >
         @csrf
           <div class="modal-content">
             <div class="modal-header">
@@ -74,20 +80,26 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                   </div>
                   <div class="col-lg-8 col-md-12 col-sm-12">
                     <div class="input-group">
+                    @if($addonsdata->addon_type_name == 'K')
+                    <input id="least_purchase_price_b_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices ?? ''}}" hidden>
+                        @elseif($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
+                          <input id="least_purchase_price_b_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices->purchase_price_aed ?? ''}}" hidden>
+                        @endif
                                       <input value="{{$addonsdata->SellingPrice->id}}" name='id' id="createNew" hidden>
-                                      <input id="selling_price_b_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                                      <input id="selling_price_b_{{$addonsdata->id}}" oninput="inputNumberAbs(this,{{$addonsdata->id}},'b')" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
                                             name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                                       <div class="input-group-append">
                                         <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                       </div>
                                     </div>
+                                    <span id="b_error_{{$addonsdata->id}}" class="error required-class paragraph-class" style="color:#fd625e; font-size:13px;"></span>
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
-                              <button type="submit"  class="btn btn-primary btn-sm createAddonId">Submit</button>
+                              <button type="submit" id="submit_b_{{$addonsdata->id}}" class="btn btn-primary btn-sm createAddonId">Submit</button>
                             </div>
                           </div>
                         </form>
@@ -122,12 +134,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                                   </div>
                                   <div class="col-lg-8 col-md-12 col-sm-12">
                                     <div class="input-group">
-                                    <input value="{{$addonsdata->PendingSellingPrice->id}}" name='id' id="createNew" hidden>
-                                        <input id="selling_price_c_{{$addonsdata->id}}" oninput="inputNumberAbs(this)" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
+                                      @if($addonsdata->addon_type_name == 'K')
+                                        <input id="least_purchase_price_c_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices ?? ''}}" hidden>
+                                      @elseif($addonsdata->addon_type_name == 'SP' OR $addonsdata->addon_type_name == 'P')
+                                        <input id="least_purchase_price_c_{{$addonsdata->id}}" name="least_purchase_price" value="{{$addonsdata->LeastPurchasePrices->purchase_price_aed ?? ''}}" hidden>
+                                      @endif
+                                      <input value="{{$addonsdata->PendingSellingPrice->id}}" name='id' id="createNew" hidden>
+                                        <input id="selling_price_c_{{$addonsdata->id}}" oninput="inputNumberAbs(this,{{$addonsdata->id}},'c')" class="form-control widthinput @error('selling_price') is-invalid @enderror" 
                                             name="selling_price" placeholder="Enter Selling Price" value="" autocomplete="selling_price" required>
                                         <div class="input-group-append">
                                           <span class="input-group-text widthinput" id="basic-addon2">AED</span>
                                         </div>
+                                        <span id="c_error_{{$addonsdata->id}}" class="error required-class paragraph-class" style="color:#fd625e; font-size:13px;"></span>
+
                                     </div>
                                   </div>
                                 </div>
@@ -135,7 +154,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary btn-sm closeSelPrice" data-bs-dismiss="modal">Close</button>
-                              <button type="submit"  class="btn btn-primary btn-sm createAddonId">Submit</button>
+                              <button type="submit" id="submit_c_{{$addonsdata->id}}" class="btn btn-primary btn-sm createAddonId">Submit</button>
                             </div>
                           </div>
                         </form>
@@ -146,38 +165,44 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
                 @endcan
 @push('scripts')
   <script>
-    
-  
-    function inputNumberAbs(currentPriceInput) 
-    { 
+    function inputNumberAbs(currentPriceInput,index,type) { 
       var id = currentPriceInput.id;
       var input = document.getElementById(id);
       var val = input.value;
       val = val.replace(/^0+|[^\d.]/g, '');
-      if(val.split('.').length>2) 
-      {
+      if(val.split('.').length>2) {
         val =val.replace(/\.+$/,"");
       }
       input.value = val;
-      // if(currentPriceInput.id == 'updateSellingPriceId')
-      // {
-      //           var value = currentPriceInput.value;
-      //           if(value == '')
-      //           {
-                   
-      //               if(value.legth != 0)
-      //               {
-      //                   $msg = "Selling Price is required";
-      //                   showSellingPriceError($msg);
-      //               }
-      //           }
-      //           else
-      //           {
-      //               removeSellingPriceError();
-      //           }
-      //       }
+      var currentInput = '';
+      currentInput = input.value;
+      var leastPurchasePrice = '';
+      leastPurchasePrice = $("#least_purchase_price_"+type+"_"+index).val();
+      if (currentInput == Math.floor(currentInput)) {
+
+      alert("Integer")
+
+      } 
+      else {
+
+      alert("Decimal")
+
+      }
+      if(currentInput == '') { 
+        document.getElementById(type+'_error_'+index).textContent='';
+        document.getElementById('submit_'+type+'_'+index).removeAttribute("disabled");
+      }
+      else {
+        if(val < leastPurchasePrice) {
+        document.getElementById(type+'_error_'+index).textContent='Enter greater amount than purchase price';
+        document.getElementById('submit_'+type+'_'+index).setAttribute("disabled", "disabled");
+        }
+        else if(val >= leastPurchasePrice) {
+          document.getElementById(type+'_error_'+index).textContent='';
+          document.getElementById('submit_'+type+'_'+index).removeAttribute("disabled");
+        }
+         
+      }
     }
-  
-  
   </script>
 @endpush

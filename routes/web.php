@@ -167,7 +167,8 @@ Route::get('/d', function () {
     Route::post('kit/priceStore', [KitCommonItemController::class, 'priceStore'])->name('kit.priceStore');
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
     Route::post('kit/items/store', [KitCommonItemController::class, 'storeKitItems'])->name('kitItems.store');
-
+    Route::get('purchasePriceHistory/{id}', [KitCommonItemController::class, 'purchasePriceHistory'])->name('kit.purchasePriceHistory');
+    
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);

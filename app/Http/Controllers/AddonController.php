@@ -61,27 +61,16 @@ class AddonController extends Controller {
                 $supplierAddonDetails = [];
                 $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
                 $totalPrice = 0;
+                $totalPriceTrue = 'yes';
                 foreach($supplierAddonDetails->KitItems as $oneItem) { 
-                    $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
-                    $itemSps = [];
-                    $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id')->toArray();
-                    $itemModelDes = [];
-                    $itemModelDes = AddonTypes::where('addon_details_id',$addon->id)->pluck('model_number');
-                    $modelDescSps = [];
-                    $modelDescSps = AddonTypes::whereIn('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
-                    $intersectArray = [];
-                    $intersectArray = array_intersect($modelDescSps,$itemSps);
-                    $oneItem->countArray = count($intersectArray);
-                    $SpWithoutVendorIds = [];
-                    $SpWithoutVendorIds = AddonDetails::whereIn('id',$intersectArray)->doesntHave('AddonSuppliers')->pluck('id');
-                    $SpWithoutVendorPartNos = [];
-                    $SpWithoutVendorPartNos = SparePartsNumber::whereIn('addon_details_id',$SpWithoutVendorIds)->latest()->with('addondetails')->get();
-                    if(count($SpWithoutVendorPartNos) > 0) {
-                        $oneItem->latestPartNoSp = $SpWithoutVendorPartNos[0]->addondetails;
+                    if($oneItem->kit_item_total_purchase_price != 0) {
+                        $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
                     }
-                    $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
+                    else {
+                        $totalPriceTrue = 'no';
+                    }
                 }
-                if($totalPrice != 0) {
+                if($totalPriceTrue == 'yes' && $totalPrice != 0) {
                     $addon->LeastPurchasePrices = $totalPrice;
                 }
                 else {
@@ -178,27 +167,16 @@ class AddonController extends Controller {
                 $supplierAddonDetails = [];
                 $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
                 $totalPrice = 0;
+                $totalPriceTrue = 'yes';
                 foreach($supplierAddonDetails->KitItems as $oneItem) { 
-                    $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
-                    $itemSps = [];
-                    $itemSps = AddonDetails::where('description',$oneItem->item_id)->pluck('id')->toArray();
-                    $itemModelDes = [];
-                    $itemModelDes = AddonTypes::where('addon_details_id',$addon->id)->pluck('model_number');
-                    $modelDescSps = [];
-                    $modelDescSps = AddonTypes::whereIn('model_number',$itemModelDes)->pluck('addon_details_id')->toArray();
-                    $intersectArray = [];
-                    $intersectArray = array_intersect($modelDescSps,$itemSps);
-                    $oneItem->countArray = count($intersectArray);
-                    $SpWithoutVendorIds = [];
-                    $SpWithoutVendorIds = AddonDetails::whereIn('id',$intersectArray)->doesntHave('AddonSuppliers')->pluck('id');
-                    $SpWithoutVendorPartNos = [];
-                    $SpWithoutVendorPartNos = SparePartsNumber::whereIn('addon_details_id',$SpWithoutVendorIds)->latest()->with('addondetails')->get();
-                    if(count($SpWithoutVendorPartNos) > 0) {
-                        $oneItem->latestPartNoSp = $SpWithoutVendorPartNos[0]->addondetails;
+                    if($oneItem->kit_item_total_purchase_price != 0) {
+                        $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
                     }
-                    $oneItem->SpWithoutVendorPartNos = $SpWithoutVendorPartNos;
+                    else {
+                        $totalPriceTrue = 'no';
+                    }
                 }
-                if($totalPrice != 0) {
+                if($totalPriceTrue == 'yes' && $totalPrice != 0) {
                     $addon->LeastPurchasePrices = $totalPrice;
                 }
                 else {
