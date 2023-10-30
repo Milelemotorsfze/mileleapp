@@ -265,6 +265,7 @@
             let sfx = $(this).val();
             let model = $('#model').val();
             let url = '{{ route('demand.get-variant') }}';
+            let loiId = '{{ $letterOfIndent->id }}';
             $.ajax({
                 type: "GET",
                 url: url,
@@ -272,6 +273,7 @@
                 data: {
                     sfx: sfx,
                     model:model,
+                    letter_of_indent_id: loiId,
                     module: 'LOI',
                 },
                 success:function (data) {
@@ -291,6 +293,7 @@
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
             var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                alert(id);
                 if (e) {
                     $.ajax({
                         type: "POST",
