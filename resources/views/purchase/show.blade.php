@@ -25,7 +25,7 @@
         <i class="fa fa-arrow-left" aria-hidden="true"></i>
     </a>
 @endif -->
-<b>Purchase Order Number : {{$purchasingOrder->po_number}}</b> 
+<b>Purchase Order Number : {{$purchasingOrder->po_number}}</b>
 <!-- @if ($nextId)
     <a class="btn btn-sm btn-info" href="{{ route('purchasing-order.show', $nextId) }}">
        <i class="fa fa-arrow-right" aria-hidden="true"></i>
@@ -33,7 +33,7 @@
 @endif -->
 
         <a  class="btn btn-sm btn-info float-end" href="{{ route('purchasing-order.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
-        
+
     </div>
     @php
     $exColours = \App\Models\ColorCode::where('belong_to', 'ex')->pluck('name', 'id')->toArray();
@@ -132,7 +132,7 @@
   <label for="choices-single-default" class="form-label"><strong>Payment Initiation Request</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="updateallStatus('Approved', {{ $purchasingOrder->id }})">Approve All</button>
   <button id="rejection-btn" class="btn btn-danger" onclick="updateallStatus('Rejected', {{ $purchasingOrder->id }})">Reject All</button>
 </div>
@@ -160,7 +160,7 @@
   <label for="choices-single-default" class="form-label"><strong>Initiate Payment Request</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreq('Approved', {{ $purchasingOrder->id }})">Request for All</button>
 </div>
 @endif
@@ -171,7 +171,7 @@
   <label for="choices-single-default" class="form-label"><strong>Vendor Confirmed</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqpocomp('Approved', {{ $purchasingOrder->id }})">Confirmed All</button>
 </div>
 @endif
@@ -182,7 +182,7 @@
   <label for="choices-single-default" class="form-label"><strong>Incoming Stock</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqpocompin('Approved', {{ $purchasingOrder->id }})">Incoming All</button>
 </div>
 @endif
@@ -198,7 +198,7 @@
   <label for="choices-single-default" class="form-label"><strong>Payment Request Initiation</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfin('Approved', {{ $purchasingOrder->id }})">Request for All</button>
 </div>
 @endif
@@ -209,7 +209,7 @@
   <label for="choices-single-default" class="form-label"><strong>Initiate Payment</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpay('Approved', {{ $purchasingOrder->id }})">Initiatie for All</button>
 </div>
 @endif
@@ -220,7 +220,7 @@
   <label for="choices-single-default" class="form-label"><strong>Payment Completed</strong></label>
 </div>
   <div class="col-lg-2 col-md-3 col-sm-12">
- 
+
   <button id="approval-btn" class="btn btn-success" onclick="allpaymentintreqfinpaycomp('Approved', {{ $purchasingOrder->id }})">Complete All Payments</button>
 </div>
 @endif
@@ -364,7 +364,7 @@
                             $brand_names = $brand->brand_name;
                             $master_model_lines_ids = DB::table('master_model_lines')->where('id', $master_model_lines_id)->first();
                             $model_line = $master_model_lines_ids->model_line;
-                            @endphp 
+                            @endphp
                             <td>{{ $vehicles->id }}</td>
                             <td>{{ ucfirst(strtolower($brand_names)) }}</td>
                             <td>{{ ucfirst(strtolower($model_line)) }}</td>
@@ -483,10 +483,10 @@
                             @if ($hasPermission)
                             <td>{{ ucfirst(strtolower($vehicles->payment_status)) }}</td>
                                 @endif
-                                <td style ="width:160px;">  
+                                <td style ="width:160px;">
                                 <div class="row">
         <div class="col-lg-12" style="display: inline-flex;">
-            <div class="col-lg-8">     
+            <div class="col-lg-8">
                         {{-- For Management  --}}
                         @php
                         $hasPermission = Auth::user()->hasPermissionForSelectedRole('price-edit');
@@ -545,7 +545,7 @@
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Vendor Confirmed
 											</a>
-                      @endif
+                                           @endif
 											@endif
 											@endif
 											{{-- End For Vendor Confirm  --}}
@@ -554,7 +554,7 @@
 										@php
 										$hasPermission = Auth::user()->hasPermissionForSelectedRole('edit-po-colour-details');
 										@endphp
-										@if ($hasPermission) 
+										@if ($hasPermission)
 										@if ($purchasingOrder->status === 'Approved')
 										@if ($vehicles->status === 'Approved' && $vehicles->payment_status === '')
 										<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentconfirm', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
@@ -804,7 +804,7 @@ $colournew = $new_value ? $new_value->name : null;
             <th>Estimated Arrival</th>
             <th>Update Date</th>
             <th>Updated By</th>
-            <th>Role</th>                  
+            <th>Role</th>
             </tr>
         </thead>
         <tbody>
@@ -883,7 +883,7 @@ $colournew = $new_value ? $new_value->name : null;
         <td>{{ $previousLog->estimation_date }}</td>
         <td>{{ date('d-M-Y', strtotime($previousLog->date)) }} {{ $previousLog->time }}</td>
         <td>{{ ucfirst(strtolower($change_bys)) }}</td>
-        <td>{{ $roleselected }}</td>   
+        <td>{{ $roleselected }}</td>
     </tr>
 @endif
 
@@ -1108,7 +1108,7 @@ updateBtn.addEventListener('click', () => {
   });
   const updatedData = [];
   editableFields.forEach(field => {
-    const fieldName = field.classList[1]; 
+    const fieldName = field.classList[1];
     const fieldValue = field.innerText.trim();
   const selectElement = field.querySelector('select');
   if (selectElement) {

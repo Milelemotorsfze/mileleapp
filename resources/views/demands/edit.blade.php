@@ -2,7 +2,7 @@
 @section('content')
     <div class="card-header">
         <h4 class="card-title">Update Demand</h4>
-        <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+        <a  class="btn btn-sm btn-info float-end" href="{{ route('demands.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </div>
     <div class="card-body">
         @if (count($errors) > 0)
@@ -57,10 +57,10 @@
                                 <div class="col-lg-4 col-md-4 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">Model</label>
                                 </div>
-                                <div class="col-lg-4 col-md-3 col-sm-12">
+                                <div class="col-lg-3 col-md-3 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">SFX</label>
                                 </div>
-                                <div class="col-lg-4 col-md-5 col-sm-12">
+                                <div class="col-lg-5 col-md-5 col-sm-12">
                                     <label for="basicpill-firstname-input" class="form-label">Variant</label>
                                 </div>
                             </div>
@@ -88,12 +88,12 @@
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label>
                                 <input type="text" value="{{ $demandList->masterModel->model ?? ''}}"  readonly class="form-control" >
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
+                            <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
                                 <label class="form-label d-lg-none d-xl-none d-xxl-none">SFX</label>
                                 <input type="text" value="{{ $demandList->masterModel->sfx ?? ''}}" readonly class="form-control">
                             </div>
-                            <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Varient</label>
+                            <div class="col-lg-5 col-md-12 col-sm-12 col-xs-12">
+                                <label class="form-label d-lg-none d-xl-none d-xxl-none">Variant</label>
                                 <input type="text" value="{{ $demandList->masterModel->variant->name ?? '' }}" readonly class="form-control">
                             </div>
                         </div>

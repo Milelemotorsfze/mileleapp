@@ -13,6 +13,7 @@ class SupplierInventory extends Model
     use HasFactory;
     public $timestamps = false;
     public const VEH_STATUS_SUPPLIER_INVENTORY = "supplier inventory";
+    public const VEH_STATUS_VENDOR_CONFIRMED = "Vendor Confirmed";
     public const VEH_STATUS_LOI_APPROVED = "LOI Approved";
     public const VEH_STATUS_DELETED = "Deleted";
     public const DEALER_TRANS_CARS = "Trans Cars";

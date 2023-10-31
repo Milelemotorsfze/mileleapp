@@ -228,23 +228,25 @@ class SupplierInventoryController extends Controller
                     }
                     foreach ($uploadFileContents as $uploadFileContent)
                     {
-//                        $model = MasterModel::where('model', $uploadFileContent['model'])
-//                            ->where('sfx', $uploadFileContent['sfx'])
-//                            ->where('steering', $uploadFileContent['steering'])
-//                            ->first();
-//                        $modelId = $model->id;
-
-                        $modelIds = MasterModel::where('model', $uploadFileContent['model'])
+                        $model = MasterModel::where('model', $uploadFileContent['model'])
                             ->where('sfx', $uploadFileContent['sfx'])
                             ->where('steering', $uploadFileContent['steering'])
-                            ->pluck('id')->toArray();
-                        // after having eta import data their is no cahnges for data of thata ro.so consider the data without eta import for inventory
-                        $supplierInventories = SupplierInventory::whereIn('master_model_id', $modelIds)
+                            ->first();
+                        $modelId = $model->id;
+                        info("start ....model id");
+                        info($modelId);
+
+//                        $modelIds = MasterModel::where('model', $uploadFileContent['model'])
+//                            ->where('sfx', $uploadFileContent['sfx'])
+//                            ->where('steering', $uploadFileContent['steering'])
+//                            ->pluck('id')->toArray();
+                        // after having eta import data their is no changes for data of thata ro.so consider the data without eta import for inventory
+                        $supplierInventories = SupplierInventory::where('master_model_id', $modelId)
                             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                             ->where('supplier_id', $request->supplier_id)
-                            ->where('whole_sales', $request->whole_sales)
-                            ->whereNull('eta_import');
+                            ->where('whole_sales', $request->whole_sales);
+                            //->whereNull('eta_import');
 
                         if ($supplierInventories->count() <= 0)
                         {
@@ -255,25 +257,41 @@ class SupplierInventoryController extends Controller
                             $newlyAddedRows[$i]['engine_number'] = $uploadFileContent['engine_number'];
                             $newlyAddedRows[$i]['color_code'] = $uploadFileContent['color_code'];
                         } else {
+                            info("chaisis");
+                            info($uploadFileContent['chasis']);
                             if (!empty($uploadFileContent['chasis']))
                             {
                                 // Store the Count into Update the Row with data
                                 $supplierInventory = $supplierInventories->where('chasis', $uploadFileContent['chasis'])
                                     ->first();
-                                $isNullChaisis = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                info("chaisis avaialable");
+
+                                info($supplierInventory);
+                                $isNullChaisis = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                     ->where('supplier_id', $request->supplier_id)
                                     ->where('whole_sales', $request->whole_sales)
-                                    ->whereNull('eta_import')
+                                  //  ->whereNull('eta_import')
                                     ->whereNull('chasis');
 
-                                if (!$supplierInventory) {
+                                if (empty($supplierInventory)) {
+                                    info("chaiss not existing");
                                     //adding new row simply
-                                    if (!empty($isNullChaisis->first())) {
+                                    $isNullChaisisExist = $isNullChaisis->first();
+                                    if (!empty($isNullChaisisExist)) {
                                         // null chaisis existing => updating row
                                         $chasisUpdatedRow = $isNullChaisis->whereNotIn('id',$chasisUpdatedRowIds)->first();
-                                        $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
+                                        info($uploadFileContent['model']);
+                                        info($uploadFileContent['sfx']);
+                                        info($uploadFileContent['chasis']);
+
+                                        info($chasisUpdatedRow);
+                                        info("end");
+//                                        dd($chasisUpdatedRow->id);
+                                        if($chasisUpdatedRow) {
+                                            $chasisUpdatedRowIds[] = $chasisUpdatedRow->id;
+                                        }
                                         $isNullChaisis = $isNullChaisis->first();
 
                                         $updatedRowsIds[] = $isNullChaisis->id;
@@ -355,14 +373,14 @@ class SupplierInventoryController extends Controller
                                 }
                             } else
                             {
-                                $nullChaisisCount = SupplierInventory::whereIn('master_model_id', $modelIds)
+                                $nullChaisisCount = SupplierInventory::where('master_model_id', $modelId)
                                     ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                     ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                                     ->where('supplier_id', $request->supplier_id)
                                     ->where('whole_sales', $request->whole_sales)
                                     ->whereNotIn('id', $chasisUpdatedRowIds)
                                     ->whereNull('chasis')
-                                    ->whereNull('eta_import')
+                                    //->whereNull('eta_import')
                                     ->count();
                                 $modelSfxValuePair = $uploadFileContent['model']."_".$uploadFileContent['sfx'];
                                 $countblankchasis[] = $modelSfxValuePair;
@@ -460,20 +478,20 @@ class SupplierInventoryController extends Controller
                         $excelRows = [];
                         foreach ($uploadFileContents as $uploadFileContent)
                         {
-//                            $model = MasterModel::where('model', $uploadFileContent['model'])
-//                                ->where('sfx', $uploadFileContent['sfx'])
-//                                ->where('steering',$uploadFileContent['steering'])
-//                                ->first();
+                            $model = MasterModel::where('model', $uploadFileContent['model'])
+                                ->where('sfx', $uploadFileContent['sfx'])
+                                ->where('steering',$uploadFileContent['steering'])
+                                ->first();
                             $isExistSupplier = SupplierInventory::where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
                                 ->where('supplier_id', $request->supplier_id)
                                 ->where('whole_sales', $request->whole_sales)
-                                ->whereIn('master_model_id', $modelIds)
+                                ->where('master_model_id', $model->id)
                                 ->where('chasis', $uploadFileContent['chasis'])
                                 ->where('engine_number', $uploadFileContent['engine_number'])
                                 ->where('color_code', $uploadFileContent['color_code'])
                                 ->where('pord_month', $uploadFileContent['pord_month'])
                                 ->where('po_arm', $uploadFileContent['po_arm'])
-                                ->whereNull('eta_import')
+                               // ->whereNull('eta_import')
                                 ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE);
                             if ($isExistSupplier->count() > 0)
                             {
@@ -510,7 +528,7 @@ class SupplierInventoryController extends Controller
                             ->where('supplier_id', $request->supplier_id)
                             ->where('whole_sales', $request->whole_sales)
                             ->whereNotIn('id', $excelRows)
-                            ->whereNull('eta_import')
+                           // ->whereNull('eta_import')
                             ->get();
                         foreach ($deletedRows as $deletedRow) {
                             $deletedRow->status = SupplierInventory::VEH_STATUS_DELETED;
@@ -521,7 +539,7 @@ class SupplierInventoryController extends Controller
                         ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
                         ->where('supplier_id', $request->supplier_id)
                         ->where('whole_sales', $request->whole_sales)
-                        ->whereNull('eta_import')
+                       // ->whereNull('eta_import')
                         ->get();
                     if ($preivousDatas->count() > 0) {
                         foreach ($preivousDatas as $preivousData)

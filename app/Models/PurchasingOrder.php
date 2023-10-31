@@ -17,4 +17,8 @@ class PurchasingOrder extends Model
     {
         return $this->hasMany(Vehicles::class);
     }
+    public function LOIPurchasingOrder()
+    {
+        return $this->hasOne(LOIItemPurchaseOrder::class, 'purchase_order_id');
+    }
 }

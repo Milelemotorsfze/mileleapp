@@ -158,16 +158,17 @@
                                     <div class="col-lg-1 col-md-3">
     {{--                                    Show LOI QTY as PFI QTY when inventory qty is > loi qty--}}
                                         <?php
-                                            if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
-                                                $count = $letterOfIndentItem->inventory_quantity;
-                                                if($count <= 0){
-                                                    $count = 0;
-                                                }
-
-                                            }else{
-
-                                                $count = $letterOfIndentItem->quantity;
-                                            }
+//                                            if($letterOfIndentItem->inventory_quantity <= $letterOfIndentItem->quantity) {
+//                                                $count = $letterOfIndentItem->inventory_quantity;
+//                                                if($count <= 0){
+//                                                    $count = 0;
+//                                                }
+//
+//                                            }else{
+//
+//                                                $count = $letterOfIndentItem->quantity;
+//                                            }
+                                            $count = $letterOfIndentItem->quantity;
                                             ?>
 {{--                                        {{ $count }}--}}
 

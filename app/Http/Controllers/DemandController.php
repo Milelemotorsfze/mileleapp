@@ -112,16 +112,15 @@ class DemandController extends Controller
                 foreach ($loiItems as $loiItem) {
                     $addedModelIds[] = $loiItem->master_model_id;
                 }
-                $supplierInventoriesModels = SupplierInventory::with('masterModel')
-                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-                    ->whereNull('eta_import')
-                    ->whereNull('status')
-                    ->groupBy('master_model_id')
-                    ->pluck('master_model_id');
+//                $supplierInventoriesModels = SupplierInventory::with('masterModel')
+//                    ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//                    ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//                    ->whereNull('eta_import')
+//                    ->whereNull('status')
+//                    ->groupBy('master_model_id')
+//                    ->pluck('master_model_id');
 
-                $data = $data->whereNotIn('id', $addedModelIds)
-                            ->whereIn('id', $supplierInventoriesModels);
+                $data = $data->whereNotIn('id', $addedModelIds);
             }
             if($request->module == 'Demand')
             {
@@ -132,7 +131,7 @@ class DemandController extends Controller
                 }
                 $data = $data->whereNotIn('id', $addedModelIds);
             }
-            $data = $data->pluck('sfx');
+            $data = $data->groupBy('sfx')->pluck('sfx');
 
         return $data;
     }
@@ -151,7 +150,12 @@ class DemandController extends Controller
                     $query->where('model', $request->model);
                 })
                 ->first();
-            $data['quantity'] = $inventory->actual_quantity;
+            if($inventory) {
+                $data['quantity'] = $inventory->actual_quantity;
+            }else{
+                $data['quantity'] = 0;
+            }
+
         }
 
         return $data;
