@@ -376,8 +376,13 @@
                             </div>
                             <div class="col-xxl-5 col-lg-5 col-md-12 col-sm-12 col-12" style="padding-right:3px; padding-left:3px; width:232px; height158px;">
                                 @if($addonsdata->image)
+                                    @if (file_exists(public_path().'/addon_image/'.$addonsdata->image))
                                     <img id="myImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                     alt="Addon Image" style="max-height:159px; max-width:232px;">
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
                                 @else
                                     <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="max-height:159px; max-width:232px;" alt="Addon Image"  />
