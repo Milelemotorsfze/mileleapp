@@ -1,7 +1,7 @@
 @extends('layouts.table')
 @section('content')
         <div class="card-header">
-            <h4 class="card-title">Selling Price Histories</h4>
+            <h4 class="card-title">Warranty Selling Price Histories</h4>
             <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
             @if (count($errors) > 0)
                 <div class="alert alert-danger">
@@ -53,6 +53,12 @@
                             <thead>
                             <tr>
                                 <th>No</th>
+                                @if($isIdExist == false)
+                                <th>Policy Name</th>
+                                <th>Eligibility Criteria</th>
+                                <th>Brand</th>
+                                <th>Country</th>
+                                @endif
                                 <th>Old Price (AED)</th>
                                 <th>Requested Price (AED)</th>
                                 <th>Created By</th>
@@ -66,6 +72,12 @@
                             @foreach ($pendingSellingPriceHistories as $key => $pendingSellingPriceHistory)
                                 <tr data-id="1">
                                     <td>{{ ++$i }}</td>
+                                    @if($isIdExist == false)
+                                    <td>Policy Name</td>
+                                    <td>Eligibility Criteria</td>
+                                    <td>{{$pendingSellingPriceHistory->warrantyBrand->brand->brand_name}}</td>
+                                    <td>Country</td>
+                                    @endif
                                     <td>{{ $pendingSellingPriceHistory->old_price ?? '' }}</td>
                                     <td>{{ $pendingSellingPriceHistory->updated_price ?? '' }}</td>
                                     <td>{{ $pendingSellingPriceHistory->createdUser->name ?? '' }}</td>
@@ -95,6 +107,14 @@
                                                     data-bs-target="#reject-selling-price-{{$pendingSellingPriceHistory->id}}">
                                                 Reject
                                             </button>
+                                        @endif
+                                        @endcan
+                                        @can('warranty-view')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-view']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="btn btn-sm btn-warning" href="{{ route('warranty.show',$pendingSellingPriceHistory->warrantyBrand->premium->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
                                         @endif
                                         @endcan
                                     </td>
@@ -237,11 +257,18 @@
                             <thead>
                             <tr>
                                 <th>No</th>
+                                @if($isIdExist == false)
+                                <th>Policy Name</th>
+                                <th>Eligibility Criteria</th>
+                                <th>Brand</th>
+                                <th>Country</th>
+                                @endif
                                 <th>Old Price</th>
                                 <th>Updated Price</th>
                                 <th>Updated By</th>
                                 <th>Approved By</th>
                                 <th>Date & Time</th>
+                                <th>Action<th>
                             </tr>
                             </thead>
                             <tbody>
@@ -249,11 +276,27 @@
                             @foreach ($approvedSellingPriceHistories as $key => $approvedSellingPriceHistory)
                                 <tr data-id="1">
                                     <td>{{ ++$i }}</td>
+                                    @if($isIdExist == false)
+                                    <td>Policy Name</td>
+                                    <td>Eligibility Criteria</td>
+                                    <td>{{$approvedSellingPriceHistory->warrantyBrand->brand->brand_name}}</td>
+                                    <td>Country</td>
+                                    @endif
                                     <td>{{ $approvedSellingPriceHistory->old_price }}</td>
                                     <td>{{ $approvedSellingPriceHistory->updated_price }}</td>
                                     <td>{{ $approvedSellingPriceHistory->updatedUser->name ?? ''}} </td>
                                     <td>{{ $approvedSellingPriceHistory->statusUpdatedUser->name ?? '' }} </td>
                                     <td>{{ $approvedSellingPriceHistory->updated_at }} </td>
+                                    <td>
+                                        @can('warranty-view')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-view']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="btn btn-sm btn-warning" href="{{ route('warranty.show',$approvedSellingPriceHistory->warrantyBrand->premium->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                        @endif
+                                        @endcan
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -268,11 +311,18 @@
                             <thead>
                             <tr>
                                 <th>No</th>
+                                @if($isIdExist == false)
+                                <th>Policy Name</th>
+                                <th>Eligibility Criteria</th>
+                                <th>Brand</th>
+                                <th>Country</th>
+                                @endif
                                 <th>Old Price</th>
                                 <th>Requested Price</th>
                                 <th>Updated By</th>
                                 <th>Rejected By</th>
                                 <th>Date & Time</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -280,11 +330,27 @@
                             @foreach ($rejectedSellingPriceHistories as $key => $rejectedSellingPriceHistory)
                                 <tr data-id="1">
                                     <td>{{ ++$i }}</td>
+                                    @if($isIdExist == false)
+                                    <td>Policy Name</td>
+                                    <td>Eligibility Criteria</td>
+                                    <td>{{$rejectedSellingPriceHistory->warrantyBrand->brand->brand_name}}</td>
+                                    <td>Country</td>
+                                    @endif
                                     <td>{{ $rejectedSellingPriceHistory->old_price }}</td>
                                     <td>{{ $rejectedSellingPriceHistory->updated_price }}</td>
                                     <td>{{ $rejectedSellingPriceHistory->updatedUser->name ?? ''}} </td>
                                     <td>{{ $rejectedSellingPriceHistory->statusUpdatedUser->name ?? '' }} </td>
                                     <td>{{ $rejectedSellingPriceHistory->updated_at }} </td>
+                                    <td>
+                                        @can('warranty-view')
+                                        @php
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['warranty-view']);
+                                        @endphp
+                                        @if ($hasPermission)
+                                        <a class="btn btn-sm btn-warning" href="{{ route('warranty.show',$approvedSellingPriceHistory->warrantyBrand->premium->id) }}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                                        @endif
+                                        @endcan
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>

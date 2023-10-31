@@ -355,11 +355,11 @@
                             'warranty-selling-price-histories-list','warranty-selling-price-histories-edit','warranty-selling-price-approve','warranty-selling-price-edit']);
                             @endphp
                             @if ($hasPermission)
-                            <!-- <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
+                            <div class="dropdown">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Warranties</span>
                                 </a>
-                            </div> -->
+                            </div>
                             @endif
                             @endcanany
                         </div>

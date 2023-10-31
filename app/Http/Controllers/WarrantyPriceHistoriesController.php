@@ -22,15 +22,27 @@ class WarrantyPriceHistoriesController extends Controller
     }
     public function listSellingPrices(Request $request)
     {
-        $pendingSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
-            ->where('status', 'pending')->get();
-        $approvedSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
-            ->where('status', 'approved')->get();
-        $rejectedSellingPriceHistories = WarrantySellingPriceHistory::where('warranty_brand_id', $request->id)
-            ->where('status', 'rejected')->get();
-
+        $isIdExist = false;
+        $pendingSellingPriceHistories = WarrantySellingPriceHistory::where('status', 'pending');
+        if($request->id) {
+            $pendingSellingPriceHistories = $pendingSellingPriceHistories->where('warranty_brand_id', $request->id);
+        }
+        $pendingSellingPriceHistories = $pendingSellingPriceHistories->latest('updated_at')->get();
+        $approvedSellingPriceHistories = WarrantySellingPriceHistory::where('status', 'approved');
+        if($request->id) {
+            $approvedSellingPriceHistories = $approvedSellingPriceHistories->where('warranty_brand_id', $request->id);
+        }
+        $approvedSellingPriceHistories = $approvedSellingPriceHistories->latest('updated_at')->get();
+        $rejectedSellingPriceHistories = WarrantySellingPriceHistory::where('status', 'rejected');
+        if($request->id) {
+            $rejectedSellingPriceHistories =$rejectedSellingPriceHistories->where('warranty_brand_id', $request->id);
+        }
+        $rejectedSellingPriceHistories =$rejectedSellingPriceHistories->latest('updated_at')->get();
+        if($request->id) {
+            $isIdExist = true;
+        }
         return view('warranty.price_histories.selling_price.index', compact('pendingSellingPriceHistories',
-            'approvedSellingPriceHistories','rejectedSellingPriceHistories'));
+            'approvedSellingPriceHistories','rejectedSellingPriceHistories','isIdExist'));
     }
 
     /**
