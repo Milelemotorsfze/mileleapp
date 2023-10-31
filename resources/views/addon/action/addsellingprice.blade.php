@@ -178,26 +178,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
       currentInput = input.value;
       var leastPurchasePrice = '';
       leastPurchasePrice = $("#least_purchase_price_"+type+"_"+index).val();
-      if (currentInput == Math.floor(currentInput)) {
-
-      alert("Integer")
-
-      } 
-      else {
-
-      alert("Decimal")
-
-      }
       if(currentInput == '') { 
         document.getElementById(type+'_error_'+index).textContent='';
         document.getElementById('submit_'+type+'_'+index).removeAttribute("disabled");
       }
       else {
-        if(val < leastPurchasePrice) {
+        if(parseFloat(val) < parseFloat(leastPurchasePrice)) {
         document.getElementById(type+'_error_'+index).textContent='Enter greater amount than purchase price';
         document.getElementById('submit_'+type+'_'+index).setAttribute("disabled", "disabled");
         }
-        else if(val >= leastPurchasePrice) {
+        else if(parseFloat(val) >= parseFloat(leastPurchasePrice)) {
           document.getElementById(type+'_error_'+index).textContent='';
           document.getElementById('submit_'+type+'_'+index).removeAttribute("disabled");
         }

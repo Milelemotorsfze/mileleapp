@@ -1,6 +1,12 @@
                                 @if($addonsdata->image)
-                                     <img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
+                                @if (file_exists(public_path().'/addon_image/'.$addonsdata->image))
+                                <img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                                     alt="Addon Image" style="width:100%; height:100px;">
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+                                     
                                @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
                                     @endif

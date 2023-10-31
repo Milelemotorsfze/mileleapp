@@ -95,6 +95,9 @@ class Supplier extends Model
     {
         return $this->hasMany(VendorDocument::class,'supplier_id','id');
     }
+    public function personContactBy() {
+        return $this->belongsTo(User::class,'person_contact_by');
+    }
     public function getSubCategoriesAttribute() {
 
         $vehicleSubCategories = [

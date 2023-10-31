@@ -244,7 +244,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                                 <label for="choices-single-default" class="form-label fw-bold">{{ __('Person Contact By') }}</label>
                             </div>
                             <div class="col-xxl-8 col-md-6 col-sm-12 ">
-                                <span>{{$supplier->person_contact_by}}</span>
+                                <span>{{ $supplier->personContactBy->name ?? '' }}</span>
                             </div>
                         </div>
                         <div class="row">

@@ -295,9 +295,15 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 				</br>
 				<center>
 					@if($supplierAddonDetails->image)
+					@if (file_exists(public_path().'/addon_image/'.$supplierAddonDetails->image))
 					<img id="blah" src="{{ url('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image"
 						class="contain image-click-class"
 						data-modal-id="showImageModal"/>
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+					
 					@else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
 						style="width:200px; height: 200px;;" alt="Addon Image"  />
 					@endif
@@ -389,12 +395,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 						@if($Kit->countArray > 0)
 						@if(isset($Kit->least_price_vendor->supplierAddonDetails))
 						@if($Kit->least_price_vendor->supplierAddonDetails->image)
+						@if (file_exists(public_path().'/addon_image/'.$Kit->least_price_vendor->supplierAddonDetails->image))
 						<img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->least_price_vendor->supplierAddonDetails->image) }}" class="image-click-class"
 							style="width:100%; height:125px;" alt="Addon Image"  />
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+						
 						@endif
 						@elseif(count($Kit->SpWithoutVendorPartNos) > 0)
+						@if (file_exists(public_path().'/addon_image/'.$Kit->latestPartNoSp->image))
 						<img id="addon-item-image-{{$i}}" src="{{ url('addon_image/' . $Kit->latestPartNoSp->image) }}" class="image-click-class"
 							style="width:100%; height:125px;" alt="Addon Image"  />
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+						
 						@endif
 						@else
 						<img id="addon-item-image-{{$i}}" src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class" style="width:100%; height:125px;" alt="Addon Image"  />

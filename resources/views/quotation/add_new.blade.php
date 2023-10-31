@@ -207,7 +207,15 @@
                             @endphp
                             @foreach ($data as $key => $addon)
                                 <tr>
-                                    <td><img src="{{ $addon->image }}" alt="Addon thumbnail" style="width: 100px;"></td>
+                                    <td>
+                                    @if (file_exists(public_path().'/addon_image/'.$addon->image))
+                                    <img src="{{ $addon->image }}" alt="Addon thumbnail" style="width: 100px;">
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+                                        
+                                    </td>
                                     <td>{{ $addon->name }}</td>
                                     <td>{{ $addon->addon_code }}</td>
                                     <td>{{ $addon->lead_time }}</td>
