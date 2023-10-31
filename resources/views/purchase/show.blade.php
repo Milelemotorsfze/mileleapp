@@ -545,7 +545,7 @@
 											<a title="Payment" data-placement="top" class="btn btn-sm btn-success" href="{{ route('vehicles.paymentrelconfirmvendors', $vehicles->id) }}" onclick="return confirmPayment();" style="margin-right: 10px; white-space: nowrap;">
 											Vendor Confirmed
 											</a>
-                      @endif
+                                           @endif
 											@endif
 											@endif
 											{{-- End For Vendor Confirm  --}}

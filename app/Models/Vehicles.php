@@ -57,9 +57,10 @@ class Vehicles extends Model
         return $this->belongsTo(ColorCode::class,'ex_colour','id');
     }
     public function purchasingOrder()
-{
+    {
     return $this->belongsTo(PurchasingOrder::class, 'purchasing_order_id');
-}
+    }
+
 public function latestRemarkSales()
     {
         return $this->hasOne(Remarks::class)

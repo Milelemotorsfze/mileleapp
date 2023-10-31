@@ -142,6 +142,7 @@
                         @foreach($pfiVehicleVariants as $key => $pfiVehicleVariant)
                             <div class="row">
                                 <input type="hidden" name="approved_loi_ids[]" value="{{$pfiVehicleVariant->id}}">
+                                <input type="hidden" id="master-model-id-{{$key}}" value="{{$pfiVehicleVariant->letterOfIndentItem->masterModel->id ?? ''}}">
                                 <div class="col-lg-2 col-md-6">
                                     <input type="text" placeholder="Select Variants"  list="variantslist"
                                            class="form-control mb-1" id="variant-id-{{$key}}" autocomplete="off"
@@ -274,9 +275,11 @@
                 var masterModelLine = $('#master-model-line-'+i).val();
                 var detail = $('#variant-detail-'+i).val();
                 var variantId = $('#variant-id-'+i).attr('data-id');
+                var masterModelId = $('#master-model-id-'+i).val();
 
                 for (var j = 0; j < qty; j++) {
                     var newRow = $('<div class="row row-space"></div>');
+                    var masterModelCol  = $('<input type="hidden" id="model-id" name="master_model_id[]" value="' + masterModelId + '" >');
                     var variantCol = $('<div class="col-lg-1 col-md-6"><input type="text" id="variant-id"  name="variant_id[]" value="' + selectedVariant + '" class="form-control" readonly></div>');
                     var brandCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="brand[]" value="' + brand + '" class="form-control" readonly></div>');
                     var masterModelLineCol = $('<div class="col-lg-1 col-md-6"><input type="text" name="master_model_line[]" value="' + masterModelLine + '" class="form-control" readonly></div>');
@@ -302,7 +305,7 @@
                             intColourDropdown.append($('<option></option>').attr('value', id).text(intColours[id]));
                         }
                     }
-                    newRow.append(variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, engineNumber, vinCol, removeBtn);
+                    newRow.append(masterModelCol, variantCol, brandCol, masterModelLineCol, detailCol, exColourCol, intColourCol, estimatedCol, territory, engineNumber, vinCol, removeBtn);
                     $('#variantRowsContainer').append(newRow);
                 }
             }
