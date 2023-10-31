@@ -373,7 +373,7 @@ class KitCommonItemController extends Controller {
         }
         return response($data);
     }
-    public function priceStore(Request $request) {
+    public function priceStore(Request $request) { 
         $success = false;
         if(($request->current_purchase_price != '' || $request->current_purchase_price != 'NOT AVAILABLE' ) 
         && $request->previous_purchase_price != $request->current_purchase_price) {
@@ -493,5 +493,9 @@ class KitCommonItemController extends Controller {
         else{
             return response()->json(['success' => 'This is a new kit']);
         }
+    }
+    public function purchasePriceHistory($id) {
+        $kitPriceHistories = KitPriceHistory::where('addon_details_id',$id)->get();
+        return view('kit.purchasePriceHistories',compact('kitPriceHistories'));
     }
 }
