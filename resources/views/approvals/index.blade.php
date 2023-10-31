@@ -141,6 +141,22 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 								</button>
                                 @endif
                                 @endcanany
+								@can('addon-view')
+								@php
+									$hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
+								@endphp
+								@if ($hasPermission)
+									@if($pending->addonDetail->addon_type_name == 'K')
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems',$pending->addonDetail->id) }}">
+												<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@else
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems',$pending->addonDetail->id) }}">
+											<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@endif
+								@endif
+							@endcan
 							</td>
 							<div class="modal fade" id="edit-selling-price-{{$pending->id}}"  tabindex="-1"
 								aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -294,6 +310,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Approved By</th>
 							<th>Approved Date & Time</th>
 							<th>Status</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -315,6 +332,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
                             <td>{{ $approvedOne->StatusUpdatedBy->name ?? '' }}</td>
 							<td>{{ $approvedOne->updated_at}}</td>
 							<td>{{ $approvedOne->status}}</td>
+							<td>
+								@if ($hasPermission)
+									@if( $approvedOne->addonDetail->addon_type_name == 'K')
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems', $approvedOne->addonDetail->id) }}">
+												<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@else
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems', $approvedOne->addonDetail->id) }}">
+											<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@endif
+								@endif
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
@@ -343,6 +373,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<th>Updated By</th>
 							<th>Rejected By</th>
 							<th>Rejected Date & Time</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -361,8 +392,21 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 							<td>{{ $rejectedOne->selling_price ?? '' }}</td>
 							<td>{{ $rejectedOne->CreatedBy->name ?? '' }}</td>
 							<td>{{ $rejectedOne->UpdatedBy->name ?? '' }}</td>
-                            <td>{{ $approvedOne->StatusUpdatedBy->name ?? '' }}</td>
+                            <td>{{ $rejectedOne->StatusUpdatedBy->name ?? '' }}</td>
 							<td>{{ $rejectedOne->updated_at}}</td>
+							<td>
+								@if ($hasPermission)
+									@if( $rejectedOne->addonDetail->addon_type_name == 'K')
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('kit.kitItems', $rejectedOne->addonDetail->id) }}">
+												<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@else
+										<a title="View Addon Details" class="btn btn-sm btn-warning" href="{{ route('addon.kitItems', $rejectedOne->addonDetail->id) }}">
+											<i class="fa fa-eye" aria-hidden="true"></i>
+										</a>
+									@endif
+								@endif
+							</td>
 						</tr>
 						@endforeach
 					</tbody>
