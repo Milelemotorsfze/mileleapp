@@ -45,23 +45,9 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 		<li class="nav-item">
 			<a class="nav-link active" data-bs-toggle="pill" href="#pending-selling-prices">Pending </a>
 		</li>
-        @endif
-        @endcanany
-        @canany(['approve-addon-new-selling-price'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['approve-addon-new-selling-price']);
-        @endphp
-        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#approved-selling-prices">Approved </a>
 		</li>
-        @endif
-        @endcanany
-        @canany(['reject-addon-new-selling-price'])
-        @php
-        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['reject-addon-new-selling-price']);
-        @endphp
-        @if ($hasPermission)
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="pill" href="#rejected-selling-prices">Rejected </a>
 		</li>
@@ -288,13 +274,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    @endif
-    @endcanany
-	@canany(['approve-addon-new-selling-price'])
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['approve-addon-new-selling-price']);
-    @endphp
-    @if ($hasPermission)
     <div class="tab-pane fade show" id="approved-selling-prices">
 		<div class="card-body">
 			<div class="table-responsive">
@@ -352,13 +331,6 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-sel
 			</div>
 		</div>
 	</div>
-    @endif
-    @endcanany
-    @canany(['reject-addon-new-selling-price'])
-    @php
-    $hasPermission = Auth::user()->hasPermissionForSelectedRole(['reject-addon-new-selling-price']);
-    @endphp
-    @if ($hasPermission)
 	<div class="tab-pane fade show" id="rejected-selling-prices">
 		<div class="card-body">
 			<div class="table-responsive">
