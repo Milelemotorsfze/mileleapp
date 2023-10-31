@@ -50,17 +50,18 @@ class LOIItemsController extends Controller
             ." ".$loiItem->masterModel->variant->fuel_type;
         }
          $addedModelIds = array_unique($addedModelIds);
-        $supplierInventoriesModels = SupplierInventory::with('masterModel')
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
-            ->whereNull('status')
-            ->whereNotIn('master_model_id', $addedModelIds)
-            ->groupBy('master_model_id')
-            ->pluck('master_model_id');
-//            dd($supplierInventoriesModels);
-        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
-       // $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
+//        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->whereNull('eta_import')
+//            ->whereNull('status')
+//            ->whereNotIn('master_model_id', $addedModelIds)
+//            ->groupBy('master_model_id')
+//            ->pluck('master_model_id');
+////            dd($supplierInventoriesModels);
+//        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
+        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->get();
+
 
         return view('letter-of-indent-items.create',compact('letterOfIndent','letterOfIndentItems',
             'models'));
@@ -136,16 +137,17 @@ class LOIItemsController extends Controller
                 ." ".$loiItem->masterModel->variant->fuel_type;
         }
         $addedModelIds = array_unique($addedModelIds);
-        $supplierInventoriesModels = SupplierInventory::with('masterModel')
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
-            ->whereNull('status')
-            ->whereNotIn('master_model_id', $addedModelIds)
-            ->groupBy('master_model_id')
-            ->pluck('master_model_id');
+//        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->whereNull('eta_import')
+//            ->whereNull('status')
+//            ->whereNotIn('master_model_id', $addedModelIds)
+//            ->groupBy('master_model_id')
+//            ->pluck('master_model_id');
 
-        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
+//        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
+        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->get();
 
         return view('letter-of-indent-items.edit', compact('letterOfIndent','letterOfIndentItems','models'));
     }
