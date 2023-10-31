@@ -178,16 +178,16 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['add-new-addon-sell
       currentInput = input.value;
       var leastPurchasePrice = '';
       leastPurchasePrice = $("#least_purchase_price_"+type+"_"+index).val();
-      if (currentInput == Math.floor(currentInput)) {
+      // if (currentInput == Math.floor(currentInput)) {
 
-      alert("Integer")
+      // alert("Integer")
 
-      } 
-      else {
+      // } 
+      // else {
 
-      alert("Decimal")
+      // alert("Decimal")
 
-      }
+      // }
       if(currentInput == '') { 
         document.getElementById(type+'_error_'+index).textContent='';
         document.getElementById('submit_'+type+'_'+index).removeAttribute("disabled");
