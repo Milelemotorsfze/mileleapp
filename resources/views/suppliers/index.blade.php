@@ -128,7 +128,7 @@
                             @endforeach
                           @endif
                         </td>
-                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>{{ $supplier->personContactBy->name ?? '' }}</td>
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->contact_number }}</td>
@@ -290,7 +290,7 @@
                             @endforeach
                           @endif
                         </td>
-                        <td>{{ $supplier->person_contact_by }}</td>
+                        <td>{{ $supplier->personContactBy->name ?? '' }}</td>
                         <td>{{ $supplier->contact_person }}</td>
                         <td>{{ $supplier->email }}</td>
                         <td>{{ $supplier->contact_number }}</td>

@@ -24,6 +24,10 @@ class AddonSellingPrice extends Model
     {
         return $this->hasOne(User::class,'id','created_by');
     }
+    public function UpdatedBy()
+    {
+        return $this->hasOne(User::class,'id','updated_by');
+    }
     public function StatusUpdatedBy()
     {
         return $this->hasOne(User::class,'id','status_updated_by');

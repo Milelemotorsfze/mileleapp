@@ -42,6 +42,20 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['view-addon-selling
     </a>
 @endif
 @endcan
+
+@if($addonsdata->addon_type_name == 'K')
+@can('supplier-addon-purchase-price-history')
+@php
+$hasPermission = Auth::user()->hasPermissionForSelectedRole(['supplier-addon-purchase-price-history']);
+@endphp
+@if ($hasPermission)
+    <a title="Pruchase Price History" class="btn btn-sm btn-secondary modal-button" href="{{ route('kit.purchasePriceHistory',$addonsdata->id) }}">
+        <i class="fa fa-history" aria-hidden="true"></i>
+    </a>
+@endif
+@endcan
+@endif
+
 @can('addon-active-inactive')
 @php
 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-active-inactive']);

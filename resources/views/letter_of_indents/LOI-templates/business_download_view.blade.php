@@ -3,7 +3,7 @@
 <html>
 <head>
     <style>
-        @page { size: 700pt }
+        /*@page { size: 700pt }*/
         .content{
             font-family: arial, sans-serif;
         }

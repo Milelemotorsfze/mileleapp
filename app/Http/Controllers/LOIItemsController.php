@@ -36,20 +36,32 @@ class LOIItemsController extends Controller
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
             $addedModelIds[] = $loiItem->master_model_id;
-            $loiItem->loi_description = $loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->engine
-            ." ".$loiItem->fuel_type;
+            $model = MasterModel::find($loiItem->master_model_id);
+            $similarModelIds = MasterModel::where('steering', $model->steering)
+                ->where('model', $model->model)
+                ->where('sfx', $model->sfx)
+                ->where('variant_id', $model->variant_id)
+                ->pluck('id')->toArray();
+                foreach ($similarModelIds as $item){
+                    array_push($addedModelIds, $item);
+                }
+
+            $loiItem->loi_description = "(".$loiItem->masterModel->variant->name .") ".$loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->masterModel->variant->engine
+            ." ".$loiItem->masterModel->variant->fuel_type;
         }
+         $addedModelIds = array_unique($addedModelIds);
+//        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->whereNull('eta_import')
+//            ->whereNull('status')
+//            ->whereNotIn('master_model_id', $addedModelIds)
+//            ->groupBy('master_model_id')
+//            ->pluck('master_model_id');
+////            dd($supplierInventoriesModels);
+//        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
+        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->get();
 
-        $supplierInventoriesModels = SupplierInventory::with('masterModel')
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
-            ->whereNotIn('master_model_id', $addedModelIds)
-            ->groupBy('master_model_id')
-            ->pluck('master_model_id');
-
-        $models = MasterModel::whereIn('id',$supplierInventoriesModels)->get();
-       // $letterOfIndentItems = LetterOfIndentItem::where('letter_of_indent_id', $request->id)->get();
 
         return view('letter-of-indent-items.create',compact('letterOfIndent','letterOfIndentItems',
             'models'));
@@ -111,19 +123,31 @@ class LOIItemsController extends Controller
         $addedModelIds = [];
         foreach ($letterOfIndentItems as $loiItem) {
             $addedModelIds[] = $loiItem->master_model_id;
-            $loiItem->loi_description = $loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->engine
-                ." ".$loiItem->fuel_type;
+            $model = MasterModel::find($loiItem->master_model_id);
+            $similarModelIds = MasterModel::where('steering', $model->steering)
+                ->where('model', $model->model)
+                ->where('sfx', $model->sfx)
+                ->where('variant_id', $model->variant_id)
+                ->pluck('id')->toArray();
+            foreach ($similarModelIds as $item){
+                array_push($addedModelIds, $item);
+            }
+
+            $loiItem->loi_description = "(".$loiItem->masterModel->variant->name .") ".$loiItem->masterModel->steering." ". $loiItem->masterModel->variant->master_model_lines->model_line." ". $loiItem->masterModel->variant->engine
+                ." ".$loiItem->masterModel->variant->fuel_type;
         }
+        $addedModelIds = array_unique($addedModelIds);
+//        $supplierInventoriesModels = SupplierInventory::with('masterModel')
+//            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+//            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+//            ->whereNull('eta_import')
+//            ->whereNull('status')
+//            ->whereNotIn('master_model_id', $addedModelIds)
+//            ->groupBy('master_model_id')
+//            ->pluck('master_model_id');
 
-        $supplierInventoriesModels = SupplierInventory::with('masterModel')
-            ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-            ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-            ->whereNull('eta_import')
-            ->whereNotIn('master_model_id', $addedModelIds)
-            ->groupBy('master_model_id')
-            ->pluck('master_model_id');
-
-        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->get();
+//        $models = MasterModel::whereIn('id', $supplierInventoriesModels)->groupBy('model')->get();
+        $models = MasterModel::whereNotIn('id', $addedModelIds)->groupBy('model')->get();
 
         return view('letter-of-indent-items.edit', compact('letterOfIndent','letterOfIndentItems','models'));
     }
@@ -141,9 +165,11 @@ class LOIItemsController extends Controller
      */
     public function destroy(string $id)
     {
-        $letterOfIndentItem = LetterOfIndentItem::find($id);
-        $letterOfIndentItem->delete();
-        return true;
+
+        $letterOfIndentItem = LetterOfIndentItem::where('id', $id)->delete();
+//        dd($letterOfIndentItem);
+//        $letterOfIndentItem->delete();
+        return response(true);
     }
     public function mileleApproval(Request $request)
     {
@@ -181,14 +207,21 @@ class LOIItemsController extends Controller
                 $approvedLOIItem->save();
             }
             // Supplier inventory will be unlisted when DELIVERY NOTE (DN) came
-
-//            $supplierInventoriesIds = SupplierInventory::where('master_model_id', $letterOfIndentItem->master_model_id)
-//                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
-//                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
-//                ->whereNull('eta_import')
-//                ->take($quantity)
-//                ->pluck('id');
-//            SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['veh_status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
+            // temperorly change the status of supplier inventory , and consider this status to inventory count.
+            $masterModel = MasterModel::find($letterOfIndentItem->master_model_id);
+            $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+                ->where('model', $masterModel->model)
+                ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+            $supplierInventoriesIds = SupplierInventory::whereIn('master_model_id', $masterModelIds)
+                ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
+                ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+                ->whereNull('eta_import')
+                ->whereNull('status')
+                ->take($quantity)
+                ->pluck('id');
+            info("supplier inventory Id");
+            info($supplierInventoriesIds);
+            SupplierInventory::whereIn('id', $supplierInventoriesIds)->update(['status' => SupplierInventory::VEH_STATUS_LOI_APPROVED]);
         }
 
         if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {

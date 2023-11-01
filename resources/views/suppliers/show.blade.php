@@ -244,7 +244,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
                                 <label for="choices-single-default" class="form-label fw-bold">{{ __('Person Contact By') }}</label>
                             </div>
                             <div class="col-xxl-8 col-md-6 col-sm-12 ">
-                                <span>{{$supplier->person_contact_by}}</span>
+                                <span>{{ $supplier->personContactBy->name ?? '' }}</span>
                             </div>
                         </div>
                         <div class="row">
@@ -553,7 +553,7 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-supplier-vie
         var data = {!! json_encode($supplier) !!};
         $(document).ready(function ()
         {
-            // $("#adoon").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
+            // $("#adoon").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
             // $("#adoon").select2();
         });
          // show image in large view

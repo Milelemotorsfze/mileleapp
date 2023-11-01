@@ -7,7 +7,7 @@
         @if ($hasPermission)
             <div class="card-header">
                 <h4 class="card-title">Update LOI Items</h4>
-                <a  class="btn btn-sm btn-info float-end" href="{{ url()->previous() }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+                <a  class="btn btn-sm btn-info float-end" href="{{ route('letter-of-indents.index') }}" ><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
 
             </div>
             <div class="card-body">
@@ -22,7 +22,7 @@
                     </div>
                 @endif
                 <div class="row">
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-2 col-md-6">
                         <div class="mb-3">
                             <label for="choices-single-default" class="form-label">Customer</label>
                             <select class="form-control" data-trigger name="customer_id" id="customer" readonly>
@@ -30,9 +30,9 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-2 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label text-muted">LOI Category</label>
+                            <label for="choices-single-default" class="form-label">LOI Category</label>
                             <select class="form-control" name="category" readonly >
                                 <option value="{{\App\Models\LetterOfIndent::LOI_CATEGORY_REAL}}"
                                     {{$letterOfIndent->category == \App\Models\LetterOfIndent::LOI_CATEGORY_REAL ? 'selected' : " "}}  >
@@ -45,11 +45,23 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-lg-2 col-md-6">
                         <div class="mb-3">
-                            <label for="choices-single-default" class="form-label text-muted">LOI Date</label>
+                            <label for="choices-single-default" class="form-label ">LOI Date</label>
                             <input type="date" class="form-control" id="basicpill-firstname-input" readonly
                                    value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d') }}" name="date">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Dealer</label>
+                            <input type="text" class="form-control" value="{{ $letterOfIndent->dealers }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-12">
+                        <div class="mb-3">
+                            <label for="choices-single-default" class="form-label">Vendor</label>
+                            <input type="text" class="form-control" value="{{ $letterOfIndent->supplier->supplier ?? '' }}" readonly>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,10 @@
 @extends('layouts.table')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
+  .red-star {
+    color: red;
+    font-size: 2.2em;
+}
     div.dataTables_wrapper div.dataTables_info {
   padding-top: 0px;
 }
@@ -238,7 +242,18 @@
                 { data: 'ppmmyyy', name: 'vehicles.ppmmyyy' },
                 { data: 'interior_color', name: 'int_color.name' },
                 { data: 'exterior_color', name: 'ex_color.name' },
-            ]
+            ],
+            columnDefs: [
+            {
+                targets: 0,
+                render: function (data, type, row) {
+                    if (row.status === 'Re Work') {
+                        return '<span class="red-star">*</span> ' + data;
+                    }
+                    return data;
+                }
+            }
+        ]
         });
         $('#dtBasicExample2').DataTable({
             processing: true,
@@ -312,38 +327,71 @@
   $(document).ready(function () {
     var table1 = $('#dtBasicExample1').DataTable();
     $('#dtBasicExample1 tbody').on('dblclick', 'tr', function () {
-        var data = table1.row(this).data();
-        var IncidentId = data.incidentsnumber;
-        var vehicle_status = data.vehicle_status;
-        var part_po_number = data.part_po_number;
-        var update_remarks = data.update_remarks;
-        var vin = data.vin;
-        var vehicleStatusDropdown = '<select name="vehicle_status" class="form-control">';
-        vehicleStatusDropdown += '<option value="Incident Reported" ' + (vehicle_status === "Incident Reported" ? 'selected' : '') + '>Incident Reported</option>';
-        vehicleStatusDropdown += '<option value="Work Started" ' + (vehicle_status === "Work Started" ? 'selected' : '') + '>Work Started</option>';
-        vehicleStatusDropdown += '<option value="Work Completed" ' + (vehicle_status === "Work Completed" ? 'selected' : '') + '>Work Completed</option>';
-        vehicleStatusDropdown += '</select>';
-
-        var html = '<table class="table">';
-        html += '<tr>';
-        html += '<td>Part Purchase Order</td>';
-        html += '<td><input type="text" name="part_po_number" class="form-control" value="' + (part_po_number || '') + '"></td>';
-        html += '</tr>';
-        html += '<tr>';
-        html += '<td>Vehicle Status</td>';
-        html += '<td>' + vehicleStatusDropdown + '</td>';
-        html += '</tr>';
-        html += '<tr>';
-        html += '<td>Remarks</td>';
-        html += '<td><textarea name="update_remarks" class="form-control" rows="4">' + (update_remarks || '') + '</textarea></td>';
-        html += '</tr>';
-        html += '</table>';
-        
-        $('#incidentsLabel').text('Update Incident Status - VIN: ' + vin);
-        $('#IncidentId').val(IncidentId);
-        $('#stageAndinput').html(html);
-        $('#incidents').modal('show');
+    var data = table1.row(this).data();
+    var IncidentId = data.incidentsnumber;
+    var vehicle_status = data.vehicle_status;
+    var part_po_number = data.part_po_number;
+    var update_remarks = data.update_remarks;
+    var status = data.status;
+    var vin = data.vin;
+    var vehicleStatusDropdown = '<select name="vehicle_status" class="form-control">';
+    vehicleStatusDropdown += '<option value="Incident Reported" ' + (vehicle_status === "Incident Reported" ? 'selected' : '') + '>Incident Reported</option>';
+    vehicleStatusDropdown += '<option value="Work Started" ' + (vehicle_status === "Work Started" ? 'selected' : '') + '>Work Started</option>';
+    vehicleStatusDropdown += '<option value="Work Completed" ' + (vehicle_status === "Work Completed" ? 'selected' : '') + '>Work Completed</option>';
+    vehicleStatusDropdown += '</select>';
+    var html = '<table class="table">';
+    html += '<tr>';
+    html += '<td>Part Purchase Order</td>';
+    html += '<td><input type="text" name="part_po_number" class="form-control" value="' + (part_po_number || '') + '"></td>';
+    html += '</tr>';
+    html += '<tr>';
+    html += '<td>Vehicle Status</td>';
+    html += '<td>' + vehicleStatusDropdown + '</td>';
+    html += '</tr>';
+    html += '<tr>';
+    html += '<td>Remarks</td>';
+    html += '<td><textarea name="update_remarks" class="form-control" rows="4">' + (update_remarks || '') + '</textarea></td>';
+    html += '</tr>';
+    html += '</table>';
+    $('#incidentsLabel').text('Update Incident Status - VIN: ' + vin);
+    $('#IncidentId').val(IncidentId);
+    $('#stageAndinput').html(html);
+    $('#incidents').modal('show');
+    if (vehicle_status === "Re Work") {
+    $.ajax({
+      url: '/get-incident-works/' + IncidentId,
+        type: 'GET',
+        success: function(data) {
+            if (data.error) {
+                console.error(data.error);
+            } else {
+              var worksHtml = '<table class="table table-bordered">';
+              worksHtml += '<thead>';
+              worksHtml += '<tr>';
+              worksHtml += '<th>Work</th>';
+              worksHtml += '<th>Status</th>';
+              worksHtml += '<th>Remarks</th>';
+              worksHtml += '</tr>';
+              worksHtml += '</thead>';
+              worksHtml += '<tbody>';
+              for (var i = 0; i < data.length; i++) {
+                  worksHtml += '<tr>';
+                  worksHtml += '<td>' + data[i].works + '</td>';
+                  worksHtml += '<td>' + data[i].status + '</td>';
+                  worksHtml += '<td>' + data[i].remarks + '</td>';
+                  worksHtml += '</tr>';
+              }
+              worksHtml += '</tbody>';
+              worksHtml += '</table>';
+              $('#stageAndinput').append(worksHtml);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(error);
+        }
     });
+  }
+});
 });
 function saveincidentupdate() {
     var IncidentId = $('#IncidentId').val();

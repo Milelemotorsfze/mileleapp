@@ -120,7 +120,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
 
   <div class="card-header">
     <h4 class="card-title">
-      Addon Info
+      @if($data == 'P') Accessories @elseif($data == 'SP') Spare Parts @elseif($data == 'K') Kits @elseif($data == 'all') Addons @endif
+       Info
     </h4>
 
     @canany(['addon-create'])
@@ -163,7 +164,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     <form>
       <input type="text" value="{{$data}}" id="data" hidden>
       <div class="row">
-        <h6><center>Addon Filters</center></h6>
+        <h6><center> @if($data == 'P') Accessories @elseif($data == 'SP') Spare Parts @elseif($data == 'K') Kits @elseif($data == 'all') Addons @endif Filters</center></h6>
         <div class="col-xxl-4 col-lg-4 col-md-6 col-sm-12">
         <label class="col-form-label text-md-end">{{ __('Choose Addon Name') }}</label>
           <select id="fltr-addon-code" multiple="true" style="width: 100%;">
@@ -219,7 +220,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
     $(document).ready(function ()
     {
       // console.log(addon[0]);
-      $("#fltr-addon-code").attr("data-placeholder","Choose Addon Code....     Or     Type Here To Search....");
+      $("#fltr-addon-code").attr("data-placeholder","Choose Addon Name....     Or     Type Here To Search....");
       $("#fltr-addon-code").select2();
       $("#fltr-brand").attr("data-placeholder","Choose Brand....    Or     Type Here To Search....");
       $("#fltr-brand").select2();

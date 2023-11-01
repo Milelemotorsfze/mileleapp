@@ -133,7 +133,7 @@ class PFIController extends Controller
             $approvedLoiItem->pfi_id = $pfi->id;
             $approvedLoiItem->save();
         }
-        DB::commit();
+
         $pdf = new Fpdi();
         $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
 
@@ -142,8 +142,7 @@ class PFIController extends Controller
             $pdf->AddPage();
             $tplIdx = $pdf->importPage($i);
             $pdf->useTemplate($tplIdx);
-            if($i==$pageCount) {
-                if($letterOfIndent->dealers == 'Trans Car')
+            if($i == $pageCount) {
                 $pdf->Image('milele_seal.png', 80, 230, 50,35);
             }
         }
@@ -154,6 +153,8 @@ class PFIController extends Controller
         $pdf->Output($directory.'/'.$signedFileName,'F');
         $pfi->pfi_document_with_sign = $signedFileName;
         $pfi->save();
+
+        DB::commit();
 
         return redirect()->route('pfi.index')->with('message', 'PFI created Successfully');
     }

@@ -1434,7 +1434,7 @@ function incidentreport(InspectionId) {
 <script>
 function saveinspectiondetails() {
     var engine = $('#engine').val();
-    var inspection_id = $('#inspection_id').val();
+    var ins  ection_id = $('#inspection_id').val();
     var vin = $('#vin').val();
     var int_colour = $('#int_colour').val();
     var ex_colour = $('#ex_colour').val();

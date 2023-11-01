@@ -308,14 +308,28 @@
                         @endif
                         @endcanany
 
-
-                        <!-- <li class="nav-item dropdown">
+                        @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price',
+                        'warranty-selling-price-histories-list','warranty-selling-price-histories-edit','warranty-selling-price-approve',
+                        'warranty-selling-price-edit'])
+                        @php
+                        $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price',
+                        'reject-addon-new-selling-price','warranty-selling-price-histories-list','warranty-selling-price-histories-edit',
+                        'warranty-selling-price-approve','warranty-selling-price-edit']);
+                        @endphp
+                        @if ($hasPermission)
+                        <li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                             <i data-feather="grid"></i>
                             <span data-key="t-extra-pages">Approvals</span>
                             <div class="arrow-down"></div>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="topnav-more">
+                            @canany(['edit-addon-new-selling-price','approve-addon-new-selling-price','reject-addon-new-selling-price'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price','approve-addon-new-selling-price',
+                            'reject-addon-new-selling-price']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
                                 <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('addon.approval','P') }}" id="topnav-auth" role="button">
                                     <span data-key="t-authentication">Accessories</span>
@@ -331,14 +345,27 @@
                                     <span data-key="t-utility">Kits</span>
                                 </a>
                             </div>
+                            @endif
+                            @endcanany
+
+                            @canany(['edit-addon-new-selling-price','warranty-selling-price-histories-list','warranty-selling-price-histories-edit',
+                            'warranty-selling-price-approve','warranty-selling-price-edit'])
+                            @php
+                            $hasPermission = Auth::user()->hasPermissionForSelectedRole(['edit-addon-new-selling-price',
+                            'warranty-selling-price-histories-list','warranty-selling-price-histories-edit','warranty-selling-price-approve','warranty-selling-price-edit']);
+                            @endphp
+                            @if ($hasPermission)
                             <div class="dropdown">
-                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('suppliers.index') }}" id="topnav-utility" role="button">
+                                <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('warranty-selling-price-histories.index') }}" id="topnav-utility" role="button">
                                     <span data-key="t-utility">Warranties</span>
                                 </a>
                             </div>
+                            @endif
+                            @endcanany
                         </div>
-                    </li> -->
-
+                    </li>
+                    @endif
+                    @endcanany
 
                     @can('Calls-view')
                     @php
@@ -481,9 +508,9 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="topnav-more">
-                                @can('demand-planning-supplier-create')
+                                @can('demand-planning-supplier-list')
                                     @php
-                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-create');
+                                        $hasPermission = Auth::user()->hasPermissionForSelectedRole('demand-planning-supplier-list');
                                     @endphp
                                     @if ($hasPermission)
                                     <div class="dropdown">

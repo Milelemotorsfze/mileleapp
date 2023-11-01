@@ -60,7 +60,9 @@
                                 <th>Lead Time</th>
                                 @endif
                                 <th>Model Year</th>
+                                @if($content != '')
                                 <th>Additional Remarks</th>
+                                @endif
                                 @if($content == '')
                                     @can('supplier-addon-purchase-price-view')
                                     @php
@@ -101,8 +103,14 @@
                                         <td>{{ ++$i }}</td>
                                         <td>
                                @if($addonsdata->image)
-                                     <img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
+                               @if (file_exists(public_path().'/addon_image/'.$addonsdata->image))
+                               <img id="myallBrandImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                                  alt="Addon Image" style="width:100%; height:100px;">
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+                                     
                                 @else
                                 <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
@@ -128,12 +136,12 @@
                                         <td>All Model Lines</td>
                                         <td></td>
                                         @if($content == '')
-                                        <td> @if(isset($addonsdata->LeastPurchasePrices->lead_time_min) || isset($addonsdata->LeastPurchasePrices->lead_time_max))
-                                            {{$addonsdata->LeastPurchasePrices->lead_time_min}}
-                                            @if($addonsdata->LeastPurchasePrices->lead_time_max != ''
-                                            && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max)
-                                            - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif
-                                            @if($addonsdata->LeastPurchasePrices->lead_time_min != '' OR $addonsdata->LeastPurchasePrices->lead_time_max != '')
+                                        <td> @if(isset($addonsdata->least_purchase_price->lead_time_min) || isset($addonsdata->least_purchase_price->lead_time_max))
+                                            {{$addonsdata->least_purchase_price->lead_time_min}}
+                                            @if($addonsdata->least_purchase_price->lead_time_max != ''
+                                            && $addonsdata->least_purchase_price->lead_time_min < $addonsdata->least_purchase_price->lead_time_max)
+                                            - {{$addonsdata->least_purchase_price->lead_time_max}} @endif
+                                            @if($addonsdata->least_purchase_price->lead_time_min != '' OR $addonsdata->least_purchase_price->lead_time_max != '')
                                             Days
                                             @endif
                                             @endif
@@ -143,7 +151,10 @@
                                             {{$addonsdata->model_year_start}}
                                             @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif
                                         </td>
+                                        @if($content != '')
                                         <td>{{$addonsdata->additional_remarks}}</td>
+                                         @endif
+                                        
                                         @if($content == '')
                                             @can('supplier-addon-purchase-price-view')
                                             @php
@@ -155,14 +166,14 @@
                                             @endcan
                                             <td>{{$addonsdata->PurchasePrices->updated_at}}</td>
                                         @endif
-                                        @if($addonsdata->LeastPurchasePrices!= null)
-                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                        @if($addonsdata->least_purchase_price!= null)
+                                            @if($addonsdata->least_purchase_price->purchase_price_aed != '')
                                                 @can('addon-least-purchase-price-view')
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-least-purchase-price-view']);
                                                 @endphp
                                                 @if ($hasPermission)
-                                                    <td>{{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED</td>
+                                                    <td>{{$addonsdata->least_purchase_price->purchase_price_aed}} AED</td>
                                                 @endif
                                                 @endcan
                                             @endif
@@ -221,8 +232,14 @@
                                             <td>{{ ++$i }}</td>
                                             <td>
                                             @if($addonsdata->image)
-                                     <img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
+                                            @if (file_exists(public_path().'/addon_image/'.$addonsdata->image))
+                                            <img id="myallModalImg_{{$addonsdata->id}}" class="image-click-class" src="{{ asset('addon_image/' . $addonsdata->image) }}"
                                                     alt="Addon Image" style="width:100%; height:100px;">
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+                                     
                                 @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
                                     style="width:100%; height:125px;" alt="Addon Image"  />
                                     @endif
@@ -255,12 +272,12 @@
                                             <td>{{$AddonTypes->modelDescription->model_description ?? ''}}</td>
                                             @if($content == '')
                                             <td>
-                                                @if(isset($addonsdata->LeastPurchasePrices->lead_time_min) || isset($addonsdata->LeastPurchasePrices->lead_time_max))
-                                                    @if($addonsdata->LeastPurchasePrices->lead_time_min != '' OR $addonsdata->LeastPurchasePrices->lead_time_max != '')
-                                                    {{$addonsdata->LeastPurchasePrices->lead_time_min}}
-                                                    @if($addonsdata->LeastPurchasePrices->lead_time_max != ''
-                                                    && $addonsdata->LeastPurchasePrices->lead_time_min < $addonsdata->LeastPurchasePrices->lead_time_max)
-                                                    - {{$addonsdata->LeastPurchasePrices->lead_time_max}} @endif
+                                                @if(isset($addonsdata->least_purchase_price->lead_time_min) || isset($addonsdata->least_purchase_price->lead_time_max))
+                                                    @if($addonsdata->least_purchase_price->lead_time_min != '' OR $addonsdata->least_purchase_price->lead_time_max != '')
+                                                    {{$addonsdata->least_purchase_price->lead_time_min}}
+                                                    @if($addonsdata->least_purchase_price->lead_time_max != ''
+                                                    && $addonsdata->least_purchase_price->lead_time_min < $addonsdata->least_purchase_price->lead_time_max)
+                                                    - {{$addonsdata->least_purchase_price->lead_time_max}} @endif
                                                     Days
                                                     @endif
                                                 @endif
@@ -268,7 +285,10 @@
                                             @endif
                                             <td>{{$addonsdata->model_year_start}}
                                                 @if($addonsdata->model_year_end != '' && $addonsdata->model_year_start != $addonsdata->model_year_end) - {{$addonsdata->model_year_end}} @endif</td>
-                                            <td>{{$addonsdata->additional_remarks}}</td>
+                                                @if($content != '')
+                                                <td>{{$addonsdata->additional_remarks}}</td>
+                                                @endif
+                                                
 {{--                                            //////// countinue from here scroll in table view --}}
                                             @if($content == '')
                                                 @can('supplier-addon-purchase-price-view')
@@ -294,10 +314,10 @@
 {{--                                                @endphp--}}
 {{--                                                @if ($hasPermission)--}}
                                                     <td>
-                                                        @if($addonsdata->LeastPurchasePrices!= null)
-                                                            @if($addonsdata->LeastPurchasePrices->purchase_price_aed != '')
+                                                        @if($addonsdata->least_purchase_price!= null)
+                                                            @if($addonsdata->least_purchase_price->purchase_price_aed != '')
 
-                                                                {{$addonsdata->LeastPurchasePrices->purchase_price_aed}} AED
+                                                                {{$addonsdata->least_purchase_price->purchase_price_aed}} AED
                                                             @endif
                                                         @endif
                                                     </td>

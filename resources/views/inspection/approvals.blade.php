@@ -215,11 +215,8 @@
             <thead>
               <tr>
                 <th>Check List Items</th>
-                <th>Reciving Qty</th>
                 <th>Reciving</th>
-                <th>Delivery Qty</th>
                 <th>Delivery</th>
-                <th>Remarks</th>
               </tr>
             </thead>
             <tbody>
@@ -228,14 +225,25 @@
         </div>
         <div class="row">
     <div class="col-lg-12">
-        <p><strong>Remarks</strong></p>
-        <textarea id="pdi_remarks" rows="4" placeholder="Enter your remarks here..." style="width: 100%;"></textarea>
+        <p><strong>PDI Remarks</strong></p>
+       <div id="pdiremarks"></div>
+    </div>
+</div>
+<br>
+<div id ="incidentContainer">
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <p><strong>Manager Remarks</strong></p>
+        <textarea id="mangerremarks" rows="4" placeholder="Enter your remarks here..." style="width: 100%;"></textarea>
     </div>
 </div>
         </div>
       <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" onclick="approvedpdi()">Approved</button>
+                <button type="button" class="btn btn-success" onclick="approvedpdi()">Approved PDI</button>
+                <div id="incidentapp">
+                </div>
             </div>
     </div>
   </div>
@@ -265,6 +273,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                   <th>Inspection Date</th>
+                  <th>Inspection Person</th>
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>Changing Fields</th>
@@ -295,6 +304,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Inspection Date</th>
+                <th>Inspection Person</th>
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>PO Number</th>
@@ -328,6 +338,7 @@
             <thead class="bg-soft-secondary">
                 <tr>
                 <th>Re Inspection Date</th>
+                <th>Inspection Person</th>
                   <th>Stage</th>
                   <th>QC Remarks</th>
                   <th>Changing Fields</th>
@@ -364,6 +375,7 @@
                   <th>VIN</th>
                   <th>Engine</th>
                   <th>Inspection Date</th>
+                  <th>Inspection Person</th>
                   <th>Type</th>
                   <th>Narration</th>
                   <th>Reason</th>
@@ -401,6 +413,7 @@
             ajax: "{{ route('approvalsinspection.index', ['status' => 'Pending']) }}",
             columns: [
                 { data: 'created_at_formte', name: 'inspection.created_at' },
+                { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
                 { data: 'remark', name: 'inspection.remark' },
                 {
@@ -472,6 +485,7 @@
             ajax: "{{ route('approvalsinspection.index', ['status' => 'approved']) }}",
             columns: [
               { data: 'created_at_formte', name: 'inspection.created_at' },
+              { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
                 { data: 'remark', name: 'inspection.remark' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
@@ -496,6 +510,7 @@
             ajax: "{{ route('approvalsinspection.index', ['status' => 'Reinspectionapproval']) }}",
             columns: [
               { data: 'reinspection_date', name: 'inspection.reinspection_date' },
+              { data: 'created_by_name', name: 'users.name' },
                 { data: 'stage', name: 'inspection.stage' },
                 { data: 'reinspection_remarks', name: 'inspection.reinspection_remarks' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
@@ -518,6 +533,7 @@
             ajax: "{{ route('approvalsinspection.index', ['status' => 'reparingapproval']) }}",
             columns: [
                 { data: 'incidentsnumber', name: 'incident.id' },
+                { data: 'created_by_name', name: 'users.name' },
                 { data: 'update_remarks', name: 'incident.update_remarks' },
                 { data: 'part_po_number', name: 'incident.part_po_number' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
@@ -608,7 +624,7 @@
     $.ajax({
       url: '/pdi-inspection/' + vehicleId,
       method: 'GET',
-      success: function (response) {
+      success: function (response) { 
         var additionalInfo = response.additionalInfo;
         var PdiInspectionData = response.PdiInspectionData;
         var grnpicturelink = response.grnpicturelink;
@@ -616,6 +632,7 @@
         var PDIpicturelink = response.PDIpicturelink;
         var modificationpicturelink = response.modificationpicturelink;
         var Incidentpicturelink = response.Incidentpicturelink;
+        var remarks = response.remarks;
         var buttonContainerHtml = '';
       if (grnpicturelink) {
         buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${grnpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> GRN Pictures</a>&nbsp;&nbsp;`;
@@ -632,21 +649,99 @@
       if (Incidentpicturelink) {
         buttonContainerHtml += `<a class="btn btn-sm btn-primary" href="${Incidentpicturelink}" target="_blank"><i class="fa fa-camera" aria-hidden="true"></i> Incident Pictures</a>`;
       }
+      if (response.incidentDetails) {
+  var incidentHtml = `
+    <h5>Incident Report</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Incident Type</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.type ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Narration Of Accident / Damage</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.narration ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Damage Details</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.detail ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Driven By</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.driven_by ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Responsibility for Recover the Damages</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.responsivity ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-4">
+            <label><strong>Reason</strong></label>
+          </div>
+          <div class="col-md-8">
+            ${response.incidentDetails.reason ?? ''}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            ${response.incidentDetails.file_path ? 
+              `<img src="{{ asset('qc/') }}/${response.incidentDetails.file_path}" alt="Incident Image">` : 
+              'No image available'}
+          </div>
+        </div>
+      </div>
+    <br>`;
+  $('#incidentContainer').html(incidentHtml);
+  var approvedPdiButton = '<button type="button" class="btn btn-warning" onclick="approvedincidentsonly()">Approved Incident Only</button>';
+        $('#incidentapp').html(approvedPdiButton);
+    } else {
+        $('#incidentapp').hide();
+    }
         $('#modelLinepdi').text(additionalInfo.model_line);
         $('#vinpdi').text(additionalInfo.vin);
         $('#intColourpdi').text(additionalInfo.int_colour);
         $('#extColourpdi').text(additionalInfo.ext_colour);
         $('#locationpdi').text(additionalInfo.location);
         $('#model_yearpdi').text(additionalInfo.my);
-        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check List Items</th><th>Receving Qty</th><th>Receving</th><th>Delivery Qty</th><th>Delivery</th><th>Remarks</th></tr></thead><tbody>';
+        $('#pdiremarks').text(remarks.remark);
+        var tableHtml = '<table class="table table-bordered"><thead><tr><th>Check List Items</th><th>Receving</th><th>Delivery</th></tr></thead><tbody>';
         PdiInspectionData.forEach(function (row) {
           tableHtml += `<tr>
   <td class="text-left">${row.checking_item !== null ? row.checking_item : ''}</td>
-  <td>${row.reciving_qty !== null ? row.reciving_qty : ''}</td>
   <td>${row.reciving !== null ? row.reciving : ''}</td>
-  <td>${row.qty !== null ? row.qty : ''}</td>
   <td>${row.status !== null ? row.status : ''}</td>
-  <td>${row.remarks !== null ? row.remarks : ''}</td>
 </tr>`;
         });
         tableHtml += '</tbody></table>';
@@ -696,12 +791,12 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
     tableHtml += '</tbody></table>';
     $('#modalBody').append(tableHtml);
     $('#works').modal('show');
-},
-        error: function (error) {
-            console.error(error);
-        }
+    },
+            error: function (error) {
+                console.error(error);
+            }
+        });
     });
-});
   });
 </script>
 <script>
@@ -754,7 +849,7 @@ function approvedroutein() {
 }
 function approvedpdi() {
     var inspectionid = $('#inspection_id').val();
-    var remarks = $('#pdi_remarks').val();
+    var remarks = $('#mangerremarks').val();
     $.ajax({
         type: 'POST',
         url: '{{route('inspectionapprovalpdi.approvalspdi')}}',
@@ -764,6 +859,27 @@ function approvedpdi() {
         },
         success: function (response) {
           alertify.success('Approved Repaired Inspection');
+            setTimeout(function() {
+        window.location.reload();
+        }, 1000);
+        },
+        error: function (error) {
+            console.error('Error saving incident update:', error);
+        }
+    });
+}
+function approvedincidentsonly() {
+    var inspectionid = $('#inspection_id').val();
+    var remarks = $('#mangerremarks').val();
+    $.ajax({
+        type: 'POST',
+        url: '{{route('inspectionapprovalpdi.approvedincidentsonly')}}',
+        data: { inspectionid: inspectionid,  remarks: remarks  },
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+          alertify.success('Approved Incident Success');
             setTimeout(function() {
         window.location.reload();
         }, 1000);

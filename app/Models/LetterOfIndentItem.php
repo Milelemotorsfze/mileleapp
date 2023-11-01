@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LetterOfIndentItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 //    public $timestamps = false;
     protected $appends = [
         'steering',
@@ -47,14 +48,19 @@ class LetterOfIndentItem extends Model
     }
     public function getInventoryQuantityAttribute()
     {
-//        $mastermodel = MasterModel::where('model', $this->model)
-//            ->where('sfx', $this->sfx)
-//            ->first();
-        $modelId = $this->master_model_id;
-
-        $inventoryCount = SupplierInventory::where('master_model_id', $modelId)
+        info('mastermodelid');
+        info($this->master_model_id);
+        $masterModel = MasterModel::find($this->master_model_id);
+        $masterModelIds = MasterModel::where('steering', $masterModel->steering)
+            ->where('model', $masterModel->model)
+            ->where('sfx', $masterModel->sfx)->pluck('id')->toArray();
+        info("inventory count");
+        info($masterModelIds);
+        $inventoryCount = SupplierInventory::whereIn('master_model_id', $masterModelIds)
             ->where('veh_status', SupplierInventory::VEH_STATUS_SUPPLIER_INVENTORY)
             ->where('upload_status', SupplierInventory::UPLOAD_STATUS_ACTIVE)
+            ->whereNull('status')
+            ->whereNull('eta_import')
             ->count();
 
         return $inventoryCount;

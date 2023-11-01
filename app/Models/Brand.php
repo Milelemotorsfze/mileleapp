@@ -31,4 +31,8 @@ class Brand extends Model
     {
         return $this->hasMany(WarrantyBrands::class);
     }
+    public function addons()
+    {
+        return $this->hasMany(AddonTypes::class);
+    }
 }

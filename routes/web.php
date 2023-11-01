@@ -167,7 +167,8 @@ Route::get('/d', function () {
     Route::post('kit/priceStore', [KitCommonItemController::class, 'priceStore'])->name('kit.priceStore');
     Route::get('getPartNumbers', [KitCommonItemController::class, 'getPartNumbers'])->name('getPartNumbers');
     Route::post('kit/items/store', [KitCommonItemController::class, 'storeKitItems'])->name('kitItems.store');
-
+    Route::get('purchasePriceHistory/{id}', [KitCommonItemController::class, 'purchasePriceHistory'])->name('kit.purchasePriceHistory');
+    
 
     // Warranty
     Route::resource('warranty', WarrantyController::class);
@@ -438,6 +439,7 @@ Route::get('/d', function () {
     Route::resource('inspection', InspectionController::class);
     Route::get('reinspection/reshow/{id}', [InspectionController::class, 'reshow'])->name('reinspection.reshow');
     Route::get('inspection/instock/{id}', [InspectionController::class, 'instock'])->name('inspection.instock');
+    Route::get('inspection/pdi/{id}', [InspectionController::class, 'pdiinspectionf'])->name('inspection.pdiinspection');
     Route::resource('approvalsinspection', ApprovalsController::class);
     Route::resource('incident', IncidentController::class);
     Route::post('incident/saving', [IncidentController::class,'updatestatus'])->name('incidentupdate.updatestatus');
@@ -464,9 +466,11 @@ Route::get('/d', function () {
     Route::get('/get-vehicle-extra-items/{vehicle_id}', [InspectionController::class, 'getVehicleExtraItems']);
     Route::get('/pdi-inspection/{vehicleId}', [ApprovalsController::class, 'getpdiInspectionData']);
     Route::post('inspectionpdiapp/approvals', [ApprovalsController::class,'approvalspdi'])->name('inspectionapprovalpdi.approvalspdi');
+    Route::post('inspectionpdiappin/approvals', [ApprovalsController::class,'approvedincidentsonly'])->name('inspectionapprovalpdi.approvedincidentsonly');
     Route::get('incidents/updatevehicledetails', [IncidentController::class, 'updatevehicledetails'])->name('incident.updatevehicledetails');
     Route::post('incident/createincidents', [IncidentController::class,'createincidents'])->name('incident.createincidents');
     Route::resource('modification', ModificationController::class);
+    Route::post('incident/reinspectionsforre', [IncidentController::class, 'reinspectionsforre'])->name('incident.reinspectionsforre');
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');

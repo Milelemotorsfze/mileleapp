@@ -389,8 +389,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 			<div class="row">
 				<center>
 					@if($supplierAddonDetails->image)
+					@if (file_exists(public_path().'/addon_image/'.$supplierAddonDetails->image))
 					<img id="blah" src="{{ asset('addon_image/' . $supplierAddonDetails->image) }}" alt="Addon image" 
 						class="contain image-click-class" data-modal-id="showImageModal"/>
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+					
 					@else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
 						style="width:200px; height: 200px;;" alt="Addon Image"  />
 					@endif
@@ -518,8 +524,19 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 						{{$Kit->addon->AddonName->name}}
 					</div>
 					<div class="col-xxl-5 col-lg-5 col-md-4 col-sm-4" style="padding-right:3px; padding-left:3px;">
-						<img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class"
+					 @if($Kit->addon->image)
+                                @if (file_exists(public_path().'/addon_image/'.$Kit->addon->image))
+                                <img id="myImg" src="{{ asset('addon_image/' . $Kit->addon->image) }}" class="image-click-class"
 							style="width:100%; height:125px;" alt="Addon Image"  />
+                                    @else
+                                    <img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="max-height:159px; max-width:232px;" alt="Addon Image"  />
+                                    @endif
+                                     
+                               @else<img src="{{ url('addon_image/imageNotAvailable.png') }}" class="image-click-class"
+                                    style="width:100%; height:125px;" alt="Addon Image"  />
+                                    @endif
+						
 					</div>
 					<div class="col-xxl-7 col-lg-7 col-md-8 col-sm-8" >
 						<div class="row" style="padding-right:3px; padding-left:3px;">
