@@ -258,8 +258,11 @@
             <input type="hidden" id="incidentId" name="incidentId" value="">
             <div id="modalBody" class="modal-body">
             </div>
+            <!-- <label for="remarks">Remarks:</label>
+    <input type="text" id="remarks" name="remarks"> -->
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="reworkButton" style="float: right; margin-right: 10px;" type="button" class="btn btn-warning">Re Work</button>
                 <button type="button" class="btn btn-success" onclick="savereincidentupdate()">Approved</button>
             </div>
         </div>
@@ -779,27 +782,90 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
         type: 'GET',
         url: '/get-incident-works/' + incidentId,
         success: function (response) {
-    $('#worksLabel').text('View Pictures Details - VIN: ' + vin);
-    $('#modalBody').empty();
-    var tableHtml = '<table class="table table-bordered"><thead><tr><th>Works</th><th>Status</th><th>Remarks</th></tr></thead><tbody>';
-    for (var i = 0; i < response.length; i++) {
-        var work = response[i].works;
-        var workStatus = response[i].status;
-        var workRemarks = response[i].remarks;
-        tableHtml += '<tr><td>' + work + '</td><td>' + workStatus + '</td><td>' + workRemarks + '</td></tr>';
-    }
-    tableHtml += '</tbody></table>';
-    $('#modalBody').append(tableHtml);
-    $('#works').modal('show');
-    },
-            error: function (error) {
-                console.error(error);
+            $('#worksLabel').text('View Incident Details - VIN: ' + vin);
+            $('#modalBody').empty();
+            var tableHtml = '<table class="table table-bordered"><thead><tr><th>Works</th><th>Status</th><th>Remarks</th></tr></thead><tbody>';
+            for (var i = 0; i < response.length; i++) {
+                var work = response[i].works;
+                var workStatus = response[i].status;
+                var workRemarks = response[i].remarks;
+                tableHtml += '<tr><td>' + work + '</td><td>' + workStatus + '</td><td>' + workRemarks + '</td></tr>';
             }
-        });
+            tableHtml += '</tbody></table>';
+            $('#modalBody').append(tableHtml);
+            $.ajax({
+                type: 'GET',
+                url: '/get-pdi-inspection/' + incidentId,
+                success: function (pdiResponse) {
+                  var pdiHtml = '<h3>PDI Inspection Data</h3>';
+                        pdiHtml += '<table class="table table-bordered"><thead><tr><th>Checking Item</th><th>Receiving</th><th>Status</th></tr></thead><tbody>';
+                        for (var j = 0; j < pdiResponse.length; j++) {
+                            var checkingItem = pdiResponse[j].checking_item;
+                            var receiving = pdiResponse[j].reciving;
+                            var status = pdiResponse[j].status;
+                            pdiHtml += '<tr><td>' + checkingItem + '</td><td>' + receiving + '</td><td>' + status + '</td></tr>';
+                        }
+                        pdiHtml += '</tbody></table>';
+                        $('#modalBody').append(pdiHtml);
+                    },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+            $.ajax({
+                type: 'GET',
+                url: '/get-incident-details/' + incidentId,
+                success: function (incidentResponse) {
+                  var incidentHtml = '<div class="row">';
+    incidentHtml += '<div class="col-md-4"><label><strong>Narration Of Accident / Damage</strong></label></div>';
+    incidentHtml += '<div class="col-md-8">' + (incidentResponse.narration || '') + '</div>';
+    incidentHtml += '<div class="col-md-3">';
+    incidentHtml += '<div class="row">';
+    incidentHtml += '<div class="col-md-4"><label><strong>Damage Details</strong></label></div>';
+    incidentHtml += '<div class="col-md-8">' + (incidentResponse.detail || '') + '</div>';
+    incidentHtml += '</div></div>';
+    incidentHtml += '<div class="col-md-3">';
+    incidentHtml += '<div class="row">';
+    incidentHtml += '<div class="col-md-4"><label><strong>Driven By</strong></label></div>';
+    incidentHtml += '<div class="col-md-8">' + (incidentResponse.driven_by || '') + '</div>';
+    incidentHtml += '</div></div>';
+    incidentHtml += '<div class="col-md-6">';
+    incidentHtml += '<div class="row">';
+    incidentHtml += '<div class="col-md-4"><label><strong>Responsibility for Recover the Damages</strong></label></div>';
+    incidentHtml += '<div class="col-md-8">' + (incidentResponse.responsivity || '') + '</div>';
+    incidentHtml += '</div></div>';
+    incidentHtml += '<div class="col-md-3">';
+    incidentHtml += '<div class="row">';
+    incidentHtml += '<div class="col-md-4"><label><strong>Reason</strong></label></div>';
+    incidentHtml += '<div class="col-md-8">' + (incidentResponse.reason || '') + '</div>';
+    incidentHtml += '</div></div>';
+    incidentHtml += '<div class="col-md-12">';
+    incidentHtml += '<div class="row">';
+    incidentHtml += '<div class="col-md-12">';
+    if (incidentResponse.file_path) {
+        incidentHtml += '<img src="' + incidentResponse.file_path + '" alt="Incident Image">';
+    } else {
+        incidentHtml += 'No image available';
+    }
+    incidentHtml += '</div></div></div>';
+    incidentHtml += '</div>';
+                    $('#modalBody').append(incidentHtml);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+
+            $('#works').modal('show');
+        },
+        error: function (error) {
+            console.error(error);
+        }
     });
-  });
-</script>
-<script>
+    });
+      });
+    </script>
+    <script>
     const successMessage = document.getElementById('success-message');
     if (successMessage) {
         setTimeout(() => {
@@ -826,8 +892,8 @@ $('#dtBasicExample4 tbody').on('dblclick', 'tr', function () {
             console.error('Error saving incident update:', error);
         }
     });
-}
-function approvedroutein() {
+    }
+    function approvedroutein() {
     var inspectionid = $('#inspection_id').val();
     $.ajax({
         type: 'POST',
@@ -846,8 +912,8 @@ function approvedroutein() {
             console.error('Error saving incident update:', error);
         }
     });
-}
-function approvedpdi() {
+    }
+    function approvedpdi() {
     var inspectionid = $('#inspection_id').val();
     var remarks = $('#mangerremarks').val();
     $.ajax({
@@ -867,8 +933,8 @@ function approvedpdi() {
             console.error('Error saving incident update:', error);
         }
     });
-}
-function approvedincidentsonly() {
+    }
+    function approvedincidentsonly() {
     var inspectionid = $('#inspection_id').val();
     var remarks = $('#mangerremarks').val();
     $.ajax({
@@ -888,12 +954,37 @@ function approvedincidentsonly() {
             console.error('Error saving incident update:', error);
         }
     });
-}
+    }
+    </script>
+    <script>
+    $(document).ready(function() {
+        $("#reworkButton").click(function() {
+          // var remarks = $("#remarks").val();
+        var incidentId = $("#incidentId").val();
+        var requestData = {
+          _token: "{{ csrf_token() }}", // Include the CSRF token
+            // remarks: remarks,
+            incidentId: incidentId
+        };
+            $.ajax({
+                type: "POST",
+                url: "{{ route('incident.reinspectionsforrem') }}",
+                data: requestData,
+                success: function(response) {
+                    alertify.success('Re Work Update successfully');
+                    window.location.href = "{{ route('incident.index') }}";
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
 </script>
-@endif
-@else
-    @php
-        redirect()->route('home')->send();
-    @endphp
-@endif
-@endsection
+    @endif
+    @else
+        @php
+            redirect()->route('home')->send();
+        @endphp
+    @endif
+    @endsection
