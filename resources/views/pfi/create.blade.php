@@ -216,6 +216,7 @@
                             <div class="col-lg-6 col-md-6" id="file-preview">
                             </div>
                         </div>
+                        <br>
                         <input type="hidden" value="{{ request()->id }}" name="letter_of_indent_id" id="letter_of_indent_id">
                         @if($approvedPfiItems->count() > 0)
                             <div class="col-12 text-center">

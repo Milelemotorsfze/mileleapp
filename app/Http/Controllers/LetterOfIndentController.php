@@ -15,6 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Monarobase\CountryList\CountryListFacade;
 use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Storage;
@@ -356,6 +357,15 @@ class LetterOfIndentController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::beginTransaction();
+
+        LetterOfIndentDocument::where('letter_of_indent_id', $id)->delete();
+        LetterOfIndentItem::where('letter_of_indent_id', $id)->delete();
+        LetterOfIndent::find($id)->delete();
+
+        DB::commit();
+
+        return response(true);
+
     }
 }

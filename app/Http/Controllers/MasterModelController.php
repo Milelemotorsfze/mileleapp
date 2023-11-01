@@ -74,7 +74,10 @@ class MasterModelController extends Controller
         ]);
 
         $isAlreadyExist = MasterModel::where('model', $request->model)
-                                ->where('sfx', $request->sfx)->first();
+                                ->where('sfx', $request->sfx)
+                                ->where('steering', $request->steering)
+                                ->where('variant_id', $request->variant_id)
+                                ->first();
         if($isAlreadyExist) {
             return  redirect()->back()->withErrors('This Model and Sfx is already existing');
         }
@@ -126,6 +129,8 @@ class MasterModelController extends Controller
 
         $isAlreadyExist = MasterModel::where('model', $request->model)
                             ->where('sfx', $request->sfx)
+                            ->where('steering', $request->steering)
+                            ->where('variant_id', $request->variant_id)
                             ->whereNot('id',$id)->first();
         if($isAlreadyExist) {
             return  redirect()->back()->withErrors('This Model and Sfx is already existing');

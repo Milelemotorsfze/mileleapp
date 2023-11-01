@@ -30,7 +30,7 @@ class PFIController extends Controller
             $pfiTotalQuantity = ApprovedLetterOfIndentItem::where('pfi_id', $pfi->id)->sum('quantity');
 
             $totalPoCreatedQuantity = LOIItemPurchaseOrder::whereIn('approved_loi_id', $approvedLOIItemIds)
-                                        ->sum('quantity');
+                                            ->sum('quantity');
             if($pfiTotalQuantity == $totalPoCreatedQuantity) {
                $pfi->is_po_active = false;
             }else{
@@ -63,6 +63,7 @@ class PFIController extends Controller
     {
         $approevdLOI = ApprovedLetterOfIndentItem::findOrFail($request->id);
         if($request->action == 'REMOVE') {
+            $approevdLOI->pfi_id = NULL;
             $approevdLOI->is_pfi_created = false;
         }else{
             $approevdLOI->is_pfi_created = true;
@@ -180,7 +181,20 @@ class PFIController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $pfi = PFI::find($id);
+
+        (new UserActivityController)->createActivity('Open PFI Edit Page');
+
+        $letterOfIndent = LetterOfIndent::findOrFail($pfi->letter_of_indent_id);
+        $approvedPfiItems = ApprovedLetterOfIndentItem::where('pfi_id', $id)
+            ->where('is_pfi_created', true)
+            ->get();
+        $pendingPfiItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $letterOfIndent->id)
+            ->whereNull('pfi_id')
+            ->where('is_pfi_created', false)
+            ->get();
+
+        return view('pfi.edit', compact('pfi','pendingPfiItems','approvedPfiItems','letterOfIndent'));
     }
 
     /**
@@ -196,6 +210,33 @@ class PFIController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $pfi = PFI::find($id);
+        $approvedItemsForPFIs = ApprovedLetterOfIndentItem::where('pfi_id', $id)->get();
+
+        DB::beginTransaction();
+        // make pfi creation reverse when it is deleting
+        if($approvedItemsForPFIs) {
+            foreach ($approvedItemsForPFIs as $approvedItemsForPFI) {
+                $approvedItemsForPFI->pfi_id = NULL;
+                $approvedItemsForPFI->is_pfi_created = false;
+                $approvedItemsForPFI->save();
+            }
+
+            $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
+            info($letterOfIndent);
+            // change the status to previous while deleting PO
+            if($letterOfIndent->total_loi_quantity == $letterOfIndent->total_approved_quantity) {
+                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_APPROVED;
+            }else{
+                $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_APPROVED;
+            }
+            $letterOfIndent->save();
+        }
+        $pfi->delete();
+
+        DB::commit();
+
+        return response(true);
+
     }
 }
