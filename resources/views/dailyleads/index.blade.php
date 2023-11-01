@@ -193,7 +193,7 @@ input[type=number]::-webkit-outer-spin-button
               </thead>
               <tbody>
                 @foreach ($pendingdata as $key => $calls)
-                <tr data-id="1">
+                    <tr data-id="{{$calls->id}}">
                     <td>{{ date('d-M-Y', strtotime($calls->created_at)) }}</td>
                     <td>{{ $calls->type }}</td>
                     <td>{{ $calls->name }}</td>
@@ -253,7 +253,7 @@ input[type=number]::-webkit-outer-spin-button
     @can('sales-view')
       <li><a class="dropdown-item" href="#" onclick="openModalp('{{ $calls->id }}')">Prospecting</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModald('{{ $calls->id }}')">Demand</a></li>
-      <li><a class="dropdown-item" href="{{ route('qoutation.proforma_invoice', ['callId' => $calls->id]) }}">Quotation</a></li>
+      <li><a class="dropdown-item" href="#" onclick="openModal('{{ $calls->id }}')">Quotation</a></li>
       <li><a class="dropdown-item" href="#" onclick="openModalqualified('{{ $calls->id }}')">Negotiation</a></li>
       <!-- <li><a class="dropdown-item" href="{{ route('booking.create', ['call_id' => $calls->id]) }}">Booking Vehicles</a></li> -->
       <!-- <li><a class="dropdown-item" href="">Booking (Coming Soon)</a></li> -->
@@ -925,6 +925,20 @@ function openModalr(callId) {
   $('#rejectionModal').data('call-id', callId);
   $('#rejectionModal').modal('show');
 }
+function reloadDataTable(sectionId) {
+    let dataTableValue;
+    if (sectionId === 'dataTable2' || sectionId === 'dataTable3' || sectionId === 'dataTable4' || sectionId === 'dataTable5' || sectionId === 'dataTable6' || sectionId === 'dataTable7') {
+        dataTableValue = eval(sectionId); 
+        if (dataTableValue) {
+            dataTableValue.ajax.reload();
+            console.log("Current Data Table is: ", sectionId);
+        } else {
+            console.log(`Data table with ${sectionId} is missing`);
+        }
+    } else {
+        console.log(`Invalid section ID: ${sectionId}`);
+    }
+}
 function saveprospecting() {
   var callId = $('#prospectingmodel').data('call-id');
   var date = document.getElementById('date').value;
@@ -946,10 +960,15 @@ function saveprospecting() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
-          location.reload();
-        } else {
+var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Prospecting submitted successfully');
+          $('#prospectingmodel').modal('hide');
+          reloadDataTable('dataTable2');
+        }
+         else {
           console.error('Error saving Prospecting');
           alert('Error saving Prospecting');
         }
@@ -982,9 +1001,13 @@ function savedemand() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Prospecting saved successfully');
-          alert('Prospecting saved successfully');
-          location.reload();
+          var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Demand request submitted successfully');
+          $('#demandmodel').modal('hide');
+          reloadDataTable('dataTable3');
         } else {
           console.error('Error saving Prospecting');
           alert('Error saving Prospecting');
@@ -1035,46 +1058,17 @@ function saveQuotations() {
       if (xhr.status === 200) {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
-          console.log('Quotation saved successfully');
-          alert('Quotation saved successfully');
-          location.reload();
+        var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Quotation request submitted successfully');
+          $('#quotationModal').modal('hide');
+          reloadDataTable('dataTable4');
+
         } else {
           console.error('Error saving quotation');
           alert('Error saving quotation');
-        }
-      } else {
-        console.error('Request failed with status ' + xhr.status);
-        alert('Request failed. Please try again.');
-      }
-    }
-  };
-  xhr.send(formData);
-}
-function saveRejection() {
-  var callId = $('#rejectionModal').data('callId');
-  var date = document.getElementById('date-input-reject').value;
-  var reason = document.getElementById('reason-reject').value;
-  var salesNotes = document.getElementById('salesnotes-reject').value;
-  var formData = new FormData();
-  formData.append('callId', callId);
-  formData.append('date', date);
-  formData.append('reason', reason);
-  formData.append('salesNotes', salesNotes);
-  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', '{{ route('sales.rejection') }}', true); // Replace '/profile/rejection' with the actual URL path to your server-side endpoint
-  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-        var response = JSON.parse(xhr.responseText);
-        if (response.success) {
-          console.log('Rejection saved successfully');
-          alert('Rejection saved successfully');
-          location.reload();
-        } else {
-          console.error('Error saving rejection');
-          alert('Error saving rejection');
         }
       } else {
         console.error('Request failed with status ' + xhr.status);
@@ -1124,8 +1118,14 @@ function savenegotiation() {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
           console.log('Negotiation saved successfully');
-          alert('Negotiation saved successfully');
-          location.reload();
+          var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Negotiation submitted successfully');
+          $('#qualified').modal('hide');
+          reloadDataTable('dataTable5');
+
         } else {
           console.error('Error saving Negotiation');
           alert('Error saving Negotiation');
@@ -1178,11 +1178,58 @@ function savenegotiation() {
         var response = JSON.parse(xhr.responseText);
         if (response.success) {
           console.log('Sales Order saved successfully');
-          alert('Sales Order saved successfully');
-          location.reload();
+          var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Sales Order save successfully');
+          $('#ClosedModal').modal('hide');
+          reloadDataTable('dataTable6');
+
         } else {
           console.error('Error saving Prospecting');
           alert('Error saving Prospecting');
+        }
+      } else {
+        console.error('Request failed with status ' + xhr.status);
+        alert('Request failed. Please try again.');
+      }
+    }
+  };
+  xhr.send(formData);
+}
+function saveRejection() {
+  var callId = $('#rejectionModal').data('callId');
+  var date = document.getElementById('date-input-reject').value;
+  var reason = document.getElementById('reason-reject').value;
+  var salesNotes = document.getElementById('salesnotes-reject').value;
+  var formData = new FormData();
+  formData.append('callId', callId);
+  formData.append('date', date);
+  formData.append('reason', reason);
+  formData.append('salesNotes', salesNotes);
+  var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '{{ route('sales.rejection') }}', true); // Replace '/profile/rejection' with the actual URL path to your server-side endpoint
+  xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.success) {
+          console.log('Rejection saved successfully');
+          var tableRow = document.querySelector('tr[data-id="' + callId + '"]');
+          if (tableRow) {
+            tableRow.remove();
+          }
+          alertify.success('Rejection save successfully');
+          $('#rejectionModal').modal('hide');
+          reloadDataTable('dataTable7');
+
+          
+        } else {
+          console.error('Error saving rejection');
+          alert('Error saving rejection');
         }
       } else {
         console.error('Request failed with status ' + xhr.status);
@@ -1301,8 +1348,9 @@ function s2ab(s) {
 });
 </script>
 <script>
+let dataTable2, dataTable3, dataTable5, dataTable6, dataTable7;
     $(document).ready(function () {
-        $('#dtBasicExample2').DataTable({
+        dataTable2 = $('#dtBasicExample2').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Prospecting']) }}",
@@ -1381,7 +1429,7 @@ function s2ab(s) {
                 },
             ]
         });
-        $('#dtBasicExample3').DataTable({
+        dataTable3 = $('#dtBasicExample3').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'New Demand']) }}",
@@ -1480,7 +1528,7 @@ function s2ab(s) {
                 },
             ]
         });
-        $('#dtBasicExample4').DataTable({
+       dataTable4 = $('#dtBasicExample4').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Quoted']) }}",
@@ -1614,7 +1662,7 @@ function s2ab(s) {
                 },
             ]
         });
-        $('#dtBasicExample5').DataTable({
+       dataTable5 =  $('#dtBasicExample5').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Negotiation']) }}",
@@ -1784,7 +1832,7 @@ function s2ab(s) {
                 },
             ]
         });
-        $('#dtBasicExample6').DataTable({
+       dataTable6 =   $('#dtBasicExample6').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Closed']) }}",
@@ -1968,7 +2016,7 @@ function s2ab(s) {
 },
             ]
         });
-        $('#dtBasicExample7').DataTable({
+        dataTable7 =   $('#dtBasicExample7').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ route('dailyleads.index', ['status' => 'Rejected']) }}",
