@@ -471,6 +471,9 @@ Route::get('/d', function () {
     Route::post('incident/createincidents', [IncidentController::class,'createincidents'])->name('incident.createincidents');
     Route::resource('modification', ModificationController::class);
     Route::post('incident/reinspectionsforre', [IncidentController::class, 'reinspectionsforre'])->name('incident.reinspectionsforre');
+    Route::post('incident/reinspectionsforrem', [IncidentController::class, 'reinspectionsforrem'])->name('incident.reinspectionsforrem');
+    Route::get('/get-pdi-inspection/{incidentId}', [IncidentController::class,'getPdiInspection']);
+    Route::get('/get-incident-details/{incidentId}', [IncidentController::class,'getIncidentDetails']);
     // Vendors
 
     Route::get('/vendor/unique-check', [SupplierController::class, 'vendorUniqueCheck'])->name('vendor.vendorUniqueCheck');

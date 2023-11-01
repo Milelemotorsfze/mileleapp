@@ -448,4 +448,34 @@ public function updatevehicledetails(Request $request)
     $incidents->save();
     return response()->json(['message' => 'Re Work Update successfully']);
     }
+    public function getPdiInspection($incidentId)
+    {
+        $Incident = Incident::findOrFail($incidentId);
+        $inspection = Pdi::where('inspection_id', $Incident->inspection_id)->get();
+        if (!$inspection) {
+            return response()->json(['message' => 'PDI inspection not found'], 404);
+        }
+        return response()->json($inspection);
+    }
+    public function getIncidentDetails($incidentId)
+    {
+        $incident = Incident::findOrFail($incidentId);
+        return response()->json($incident);
+    }
+    public function reinspectionsforrem(Request $request)
+    {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Re Work By Manager Incident Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $Incidentid = $request->input('incidentId'); // Get the incident ID from the request
+        // $remarks = $request->input('remarks'); // Get the remarks from the request
+        $currentDate = Carbon::now();
+        $incidents = Incident::findOrFail($Incidentid);
+        $incidents->status = "Re Work";
+        $incidents->vehicle_status = "Re Work";
+        $incidents->vehicle_status = "Re Work";
+        $incidents->save();
+        return response()->json(['message' => 'Re Work Update successfully']);
+    }
     }
