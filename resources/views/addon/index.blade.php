@@ -255,7 +255,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
               $('#allBrandsFilter').prop("disabled", false);
               $('.allBrandsFilterClass').prop("disabled", false);
               $('#ModelLineDiv').show();
-              getRelatedModelLines(BrandIds);
+              // getRelatedModelLines(BrandIds);
+              if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                  fetchData(0,0);
+                  // $('.page-overlay').show();
+              }
           } else {
               if (BrandIds.includes('yes')) {
                   $('.allBrandsFilterClass').prop("disabled", true);
@@ -268,7 +272,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
               }
               else {
                   $('#allBrandsFilter').prop("disabled", true);
-                  getRelatedModelLines(BrandIds)
+                  if($(window).scrollTop() + $(window).height() >= $(document).height()) {
+                      fetchData(0,0);
+                      // $('.page-overlay').show();
+                  }
+                  // getRelatedModelLines(BrandIds)
               }
           }
 
@@ -325,67 +333,51 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $('.modal').removeClass('modalshow');
       $('.modal').addClass('modalhide');
     }
-    function getRelatedModelLines(BrandIds)
-       {
-           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
-               fetchData(0,0);
-               // $('.page-overlay').show();
-           }
-          var ModelLineIds = $('#fltr-model-line').val();
-          $.ajax({
-            url:"{{url('getRelatedModelLines')}}",
-            data: {
-                BrandIds: BrandIds,
-            },
-            dataType: 'json',
-            success: function(response){
-              // console.log(response);
-              $("#fltr-model-line").html("");
-              let BrandModelLine   = [];
-              BrandModelLine.push
-                  ({
-                      id: 'allmodellines',
-                      text: 'All Model Lines'
-                  });
-              $.each(response,function(key,value)
-              {
-                  BrandModelLine.push
-                  ({
-                      id: value.id,
-                      text: value.model_line
-                  });
-              });
-              $('#fltr-model-line').select2
-              ({
-                  placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                  allowClear: true,
-                  data: BrandModelLine
-              });
-              if(ModelLineIds != null)
-              {
-                selectedModelLines(BrandModelLine,ModelLineIds);
-              }
+    {{--function getRelatedModelLines(BrandIds)--}}
+    {{--   {--}}
+    {{--       if($(window).scrollTop() + $(window).height() >= $(document).height()) {--}}
+    {{--           fetchData(0,0);--}}
+    {{--           // $('.page-overlay').show();--}}
+    {{--       }--}}
+    {{--      var ModelLineIds = $('#fltr-model-line').val();--}}
+    {{--      $.ajax({--}}
+    {{--        url:"{{url('getRelatedModelLines')}}",--}}
+    {{--        data: {--}}
+    {{--            BrandIds: BrandIds,--}}
+    {{--        },--}}
+    {{--        dataType: 'json',--}}
+    {{--        success: function(response){--}}
+    {{--          // console.log(response);--}}
+    {{--          $("#fltr-model-line").html("");--}}
+    {{--          let BrandModelLine   = [];--}}
+    {{--          BrandModelLine.push--}}
+    {{--              ({--}}
+    {{--                  id: 'allmodellines',--}}
+    {{--                  text: 'All Model Lines'--}}
+    {{--              });--}}
+    {{--          $.each(response,function(key,value)--}}
+    {{--          {--}}
+    {{--              BrandModelLine.push--}}
+    {{--              ({--}}
+    {{--                  id: value.id,--}}
+    {{--                  text: value.model_line--}}
+    {{--              });--}}
+    {{--          });--}}
+    {{--          $('#fltr-model-line').select2--}}
+    {{--          ({--}}
+    {{--              placeholder: 'Choose Model Line....     Or     Type Here To Search....',--}}
+    {{--              allowClear: true,--}}
+    {{--              data: BrandModelLine--}}
+    {{--          });--}}
+    {{--          if(ModelLineIds != null)--}}
+    {{--          {--}}
+    {{--            selectedModelLines(BrandModelLine,ModelLineIds);--}}
+    {{--          }--}}
 
-            }
-          });
-       }
-    function selectedModelLines(BrandModelLine,ModelLineIds)
-    {
-      var setSelected = [];
-      for(let i=0; i<BrandModelLine.length; i++)
-      {
-        currentModelId = '';
-        currentModelId = BrandModelLine[i].id;
-        for(let j=0; j<ModelLineIds.length; j++)
-        {
-          if(ModelLineIds[j] == currentModelId)
-          {
-            setSelected.push(currentModelId);
-          }
-        }
-      }
-      $("#fltr-model-line").val(setSelected).trigger("change");
-  }
+    {{--        }--}}
+    {{--      });--}}
+    {{--   }--}}
+
     function showAddonTable()
     {
       let addonTable = document.getElementById('addonListTable');
@@ -482,15 +474,67 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     $('#serial_number').val(response.serial_number);
                     var total = parseInt(rowperpage) + parseInt(totalrecords);
                     $('#totalrecords').val(total);
+
                     $(".each-addon:last").after(response.addon_box_html).show().fadeIn("slow");
                     $(".each-addon-table-row:last").after(response.table_html).show().fadeIn("slow");
                    // checkWindowSize();
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
+                    console.log(response.model_lines);
+                    var modelLines = response.model_lines;
+                    // if(BrandIds.length > 0) {
+                        $("#fltr-model-line").html("");
+                        let BrandModelLines = [];
+                        BrandModelLines.push
+                        ({
+                            id: 'allmodellines',
+                            text: 'All Model Lines'
+                        });
+                        $.each(response.model_lines,function(key,value)
+                        {
+                            BrandModelLines.push
+                            ({
+                                id: value.id,
+                                text: value.model_line
+                            });
+                        });
+
+                        $('#fltr-model-line').select2
+                        ({
+                            placeholder: 'Choose Model Line....     Or     Type Here To Search....',
+                            allowClear: true,
+                            data: BrandModelLines
+                        });
+
+                        // if(ModelLineIds != null)
+                        // {
+                        //     selectedModelLines(BrandModelLines,ModelLineIds);
+                        // }
+                    // }
+                    // console.log(modelLines);
                     $('.overlay').hide();
+                    // model line getting
                 }
             });
         }
+
+    function selectedModelLines(BrandModelLines,ModelLineIds)
+    {
+        var setSelected = [];
+        for(let i=0; i<BrandModelLines.length; i++)
+        {
+            currentModelId = '';
+            currentModelId = BrandModelLines[i].id;
+            for(let j=0; j<ModelLineIds.length; j++)
+            {
+                if(ModelLineIds[j] == currentModelId)
+                {
+                    setSelected.push(currentModelId);
+                }
+            }
+        }
+        $("#fltr-model-line").val(setSelected).trigger("change");
+    }
   </script>
 @endsection
 

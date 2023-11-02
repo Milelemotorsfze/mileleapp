@@ -23,7 +23,7 @@ use Intervention\Image\Facades\Image;
 use App\Http\Controllers\UserActivityController;
 use Exception;
 class AddonController extends Controller {
-    public function index($data) { 
+    public function index($data) {
         $rowperpage = 12;
         $content = 'addon';
         $addonMasters = AddonDescription::with('Addon')->whereHas('Addon', function($q) use($data) {
@@ -52,7 +52,7 @@ class AddonController extends Controller {
         $addon1 = $addon1->orderBy('updated_at', 'DESC')->take($rowperpage)->get();
         $addonIds = $addon1->pluck('id');
         $addonIds = json_decode($addonIds);
-        foreach($addon1 as $addon) { 
+        foreach($addon1 as $addon) {
             $price = $totalPrice = '';
             if($addon->addon_type_name == 'P' OR $addon->addon_type_name == 'SP') {
                 $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
@@ -63,7 +63,7 @@ class AddonController extends Controller {
                 $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
                 $totalPrice = 0;
                 $totalPriceTrue = 'yes';
-                foreach($supplierAddonDetails->KitItems as $oneItem) { 
+                foreach($supplierAddonDetails->KitItems as $oneItem) {
                     if($oneItem->kit_item_total_purchase_price != 0) {
                         $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
                     }
@@ -77,7 +77,7 @@ class AddonController extends Controller {
                 else {
                     $addon->LeastPurchasePrices = '';
                 }
-            } 
+            }
         }
         return view('addon.index',compact('addon1','addonMasters','brandMatsers',
             'modelLineMasters','data','content','rowperpage','addonIds'));
@@ -160,7 +160,7 @@ class AddonController extends Controller {
         }
         foreach($addons as $addon) {
             $price = $totalPrice = '';
-            if($addon->addon_type_name == 'P' OR $addon->addon_type_name == 'SP') { 
+            if($addon->addon_type_name == 'P' OR $addon->addon_type_name == 'SP') {
                 $price = SupplierAddons::where('addon_details_id',$addon->id)->where('status','active')->orderBy('purchase_price_aed','ASC')->first();
                 $addon->LeastPurchasePrices = $price;
             }
@@ -169,7 +169,7 @@ class AddonController extends Controller {
                 $supplierAddonDetails = AddonDetails::where('id',$addon->id)->with('AddonName','AddonTypes.brands','SellingPrice','KitItems.addon.AddonDescription')->first();
                 $totalPrice = 0;
                 $totalPriceTrue = 'yes';
-                foreach($supplierAddonDetails->KitItems as $oneItem) { 
+                foreach($supplierAddonDetails->KitItems as $oneItem) {
                     if($oneItem->kit_item_total_purchase_price != 0) {
                         $totalPrice = $totalPrice + $oneItem->kit_item_total_purchase_price;
                     }
@@ -274,7 +274,7 @@ class AddonController extends Controller {
                             }
                         }
                     }
-                }               
+                }
                 if( Auth::user()->hasPermissionTo('addon-selling-price-view')) {
                     $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-selling-price-view']);
                     if($hasPermission) {
@@ -284,7 +284,7 @@ class AddonController extends Controller {
                             if($addon->SellingPrice!= null) {
                                 if($addon->SellingPrice->selling_price != '') {
                                     $html.= $addon->SellingPrice->selling_price . 'AED';
-                                } 
+                                }
                                 elseif($addon->PendingSellingPrice!= null){
                                     if($addon->PendingSellingPrice->selling_price != ''){
                                         $html.= $addon->PendingSellingPrice->selling_price .'AED
@@ -693,6 +693,18 @@ class AddonController extends Controller {
                 $data['table_html'] = $html;
             }
             $data['serial_number'] = '';
+        }
+
+        if($request->BrandIds) {
+            $modelLines = MasterModelLines::select('id', 'brand_id', 'model_line');
+            if ($request->BrandIds != '' && count($request->BrandIds) > 0) {
+                $modelLines = $modelLines->whereIn('brand_id', $request->BrandIds);
+            }
+            $modelLines = $modelLines->get();
+           $data['model_lines'] = $modelLines;
+        }else{
+            $modelLines = MasterModelLines::select('id', 'brand_id', 'model_line')->get();
+            $data['model_lines'] = $modelLines;
         }
         return response($data);
     }
@@ -2049,7 +2061,7 @@ class AddonController extends Controller {
                     $isExisting = $isExisting->where('is_all_model_lines','yes');
                     $data['model_line'] = 'allmodellines';
                 }
-                else{ 
+                else{
                     $modelLineArray = [];
                     if($request->model_line != null) {
                         $modelLineArray = $request->model_line;
