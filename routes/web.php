@@ -506,7 +506,7 @@ Route::get('/d', function () {
     Route::controller(ProformaInvoiceController::class)->group(function(){
         Route::get('/proforma_invoice/{callId}', 'proforma_invoice')->name('qoutation.proforma_invoice');
         Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
-        // Route::get('/get-model-lines/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
+        // Route::get('/get-model-descriptions/addon-booking/{brandId}/{type}', 'getaddonModels')->name('quotation.getaddonmodel');
         // Route::get('/get-booking-vehicles/{variantId}/{interiorColorId?}/{exteriorColorId?}', [BookingController::class, 'getbookingvehicles'])->name('booking.getbookingvehicles');
 
     });
