@@ -481,7 +481,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     var addonIds = response.addonIds;
                     hideModelDescription(addonIds);
                     console.log(response.model_lines);
-                    if(modelLines) {
+                    var modelLines = response.model_lines;
+                    // if(BrandIds.length > 0) {
                         $("#fltr-model-line").html("");
                         let BrandModelLines = [];
                         BrandModelLines.push
@@ -489,29 +490,27 @@ body {font-family: Arial, Helvetica, sans-serif;}
                             id: 'allmodellines',
                             text: 'All Model Lines'
                         });
-                        var modelLines = response.model_lines;
-
                         $.each(response.model_lines,function(key,value)
                         {
-                            console.log(value.id);
                             BrandModelLines.push
                             ({
                                 id: value.id,
                                 text: value.model_line
                             });
                         });
-                        console.log(BrandModelLines);
+
                         $('#fltr-model-line').select2
                         ({
                             placeholder: 'Choose Model Line....     Or     Type Here To Search....',
                             allowClear: true,
                             data: BrandModelLines
                         });
-                        if(ModelLineIds != null)
-                        {
-                            selectedModelLines(BrandModelLines,ModelLineIds);
-                        }
-                    }
+
+                        // if(ModelLineIds != null)
+                        // {
+                        //     selectedModelLines(BrandModelLines,ModelLineIds);
+                        // }
+                    // }
                     // console.log(modelLines);
                     $('.overlay').hide();
                     // model line getting

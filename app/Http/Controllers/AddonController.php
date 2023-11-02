@@ -701,6 +701,9 @@ class AddonController extends Controller {
             }
             $modelLines = $modelLines->get();
            $data['model_lines'] = $modelLines;
+        }else{
+            $modelLines = MasterModelLines::select('id', 'brand_id', 'model_line')->get();
+            $data['model_lines'] = $modelLines;
         }
         return response($data);
     }
