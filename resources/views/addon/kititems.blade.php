@@ -209,7 +209,14 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['addon-view']);
 					Name :</label>
 				</div>
 				<div class="col-lg-6 col-md-9 col-sm-12">
-					<span>{{ $supplierAddonDetails->AddonName->name}}</span>
+					<span>
+					@if($supplierAddonDetails->AddonName->name != '')
+                                            {{$supplierAddonDetails->AddonName->name}} 
+                                            @if(isset($supplierAddonDetails->AddonDescription))
+                                                @if($supplierAddonDetails->AddonDescription->description != '')- {{$supplierAddonDetails->AddonDescription->description}}@endif
+                                            @endif
+                                        @endif
+					</span>
 				</div>
 				<div class="col-lg-6 col-md-6 col-sm-12">
 					<label for="choices-single-default" class="form-label"> 
