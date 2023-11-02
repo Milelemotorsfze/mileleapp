@@ -21,6 +21,7 @@ use DB;
 use Validator;
 use Intervention\Image\Facades\Image;
 use App\Http\Controllers\UserActivityController;
+use Exception;
 class AddonController extends Controller {
     public function index($data) {
         $rowperpage = 12;
@@ -800,53 +801,55 @@ class AddonController extends Controller {
         return view('addon.create',compact('addons','brands','modelLines','suppliers','kitItemDropdown','description_id','addon_id','addon_type','addon_code',
                                             'addonDescription','submitFrom','kitBrand','kitModelLines','notAddedModelLines','vendors','kitId'));
     }
-    public function store(Request $request) {
+    public function store(Request $request) { 
         $authId = Auth::id();
-        //         $validator = Validator::make($request->all(), [
-        //             'addon_id' => 'required',
-        //             'addon_code' => 'required',
-        //             'addon_type' => 'required',
-        //             'fixing_charges_included' => 'required'
-        //             // 'purchase_price' => 'required',
-        //             // 'lead_time' => 'required',
-        //             // 'additional_remarks' => 'required',
-        //             // 'brand' => 'required',
-        //             // 'model' => 'required',
-        //             // 'image' => 'nullable|image|mimes:svg,jpeg,png,jpg,gif,bmp,tiff,jpe',
-        //             //|max:2048',
-        //             // nullable|image|max:1000
-        //             // mimes:jpeg,png,jpg,gif
-        //             // 'mimes:jpeg,bmp,png'
-        //             // mimes:jpg,jpeg,png,bmp,tiff
-        //             // max:4096'
-        //             // Use mimetypes: rule with image/jpeg that covers 3 extension variations for the jpeg format: jpg jpeg jpe.
-
-        // // Use image rule which covers jpeg, png, bmp, gif, or svg including jpeg's extension variations
-        //         ]);
-
-        //         if ($validator->fails())
-        //         {
-        //             dd('hi');
-        //             // return redirect(route('addon.create'))->withInput()->withErrors($validator);
-        //         }
-        //          else
-        //         {
-        $input = $request->all();
-        if($request->image) {
-            $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
-            $type = $request->image->getClientMimeType();
-            $size = $request->image->getSize();
-            $request->image->move(public_path('addon_image'), $fileName);
-            $input['image'] = $fileName;
-        }
+        // $validator = Validator::make($request->all(), [
+        //     'addon_type' => 'required',
+        //     'addon_code' => 'required',
+        //     'addon_id' => 'required',
+        //     'image' => 'required|image|mimes:svg,jpeg,png,jpg,gif,bmp,tiff,jpe,jfif',
+        // ]);
+        // if ($validator->fails()) {
+        //     // if($request->addon_type == 'K') {
+        //     //     $validator = Validator::make($request->all(), [
+        //     //         'brand_id' => 'required',
+        //     //         'brandModel' =>'required',
+        //     //         'mainItem' => 'required',
+        //     //     ]);
+        //     // }
+        //     // else if($request->addon_type == 'SP') {
+        //     //     $validator = Validator::make($request->all(), [
+        //     //         'fixing_charges_included' => 'required',
+        //     //         'part_number' =>'required',
+        //     //         'brand' =>'required',
+        //     //     ]);
+        //     // }
+        //     // else if($request->addon_type == 'P') {
+        //     //     $validator = Validator::make($request->all(), [
+        //     //         'fixing_charges_included' => 'required',
+        //     //     ]);
+        //     // }
+        //     if($request->addon_type == 'P' OR $request->addon_type == 'SP') {
+        //         return redirect(route('addon.create'))->withInput()->withErrors($validator);
+        //     }
+        //     else if($request->addon_type == 'K') {
+        //         return redirect(route('addon.create'))->withInput()->withErrors($validator);
+        //     }      
+        // }
+        // else {
+        try {
+            DB::beginTransaction();
+            $input = $request->all();
+            if($request->image) {
+                $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
+                $type = $request->image->getClientMimeType();
+                $size = $request->image->getSize();
+                $request->image->move(public_path('addon_image'), $fileName);
+                $input['image'] = $fileName;
+            }
             $input['addon_id'] = $request->addon_id;
             $input['currency'] = 'AED';
             $input['created_by'] = $authId;
-            // $lastAddonCode = AddonDetails::orderBy('id', 'desc')->first()->addon_code;
-            // $lastAddonCodeNumber = substr($lastAddonCode, 1, 5);
-            // $newAddonCodeNumber =  $lastAddonCodeNumber+1;
-            // $newAddonCode = "P".$newAddonCodeNumber;
-            // $input['addon_code'] = $newAddonCode;
             $masterAddonByType = Addon::where('addon_type',$request->addon_type)->pluck('id');
             if(count($masterAddonByType) > 0) {
                 $lastAddonCode = AddonDetails::where('addon_type_name',$request->addon_type)->whereIn('addon_id',$masterAddonByType)->withTrashed()->orderBy('id', 'desc')->first();
@@ -1109,6 +1112,14 @@ class AddonController extends Controller {
                                     ->with('success',$typename.' created successfully');
                 }
             }
+            DB::commit();  
+        } 
+        catch (Exception $e) {
+            DB::rollback();
+            info($e);
+            // throw $e;
+            abort(500); 
+        }
         // }
     }
     public function destroy(string $id) {

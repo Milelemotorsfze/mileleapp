@@ -385,8 +385,24 @@ $hasPermission = Auth::user()->hasPermissionForSelectedRole(['user-create','user
    $(document).ready(function ()
    {
      $('#activeUsersList').DataTable();
+     $('#activeUsersList').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
+            function ModalOpen(modalId) {
+                $('#' + modalId).addClass('modalshow');
+                $('#' + modalId).removeClass('modalhide');
+            }
      $('#inactiveUsersList').DataTable();
+     $('#inactiveUsersList').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
      $('#deletedUsersList').DataTable();
+     $('#deletedUsersList').on( 'click', '.modal-button', function () {
+                var modalId = $(this).data('modal-id');
+                ModalOpen(modalId);
+            });
      $('.modal-button').on('click', function()
      {
        var modalId = $(this).data('modal-id');
