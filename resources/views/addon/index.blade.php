@@ -480,9 +480,7 @@ var currentOnChange = '';
                                     }
                                 }
                             }
-                            console.log(setSelected);
                             $("#fltr-model-line").select2().val(setSelected).trigger('change');
-
                         }
                     }
 
