@@ -8,12 +8,14 @@ use App\Models\LetterOfIndent;
 use App\Models\LetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\PFI;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use setasign\Fpdi\PdfReader\Page;
 use setasign\Fpdi\Tcpdf\Fpdi;
+use Illuminate\Support\Facades\File;
 
 class PFIController extends Controller
 {
@@ -63,11 +65,19 @@ class PFIController extends Controller
     {
         $approevdLOI = ApprovedLetterOfIndentItem::findOrFail($request->id);
         if($request->action == 'REMOVE') {
-            $approevdLOI->pfi_id = NULL;
+            if($request->pfi_id) {
+                $approevdLOI->pfi_id = NULL;
+            }
+
             $approevdLOI->is_pfi_created = false;
         }else{
+            if($request->pfi_id) {
+                $approevdLOI->pfi_id = $request->pfi_id;
+            }
+
             $approevdLOI->is_pfi_created = true;
         }
+
         $approevdLOI->save();
 
         return response(true);
@@ -202,7 +212,88 @@ class PFIController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        (new UserActivityController)->createActivity('Updated PFI Details');
+
+        $request->validate([
+            'pfi_reference_number' => 'required',
+            'pfi_date' => 'required',
+            'amount'  => 'required',
+            'file' => 'mimes:pdf'
+        ]);
+
+        DB::beginTransaction();
+        $pfi = PFI::find($id);
+
+        $pfi->pfi_reference_number = $request->pfi_reference_number;
+        $pfi->pfi_date = Carbon::parse($request->pfi_date)->format('Y-m-d');
+        $pfi->amount = $request->amount;
+        $pfi->comment = $request->comment;
+
+        $destinationPath = 'PFI_document_withoutsign';
+        $destination = 'PFI_document_withsign';
+
+        if ($request->has('file'))
+        {
+            if (File::exists(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign))) {
+                File::delete(public_path('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign));
+            }
+            if (File::exists(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign))) {
+                File::delete(public_path('PFI_document_withsign/'.$pfi->pfi_document_with_sign));
+            }
+            $file = $request->file('file');
+            $extension = $file->getClientOriginalExtension();
+            $fileName = time().'.'.$extension;
+            $file->move($destinationPath, $fileName);
+            $pfi->pfi_document_without_sign = $fileName;
+
+            $pdf = new Fpdi();
+            $pageCount = $pdf->setSourceFile($destinationPath.'/'.$fileName);
+
+            for ($i=1; $i <= $pageCount; $i++)
+            {
+                $pdf->AddPage();
+                $tplIdx = $pdf->importPage($i);
+                $pdf->useTemplate($tplIdx);
+                if($i == $pageCount) {
+                    $pdf->Image('milele_seal.png', 80, 230, 50,35);
+                }
+            }
+
+            $signedFileName = 'signed_'.time().'.'.$extension;
+            $directory = public_path('PFI_Document_with_sign');
+            \Illuminate\Support\Facades\File::makeDirectory($directory, $mode = 0777, true, true);
+            $pdf->Output($directory.'/'.$signedFileName,'F');
+            $pfi->pfi_document_with_sign = $signedFileName;
+        }
+
+        $pfi->save();
+
+        $currentlyApprovedItems = ApprovedLetterOfIndentItem::where('letter_of_indent_id', $pfi->letter_of_indent_id)
+            ->where('is_pfi_created', true)
+            ->get();
+
+        $letterOfIndent = LetterOfIndent::find($pfi->letter_of_indent_id);
+
+        $pfiApprovedQuantity = $currentlyApprovedItems->sum('quantity');
+
+        // status change in LOI table by checking quantity of pfi created untill now
+        if($pfiApprovedQuantity == $letterOfIndent->total_loi_quantity) {
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PFI_CREATED;
+        }else{
+            $letterOfIndent->status = LetterOfIndent::LOI_STATUS_PARTIAL_PFI_CREATED;
+        }
+        $letterOfIndent->save();
+        // update pfiId FOR EACH ADDED ITEM
+        foreach ($currentlyApprovedItems as $currentlyApprovedItem)
+        {
+            $approvedLoiItem = ApprovedLetterOfIndentItem::find($currentlyApprovedItem->id);
+            $approvedLoiItem->pfi_id = $pfi->id;
+            $approvedLoiItem->save();
+        }
+
+        DB::commit();
+
+        return redirect()->route('pfi.index')->with('message', 'PFI Updated Successfully');
     }
 
     /**

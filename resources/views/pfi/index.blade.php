@@ -16,12 +16,12 @@
                         <thead class="bg-soft-secondary">
                         <tr>
                             <th>S.NO</th>
-                            <th>Date</th>
+                            <th>Created Date</th>
                             <th>Reference Number</th>
                             <th>Customer Name </th>
                             <th>Customer Country</th>
                             <th>Amount</th>
-                            <th>Released Date</th>
+                            <th>PFI Date</th>
                             <th>Comment</th>
                             <th>Status</th>
                             <th>Actions</th>

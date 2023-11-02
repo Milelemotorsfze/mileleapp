@@ -191,7 +191,7 @@
                         <div class="col-lg-3 col-md-6">
                             <div class="mb-3">
                                 <label for="choices-single-default" class="form-label">Released Date</label>
-                                <input type="date" class="form-control" value="{{ old('comment', \Carbon\Carbon::parse($pfi->comment)->format('Y-m-d') ) }}" name="pfi_date">
+                                <input type="date" class="form-control" value="{{ old('comment', $pfi->pfi_date) }}" name="pfi_date">
                             </div>
                         </div>
                         <div class="col-lg-3 col-md-6">
@@ -265,6 +265,7 @@
                 data: {
                     id: id,
                     action: action,
+                    pfi_id: '{{ $pfi->id }}'
                 },
                 success:function () {
                     location.reload();
@@ -308,7 +309,6 @@
                     required: true,
                 },
                 file:{
-                    required:true,
                     extension: 'pdf'
                 },
             },
