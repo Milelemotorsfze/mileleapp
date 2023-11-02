@@ -101,16 +101,27 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
-                                                <button type="button" class="btn btn-primary btn-sm "><i class="fa fa-edit"></i></button>
-                                            </a>
-
-        {{--                                    <a href="{{ route('letter-of-indents.generate-loi',['id' => $letterOfIndent->id ]) }}">--}}
-        {{--                                        <button type="button" class="btn btn-primary btn-sm">LOI PDF</button>--}}
-        {{--                                    </a>--}}
-        {{--                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#reject-LOI-{{$letterOfIndent->id}}">--}}
-        {{--                                        Reject--}}
-        {{--                                    </button>--}}
+                                            @can('LOI-edit')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-edit');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <a href="{{ route('letter-of-indents.edit',$letterOfIndent->id) }}">
+                                                        <button type="button" class="btn btn-primary btn-sm "><i class="fa fa-edit"></i></button>
+                                                    </a>
+                                                @endif
+                                            @endcan
+                                            @can('LOI-delete')
+                                                @php
+                                                    $hasPermission = Auth::user()->hasPermissionForSelectedRole('LOI-delete');
+                                                @endphp
+                                                @if ($hasPermission)
+                                                    <button type="button" class="btn btn-danger btn-sm loi-button-delete"
+                                                            data-id="{{ $letterOfIndent->id }}" data-url="{{ route('letter-of-indents.destroy', $letterOfIndent->id) }}">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                @endif
+                                            @endcan
                                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-loi-items-{{$letterOfIndent->id}}">
                                                 View LOI Items
                                             </button>
@@ -118,72 +129,7 @@
                                                 View LOI Docs
                                             </button>
                                         </td>
-        {{--                                <div class="modal fade" id="reject-LOI-{{$letterOfIndent->id}}"  tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
-        {{--                                    <div class="modal-dialog ">--}}
-        {{--                                        <div class="modal-content">--}}
-        {{--                                            <div class="modal-header">--}}
-        {{--                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Reject LOI</h1>--}}
-        {{--                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
-        {{--                                            </div>--}}
-        {{--                                            <div class="modal-body p-3">--}}
-        {{--                                                <div class="col-lg-12">--}}
-        {{--                                                    <div class="row">--}}
-        {{--                                                        <div class="col-12">--}}
-        {{--                                                            <div class="row mt-2">--}}
-        {{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-        {{--                                                                    <label class="form-label font-size-13 text-center">Customer</label>--}}
-        {{--                                                                </div>--}}
-        {{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-        {{--                                                                    <input type="text" value="{{  $letterOfIndent->customer->name }}" class="form-control" readonly >--}}
-        {{--                                                                </div>--}}
-        {{--                                                            </div>--}}
-        {{--                                                            <div class="row mt-2">--}}
-        {{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-        {{--                                                                    <label class="form-label font-size-13 text-muted">Category</label>--}}
-        {{--                                                                </div>--}}
-        {{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-        {{--                                                                    <input type="text" value="{{ $letterOfIndent->category }}" class="form-control" readonly >--}}
-        {{--                                                                </div>--}}
-        {{--                                                            </div>--}}
-        {{--                                                            <div class="row mt-2">--}}
-        {{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-        {{--                                                                    <label class="form-label font-size-13 text-muted">Supplier</label>--}}
-        {{--                                                                </div>--}}
-        {{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-        {{--                                                                    <input type="text" value="{{ $letterOfIndent->supplier->supplier }}" class="form-control" readonly >--}}
-        {{--                                                                </div>--}}
-        {{--                                                            </div>--}}
-        {{--                                                            <div class="row mt-2">--}}
-        {{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-        {{--                                                                    <label class="form-label font-size-13 text-muted">LOI Date</label>--}}
-        {{--                                                                </div>--}}
-        {{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-        {{--                                                                    <input type="text" value="{{ \Illuminate\Support\Carbon::parse($letterOfIndent->date)->format('Y-m-d')  }}"--}}
-        {{--                                                                           readonly class="form-control">--}}
-        {{--                                                                </div>--}}
-        {{--                                                            </div>--}}
-        {{--                                                            <div class="row mt-2">--}}
-        {{--                                                                <div class="col-lg-2 col-md-12 col-sm-12">--}}
-        {{--                                                                    <label class="form-label font-size-13 text-muted">Reason</label>--}}
-        {{--                                                                </div>--}}
-        {{--                                                                <div class="col-lg-10 col-md-12 col-sm-12">--}}
-        {{--                                                                    <textarea class="form-control" cols="75" name="review" id="review"  rows="5" required></textarea>--}}
-        {{--                                                                </div>--}}
-        {{--                                                            </div>--}}
-        {{--                                                            <input type="hidden" value="{{ $letterOfIndent->id }}" id="id">--}}
-        {{--                                                            <input type="hidden" value="{{ \App\Models\LetterOfIndent::LOI_STATUS_REJECTED }}" id="status">--}}
-        {{--                                                        </div>--}}
-        {{--                                                    </div>--}}
-        {{--                                                </div>--}}
-        {{--                                            </div>--}}
-        {{--                                            <div class="modal-footer">--}}
-        {{--                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>--}}
-        {{--                                                <button type="button" class="btn btn-primary  status-reject-button">Submit</button>--}}
 
-        {{--                                            </div>--}}
-        {{--                                        </div>--}}
-        {{--                                    </div>--}}
-        {{--                                </div>--}}
                                         <div class="modal fade" id="view-loi-items-{{$letterOfIndent->id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                                 <div class="modal-content">
@@ -958,6 +904,8 @@
                     </div>
                 </div>
             </div>
+        @endif
+    @endcan
             <script type="text/javascript">
                 $(document).ready(function () {
                     $('.status-reject-button').click(function (e) {
@@ -984,10 +932,31 @@
                             }
                         });
                     }
-                })
+                });
+                $('.loi-button-delete').on('click',function(){
+                    let id = $(this).attr('data-id');
+                    let url =  $(this).attr('data-url');
+                    var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
+                        if (e) {
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                dataType: "json",
+                                data: {
+                                    _method: 'DELETE',
+                                    id: 'id',
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success:function (data) {
+                                    location.reload();
+                                    alertify.success('LOI Deleted successfully.');
+                                }
+                            });
+                        }
+                    }).set({title:"Delete Item"})
+                });
             </script>
-        @endif
-    @endcan
+
 @endsection
 
 

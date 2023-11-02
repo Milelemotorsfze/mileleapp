@@ -21,6 +21,7 @@ use App\Models\Incident;
 use App\Models\Inspection;
 use Illuminate\Support\Facades\File;
 use App\Models\Vehicleslog;
+use App\Models\Pdi;
 use App\Models\MasterModelLines;
 
 class IncidentController extends Controller
@@ -87,6 +88,7 @@ class IncidentController extends Controller
                     'incident.type',
                     'incident.part_po_number',
                     'incident.vehicle_status',
+                    'incident.status',
                     'incident.update_remarks',
                     'incident.narration',
                     'incident.reason',
@@ -119,7 +121,8 @@ class IncidentController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('inspection', 'incident.inspection_id', '=', 'inspection.id')
-                ->where('incident.status', 'approved');
+                ->where('incident.status', 'approved')
+                ->orWhere('incident.status', 'Re Work');
                 $data = $data->groupBy('vehicles.id');
             } 
             if($status === "vehicles_repaired_confirmed")
@@ -257,7 +260,14 @@ public function showre($id)
     $model_line = MasterModelLines::find($variant->master_model_lines_id);
     $intColor = ColorCode::find($vehicle->int_colour);
     $extColor = ColorCode::find($vehicle->ex_colour);
-    return view('inspection.incidentinspection', compact('vehicle', 'brand', 'intColor', 'extColor', 'variant', 'model_line', 'Incident', 'inspection'));
+    if ($inspection->stage === "PDI") {
+        $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
+            ->where('inspection_id', $inspection->id)
+            ->get();
+    } else {
+        $PdiInspectionData = null; // Set to null if not "PDI" stage
+    }
+    return view('inspection.incidentinspection', compact('PdiInspectionData','vehicle', 'brand', 'intColor', 'extColor', 'variant', 'model_line', 'Incident', 'inspection'));
 }
 public function reinspectionsforapp(Request $request)
 {
@@ -415,4 +425,57 @@ public function updatevehicledetails(Request $request)
         Incident::create($incidentData);
         return redirect()->route('incident.index')->with('success', 'Incident Submit For Approval successfully');
     }
-}
+    public function reinspectionsforre(Request $request)
+    {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Submit the Re-inspection report for approval";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+    $currentDate = Carbon::now();
+    $Incidentid = $request->input('Incidentid');
+    foreach ($request->input('work') as $key => $work) {
+        $incidentWork = new IncidentWork();
+        $incidentWork->works = $work;
+        $incidentWork->status = $request->input('status')[$key];
+        $incidentWork->remarks = $request->input('remarks')[$key] ?? null;
+        $incidentWork->incident_id = $Incidentid;
+        $incidentWork->save();
+    }
+    $incidents = Incident::findOrFail($Incidentid);
+    $incidents->status = "Re Work";
+    $incidents->reinspection_date = $currentDate;
+    $incidents->vehicle_status = "Re Work";
+    $incidents->save();
+    return response()->json(['message' => 'Re Work Update successfully']);
+    }
+    public function getPdiInspection($incidentId)
+    {
+        $Incident = Incident::findOrFail($incidentId);
+        $inspection = Pdi::where('inspection_id', $Incident->inspection_id)->get();
+        if (!$inspection) {
+            return response()->json(['message' => 'PDI inspection not found'], 404);
+        }
+        return response()->json($inspection);
+    }
+    public function getIncidentDetails($incidentId)
+    {
+        $incident = Incident::findOrFail($incidentId);
+        return response()->json($incident);
+    }
+    public function reinspectionsforrem(Request $request)
+    {
+    $useractivities =  New UserActivities();
+        $useractivities->activity = "Re Work By Manager Incident Inspection";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $Incidentid = $request->input('incidentId'); // Get the incident ID from the request
+        // $remarks = $request->input('remarks'); // Get the remarks from the request
+        $currentDate = Carbon::now();
+        $incidents = Incident::findOrFail($Incidentid);
+        $incidents->status = "Re Work";
+        $incidents->vehicle_status = "Re Work";
+        $incidents->vehicle_status = "Re Work";
+        $incidents->save();
+        return response()->json(['message' => 'Re Work Update successfully']);
+    }
+    }

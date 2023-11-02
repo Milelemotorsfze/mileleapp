@@ -190,7 +190,7 @@
     function checkQuantity(key) {
         var selectedQuantity = $('#quantity-'+key).val();
         var variantQuantity = $('#quantity-'+key).attr('data-quantity');
-        if(selectedQuantity > variantQuantity) {
+        if(parseInt(selectedQuantity) > parseInt(variantQuantity)) {
             formValid = false;
             $('.QuantityError-'+key).text("Please Enter Quantity less than "+variantQuantity);
             $('.add-row-btn').attr('disabled', true);
@@ -198,7 +198,6 @@
             formValid = true;
             $('.QuantityError-'+key).text("");
             $('.add-row-btn').attr('disabled', false);
-
         }
     }
 

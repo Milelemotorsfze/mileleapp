@@ -949,254 +949,216 @@ class InspectionController extends Controller
        $inspection->status = "Pending";
        $inspection->vehicle_id = $vehicle_id;
        $inspection->created_by = Auth::id();
-       $inspection->remark = $request->input('remarks');
+       $inspection->remark = $request->input('pdi_remarks');
        $inspection->stage = "PDI";
        $inspection->save();
-       $delivery_sparewheel =  $request->input('delivery_sparewheel');
-       $delivery_sparewheel =  $request->input('delivery_sparewheel');
-       $dqty_sparewheel =  $request->input('dqty_sparewheel');
-       $remarks_sparewheel =  $request->input('remarks_sparewheel');
        $pdi = New Pdi();
        $pdi->checking_item = "Spare Wheel";
-       $pdi->qty = $dqty_sparewheel;
-       $pdi->remarks = $remarks_sparewheel;
-       $pdi->status = $delivery_sparewheel;
+       $pdi->reciving = $request->input('sparewheelr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving_qty = $request->input('qty_sparewheel');
-       $pdi->reciving = $request->input('recving_sparewheel');
+       $pdi->status = $request->input('sparewheel');
        $pdi->save();
-       $delivery_jack =  $request->input('delivery_jack');
-       $dqty_jack =  $request->input('dqty_jack');
-       $remarks_jack =  $request->input('remarks_jack');
        $pdi = New Pdi();
        $pdi->checking_item = "Jack";
-       $pdi->qty = $dqty_jack;
-       $pdi->remarks = $remarks_jack;
-       $pdi->status = $delivery_jack;
+       $pdi->reciving = $request->input('jackr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving_qty = $request->input('qty_jack');
-       $pdi->reciving = $request->input('recving_jack');
+       $pdi->status = $request->input('jack');
        $pdi->save();
-       $delivery_wheel =  $request->input('delivery_wheel');
-       $dqty_wheel =  $request->input('dqty_wheel');
-       $remarks_wheel =  $request->input('remarks_wheel');
        $pdi = New Pdi();
-       $pdi->checking_item = "Wheel Spanner";
-       $pdi->qty = $dqty_wheel;
-       $pdi->remarks = $remarks_wheel;
-       $pdi->status = $delivery_wheel;
+       $pdi->checking_item = "FIRST AID KIT";
+       $pdi->reciving = $request->input('firstaidr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving_qty = $request->input('qty_wheel');
-       $pdi->reciving = $request->input('recving_wheel');
+       $pdi->status = $request->input('firstaid');
        $pdi->save();
-       $delivery_firstaid =  $request->input('delivery_firstaid');
-       $dqty_firstaid =  $request->input('dqty_firstaid');
-       $remarks_firstaid =  $request->input('remarks_firstaid');
        $pdi = New Pdi();
-       $pdi->checking_item = "First Aid Kit / Packing Box";
-       $pdi->qty = $dqty_firstaid;
-       $pdi->remarks = $remarks_firstaid;
-       $pdi->status = $delivery_firstaid;
+       $pdi->checking_item = "FLOOR MAT";
+       $pdi->reciving = $request->input('floor_matr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving_qty = $request->input('qty_firstaid');
-       $pdi->reciving = $request->input('recving_firstaid');
+       $pdi->status = $request->input('floor_mat');
        $pdi->save();
-       $delivery_floor_mat =  $request->input('delivery_floor_mat');
-       $dqty_floor_mat =  $request->input('dqty_floor_mat');
-       $remarks_floor_mat =  $request->input('remarks_floor_mat');
        $pdi = New Pdi();
-       $pdi->checking_item = "Floor Mat";
-       $pdi->qty = $dqty_floor_mat;
-       $pdi->remarks = $remarks_floor_mat;
-       $pdi->status = $delivery_floor_mat;
+       $pdi->checking_item = "SERVICE BOOK & MANUAL";
+       $pdi->reciving = $request->input('service_bookr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving_qty = $request->input('qty_floor_mat');
-       $pdi->reciving = $request->input('recving_floor_mat');
+       $pdi->status = $request->input('service_book');
        $pdi->save();
-       $delivery_service_book =  $request->input('delivery_service_book');
-       $dqty_service_book =  $request->input('dqty_service_book');
-       $remarks_service_book =  $request->input('remarks_service_book');
        $pdi = New Pdi();
-       $pdi->checking_item = "Service Book & Manual";
-       $pdi->qty = $dqty_service_book;
-       $pdi->remarks = $remarks_service_book;
-       $pdi->status = $delivery_service_book;
+       $pdi->checking_item = "KEYS / QTY";
+       $pdi->reciving = $request->input('keysr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_service_book');
-       $pdi->reciving_qty = $request->input('qty_service_book');
+       $pdi->status = $request->input('keys');
        $pdi->save();
-       $delivery_keys =  $request->input('delivery_keys');
-       $dqty_keys =  $request->input('dqty_keys');
-       $remarks_keys =  $request->input('remarks_keys');
        $pdi = New Pdi();
-       $pdi->checking_item = "Keys";
-       $pdi->qty = $dqty_keys;
-       $pdi->remarks = $remarks_keys;
-       $pdi->status = $delivery_keys;
+       $pdi->checking_item = "EXTERIOR PAINT AND BODY";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_keys');
-       $pdi->reciving_qty = $request->input('qty_keys');
+       $pdi->status = $request->input('exteriorpaint');
        $pdi->save();
-       $delivery_wheelrim =  $request->input('delivery_wheelrim');
-       $dqty_wheelrim =  $request->input('dqty_wheelrim');
-       $remarks_wheelrim =  $request->input('remarks_wheelrim');
        $pdi = New Pdi();
-       $pdi->checking_item = "Wheel Rim / Tyres";
-       $pdi->qty = $dqty_wheelrim;
-       $pdi->remarks = $remarks_wheelrim;
-       $pdi->status = $delivery_wheelrim;
+       $pdi->checking_item = "INTERIOR & UPHOLSTERY";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_wheelrim');
-       $pdi->reciving_qty = $request->input('qty_wheelrim');
+       $pdi->status = $request->input('interior');
        $pdi->save();
-       $delivery_fire_extinguisher =  $request->input('delivery_fire_extinguisher');
-       $dqty_fire_extinguisher =  $request->input('dqty_fire_extinguisher');
-       $remarks_fire_extinguisher =  $request->input('remarks_fire_extinguisher');
        $pdi = New Pdi();
-       $pdi->checking_item = "Fire Extinguisher";
-       $pdi->qty = $dqty_fire_extinguisher;
-       $pdi->remarks = $remarks_fire_extinguisher;
-       $pdi->status = $delivery_fire_extinguisher;
+       $pdi->checking_item = "WHEEL RIM / TYRES";
+       $pdi->reciving = $request->input('wheelrimr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_fire_extinguisher');
-       $pdi->reciving_qty = $request->input('qty_fire_extinguisher');
+       $pdi->status = $request->input('wheelrim');
        $pdi->save();
-       $delivery_sd_card =  $request->input('delivery_sd_card');
-       $dqty_sd_card =  $request->input('dqty_sd_card');
-       $remarks_sd_card =  $request->input('remarks_sd_card');
        $pdi = New Pdi();
-       $pdi->checking_item = "SD Card / Remote /  H Phones";
-       $pdi->qty = $dqty_sd_card;
-       $pdi->remarks = $remarks_sd_card;
-       $pdi->status = $delivery_sd_card;
+       $pdi->checking_item = "FIRE EXTINGUISHER";
+       $pdi->reciving = $request->input('fire_extinguisherr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_sd_card');
-       $pdi->reciving_qty = $request->input('qty_sd_card');
+       $pdi->status = $request->input('fire_extinguisher');
        $pdi->save();
-       $delivery_ac_system =  $request->input('delivery_ac_system');
-       $dqty_ac_system =  $request->input('dqty_ac_system');
-       $remarks_ac_system =  $request->input('remarks_ac_system');
+       $pdi = New Pdi();
+       $pdi->checking_item = "SD Card / Remote / H Phones";
+       $pdi->reciving = $request->input('sd_cardr');
+       $pdi->vehicle_id = $vehicle_id;
+       $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('sd_card');
+       $pdi->save();
        $pdi = New Pdi();
        $pdi->checking_item = "A/C System";
-       $pdi->qty = $dqty_ac_system;
-       $pdi->remarks = $remarks_ac_system;
-       $pdi->status = $delivery_ac_system;
+       $pdi->reciving = $request->input('ac_systemr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_ac_system');
-       $pdi->reciving_qty = $request->input('qty_ac_system');
+       $pdi->status = $request->input('ac_system');
        $pdi->save();
-       $delivery_dash_board =  $request->input('delivery_dash_board');
-       $dqty_dash_board =  $request->input('dqty_dash_board');
-       $remarks_dash_board =  $request->input('remarks_dash_board');
        $pdi = New Pdi();
-       $pdi->checking_item = "Dash Board / T Screen / LCD";
-       $pdi->qty = $dqty_dash_board;
-       $pdi->remarks = $remarks_dash_board;
-       $pdi->status = $delivery_dash_board;
+       $pdi->checking_item = "DASHBOARD / T SCREEN / LCD";
+       $pdi->reciving = $request->input('dash_boardr');
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
-       $pdi->reciving = $request->input('recving_dash_board');
-       $pdi->reciving_qty = $request->input('qty_dash_board');
+       $pdi->status = $request->input('dash_board');
        $pdi->save();
-       $delivery_paint =  $request->input('delivery_paint');
-       $dqty_paint =  $request->input('dqty_paint');
-       $remarks_paint =  $request->input('remarks_paint');
        $pdi = New Pdi();
-       $pdi->checking_item = "Exterior Paint & Body";
-       $pdi->qty = $dqty_paint;
-       $pdi->remarks = $remarks_paint;
-       $pdi->status = $delivery_paint;
+       $pdi->checking_item = "CAMERA";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('camera');
        $pdi->save();
-       $delivery_interior =  $request->input('delivery_interior');
-       $dqty_interior =  $request->input('dqty_interior');
-       $remarks_interior =  $request->input('remarks_interior');
        $pdi = New Pdi();
-       $pdi->checking_item = "Interior & Upholstery";
-       $pdi->qty = $dqty_interior;
-       $pdi->remarks = $remarks_interior;
-       $pdi->status = $delivery_interior;
+       $pdi->checking_item = "STICKER REMOVAL";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('sticker');
        $pdi->save();
-       $delivery_camera =  $request->input('delivery_camera');
-       $dqty_camera =  $request->input('dqty_camera');
-       $remarks_camera =  $request->input('remarks_camera');
        $pdi = New Pdi();
-       $pdi->checking_item = "Camera";
-       $pdi->qty = $dqty_camera;
-       $pdi->remarks = $remarks_camera;
-       $pdi->status = $delivery_camera;
+       $pdi->checking_item = "PACKING BOX";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('packingbox');
        $pdi->save();
-       $delivery_sticker_removal =  $request->input('delivery_sticker_removal');
-       $dqty_sticker_removal =  $request->input('dqty_sticker_removal');
-       $remarks_sticker_removal =  $request->input('remarks_sticker_removal');
        $pdi = New Pdi();
-       $pdi->checking_item = "Sticker Removal";
-       $pdi->qty = $dqty_sticker_removal;
-       $pdi->remarks = $remarks_sticker_removal;
-       $pdi->status = $delivery_sticker_removal;
+       $pdi->checking_item = "PHOTOS 6 Nos";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('photo');
        $pdi->save();
-       $delivery_packing =  $request->input('delivery_packing');
-       $dqty_packing =  $request->input('dqty_packing');
-       $remarks_packing =  $request->input('remarks_packing');
        $pdi = New Pdi();
-       $pdi->checking_item = "Un Packing / Fitment / PDI";
-       $pdi->qty = $dqty_packing;
-       $pdi->remarks = $remarks_packing;
-       $pdi->status = $delivery_packing;
+       $pdi->checking_item = "FUEL / BATTERY";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('fuel');
        $pdi->save();
-       $delivery_fuel =  $request->input('delivery_fuel');
-       $dqty_fuel =  $request->input('dqty_fuel');
-       $remarks_fuel =  $request->input('remarks_fuel');
        $pdi = New Pdi();
-       $pdi->checking_item = "Fuel / Battery";
-       $pdi->qty = $dqty_fuel;
-       $pdi->remarks = $remarks_fuel;
-       $pdi->status = $delivery_fuel;
+       $pdi->checking_item = "UNDER HOOD INSPECTION";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('under_hood');
        $pdi->save();
-       $delivery_under_hood =  $request->input('delivery_under_hood');
-       $dqty_under_hood =  $request->input('dqty_under_hood');
-       $remarks_under_hood =  $request->input('remarks_under_hood');
        $pdi = New Pdi();
-       $pdi->checking_item = "Under Hood Inspection";
-       $pdi->qty = $dqty_under_hood;
-       $pdi->remarks = $remarks_under_hood;
-       $pdi->status = $delivery_under_hood;
+       $pdi->checking_item = "OILS AND FLUIDS LEVELS INSPECTION";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('oil');
        $pdi->save();
-       $delivery_oil =  $request->input('delivery_oil');
-       $dqty_oil =  $request->input('dqty_oil');
-       $remarks_oil =  $request->input('remarks_oil');
        $pdi = New Pdi();
-       $pdi->checking_item = "Oils and Fluids Levels Inspection";
-       $pdi->qty = $dqty_oil;
-       $pdi->remarks = $remarks_oil;
-       $pdi->status = $delivery_oil;
+       $pdi->checking_item = "ALL FUNCTIONS OPERATIONS AS PER PO";
        $pdi->vehicle_id = $vehicle_id;
        $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('funcationpo');
        $pdi->save();
+       $pdi = New Pdi();
+       $pdi->checking_item = "CLEANING AND WASHING";
+       $pdi->vehicle_id = $vehicle_id;
+       $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('washing');
+       $pdi->save();
+       $pdi = New Pdi();
+       $pdi->checking_item = "OTHER REMARKS";
+       $pdi->vehicle_id = $vehicle_id;
+       $pdi->inspection_id = $inspection->id;
+       $pdi->status = $request->input('otherremarks');
+       $pdi->save();
+       $isIncidentChecked = $request->has('enableInputsincludent');
+       if ($isIncidentChecked) {
+           $canvasImageDataURL = $request->input('canvas_image');
+           $canvasImageData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $canvasImageDataURL));
+           $filename = 'canvas_image_' . uniqid() . '.png';
+           $directory = public_path('qc');
+           File::makeDirectory($directory, $mode = 0777, true, true);
+           File::put($directory . '/' . $filename, $canvasImageData);
+       $reasons = [
+           'overspeed',
+           'weather',
+           'vehicle_defects',
+           'negligence',
+           'sudden_halt',
+           'road_defects',
+           'fatigue',
+           'no_safety_distance',
+           'using_gsm',
+           'overtaking',
+           'wrong_action',
+       ];
+       $selectedReasons = [];
+       foreach ($reasons as $reason) {
+           if ($request->has($reason)) {
+               $selectedReasons[] = $reason;
+           }
+       }
+           $incidentData = [
+               'vehicle_id' => $vehicle_id,
+               'type' => $request->input('incidenttype'),
+               'narration' => $request->input('narration'),
+               'detail' => $request->input('damageDetails'),
+               'driven_by' => $request->input('drivenBy'),
+               'responsivity' => $request->input('responsibility'),
+               'inspection_id' => $inspection->id,
+               'file_path' => $filename,
+               'created_by' => Auth::id(),
+               'status' => "Pending",
+               'reason' => implode(', ', $selectedReasons),
+           ];
+           Incident::create($incidentData);
+       }
        return redirect()->route('inspection.index')->with('success', 'Vehicle PDI successfully Submit For Approval');
+    }
+    public function pdiinspectionf($id) 
+    {
+    $itemsWithQuantities = VehicleExtraItems::where('vehicle_id', $id)
+            ->select('item_name', 'qty')
+            ->get();
+            $vehicleDetails = DB::table('vehicles')
+            ->join('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
+            ->join('color_codes as int_color', 'vehicles.int_colour', '=', 'int_color.id')
+            ->join('color_codes as ex_color', 'vehicles.ex_colour', '=', 'ex_color.id')
+            ->join('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
+            ->join('brands', 'varaints.brands_id', '=', 'brands.id')
+            ->where('vehicles.id', $id)
+            ->select('vehicles.id', 'vehicles.vin', 'vehicles.varaints_id', 'master_model_lines.model_line', 'int_color.name as int_colour_name','ex_color.name as ex_colour_name', 'brands.brand_name')
+            ->first();
+    return view('inspection.pdivehicleview', compact('itemsWithQuantities', 'vehicleDetails'));
     }
 }

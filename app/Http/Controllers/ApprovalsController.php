@@ -43,6 +43,7 @@ class ApprovalsController extends Controller
             if($status == "reparingapproval"){
                 $data = Incident::select( [
                     'incident.id as incidentsnumber',
+                    'users.name as created_by_name',
                     'incident.type',
                     'incident.part_po_number',
                     'incident.update_remarks',
@@ -75,12 +76,14 @@ class ApprovalsController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('inspection', 'incident.inspection_id', '=', 'inspection.id')
+                ->leftJoin('users', 'inspection.created_by', '=', 'users.id')
                 ->where('incident.status', 'repairingapproval');
                 $data = $data->groupBy('vehicles.id');
             }
             else{
             $data = Inspection::select( [
                 'inspection.id',
+                'users.name as created_by_name',
                     'inspection.vehicle_id',
                     'inspection.reinspection_remarks',
                     'inspection.stage',
@@ -116,6 +119,7 @@ class ApprovalsController extends Controller
                 ->leftJoin('varaints', 'vehicles.varaints_id', '=', 'varaints.id')
                 ->leftJoin('master_model_lines', 'varaints.master_model_lines_id', '=', 'master_model_lines.id')
                 ->leftJoin('brands', 'varaints.brands_id', '=', 'brands.id')
+                ->leftJoin('users', 'inspection.created_by', '=', 'users.id')
                 ->where('inspection.status', $status);
                 $data = $data->groupBy('vehicles.id');
             }
@@ -691,7 +695,7 @@ class ApprovalsController extends Controller
         $useractivities->activity = "Open The PDI Inspection";
         $useractivities->users_id = Auth::id();
         $useractivities->save();
-        $PdiInspectionData = Pdi::select('checking_item', 'qty', 'remarks', 'status', 'reciving', 'reciving_qty')
+        $PdiInspectionData = Pdi::select('checking_item', 'reciving', 'status')
                             ->where('inspection_id', $vehicleId)
                             ->get();
         $inspection = Inspection::find($vehicleId);
@@ -703,6 +707,7 @@ class ApprovalsController extends Controller
         ->leftJoin('warehouse', 'vehicles.latest_location', '=', 'warehouse.id')
         ->where('vehicles.id', $inspection->vehicle_id)
         ->first();
+        $incidentDetails = Incident::where('inspection_id', $inspection->id)->first();
         $vehicle = Vehicles::find($inspection->vehicle_id);
         $grnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN')->pluck('vehicle_picture_link')->first();
         $secgrnpicturelink = VehiclePicture::where('vehicle_id', $inspection->vehicle_id)->where('category', 'GRN-2')->pluck('vehicle_picture_link')->first();
@@ -717,6 +722,8 @@ class ApprovalsController extends Controller
             'PDIpicturelink' => $PDIpicturelink,
             'modificationpicturelink' => $modificationpicturelink,
             'Incidentpicturelink' => $Incidentpicturelink,
+            'incidentDetails' => $incidentDetails,
+            'remarks' => $inspection,
         ]);
     }
     public function approvalspdi(Request $request)
@@ -751,5 +758,27 @@ class ApprovalsController extends Controller
             $vehicles->save();
             event(new DataUpdatedEvent(['id' => $inspection->vehicle_id, 'message' => "Data Update"]));
         return response()->json(['message' => 'Data saved successfully']);
+    }
+    public function approvedincidentsonly(Request $request)
+    {
+        $useractivities =  New UserActivities();
+        $useractivities->activity = "Approved The PDI Incident Only";
+        $useractivities->users_id = Auth::id();
+        $useractivities->save();
+        $dubaiTimeZone = CarbonTimeZone::create('Asia/Dubai');
+        $currentDateTime = Carbon::now($dubaiTimeZone);
+        $currentDate = Carbon::now();
+        $inspectionId = $request->input('inspectionid');
+        $remarks = $request->input('remarks');
+        $inspection = Inspection::find($inspectionId);
+        $inspection->status = 'PDI Incident Approved';
+        $inspection->processing_date = $currentDate;
+        $inspection->process_remarks = $remarks;
+        $inspection->save();
+        $incident = Incident::where('inspection_id', $inspectionId)->first();
+        $incident->status = 'Approved';
+        $incident->reported_date = $currentDate;
+        $incident->save();
+        return response()->json(['message' => 'Incident Approved successfully']);
     }
 }

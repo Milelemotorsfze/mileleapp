@@ -17,7 +17,7 @@
 <div class="card-header">
     <h4 class="card-title">
      Re Inspection
-     <a style="float: right;" class="btn btn-sm btn-info" href="{{ route('approvalsinspection.index') }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
+     <a style="float: right;" class="btn btn-sm btn-info" href="{{ url()->previous() }}" text-align: right><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</a>
     </h4>
     <br>
 </div>
@@ -247,6 +247,47 @@
                     {{$Incident->update_remarks ?? ''}}
 </div>
 </div>
+@if($inspection->stage == "PDI")
+<div>
+<button id="togglePdiDetails" class="btn btn-primary" data-toggle="collapse" data-target="#pdiInspectionDetails">
+    Show/Hide PDI Report <i class="fas fa-chevron-down"></i>
+</button>
+<br>
+</div>
+<div id="pdiInspectionDetails" style="display: none;">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Check List Items</th>
+                <th>Receiving</th>
+                <th>Delivery</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($PdiInspectionData as $item)
+                <tr>
+                    <td>{{ $item->checking_item }}</td>
+                    <td>{{ $item->receiving }}</td>
+                    <td>{{ $item->status }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+<div class="row">
+    <div class="col-lg-12">
+        <strong>PDI Remarks</strong>
+        <br>
+        {{$inspection->remark}}
+    </div>
+    <br>
+    <div class="col-lg-12">
+        <strong>Manager Remarks</strong>
+        <br>
+        {{$inspection->process_remarks}}
+    </div>
+</div>
+</div>
+@endif
 <hr>
 <form method="post" action="{{ route('incident.reinspectionsforapp') }}">
     @csrf
@@ -278,6 +319,7 @@
         </br>
         <button type="button" id="addRow" class="btn btn-primary">Add Row</button>
         <button  style="float: right; margin-right: 10px;" type="submit" class="btn btn-success">Submit</button>
+        <button id="reworkButton" style="float: right; margin-right: 10px;" type="button" class="btn btn-warning">Re Work</button>
 </form>
 </div>
 @endsection
@@ -410,6 +452,30 @@
 
             layer.add(background);
             layer.batchDraw();
+        });
+    });
+    $(document).ready(function() {
+        $("#togglePdiDetails").click(function() {
+            $("#pdiInspectionDetails").toggle();
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $("#reworkButton").click(function() {
+            var formData = $("form").serialize();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('incident.reinspectionsforre') }}",
+                data: formData,
+                success: function(response) {
+                    alertify.success('Re Work Update successfully');
+                    window.location.href = "{{ route('incident.index') }}";
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
         });
     });
 </script>

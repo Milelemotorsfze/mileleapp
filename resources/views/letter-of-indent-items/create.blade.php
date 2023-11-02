@@ -293,7 +293,7 @@
             let id = $(this).attr('data-id');
             let url =  $(this).attr('data-url');
             var confirm = alertify.confirm('Are you sure you want to Delete this item ?',function (e) {
-                alert(id);
+
                 if (e) {
                     $.ajax({
                         type: "POST",
