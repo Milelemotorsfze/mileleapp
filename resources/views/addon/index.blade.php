@@ -216,7 +216,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
  @endcanany
   <script type="text/javascript">
     var brandMatsers = {!! json_encode($brandMatsers) !!};
-
+var currentOnChange = '';
     $(document).ready(function ()
     {
       // console.log(addon[0]);
@@ -227,6 +227,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       $("#fltr-model-line").attr("data-placeholder","Choose Model Line....     Or     Type Here To Search....");
       $("#fltr-model-line").select2();
       $('#fltr-addon-code').change(function(e) {
+        currentOnChange = 'addon_code';
           var start = 0;
           var totalrecords = 0;
 
@@ -241,6 +242,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
           }
       });
       $('#fltr-brand').change(function(e) {
+        currentOnChange = 'brand';
           var BrandIds = $(this).val();
           var totalrecords = 0;
           var start = 0;
@@ -283,6 +285,7 @@ body {font-family: Arial, Helvetica, sans-serif;}
       });
 
       $('#fltr-model-line').change(function(e) {
+        currentOnChange = 'model_line';
           e.preventDefault();
             // set total record and start = 0
           var start = 0;
@@ -483,6 +486,8 @@ body {font-family: Arial, Helvetica, sans-serif;}
                     // console.log(response.model_lines);
                     var modelLines = response.model_lines;
                     // if(BrandIds.length > 0) {
+                        // alert(currentOnChange);
+                        if(currentOnChange == 'brand') {
                         $("#fltr-model-line").html("");
                         let BrandModelLines = [];
                         BrandModelLines.push
@@ -524,10 +529,11 @@ body {font-family: Arial, Helvetica, sans-serif;}
                                 }
                             }
                             console.log(setSelected);
-                            $("#fltr-model-line").select2().val(5).trigger('change');
-                            // $("#fltr-model-line").val(5).trigger("change");
-                            // selectedModelLines(BrandModelLines,ModelLineIds);
+                            $("#fltr-model-line").select2().val(setSelected).trigger('change');
+                            // 
+                            // selectedModelLines(setSelected);
                         }
+                    }
                     // }
                     // console.log(modelLines);
                     $('.overlay').hide();
