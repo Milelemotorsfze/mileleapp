@@ -837,8 +837,8 @@ class AddonController extends Controller {
         //     }      
         // }
         // else {
-        // try {
-        //     DB::beginTransaction();
+        try {
+            DB::beginTransaction();
             $input = $request->all();
             if($request->image) {
                 $fileName = auth()->id() . '_' . time() . '.'. $request->image->extension();
@@ -1112,14 +1112,14 @@ class AddonController extends Controller {
                                     ->with('success',$typename.' created successfully');
                 }
             }
-        //     DB::commit();  
-        // } 
-        // catch (Exception $e) {
-        //     DB::rollback();
-        //     info($e);
-        //     // throw $e;
-        //     abort(500); 
-        // }
+            DB::commit();  
+        } 
+        catch (Exception $e) {
+            DB::rollback();
+            info($e);
+            // throw $e;
+            abort(500); 
+        }
         // }
     }
     public function destroy(string $id) {
