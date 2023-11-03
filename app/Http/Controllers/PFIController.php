@@ -63,7 +63,8 @@ class PFIController extends Controller
     }
     public function addPFI(Request $request)
     {
-        $approevdLOI = ApprovedLetterOfIndentItem::findOrFail($request->id);
+        $approevdLOI = ApprovedLetterOfIndentItem::with('letterOfIndentItem.masterModel.variant')
+        ->findOrFail($request->id);
         if($request->action == 'REMOVE') {
             if($request->pfi_id) {
                 $approevdLOI->pfi_id = NULL;
@@ -80,7 +81,7 @@ class PFIController extends Controller
 
         $approevdLOI->save();
 
-        return response(true);
+        return response($approevdLOI);
     }
     /**
      * Store a newly created resource in storage.
