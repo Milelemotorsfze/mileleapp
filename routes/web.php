@@ -66,6 +66,8 @@ use App\Http\Controllers\ModificationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProformaInvoiceController;
 use App\Http\Controllers\ApprovalAwaitingController;
+use App\Http\Controllers\ShippingController;
+
 
 /*
 /*
@@ -507,6 +509,8 @@ Route::get('/d', function () {
     Route::resource('logisticsdocuments', DocumentController::class);
     Route::post('logisticsdocuments/sending', [DocumentController::class, 'updatedoc'])->name('logisticsdocuments.updatedoc');
     Route::post('logisticsdocuments/sendingbl', [DocumentController::class, 'updatedocbl'])->name('logisticsdocuments.updatedocbl');
+    Route::resource('Shipping', ShippingController::class);
+    Route::post('shipping/updateprice', [ShippingController::class, 'updateprice'])->name('shipping.updateprice');
 
     //Profoma Invoice
     Route::controller(ProformaInvoiceController::class)->group(function(){
