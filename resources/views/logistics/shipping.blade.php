@@ -188,7 +188,7 @@
                         return 'S-' + data.toString().padStart(3, '0');
                     }
                 },
-                { data: 'category', name: 'shipping_charges.category' },
+                { data: 'name', name: 'shipping_charges.name' },
                 { data: 'description', name: 'shipping_charges.description' },
                 { data: 'price', name: 'shipping_charges.price' },
                 {
@@ -213,7 +213,7 @@
                         return 'DP-' + data.toString().padStart(3, '0');
                     }
                 },
-                { data: 'category', name: 'shipping_documents.category' },
+                { data: 'name', name: 'shipping_documents.name' },
                 { data: 'description', name: 'shipping_documents.description' },
                 { data: 'price', name: 'shipping_documents.price' },
                 {
@@ -238,7 +238,7 @@
                         return 'D-' + data.toString().padStart(3, '0');
                     }
                 },
-                { data: 'category', name: 'shipping_certification.category' },
+                { data: 'name', name: 'shipping_certification.name' },
                 { data: 'description', name: 'shipping_certification.description' },
                 { data: 'price', name: 'shipping_certification.price' },
                 {
