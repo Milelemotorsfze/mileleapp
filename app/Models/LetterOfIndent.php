@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LetterOfIndent extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     public const LOI_CATEGORY_REAL = "Real";
     public const LOI_CATEGORY_SPECIAL = "Special";
     public const LOI_SUBMISION_STATUS_NEW = "New";

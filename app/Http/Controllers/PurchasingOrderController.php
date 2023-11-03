@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ApprovedLetterOfIndentItem;
 use App\Models\LOIItemPurchaseOrder;
 use App\Models\MasterModel;
+use App\Models\PFI;
 use App\Models\PurchasingOrder;
 use App\Models\PurchasingOrderItems;
 use App\Models\SupplierInventory;
@@ -307,7 +308,11 @@ class PurchasingOrderController extends Controller
                 $loiItemsOfPurcahseOrders = $request->approved_loi_ids;
                 $variantsQuantity = array_count_values($variantNames);
                 foreach($loiItemsOfPurcahseOrders as $key => $loiItemsOfPurchaseOrder) {
+
                     $approvedLoiItem = ApprovedLetterOfIndentItem::Find($loiItemsOfPurchaseOrder);
+                    $pfi = PFI::find($approvedLoiItem->pfi_id);
+                    $pfi->status = 'PO Initiated';
+                    $pfi->save();
                     $variant = $approvedLoiItem->letterOfIndentItem->masterModel->variant->name;
                     $loiPurchaseOrder = new LOIItemPurchaseOrder();
                     $loiPurchaseOrder->approved_loi_id = $loiItemsOfPurchaseOrder;
