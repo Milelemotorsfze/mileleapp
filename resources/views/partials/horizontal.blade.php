@@ -248,7 +248,6 @@
                                                 <a href="{{ route('kit.create') }}" class="dropdown-item" data-key="t-login">Create Kit</a>
                                                 @endif
                                                 @endcan
-
                                                 @canany(['addon-create','accessories-list','spare-parts-list','kit-list'])
                                                 @php
                                                 $hasPermission = Auth::user()->hasPermissionForSelectedRole(['accessories-list','spare-parts-list','kit-list']);
@@ -844,11 +843,24 @@
                             $hasPermission = Auth::user()->hasPermissionForSelectedRole(['document-edit']);
                         @endphp
                         @if ($hasPermission)
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle arrow-none" href="{{ route('logisticsdocuments.index') }}" id="topnav-more" role="button">
+                        <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle arrow-none" href="#" id="topnav-more" role="button">
                                     <i data-feather="list"></i>
-                                    <span data-key="t-extra-pages">Documents</span>
+                                    <span data-key="t-extra-pages">Logistics</span>
+                                    <div class="arrow-down"></div>
                                 </a>
+                                <div class="dropdown-menu" aria-labelledby="topnav-more">
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('logisticsdocuments.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Update Status</span>
+                                            </a>
+                                        </div>
+                                        <div class="dropdown">
+                                            <a class="dropdown-item dropdown-toggle arrow-none" href="{{ route('Shipping.index') }}" id="topnav-utility" role="button">
+                                                <span data-key="t-utility"> Addons</span>
+                                            </a>
+                                        </div>
+                                </div>
                             </li>
                             @endif
                             @php
