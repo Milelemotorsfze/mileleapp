@@ -28,7 +28,7 @@ class ShippingController extends Controller
             if ($status === "Shipping") {
                 $data = Shipping::select([
                     'shipping_charges.id',
-                    'shipping_charges.category',
+                    'shipping_charges.name',
                     'shipping_charges.description',
                     'shipping_charges.price',
                     'shipping_charges.created_by',
@@ -39,7 +39,7 @@ class ShippingController extends Controller
             else if ($status === "Shipping_document") {
                 $data = ShippingDocuments::select([
                     'shipping_documents.id',
-                    'shipping_documents.category',
+                    'shipping_documents.name',
                     'shipping_documents.description',
                     'shipping_documents.price',
                     'shipping_documents.created_by',
@@ -50,7 +50,7 @@ class ShippingController extends Controller
             else if ($status === "certification") {
                 $data = ShippingCertification::select([
                     'shipping_certification.id',
-                    'shipping_certification.category',
+                    'shipping_certification.name',
                     'shipping_certification.description',
                     'shipping_certification.price',
                     'shipping_certification.created_by',
@@ -105,7 +105,7 @@ class ShippingController extends Controller
         $description = $request->input('description');
         if($category == "Shipping"){
         $shipping = New Shipping;
-        $shipping->category = $addon_name;
+        $shipping->name = $addon_name;
         $shipping->description = $description;
         $shipping->price = $price;
         $shipping->created_by = Auth::id();
@@ -113,7 +113,7 @@ class ShippingController extends Controller
         }
         else if($category == "Shipping Documents"){
             $shippingdoc = New ShippingDocuments;
-            $shippingdoc->category = $addon_name;
+            $shippingdoc->name = $addon_name;
             $shippingdoc->description = $description;
             $shippingdoc->price = $price;
             $shippingdoc->created_by = Auth::id();
@@ -121,7 +121,7 @@ class ShippingController extends Controller
         }
         else if($category == "Certificates"){
             $shippingcert = New ShippingCertification;
-            $shippingcert->category = $addon_name;
+            $shippingcert->name = $addon_name;
             $shippingcert->description = $description;
             $shippingcert->price = $price;
             $shippingcert->created_by = Auth::id();
