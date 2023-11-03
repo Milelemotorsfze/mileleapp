@@ -42,30 +42,29 @@
                                 <td>{{ $pfi->comment }}</td>
                                 <td>{{$pfi->status }}</td>
                                 <td>
-                                    {{--                                    @if($pfi->status == 'New')--}}
-                                    @can('PFI-delete')
-                                        @php
-                                            $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-delete');
-                                        @endphp
-                                        @if ($hasPermission)
-                                            <button type="button" class="btn btn-danger btn-sm pfi-button-delete"
-                                                    data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        @endif
-                                    @endcan
-                                    {{--                                        @can('PFI-edit')--}}
-                                    {{--                                            @php--}}
-                                    {{--                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-edit');--}}
-                                    {{--                                            @endphp--}}
-                                    {{--                                            @if ($hasPermission)--}}
-                                    <a class="btn btn-primary btn-sm" href="{{ route('pfi.edit', $pfi->id) }}">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-                                    {{--                                            @endif--}}
-                                    {{--                                        @endcan--}}
-
-                                    {{--                                    @endif--}}
+                                    @if($pfi->status == 'New')
+                                        @can('pfi-delete')
+                                            @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-delete');
+                                            @endphp
+                                            @if ($hasPermission)
+                                                <button type="button" class="btn btn-danger btn-sm pfi-button-delete"
+                                                        data-id="{{ $pfi->id }}" data-url="{{ route('pfi.destroy', $pfi->id) }}">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            @endif
+                                        @endcan
+                                        @can('pfi-edit')
+                                            @php
+                                                $hasPermission = Auth::user()->hasPermissionForSelectedRole('PFI-edit');
+                                            @endphp
+                                            @if ($hasPermission)
+                                            <a class="btn btn-primary btn-sm" href="{{ route('pfi.edit', $pfi->id) }}">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                            @endif
+                                        @endcan
+                                    @endif
                                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#view-pfi-docs-{{$pfi->id}}">
                                         View Docs
                                     </button>

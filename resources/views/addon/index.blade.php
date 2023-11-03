@@ -336,50 +336,7 @@ var currentOnChange = '';
       $('.modal').removeClass('modalshow');
       $('.modal').addClass('modalhide');
     }
-    function getRelatedModelLines(BrandIds)
-       {
-           if($(window).scrollTop() + $(window).height() >= $(document).height()) {
-               fetchData(0,0);
-               // $('.page-overlay').show();
-           }
-          var ModelLineIds = $('#fltr-model-line').val();
-          $.ajax({
-            url:"{{url('getRelatedModelLines')}}",
-            data: {
-                BrandIds: BrandIds,
-            },
-            dataType: 'json',
-            success: function(response){
-              // console.log(response);
-              $("#fltr-model-line").html("");
-              let BrandModelLine   = [];
-              BrandModelLine.push
-                  ({
-                      id: 'allmodellines',
-                      text: 'All Model Lines'
-                  });
-              $.each(response,function(key,value)
-              {
-                  BrandModelLine.push
-                  ({
-                      id: value.id,
-                      text: value.model_line
-                  });
-              });
-              $('#fltr-model-line').select2
-              ({
-                  placeholder: 'Choose Model Line....     Or     Type Here To Search....',
-                  allowClear: true,
-                  data: BrandModelLine
-              });
-              if(ModelLineIds != null)
-              {
-                selectedModelLines(BrandModelLine,ModelLineIds);
-              }
 
-            }
-          });
-       }
 
     function showAddonTable()
     {
@@ -485,8 +442,7 @@ var currentOnChange = '';
                     hideModelDescription(addonIds);
                     // console.log(response.model_lines);
                     var modelLines = response.model_lines;
-                    // if(BrandIds.length > 0) {
-                        // alert(currentOnChange);
+
                         if(currentOnChange == 'brand') {
                         $("#fltr-model-line").html("");
                         let BrandModelLines = [];
@@ -507,12 +463,8 @@ var currentOnChange = '';
                         ({
                             placeholder: 'Choose Model Line....     Or     Type Here To Search....',
                             allowClear: true,
-                            data: BrandModelLines
+                            data: BrandModelLines,
                         });
-                    // }
-                    // $("#fltr-model-line option:selected").prop("selected", true);
-                    // $("#fltr-model-line").trigger('change.select2');
-                    //     $("#fltr-model-line").val(ModelLineIds).trigger("change");
                         if(ModelLineIds != null)
                         {
                             var setSelected = [];
@@ -528,24 +480,15 @@ var currentOnChange = '';
                                     }
                                 }
                             }
-                            console.log(setSelected);
                             $("#fltr-model-line").select2().val(setSelected).trigger('change');
-                            // 
-                            // selectedModelLines(setSelected);
                         }
                     }
-                    // }
-                    // console.log(modelLines);
+
                     $('.overlay').hide();
-                    // model line getting
+
                 }
             });
         }
-
-    function selectedModelLines(BrandModelLines,ModelLineIds)
-    {
-
-    }
   </script>
 @endsection
 

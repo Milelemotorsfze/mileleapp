@@ -536,12 +536,12 @@
             ajax: "{{ route('approvalsinspection.index', ['status' => 'reparingapproval']) }}",
             columns: [
                 { data: 'incidentsnumber', name: 'incident.id' },
-                { data: 'created_by_name', name: 'users.name' },
                 { data: 'update_remarks', name: 'incident.update_remarks' },
                 { data: 'part_po_number', name: 'incident.part_po_number' },
                 { data: 'po_number', name: 'purchasing_order.po_number' },
                 { data: 'vin', name: 'vehicles.vin' },
                 { data: 'engine', name: 'vehicles.engine' },
+                { data: 'created_by_name', name: 'users.name' },
                 { data: 'reinspection_date', name: 'incident.reinspection_date' },
                 { data: 'type', name: 'incident.type' },
                 { data: 'narration', name: 'incident.narration' },
