@@ -466,7 +466,7 @@
 								<th>Model Line</th>
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
-								<th>Least Purchase Price</th>
+								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Qoutation</th>
 							</tr>
@@ -534,13 +534,13 @@
 								<th>ID</th>
 								<th>Spare Part Name</th>
 								<th>Spare Part Code</th>
-								<th>Brand</th>
+								<th>Brand/Model Line</th>
 								<th>Model Line</th>
                                 <th>Model Description</th>
                                 <th>Model Year</th>
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
-								<th>Least Purchase Price</th>
+								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Qoutation</th>
 							</tr>
@@ -613,7 +613,7 @@
                                 <th>Model Description</th>
 								<th>Additional Remarks</th>
 								<th>Fixing Charge</th>
-								<th>Least Purchase Price</th>
+								<!-- <th>Least Purchase Price(AED)</th> -->
 								<th>Selling Price(AED)</th>
 								<th style="width:30px;">Add Into Qoutation</th>
 							</tr>
@@ -1084,24 +1084,69 @@ var secondTable = $('#dtBasicExample2').DataTable({
             type: 'GET',
             url: url,
             success: function(response) {
+                var slNo = 0;
                 var data = response.map(function(accessory) { 
+                    // console.log(accessory);
+                    slNo = slNo + 1;
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
-                        return [
-                            accessory.id,
-                            accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description,
-                            accessory.addon_code,
-                            addButton
-                        ];
+                       var accessoryName = accessory.addon_description.addon.name + ' - ' + accessory.addon_description.description;
+                    } 
+                    else {
+                        var accessoryName = accessory.addon_description.addon.name;
+                    }
+                    if(accessory.is_all_brands == 'yes') {
+                        var accessoryBrand = 'All Brands'
                     }
                     else {
-                        return [
-                            accessory.id,
-                            accessory.addon_description.addon.name,
-                            accessory.addon_code,
-                            addButton
-                        ];
+                        console.log(accessory.addon_types);
+                        // var size = 0;
+                        // size = (accessory.addon_types).length;
+                        // for(var i=0; i < size; i++) {
+                        //     if(accessory.addon_types[i].brand_id == brandId) {
+                        //         console.log(accessory.addon_types.brands.brand_name);
+                        //         var accessoryBrand = '';
+                        //     }
+                        // }
                     }
+                    if(accessory.additional_remarks != null) {
+                        var accessoryAdditionalRemarks = '';
+                    }
+                    else {
+                        var accessoryAdditionalRemarks = accessory.additional_remarks;
+                    }
+                    if(accessory.fixing_charges_included == 'yes') {
+                        var accessoryFixingCharge = 'Included';
+                    }
+                    else {
+                        var accessoryFixingCharge = accessory.fixing_charge_amount + ' AED';
+                    }
+                    if(accessory.selling_price != null) {
+                        if(accessory.selling_price.selling_price != '0.00' || accessory.selling_price.selling_price != null) {
+                            var accessorySellingPrice = accessory.selling_price.selling_price;
+                        }
+                    }
+                    else if(accessory.pending_selling_price != null) {
+                        if(accessory.pending_selling_price != null) {
+                            if(accessory.pending_selling_price != '0.00' || accessory.pending_selling_price.selling_price != null) {
+                                var accessorySellingPrice = accessory.pending_selling_price.selling_price + ' (Approval Awaiting)';
+                            }
+                        }
+                    }
+                    else {
+                        var accessorySellingPrice = 'Not Added';
+                    }
+                    return [
+                            slNo,
+                            accessoryName,
+                            accessory.addon_code,
+                            accessoryBrand,
+                            accessoryAdditionalRemarks,
+                            accessoryFixingCharge,
+                            // accessory.LeastPurchasePrices.purchase_price_aed,
+                            accessorySellingPrice,
+                            addButton,
+                        ];
                 });
                 if ($.fn.dataTable.isDataTable('#dtBasicExample5')) {
                     $('#dtBasicExample5').DataTable().destroy();
@@ -1112,6 +1157,11 @@ var secondTable = $('#dtBasicExample2').DataTable({
                         { title: 'ID' },
                         { title: 'Accessory Name' },
                         { title: 'Accessory Code' },
+                        { title: 'Brand/Model Lines' },
+                        { title: 'Additional Remarks' },
+                        { title: 'Fixing Charge'},
+                        // { title: 'Least Purchase Price(AED)'}
+                        { title: 'Selling Price(AED)'},
                         {
                             title: 'Actions',
                             render: function(data, type, row) {
