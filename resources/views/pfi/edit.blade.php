@@ -219,7 +219,7 @@
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6" id="file-preview">
-                            <iframe src="{{ url('PFI_Document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
+                            <iframe src="{{ url('PFI_document_withoutsign/'.$pfi->pfi_document_without_sign) }}" ></iframe>
                         </div>
                     </div>
                         <br>
