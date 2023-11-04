@@ -29,9 +29,9 @@
     text-align: center;
     line-height: 20px;
     border-radius: 50%;
-    border: 1px solid #FFFF00; 
+    border: 1px solid #FFFF00;
     cursor: pointer;
-    transition: background-color 0.3s ease; 
+    transition: background-color 0.3s ease;
 }
 .circle-button::before {
     content: '+';
@@ -46,7 +46,7 @@
     text-align: center;
     line-height: 20px;
     border-radius: 30%;
-    border: 1px solid #FFFF00; 
+    border: 1px solid #FFFF00;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
@@ -86,7 +86,7 @@
 		<div class="col-sm-4">
 			<div class="row">
 				<div class="col-sm-6">
-					Document No : 
+					Document No :
 				</div>
 				<div class="col-sm-6">
 					{{$callDetails->id}}
@@ -94,7 +94,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label for="timeRange">Document Validity:</label> 
+					<label for="timeRange">Document Validity:</label>
 				</div>
 				<div class="col-sm-6">
 					<select id="timeRange">
@@ -112,7 +112,7 @@
 			@endphp
 			<div class="row">
 				<div class="col-sm-6">
-					Sales Person : 
+					Sales Person :
 				</div>
 				<div class="col-sm-6">
 					{{ Auth::user()->name }}
@@ -120,7 +120,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Sales Office : 
+					Sales Office :
 				</div>
 				<div class="col-sm-6">
 					{{ $empProfile->office }}
@@ -128,7 +128,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Sales Email ID : 
+					Sales Email ID :
 				</div>
 				<div class="col-sm-6">
 					{{ Auth::user()->email }}
@@ -136,7 +136,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Sales Contact No : 
+					Sales Contact No :
 				</div>
 				<div class="col-sm-6">
 					{{ $empProfile->phone }}
@@ -146,23 +146,23 @@
 		<div class="col-sm-4">
 			<div class="row">
 				<div class="col-sm-6">
-					Customer ID : 
+					Customer ID :
 				</div>
 				<div class="col-sm-6">
-					{{ $empProfile->id }} 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Company : 
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="company" id="company"> 
+					{{ $empProfile->id }}
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					<label for="timeRange">Person :</label> 
+					Company :
+				</div>
+				<div class="col-sm-6">
+					<input type="text" name="company" id="company">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+					<label for="timeRange">Person :</label>
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="name" id="name" value="{{$callDetails->name}}">
@@ -170,7 +170,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Contact No : 
+					Contact No :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="phone_number" id="phone_number" value="{{$callDetails->phone}}">
@@ -178,7 +178,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Email : 
+					Email :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="email" id="email" value="{{$callDetails->email}}">
@@ -186,7 +186,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Address : 
+					Address :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -196,15 +196,7 @@
 		<div class="col-sm-4">
 			<div class="row">
 				<div class="col-sm-6">
-					Final Destination : 
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address"> 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Incoterm : 
+					Final Destination :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -212,7 +204,15 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Place of Delivery : 
+					Incoterm :
+				</div>
+				<div class="col-sm-6">
+					<input type="text" name="address" id="address">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+					Place of Delivery :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -234,7 +234,7 @@
 		<div class="col-sm-4">
 			<div class="row">
 				<div class="col-sm-6">
-					System Code : 
+					System Code :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -242,25 +242,7 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					Payment Terms : 
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-4">
-			<div class="row">
-				<div class="col-sm-6">
-					Rep Name : 
-				</div>
-				<div class="col-sm-6">
-					<input type="text" name="address" id="address">
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6">
-					Rep No : 
+					Payment Terms :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -270,7 +252,7 @@
 		<div class="col-sm-4">
 			<div class="row">
 				<div class="col-sm-6">
-					CB Name : 
+					Rep Name :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -278,7 +260,25 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-6">
-					CB No : 
+					Rep No :
+				</div>
+				<div class="col-sm-6">
+					<input type="text" name="address" id="address">
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="row">
+				<div class="col-sm-6">
+					CB Name :
+				</div>
+				<div class="col-sm-6">
+					<input type="text" name="address" id="address">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-6">
+					CB No :
 				</div>
 				<div class="col-sm-6">
 					<input type="text" name="address" id="address">
@@ -309,30 +309,38 @@
 	</div>
 	<br>
 	<div class="row">
-		<div class="col-sm-2">
+		<div class="col-sm-1">
 			<input type="radio" id="showVehicles" name="contentType">
 			<label for="showVehicles">Add Vehicles</label>
 		</div>
-		<div class="col-sm-2">
+		<div class="col-sm-1">
 			<input type="radio" id="showAccessories" name="contentType">
 			<label for="showAccessories">Add Accessories</label>
 		</div>
-		<div class="col-sm-2">
+		<div class="col-sm-1">
 			<input type="radio" id="showSpareParts" name="contentType">
 			<label for="showSpareParts">Add Spare Parts</label>
 		</div>
-		<div class="col-sm-2">
+		<div class="col-sm-1">
 			<input type="radio" id="showKits" name="contentType">
 			<label for="showKits">Add Kits</label>
 		</div>
-		<div class="col-sm-2">
-			<input type="radio" id="showLogistics" name="contentType">
-			<label for="showLogistics">Add Logistics</label>
+		<div class="col-sm-1">
+			<input type="radio" id="showShipping" name="contentType">
+			<label for="showShipping">Add Shipping</label>
 		</div>
-		<div class="col-sm-2">
-			<input type="radio" id="showCertificates" name="contentType">
-			<label for="showCertificates">Add Certificates</label>
-		</div>
+        <div class="col-sm-2">
+            <input type="radio" id="showShippingDocuments" name="contentType">
+            <label for="showShippingDocuments">Add Shipping Documents</label>
+        </div>
+        <div class="col-sm-1">
+            <input type="radio" id="showCertificates" name="contentType">
+            <label for="showCertificates"> Certificate</label>
+        </div>
+        <div class="col-sm-1">
+            <input type="radio" id="showOthers" name="contentType">
+            <label for="showOthers">Add Other</label>
+        </div>
 	</div>
 	<div id="vehiclesContent" class="contentveh">
 		<hr>
@@ -625,8 +633,45 @@
 			</div>
 		</div>
 	</div>
-	<div id="logisticsContent" class="contentveh">
-		waqar4
+	<div id="shippingContent" class="contentveh">
+        <hr>
+        <br>
+{{--        <div class="card">--}}
+{{--            <div class="card-body">--}}
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table id="shipping-table" class="table table-striped table-editable table-edits table">
+                                <thead class="bg-soft-secondary">
+                                <tr>
+                                    <th>S.No</th>
+                                    <th>Code</th>
+                                    <th>Addon Name</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th style="width:30px;">Add Into Qoutation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <div hidden>{{$i=0;}}
+                                    @foreach($shippings as $shipping)
+                                        <tr>
+                                        <td>{{ ++$i }}</td>
+                                        <td></td>
+                                        <td>{{ $shipping->name }}</td>
+                                        <td>{{ $shipping->description  }}</td>
+                                        <td>{{ $shipping->price }}</td>
+                                        <td><button class="add-button circle-button" data-shipping-id="{{ $shipping->id }}">Add</button></td>
+                                        </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+{{--                </div>--}}
+{{--            </div>--}}
+        </div>
+
 	</div>
 	<div id="certificatesContent" class="contentveh">
 		waqar5
@@ -650,16 +695,17 @@
     </script>
 <script>
         $(document).ready(function() {
+            $('#shipping-table').DataTable();
             $('#brand').select2();
             $('#model_line').select2();
             $('#variant').select2();
             $('#interior_color').select2();
             $('#exterior_color').select2();
-			
+
 			$('#accessories_addon').select2();
             $('#accessories_brand').select2();
 			$('#accessories_model_line').select2();
-            
+
             $('#spare_parts_addon').select2();
             $('#spare_parts_brand').select2();
 			$('#spare_parts_model_line').select2();
@@ -980,18 +1026,23 @@ var secondTable = $('#dtBasicExample2').DataTable({
         console.log('Add button clicked for vehicle ID:', vehicleId);
         var rowData = [];
         var row = $(this).closest('tr');
+        console.log(row);
         row.find('td').each(function() {
             rowData.push($(this).text());
         });
+        // pass the type(which table click inside to datatable => inside rendering chcek the row type value then add the data)
         var secondTable = $('#dtBasicExample2').DataTable();
         secondTable.row.add(rowData).draw();
         var firstTable = $('#dtBasicExample1').DataTable();
         firstTable.row(row).remove().draw();
+        var shippingTable = $('#shipping-table').DataTable();
+        shippingTable.row(row).remove().draw();
     });
     $('#search-button').on('click', function() {
         var variantId = $('#variant').val();
         var interiorColorId = $('#interior_color').val();
         var exteriorColorId = $('#exterior_color').val();
+
         if (!variantId) {
             alert("Please select a variant before searching.");
             return;
@@ -1058,7 +1109,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             }
         });
     });
-	$('#accessories-search-button').on('click', function() { 
+	$('#accessories-search-button').on('click', function() {
         var addonId = $('#accessories_addon').val();
         var brandId = $('#accessories_brand').val();
         var modelLineId = $('#accessories_model_line').val();
@@ -1077,14 +1128,14 @@ var secondTable = $('#dtBasicExample2').DataTable({
 
         if (modelLineId) {
             url = url.replace('modelLineId', modelLineId);
-        } else { 
+        } else {
             url = url.replace('modelLineId?', '');
         }
         $.ajax({
             type: 'GET',
             url: url,
             success: function(response) {
-                var data = response.map(function(accessory) { 
+                var data = response.map(function(accessory) {
                     var addButton = '<button class="accessory-add-button" data-accessory-id="' + accessory.id + '">Add</button>';
                     if(accessory.addon_description.description != null) {
                         return [
@@ -1154,8 +1205,8 @@ var secondTable = $('#dtBasicExample2').DataTable({
         $.ajax({
             type: 'GET',
             url: url,
-            success: function(response) {  
-                var data = response.map(function(sparepart) { 
+            success: function(response) {
+                var data = response.map(function(sparepart) {
                     var addButton = '<button class="sparepart-add-button" data-sparepart-id="' + sparepart.id + '">Add</button>';
                     return [
                         sparepart.id,
@@ -1216,7 +1267,7 @@ var secondTable = $('#dtBasicExample2').DataTable({
             type: 'GET',
             url: url,
             success: function(response) {  console.log(response);
-                var data = response.map(function(kit) { 
+                var data = response.map(function(kit) {
                     var addButton = '<button class="kit-add-button" data-kit-id="' + kit.id + '">Add</button>';
                     return [
                         kit.id,
@@ -1262,5 +1313,6 @@ var secondTable = $('#dtBasicExample2').DataTable({
         return isEditable;
     }
         });
-    </script> 
+
+    </script>
 @endpush

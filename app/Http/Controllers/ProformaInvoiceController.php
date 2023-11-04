@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Shipping;
 use Illuminate\Http\Request;
 use App\Models\Calls;
 use App\Models\Brand;
@@ -37,22 +38,23 @@ class ProformaInvoiceController extends Controller {
                 $query->where('addon_type_name','K');
             });
         })->get();
+        $shippings = Shipping::all();
         return view('proforma.invoice', compact('callDetails', 'brands','assessoriesDesc','sparePartsDesc','kitsDesc','accessoriesBrands','sparePartsBrands',
-        'kitsBrands'));
+        'kitsBrands','shippings'));
     }
-    public function getaddonModels(Request $request, $brandId, $type) { 
+    public function getaddonModels(Request $request, $brandId, $type) {
         $modelLines = MasterModelLines::where('brand_id', $brandId)
         // ->whereHas('addons', function($q) use($type) {
         //     $q->whereHas('Addons', function($query) use($type) {
         //         $query->where('addon_type_name',$type);
         //     });
         // });
-        ->pluck('model_line', 'id'); 
+        ->pluck('model_line', 'id');
         return response()->json($modelLines);
     }
     public function getaddonModelDescriptions(Request $request, $modelLineId, $type) {
         $modelDescriptions = MasterModelDescription::where('model_line_id', $modelLineId)
-        ->pluck('model_description', 'id'); 
+        ->pluck('model_description', 'id');
         return response()->json($modelDescriptions);
     }
     public function getbookingAccessories($addonId,$brandId,$modelLineId) {
