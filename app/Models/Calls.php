@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-use App\Models\CallsRequirement;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,5 +37,5 @@ class Calls extends Model
     //         ->selectRaw('GROUP_CONCAT(CONCAT(brands.brand_name, " - ", master_model_lines.model_line) SEPARATOR ", ")')
     //         ->join('master_model_lines', 'calls_requirement.model_line_id', '=', 'master_model_lines.id')
     //         ->join('brands', 'master_model_lines.brand_id', '=', 'brands.id');
-    // }    
+    // }
 }
