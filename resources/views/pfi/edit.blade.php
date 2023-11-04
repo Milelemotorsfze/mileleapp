@@ -293,6 +293,9 @@
                 success:function (response) {
                     // location.reload();
                     // console.log(response);
+                    var itemsCount = response.approvedItems;
+                    $('#added-pfi-count').val(itemsCount);
+
                     $('#pending-row-'+id).remove();
                     $('#approved').append('<div class="row mt-2" id="approved-row-'+ response.id+'"><div class="col-lg-3 col-md-6"> <label class="form-label d-lg-none d-xl-none d-xxl-none">Model</label> ' +
                         '<input type="text" value="'+ response.letter_of_indent_item.master_model.model +'" readonly class="form-control mb-2"> </div>' +
@@ -309,10 +312,11 @@
             });
         }
         function removepfi(id) {
+           let addedPfiCount = $('#added-pfi-count').val();
+           console.log(addedPfiCount);
             let action = 'REMOVE';
-            let approvedItems = '{{ $approvedPfiItems->count() }}';
-            alert(approvedItems);
-            if(approvedItems > 1) {
+
+            if(addedPfiCount > 1) {
                 let url = '{{ route('add_pfi') }}';
                 $.ajax({
                     type: "GET",
@@ -326,6 +330,8 @@
                     success:function (response) {
                         // location.reload();
                         // console.log(response);
+                        var itemsCount = response.approvedItems;
+                        $('#added-pfi-count').val(itemsCount);
 
                         $('#approved-row-'+id).remove();
                         $('#pending').append(' <div class="row mt-2" id="pending-row-'+ response.id+'"><div class="col-lg-3 col-md-6">' +
@@ -340,10 +346,6 @@
                             '<div class="col-lg-2 col-md-2"> ' +
                             '<button type="button" class="btn btn-info btn-sm add-now" onclick="addpfi('+ response.id +')" >Add Pfi </button> </div></div>'
                         );
-
-
-
-
                     }
                 });
             }else{
