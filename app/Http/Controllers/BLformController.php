@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\blform;
+
+use App\Models\BlForm;
 use Illuminate\Http\Request;
 
 class BLformController extends Controller
@@ -13,7 +14,7 @@ class BLformController extends Controller
     public function index()
     {
         return view('blform.index');
-        $bldata = BLForm::all();
+        $bldata = BlForm::all();
         $vinsdata = VinsData::all();
     }
     public function create()
