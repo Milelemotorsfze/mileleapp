@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Quotation extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'calls_id',
+        'date',
+        'deal_value',
+        'sales_notes',
+        'file_path',
+    ];
+    public $timestamps = false;
 }
